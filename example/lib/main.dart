@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_scanner/image_scanner.dart';
 import 'package:image_scanner_example/photos.dart';
-import 'package:multiple_image_picker/multiple_image_picker.dart';
 
 void main() => runApp(new MyApp());
 
