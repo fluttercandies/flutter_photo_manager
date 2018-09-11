@@ -6,13 +6,21 @@ import android.util.Log
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
+import java.io.File
+import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.Executors
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 
 class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
     companion object {
-        private val threadPool = Executors.newFixedThreadPool(10)
+        private val threadPool: ThreadPoolExecutor
+
+        init {
+            threadPool = ThreadPoolExecutor(5, 1000, 200, TimeUnit.MINUTES, ArrayBlockingQueue<Runnable>(5))
+        }
 
         var handler: Handler = Handler()
     }
