@@ -61,7 +61,7 @@ class ImageScanner {
     if (Platform.isAndroid) {
       return File(id);
     } else if (Platform.isIOS) {
-      var path = await _channel.invokeMethod("getFullFileWithId");
+      var path = await _channel.invokeMethod("getFullFileWithId", id);
       if (path == null) {
         return null;
       }
@@ -74,18 +74,19 @@ class ImageScanner {
     if (Platform.isAndroid) {
       return File(id).readAsBytes();
     } else if (Platform.isIOS) {
-      print("prepare get $id");
-      List<dynamic> bytes = await _channel.invokeMethod("getBytesWithId");
+      List<dynamic> bytes = await _channel.invokeMethod("getBytesWithId", id);
       print(bytes);
       if (bytes == null) {
         return null;
       }
-      return bytes.map((v) {
+      List<int> l = bytes.map((v) {
         if (v is int) {
           return v;
         }
         return 0;
       }).toList();
+
+      return l;
     }
     return null;
   }

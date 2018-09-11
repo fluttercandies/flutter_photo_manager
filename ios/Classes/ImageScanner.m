@@ -182,7 +182,6 @@
 
 - (void)getBytesWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
     NSString *imgId = call.arguments;
-
     PHAsset *asset = _idAssetDict[imgId];
 
     PHImageManager *manager = PHImageManager.defaultManager;

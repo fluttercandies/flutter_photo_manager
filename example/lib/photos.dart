@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_scanner/image_scanner.dart';
@@ -92,7 +93,7 @@ class BigImageState extends State<BigImage> {
             print("snapshot.data = ${snapshot.data}");
             if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
               return Image.memory(
-                snapshot.data,
+                Uint8List.fromList(snapshot.data),
                 width: double.infinity,
                 height: double.infinity,
               );
