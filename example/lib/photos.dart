@@ -31,14 +31,14 @@ class _PhotoPageState extends State<PhotoPage> {
   Widget _buildItem(BuildContext context, int index) {
     var data = widget.photos[index];
     // SystemChannels
-    return FutureBuilder<String>(
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+    return FutureBuilder<File>(
+      builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
         print("snapshot.connectionState state = ${snapshot.connectionState}");
-        if (snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.connectionState == ConnectionState.done && data != null) {
           var data = snapshot.data;
           print(data);
           return Image.file(
-            File(data),
+            data,
             width: 200.0,
             height: 200.0,
           );

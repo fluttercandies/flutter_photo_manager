@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
           child: Icon(Icons.refresh),
           onPressed: () async {
             print("wait scan");
-            var list = await ImageScanner.getImagePathIdList();
+            var list = await ImageScanner.getImagePathList();
 
             print("list = $list");
             pathList.clear();
