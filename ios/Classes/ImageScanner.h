@@ -10,6 +10,17 @@
 }
 @property(nonatomic, strong) NSObject <FlutterPluginRegistrar> *registrar;
 
-- (void)getImageIdList:(FlutterMethodCall *)call result:(FlutterResult)result;
+- (void)getGalleryIdList:(FlutterMethodCall *)call result:(FlutterResult)result;
 
+- (void)requestPermissionWithResult:(FlutterResult)result;
+
+- (void)getGalleryNameWithCall:(FlutterMethodCall *)call result:(FlutterResult)result;
+
+- (void)getImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
+
+- (void)getThumbPathWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
+
+- (void)getBytesWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
+
+- (void)getFullFileWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
 @end

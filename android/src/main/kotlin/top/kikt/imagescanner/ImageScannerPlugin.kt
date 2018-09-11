@@ -33,8 +33,8 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
 
                 override fun onGranted() {
                     when {
-                        call.method == "getImageIdList" -> scanner.scanAndGetImageIdList(result)
-                        call.method == "getImagePathList" -> scanner.getPathListWithPathIds(call, result)
+                        call.method == "getGalleryIdList" -> scanner.scanAndGetImageIdList(result)
+                        call.method == "getGalleryNameList" -> scanner.getPathListWithPathIds(call, result)
                         call.method == "getImageListWithPathId" -> scanner.getImageListWithPathId(call, result)
                         call.method == "getImageThumbListWithPathId" -> scanner.getImageThumbListWithPathId(call, result)
                         call.method == "getThumbPath" -> scanner.getImageThumb(call, result)

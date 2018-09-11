@@ -26,6 +26,12 @@ class _MyAppState extends State<MyApp> {
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.refresh),
           onPressed: () async {
+            var result = await ImageScanner.requestPermission();
+            if (!(result == true)) {
+              print("未授予权限");
+              return;
+            }
+
             print("wait scan");
             var list = await ImageScanner.getImagePathList();
 

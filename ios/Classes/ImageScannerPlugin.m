@@ -14,16 +14,20 @@
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    if ([@"getImageIdList" isEqualToString:call.method]) {
-        [_scanner getImageIdList:call result:result];
-    } else if ([@"getImagePathList" isEqualToString:call.method]) {
-
+    if ([@"requestPermission" isEqualToString:call.method]) {
+        [_scanner requestPermissionWithResult:result];
+    } else if ([@"getGalleryIdList" isEqualToString:call.method]) {
+        [_scanner getGalleryIdList:call result:result];
+    } else if ([@"getGalleryNameList" isEqualToString:call.method]) {
+        [_scanner getGalleryNameWithCall:call result:result];
     } else if ([@"getImageListWithPathId" isEqualToString:call.method]) {
-
-    } else if ([@"getImageThumbListWithPathId" isEqualToString:call.method]) {
-
+        [_scanner getImageListWithCall:call result:result];
     } else if ([@"getThumbPath" isEqualToString:call.method]) {
-
+        [_scanner getThumbPathWithCall:call result:result];
+    } else if ([@"getFullFileWithId" isEqualToString:call.method]) {
+        [_scanner getFullFileWithCall:call result:result];
+    } else if ([@"getBytesWithId" isEqualToString:call.method]) {
+        [_scanner getBytesWithCall:call result:result];
     } else {
         result(FlutterMethodNotImplemented);
     }
