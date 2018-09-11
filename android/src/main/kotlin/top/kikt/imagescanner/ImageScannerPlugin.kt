@@ -24,15 +24,23 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
             permissionsUtils.dealResult(i, strings, ints)
             true
         }
+
+
+
         permissionsUtils.apply {
             withActivity(registrar.activity())
             permissionsListener = object : PermissionsListener {
                 override fun onDenied(deniedPermissions: Array<out String>?) {
-                    result.error("失败", "权限被拒绝", "")
+                    if (call.method == "requestPermission") {
+                        result.success(0)
+                    } else {
+                        result.error("失败", "权限被拒绝", "")
+                    }
                 }
 
                 override fun onGranted() {
                     when {
+                        call.method == "requestPermission" -> result.success(1)
                         call.method == "getGalleryIdList" -> scanner.scanAndGetImageIdList(result)
                         call.method == "getGalleryNameList" -> scanner.getPathListWithPathIds(call, result)
                         call.method == "getImageListWithPathId" -> scanner.getImageListWithPathId(call, result)

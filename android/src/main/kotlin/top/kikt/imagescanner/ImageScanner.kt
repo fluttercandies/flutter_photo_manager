@@ -1,5 +1,6 @@
 package top.kikt.imagescanner
 
+import android.os.Handler
 import android.provider.MediaStore
 import android.util.Log
 import io.flutter.plugin.common.MethodCall
@@ -11,8 +12,12 @@ import java.util.concurrent.Executors
 class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
     companion object {
-        private val threadPool = Executors.newFixedThreadPool(5)
+        private val threadPool = Executors.newFixedThreadPool(10)
+
+        var handler: Handler = Handler()
     }
+
+    val thumbHelper = ThumbHelper(registrar)
 
     private val STORE_IMAGES = arrayOf(MediaStore.Images.Media.DISPLAY_NAME, // 显示的名字
             MediaStore.Images.Media.DATA, // 数据
@@ -76,7 +81,6 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
     private fun split() {
         map.clear()
-        val thumbHelper = ThumbHelper(registrar)
         imgList.forEach {
             var list = map[it.dirId]
             if (list == null) {
@@ -128,6 +132,20 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
                 img.thumb
             }
             result.success(r)
+//            refreshThumb(r)
+        }
+    }
+
+    private fun refreshThumb(r: List<String?>?) {
+        handler.post {
+            threadPool.execute {
+                r?.forEach { path ->
+                    val img = pathImgMap[path]
+                    if (path != null && img != null) {
+                        thumbHelper.getThumb(path, img.imgId)
+                    }
+                }
+            }
         }
     }
 
@@ -150,20 +168,32 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
     fun getThumb(call: MethodCall, result: MethodChannel.Result) {
         val path = call.arguments as String
-
     }
 
     val pathImgMap = HashMap<String, Img>()
 
+    private fun getThumbFromPath(img: Img?): String? {
+        if (img == null) {
+            return null
+        }
+        return thumbMap[img.imgId]
+    }
+
     fun getImageThumb(call: MethodCall, result: MethodChannel.Result) {
         threadPool.execute {
+
             val path = call.arguments as String
             val img = pathImgMap[path]
             if (img == null) {
                 result.success(null)
             } else {
-                val thumb = ThumbHelper(registrar).getThumb(path, img.imgId)
-                result.success(thumb)
+                val thumbFromPath = getThumbFromPath(img)
+                if (thumbFromPath == null) {
+                    val thumb = thumbHelper.getThumb(path, img.imgId)
+                    result.success(thumb)
+                } else {
+                    result.success(thumbFromPath)
+                }
             }
         }
     }

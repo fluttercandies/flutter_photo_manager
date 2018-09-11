@@ -34,10 +34,8 @@ class _PhotoPageState extends State<PhotoPage> {
     // SystemChannels
     return FutureBuilder<File>(
       builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
-        // print("snapshot.connectionState state = ${snapshot.connectionState}");
         if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
           var data = snapshot.data;
-          // print(data);
           return GestureDetector(
             child: Image.file(
               data,
@@ -55,7 +53,7 @@ class _PhotoPageState extends State<PhotoPage> {
         } else {
           return Container(
             child: SizedBox(
-              child: CircularProgressIndicator(),
+              child: FlutterLogo(),
               width: 35.0,
               height: 35.0,
             ),
@@ -89,8 +87,6 @@ class BigImageState extends State<BigImage> {
       body: Container(
         child: FutureBuilder<List<int>>(
           builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
-            print("snapshot.connectionState = ${snapshot.connectionState}");
-            print("snapshot.data = ${snapshot.data}");
             if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
               return Image.memory(
                 Uint8List.fromList(snapshot.data),

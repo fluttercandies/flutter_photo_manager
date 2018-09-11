@@ -16,6 +16,7 @@
 @property(nonatomic, strong) NSMutableDictionary<NSString *, PHCollection *> *idCollectionDict;
 @property(nonatomic, strong) NSMutableDictionary<NSString *, PHAsset *> *idAssetDict;
 
+@property(nonatomic, strong) dispatch_queue_t asynQueue;
 @end
 
 @implementation ImageScanner {
@@ -26,30 +27,36 @@
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
         if (status == PHAuthorizationStatusAuthorized) {
             [PHPhotoLibrary.sharedPhotoLibrary registerChangeObserver:self];
-            result(@true);
+            result(@1);
         } else {
-            result(nil);
+            result(@0);
         }
     }];
+
+    self.asynQueue = dispatch_queue_create("asyncQueue", nil);
 }
 
 - (void)getGalleryIdList:(FlutterMethodCall *)call result:(FlutterResult)result {
-    [self refreshGallery];
-    NSMutableArray *arr = [NSMutableArray new];
-    if (_idCollectionDict) {
-        [_idCollectionDict removeAllObjects];
-    } else {
-        _idCollectionDict = [NSMutableDictionary new];
-    }
-    for (PHCollection *collection in _galleryArray) {
-        [arr addObject:collection.localIdentifier];
-        _idCollectionDict[collection.localIdentifier] = collection;
-    }
-    result(arr);
+    dispatch_async(_asynQueue, ^{
+        [self refreshGallery];
+        NSMutableArray *arr = [NSMutableArray new];
+        if (_idCollectionDict) {
+            [_idCollectionDict removeAllObjects];
+        } else {
+            _idCollectionDict = [NSMutableDictionary new];
+        }
+        for (PHCollection *collection in _galleryArray) {
+            [arr addObject:collection.localIdentifier];
+            _idCollectionDict[collection.localIdentifier] = collection;
+        }
+        result(arr);
+    });
 }
 
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
-    [self refreshGallery];
+    dispatch_async(_asynQueue, ^{
+        [self refreshGallery];
+    });
 }
 
 - (void)refreshGallery {
@@ -70,56 +77,62 @@
 }
 
 - (void)getGalleryNameWithCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    NSArray *ids = call.arguments;
-    NSMutableArray<NSString *> *r = [NSMutableArray new];
-    for (NSString *id in ids) {
-        PHCollection *collection = _idCollectionDict[id];
-        [r addObject:collection.localizedTitle];
-    }
-    result(r);
+    dispatch_async(_asynQueue, ^{
+        NSArray *ids = call.arguments;
+        NSMutableArray<NSString *> *r = [NSMutableArray new];
+        for (NSString *id in ids) {
+            PHCollection *collection = _idCollectionDict[id];
+            [r addObject:collection.localizedTitle];
+        }
+        result(r);
+    });
 }
 
 - (void)getImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
-    if (_idAssetDict) {
-        [_idAssetDict removeAllObjects];
-    } else {
-        _idAssetDict = [NSMutableDictionary new];
-    }
+    dispatch_async(_asynQueue, ^{
+        if (_idAssetDict) {
+            [_idAssetDict removeAllObjects];
+        } else {
+            _idAssetDict = [NSMutableDictionary new];
+        }
 
-    NSString *pathId = call.arguments;
-    PHCollection *collection = _idCollectionDict[pathId];
+        NSString *pathId = call.arguments;
+        PHCollection *collection = _idCollectionDict[pathId];
 
-    PHFetchOptions *opt = [PHFetchOptions new];
+        PHFetchOptions *opt = [PHFetchOptions new];
 //    opt.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:true]];
 
-    PHFetchResult<PHAssetCollection *> *r = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[collection.localIdentifier] options:opt];
+        PHFetchResult<PHAssetCollection *> *r = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[collection.localIdentifier] options:opt];
 
-    NSMutableArray<NSString *> *arr = [NSMutableArray new];
+        NSMutableArray<NSString *> *arr = [NSMutableArray new];
 
-    for (PHAssetCollection *assetCollection in r) {
-        PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection options:opt];
-        for (PHAsset *asset in fetchResult) {
-            NSString *id = asset.localIdentifier;
-            _idAssetDict[id] = asset;
-            [arr addObject:id];
+        for (PHAssetCollection *assetCollection in r) {
+            PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection options:opt];
+            for (PHAsset *asset in fetchResult) {
+                NSString *id = asset.localIdentifier;
+                _idAssetDict[id] = asset;
+                [arr addObject:id];
+            }
         }
-    }
 
-    flutterResult(arr);
+        flutterResult(arr);
+    });
 }
 
 - (void)getThumbPathWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
-    PHImageManager *manager = PHImageManager.defaultManager;
+    dispatch_async(_asynQueue, ^{
+        PHImageManager *manager = PHImageManager.defaultManager;
 
-    NSString *imgId = call.arguments;
+        NSString *imgId = call.arguments;
 
-    PHAsset *asset = _idAssetDict[imgId];
+        PHAsset *asset = _idAssetDict[imgId];
 
-    [manager requestImageForAsset:asset targetSize:CGSizeMake(100, 100) contentMode:PHImageContentModeAspectFill options:[PHImageRequestOptions new] resultHandler:^(UIImage *result, NSDictionary *info) {
-        NSData *data = UIImageJPEGRepresentation(result, 95);
-        NSString *path = [self writeThumbFileWithAssetId:asset imageData:data];
-        flutterResult(path);
-    }];
+        [manager requestImageForAsset:asset targetSize:CGSizeMake(100, 100) contentMode:PHImageContentModeAspectFill options:[PHImageRequestOptions new] resultHandler:^(UIImage *result, NSDictionary *info) {
+            NSData *data = UIImageJPEGRepresentation(result, 95);
+            NSString *path = [self writeThumbFileWithAssetId:asset imageData:data];
+            flutterResult(path);
+        }];
+    });
 }
 
 - (NSString *)writeThumbFileWithAssetId:(PHAsset *)asset imageData:(NSData *)imageData {
@@ -145,18 +158,20 @@
 }
 
 - (void)getFullFileWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
-    PHImageManager *manager = PHImageManager.defaultManager;
+    dispatch_async(_asynQueue, ^{
+        PHImageManager *manager = PHImageManager.defaultManager;
 
-    NSString *imgId = call.arguments;
+        NSString *imgId = call.arguments;
 
-    PHAsset *asset = _idAssetDict[imgId];
+        PHAsset *asset = _idAssetDict[imgId];
 
-    __weak ImageScanner *wSelf = self;
+        __weak ImageScanner *wSelf = self;
 
-    [manager requestImageDataForAsset:asset options:[PHImageRequestOptions new] resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
-        NSString *path = [wSelf writeFullFileWithAssetId:asset imageData:imageData];
-        flutterResult(path);
-    }];
+        [manager requestImageDataForAsset:asset options:[PHImageRequestOptions new] resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
+            NSString *path = [wSelf writeFullFileWithAssetId:asset imageData:imageData];
+            flutterResult(path);
+        }];
+    });
 }
 
 - (NSString *)writeFullFileWithAssetId:(PHAsset *)asset imageData:(NSData *)imageData {
@@ -181,14 +196,16 @@
 }
 
 - (void)getBytesWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
-    NSString *imgId = call.arguments;
-    PHAsset *asset = _idAssetDict[imgId];
+    dispatch_async(_asynQueue, ^{
+        NSString *imgId = call.arguments;
+        PHAsset *asset = _idAssetDict[imgId];
 
-    PHImageManager *manager = PHImageManager.defaultManager;
-    [manager requestImageDataForAsset:asset options:[PHImageRequestOptions new] resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
-        NSArray *arr = [ImageScanner convertNSData:imageData];
-        flutterResult(arr);
-    }];
+        PHImageManager *manager = PHImageManager.defaultManager;
+        [manager requestImageDataForAsset:asset options:[PHImageRequestOptions new] resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
+            NSArray *arr = [ImageScanner convertNSData:imageData];
+            flutterResult(arr);
+        }];
+    });
 }
 
 + (NSArray *)convertNSData:(NSData *)data {

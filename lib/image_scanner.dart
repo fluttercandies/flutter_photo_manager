@@ -11,7 +11,7 @@ class ImageScanner {
   /// in ios request the photo permission
   static Future<bool> requestPermission() async {
     var result = await _channel.invokeMethod("requestPermission");
-    return result != null;
+    return result == 1;
   }
 
   /// get gallery list
@@ -75,7 +75,6 @@ class ImageScanner {
       return File(id).readAsBytes();
     } else if (Platform.isIOS) {
       List<dynamic> bytes = await _channel.invokeMethod("getBytesWithId", id);
-      print(bytes);
       if (bytes == null) {
         return null;
       }
