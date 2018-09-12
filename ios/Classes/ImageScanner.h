@@ -23,4 +23,6 @@
 - (void)getBytesWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
 
 - (void)getFullFileWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
+
++ (void)openSetting;
 @end

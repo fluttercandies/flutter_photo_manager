@@ -1,11 +1,13 @@
 package top.kikt.imagescanner
 
 import android.Manifest
+import android.util.Log
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
+
 
 class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
     companion object {
@@ -17,20 +19,27 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
     }
 
     val scanner = ImageScanner(registrar)
+    private val permissionsUtils = PermissionsUtils()
 
-    override fun onMethodCall(call: MethodCall, result: Result): Unit {
-        val permissionsUtils = PermissionsUtils()
+    init {
         registrar.addRequestPermissionsResultListener { i, strings, ints ->
             permissionsUtils.dealResult(i, strings, ints)
             true
         }
+    }
 
-
+    override fun onMethodCall(call: MethodCall, result: Result): Unit {
+        if (call.method == "openSetting") {
+            result.success("")
+            permissionsUtils.getAppDetailSettingIntent(registrar.activity())
+            return
+        }
 
         permissionsUtils.apply {
             withActivity(registrar.activity())
             permissionsListener = object : PermissionsListener {
                 override fun onDenied(deniedPermissions: Array<out String>?) {
+                    Log.i("permission", "onDenied")
                     if (call.method == "requestPermission") {
                         result.success(0)
                     } else {
@@ -39,6 +48,7 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                 }
 
                 override fun onGranted() {
+                    Log.i("permission", "onGranted")
                     when {
                         call.method == "requestPermission" -> result.success(1)
                         call.method == "getGalleryIdList" -> scanner.scanAndGetImageIdList(result)

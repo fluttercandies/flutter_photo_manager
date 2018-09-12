@@ -16,7 +16,7 @@
 @property(nonatomic, strong) NSMutableDictionary<NSString *, PHCollection *> *idCollectionDict;
 @property(nonatomic, strong) NSMutableDictionary<NSString *, PHAsset *> *idAssetDict;
 
-@property(nonatomic, strong) dispatch_queue_t asynQueue;
+@property(nonatomic) dispatch_queue_t asyncQueue;
 @end
 
 @implementation ImageScanner {
@@ -33,11 +33,11 @@
         }
     }];
 
-    self.asynQueue = dispatch_queue_create("asyncQueue", nil);
+    self.asyncQueue = dispatch_queue_create("asyncQueue", nil);
 }
 
 - (void)getGalleryIdList:(FlutterMethodCall *)call result:(FlutterResult)result {
-    dispatch_async(_asynQueue, ^{
+    dispatch_async(_asyncQueue, ^{
         [self refreshGallery];
         NSMutableArray *arr = [NSMutableArray new];
         if (_idCollectionDict) {
@@ -54,7 +54,7 @@
 }
 
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
-    dispatch_async(_asynQueue, ^{
+    dispatch_async(_asyncQueue, ^{
         [self refreshGallery];
     });
 }
@@ -77,7 +77,7 @@
 }
 
 - (void)getGalleryNameWithCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    dispatch_async(_asynQueue, ^{
+    dispatch_async(_asyncQueue, ^{
         NSArray *ids = call.arguments;
         NSMutableArray<NSString *> *r = [NSMutableArray new];
         for (NSString *id in ids) {
@@ -89,7 +89,7 @@
 }
 
 - (void)getImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
-    dispatch_async(_asynQueue, ^{
+    dispatch_async(_asyncQueue, ^{
         if (_idAssetDict) {
             [_idAssetDict removeAllObjects];
         } else {
@@ -120,7 +120,7 @@
 }
 
 - (void)getThumbPathWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
-    dispatch_async(_asynQueue, ^{
+    dispatch_async(_asyncQueue, ^{
         PHImageManager *manager = PHImageManager.defaultManager;
 
         NSString *imgId = call.arguments;
@@ -143,7 +143,7 @@
     NSFileManager *manager = NSFileManager.defaultManager;
 
     NSMutableString *path = [NSMutableString stringWithString:homePath];
-    NSString *dir = [path stringByAppendingPathComponent:@"/.thumb"];
+    NSString *dir = [path stringByAppendingPathComponent:@".thumb"];
 
     BOOL createSuccess = [manager createDirectoryAtPath:dir attributes:nil];
 
@@ -158,7 +158,7 @@
 }
 
 - (void)getFullFileWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
-    dispatch_async(_asynQueue, ^{
+    dispatch_async(_asyncQueue, ^{
         PHImageManager *manager = PHImageManager.defaultManager;
 
         NSString *imgId = call.arguments;
@@ -179,7 +179,7 @@
     NSFileManager *manager = NSFileManager.defaultManager;
 
     NSMutableString *path = [NSMutableString stringWithString:homePath];
-    [path appendString:@"/.images"];
+    [path appendString:@".images"];
 
     BOOL createSuccess = [manager createDirectoryAtPath:path attributes:@{}];
 
@@ -196,7 +196,7 @@
 }
 
 - (void)getBytesWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
-    dispatch_async(_asynQueue, ^{
+    dispatch_async(_asyncQueue, ^{
         NSString *imgId = call.arguments;
         PHAsset *asset = _idAssetDict[imgId];
 
@@ -215,6 +215,13 @@
         [array addObject:@(bytes[i])];
     }
     return array;
+}
+
++ (void)openSetting {
+    NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        [[UIApplication sharedApplication] openURL:url];
+    }
 }
 
 @end

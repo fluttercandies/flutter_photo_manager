@@ -14,6 +14,12 @@
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
+    if ([@"openSetting" isEqualToString:call.method]) {
+        [ImageScanner openSetting];
+        result(@"");
+        return;
+    }
+
     if ([@"requestPermission" isEqualToString:call.method]) {
         [_scanner requestPermissionWithResult:result];
     } else if ([@"getGalleryIdList" isEqualToString:call.method]) {

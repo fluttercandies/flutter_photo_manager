@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_scanner/image_scanner.dart';
@@ -31,16 +30,18 @@ class _PhotoPageState extends State<PhotoPage> {
 
   Widget _buildItem(BuildContext context, int index) {
     var item = widget.photos[index];
-    // SystemChannels
+
     return FutureBuilder<File>(
       builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
         if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
           var data = snapshot.data;
+          print(data.absolute.path);
           return GestureDetector(
             child: Image.file(
               data,
               width: 200.0,
               height: 200.0,
+              fit: BoxFit.contain,
             ),
             onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -85,18 +86,22 @@ class BigImageState extends State<BigImage> {
         title: Text('大图'),
       ),
       body: Container(
-        child: FutureBuilder<List<int>>(
-          builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
-            if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
-              return Image.memory(
-                Uint8List.fromList(snapshot.data),
-                width: double.infinity,
-                height: double.infinity,
+        child: FutureBuilder<File>(
+          builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+            var data = snapshot.data;
+            if (snapshot.connectionState == ConnectionState.done && data != null) {
+              print(data.lengthSync());
+              print(data.absolute.path);
+              return Image.file(
+                data,
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                fit: BoxFit.contain,
               );
             }
             return Container();
           },
-          future: widget.entity.fullData,
+          future: widget.entity.file,
         ),
       ),
     );

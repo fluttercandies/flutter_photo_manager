@@ -18,6 +18,12 @@ class _MyAppState extends State<MyApp> {
       home: new Scaffold(
         appBar: new AppBar(
           title: const Text('Plugin example app'),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.settings_applications),
+              onPressed: _openSetting,
+            ),
+          ],
         ),
         body: new ListView.builder(
           itemBuilder: _buildItem,
@@ -63,5 +69,9 @@ class _MyAppState extends State<MyApp> {
         Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => page));
       },
     );
+  }
+
+  void _openSetting() {
+    ImageScanner.openSetting();
   }
 }

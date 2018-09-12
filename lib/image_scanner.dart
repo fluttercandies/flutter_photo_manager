@@ -27,6 +27,10 @@ class ImageScanner {
     return _getPathList(list.map((v) => v.toString()).toList());
   }
 
+  static void openSetting() {
+    _channel.invokeMethod("openSetting");
+  }
+
   static Future<List<ImageParentPath>> _getPathList(List<String> idList) async {
     /// 获取文件夹列表,这里主要是获取相册名称
     var list = await _channel.invokeMethod("getGalleryNameList", idList);
