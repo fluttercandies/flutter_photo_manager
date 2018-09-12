@@ -50,6 +50,17 @@ class ImageScanner {
     return list.map((v) => ImageEntity(id: v.toString())).toList();
   }
 
+  /// create thumb with path entity
+  ///
+  /// ios did'n t need so just return true
+  static Future<bool> createThumb(ImageParentPath path) async {
+    if (Platform.isAndroid) {
+      bool result = await _channel.invokeMethod("createThumbWithPathId", path.id);
+      return result == true;
+    }
+    return true;
+  }
+
   /// get thumb path with img id
   ///
   /// 通过文件的完整路径获取缩略图路径

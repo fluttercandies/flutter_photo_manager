@@ -6,21 +6,16 @@ import android.util.Log
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
-import java.io.File
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.Executors
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 
 
 class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
     companion object {
-        private val threadPool: ThreadPoolExecutor
+        private const val poolSize = 8
+        private val thumbPool = ThreadPoolExecutor(poolSize, 10000, 200, TimeUnit.MINUTES, ArrayBlockingQueue<Runnable>(5))
 
-        init {
-            threadPool = ThreadPoolExecutor(5, 1000, 200, TimeUnit.MINUTES, ArrayBlockingQueue<Runnable>(5))
-        }
+        private val threadPool: ThreadPoolExecutor = ThreadPoolExecutor(poolSize + 3, 1000, 200, TimeUnit.MINUTES, ArrayBlockingQueue<Runnable>(poolSize + 3))
 
         var handler: Handler = Handler()
     }
@@ -144,16 +139,59 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         }
     }
 
-    private fun refreshThumb(r: List<String?>?) {
-        handler.post {
-            threadPool.execute {
-                r?.forEach { path ->
-                    val img = pathImgMap[path]
-                    if (path != null && img != null) {
-                        thumbHelper.getThumb(path, img.imgId)
-                    }
-                }
+    private fun refreshThumb(imgList: List<Img>): Future<Boolean> {
+        val count = imgList.count()
+
+
+        if (count >= poolSize) {
+            val futureList = ArrayList<Future<Boolean>>()
+            val per = count / poolSize
+            for (i in 0 until poolSize) {
+                val start = i * per
+                val end = if (i == poolSize - 1) count - 1 else (i + 1) * per
+                Log.i("img_count", "max = $count , start = $start , end = $end")
+                val subList = imgList.subList(start, end)
+                val futureTask = FutureTask(ImageCallBack(subList, thumbHelper))
+                futureList.add(futureTask)
+                thumbPool.execute(futureTask)
             }
+
+            val future = FutureTask<Boolean>(Callable {
+                futureList.forEach {
+                    it.get()
+                }
+                true
+            })
+
+            thumbPool.execute(future)
+
+            return future
+        } else {
+            val future: FutureTask<Boolean> = FutureTask(Callable {
+                imgList.forEachIndexed { index, img ->
+                    val thumb = thumbHelper.getThumb(img.path, img.imgId)
+                    Log.i("image_thumb", "make thumb = $thumb ,progress = ${index + 1} / $count")
+                }
+                true
+            })
+            handler.post {
+                thumbPool.execute(future)
+            }
+            return future
+        }
+    }
+
+
+    fun createThumbWithPathId(call: MethodCall, result: MethodChannel.Result) {
+        val pathId = call.arguments as String
+        val list = map[pathId]
+        if (list == null || list.isEmpty()) {
+            result.success(true)
+            return
+        }
+        val future = refreshThumb(list)
+        threadPool.execute {
+            result.success(future.get())
         }
     }
 
@@ -204,6 +242,18 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
                 }
             }
         }
+    }
+
+
+}
+
+class ImageCallBack(val imgList: List<Img>, val thumbHelper: ThumbHelper) : Callable<Boolean> {
+    override fun call(): Boolean {
+        imgList.forEachIndexed { index, img ->
+            val thumb = thumbHelper.getThumb(img.path, img.imgId)
+            Log.i("image_thumb", "make thumb = $thumb ,progress = ${index + 1} / ${imgList.count()}")
+        }
+        return true
     }
 
 }

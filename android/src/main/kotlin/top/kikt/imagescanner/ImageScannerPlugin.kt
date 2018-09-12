@@ -52,6 +52,10 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                 scanner.getImageThumb(call, result)
                 true
             }
+            call.method == "createThumbWithPathId" -> {
+                scanner.createThumbWithPathId(call, result)
+                true
+            }
             else -> false
         }
 

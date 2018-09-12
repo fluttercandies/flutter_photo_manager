@@ -41,7 +41,7 @@ class _MyAppState extends State<MyApp> {
             print("wait scan");
             var list = await ImageScanner.getImagePathList();
 
-            print("list = $list");
+            // print("list = $list");
             pathList.clear();
             pathList.addAll(list);
             setState(() {});
@@ -63,7 +63,7 @@ class _MyAppState extends State<MyApp> {
       onTap: () async {
         var list = await ImageScanner.getImageList(data);
         var page = PhotoPage(
-          name: data.name,
+          pathEntity: data,
           photos: list,
         );
         Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => page));
