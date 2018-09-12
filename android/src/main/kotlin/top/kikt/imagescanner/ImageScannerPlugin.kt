@@ -35,6 +35,30 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
             return
         }
 
+        val handleResult = when {
+            call.method == "getGalleryNameList" -> {
+                scanner.getPathListWithPathIds(call, result)
+                true
+            }
+            call.method == "getImageListWithPathId" -> {
+                scanner.getImageListWithPathId(call, result)
+                true
+            }
+            call.method == "getImageThumbListWithPathId" -> {
+                scanner.getImageThumbListWithPathId(call, result)
+                true
+            }
+            call.method == "getThumbPath" -> {
+                scanner.getImageThumb(call, result)
+                true
+            }
+            else -> false
+        }
+
+        if (handleResult) {
+            return
+        }
+
         permissionsUtils.apply {
             withActivity(registrar.activity())
             permissionsListener = object : PermissionsListener {
@@ -52,15 +76,12 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                     when {
                         call.method == "requestPermission" -> result.success(1)
                         call.method == "getGalleryIdList" -> scanner.scanAndGetImageIdList(result)
-                        call.method == "getGalleryNameList" -> scanner.getPathListWithPathIds(call, result)
-                        call.method == "getImageListWithPathId" -> scanner.getImageListWithPathId(call, result)
-                        call.method == "getImageThumbListWithPathId" -> scanner.getImageThumbListWithPathId(call, result)
-                        call.method == "getThumbPath" -> scanner.getImageThumb(call, result)
-                        else -> result.notImplemented()
                     }
                 }
             }
         }.getPermissions(registrar.activity(), 3001, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+
     }
 
 }
