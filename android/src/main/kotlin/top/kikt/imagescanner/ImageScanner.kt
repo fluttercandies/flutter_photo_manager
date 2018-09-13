@@ -195,6 +195,30 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         }
     }
 
+    fun createThumbWithPathIdAndIndex(call: MethodCall, result: MethodChannel.Result) {
+        val params = call.arguments as List<Any>
+        val pathId = params[0] as String
+        var startIndex = params[1] as Int
+        var endIndex = params[2] as Int
+
+        val list = map[pathId]
+        if (list == null || list.isEmpty()) {
+            result.success(true)
+            return
+        }
+        if (startIndex <= 0) {
+            startIndex = 0
+        }
+
+        if (endIndex >= list.count()) {
+            endIndex = list.count()
+        }
+        val future = refreshThumb(list.subList(startIndex, endIndex))
+        threadPool.execute {
+            result.success(future.get())
+        }
+    }
+
     var thumbMap = HashMap<String, String>()
 
     private fun scanThumb() {
@@ -227,7 +251,6 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
     fun getImageThumb(call: MethodCall, result: MethodChannel.Result) {
         threadPool.execute {
-
             val path = call.arguments as String
             val img = pathImgMap[path]
             if (img == null) {
@@ -244,6 +267,19 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         }
     }
 
+
+    fun getImageThumbData(call: MethodCall, result: MethodChannel.Result) {
+        threadPool.execute {
+            val id = call.arguments as String
+            val img = pathImgMap[id]
+            if (img == null) {
+                result.success(null)
+                return@execute
+            }
+            val thumbData = thumbHelper.getThumbData(img)
+            result.success(thumbData)
+        }
+    }
 
 }
 

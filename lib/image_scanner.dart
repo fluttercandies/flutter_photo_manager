@@ -61,6 +61,14 @@ class ImageScanner {
     return true;
   }
 
+  static Future<bool> createThumbWithIndex(ImageParentPath path, {int start = 0, int end}) async {
+    if (Platform.isAndroid) {
+      bool result = await _channel.invokeMethod("createThumbWithPathIdAndIndex", [path.id, start, end]);
+      return result == true;
+    }
+    return true;
+  }
+
   /// get thumb path with img id
   ///
   /// 通过文件的完整路径获取缩略图路径
@@ -104,6 +112,18 @@ class ImageScanner {
     }
     return null;
   }
+
+  static Future<List<int>> _getThumbDataWithId(String id) async {
+    List<dynamic> bytes = await _channel.invokeMethod("getThumbBytesWithId", id);
+    List<int> result = bytes.map((v) {
+      if (v is int) {
+        return v;
+      }
+      return 0;
+    }).toList();
+
+    return result;
+  }
 }
 
 /// image entity
@@ -123,6 +143,8 @@ class ImageEntity {
 
   /// the image's bytes
   Future<List<int>> get fullData => ImageScanner._getDataWithId(id);
+
+  Future<List<int>> get thumbData => ImageScanner._getThumbDataWithId(id);
 
   ImageEntity({this.id});
 }

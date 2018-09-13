@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.media.ThumbnailUtils
 import android.os.Environment.DIRECTORY_PICTURES
 import io.flutter.plugin.common.PluginRegistry
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 
@@ -35,5 +36,12 @@ class ThumbHelper(val registrar: PluginRegistry.Registrar) {
             return result
         }
         return makeThumb(path, id)
+    }
+
+    fun getThumbData(img: Img): ByteArray {
+        val bitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(img.path), 100, 100)
+        val bos = ByteArrayOutputStream()
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 95, bos)
+        return bos.toByteArray()
     }
 }

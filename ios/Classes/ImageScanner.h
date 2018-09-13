@@ -25,4 +25,6 @@
 - (void)getFullFileWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
 
 + (void)openSetting;
+
+- (void)getThumbBytesWithCall:(FlutterMethodCall *)call result:(FlutterResult)result;
 @end

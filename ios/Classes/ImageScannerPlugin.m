@@ -30,6 +30,8 @@
         [_scanner getImageListWithCall:call result:result];
     } else if ([@"getThumbPath" isEqualToString:call.method]) {
         [_scanner getThumbPathWithCall:call result:result];
+    } else if ([@"getThumbBytesWithId" isEqualToString:call.method]) {
+        [_scanner getThumbBytesWithCall:call result:result];
     } else if ([@"getFullFileWithId" isEqualToString:call.method]) {
         [_scanner getFullFileWithCall:call result:result];
     } else if ([@"getBytesWithId" isEqualToString:call.method]) {

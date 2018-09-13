@@ -135,6 +135,25 @@
     });
 }
 
+- (void)getThumbBytesWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
+    dispatch_async(_asyncQueue, ^{
+        PHImageManager *manager = PHImageManager.defaultManager;
+
+        NSString *imgId = call.arguments;
+
+        PHAsset *asset = _idAssetDict[imgId];
+
+        [manager requestImageForAsset:asset targetSize:CGSizeMake(100, 100) contentMode:PHImageContentModeAspectFill options:[PHImageRequestOptions new] resultHandler:^(UIImage *result, NSDictionary *info) {
+            NSData *data = UIImageJPEGRepresentation(result, 95);
+            dispatch_async(_asyncQueue, ^{
+                [self writeThumbFileWithAssetId:asset imageData:data];
+            });
+            NSArray *arr = [ImageScanner convertNSData:data];
+            flutterResult(arr);
+        }];
+    });
+}
+
 - (NSString *)writeThumbFileWithAssetId:(PHAsset *)asset imageData:(NSData *)imageData {
     NSString *homePath = NSTemporaryDirectory();
 
