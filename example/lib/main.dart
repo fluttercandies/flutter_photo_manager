@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:image_scanner/image_scanner.dart';
-import 'package:image_scanner_example/new_photos.dart';
 import 'package:image_scanner_example/photos.dart';
 
 void main() => runApp(new MyApp());
@@ -20,12 +19,6 @@ class _MyAppState extends State<MyApp> {
         appBar: new AppBar(
           title: const Text('Plugin example app'),
           actions: <Widget>[
-            Builder(
-              builder: (ctx) => IconButton(
-                    icon: Icon(Icons.local_activity),
-                    onPressed: () => _openNewPhoto(ctx),
-                  ),
-            ),
             IconButton(
               icon: Icon(Icons.settings_applications),
               onPressed: _openSetting,
@@ -68,7 +61,7 @@ class _MyAppState extends State<MyApp> {
         title: Text(data.name),
       ),
       onTap: () async {
-        var list = await ImageScanner.getImageList(data);
+        var list = await data.imageList;
         var page = PhotoPage(
           pathEntity: data,
           photos: list,
@@ -80,9 +73,5 @@ class _MyAppState extends State<MyApp> {
 
   void _openSetting() {
     ImageScanner.openSetting();
-  }
-
-  void _openNewPhoto(context) {
-    Navigator.push(context, MaterialPageRoute(builder: (ctx) => NewPhotosPage()));
   }
 }

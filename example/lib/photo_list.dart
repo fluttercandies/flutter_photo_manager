@@ -17,7 +17,7 @@ class _PhotoListState extends State<PhotoList> {
   Widget build(BuildContext context) {
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 5,
+        crossAxisCount: 3,
         childAspectRatio: 1.0,
       ),
       itemBuilder: _buildItem,

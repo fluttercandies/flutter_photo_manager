@@ -46,42 +46,9 @@ class ImageScanner {
   /// get image entity with path
   ///
   /// 获取指定相册下的所有内容
-  static Future<List<ImageEntity>> getImageList(ImageParentPath path) async {
+  static Future<List<ImageEntity>> _getImageList(ImageParentPath path) async {
     List list = await _channel.invokeMethod("getImageListWithPathId", path.id);
     return list.map((v) => ImageEntity(id: v.toString())).toList();
-  }
-
-  /// create thumb with path entity
-  ///
-  /// ios did'n t need so just return true
-  static Future<bool> createThumb(ImageParentPath path) async {
-    if (Platform.isAndroid) {
-      bool result =
-          await _channel.invokeMethod("createThumbWithPathId", path.id);
-      return result == true;
-    }
-    return true;
-  }
-
-  static Future<bool> createThumbWithIndex(ImageParentPath path,
-      {int start = 0, int end}) async {
-    if (Platform.isAndroid) {
-      bool result = await _channel
-          .invokeMethod("createThumbWithPathIdAndIndex", [path.id, start, end]);
-      return result == true;
-    }
-    return true;
-  }
-
-  /// get thumb path with img id
-  ///
-  /// 通过文件的完整路径获取缩略图路径
-  static Future<File> _getThumbWithId(String id) async {
-    var thumb = await _channel.invokeMethod("getThumbPath", id);
-    if (thumb == null) {
-      return null;
-    }
-    return File(thumb);
   }
 
   static Future<File> _getFullFileWithId(String id) async {
@@ -146,14 +113,15 @@ class ImageEntity {
   /// thumb path
   ///
   /// you can use File(path) to use
-  Future<File> get thumb async => ImageScanner._getThumbWithId(id);
+  // Future<File> get thumb async => ImageScanner._getThumbWithId(id);
 
-  /// if you need update ,then you can use the file
+  /// if you need upload file ,then you can use the file
   Future<File> get file async => ImageScanner._getFullFileWithId(id);
 
-  /// the image's bytes
+  /// the image's bytes ,
   Future<List<int>> get fullData => ImageScanner._getDataWithId(id);
 
+  /// thumb data , for display
   Future<Uint8List> get thumbData => ImageScanner._getThumbDataWithId(id);
 
   ImageEntity({this.id});
@@ -176,4 +144,7 @@ class ImageParentPath {
   String name;
 
   ImageParentPath({this.id, this.name});
+
+  /// the image entity list
+  Future<List<ImageEntity>> get imageList => ImageScanner._getImageList(this);
 }

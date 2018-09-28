@@ -141,11 +141,11 @@
 
         NSString *imgId = call.arguments;
 
-        PHAsset *asset = _idAssetDict[imgId];
+        PHAsset *asset = self->_idAssetDict[imgId];
 
         [manager requestImageForAsset:asset targetSize:CGSizeMake(100, 100) contentMode:PHImageContentModeAspectFill options:[PHImageRequestOptions new] resultHandler:^(UIImage *result, NSDictionary *info) {
             NSData *data = UIImageJPEGRepresentation(result, 95);
-            dispatch_async(_asyncQueue, ^{
+            dispatch_async(self->_asyncQueue, ^{
                 [self writeThumbFileWithAssetId:asset imageData:data];
             });
             NSArray *arr = [ImageScanner convertNSData:data];
@@ -157,7 +157,7 @@
 - (NSString *)writeThumbFileWithAssetId:(PHAsset *)asset imageData:(NSData *)imageData {
     NSString *homePath = NSTemporaryDirectory();
 
-    NSURL *url = [[NSURL alloc] initWithString:homePath];
+//    NSURL *url = [[NSURL alloc] initWithString:homePath];
 
     NSFileManager *manager = NSFileManager.defaultManager;
 
