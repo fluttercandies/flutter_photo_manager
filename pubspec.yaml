@@ -1,5 +1,5 @@
-name: image_scanner
-description: You can scan photos and albums. Only api, not have ui. you can use the api to create your image picker.
+name: photo_manager
+description: You can scan photos and albums. Only api, not have ui. you can use the api to create your image picker. or use image_manager
 version: 0.0.1
 author: caijinglong<cjl_spy@163.com>
 homepage: https://github.com/CaiJingLong/flutter_photo_manager

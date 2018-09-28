@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:image_scanner/image_scanner.dart';
+import 'package:photo_manager/image_scanner.dart';
 import 'package:image_scanner_example/photo_list.dart';
 
 class PhotoPage extends StatefulWidget {
