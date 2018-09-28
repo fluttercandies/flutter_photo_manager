@@ -6,6 +6,7 @@ import android.util.Log
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
+import top.kikt.imagescanner.thumb.ThumbnailUtil
 import java.util.concurrent.*
 
 
@@ -13,7 +14,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
     companion object {
         private const val poolSize = 8
-        private val thumbPool = ThreadPoolExecutor(poolSize, 10000, 200, TimeUnit.MINUTES, ArrayBlockingQueue<Runnable>(5))
+        private val thumbPool = ThreadPoolExecutor(poolSize, 1000, 200, TimeUnit.MINUTES, ArrayBlockingQueue<Runnable>(5))
 
         private val threadPool: ThreadPoolExecutor = ThreadPoolExecutor(poolSize + 3, 1000, 200, TimeUnit.MINUTES, ArrayBlockingQueue<Runnable>(poolSize + 3))
 
@@ -269,16 +270,9 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
 
     fun getImageThumbData(call: MethodCall, result: MethodChannel.Result) {
-        threadPool.execute {
-            val id = call.arguments as String
-            val img = pathImgMap[id]
-            if (img == null) {
-                result.success(null)
-                return@execute
-            }
-            val thumbData = thumbHelper.getThumbData(img)
-            result.success(thumbData)
-        }
+        val id = call.arguments as String
+        val img = pathImgMap[id] ?: return
+        ThumbnailUtil.getThumbnailByGlide(registrar.activity(), img.path, result)
     }
 
 }

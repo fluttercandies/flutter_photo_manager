@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_scanner/image_scanner.dart';
+import 'package:image_scanner_example/photo_list.dart';
 
 class PhotoPage extends StatefulWidget {
   final ImageParentPath pathEntity;
@@ -22,18 +23,19 @@ class _PhotoPageState extends State<PhotoPage> {
       appBar: AppBar(
         title: Text(widget.pathEntity.name),
       ),
-      body: FutureBuilder<bool>(
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.data != null) {
-            return _buildGrid();
-          }
-          return Center(
-            child: Text('加载中...'),
-          );
-        },
-        future: _getThumbFuture(0),
-        // future: ImageScanner.createThumbWithIndex(widget.pathEntity, start: 0, end: 100),
-      ),
+      // body: FutureBuilder<bool>(
+      //   builder: (BuildContext context, AsyncSnapshot snapshot) {
+      //     if (snapshot.data != null) {
+      //       return _buildGrid();
+      //     }
+      //     return Center(
+      //       child: Text('加载中...'),
+      //     );
+      //   },
+      //   future: _getThumbFuture(0),
+      //   // future: ImageScanner.createThumbWithIndex(widget.pathEntity, start: 0, end: 100),
+      // ),
+      body: PhotoList(photos: widget.photos),
     );
   }
 

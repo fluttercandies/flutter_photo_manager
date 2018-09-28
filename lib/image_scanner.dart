@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
@@ -113,16 +114,16 @@ class ImageScanner {
     return null;
   }
 
-  static Future<List<int>> _getThumbDataWithId(String id) async {
-    List<dynamic> bytes = await _channel.invokeMethod("getThumbBytesWithId", id);
-    List<int> result = bytes.map((v) {
-      if (v is int) {
-        return v;
-      }
-      return 0;
-    }).toList();
+  static Future<Uint8List> _getThumbDataWithId(String id) async {
+    return await _channel.invokeMethod("getThumbBytesWithId", id);
+    // List<int> result = bytes.map((v) {
+    //   if (v is int) {
+    //     return v;
+    //   }
+    //   return 0;
+    // }).toList();
 
-    return result;
+    // return result;
   }
 }
 
@@ -144,7 +145,7 @@ class ImageEntity {
   /// the image's bytes
   Future<List<int>> get fullData => ImageScanner._getDataWithId(id);
 
-  Future<List<int>> get thumbData => ImageScanner._getThumbDataWithId(id);
+  Future<Uint8List> get thumbData => ImageScanner._getThumbDataWithId(id);
 
   ImageEntity({this.id});
 }
