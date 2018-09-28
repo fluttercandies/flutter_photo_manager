@@ -56,15 +56,18 @@ class ImageScanner {
   /// ios did'n t need so just return true
   static Future<bool> createThumb(ImageParentPath path) async {
     if (Platform.isAndroid) {
-      bool result = await _channel.invokeMethod("createThumbWithPathId", path.id);
+      bool result =
+          await _channel.invokeMethod("createThumbWithPathId", path.id);
       return result == true;
     }
     return true;
   }
 
-  static Future<bool> createThumbWithIndex(ImageParentPath path, {int start = 0, int end}) async {
+  static Future<bool> createThumbWithIndex(ImageParentPath path,
+      {int start = 0, int end}) async {
     if (Platform.isAndroid) {
-      bool result = await _channel.invokeMethod("createThumbWithPathIdAndIndex", [path.id, start, end]);
+      bool result = await _channel
+          .invokeMethod("createThumbWithPathIdAndIndex", [path.id, start, end]);
       return result == true;
     }
     return true;
@@ -115,15 +118,21 @@ class ImageScanner {
   }
 
   static Future<Uint8List> _getThumbDataWithId(String id) async {
-    return await _channel.invokeMethod("getThumbBytesWithId", id);
-    // List<int> result = bytes.map((v) {
-    //   if (v is int) {
-    //     return v;
-    //   }
-    //   return 0;
-    // }).toList();
+    var result = await _channel.invokeMethod("getThumbBytesWithId", id);
+    if (result is Uint8List) {
+      return result;
+    }
+    if (result is List<dynamic>) {
+      List<int> l = result.map((v) {
+        if (v is int) {
+          return v;
+        }
+        return 0;
+      }).toList();
+      return Uint8List.fromList(l);
+    }
 
-    // return result;
+    return null;
   }
 }
 
