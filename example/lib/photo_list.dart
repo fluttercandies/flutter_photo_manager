@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:photo_manager/image_scanner.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 class PhotoList extends StatefulWidget {
   final List<ImageEntity> photos;
