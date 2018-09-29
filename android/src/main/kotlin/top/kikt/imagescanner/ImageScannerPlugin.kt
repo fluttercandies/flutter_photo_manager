@@ -44,6 +44,10 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                 scanner.getImageListWithPathId(call, result)
                 true
             }
+            call.method == "getAllImageList" -> {
+                scanner.getAllImageList(call, result)
+                true
+            }
             call.method == "getImageThumbListWithPathId" -> {
                 scanner.getImageThumbListWithPathId(call, result)
                 true

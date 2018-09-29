@@ -119,6 +119,27 @@
     });
 }
 
+- (void)getAllImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult{
+    dispatch_async(_asyncQueue, ^{
+        NSMutableArray<NSString *> *arr = [NSMutableArray new];
+        
+        NSArray<PHCollection*> *collectionArray =  [self->_idCollectionDict allValues];
+        PHFetchOptions *opt = [PHFetchOptions new];
+        
+        for (PHAssetCollection *assetCollection in collectionArray) {
+            PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection options:opt];
+            for (PHAsset *asset in fetchResult) {
+                NSString *id = asset.localIdentifier;
+                if(![arr containsObject:id]){
+                    [arr addObject:id];
+                }
+            }
+        }
+        
+        flutterResult(arr);
+    });
+}
+
 - (void)getThumbPathWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
     dispatch_async(_asyncQueue, ^{
         PHImageManager *manager = PHImageManager.defaultManager;

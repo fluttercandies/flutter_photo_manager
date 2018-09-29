@@ -28,6 +28,8 @@
         [_scanner getGalleryNameWithCall:call result:result];
     } else if ([@"getImageListWithPathId" isEqualToString:call.method]) {
         [_scanner getImageListWithCall:call result:result];
+    } else if ([@"getAllImageList" isEqualToString:call.method]) {
+        [_scanner getAllImageListWithCall:call result:result];
     } else if ([@"getThumbPath" isEqualToString:call.method]) {
         [_scanner getThumbPathWithCall:call result:result];
     } else if ([@"getThumbBytesWithId" isEqualToString:call.method]) {

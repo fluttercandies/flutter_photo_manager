@@ -1,21 +1,21 @@
 PODS:
   - Flutter (1.0.0)
-  - image_scanner (0.0.1):
+  - photo_manager (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - Flutter (from `.symlinks/flutter/ios`)
-  - image_scanner (from `.symlinks/plugins/image_scanner/ios`)
+  - photo_manager (from `.symlinks/plugins/photo_manager/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: ".symlinks/flutter/ios"
-  image_scanner:
-    :path: ".symlinks/plugins/image_scanner/ios"
+  photo_manager:
+    :path: ".symlinks/plugins/photo_manager/ios"
 
 SPEC CHECKSUMS:
   Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
-  image_scanner: 76d72534df413395ca2178ca1284fbdbaaea4bb9
+  photo_manager: a406dfebdf49773f7eb25ba093e132f6d1f677e1
 
 PODFILE CHECKSUM: 1e5af4103afd21ca5ead147d7b81d06f494f51a2
 

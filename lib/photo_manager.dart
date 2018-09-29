@@ -18,26 +18,34 @@ class ImageScanner {
   /// get gallery list
   ///
   /// 获取相册"文件夹" 列表
-  static Future<List<ImageParentPath>> getImagePathList() async {
+  static Future<List<ImagePathEntity>> getImagePathList(
+      {bool hasAll = true}) async {
     /// 获取id 列表
     List list = await _channel.invokeMethod('getGalleryIdList');
     if (list == null) {
       return [];
     }
 
-    return _getPathList(list.map((v) => v.toString()).toList());
+    List<ImagePathEntity> pathList =
+        await _getPathList(list.map((v) => v.toString()).toList());
+
+    if (hasAll == true) {
+      pathList.insert(0, ImagePathEntity.all);
+    }
+
+    return pathList;
   }
 
   static void openSetting() {
     _channel.invokeMethod("openSetting");
   }
 
-  static Future<List<ImageParentPath>> _getPathList(List<String> idList) async {
+  static Future<List<ImagePathEntity>> _getPathList(List<String> idList) async {
     /// 获取文件夹列表,这里主要是获取相册名称
     var list = await _channel.invokeMethod("getGalleryNameList", idList);
-    List<ImageParentPath> result = [];
+    List<ImagePathEntity> result = [];
     for (var i = 0; i < idList.length; i++) {
-      result.add(ImageParentPath(id: idList[i], name: list[i].toString()));
+      result.add(ImagePathEntity(id: idList[i], name: list[i].toString()));
     }
 
     return result;
@@ -46,7 +54,12 @@ class ImageScanner {
   /// get image entity with path
   ///
   /// 获取指定相册下的所有内容
-  static Future<List<ImageEntity>> _getImageList(ImageParentPath path) async {
+  static Future<List<ImageEntity>> _getImageList(ImagePathEntity path) async {
+    if (path.id == ImagePathEntity.all.id) {
+      List list = await _channel.invokeMethod("getAllImageList");
+      return list.map((v) => ImageEntity(id: v.toString())).toList();
+    }
+
     List list = await _channel.invokeMethod("getImageListWithPathId", path.id);
     return list.map((v) => ImageEntity(id: v.toString())).toList();
   }
@@ -125,10 +138,23 @@ class ImageEntity {
   Future<Uint8List> get thumbData => ImageScanner._getThumbDataWithId(id);
 
   ImageEntity({this.id});
+
+  @override
+  int get hashCode {
+    return id.hashCode;
+  }
+
+  @override
+  bool operator ==(other) {
+    if(other is! ImageEntity){
+      return false;
+    }
+    return this.id == other.id;
+  }
 }
 
 /// Gallery Id
-class ImageParentPath {
+class ImagePathEntity {
   /// id
   ///
   /// in ios is localIdentifier
@@ -143,8 +169,27 @@ class ImageParentPath {
   /// in ios is photos gallery name
   String name;
 
-  ImageParentPath({this.id, this.name});
+  ImagePathEntity({this.id, this.name});
 
   /// the image entity list
   Future<List<ImageEntity>> get imageList => ImageScanner._getImageList(this);
+
+  static var all = ImagePathEntity()
+    ..id = "dfnsfkdfj2454AJJnfdkl"
+    ..name = "全部";
+
+  @override
+  bool operator ==(other) {
+    if(other is! ImagePathEntity){
+      return false;
+    }
+    return this.id == other.id;
+  }
+
+  @override
+  int get hashCode {
+    return this.id.hashCode;
+  }
+
+
 }

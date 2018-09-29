@@ -128,6 +128,16 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
     }
 
 
+    fun getAllImageList(call: MethodCall, result: MethodChannel.Result) {
+        threadPool.execute {
+            val list = imgList.map {
+                it.path
+            }.toList()
+            result.success(list)
+        }
+    }
+
+
     fun getImageThumbListWithPathId(call: MethodCall, result: MethodChannel.Result) {
         threadPool.execute {
             val pathId = call.arguments as String

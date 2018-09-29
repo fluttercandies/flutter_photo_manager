@@ -18,6 +18,8 @@
 
 - (void)getImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
 
+-(void) getAllImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
+
 - (void)getThumbPathWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
 
 - (void)getBytesWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;

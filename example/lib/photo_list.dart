@@ -27,6 +27,7 @@ class _PhotoListState extends State<PhotoList> {
 
   Widget _buildItem(BuildContext context, int index) {
     var entity = widget.photos[index];
+    print("请求的index = $index , image id = ${entity.id}");
     return FutureBuilder<Uint8List>(
       future: entity.thumbData,
       builder: (BuildContext context, AsyncSnapshot<Uint8List> snapshot) {

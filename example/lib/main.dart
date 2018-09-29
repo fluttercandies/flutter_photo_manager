@@ -10,7 +10,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  var pathList = <ImageParentPath>[];
+  var pathList = <ImagePathEntity>[];
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +62,7 @@ class _MyAppState extends State<MyApp> {
       ),
       onTap: () async {
         var list = await data.imageList;
+        print("开启的相册为:${data.name} , 数量为 : ${list.length}");
         var page = PhotoPage(
           pathEntity: data,
           photos: list,
