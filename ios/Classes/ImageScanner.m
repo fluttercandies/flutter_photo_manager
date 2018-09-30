@@ -166,9 +166,9 @@
 
         [manager requestImageForAsset:asset targetSize:CGSizeMake(100, 100) contentMode:PHImageContentModeAspectFill options:[PHImageRequestOptions new] resultHandler:^(UIImage *result, NSDictionary *info) {
             NSData *data = UIImageJPEGRepresentation(result, 95);
-            dispatch_async(self->_asyncQueue, ^{
-                [self writeThumbFileWithAssetId:asset imageData:data];
-            });
+//            dispatch_async(self->_asyncQueue, ^{
+//                [self writeThumbFileWithAssetId:asset imageData:data];
+//            });
             NSArray *arr = [ImageScanner convertNSData:data];
             flutterResult(arr);
         }];
