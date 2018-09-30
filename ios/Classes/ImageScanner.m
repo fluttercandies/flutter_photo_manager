@@ -90,9 +90,7 @@
 
 - (void)getImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
     dispatch_async(_asyncQueue, ^{
-        if (_idAssetDict) {
-            [_idAssetDict removeAllObjects];
-        } else {
+        if (!_idAssetDict) {
             _idAssetDict = [NSMutableDictionary new];
         }
 
@@ -121,6 +119,12 @@
 
 - (void)getAllImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult{
     dispatch_async(_asyncQueue, ^{
+        if (_idAssetDict) {
+            [_idAssetDict removeAllObjects];
+        } else {
+            _idAssetDict = [NSMutableDictionary new];
+        }
+        
         NSMutableArray<NSString *> *arr = [NSMutableArray new];
         
         NSArray<PHCollection*> *collectionArray =  [self->_idCollectionDict allValues];
@@ -130,6 +134,7 @@
             PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection options:opt];
             for (PHAsset *asset in fetchResult) {
                 NSString *id = asset.localIdentifier;
+                _idAssetDict[id] = asset;
                 if(![arr containsObject:id]){
                     [arr addObject:id];
                 }
