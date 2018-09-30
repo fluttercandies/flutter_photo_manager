@@ -20,7 +20,9 @@ class ThumbHelper(val registrar: PluginRegistry.Registrar) {
 
         val bitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(path), 100, 100)
         val result = "${file.absolutePath}/$id.jpg"
-        bitmap?.compress(Bitmap.CompressFormat.JPEG, 95, FileOutputStream(result))
+        val fileOutputStream = FileOutputStream(result)
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 95, fileOutputStream)
+        fileOutputStream.close()
 
         return result
     }
@@ -39,7 +41,7 @@ class ThumbHelper(val registrar: PluginRegistry.Registrar) {
     }
 
     fun getThumbData(img: Img): ByteArray {
-        val bitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(img.path), 100, 100)
+        val bitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(img.path), 80, 80)
         val bos = ByteArrayOutputStream()
         bitmap?.compress(Bitmap.CompressFormat.JPEG, 95, bos)
         return bos.toByteArray()
