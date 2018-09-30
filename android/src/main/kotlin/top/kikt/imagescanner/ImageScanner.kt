@@ -7,6 +7,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import top.kikt.imagescanner.thumb.ThumbnailUtil
+import java.io.File
 import java.util.concurrent.*
 
 
@@ -58,6 +59,12 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             val thumb = mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.MINI_THUMB_MAGIC))
             val imgId = mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns._ID))
             val img = Img(path, imgId, dir, dirId, title, thumb)
+
+            val file = File(path)
+            if (file.exists().not()) {
+                continue
+            }
+
             imgList.add(img)
 
             idPathMap[dirId] = dir
@@ -280,8 +287,13 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
 
     fun getImageThumbData(call: MethodCall, result: MethodChannel.Result) {
+
+
         val id = call.arguments as String
         val img = pathImgMap[id] ?: return
+
+//        result.success(thumbHelper.getThumbData(img))
+
         ThumbnailUtil.getThumbnailByGlide(registrar.activity(), img.path, result)
     }
 
