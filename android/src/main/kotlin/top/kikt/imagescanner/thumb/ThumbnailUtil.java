@@ -20,7 +20,7 @@ import io.flutter.plugin.common.MethodChannel;
  * Created by debuggerx on 18-9-27 下午2:08
  */
 public class ThumbnailUtil {
-    public static void getThumbnailByGlide(Context ctx, String path, int width, int height, final MethodChannel.Result result) {
+    public static void getThumbnailByGlideUsePixels(Context ctx, String path, int width, int height, final MethodChannel.Result result) {
 
         Glide.with(ctx)
                 .asBitmap()
@@ -53,11 +53,16 @@ public class ThumbnailUtil {
     }
 
     public static void getThumbnailByGlide(Context ctx, String path, final MethodChannel.Result result) {
+        getThumbnailByGlide(ctx, path, 64, 64, result);
+    }
+
+
+    public static void getThumbnailByGlide(Context ctx, String path, int width, int height, final MethodChannel.Result result) {
 
         Glide.with(ctx)
                 .asBitmap()
                 .load(new File(path))
-                .into(new CustomTarget<Bitmap>(64, 64) {
+                .into(new CustomTarget<Bitmap>(width, height) {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                         ByteArrayOutputStream bos = new ByteArrayOutputStream();

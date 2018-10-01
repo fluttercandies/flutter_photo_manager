@@ -97,8 +97,13 @@ class ImageScanner {
     return null;
   }
 
-  static Future<Uint8List> _getThumbDataWithId(String id) async {
-    var result = await _channel.invokeMethod("getThumbBytesWithId", id);
+  static Future<Uint8List> _getThumbDataWithId(
+    String id, {
+    int width = 64,
+    int height = 64,
+  }) async {
+    var result =
+        await _channel.invokeMethod("getThumbBytesWithId", [id, width, height]);
     if (result is Uint8List) {
       return result;
     }
@@ -137,6 +142,10 @@ class ImageEntity {
   /// thumb data , for display
   Future<Uint8List> get thumbData => ImageScanner._getThumbDataWithId(id);
 
+  Future<Uint8List> thumbDataWithSize(int width,int height){
+    return ImageScanner._getThumbDataWithId(id, width: width, height:  height);
+  }
+
   ImageEntity({this.id});
 
   @override
@@ -146,7 +155,7 @@ class ImageEntity {
 
   @override
   bool operator ==(other) {
-    if(other is! ImageEntity){
+    if (other is! ImageEntity) {
       return false;
     }
     return this.id == other.id;
@@ -180,7 +189,7 @@ class ImagePathEntity {
 
   @override
   bool operator ==(other) {
-    if(other is! ImagePathEntity){
+    if (other is! ImagePathEntity) {
       return false;
     }
     return this.id == other.id;
@@ -190,6 +199,4 @@ class ImagePathEntity {
   int get hashCode {
     return this.id.hashCode;
   }
-
-
 }

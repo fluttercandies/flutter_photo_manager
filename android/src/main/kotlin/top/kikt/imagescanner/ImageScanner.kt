@@ -288,15 +288,16 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
     fun getImageThumbData(call: MethodCall, result: MethodChannel.Result) {
 
-
-        val id = call.arguments as String
+        val args = call.arguments as List<Any>
+        val id = args[0] as String
         val img = pathImgMap[id] ?: return
+        val width = args[1] as Int
+        val height = args[2] as Int
 
 //        result.success(thumbHelper.getThumbData(img))
 
-        ThumbnailUtil.getThumbnailByGlide(registrar.activity(), img.path, result)
+        ThumbnailUtil.getThumbnailByGlide(registrar.activity(), img.path, width, height, result)
     }
-
 }
 
 class ImageCallBack(val imgList: List<Img>, val thumbHelper: ThumbHelper) : Callable<Boolean> {

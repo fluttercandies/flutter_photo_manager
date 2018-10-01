@@ -165,12 +165,15 @@
     dispatch_async(_asyncQueue, ^{
         PHImageManager *manager = PHImageManager.defaultManager;
 
-        NSString *imgId = call.arguments;
+        NSArray *args = call.arguments;
+        NSString *imgId = [args objectAtIndex:0];
+        int width = [args objectAtIndex:1];
+        int height = [args objectAtIndex:2];
 
         PHAsset *asset = self->_idAssetDict[imgId];
 
-        [manager requestImageForAsset:asset targetSize:CGSizeMake(100, 100) contentMode:PHImageContentModeAspectFill options:[PHImageRequestOptions new] resultHandler:^(UIImage *result, NSDictionary *info) {
-            NSData *data = UIImageJPEGRepresentation(result, 95);
+        [manager requestImageForAsset:asset targetSize:CGSizeMake(width, height) contentMode:PHImageContentModeAspectFill options:[PHImageRequestOptions new] resultHandler:^(UIImage *result, NSDictionary *info) {
+            NSData *data = UIImageJPEGRepresentation(result, 100);
 //            dispatch_async(self->_asyncQueue, ^{
 //                [self writeThumbFileWithAssetId:asset imageData:data];
 //            });
