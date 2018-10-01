@@ -169,14 +169,14 @@
         NSString *imgId = [args objectAtIndex:0];
         int width = [((NSString*)[args objectAtIndex:1]) intValue];
         int height = [((NSString*)[args objectAtIndex:2]) intValue];
-        NSLog(@"request width = %i , height = %i",width,height);
+        // NSLog(@"request width = %i , height = %i",width,height);
 
         PHAsset *asset = self->_idAssetDict[imgId];
         PHImageRequestOptions *options = [PHImageRequestOptions new];
         options.resizeMode = PHImageRequestOptionsResizeModeFast;
         __block BOOL isReply = NO;
         [manager requestImageForAsset:asset targetSize:CGSizeMake(width, height) contentMode:PHImageContentModeAspectFill options: options resultHandler:^(UIImage *result, NSDictionary *info) {
-            NSLog(@"image width = %f , height = %f",result.size.width,result.size.height);
+            // NSLog(@"image width = %f , height = %f",result.size.width,result.size.height);
             BOOL downloadFinined = ![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue];
             if(!downloadFinined){
                 return;
