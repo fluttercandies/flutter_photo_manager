@@ -167,17 +167,30 @@
 
         NSArray *args = call.arguments;
         NSString *imgId = [args objectAtIndex:0];
-        int width = [args objectAtIndex:1];
-        int height = [args objectAtIndex:2];
+        int width = [((NSString*)[args objectAtIndex:1]) intValue];
+        int height = [((NSString*)[args objectAtIndex:2]) intValue];
+        NSLog(@"request width = %i , height = %i",width,height);
 
         PHAsset *asset = self->_idAssetDict[imgId];
-
-        [manager requestImageForAsset:asset targetSize:CGSizeMake(width, height) contentMode:PHImageContentModeAspectFill options:[PHImageRequestOptions new] resultHandler:^(UIImage *result, NSDictionary *info) {
+        PHImageRequestOptions *options = [PHImageRequestOptions new];
+        options.resizeMode = PHImageRequestOptionsResizeModeFast;
+        __block BOOL isReply = NO;
+        [manager requestImageForAsset:asset targetSize:CGSizeMake(width, height) contentMode:PHImageContentModeAspectFill options: options resultHandler:^(UIImage *result, NSDictionary *info) {
+            NSLog(@"image width = %f , height = %f",result.size.width,result.size.height);
+            BOOL downloadFinined = ![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue];
+            if(!downloadFinined){
+                return;
+            }
             NSData *data = UIImageJPEGRepresentation(result, 100);
 //            dispatch_async(self->_asyncQueue, ^{
 //                [self writeThumbFileWithAssetId:asset imageData:data];
 //            });
             NSArray *arr = [ImageScanner convertNSData:data];
+            
+            if(isReply){
+                return;
+            }
+            isReply = YES;
             flutterResult(arr);
         }];
     });

@@ -291,8 +291,8 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         val args = call.arguments as List<Any>
         val id = args[0] as String
         val img = pathImgMap[id] ?: return
-        val width = args[1] as Int
-        val height = args[2] as Int
+        val width = (args[1] as String).toInt()
+        val height = (args[2] as String).toInt()
 
 //        result.success(thumbHelper.getThumbData(img))
 

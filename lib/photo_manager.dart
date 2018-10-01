@@ -103,7 +103,7 @@ class ImageScanner {
     int height = 64,
   }) async {
     var result =
-        await _channel.invokeMethod("getThumbBytesWithId", [id, width, height]);
+        await _channel.invokeMethod("getThumbBytesWithId", [id, width.toString(), height.toString()]);
     if (result is Uint8List) {
       return result;
     }
