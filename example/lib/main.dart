@@ -32,14 +32,14 @@ class _MyAppState extends State<MyApp> {
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.refresh),
           onPressed: () async {
-            var result = await ImageScanner.requestPermission();
+            var result = await PhotoManager.requestPermission();
             if (!(result == true)) {
               print("未授予权限");
               return;
             }
 
             print("wait scan");
-            var list = await ImageScanner.getImagePathList();
+            List<ImagePathEntity> list = await PhotoManager.getImagePathList();
 
             // print("list = $list");
             pathList.clear();
@@ -73,6 +73,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _openSetting() {
-    ImageScanner.openSetting();
+    PhotoManager.openSetting();
   }
 }

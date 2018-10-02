@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
-class ImageScanner {
+class PhotoManager {
   static const MethodChannel _channel = const MethodChannel('image_scanner');
 
   /// in android WRITE_EXTERNAL_STORAGE  READ_EXTERNAL_STORAGE
@@ -131,19 +131,19 @@ class ImageEntity {
   /// thumb path
   ///
   /// you can use File(path) to use
-  // Future<File> get thumb async => ImageScanner._getThumbWithId(id);
+  // Future<File> get thumb async => PhotoManager._getThumbWithId(id);
 
   /// if you need upload file ,then you can use the file
-  Future<File> get file async => ImageScanner._getFullFileWithId(id);
+  Future<File> get file async => PhotoManager._getFullFileWithId(id);
 
   /// the image's bytes ,
-  Future<List<int>> get fullData => ImageScanner._getDataWithId(id);
+  Future<List<int>> get fullData => PhotoManager._getDataWithId(id);
 
   /// thumb data , for display
-  Future<Uint8List> get thumbData => ImageScanner._getThumbDataWithId(id);
+  Future<Uint8List> get thumbData => PhotoManager._getThumbDataWithId(id);
 
   Future<Uint8List> thumbDataWithSize(int width,int height){
-    return ImageScanner._getThumbDataWithId(id, width: width, height:  height);
+    return PhotoManager._getThumbDataWithId(id, width: width, height:  height);
   }
 
   ImageEntity({this.id});
@@ -181,7 +181,7 @@ class ImagePathEntity {
   ImagePathEntity({this.id, this.name});
 
   /// the image entity list
-  Future<List<ImageEntity>> get imageList => ImageScanner._getImageList(this);
+  Future<List<ImageEntity>> get imageList => PhotoManager._getImageList(this);
 
   static var all = ImagePathEntity()
     ..id = "dfnsfkdfj2454AJJnfdkl"
