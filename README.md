@@ -4,7 +4,7 @@ A flutter api for photo, you can get photo from ios or android
 
 一个提供相册api的插件, android ios 可用,没有ui,以便于自定义自己的界面, 你可以通过提供的api来制作图片相关的ui或插件
 
-or use [photo](https://pub.dartlang.org/photo) library , a multi image picker .All UI comes from flutter.
+or use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker .All UI comes from flutter.
 
 ## install
   photo: ^0.0.1
