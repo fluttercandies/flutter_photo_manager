@@ -8,7 +8,10 @@ or use [photo](https://pub.dartlang.org/packages/photo) library , a multi image 
 
 ## install
 
-photo: ^0.0.3
+```yaml
+dependencies:
+  photo_manager: ^0.0.3
+```
 
 ## import
 
