@@ -1,6 +1,6 @@
 name: photo_manager
-description: You can scan photos and albums. Only api, not have ui. you can use the api to create your image picker. or use photo 
-version: 0.0.2
+description: You can scan photos and albums. Only api, not have ui. you can use the api to create your image picker. or use photo
+version: 0.0.3
 author: caijinglong<cjl_spy@163.com>
 homepage: https://github.com/CaiJingLong/flutter_photo_manager
 
@@ -19,7 +19,6 @@ flutter:
   plugin:
     androidPackage: top.kikt.imagescanner
     pluginClass: ImageScannerPlugin
-
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
   #  - images/a_dot_burr.jpeg
@@ -30,7 +29,6 @@ flutter:
   #
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
-
   # To add custom fonts to your plugin package, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a

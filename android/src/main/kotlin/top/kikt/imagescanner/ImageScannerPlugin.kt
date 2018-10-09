@@ -24,7 +24,14 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
     init {
         registrar.addRequestPermissionsResultListener { i, strings, ints ->
             permissionsUtils.dealResult(i, strings, ints)
-            true
+            false
+        }
+        permissionsUtils.permissionsListener = object : PermissionsListener {
+            override fun onDenied(deniedPermissions: Array<out String>?) {
+            }
+
+            override fun onGranted() {
+            }
         }
     }
 
@@ -75,23 +82,30 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
             return
         }
 
+
+        var r: Result? = result
+
         permissionsUtils.apply {
             withActivity(registrar.activity())
             permissionsListener = object : PermissionsListener {
                 override fun onDenied(deniedPermissions: Array<out String>?) {
-                    Log.i("permission", "onDenied")
+                    Log.i("permission", "onDenied call.method = ${call.method}")
+                    val localResult = r
+                    r = null
                     if (call.method == "requestPermission") {
-                        result.success(0)
+                        localResult?.success(0)
                     } else {
-                        result.error("失败", "权限被拒绝", "")
+                        localResult?.error("失败", "权限被拒绝", "")
                     }
                 }
 
                 override fun onGranted() {
-                    Log.i("permission", "onGranted")
+                    Log.i("permission", "onGranted call.method = ${call.method}")
+                    val localResult = r
+                    r = null
                     when {
-                        call.method == "requestPermission" -> result.success(1)
-                        call.method == "getGalleryIdList" -> scanner.scanAndGetImageIdList(result)
+                        call.method == "requestPermission" -> localResult?.success(1)
+                        call.method == "getGalleryIdList" -> scanner.scanAndGetImageIdList(localResult)
                     }
                 }
             }

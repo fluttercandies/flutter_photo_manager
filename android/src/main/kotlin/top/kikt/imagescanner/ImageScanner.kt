@@ -75,12 +75,12 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         mCursor.close()
     }
 
-    fun scanAndGetImageIdList(result: MethodChannel.Result) {
+    fun scanAndGetImageIdList(result: MethodChannel.Result?) {
         threadPool.execute {
             scan()
             scanThumb()
             split()
-            result.success(map.keys.toList())
+            result?.success(map.keys.toList())
         }
     }
 

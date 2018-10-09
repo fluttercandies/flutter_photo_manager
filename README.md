@@ -2,12 +2,13 @@
 
 A flutter api for photo, you can get photo from ios or android
 
-一个提供相册api的插件, android ios 可用,没有ui,以便于自定义自己的界面, 你可以通过提供的api来制作图片相关的ui或插件
+一个提供相册 api 的插件, android ios 可用,没有 ui,以便于自定义自己的界面, 你可以通过提供的 api 来制作图片相关的 ui 或插件
 
 or use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker .All UI comes from flutter.
 
 ## install
-  photo: ^0.0.1
+
+photo: ^0.0.3
 
 ## import
 
@@ -16,6 +17,7 @@ import 'package:photo_manager/photo_manager.dart';
 ```
 
 ## use
+
 see the example/lib/main.dart
 
 or see next
@@ -34,11 +36,13 @@ if(result == true){
 ```
 
 2. you get all of imagePath(gallery)
+
 ```dart
 List<ImagePathEntity> list = await PhotoManager.getImagePathList();
 ```
 
 3. get image list from imagePath
+
 ```dart
 List<ImageEntity> imageList = await data.imageList;
 ```
@@ -54,5 +58,4 @@ List<int> fileData = await entity.fullData; // image file bytes
 Uint8List thumbBytes = await entity.thumbData; // thumb data ,you can use Image.memory(thumbBytes); size is 64px*64px;
 
 Uint8List thumbDataWithSize = await entity.thumbDataWithSize(width,height); //Just like thumbnails, you can specify your own size. unit is px;
-
 ```
