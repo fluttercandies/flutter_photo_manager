@@ -4,6 +4,12 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
+enum AssetType {
+  other,
+  image,
+  video,
+}
+
 class PhotoManager {
   static const MethodChannel _channel = const MethodChannel('image_scanner');
 
@@ -18,16 +24,14 @@ class PhotoManager {
   /// get gallery list
   ///
   /// 获取相册"文件夹" 列表
-  static Future<List<ImagePathEntity>> getImagePathList(
-      {bool hasAll = true}) async {
+  static Future<List<ImagePathEntity>> getImagePathList({bool hasAll = true}) async {
     /// 获取id 列表
     List list = await _channel.invokeMethod('getGalleryIdList');
     if (list == null) {
       return [];
     }
 
-    List<ImagePathEntity> pathList =
-        await _getPathList(list.map((v) => v.toString()).toList());
+    List<ImagePathEntity> pathList = await _getPathList(list.map((v) => v.toString()).toList());
 
     if (hasAll == true) {
       pathList.insert(0, ImagePathEntity.all);
@@ -43,12 +47,24 @@ class PhotoManager {
   static Future<List<ImagePathEntity>> _getPathList(List<String> idList) async {
     /// 获取文件夹列表,这里主要是获取相册名称
     var list = await _channel.invokeMethod("getGalleryNameList", idList);
+
     List<ImagePathEntity> result = [];
     for (var i = 0; i < idList.length; i++) {
-      result.add(ImagePathEntity(id: idList[i], name: list[i].toString()));
+      var entity = ImagePathEntity(id: idList[i], name: list[i].toString());
+      result.add(entity);
     }
 
     return result;
+  }
+
+  static AssetType _convertTypeFromString(String type) {
+    print("type = $type");
+    try {
+      var intType = int.tryParse(type) ?? 0;
+      return AssetType.values[intType];
+    } on Exception {
+      return AssetType.other;
+    }
   }
 
   /// get image entity with path
@@ -61,7 +77,19 @@ class PhotoManager {
     }
 
     List list = await _channel.invokeMethod("getImageListWithPathId", path.id);
-    return list.map((v) => ImageEntity(id: v.toString())).toList();
+    var entityList = list.map((v) => ImageEntity(id: v.toString())).toList();
+    var ids = entityList.map((v) => v.id).toList();
+    print("entityList ids = $ids type = ${ids.runtimeType}");
+    List typeList = await _channel.invokeMethod("getAssetTypeWithIds", ids);
+
+    print("typeList = $typeList");
+
+    for (var i = 0; i < typeList.length; i++) {
+      var entity = entityList[i];
+      entity.type = _convertTypeFromString(typeList[i]);
+    }
+
+    return entityList;
   }
 
   static Future<File> _getFullFileWithId(String id) async {
@@ -102,8 +130,7 @@ class PhotoManager {
     int width = 64,
     int height = 64,
   }) async {
-    var result =
-        await _channel.invokeMethod("getThumbBytesWithId", [id, width.toString(), height.toString()]);
+    var result = await _channel.invokeMethod("getThumbBytesWithId", [id, width.toString(), height.toString()]);
     if (result is Uint8List) {
       return result;
     }
@@ -128,6 +155,11 @@ class ImageEntity {
   /// in ios is asset id
   String id;
 
+  /// the asset type
+  ///
+  /// see [AssetType]
+  AssetType type;
+
   /// thumb path
   ///
   /// you can use File(path) to use
@@ -142,8 +174,8 @@ class ImageEntity {
   /// thumb data , for display
   Future<Uint8List> get thumbData => PhotoManager._getThumbDataWithId(id);
 
-  Future<Uint8List> thumbDataWithSize(int width,int height){
-    return PhotoManager._getThumbDataWithId(id, width: width, height:  height);
+  Future<Uint8List> thumbDataWithSize(int width, int height) {
+    return PhotoManager._getThumbDataWithId(id, width: width, height: height);
   }
 
   ImageEntity({this.id});

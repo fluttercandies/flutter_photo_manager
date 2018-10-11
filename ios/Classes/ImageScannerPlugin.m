@@ -38,6 +38,8 @@
         [_scanner getFullFileWithCall:call result:result];
     } else if ([@"getBytesWithId" isEqualToString:call.method]) {
         [_scanner getBytesWithCall:call result:result];
+    } else if ([@"getAssetTypeWithIds" isEqualToString:call.method]) {
+        [_scanner getAssetTypeByIdsWithCall:call result:result];
     } else {
         result(FlutterMethodNotImplemented);
     }

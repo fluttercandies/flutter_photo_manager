@@ -9,6 +9,7 @@
 #import <Photos/PHAsset.h>
 #import "ImageScanner.h"
 #import "MD5Utils.h"
+#import "PHAsset+PHAsset_checkType.h"
 
 @interface ImageScanner () <PHPhotoLibraryChangeObserver>
 
@@ -259,13 +260,32 @@
 - (void)getBytesWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
     dispatch_async(_asyncQueue, ^{
         NSString *imgId = call.arguments;
-        PHAsset *asset = _idAssetDict[imgId];
+        PHAsset *asset = self->_idAssetDict[imgId];
 
         PHImageManager *manager = PHImageManager.defaultManager;
         [manager requestImageDataForAsset:asset options:[PHImageRequestOptions new] resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
             NSArray *arr = [ImageScanner convertNSData:imageData];
             flutterResult(arr);
         }];
+    });
+}
+
+
+-(void) getAssetTypeByIdsWithCall:(FlutterMethodCall *)call result:(FlutterResult)result{
+    dispatch_async(_asyncQueue, ^{
+        NSArray *ids = call.arguments;
+        NSMutableArray *resultArr = [NSMutableArray new];
+        for (NSString *imgId in ids){
+            PHAsset *asset = self -> _idAssetDict[imgId];
+            if([asset isImage]){
+                [resultArr addObject:@"1"];
+            }else if([asset isVideo]) {
+                [resultArr addObject:@"2"];
+            }else{
+                [resultArr addObject:@"0"];
+            }
+        }
+        result(resultArr);
     });
 }
 
