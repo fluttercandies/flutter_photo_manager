@@ -73,23 +73,26 @@ class PhotoManager {
   static Future<List<ImageEntity>> _getImageList(ImagePathEntity path) async {
     if (path.id == ImagePathEntity.all.id) {
       List list = await _channel.invokeMethod("getAllImageList");
-      return list.map((v) => ImageEntity(id: v.toString())).toList();
+      var entityList = list.map((v) => ImageEntity(id: v.toString())).toList();
+      await _fetchType(entityList);
+      return entityList;
     }
 
     List list = await _channel.invokeMethod("getImageListWithPathId", path.id);
     var entityList = list.map((v) => ImageEntity(id: v.toString())).toList();
-    var ids = entityList.map((v) => v.id).toList();
-    print("entityList ids = $ids type = ${ids.runtimeType}");
-    List typeList = await _channel.invokeMethod("getAssetTypeWithIds", ids);
+    await _fetchType(entityList);
 
-    print("typeList = $typeList");
+    return entityList;
+  }
+
+  static Future _fetchType(List<ImageEntity> entityList )async{
+    var ids = entityList.map((v) => v.id).toList();
+    List typeList = await _channel.invokeMethod("getAssetTypeWithIds", ids);
 
     for (var i = 0; i < typeList.length; i++) {
       var entity = entityList[i];
       entity.type = _convertTypeFromString(typeList[i]);
     }
-
-    return entityList;
   }
 
   static Future<File> _getFullFileWithId(String id) async {
