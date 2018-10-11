@@ -29,4 +29,6 @@
 + (void)openSetting;
 
 - (void)getThumbBytesWithCall:(FlutterMethodCall *)call result:(FlutterResult)result;
+
+- (void)getAssetTypeByIdsWithCall:(FlutterMethodCall *)call result:(FlutterResult)result;
 @end
