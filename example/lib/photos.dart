@@ -3,8 +3,8 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:image_scanner_example/photo_list.dart';
 
 class PhotoPage extends StatefulWidget {
-  final ImagePathEntity pathEntity;
-  final List<ImageEntity> photos;
+  final AssetPathEntity pathEntity;
+  final List<AssetEntity> photos;
 
   const PhotoPage({Key key, this.pathEntity, this.photos}) : super(key: key);
 

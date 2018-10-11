@@ -24,17 +24,17 @@ class PhotoManager {
   /// get gallery list
   ///
   /// 获取相册"文件夹" 列表
-  static Future<List<ImagePathEntity>> getImagePathList({bool hasAll = true}) async {
+  static Future<List<AssetPathEntity>> getAssetPathList({bool hasAll = true}) async {
     /// 获取id 列表
     List list = await _channel.invokeMethod('getGalleryIdList');
     if (list == null) {
       return [];
     }
 
-    List<ImagePathEntity> pathList = await _getPathList(list.map((v) => v.toString()).toList());
+    List<AssetPathEntity> pathList = await _getPathList(list.map((v) => v.toString()).toList());
 
     if (hasAll == true) {
-      pathList.insert(0, ImagePathEntity.all);
+      pathList.insert(0, AssetPathEntity.all);
     }
 
     return pathList;
@@ -44,13 +44,13 @@ class PhotoManager {
     _channel.invokeMethod("openSetting");
   }
 
-  static Future<List<ImagePathEntity>> _getPathList(List<String> idList) async {
+  static Future<List<AssetPathEntity>> _getPathList(List<String> idList) async {
     /// 获取文件夹列表,这里主要是获取相册名称
     var list = await _channel.invokeMethod("getGalleryNameList", idList);
 
-    List<ImagePathEntity> result = [];
+    List<AssetPathEntity> result = [];
     for (var i = 0; i < idList.length; i++) {
-      var entity = ImagePathEntity(id: idList[i], name: list[i].toString());
+      var entity = AssetPathEntity(id: idList[i], name: list[i].toString());
       result.add(entity);
     }
 
@@ -70,22 +70,22 @@ class PhotoManager {
   /// get image entity with path
   ///
   /// 获取指定相册下的所有内容
-  static Future<List<ImageEntity>> _getImageList(ImagePathEntity path) async {
-    if (path.id == ImagePathEntity.all.id) {
+  static Future<List<AssetEntity>> _getImageList(AssetPathEntity path) async {
+    if (path.id == AssetPathEntity.all.id) {
       List list = await _channel.invokeMethod("getAllImageList");
-      var entityList = list.map((v) => ImageEntity(id: v.toString())).toList();
+      var entityList = list.map((v) => AssetEntity(id: v.toString())).toList();
       await _fetchType(entityList);
       return entityList;
     }
 
     List list = await _channel.invokeMethod("getImageListWithPathId", path.id);
-    var entityList = list.map((v) => ImageEntity(id: v.toString())).toList();
+    var entityList = list.map((v) => AssetEntity(id: v.toString())).toList();
     await _fetchType(entityList);
 
     return entityList;
   }
 
-  static Future _fetchType(List<ImageEntity> entityList )async{
+  static Future _fetchType(List<AssetEntity> entityList )async{
     var ids = entityList.map((v) => v.id).toList();
     List typeList = await _channel.invokeMethod("getAssetTypeWithIds", ids);
 
@@ -152,7 +152,7 @@ class PhotoManager {
 }
 
 /// image entity
-class ImageEntity {
+class AssetEntity {
   /// in android is full path
   ///
   /// in ios is asset id
@@ -181,7 +181,7 @@ class ImageEntity {
     return PhotoManager._getThumbDataWithId(id, width: width, height: height);
   }
 
-  ImageEntity({this.id});
+  AssetEntity({this.id});
 
   @override
   int get hashCode {
@@ -190,7 +190,7 @@ class ImageEntity {
 
   @override
   bool operator ==(other) {
-    if (other is! ImageEntity) {
+    if (other is! AssetEntity) {
       return false;
     }
     return this.id == other.id;
@@ -198,7 +198,7 @@ class ImageEntity {
 }
 
 /// Gallery Id
-class ImagePathEntity {
+class AssetPathEntity {
   /// id
   ///
   /// in ios is localIdentifier
@@ -213,18 +213,18 @@ class ImagePathEntity {
   /// in ios is photos gallery name
   String name;
 
-  ImagePathEntity({this.id, this.name});
+  AssetPathEntity({this.id, this.name});
 
   /// the image entity list
-  Future<List<ImageEntity>> get imageList => PhotoManager._getImageList(this);
+  Future<List<AssetEntity>> get assetList => PhotoManager._getImageList(this);
 
-  static var all = ImagePathEntity()
+  static var all = AssetPathEntity()
     ..id = "dfnsfkdfj2454AJJnfdkl"
     ..name = "全部";
 
   @override
   bool operator ==(other) {
-    if (other is! ImagePathEntity) {
+    if (other is! AssetPathEntity) {
       return false;
     }
     return this.id == other.id;
