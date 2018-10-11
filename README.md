@@ -14,7 +14,7 @@ or use [photo](https://pub.dartlang.org/packages/photo) library , a multi image 
 
 ```yaml
 dependencies:
-  photo_manager: ^0.0.3
+  photo_manager: ^0.1.0
 ```
 
 ## import

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class PhotoList extends StatefulWidget {
-  final List<ImageEntity> photos;
+  final List<AssetEntity> photos;
 
   PhotoList({this.photos});
 
