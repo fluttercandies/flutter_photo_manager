@@ -1,5 +1,9 @@
 # photo_manager
 
+[![pub package](https://img.shields.io/pub/v/photo_manager.svg)](https://pub.dartlang.org/packages/photo_manager)
+![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)
+
+
 A flutter api for photo, you can get photo from ios or android
 
 一个提供相册 api 的插件, android ios 可用,没有 ui,以便于自定义自己的界面, 你可以通过提供的 api 来制作图片相关的 ui 或插件
