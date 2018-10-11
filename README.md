@@ -10,6 +10,11 @@ A flutter api for photo, you can get image/video from ios or android
 
 or use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker .All UI comes from flutter.
 
+## api changed
+<h3 style="color:red;">API incompatibility</h3>
+
+because support video, so rename api from ImageXXXX to AssetXXXX
+
 ## install
 
 ```yaml
