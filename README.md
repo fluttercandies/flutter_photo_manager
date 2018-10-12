@@ -21,7 +21,7 @@ so 0.1.X and 0.0.X incompatibility
 
 ```yaml
 dependencies:
-  photo_manager: ^0.1.2
+  photo_manager: ^0.1.3
 ```
 
 ## import

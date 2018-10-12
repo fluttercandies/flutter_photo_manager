@@ -39,7 +39,7 @@ class _MyAppState extends State<MyApp> {
             }
 
             print("wait scan");
-            List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
+            List<AssetPathEntity> list = await PhotoManager.getAssetPathList(hasVideo: false);
 
             // print("list = $list");
             pathList.clear();
