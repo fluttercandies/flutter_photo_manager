@@ -32,24 +32,27 @@ class _PhotoListState extends State<PhotoList> {
       future: entity.thumbData,
       builder: (BuildContext context, AsyncSnapshot<Uint8List> snapshot) {
         if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
-          return Stack(
-            children: <Widget>[
-              Image.memory(
-                snapshot.data,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: double.infinity,
-              ),
-              IgnorePointer(
-                child: Container(
-                  alignment: Alignment.center,
-                  child: Text(
-                    '${entity.type}',
-                    style: TextStyle(color: Colors.white),
+          return InkWell(
+            onTap: () => showInfo(entity),
+            child: Stack(
+              children: <Widget>[
+                Image.memory(
+                  snapshot.data,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+                IgnorePointer(
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: Text(
+                      '${entity.type}',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         }
         return Center(
@@ -57,5 +60,13 @@ class _PhotoListState extends State<PhotoList> {
         );
       },
     );
+  }
+
+  showInfo(AssetEntity entity) async {
+    if (entity.type == AssetType.video) {
+      var file = await entity.file;
+      var length = file.lengthSync();
+      print("${entity.id} length = $length");
+    }
   }
 }
