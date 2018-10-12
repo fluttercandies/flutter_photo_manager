@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:image_scanner_example/photos.dart';
+import 'photos.dart';
 
 void main() => runApp(new MyApp());
 

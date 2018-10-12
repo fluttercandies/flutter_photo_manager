@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:image_scanner_example/photo_list.dart';
+import 'photo_list.dart';
 
 class PhotoPage extends StatefulWidget {
   final AssetPathEntity pathEntity;
