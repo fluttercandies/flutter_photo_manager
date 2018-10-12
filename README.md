@@ -3,7 +3,6 @@
 [![pub package](https://img.shields.io/pub/v/photo_manager.svg)](https://pub.dartlang.org/packages/photo_manager)
 ![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)
 
-
 A flutter api for photo, you can get image/video from ios or android
 
 一个提供相册 api 的插件, android ios 可用,没有 ui,以便于自定义自己的界面, 你可以通过提供的 api 来制作图片相关的 ui 或插件
@@ -11,15 +10,18 @@ A flutter api for photo, you can get image/video from ios or android
 or use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker .All UI comes from flutter.
 
 ## api changed
-<h3 style="color:red;">API incompatibility</h3>
+
+in 0.1.0 API incompatibility
 
 because support video, so rename api from ImageXXXX to AssetXXXX
+
+so 0.1.X and 0.0.X incompatibility
 
 ## install
 
 ```yaml
 dependencies:
-  photo_manager: ^0.1.1
+  photo_manager: ^0.1.2
 ```
 
 ## import

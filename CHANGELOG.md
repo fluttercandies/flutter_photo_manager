@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.2 fix bug
+
+ios get video file is async
+
 ## 0.1.1 fix ios video
 
 fix 'ios video full file is a jpg' problem
