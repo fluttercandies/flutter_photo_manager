@@ -1,3 +1,9 @@
+# CHANGELOG
+
+## 0.1.1 fix ios video
+
+fix 'ios video full file is a jpg' problem
+
 ## 0.1.0 support video
 
 support video in android.
@@ -13,4 +19,4 @@ update for the issue #1 (NPE when request other permission on android)
 
 first version
 
-api
+api for photo

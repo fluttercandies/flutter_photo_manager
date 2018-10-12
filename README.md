@@ -19,7 +19,7 @@ because support video, so rename api from ImageXXXX to AssetXXXX
 
 ```yaml
 dependencies:
-  photo_manager: ^0.1.0
+  photo_manager: ^0.1.1
 ```
 
 ## import
