@@ -24,14 +24,27 @@ class PhotoManager {
   /// get gallery list
   ///
   /// 获取相册"文件夹" 列表
-  static Future<List<AssetPathEntity>> getAssetPathList({bool hasAll = true}) async {
+  ///
+  /// [hasAll] contains all path
+  /// [hasAll] 包含所有文件
+  ///
+  /// [hasVideo] contains video
+  /// [hasVideo] 包含视频
+  ///
+  static Future<List<AssetPathEntity>> getAssetPathList({
+    bool hasAll = true,
+    bool hasVideo = true,
+  }) async {
     /// 获取id 列表
     List list = await _channel.invokeMethod('getGalleryIdList');
     if (list == null) {
       return [];
     }
 
-    List<AssetPathEntity> pathList = await _getPathList(list.map((v) => v.toString()).toList());
+    List<AssetPathEntity> pathList = await _getPathList(
+      list.map((v) => v.toString()).toList(),
+      hasVideo: hasVideo,
+    );
 
     if (hasAll == true) {
       pathList.insert(0, AssetPathEntity.all);
@@ -44,13 +57,17 @@ class PhotoManager {
     _channel.invokeMethod("openSetting");
   }
 
-  static Future<List<AssetPathEntity>> _getPathList(List<String> idList) async {
+  static Future<List<AssetPathEntity>> _getPathList(List<String> idList, {bool hasVideo}) async {
     /// 获取文件夹列表,这里主要是获取相册名称
     var list = await _channel.invokeMethod("getGalleryNameList", idList);
 
     List<AssetPathEntity> result = [];
     for (var i = 0; i < idList.length; i++) {
-      var entity = AssetPathEntity(id: idList[i], name: list[i].toString());
+      var entity = AssetPathEntity(
+        id: idList[i],
+        name: list[i].toString(),
+        hasVideo: hasVideo,
+      );
       result.add(entity);
     }
 
@@ -71,21 +88,28 @@ class PhotoManager {
   ///
   /// 获取指定相册下的所有内容
   static Future<List<AssetEntity>> _getImageList(AssetPathEntity path) async {
+    List<dynamic> list;
     if (path.id == AssetPathEntity.all.id) {
-      List list = await _channel.invokeMethod("getAllImageList");
-      var entityList = list.map((v) => AssetEntity(id: v.toString())).toList();
-      await _fetchType(entityList);
-      return entityList;
+      list = await _channel.invokeMethod("getAllImageList");
+    } else {
+      list = await _channel.invokeMethod("getImageListWithPathId", path.id);
     }
-
-    List list = await _channel.invokeMethod("getImageListWithPathId", path.id);
     var entityList = list.map((v) => AssetEntity(id: v.toString())).toList();
     await _fetchType(entityList);
-
-    return entityList;
+    return _filterType(entityList, path.hasVideo);
   }
 
-  static Future _fetchType(List<AssetEntity> entityList )async{
+  static List<AssetEntity> _filterType(List<AssetEntity> list, bool hasVideo) {
+    return list.where((it) {
+      if (it.type == AssetType.image) {
+        return true;
+      } else {
+        return it.type == AssetType.video && hasVideo;
+      }
+    }).toList();
+  }
+
+  static Future _fetchType(List<AssetEntity> entityList) async {
     var ids = entityList.map((v) => v.id).toList();
     List typeList = await _channel.invokeMethod("getAssetTypeWithIds", ids);
 
@@ -213,7 +237,10 @@ class AssetPathEntity {
   /// in ios is photos gallery name
   String name;
 
-  AssetPathEntity({this.id, this.name});
+  /// hasVideo
+  bool hasVideo;
+
+  AssetPathEntity({this.id, this.name, this.hasVideo});
 
   /// the image entity list
   Future<List<AssetEntity>> get assetList => PhotoManager._getImageList(this);
