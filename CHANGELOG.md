@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.3 add params
+
+add a params to help user disable get video
+
 ## 0.1.2 fix bug
 
 ios get video file is async
