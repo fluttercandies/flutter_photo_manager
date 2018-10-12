@@ -225,15 +225,73 @@
 
         NSString *imgId = call.arguments;
 
-        PHAsset *asset = _idAssetDict[imgId];
-
+        PHAsset *asset = self->_idAssetDict[imgId];
         __weak ImageScanner *wSelf = self;
-
-        [manager requestImageDataForAsset:asset options:[PHImageRequestOptions new] resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
-            NSString *path = [wSelf writeFullFileWithAssetId:asset imageData:imageData];
-            flutterResult(path);
-        }];
+        if([asset isImage]) {
+            [manager requestImageDataForAsset:asset options:[PHImageRequestOptions new] resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
+                NSString *path = [wSelf writeFullFileWithAssetId:asset imageData:imageData];
+                flutterResult(path);
+            }];
+        } else if([asset isVideo]) {
+            PHVideoRequestOptions *options = [PHVideoRequestOptions new];
+            options.version = PHVideoRequestOptionsVersionCurrent;
+//            NSString *path =
+            [self writeFullVideoFileWithAsset:asset result:flutterResult];
+//            flutterResult(path);
+        } else {
+            flutterResult(nil);
+        }
     });
+}
+
+- (void) writeFullVideoFileWithAsset:(PHAsset*) asset result:(FlutterResult)result{
+    NSString *homePath = NSTemporaryDirectory();
+    NSFileManager *manager = NSFileManager.defaultManager;
+    
+    NSMutableString *path = [NSMutableString stringWithString:homePath];
+    
+    NSString *filename = [asset valueForKey:@"filename"];
+   
+    NSString *dirPath = [NSString stringWithFormat:@"%@/%@",homePath,@".video"];
+    [manager createDirectoryAtPath:dirPath attributes:@{}];
+    
+    [path appendFormat:@"%@/%@",@".video",filename];
+    PHVideoRequestOptions *options = [PHVideoRequestOptions new];
+    if([manager fileExistsAtPath:path]){
+        NSLog(@"read cache from %@",path);
+        result(path);
+        return;
+    }
+    [[PHImageManager defaultManager]requestAVAssetForVideo:asset options:options resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+        NSURL *fileRUL = [asset valueForKey:@"URL"];
+        NSData *beforeVideoData = [NSData dataWithContentsOfURL:fileRUL];//未压缩的视频流
+        BOOL createResult = [manager createFileAtPath:path contents:beforeVideoData attributes:@{}];
+        NSLog(@"write file to %@ , size = %lu , createResult = %@",path,(unsigned long)beforeVideoData.length,createResult?@"true":@"false");
+        result(path);
+    }];
+//
+//
+//    if(@available(iOS 9.0, *)){
+//        NSArray<PHAssetResource *> *a = [PHAssetResource assetResourcesForAsset:asset];
+//        PHAssetResource *resource = a.firstObject;
+//
+//        if (resource.originalFilename) {
+//            filename = resource.originalFilename;
+//        }
+//        [path appendFormat:@"%@/%@",@".video",filename];
+//        if([manager fileExistsAtPath:path]){
+//            result(path);
+//            return;
+//        }
+//        PHAssetResourceRequestOptions * options = [[PHAssetResourceRequestOptions alloc] init];
+//
+//        [[PHAssetResourceManager defaultManager]writeDataForAssetResource:resource toFile:[NSURL fileURLWithPath:filename] options:options completionHandler:^(NSError * _Nullable error) {
+//            result(path);
+//        }];
+//
+//    } else {
+//
+//    }
 }
 
 - (NSString *)writeFullFileWithAssetId:(PHAsset *)asset imageData:(NSData *)imageData {
