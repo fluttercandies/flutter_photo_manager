@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.4 fix bug
+
+update all path hasVideo property
+
 ## 0.1.3 add params
 
 add a params to help user disable get video
