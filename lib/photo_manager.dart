@@ -59,6 +59,8 @@ class PhotoManager {
   }
 
   static Future<List<AssetPathEntity>> _getPathList(List<String> idList, {bool hasVideo}) async {
+    hasVideo ??= true;
+
     /// 获取文件夹列表,这里主要是获取相册名称
     var list = await _channel.invokeMethod("getGalleryNameList", idList);
 
