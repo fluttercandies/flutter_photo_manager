@@ -47,6 +47,7 @@ class PhotoManager {
     );
 
     if (hasAll == true) {
+      AssetPathEntity.all.hasVideo = hasVideo;
       pathList.insert(0, AssetPathEntity.all);
     }
 
@@ -75,7 +76,7 @@ class PhotoManager {
   }
 
   static AssetType _convertTypeFromString(String type) {
-    print("type = $type");
+    // print("type = $type");
     try {
       var intType = int.tryParse(type) ?? 0;
       return AssetType.values[intType];
@@ -96,10 +97,12 @@ class PhotoManager {
     }
     var entityList = list.map((v) => AssetEntity(id: v.toString())).toList();
     await _fetchType(entityList);
-    return _filterType(entityList, path.hasVideo);
+    return _filterType(entityList, path.hasVideo == true);
   }
 
   static List<AssetEntity> _filterType(List<AssetEntity> list, bool hasVideo) {
+    hasVideo ??= true;
+
     return list.where((it) {
       if (it.type == AssetType.image) {
         return true;
@@ -245,9 +248,12 @@ class AssetPathEntity {
   /// the image entity list
   Future<List<AssetEntity>> get assetList => PhotoManager._getImageList(this);
 
-  static var all = AssetPathEntity()
+  static var _all = AssetPathEntity()
     ..id = "dfnsfkdfj2454AJJnfdkl"
-    ..name = "全部";
+    ..name = "全部"
+    ..hasVideo = true;
+
+  static AssetPathEntity get all => _all;
 
   @override
   bool operator ==(other) {
