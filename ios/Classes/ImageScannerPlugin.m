@@ -10,6 +10,10 @@
     [registrar addMethodCallDelegate:instance channel:channel];
 
     instance.scanner = [[ImageScanner alloc] init];
+    
+    NSString *path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES) objectAtIndex:0];
+    NSLog(@"沙盒目录 = %@",path);
+    
     instance.registrar = registrar;
 }
 
@@ -40,6 +44,8 @@
         [_scanner getBytesWithCall:call result:result];
     } else if ([@"getAssetTypeWithIds" isEqualToString:call.method]) {
         [_scanner getAssetTypeByIdsWithCall:call result:result];
+    } else if([@"isCloudWithImageId" isEqualToString:call.method]){
+        [_scanner isCloudWithCall:call result:result];
     } else {
         result(FlutterMethodNotImplemented);
     }

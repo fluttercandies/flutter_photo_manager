@@ -10,6 +10,7 @@
 #import <Photos/PHPhotoLibrary.h>
 #import "MD5Utils.h"
 #import "PHAsset+PHAsset_checkType.h"
+#import "AssetEntity.h"
 
 @interface ImageScanner () <PHPhotoLibraryChangeObserver>
 
@@ -166,6 +167,16 @@
                       contentMode:PHImageContentModeAspectFill
                           options:[PHImageRequestOptions new]
                     resultHandler:^(UIImage *result, NSDictionary *info) {
+                        
+                        BOOL downloadFinined =
+                        ![[info objectForKey:PHImageCancelledKey] boolValue] &&
+                        ![info objectForKey:PHImageErrorKey] &&
+                        ![[info objectForKey:PHImageResultIsDegradedKey] boolValue];
+                        if (!downloadFinined) {
+                            flutterResult(nil);
+                            return;
+                        }
+                        
                       NSData *data = UIImageJPEGRepresentation(result, 95);
                       NSString *path = [self writeThumbFileWithAssetId:asset imageData:data];
                       flutterResult(path);
@@ -187,6 +198,8 @@
     PHImageRequestOptions *options = [PHImageRequestOptions new];
     options.resizeMode = PHImageRequestOptionsResizeModeFast;
     __block BOOL isReply = NO;
+      
+      __weak ImageScanner *wSelf = self;
     [manager requestImageForAsset:asset
                        targetSize:CGSizeMake(width, height)
                       contentMode:PHImageContentModeAspectFill
@@ -199,6 +212,9 @@
                           ![info objectForKey:PHImageErrorKey] &&
                           ![[info objectForKey:PHImageResultIsDegradedKey] boolValue];
                       if (!downloadFinined) {
+//                        dispatch_async(wSelf.asyncQueue, ^{
+//                             [wSelf getThumbBytesWithCall:call result:flutterResult];
+//                        });
                         return;
                       }
                       NSData *data = UIImageJPEGRepresentation(result, 100);
@@ -360,6 +376,18 @@
     }
     result(resultArr);
   });
+}
+
+- (void)isCloudWithCall:(FlutterMethodCall *)call result:(FlutterResult)result{
+    
+    NSString *imageId = call.arguments;
+    
+    PHAsset *asset = _idAssetDict[imageId];
+    if (asset){
+        
+    }else{
+        result(nil);
+    }
 }
 
 + (NSArray *)convertNSData:(NSData *)data {
