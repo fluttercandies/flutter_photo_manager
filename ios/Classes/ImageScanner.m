@@ -212,9 +212,10 @@
                           ![info objectForKey:PHImageErrorKey] &&
                           ![[info objectForKey:PHImageResultIsDegradedKey] boolValue];
                       if (!downloadFinined) {
-//                        dispatch_async(wSelf.asyncQueue, ^{
-//                             [wSelf getThumbBytesWithCall:call result:flutterResult];
-//                        });
+                          // reload thumb data in per 5 seconds
+                          dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                              [wSelf getThumbBytesWithCall:call result:flutterResult];
+                          });
                         return;
                       }
                       NSData *data = UIImageJPEGRepresentation(result, 100);
