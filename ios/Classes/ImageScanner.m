@@ -213,9 +213,24 @@
                           ![[info objectForKey:PHImageResultIsDegradedKey] boolValue];
                       if (!downloadFinined) {
                           // reload thumb data in per 5 seconds
-                          dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                              [wSelf getThumbBytesWithCall:call result:flutterResult];
-                          });
+//                          dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//                              [wSelf getThumbBytesWithCall:call result:flutterResult];
+//                          });
+                          if ([info objectForKey:PHImageResultIsInCloudKey] && !result) {
+                              PHImageRequestOptions *option = [[PHImageRequestOptions alloc]init];
+                              option.networkAccessAllowed = YES;
+                              option.resizeMode = PHImageRequestOptionsResizeModeFast;
+                              [[PHImageManager defaultManager] requestImageDataForAsset:asset options:option resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+                                  NSArray *arr = [ImageScanner convertNSData:imageData];
+                                  
+                                  if (isReply) {
+                                      return;
+                                  }
+                                  isReply = YES;
+                                  flutterResult(arr);
+                              }];
+                          }
+                          
                         return;
                       }
                       NSData *data = UIImageJPEGRepresentation(result, 100);
