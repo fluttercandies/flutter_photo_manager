@@ -1,4 +1,5 @@
 #import "ImageScannerPlugin.h"
+#import "Reply.h"
 
 @implementation ImageScannerPlugin {
 }
@@ -37,11 +38,11 @@
     } else if ([@"getThumbPath" isEqualToString:call.method]) {
         [_scanner getThumbPathWithCall:call result:result];
     } else if ([@"getThumbBytesWithId" isEqualToString:call.method]) {
-        [_scanner getThumbBytesWithCall:call result:result];
+        [_scanner getThumbBytesWithCall:call result:result reply:[Reply replyWithIsReply:NO]];
     } else if ([@"getFullFileWithId" isEqualToString:call.method]) {
-        [_scanner getFullFileWithCall:call result:result];
+        [_scanner getFullFileWithCall:call result:result reply:[Reply replyWithIsReply:NO]];
     } else if ([@"getBytesWithId" isEqualToString:call.method]) {
-        [_scanner getBytesWithCall:call result:result];
+        [_scanner getBytesWithCall:call result:result reply:[Reply replyWithIsReply:NO]];
     } else if ([@"getAssetTypeWithIds" isEqualToString:call.method]) {
         [_scanner getAssetTypeByIdsWithCall:call result:result];
     } else if([@"isCloudWithImageId" isEqualToString:call.method]){

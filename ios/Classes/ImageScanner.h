@@ -5,6 +5,8 @@
 #import <Foundation/Foundation.h>
 #import <Flutter/Flutter.h>
 
+@class Reply;
+
 @interface ImageScanner : NSObject <UIImagePickerControllerDelegate, UINavigationControllerDelegate> {
 
 }
@@ -18,17 +20,17 @@
 
 - (void)getImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
 
--(void) getAllImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
+- (void)getAllImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
 
 - (void)getThumbPathWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
 
-- (void)getBytesWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
+- (void)getBytesWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult reply:(Reply *)reply;
 
-- (void)getFullFileWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
+- (void)getFullFileWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult reply:(Reply *)reply;
 
 + (void)openSetting;
 
-- (void)getThumbBytesWithCall:(FlutterMethodCall *)call result:(FlutterResult)result;
+- (void)getThumbBytesWithCall:(FlutterMethodCall *)call result:(FlutterResult)result reply:(Reply *)reply;
 
 - (void)getAssetTypeByIdsWithCall:(FlutterMethodCall *)call result:(FlutterResult)result;
 
