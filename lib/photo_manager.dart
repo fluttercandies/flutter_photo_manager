@@ -162,20 +162,36 @@ class PhotoManager {
     int width = 64,
     int height = 64,
   }) async {
-    var result = await _channel.invokeMethod("getThumbBytesWithId", [id, width.toString(), height.toString()]);
-    if (result is Uint8List) {
-      return result;
-    }
-    if (result is List<dynamic>) {
-      List<int> l = result.map((v) {
-        if (v is int) {
-          return v;
-        }
-        return 0;
-      }).toList();
-      return Uint8List.fromList(l);
-    }
+    Completer<Uint8List> completer = Completer();
+    Future.delayed(Duration.zero, () async {
+      var result = await _channel.invokeMethod("getThumbBytesWithId", [id, width.toString(), height.toString()]);
+      if (result is Uint8List) {
+        completer.complete(null);
+      } else if (result is List<dynamic>) {
+        List<int> l = result.map((v) {
+          if (v is int) {
+            return v;
+          }
+          return 0;
+        }).toList();
+        completer.complete(Uint8List.fromList(l));
+      } else {
+        print("加载错误");
+        completer.completeError("图片加载发生错误");
+      }
+    });
 
+    return completer.future;
+  }
+
+  static Future<bool> _isCloudWithAsset(AssetEntity assetEntity) async {
+    if (Platform.isAndroid) {
+      return false;
+    }
+    if (Platform.isIOS) {
+      var isICloud = await _channel.invokeMethod("isCloudWithImageId", assetEntity.id);
+      return isICloud == "1";
+    }
     return null;
   }
 }
@@ -191,6 +207,9 @@ class AssetEntity {
   ///
   /// see [AssetType]
   AssetType type;
+
+  // /// isCloud
+  // Future get isCloud async => PhotoManager._isCloudWithAsset(this);
 
   /// thumb path
   ///
