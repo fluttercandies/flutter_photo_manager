@@ -38,18 +38,21 @@ or see next
 
 ## example
 
-1. you must requestPermission
+1. request permission
+
+You must get the user's permission on android/ios.
 
 ```dart
 var result = await PhotoManager.requestPermission();
-if(result == true){
+if (result) {
     // success
-}else{
+} else {
     // fail
+    // if result is fail, you can call PhotoManger.openSetting();  to open android/ios applicaton's setting to get permission
 }
 ```
 
-2. you get all of asset list(gallery)
+2. you get all of asset list (gallery)
 
 ```dart
 List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
