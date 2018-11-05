@@ -2,7 +2,7 @@ group 'top.kikt.imagescanner'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.2.30'
+    ext.kotlin_version = '1.2.71'
     repositories {
         google()
         jcenter()
