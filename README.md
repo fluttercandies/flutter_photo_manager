@@ -79,3 +79,27 @@ Uint8List thumbDataWithSize = await entity.thumbDataWithSize(width,height); //Ju
 
 AssetType type = entity.type; // the type of asset enum of other,image,video
 ```
+
+
+## about ios build error
+
+if your flutter print like the log. see [so](https://stackoverflow.com/questions/27776497/include-of-non-modular-header-inside-framework-module)
+```
+Xcode's output:
+↳
+    === BUILD TARGET Runner OF PROJECT Runner WITH CONFIGURATION Debug ===
+    The use of Swift 3 @objc inference in Swift 4 mode is deprecated. Please address deprecated @objc inference warnings, test your code with “Use of deprecated Swift 3 @objc inference” logging enabled, and then disable inference by changing the "Swift 3 @objc Inference" build setting to "Default" for the "Runner" target.
+    === BUILD TARGET Runner OF PROJECT Runner WITH CONFIGURATION Debug ===
+    While building module 'photo_manager' imported from /Users/cai/IdeaProjects/flutter/sxw_order/ios/Runner/GeneratedPluginRegistrant.m:9:
+    In file included from <module-includes>:1:
+    In file included from /Users/cai/IdeaProjects/flutter/sxw_order/build/ios/Debug-iphonesimulator/photo_manager/photo_manager.framework/Headers/photo_manager-umbrella.h:16:
+    /Users/cai/IdeaProjects/flutter/sxw_order/build/ios/Debug-iphonesimulator/photo_manager/photo_manager.framework/Headers/MD5Utils.h:5:9: error: include of non-modular header inside framework module 'photo_manager.MD5Utils': '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator11.2.sdk/usr/include/CommonCrypto/CommonDigest.h' [-Werror,-Wnon-modular-include-in-framework-module]
+    #import <CommonCrypto/CommonDigest.h>
+            ^
+    1 error generated.
+    /Users/cai/IdeaProjects/flutter/sxw_order/ios/Runner/GeneratedPluginRegistrant.m:9:9: fatal error: could not build module 'photo_manager'
+    #import <photo_manager/ImageScannerPlugin.h>
+     ~~~~~~~^
+    2 errors generated.
+```
+
