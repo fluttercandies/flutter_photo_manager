@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'photos.dart';
@@ -56,6 +58,10 @@ class _MyAppState extends State<MyApp> {
 
   Widget _buildItem(BuildContext context, int index) {
     var data = pathList[index];
+    return _buildWithData(data);
+  }
+
+  Widget _buildWithData(AssetPathEntity data) {
     return GestureDetector(
       child: ListTile(
         title: Text(data.name),
@@ -68,6 +74,37 @@ class _MyAppState extends State<MyApp> {
           photos: list,
         );
         Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => page));
+      },
+    );
+  }
+
+  // This is an example of how to build album preview.
+  Widget _buildHasPreviewItem(BuildContext context, int index) {
+    var data = pathList[index];
+    Widget widget = FutureBuilder<List<AssetEntity>>(
+      future: data.assetList,
+      builder: (BuildContext context, AsyncSnapshot<List<AssetEntity>> snapshot) {
+        var assetList = snapshot.data;
+        if (assetList == null || assetList.isEmpty) {
+          return Container(
+            child: Text('loading'),
+          );
+        }
+        AssetEntity asset = assetList[0];
+        return _buildPreview(asset);
+      },
+    );
+    return widget;
+  }
+
+  Widget _buildPreview(AssetEntity asset) {
+    return FutureBuilder<Uint8List>(
+      future: asset.thumbDataWithSize(200, 200),
+      builder: (BuildContext context, AsyncSnapshot<Uint8List> snapshot) {
+        if (snapshot.data != null) {
+          return Image.memory(snapshot.data);
+        }
+        return Container();
       },
     );
   }
