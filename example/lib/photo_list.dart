@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -26,10 +27,16 @@ class _PhotoListState extends State<PhotoList> {
   }
 
   Widget _buildItem(BuildContext context, int index) {
-    var entity = widget.photos[index];
-    print("请求的index = $index , image id = ${entity.id} type = ${entity.type}");
+    AssetEntity entity = widget.photos[index];
+    print("request index = $index , image id = ${entity.id} type = ${entity.type}");
+
+    Future<Uint8List> thumbDataWithSize = entity.thumbDataWithSize(500, 500); // get thumb with width and height.
+    Future<Uint8List> thumbData = entity.thumbData; // the method will get thumbData is size 64*64.
+    Future<Uint8List> imageFullData = entity.fullData; // get the origin data.
+    Future<File> file = entity.file; // get file
+
     return FutureBuilder<Uint8List>(
-      future: entity.thumbData,
+      future: thumbDataWithSize,
       builder: (BuildContext context, AsyncSnapshot<Uint8List> snapshot) {
         if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
           return InkWell(
@@ -56,7 +63,7 @@ class _PhotoListState extends State<PhotoList> {
           );
         }
         return Center(
-          child: Text('加载中'),
+          child: Text('loading...'),
         );
       },
     );
