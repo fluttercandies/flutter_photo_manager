@@ -166,7 +166,7 @@ class PhotoManager {
     Future.delayed(Duration.zero, () async {
       var result = await _channel.invokeMethod("getThumbBytesWithId", [id, width.toString(), height.toString()]);
       if (result is Uint8List) {
-        completer.complete(null);
+        completer.complete(result);
       } else if (result is List<dynamic>) {
         List<int> l = result.map((v) {
           if (v is int) {
