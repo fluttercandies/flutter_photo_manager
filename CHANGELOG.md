@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.1.6
+
+Fix Android to get pictures that are empty bug.
+
+## 0.1.5
+
+support ios icloud image and video
+
 ## 0.1.4 fix bug
 
 update all path hasVideo property

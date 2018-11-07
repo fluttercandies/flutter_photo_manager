@@ -21,7 +21,7 @@ so 0.1.X and 0.0.X incompatibility
 
 ```yaml
 dependencies:
-  photo_manager: ^0.1.5
+  photo_manager: ^0.1.6
 ```
 
 ## import
@@ -80,10 +80,10 @@ Uint8List thumbDataWithSize = await entity.thumbDataWithSize(width,height); //Ju
 AssetType type = entity.type; // the type of asset enum of other,image,video
 ```
 
-
 ## about ios build error
 
 if your flutter print like the log. see [so](https://stackoverflow.com/questions/27776497/include-of-non-modular-header-inside-framework-module)
+
 ```
 Xcode's output:
 ↳
@@ -102,4 +102,3 @@ Xcode's output:
      ~~~~~~~^
     2 errors generated.
 ```
-
