@@ -67,7 +67,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         val num = mCursor.count
         Log.i("K", "num = $num")
         mCursor.moveToLast()
-        while (mCursor.moveToPrevious()) {
+        do {
             val path = mCursor.getString(mCursor
                     .getColumnIndex(MediaStore.Images.Media.DATA))
             val dir = mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME))
@@ -88,7 +88,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             pathIdMap[dir] = dirId
 
             pathImgMap[path] = img
-        }
+        } while (mCursor.moveToPrevious())
         mCursor.close()
     }
 
