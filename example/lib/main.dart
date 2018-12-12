@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'photos.dart';
 
-void main() => runApp(new MyApp());
+void main() => runApp(MaterialApp(
+      home: new MyApp(),
+    ));
 
 class MyApp extends StatefulWidget {
   @override
@@ -16,42 +18,40 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: const Text('Plugin example app'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.settings_applications),
-              onPressed: _openSetting,
-            ),
-          ],
-        ),
-        body: new ListView.builder(
-          itemBuilder: _buildItem,
-          itemCount: pathList.length,
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.refresh),
-          onPressed: () async {
-            var result = await PhotoManager.requestPermission();
-            if (!(result == true)) {
-              print("未授予权限");
-              return;
-            }
+    return new Scaffold(
+      appBar: new AppBar(
+        title: const Text('Plugin example app'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.settings_applications),
+            onPressed: _openSetting,
+          ),
+        ],
+      ),
+      body: new ListView.builder(
+        itemBuilder: _buildItem,
+        itemCount: pathList.length,
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.refresh),
+        onPressed: () async {
+          var result = await PhotoManager.requestPermission();
+          if (!(result == true)) {
+            print("未授予权限");
+            return;
+          }
 
-            print("wait scan");
-            List<AssetPathEntity> list = await PhotoManager.getAssetPathList(hasVideo: false);
+          print("wait scan");
+          List<AssetPathEntity> list = await PhotoManager.getAssetPathList(hasVideo: false);
 
-            // print("list = $list");
-            pathList.clear();
-            pathList.addAll(list);
-            setState(() {});
+          // print("list = $list");
+          pathList.clear();
+          pathList.addAll(list);
+          setState(() {});
 
-            // var r = await ImagePicker.pickImages(source: ImageSource.gallery, numberOfItems: 10);
-            // print(r);
-          },
-        ),
+          // var r = await ImagePicker.pickImages(source: ImageSource.gallery, numberOfItems: 10);
+          // print(r);
+        },
       ),
     );
   }

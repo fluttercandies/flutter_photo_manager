@@ -137,9 +137,9 @@ class PhotoManager {
     return null;
   }
 
-  static Future<List<int>> _getDataWithId(String id) async {
+  static Future<Uint8List> _getDataWithId(String id) async {
     if (Platform.isAndroid) {
-      return File(id).readAsBytes();
+      return Uint8List.fromList(File(id).readAsBytesSync());
     } else if (Platform.isIOS) {
       List<dynamic> bytes = await _channel.invokeMethod("getBytesWithId", id);
       if (bytes == null) {
@@ -152,7 +152,7 @@ class PhotoManager {
         return 0;
       }).toList();
 
-      return l;
+      return Uint8List.fromList(l);
     }
     return null;
   }
@@ -220,7 +220,7 @@ class AssetEntity {
   Future<File> get file async => PhotoManager._getFullFileWithId(id);
 
   /// the image's bytes ,
-  Future<List<int>> get fullData => PhotoManager._getDataWithId(id);
+  Future<Uint8List> get fullData => PhotoManager._getDataWithId(id);
 
   /// thumb data , for display
   Future<Uint8List> get thumbData => PhotoManager._getThumbDataWithId(id);
