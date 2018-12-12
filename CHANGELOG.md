@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.1.7 fix bug
+
+fix bug: Android's latest picture won't be found
+
+update gradle wrapper version.
+
+update kotlin version
+
 ## 0.1.6
 
 Fix Android to get pictures that are empty bug.
