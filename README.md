@@ -21,7 +21,7 @@ so 0.1.X and 0.0.X incompatibility
 
 ```yaml
 dependencies:
-  photo_manager: ^0.1.7
+  photo_manager: ^0.1.8
 ```
 
 ## import
@@ -102,3 +102,17 @@ Xcode's output:
      ~~~~~~~^
     2 errors generated.
 ```
+
+## about ios
+
+Because the album is a privacy privilege, you need user permission to access it. You must to modify the `Info.plist` file in Runner project.
+
+like next
+
+```plist
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>App need your agree, can visit your album</string>
+```
+
+xcode like image
+![in xcode](https://github.com/CaiJingLong/some_asset/blob/master/flutter_photo2.png)
