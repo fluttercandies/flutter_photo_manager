@@ -1,5 +1,7 @@
 # CHANGELOG
 
+## 0.1.8 sort asset by data
+
 ## 0.1.7 fix bug
 
 fix bug: Android's latest picture won't be found
