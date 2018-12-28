@@ -32,7 +32,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             MediaStore.Images.Media.TITLE, // id
             MediaStore.Images.Media.BUCKET_ID, // dir id 目录
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME, // dir name 目录名字
-            MediaStore.Images.Media.DATE_TAKEN
+            MediaStore.Images.Media.DATE_TAKEN //日期
     )
 
 
@@ -44,7 +44,8 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             MediaStore.Video.Media.TITLE, // id
             MediaStore.Video.Media.BUCKET_ID, // dir id 目录
             MediaStore.Video.Media.BUCKET_DISPLAY_NAME, // dir name 目录名字
-            MediaStore.Video.Media.DATE_TAKEN
+            MediaStore.Video.Media.DATE_TAKEN, //日期
+            MediaStore.Video.Media.DURATION //时长
     )
 
 
@@ -83,7 +84,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             val thumb = mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.MINI_THUMB_MAGIC))
             val imgId = mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns._ID))
             val date = mCursor.getLong(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN))
-            val img = Img(path, imgId, dir, dirId, title, thumb, AssetType.Image, date)
+            val img = Img(path, imgId, dir, dirId, title, thumb, AssetType.Image, date, null)
 
             val file = File(path)
             if (file.exists().not()) {
@@ -118,7 +119,8 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             val thumb = mCursor.getString(mCursor.getColumnIndex(MediaStore.Video.Media.MINI_THUMB_MAGIC))
             val imgId = mCursor.getString(mCursor.getColumnIndex(MediaStore.Video.Media._ID))
             val date = mCursor.getLong(mCursor.getColumnIndex(MediaStore.Video.Media.DATE_TAKEN))
-            val img = Img(path, imgId, dir, dirId, title, thumb, AssetType.Video, date)
+            val durationMs = mCursor.getLong(mCursor.getColumnIndex(MediaStore.Video.Media.DURATION))
+            val img = Img(path, imgId, dir, dirId, title, thumb, AssetType.Video, date, durationMs)
 
             val file = File(path)
             if (file.exists().not()) {
@@ -381,6 +383,21 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             AssetType.Image -> "1"
             AssetType.Video -> "2"
             AssetType.Other -> "0"
+        }
+    }
+
+    fun getAssetDurationWithId(call: MethodCall, result: MethodChannel.Result) {
+        val id = call.arguments<String>()
+        val img = pathImgMap[id]
+        if (img == null || img.type != AssetType.Video) {
+            result.success(null)
+        } else {
+            val duration = img.duration
+            if (duration == null) {
+                result.success(null)
+            } else {
+                result.success(duration / 1000)
+            }
         }
     }
 }

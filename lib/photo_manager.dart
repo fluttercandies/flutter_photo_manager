@@ -194,6 +194,11 @@ class PhotoManager {
     }
     return null;
   }
+
+  static Future<Duration> _getDurationWithId(String id) async {
+    int second = await _channel.invokeMethod("getDurationWithId", id);
+    return Duration(seconds: second);
+  }
 }
 
 /// image entity
@@ -227,6 +232,13 @@ class AssetEntity {
 
   Future<Uint8List> thumbDataWithSize(int width, int height) {
     return PhotoManager._getThumbDataWithId(id, width: width, height: height);
+  }
+
+  Future<Duration> get videoDuration async {
+    if (type != AssetType.video) {
+      return null;
+    }
+    return PhotoManager._getDurationWithId(id);
   }
 
   AssetEntity({this.id});

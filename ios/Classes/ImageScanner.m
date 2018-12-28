@@ -448,6 +448,17 @@
     }
 }
 
+-(void)getDurationWithId:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSString* imageId = call.arguments;
+    PHAsset *asset = [_idAssetDict valueForKey:imageId];
+    int duration = [asset duration];
+    if(duration == 0){
+        result(nil);
+    }else{
+        result([[NSNumber alloc] initWithInt:duration]);
+    }
+}
+
 + (NSArray *)convertNSData:(NSData *)data {
     NSMutableArray *array = [NSMutableArray array];
     Byte *bytes = data.bytes;
