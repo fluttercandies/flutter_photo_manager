@@ -79,6 +79,10 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                 scanner.getAssetTypeWithIds(call, result)
                 true
             }
+            call.method == "getDurationWithId" -> {
+                scanner.getAssetDurationWithId(call, result)
+                true
+            }
             else -> false
         }
 
@@ -120,7 +124,7 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
 
 }
 
-data class Img(val path: String, val imgId: String, val dir: String, val dirId: String, val title: String, var thumb: String?, val type: AssetType,val timeStamp:Long )
+data class Img(val path: String, val imgId: String, val dir: String, val dirId: String, val title: String, var thumb: String?, val type: AssetType, val timeStamp: Long, val duration: Long?)
 
 enum class AssetType {
     Other,
