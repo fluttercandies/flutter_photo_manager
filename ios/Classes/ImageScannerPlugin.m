@@ -47,6 +47,8 @@
         [_scanner getAssetTypeByIdsWithCall:call result:result];
     } else if([@"isCloudWithImageId" isEqualToString:call.method]){
         [_scanner isCloudWithCall:call result:result];
+    } else if([@"getDurationWithId" isEqualToString:call.method]){
+        [_scanner getDurationWithId:call result:result];
     } else {
         result(FlutterMethodNotImplemented);
     }
