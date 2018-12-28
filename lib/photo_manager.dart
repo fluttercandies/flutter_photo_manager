@@ -196,7 +196,8 @@ class PhotoManager {
   }
 
   static Future<Duration> _getDurationWithId(String id) async {
-    return await _channel.invokeMethod("getDurationWithId", id);
+    int second = await _channel.invokeMethod("getDurationWithId", id);
+    return Duration(seconds: second);
   }
 }
 

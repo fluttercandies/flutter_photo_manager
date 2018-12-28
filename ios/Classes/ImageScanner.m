@@ -451,7 +451,12 @@
 -(void)getDurationWithId:(FlutterMethodCall *)call result:(FlutterResult)result {
     NSString* imageId = call.arguments;
     PHAsset *asset = [_idAssetDict valueForKey:imageId];
-    [asset duration];
+    int duration = [asset duration];
+    if(duration == 0){
+        result(nil);
+    }else{
+        result([[NSNumber alloc] initWithInt:duration]);
+    }
 }
 
 + (NSArray *)convertNSData:(NSData *)data {

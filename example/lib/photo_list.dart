@@ -34,6 +34,10 @@ class _PhotoListState extends State<PhotoList> {
     Future<Uint8List> thumbData = entity.thumbData; // the method will get thumbData is size 64*64.
     Future<Uint8List> imageFullData = entity.fullData; // get the origin data.
     Future<File> file = entity.file; // get file
+    Future<Duration> length = entity.videoDuration;
+    length.then((v){
+      print("duration = $v");
+    });
 
     return FutureBuilder<Uint8List>(
       future: thumbDataWithSize,
