@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.9
+
+add video duration
+
 ## 0.1.8 sort asset by data
 
 ## 0.1.7 fix bug

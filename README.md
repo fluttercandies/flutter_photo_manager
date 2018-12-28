@@ -21,7 +21,7 @@ so 0.1.X and 0.0.X incompatibility
 
 ```yaml
 dependencies:
-  photo_manager: ^0.1.8
+  photo_manager: ^0.1.9
 ```
 
 ## import
@@ -78,6 +78,8 @@ Uint8List thumbBytes = await entity.thumbData; // thumb data ,you can use Image.
 Uint8List thumbDataWithSize = await entity.thumbDataWithSize(width,height); //Just like thumbnails, you can specify your own size. unit is px;
 
 AssetType type = entity.type; // the type of asset enum of other,image,video
+
+Duration duration = await entity.duration; //if type is not video, then return null.
 ```
 
 ## about ios build error
