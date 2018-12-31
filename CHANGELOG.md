@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.1.10
+
+fix
+
+    when number of photo/video is 0, will crash
+
+
 ## 0.1.9
 
 add video duration

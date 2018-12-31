@@ -56,6 +56,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         imgList.clear()
         idPathMap.clear()
         pathIdMap.clear()
+        pathImgMap.clear()
 
         scanVideo()
         scanImage()
@@ -74,6 +75,12 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         val mCursor = MediaStore.Images.Media.query(mContentResolver, mImageUri, storeImageKeys, null, MediaStore.Images.Media.DATE_TAKEN)
         val num = mCursor.count
         Log.i("K", "num = $num")
+
+        if (num == 0) {
+            mCursor.close()
+            return
+        }
+
         mCursor.moveToLast()
         do {
             val path = mCursor.getString(mCursor
@@ -105,10 +112,15 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         val mImageUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
         val mContentResolver = registrar.activity().contentResolver
 
-
         val mCursor = MediaStore.Images.Media.query(mContentResolver, mImageUri, storeVideoKeys, null, MediaStore.Images.Media.DATE_TAKEN)
         val num = mCursor.count
         Log.i("K", "num = $num")
+
+        if (num == 0) {
+            mCursor.close()
+            return
+        }
+
         mCursor.moveToLast()
         do {
             val path = mCursor.getString(mCursor
