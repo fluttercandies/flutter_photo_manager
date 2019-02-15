@@ -5,12 +5,23 @@ import 'dart:ui';
 
 import 'package:flutter/services.dart';
 
+/// asset type
+///
+/// 用于资源类型属性
 enum AssetType {
+  /// not image or video
+  ///
+  /// 不是图片 也不是视频
   other,
+
+  /// image
   image,
+
+  /// video
   video,
 }
 
+/// use the class method to help user load asset list and asset info.
 class PhotoManager {
   static const MethodChannel _channel = const MethodChannel('image_scanner');
 
@@ -55,11 +66,13 @@ class PhotoManager {
     return pathList;
   }
 
+  /// open setting page
   static void openSetting() {
     _channel.invokeMethod("openSetting");
   }
 
-  static Future<List<AssetPathEntity>> _getPathList(List<String> idList, {bool hasVideo}) async {
+  static Future<List<AssetPathEntity>> _getPathList(List<String> idList,
+      {bool hasVideo}) async {
     hasVideo ??= true;
 
     /// 获取文件夹列表,这里主要是获取相册名称
@@ -165,7 +178,8 @@ class PhotoManager {
   }) async {
     Completer<Uint8List> completer = Completer();
     Future.delayed(Duration.zero, () async {
-      var result = await _channel.invokeMethod("getThumbBytesWithId", [id, width.toString(), height.toString()]);
+      var result = await _channel.invokeMethod(
+          "getThumbBytesWithId", [id, width.toString(), height.toString()]);
       if (result is Uint8List) {
         completer.complete(result);
       } else if (result is List<dynamic>) {
@@ -177,8 +191,8 @@ class PhotoManager {
         }).toList();
         completer.complete(Uint8List.fromList(l));
       } else {
-        print("加载错误");
-        completer.completeError("图片加载发生错误");
+        print("loading image error");
+        completer.completeError("load image error");
       }
     });
 
@@ -190,7 +204,8 @@ class PhotoManager {
       return false;
     }
     if (Platform.isIOS) {
-      var isICloud = await _channel.invokeMethod("isCloudWithImageId", assetEntity.id);
+      var isICloud =
+          await _channel.invokeMethod("isCloudWithImageId", assetEntity.id);
       return isICloud == "1";
     }
     return null;
@@ -274,7 +289,7 @@ class AssetEntity {
   }
 }
 
-/// Gallery Id
+/// asset entity, for entity info.
 class AssetPathEntity {
   /// id
   ///
@@ -303,6 +318,7 @@ class AssetPathEntity {
     ..name = "all"
     ..hasVideo = true;
 
+  /// all asset path
   static AssetPathEntity get all => _all;
 
   @override
