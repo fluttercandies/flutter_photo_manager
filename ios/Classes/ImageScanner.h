@@ -36,6 +36,7 @@
 
 - (void)isCloudWithCall:(FlutterMethodCall *)call result:(FlutterResult)result;
 
--(void)getDurationWithId:(FlutterMethodCall *)call result:(FlutterResult)result;
+- (void)getDurationWithId:(FlutterMethodCall *)call result:(FlutterResult)result;
 
+- (void)getSizeWithId:(FlutterMethodCall *)call result:(FlutterResult)result;
 @end
