@@ -71,7 +71,8 @@ class PhotoManager {
     _channel.invokeMethod("openSetting");
   }
 
-  static Future<List<AssetPathEntity>> _getPathList(List<String> idList, {bool hasVideo}) async {
+  static Future<List<AssetPathEntity>> _getPathList(List<String> idList,
+      {bool hasVideo}) async {
     hasVideo ??= true;
 
     /// 获取文件夹列表,这里主要是获取相册名称
@@ -177,7 +178,8 @@ class PhotoManager {
   }) async {
     Completer<Uint8List> completer = Completer();
     Future.delayed(Duration.zero, () async {
-      var result = await _channel.invokeMethod("getThumbBytesWithId", [id, width.toString(), height.toString()]);
+      var result = await _channel.invokeMethod(
+          "getThumbBytesWithId", [id, width.toString(), height.toString()]);
       if (result is Uint8List) {
         completer.complete(result);
       } else if (result is List<dynamic>) {
@@ -202,7 +204,8 @@ class PhotoManager {
       return false;
     }
     if (Platform.isIOS) {
-      var isICloud = await _channel.invokeMethod("isCloudWithImageId", assetEntity.id);
+      var isICloud =
+          await _channel.invokeMethod("isCloudWithImageId", assetEntity.id);
       return isICloud == "1";
     }
     return null;
