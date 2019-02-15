@@ -51,6 +51,8 @@
         [_scanner getDurationWithId:call result:result];
     } else if([@"getSizeWithId" isEqualToString:call.method]){
         [_scanner getSizeWithId:call result:result];
+    } else if([@"releaseMemCache" isEqualToString:call.method]){
+        [_scanner releaseMemCache:call result:result];
     } else {
         result(FlutterMethodNotImplemented);
     }

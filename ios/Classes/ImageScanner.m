@@ -492,4 +492,11 @@
     }
 }
 
+- (void)releaseMemCache:(FlutterMethodCall *)call result:(FlutterResult)result{
+    [_galleryArray removeAllObjects];
+    [_idCollectionDict removeAllObjects];
+    [_idAssetDict removeAllObjects];
+    result(@1);
+}
+
 @end

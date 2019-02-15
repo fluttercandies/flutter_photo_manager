@@ -54,6 +54,12 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
 
     private var imgList = ArrayList<Img>()
+    /// dirId,ImgList
+    private val map = HashMap<String, ArrayList<Img>>()
+    private val idPathMap = HashMap<String, String>()
+    private val pathIdMap = HashMap<String, String>()
+    private var thumbMap = HashMap<String, String>()
+    private val pathImgMap = HashMap<String, Img>()
 
     private fun scan() {
         Log.i("K", "start scan")
@@ -167,12 +173,6 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             result?.success(map.keys.toList())
         }
     }
-
-    /// dirId,ImgList
-    val map = HashMap<String, ArrayList<Img>>()
-
-    val idPathMap = HashMap<String, String>()
-    val pathIdMap = HashMap<String, String>()
 
     private fun split() {
         map.clear()
@@ -321,8 +321,6 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         }
     }
 
-    var thumbMap = HashMap<String, String>()
-
     private fun scanThumb() {
         val mImageUri = MediaStore.Images.Thumbnails.EXTERNAL_CONTENT_URI
         val mContentResolver = registrar.activity().contentResolver
@@ -341,8 +339,6 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
     fun getThumb(call: MethodCall, result: MethodChannel.Result) {
         val path = call.arguments as String
     }
-
-    val pathImgMap = HashMap<String, Img>()
 
     private fun getThumbFromPath(img: Img?): String? {
         if (img == null) {
@@ -437,6 +433,17 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
                 "height" to img.height
         )
         result.success(sizeMap)
+    }
+
+    fun releaseMemCache(result: MethodChannel.Result) {
+        imgList.clear()
+        idPathMap.clear()
+        pathIdMap.clear()
+        pathImgMap.clear()
+        map.clear()
+        thumbMap.clear()
+
+        result.success(1)
     }
 }
 
