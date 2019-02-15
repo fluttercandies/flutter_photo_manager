@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/services.dart';
 
@@ -199,6 +200,11 @@ class PhotoManager {
     int second = await _channel.invokeMethod("getDurationWithId", id);
     return Duration(seconds: second);
   }
+
+  static Future<Size> _getSizeWithId(String id) async {
+    Map<String, int> size = await _channel.invokeMapMethod("getSizeWithId", id);
+    return Size(size["width"].toDouble(), size["height"].toDouble());
+  }
 }
 
 /// image entity
@@ -230,15 +236,26 @@ class AssetEntity {
   /// thumb data , for display
   Future<Uint8List> get thumbData => PhotoManager._getThumbDataWithId(id);
 
+  /// get thumb with size
   Future<Uint8List> thumbDataWithSize(int width, int height) {
     return PhotoManager._getThumbDataWithId(id, width: width, height: height);
   }
 
+  /// if not video ,duration is null
   Future<Duration> get videoDuration async {
     if (type != AssetType.video) {
       return null;
     }
     return PhotoManager._getDurationWithId(id);
+  }
+
+  /// nullable, if the manager is null.
+  Future<Size> get size async {
+    try {
+      return await PhotoManager._getSizeWithId(id);
+    } on Exception {
+      return null;
+    }
   }
 
   AssetEntity({this.id});
@@ -283,7 +300,7 @@ class AssetPathEntity {
 
   static var _all = AssetPathEntity()
     ..id = "dfnsfkdfj2454AJJnfdkl"
-    ..name = "全部"
+    ..name = "all"
     ..hasVideo = true;
 
   static AssetPathEntity get all => _all;

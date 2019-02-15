@@ -32,6 +32,8 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             MediaStore.Images.Media.TITLE, // id
             MediaStore.Images.Media.BUCKET_ID, // dir id 目录
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME, // dir name 目录名字
+            MediaStore.Images.Media.WIDTH, // 宽
+            MediaStore.Images.Media.HEIGHT, // 高
             MediaStore.Images.Media.DATE_TAKEN //日期
     )
 
@@ -45,6 +47,8 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             MediaStore.Video.Media.BUCKET_ID, // dir id 目录
             MediaStore.Video.Media.BUCKET_DISPLAY_NAME, // dir name 目录名字
             MediaStore.Video.Media.DATE_TAKEN, //日期
+            MediaStore.Video.Media.WIDTH, // 宽
+            MediaStore.Video.Media.HEIGHT, // 高
             MediaStore.Video.Media.DURATION //时长
     )
 
@@ -91,7 +95,9 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             val thumb = mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.MINI_THUMB_MAGIC))
             val imgId = mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns._ID))
             val date = mCursor.getLong(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN))
-            val img = Img(path, imgId, dir, dirId, title, thumb, AssetType.Image, date, null)
+            val width = mCursor.getInt(mCursor.getColumnIndex(MediaStore.Images.Media.WIDTH))
+            val height = mCursor.getInt(mCursor.getColumnIndex(MediaStore.Images.Media.HEIGHT))
+            val img = Img(path, imgId, dir, dirId, title, thumb, AssetType.Image, date, null, width, height)
 
             val file = File(path)
             if (file.exists().not()) {
@@ -132,7 +138,11 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             val imgId = mCursor.getString(mCursor.getColumnIndex(MediaStore.Video.Media._ID))
             val date = mCursor.getLong(mCursor.getColumnIndex(MediaStore.Video.Media.DATE_TAKEN))
             val durationMs = mCursor.getLong(mCursor.getColumnIndex(MediaStore.Video.Media.DURATION))
-            val img = Img(path, imgId, dir, dirId, title, thumb, AssetType.Video, date, durationMs)
+
+            val width = mCursor.getInt(mCursor.getColumnIndex(MediaStore.Video.Media.WIDTH))
+            val height = mCursor.getInt(mCursor.getColumnIndex(MediaStore.Video.Media.HEIGHT))
+
+            val img = Img(path, imgId, dir, dirId, title, thumb, AssetType.Video, date, durationMs, width, height)
 
             val file = File(path)
             if (file.exists().not()) {
@@ -344,7 +354,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
     fun getImageThumb(call: MethodCall, result: MethodChannel.Result) {
         threadPool.execute {
             val path = call.arguments as String
-            val img = pathImgMap[path]
+            val img = getImageWithId(path)
             if (img == null) {
                 result.success(null)
             } else {
@@ -364,7 +374,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
         val args = call.arguments as List<Any>
         val id = args[0] as String
-        val img = pathImgMap[id] ?: return
+        val img = getImageWithId(id) ?: return
         val width = (args[1] as String).toInt()
         val height = (args[2] as String).toInt()
 
@@ -382,7 +392,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         val resultList = ArrayList<String>()
 
         idList.forEach { id ->
-            val img = pathImgMap[id]
+            val img = getImageWithId(id)
             img?.apply {
                 resultList.add(typeFromEntity(this))
             }
@@ -400,7 +410,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
     fun getAssetDurationWithId(call: MethodCall, result: MethodChannel.Result) {
         val id = call.arguments<String>()
-        val img = pathImgMap[id]
+        val img = getImageWithId(id)
         if (img == null || img.type != AssetType.Video) {
             result.success(null)
         } else {
@@ -411,6 +421,22 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
                 result.success(duration / 1000)
             }
         }
+    }
+
+    private fun getImageWithId(id: String) = pathImgMap[id]
+
+    fun getSizeWithId(call: MethodCall, result: MethodChannel.Result) {
+        val id = call.arguments<String>()
+        val img = getImageWithId(id)
+        if (img == null) {
+            result.success(mapOf<String, Int>())
+            return
+        }
+        val sizeMap = mapOf(
+                "width" to img.width,
+                "height" to img.height
+        )
+        result.success(sizeMap)
     }
 }
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -35,7 +36,7 @@ class _PhotoListState extends State<PhotoList> {
     Future<Uint8List> imageFullData = entity.fullData; // get the origin data.
     Future<File> file = entity.file; // get file
     Future<Duration> length = entity.videoDuration;
-    length.then((v){
+    length.then((v) {
       print("duration = $v");
     });
 
@@ -77,7 +78,11 @@ class _PhotoListState extends State<PhotoList> {
     if (entity.type == AssetType.video) {
       var file = await entity.file;
       var length = file.lengthSync();
-      print("${entity.id} length = $length");
+      var size = await entity.size;
+      print("${entity.id} length = $length , size = $size");
+    } else {
+      var size = await entity.size;
+      print("${entity.id} size = $size");
     }
   }
 }
