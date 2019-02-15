@@ -1,11 +1,16 @@
 # CHANGELOG
 
+## 0.2.0
+
+add asset size field
+
+release cache method
+
 ## 0.1.10
 
 fix
 
     when number of photo/video is 0, will crash
-
 
 ## 0.1.9
 

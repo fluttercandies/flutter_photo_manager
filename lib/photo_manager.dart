@@ -1,15 +1,27 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/services.dart';
 
+/// asset type
+///
+/// 用于资源类型属性
 enum AssetType {
+  /// not image or video
+  ///
+  /// 不是图片 也不是视频
   other,
+
+  /// image
   image,
+
+  /// video
   video,
 }
 
+/// use the class method to help user load asset list and asset info.
 class PhotoManager {
   static const MethodChannel _channel = const MethodChannel('image_scanner');
 
@@ -54,11 +66,13 @@ class PhotoManager {
     return pathList;
   }
 
+  /// open setting page
   static void openSetting() {
     _channel.invokeMethod("openSetting");
   }
 
-  static Future<List<AssetPathEntity>> _getPathList(List<String> idList, {bool hasVideo}) async {
+  static Future<List<AssetPathEntity>> _getPathList(List<String> idList,
+      {bool hasVideo}) async {
     hasVideo ??= true;
 
     /// 获取文件夹列表,这里主要是获取相册名称
@@ -164,7 +178,8 @@ class PhotoManager {
   }) async {
     Completer<Uint8List> completer = Completer();
     Future.delayed(Duration.zero, () async {
-      var result = await _channel.invokeMethod("getThumbBytesWithId", [id, width.toString(), height.toString()]);
+      var result = await _channel.invokeMethod(
+          "getThumbBytesWithId", [id, width.toString(), height.toString()]);
       if (result is Uint8List) {
         completer.complete(result);
       } else if (result is List<dynamic>) {
@@ -176,8 +191,8 @@ class PhotoManager {
         }).toList();
         completer.complete(Uint8List.fromList(l));
       } else {
-        print("加载错误");
-        completer.completeError("图片加载发生错误");
+        print("loading image error");
+        completer.completeError("load image error");
       }
     });
 
@@ -189,7 +204,8 @@ class PhotoManager {
       return false;
     }
     if (Platform.isIOS) {
-      var isICloud = await _channel.invokeMethod("isCloudWithImageId", assetEntity.id);
+      var isICloud =
+          await _channel.invokeMethod("isCloudWithImageId", assetEntity.id);
       return isICloud == "1";
     }
     return null;
@@ -198,6 +214,39 @@ class PhotoManager {
   static Future<Duration> _getDurationWithId(String id) async {
     int second = await _channel.invokeMethod("getDurationWithId", id);
     return Duration(seconds: second);
+  }
+
+  static Future<Size> _getSizeWithId(String id) async {
+    Map<String, int> size = await _channel.invokeMapMethod("getSizeWithId", id);
+    return Size(size["width"].toDouble(), size["height"].toDouble());
+  }
+
+  /// Release all native(ios/android) caches, normally no calls are required.
+  ///
+  /// The main purpose is to help clean up problems where memory usage may be too large when there are too many pictures.
+  ///
+  /// Warning:
+  ///
+  ///   Once this method is invoked, unless you call the [getAssetPathList] method again, all the [AssetEntity] and [AssetPathEntity] methods/fields you have acquired will fail or produce unexpected results.
+  ///
+  ///   This method should only be invoked when you are sure you really want to do so.
+  ///
+  ///   This method is asynchronous, and calling [getAssetPathList] before the Future of this method returns causes an error.
+  ///
+  ///
+  /// 释放资源的方法,一般情况下不需要调用
+  ///
+  /// 主要目的是帮助清理当图片过多时,内存占用可能过大的问题
+  ///
+  /// 警告:
+  ///
+  /// 一旦调用这个方法,除非你重新调用  [getAssetPathList] 方法,否则你已经获取的所有[AssetEntity]/[AssetPathEntity]的所有方法/字段都将失效或产生无法预期的效果
+  ///
+  /// 这个方法应当只在你确信你真的需要这么做的时候再调用
+  ///
+  /// 这个方法是异步的,在本方法的Future返回前调用getAssetPathList 可能会产生错误
+  static Future releaseCache() async {
+    await _channel.invokeMethod("releaseMemCache");
   }
 }
 
@@ -230,15 +279,26 @@ class AssetEntity {
   /// thumb data , for display
   Future<Uint8List> get thumbData => PhotoManager._getThumbDataWithId(id);
 
+  /// get thumb with size
   Future<Uint8List> thumbDataWithSize(int width, int height) {
     return PhotoManager._getThumbDataWithId(id, width: width, height: height);
   }
 
+  /// if not video ,duration is null
   Future<Duration> get videoDuration async {
     if (type != AssetType.video) {
       return null;
     }
     return PhotoManager._getDurationWithId(id);
+  }
+
+  /// nullable, if the manager is null.
+  Future<Size> get size async {
+    try {
+      return await PhotoManager._getSizeWithId(id);
+    } on Exception {
+      return null;
+    }
   }
 
   AssetEntity({this.id});
@@ -257,7 +317,7 @@ class AssetEntity {
   }
 }
 
-/// Gallery Id
+/// asset entity, for entity info.
 class AssetPathEntity {
   /// id
   ///
@@ -283,9 +343,10 @@ class AssetPathEntity {
 
   static var _all = AssetPathEntity()
     ..id = "dfnsfkdfj2454AJJnfdkl"
-    ..name = "全部"
+    ..name = "all"
     ..hasVideo = true;
 
+  /// all asset path
   static AssetPathEntity get all => _all;
 
   @override

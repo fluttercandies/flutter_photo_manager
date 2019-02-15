@@ -83,6 +83,14 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                 scanner.getAssetDurationWithId(call, result)
                 true
             }
+            call.method == "getSizeWithId" -> {
+                scanner.getSizeWithId(call, result)
+                true
+            }
+            call.method == "releaseMemCache" -> {
+                scanner.releaseMemCache(result)
+                true
+            }
             else -> false
         }
 
@@ -124,7 +132,7 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
 
 }
 
-data class Img(val path: String, val imgId: String, val dir: String, val dirId: String, val title: String, var thumb: String?, val type: AssetType, val timeStamp: Long, val duration: Long?)
+data class Img(val path: String, val imgId: String, val dir: String, val dirId: String, val title: String, var thumb: String?, val type: AssetType, val timeStamp: Long, val duration: Long?, val width: Int, val height: Int)
 
 enum class AssetType {
     Other,
