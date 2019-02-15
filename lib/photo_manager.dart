@@ -71,8 +71,7 @@ class PhotoManager {
     _channel.invokeMethod("openSetting");
   }
 
-  static Future<List<AssetPathEntity>> _getPathList(List<String> idList,
-      {bool hasVideo}) async {
+  static Future<List<AssetPathEntity>> _getPathList(List<String> idList, {bool hasVideo}) async {
     hasVideo ??= true;
 
     /// 获取文件夹列表,这里主要是获取相册名称
@@ -178,8 +177,7 @@ class PhotoManager {
   }) async {
     Completer<Uint8List> completer = Completer();
     Future.delayed(Duration.zero, () async {
-      var result = await _channel.invokeMethod(
-          "getThumbBytesWithId", [id, width.toString(), height.toString()]);
+      var result = await _channel.invokeMethod("getThumbBytesWithId", [id, width.toString(), height.toString()]);
       if (result is Uint8List) {
         completer.complete(result);
       } else if (result is List<dynamic>) {
@@ -204,8 +202,7 @@ class PhotoManager {
       return false;
     }
     if (Platform.isIOS) {
-      var isICloud =
-          await _channel.invokeMethod("isCloudWithImageId", assetEntity.id);
+      var isICloud = await _channel.invokeMethod("isCloudWithImageId", assetEntity.id);
       return isICloud == "1";
     }
     return null;
@@ -219,6 +216,34 @@ class PhotoManager {
   static Future<Size> _getSizeWithId(String id) async {
     Map<String, int> size = await _channel.invokeMapMethod("getSizeWithId", id);
     return Size(size["width"].toDouble(), size["height"].toDouble());
+  }
+
+  /// Release all native(ios/android) caches, normally no calls are required.
+  ///
+  /// The main purpose is to help clean up problems where memory usage may be too large when there are too many pictures.
+  ///
+  /// Warning:
+  ///
+  ///   Once this method is invoked, unless you call the [getAssetPathList] method again, all the [AssetEntity] and [AssetPathEntity] methods/fields you have acquired will fail or produce unexpected results.
+  ///
+  ///   This method should only be invoked when you are sure you really want to do so.
+  ///
+  ///   This method is asynchronous, and calling [getAssetPathList] before the Future of this method returns causes an error.
+  ///
+  ///
+  /// 释放资源的方法,一般情况下不需要调用
+  ///
+  /// 主要目的是帮助清理当图片过多时,内存占用可能过大的问题
+  ///
+  /// 警告:
+  ///
+  /// 一旦调用这个方法,除非你重新调用  [getAssetPathList] 方法,否则你已经获取的所有[AssetEntity]/[AssetPathEntity]的所有方法/字段都将失效或产生无法预期的效果
+  ///
+  /// 这个方法应当只在你确信你真的需要这么做的时候再调用
+  ///
+  /// 这个方法是异步的,在本方法的Future返回前调用getAssetPathList 可能会产生错误
+  static Future releaseCache() async {
+    await _channel.invokeMethod("releaseMemCache");
   }
 }
 

@@ -87,6 +87,10 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                 scanner.getSizeWithId(call, result)
                 true
             }
+            call.method == "releaseMemCache" -> {
+                scanner.releaseMemCache(result)
+                true
+            }
             else -> false
         }
 
