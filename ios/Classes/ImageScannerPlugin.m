@@ -49,6 +49,8 @@
         [_scanner isCloudWithCall:call result:result];
     } else if([@"getDurationWithId" isEqualToString:call.method]){
         [_scanner getDurationWithId:call result:result];
+    } else if([@"getSizeWithId" isEqualToString:call.method]){
+        [_scanner getSizeWithId:call result:result];
     } else {
         result(FlutterMethodNotImplemented);
     }

@@ -459,6 +459,23 @@
     }
 }
 
+
+-(void)getSizeWithId:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSString* imageId = call.arguments;
+    PHAsset *asset = [_idAssetDict valueForKey:imageId];
+    if(!asset){
+        result([NSDictionary new]);
+        return;
+    }
+    NSUInteger width = [asset pixelWidth];
+    NSUInteger height = [asset pixelHeight];
+    NSMutableDictionary *dict = [NSMutableDictionary new];
+    dict[@"width"] = [NSNumber numberWithUnsignedInteger:width];
+    dict[@"height"] = [NSNumber numberWithUnsignedInteger:height];
+    result(dict);
+}
+
+
 + (NSArray *)convertNSData:(NSData *)data {
     NSMutableArray *array = [NSMutableArray array];
     Byte *bytes = data.bytes;
