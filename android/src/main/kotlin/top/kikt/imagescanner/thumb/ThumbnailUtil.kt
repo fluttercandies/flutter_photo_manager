@@ -9,7 +9,7 @@ import android.provider.MediaStore.Video.Thumbnails.MICRO_KIND
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.transition.Transition
 import io.flutter.plugin.common.MethodChannel
-import top.kikt.imagescanner.Img
+import top.kikt.imagescanner.Asset
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -43,7 +43,7 @@ object ThumbnailUtil {
                 })
     }
 
-    fun getThumbnailWithVideo(activity: Context, img:Img, width: Int, height: Int, result: MethodChannel.Result) {
+    fun getThumbnailWithVideo(activity: Context, asset:Asset, width: Int, height: Int, result: MethodChannel.Result) {
         var isReply = false
         fun reply(r: Any?) {
             if (isReply) {
@@ -52,7 +52,7 @@ object ThumbnailUtil {
             isReply = true
             result.success(r)
         }
-        val thumbnail = MediaStore.Video.Thumbnails.getThumbnail(activity.contentResolver, img.imgId.toLong(), MICRO_KIND, BitmapFactory.Options().apply {
+        val thumbnail = MediaStore.Video.Thumbnails.getThumbnail(activity.contentResolver, asset.imgId.toLong(), MICRO_KIND, BitmapFactory.Options().apply {
             outWidth = width
             outHeight = height
         })

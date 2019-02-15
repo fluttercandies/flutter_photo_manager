@@ -91,6 +91,23 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                 scanner.releaseMemCache(result)
                 true
             }
+            call.method == "getAllVideo" -> {
+                scanner.getAllVideo(result)
+                true
+            }
+            call.method == "getOnlyVideoWithPathId" -> {
+                scanner.getOnlyVideoWithPathId(call, result)
+                true
+            }
+            call.method == "getAllImage" -> {
+                scanner.getAllImage(result)
+                true
+            }
+            call.method == "getOnlyImageWithPathId" -> {
+                scanner.getOnlyImageWithPathId(call, result)
+                true
+            }
+
             else -> false
         }
 
@@ -122,6 +139,8 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                     when {
                         call.method == "requestPermission" -> localResult?.success(1)
                         call.method == "getGalleryIdList" -> scanner.scanAndGetImageIdList(localResult)
+                        call.method == "getVideoPathList" -> scanner.getVideoPathIdList(localResult)
+                        call.method == "getImagePathList" -> scanner.getImagePathIdList(localResult)
                     }
                 }
             }
@@ -132,7 +151,22 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
 
 }
 
-data class Img(val path: String, val imgId: String, val dir: String, val dirId: String, val title: String, var thumb: String?, val type: AssetType, val timeStamp: Long, val duration: Long?, val width: Int, val height: Int)
+data class Asset(val path: String, val imgId: String, val dir: String, val dirId: String, val title: String, var thumb: String?, val type: AssetType, val timeStamp: Long, val duration: Long?, val width: Int, val height: Int) {
+
+    override fun equals(other: Any?): Boolean {
+        if (other === this) {
+            return true
+        }
+        if (other !is Asset) return false
+
+        return this.imgId == other.imgId
+    }
+
+    override fun hashCode(): Int {
+        return imgId.hashCode()
+    }
+
+}
 
 enum class AssetType {
     Other,

@@ -53,25 +53,52 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
     )
 
 
-    private var imgList = ArrayList<Img>()
-    /// dirId,ImgList
-    private val map = HashMap<String, ArrayList<Img>>()
+    private var imgList = ArrayList<Asset>()
+    /// dirId,AssetList
+    private val map = HashMap<String, ArrayList<Asset>>()
     private val idPathMap = HashMap<String, String>()
     private val pathIdMap = HashMap<String, String>()
     private var thumbMap = HashMap<String, String>()
-    private val pathImgMap = HashMap<String, Img>()
+    private val pathAssetMap = HashMap<String, Asset>()
+
+    /// dirId,AssetList
+    internal val videoPathDirIdMap = HashMap<String, ArrayList<Asset>>()
+    /// dirId,AssetList
+    internal val imagePathDirIdMap = HashMap<String, ArrayList<Asset>>()
 
     private fun scan() {
-        Log.i("K", "start scan")
+//        Log.i("K", "start scan")
         imgList.clear()
         idPathMap.clear()
         pathIdMap.clear()
-        pathImgMap.clear()
+        pathAssetMap.clear()
 
         scanVideo()
         scanImage()
         sortAsset()
     }
+
+    private fun onlyScanVideo() {
+        imgList.clear()
+        idPathMap.clear()
+        pathIdMap.clear()
+        pathAssetMap.clear()
+
+        scanVideo()
+        sortAsset()
+    }
+
+
+    private fun onlyScanImage() {
+        imgList.clear()
+        idPathMap.clear()
+        pathIdMap.clear()
+        pathAssetMap.clear()
+
+        scanImage()
+        sortAsset()
+    }
+
 
     private fun sortAsset() {
         imgList.sortWith(Comparator { o1, o2 ->
@@ -103,19 +130,23 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             val date = mCursor.getLong(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN))
             val width = mCursor.getInt(mCursor.getColumnIndex(MediaStore.Images.Media.WIDTH))
             val height = mCursor.getInt(mCursor.getColumnIndex(MediaStore.Images.Media.HEIGHT))
-            val img = Img(path, imgId, dir, dirId, title, thumb, AssetType.Image, date, null, width, height)
+            val img = Asset(path, imgId, dir, dirId, title, thumb, AssetType.Image, date, null, width, height)
 
             val file = File(path)
             if (file.exists().not()) {
                 continue
             }
 
-            imgList.add(img)
+            if (imgList.contains(img).not()) {
+                imgList.add(img)
+            }
 
             idPathMap[dirId] = dir
             pathIdMap[dir] = dirId
 
-            pathImgMap[path] = img
+            pathAssetMap[path] = img
+
+            createImagePath(dirId, dir)
         } while (mCursor.moveToPrevious())
         mCursor.close()
     }
@@ -148,19 +179,23 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             val width = mCursor.getInt(mCursor.getColumnIndex(MediaStore.Video.Media.WIDTH))
             val height = mCursor.getInt(mCursor.getColumnIndex(MediaStore.Video.Media.HEIGHT))
 
-            val img = Img(path, imgId, dir, dirId, title, thumb, AssetType.Video, date, durationMs, width, height)
+            val img = Asset(path, imgId, dir, dirId, title, thumb, AssetType.Video, date, durationMs, width, height)
 
             val file = File(path)
             if (file.exists().not()) {
                 continue
             }
 
-            imgList.add(img)
+            if (imgList.contains(img).not()) {
+                imgList.add(img)
+            }
 
             idPathMap[dirId] = dir
             pathIdMap[dir] = dirId
 
-            pathImgMap[path] = img
+            pathAssetMap[path] = img
+
+            createVideoPath(dirId, dir)
         } while (mCursor.moveToPrevious())
         mCursor.close()
     }
@@ -169,12 +204,12 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         threadPool.execute {
             scan()
             scanThumb()
-            split()
+            filter()
             result?.success(map.keys.toList())
         }
     }
 
-    private fun split() {
+    private fun filter() {
         map.clear()
         imgList.forEach {
             var list = map[it.dirId]
@@ -241,8 +276,8 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         }
     }
 
-    private fun refreshThumb(imgList: List<Img>): Future<Boolean> {
-        val count = imgList.count()
+    private fun refreshThumb(assetList: List<Asset>): Future<Boolean> {
+        val count = assetList.count()
 
 
         if (count >= poolSize) {
@@ -252,7 +287,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
                 val start = i * per
                 val end = if (i == poolSize - 1) count - 1 else (i + 1) * per
                 Log.i("img_count", "max = $count , start = $start , end = $end")
-                val subList = imgList.subList(start, end)
+                val subList = assetList.subList(start, end)
                 val futureTask = FutureTask(ImageCallBack(subList, thumbHelper))
                 futureList.add(futureTask)
                 thumbPool.execute(futureTask)
@@ -270,7 +305,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
             return future
         } else {
             val future: FutureTask<Boolean> = FutureTask(Callable {
-                imgList.forEachIndexed { index, img ->
+                assetList.forEachIndexed { index, img ->
                     val thumb = thumbHelper.getThumb(img.path, img.imgId)
                     Log.i("image_thumb", "make thumb = $thumb ,progress = ${index + 1} / $count")
                 }
@@ -340,11 +375,11 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         val path = call.arguments as String
     }
 
-    private fun getThumbFromPath(img: Img?): String? {
-        if (img == null) {
+    private fun getThumbFromPath(asset: Asset?): String? {
+        if (asset == null) {
             return null
         }
-        return thumbMap[img.imgId]
+        return thumbMap[asset.imgId]
     }
 
     fun getImageThumb(call: MethodCall, result: MethodChannel.Result) {
@@ -396,8 +431,8 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         result.success(resultList)
     }
 
-    private fun typeFromEntity(img: Img): String {
-        return when (img.type) {
+    private fun typeFromEntity(asset: Asset): String {
+        return when (asset.type) {
             AssetType.Image -> "1"
             AssetType.Video -> "2"
             AssetType.Other -> "0"
@@ -419,7 +454,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         }
     }
 
-    private fun getImageWithId(id: String) = pathImgMap[id]
+    private fun getImageWithId(id: String) = pathAssetMap[id]
 
     fun getSizeWithId(call: MethodCall, result: MethodChannel.Result) {
         val id = call.arguments<String>()
@@ -439,19 +474,113 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         imgList.clear()
         idPathMap.clear()
         pathIdMap.clear()
-        pathImgMap.clear()
+        pathAssetMap.clear()
         map.clear()
         thumbMap.clear()
+        videoPathDirIdMap.clear()
+        imagePathDirIdMap.clear()
 
         result.success(1)
     }
+
+    fun getVideoPathIdList(result: MethodChannel.Result?) {
+        threadPool.execute {
+            videoPathDirIdMap.clear()
+            scanVideo()
+            scanThumb()
+            filterVideoPath()
+            result?.success(videoPathDirIdMap.keys.toList())
+        }
+    }
+
+    private fun createVideoPath(dirId: String, dir: String) {
+        if (videoPathDirIdMap.containsKey(dirId)) {
+            return
+        }
+
+        videoPathDirIdMap[dirId] = ArrayList()
+    }
+
+    private fun filterVideoPath() {
+
+        for (img in imgList) {
+            videoPathDirIdMap[img.dirId]?.add(img)
+        }
+    }
+
+
+    fun getImagePathIdList(result: MethodChannel.Result?) {
+        threadPool.execute {
+            imagePathDirIdMap.clear()
+            scanImage()
+            scanThumb()
+            filterImagePath()
+            result?.success(imagePathDirIdMap.keys.toList())
+        }
+    }
+
+    private fun createImagePath(dirId: String, dir: String) {
+        if (imagePathDirIdMap.containsKey(dirId)) {
+            return
+        }
+
+        imagePathDirIdMap[dirId] = ArrayList()
+    }
+
+    private fun filterImagePath() {
+
+        for (img in imgList) {
+            imagePathDirIdMap[img.dirId]?.add(img)
+        }
+    }
+
+
 }
 
-class ImageCallBack(val imgList: List<Img>, val thumbHelper: ThumbHelper) : Callable<Boolean> {
+fun ImageScanner.getAllVideo(result: MethodChannel.Result) {
+    val list = ArrayList<String>()
+    for (entry in videoPathDirIdMap) {
+        for (asset in entry.value) {
+            list.add(asset.path)
+        }
+    }
+    result.success(list)
+}
+
+fun ImageScanner.getOnlyVideoWithPathId(call: MethodCall, result: MethodChannel.Result) {
+    val list = ArrayList<String>()
+    val id = call.arguments<String>()
+    videoPathDirIdMap[id]?.forEach { asset ->
+        list.add(asset.path)
+    }
+    result.success(list)
+}
+
+fun ImageScanner.getAllImage(result: MethodChannel.Result) {
+    val list = ArrayList<String>()
+    for (entry in imagePathDirIdMap) {
+        for (asset in entry.value) {
+            list.add(asset.path)
+        }
+    }
+    result.success(list)
+}
+
+
+fun ImageScanner.getOnlyImageWithPathId(call: MethodCall, result: MethodChannel.Result) {
+    val list = ArrayList<String>()
+    val id = call.arguments<String>()
+    imagePathDirIdMap[id]?.forEach { asset ->
+        list.add(asset.path)
+    }
+    result.success(list)
+}
+
+class ImageCallBack(val assetList: List<Asset>, val thumbHelper: ThumbHelper) : Callable<Boolean> {
     override fun call(): Boolean {
-        imgList.forEachIndexed { index, img ->
+        assetList.forEachIndexed { index, img ->
             val thumb = thumbHelper.getThumb(img.path, img.imgId)
-            Log.i("image_thumb", "make thumb = $thumb ,progress = ${index + 1} / ${imgList.count()}")
+            Log.i("image_thumb", "make thumb = $thumb ,progress = ${index + 1} / ${assetList.count()}")
         }
         return true
     }
