@@ -157,7 +157,7 @@ class PhotoManager {
     List<dynamic> list;
     if (path.onlyVideo) {
       path.hasVideo = true;
-      if (path._isAll) {
+      if (path.isAll) {
         list = await _channel.invokeMethod("getAllVideo");
         return _castAsset(list, AssetType.video);
       } else {
@@ -165,7 +165,7 @@ class PhotoManager {
         return _castAsset(list, AssetType.video);
       }
     } else if (path.onlyImage) {
-      if (path._isAll) {
+      if (path.isAll) {
         list = await _channel.invokeMethod("getAllImage");
         return _castAsset(list, AssetType.image);
       } else {
@@ -173,7 +173,7 @@ class PhotoManager {
         return _castAsset(list, AssetType.image);
       }
     } else {
-      if (path._isAll == true) {
+      if (path.isAll == true) {
         list = await _channel.invokeMethod("getAllImageList");
       } else {
         list = await _channel.invokeMethod("getImageListWithPathId", path.id);
@@ -427,7 +427,7 @@ class AssetPathEntity {
   bool onlyImage = false;
 
   /// contains all asset
-  bool _isAll = false;
+  bool isAll = false;
 
   AssetPathEntity({this.id, this.name, bool hasVideo}) : _hasVideo = hasVideo;
 
@@ -437,19 +437,19 @@ class AssetPathEntity {
   static var _all = AssetPathEntity()
     ..id = "allall--dfnsfkdfj2454AJJnfdkl"
     ..name = "all"
-    .._isAll = true
+    ..isAll = true
     ..hasVideo = true;
 
   static var _allVideo = AssetPathEntity()
     ..id = "videovideo--87yuhijn3cvx"
     ..name = "all"
-    .._isAll = true
+    ..isAll = true
     ..onlyVideo = true;
 
   static var _allImage = AssetPathEntity()
     ..id = "imageimage--89hdsinvosd"
     ..onlyImage = true
-    .._isAll = true
+    ..isAll = true
     ..name = "all";
 
   /// all asset path
