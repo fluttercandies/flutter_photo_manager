@@ -5,6 +5,7 @@
 #import <Flutter/FlutterChannels.h>
 #import <Photos/PHAsset.h>
 #import <Photos/PHCollection.h>
+#import <Photos/Photos.h>
 #import <Photos/PHFetchOptions.h>
 #import <Photos/PHImageManager.h>
 #import <Photos/PHPhotoLibrary.h>
@@ -20,10 +21,31 @@
 @property(nonatomic, strong) NSMutableDictionary<NSString *, PHAsset *> *idAssetDict;
 
 @property(nonatomic) dispatch_queue_t asyncQueue;
+
+@property(nonatomic, strong) NSMutableDictionary<NSString *, NSMutableArray<PHAsset *> *> *idVideoArrayDict;
+@property(nonatomic, strong) NSMutableDictionary<NSString *, NSMutableArray<PHAsset *> *> *idImageArrayDict;
+
 @end
 
 @implementation ImageScanner {
 }
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _galleryArray = [NSMutableArray new];
+        _idCollectionDict = [NSMutableDictionary new];
+        _idAssetDict = [NSMutableDictionary new];
+        _asyncQueue = dispatch_queue_create("asyncQueue", nil);
+
+        _idVideoArrayDict = [NSMutableDictionary new];
+        _idImageArrayDict = [NSMutableDictionary new];
+    }
+
+    return self;
+}
+
+
 - (void)requestPermissionWithResult:(FlutterResult)result {
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
         if (status == PHAuthorizationStatusAuthorized) {
@@ -34,7 +56,6 @@
         }
     }];
 
-    self.asyncQueue = dispatch_queue_create("asyncQueue", nil);
 }
 
 - (void)getGalleryIdList:(FlutterMethodCall *)call result:(FlutterResult)result {
@@ -126,7 +147,25 @@
     });
 }
 
-- (void)getAllImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
+- (void)filterAssetWithBlock:(asset_block)block {
+    [self refreshGallery];
+    PHFetchOptions *opt = [PHFetchOptions new];
+    for (PHCollection *collection in self.galleryArray) {
+        PHFetchResult<PHAssetCollection *> *fetchResult = [PHAssetCollection
+                fetchAssetCollectionsWithLocalIdentifiers:@[collection.localIdentifier] options:opt];
+
+        for (PHAssetCollection *assetCollection in fetchResult) {
+            PHFetchResult<PHAsset *> *assetResult = [PHAsset
+                    fetchAssetsInAssetCollection:assetCollection options:opt];
+            for (PHAsset *asset in assetResult) {
+                _idAssetDict[asset.localIdentifier] = asset;
+                block(assetCollection, asset);
+            }
+        }
+    }
+}
+
+- (void)forEachAssetCollection:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
     dispatch_async(_asyncQueue, ^{
         if (_idAssetDict) {
             [_idAssetDict removeAllObjects];
@@ -212,8 +251,8 @@
                           contentMode:PHImageContentModeAspectFill
                               options:options
                         resultHandler:^(UIImage *result, NSDictionary *info) {
-                            // NSLog(@"image width = %f , height =
-                            // %f",result.size.width,result.size.height);
+//                            NSLog(@"image width = %f , height = "
+//                                  "%f", result.size.width, result.size.height);
                             BOOL downloadFinined =
                                     ![[info objectForKey:PHImageCancelledKey] boolValue] &&
                                             ![info objectForKey:PHImageErrorKey] &&
@@ -222,13 +261,20 @@
                                 return;
                             }
                             NSData *data = UIImageJPEGRepresentation(result, 100);
-                            NSArray *arr = [ImageScanner convertNSData:data];
 
                             if (reply.isReply) {
                                 return;
                             }
+
                             reply.isReply = YES;
-                            flutterResult(arr);
+
+                            if (!data) {
+                                flutterResult([FlutterStandardTypedData typedDataWithBytes:[NSData new]]);
+                                return;
+                            }
+
+                            FlutterStandardTypedData *typedData = [FlutterStandardTypedData typedDataWithBytes:data];
+                            flutterResult(typedData);
                         }];
     });
 }
@@ -337,9 +383,9 @@
                 NSDictionary *_Nullable info) {
 
             BOOL downloadFinined =
-                    ![[info objectForKey:PHImageCancelledKey] boolValue] &&
-                            ![info objectForKey:PHImageErrorKey] &&
-                            ![[info objectForKey:PHImageResultIsDegradedKey] boolValue];
+                    ![info[PHImageCancelledKey] boolValue] &&
+                            !info[PHImageErrorKey] &&
+                            ![info[PHImageResultIsDegradedKey] boolValue];
             if (!downloadFinined) {
                 result(nil);
                 return;
@@ -398,9 +444,9 @@
         [manager requestImageDataForAsset:asset options:options resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
 
             BOOL downloadFinined =
-                    ![[info objectForKey:PHImageCancelledKey] boolValue] &&
-                            ![info objectForKey:PHImageErrorKey] &&
-                            ![[info objectForKey:PHImageResultIsDegradedKey] boolValue];
+                    ![info[PHImageCancelledKey] boolValue] &&
+                            !info[PHImageErrorKey] &&
+                            ![info[PHImageResultIsDegradedKey] boolValue];
             if (!downloadFinined) {
                 flutterResult(nil);
                 return;
@@ -451,7 +497,7 @@
 -(void)getDurationWithId:(FlutterMethodCall *)call result:(FlutterResult)result {
     NSString* imageId = call.arguments;
     PHAsset *asset = [_idAssetDict valueForKey:imageId];
-    int duration = [asset duration];
+    int duration = (int) [asset duration];
     if(duration == 0){
         result(nil);
     }else{
@@ -470,8 +516,8 @@
     NSUInteger width = [asset pixelWidth];
     NSUInteger height = [asset pixelHeight];
     NSMutableDictionary *dict = [NSMutableDictionary new];
-    dict[@"width"] = [NSNumber numberWithUnsignedInteger:width];
-    dict[@"height"] = [NSNumber numberWithUnsignedInteger:height];
+    dict[@"width"] = @(width);
+    dict[@"height"] = @(height);
     result(dict);
 }
 
@@ -497,6 +543,116 @@
     [_idCollectionDict removeAllObjects];
     [_idAssetDict removeAllObjects];
     result(@1);
+}
+
+#pragma mark - scan for video
+
+- (void)getVideoPathList:(FlutterMethodCall *)call result:(FlutterResult)result {
+    dispatch_async(_asyncQueue, ^{
+        [self refreshGallery];
+        if (!_idVideoArrayDict) {
+            _idVideoArrayDict = [NSMutableDictionary new];
+        }
+        [_idVideoArrayDict removeAllObjects];
+        [self filterAssetWithBlock:^(PHCollection *collection, PHAsset *asset) {
+            if ([collection isKindOfClass:PHAssetCollection.class]) {
+                if (!asset.isVideo) {
+                    return;
+                }
+                PHAssetCollection *assetCollection = (PHAssetCollection *) collection;
+                NSString *id = assetCollection.localIdentifier;
+                if (!_idVideoArrayDict[id]) {
+                    _idVideoArrayDict[id] = [NSMutableArray new];
+                }
+                NSMutableArray *array = _idVideoArrayDict[id];
+
+                [array addObject:asset];
+            }
+        }];
+
+        NSArray *keys = _idVideoArrayDict.allKeys;
+        result(keys);
+    });
+}
+
+- (void)getAllVideo:(FlutterMethodCall *)call result:(FlutterResult)result {
+    dispatch_async(_asyncQueue, ^{
+        NSMutableArray<NSString *> *ids = [NSMutableArray new];
+        [self filterAssetWithBlock:^(PHCollection *collection, PHAsset *asset) {
+            if ([asset isVideo]) {
+//                NSLog(@"asset %@ is Video", asset.localIdentifier);
+                [ids addObject:asset.localIdentifier];
+            }
+        }];
+//        NSLog(@"video has %d", ids.count);
+        result(ids);
+    });
+}
+
+- (void)getOnlyVideoWithPathId:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSString *pathId = call.arguments;
+    NSMutableArray *ids = [NSMutableArray new];
+    NSMutableArray<PHAsset *> *assetArray = _idVideoArrayDict[pathId];
+
+    for (PHAsset *asset in assetArray) {
+        [ids addObject:asset.localIdentifier];
+    }
+    result(ids);
+}
+
+#pragma mark - scan for image
+
+- (void)getImagePathList:(FlutterMethodCall *)call result:(FlutterResult)result {
+    dispatch_async(_asyncQueue, ^{
+        [self refreshGallery];
+        if (!_idImageArrayDict) {
+            _idImageArrayDict = [NSMutableDictionary new];
+        }
+
+        [_idImageArrayDict removeAllObjects];
+        [self filterAssetWithBlock:^(PHCollection *collection, PHAsset *asset) {
+            if ([collection isKindOfClass:PHAssetCollection.class]) {
+                if (!asset.isImage) {
+                    return;
+                }
+
+                PHAssetCollection *assetCollection = (PHAssetCollection *) collection;
+                NSString *id = assetCollection.localIdentifier;
+
+                if (!_idImageArrayDict[id]) {
+                    _idImageArrayDict[id] = [NSMutableArray new];
+                }
+                NSMutableArray *array = _idImageArrayDict[id];
+                [array addObject:asset];
+            }
+        }];
+
+        NSArray *keys = _idImageArrayDict.allKeys;
+        result(keys);
+    });
+}
+
+- (void)getAllImage:(FlutterMethodCall *)call result:(FlutterResult)result {
+    dispatch_async(_asyncQueue, ^{
+        NSMutableArray<NSString *> *ids = [NSMutableArray new];
+        [self filterAssetWithBlock:^(PHCollection *collection, PHAsset *asset) {
+            if ([asset isImage]) {
+                [ids addObject:asset.localIdentifier];
+            }
+        }];
+        result(ids);
+    });
+}
+
+- (void)getOnlyImageWithPathId:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSString *pathId = call.arguments;
+    NSMutableArray *ids = [NSMutableArray new];
+    NSMutableArray<PHAsset *> *assetArray = _idImageArrayDict[pathId];
+
+    for (PHAsset *asset in assetArray) {
+        [ids addObject:asset.localIdentifier];
+    }
+    result(ids);
 }
 
 @end

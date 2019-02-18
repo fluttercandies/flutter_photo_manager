@@ -4,10 +4,14 @@
 
 #import <Foundation/Foundation.h>
 #import <Flutter/Flutter.h>
+#import <Photos/PHAsset.h>
+#import <Photos/PHCollection.h>
+#import "ScanForType.h"
 
+typedef void (^asset_block)(PHCollection *collection, PHAsset *asset);
 @class Reply;
 
-@interface ImageScanner : NSObject <UIImagePickerControllerDelegate, UINavigationControllerDelegate> {
+@interface ImageScanner : NSObject <UIImagePickerControllerDelegate, UINavigationControllerDelegate, ScanForType> {
 
 }
 @property(nonatomic, strong) NSObject <FlutterPluginRegistrar> *registrar;
@@ -20,7 +24,9 @@
 
 - (void)getImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
 
-- (void)getAllImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
+- (void)filterAssetWithBlock:(asset_block)block;
+
+- (void)forEachAssetCollection:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
 
 - (void)getThumbPathWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
 

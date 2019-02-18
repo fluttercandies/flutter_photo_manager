@@ -11,9 +11,9 @@
     [registrar addMethodCallDelegate:instance channel:channel];
 
     instance.scanner = [[ImageScanner alloc] init];
-    
-    NSString *path = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES) objectAtIndex:0];
-    NSLog(@"沙盒目录 = %@",path);
+
+    NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
+    NSLog(@"application path = %@", path);
     
     instance.registrar = registrar;
 }
@@ -34,7 +34,7 @@
     } else if ([@"getImageListWithPathId" isEqualToString:call.method]) {
         [_scanner getImageListWithCall:call result:result];
     } else if ([@"getAllImageList" isEqualToString:call.method]) {
-        [_scanner getAllImageListWithCall:call result:result];
+        [_scanner forEachAssetCollection:call result:result];
     } else if ([@"getThumbPath" isEqualToString:call.method]) {
         [_scanner getThumbPathWithCall:call result:result];
     } else if ([@"getThumbBytesWithId" isEqualToString:call.method]) {
@@ -53,6 +53,18 @@
         [_scanner getSizeWithId:call result:result];
     } else if([@"releaseMemCache" isEqualToString:call.method]){
         [_scanner releaseMemCache:call result:result];
+    } else if ([@"getVideoPathList" isEqualToString:call.method]) {
+        [_scanner getVideoPathList:call result:result];
+    } else if ([@"getImagePathList" isEqualToString:call.method]) {
+        [_scanner getImagePathList:call result:result];
+    } else if ([@"getAllVideo" isEqualToString:call.method]) {
+        [_scanner getAllVideo:call result:result];
+    } else if ([@"getOnlyVideoWithPathId" isEqualToString:call.method]) {
+        [_scanner getOnlyVideoWithPathId:call result:result];
+    } else if ([@"getAllImage" isEqualToString:call.method]) {
+        [_scanner getAllImage:call result:result];
+    } else if ([@"getOnlyImageWithPathId" isEqualToString:call.method]) {
+        [_scanner getOnlyImageWithPathId:call result:result];
     } else {
         result(FlutterMethodNotImplemented);
     }
