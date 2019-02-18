@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.2.1
+
+add two method to load video / image
+
+`getVideoAsset` `getImageAsset`
+
 ## 0.2.0
 
 add asset size field

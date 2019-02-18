@@ -10,19 +10,13 @@ A flutter api for photo, you can get image/video from ios or android
 
 or use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker .All UI comes from flutter.
 
-## api changed
-
-in 0.1.0 API incompatibility
-
-because support video, so rename api from ImageXXXX to AssetXXXX
-
-so 0.1.X and 0.0.X incompatibility
-
 ## install
+
+the latest [![pub package](https://img.shields.io/pub/v/photo_manager.svg)](https://pub.dartlang.org/packages/photo_manager)
 
 ```yaml
 dependencies:
-  photo_manager: ^0.2.0
+  photo_manager: $latest_version
 ```
 
 ## import
@@ -57,6 +51,18 @@ if (result) {
 
 ```dart
 List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
+```
+
+or
+
+```dart
+List<AssetPathEntity> list = await PhotoManager.getImageAsset();
+```
+
+or
+
+```dart
+List<AssetPathEntity> list = await PhotoManager.getVideoAsset();
 ```
 
 3. get asset list from imagePath
