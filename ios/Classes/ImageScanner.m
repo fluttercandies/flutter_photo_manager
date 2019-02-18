@@ -587,8 +587,7 @@
     dispatch_async(_asyncQueue, ^{
         NSMutableArray<NSString *> *ids = [NSMutableArray new];
         [self filterAssetWithBlock:^(PHCollection *collection, PHAsset *asset) {
-            if ([asset isVideo]) {
-//                NSLog(@"asset %@ is Video", asset.localIdentifier);
+            if ([asset isVideo] && ![ids containsObject:asset.localIdentifier]) {
                 [ids addObject:asset.localIdentifier];
             }
         }];
@@ -645,7 +644,7 @@
     dispatch_async(_asyncQueue, ^{
         NSMutableArray<NSString *> *ids = [NSMutableArray new];
         [self filterAssetWithBlock:^(PHCollection *collection, PHAsset *asset) {
-            if ([asset isImage]) {
+            if ([asset isImage] && ![ids containsObject:asset.localIdentifier]) {
                 [ids addObject:asset.localIdentifier];
             }
         }];
