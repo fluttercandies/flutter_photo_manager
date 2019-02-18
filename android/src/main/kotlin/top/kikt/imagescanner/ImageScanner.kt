@@ -504,7 +504,9 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
     private fun filterVideoPath() {
 
         for (img in imgList) {
-            videoPathDirIdMap[img.dirId]?.add(img)
+            if(img.type == AssetType.Video) {
+                videoPathDirIdMap[img.dirId]?.add(img)
+            }
         }
     }
 
@@ -530,7 +532,9 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
     private fun filterImagePath() {
 
         for (img in imgList) {
-            imagePathDirIdMap[img.dirId]?.add(img)
+            if(img.type == AssetType.Image) {
+                imagePathDirIdMap[img.dirId]?.add(img)
+            }
         }
     }
 

@@ -420,7 +420,7 @@ class AssetPathEntity {
   Future<List<AssetEntity>> get assetList => PhotoManager._getAssetList(this);
 
   static var _all = AssetPathEntity()
-    ..id = "dfnsfkdfj2454AJJnfdkl"
+    ..id = "allall--dfnsfkdfj2454AJJnfdkl"
     ..name = "all"
     .._isAll = true
     ..hasVideo = true;
