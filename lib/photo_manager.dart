@@ -159,14 +159,18 @@ class PhotoManager {
       path.hasVideo = true;
       if (path._isAll) {
         list = await _channel.invokeMethod("getAllVideo");
+        return _castAsset(list, AssetType.video);
       } else {
         list = await _channel.invokeMethod("getOnlyVideoWithPathId", path.id);
+        return _castAsset(list, AssetType.video);
       }
     } else if (path.onlyImage) {
       if (path._isAll) {
         list = await _channel.invokeMethod("getAllImage");
+        return _castAsset(list, AssetType.image);
       } else {
         list = await _channel.invokeMethod("getOnlyImageWithPathId", path.id);
+        return _castAsset(list, AssetType.image);
       }
     } else {
       if (path._isAll == true) {
@@ -178,6 +182,12 @@ class PhotoManager {
     var entityList = list.map((v) => AssetEntity(id: v.toString())).toList();
     await _fetchType(entityList);
     return _filterType(entityList, path.hasVideo == true);
+  }
+
+  static List<AssetEntity> _castAsset(List<dynamic> ids, AssetType type) {
+    return ids.map((v) {
+      return AssetEntity(id: v.toString())..type = type;
+    }).toList();
   }
 
   static List<AssetEntity> _filterType(List<AssetEntity> list, bool hasVideo) {
@@ -379,6 +389,11 @@ class AssetEntity {
     }
     return this.id == other.id;
   }
+
+  @override
+  String toString() {
+    return "AssetEntity{id:$id}";
+  }
 }
 
 /// asset entity, for entity info.
@@ -451,5 +466,10 @@ class AssetPathEntity {
   @override
   int get hashCode {
     return this.id.hashCode;
+  }
+
+  @override
+  String toString() {
+    return "AssetPathEntity{id:$id}";
   }
 }

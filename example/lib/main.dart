@@ -59,7 +59,7 @@ class _MyAppState extends State<MyApp> {
       ),
       onTap: () async {
         var list = await data.assetList;
-        print("开启的相册为:${data.name} , 数量为 : ${list.length}");
+        print("开启的相册为:${data.name} , 数量为 : ${list.length} , list = $list");
         var page = PhotoPage(
           pathEntity: data,
           photos: list,
