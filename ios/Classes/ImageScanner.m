@@ -62,17 +62,24 @@
     dispatch_async(_asyncQueue, ^{
         [self refreshGallery];
         NSMutableArray *arr = [NSMutableArray new];
-        if (_idCollectionDict) {
-            [_idCollectionDict removeAllObjects];
-        } else {
-            _idCollectionDict = [NSMutableDictionary new];
-        }
-        for (PHCollection *collection in _galleryArray) {
-            [arr addObject:collection.localIdentifier];
-            _idCollectionDict[collection.localIdentifier] = collection;
-        }
+        [self refreshGalleryDict:arr];
         result(arr);
     });
+}
+
+- (void)refreshGalleryDict:(NSMutableArray *)arr {
+    if (_idCollectionDict) {
+        [_idCollectionDict removeAllObjects];
+    } else {
+        _idCollectionDict = [NSMutableDictionary new];
+    }
+
+    for (PHCollection *collection in _galleryArray) {
+        if (arr) {
+            [arr addObject:collection.localIdentifier];
+        }
+        _idCollectionDict[collection.localIdentifier] = collection;
+    }
 }
 
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
@@ -494,22 +501,22 @@
     }
 }
 
--(void)getDurationWithId:(FlutterMethodCall *)call result:(FlutterResult)result {
-    NSString* imageId = call.arguments;
+- (void)getDurationWithId:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSString *imageId = call.arguments;
     PHAsset *asset = [_idAssetDict valueForKey:imageId];
     int duration = (int) [asset duration];
-    if(duration == 0){
+    if (duration == 0) {
         result(nil);
-    }else{
+    } else {
         result([[NSNumber alloc] initWithInt:duration]);
     }
 }
 
 
--(void)getSizeWithId:(FlutterMethodCall *)call result:(FlutterResult)result {
-    NSString* imageId = call.arguments;
+- (void)getSizeWithId:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSString *imageId = call.arguments;
     PHAsset *asset = [_idAssetDict valueForKey:imageId];
-    if(!asset){
+    if (!asset) {
         result([NSDictionary new]);
         return;
     }
@@ -538,7 +545,7 @@
     }
 }
 
-- (void)releaseMemCache:(FlutterMethodCall *)call result:(FlutterResult)result{
+- (void)releaseMemCache:(FlutterMethodCall *)call result:(FlutterResult)result {
     [_galleryArray removeAllObjects];
     [_idCollectionDict removeAllObjects];
     [_idAssetDict removeAllObjects];
@@ -550,6 +557,7 @@
 - (void)getVideoPathList:(FlutterMethodCall *)call result:(FlutterResult)result {
     dispatch_async(_asyncQueue, ^{
         [self refreshGallery];
+        [self refreshGalleryDict:nil];
         if (!_idVideoArrayDict) {
             _idVideoArrayDict = [NSMutableDictionary new];
         }
@@ -605,6 +613,7 @@
 - (void)getImagePathList:(FlutterMethodCall *)call result:(FlutterResult)result {
     dispatch_async(_asyncQueue, ^{
         [self refreshGallery];
+        [self refreshGalleryDict:nil];
         if (!_idImageArrayDict) {
             _idImageArrayDict = [NSMutableDictionary new];
         }
