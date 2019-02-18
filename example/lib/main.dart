@@ -23,7 +23,15 @@ class _MyAppState extends State<MyApp> {
         title: const Text('Plugin example app'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.settings_applications),
+            icon: Icon(Icons.photo),
+            onPressed: _onlyImage,
+          ),
+          IconButton(
+            icon: Icon(Icons.videocam),
+            onPressed: _onlyVideo,
+          ),
+          IconButton(
+            icon: Icon(Icons.settings),
             onPressed: _openSetting,
           ),
         ],
@@ -34,24 +42,7 @@ class _MyAppState extends State<MyApp> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.refresh),
-        onPressed: () async {
-          var result = await PhotoManager.requestPermission();
-          if (!(result == true)) {
-            print("未授予权限");
-            return;
-          }
-
-          print("wait scan");
-          List<AssetPathEntity> list =
-              await PhotoManager.getAssetPathList(hasVideo: true);
-
-          pathList.clear();
-          pathList.addAll(list);
-          setState(() {});
-
-          // var r = await ImagePicker.pickImages(source: ImageSource.gallery, numberOfItems: 10);
-          // print(r);
-        },
+        onPressed: getImages,
       ),
     );
   }
@@ -68,7 +59,7 @@ class _MyAppState extends State<MyApp> {
       ),
       onTap: () async {
         var list = await data.assetList;
-        print("开启的相册为:${data.name} , 数量为 : ${list.length}");
+        print("开启的相册为:${data.name} , 数量为 : ${list.length} , list = $list");
         var page = PhotoPage(
           pathEntity: data,
           photos: list,
@@ -83,8 +74,7 @@ class _MyAppState extends State<MyApp> {
     var data = pathList[index];
     Widget widget = FutureBuilder<List<AssetEntity>>(
       future: data.assetList,
-      builder:
-          (BuildContext context, AsyncSnapshot<List<AssetEntity>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<List<AssetEntity>> snapshot) {
         var assetList = snapshot.data;
         if (assetList == null || assetList.isEmpty) {
           return Container(
@@ -112,5 +102,39 @@ class _MyAppState extends State<MyApp> {
 
   void _openSetting() {
     PhotoManager.openSetting();
+  }
+
+  void getImages() async {
+    var result = await PhotoManager.requestPermission();
+    if (!(result == true)) {
+      print("未授予权限");
+      return;
+    }
+
+    print("wait scan");
+    List<AssetPathEntity> list = await PhotoManager.getAssetPathList(hasVideo: true);
+
+    pathList.clear();
+    pathList.addAll(list);
+    setState(() {});
+
+    // var r = await ImagePicker.pickImages(source: ImageSource.gallery, numberOfItems: 10);
+    // print(r);
+  }
+
+  void _onlyVideo() async {
+    var pathList = await PhotoManager.getVideoAsset();
+    updateDatas(pathList);
+  }
+
+  void _onlyImage() async {
+    var pathList = await PhotoManager.getImageAsset();
+    updateDatas(pathList);
+  }
+
+  updateDatas(List<AssetPathEntity> list) {
+    pathList.clear();
+    pathList.addAll(list);
+    setState(() {});
   }
 }
