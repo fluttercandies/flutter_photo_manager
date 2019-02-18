@@ -29,6 +29,23 @@
 
 @implementation ImageScanner {
 }
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _galleryArray = [NSMutableArray new];
+        _idCollectionDict = [NSMutableDictionary new];
+        _idAssetDict = [NSMutableDictionary new];
+        _asyncQueue = dispatch_queue_create("asyncQueue", nil);
+
+        _idVideoArrayDict = [NSMutableDictionary new];
+        _idImageArrayDict = [NSMutableDictionary new];
+    }
+
+    return self;
+}
+
+
 - (void)requestPermissionWithResult:(FlutterResult)result {
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
         if (status == PHAuthorizationStatusAuthorized) {
@@ -39,7 +56,6 @@
         }
     }];
 
-    self.asyncQueue = dispatch_queue_create("asyncQueue", nil);
 }
 
 - (void)getGalleryIdList:(FlutterMethodCall *)call result:(FlutterResult)result {
@@ -142,6 +158,7 @@
             PHFetchResult<PHAsset *> *assetResult = [PHAsset
                     fetchAssetsInAssetCollection:assetCollection options:opt];
             for (PHAsset *asset in assetResult) {
+                _idAssetDict[asset.localIdentifier] = asset;
                 block(assetCollection, asset);
             }
         }
@@ -234,8 +251,8 @@
                           contentMode:PHImageContentModeAspectFill
                               options:options
                         resultHandler:^(UIImage *result, NSDictionary *info) {
-                            // NSLog(@"image width = %f , height =
-                            // %f",result.size.width,result.size.height);
+//                            NSLog(@"image width = %f , height = "
+//                                  "%f", result.size.width, result.size.height);
                             BOOL downloadFinined =
                                     ![[info objectForKey:PHImageCancelledKey] boolValue] &&
                                             ![info objectForKey:PHImageErrorKey] &&
@@ -244,13 +261,20 @@
                                 return;
                             }
                             NSData *data = UIImageJPEGRepresentation(result, 100);
-                            NSArray *arr = [ImageScanner convertNSData:data];
 
                             if (reply.isReply) {
                                 return;
                             }
+
                             reply.isReply = YES;
-                            flutterResult(arr);
+
+                            if (!data) {
+                                flutterResult([FlutterStandardTypedData typedDataWithBytes:[NSData new]]);
+                                return;
+                            }
+
+                            FlutterStandardTypedData *typedData = [FlutterStandardTypedData typedDataWithBytes:data];
+                            flutterResult(typedData);
                         }];
     });
 }
@@ -556,11 +580,11 @@
         NSMutableArray<NSString *> *ids = [NSMutableArray new];
         [self filterAssetWithBlock:^(PHCollection *collection, PHAsset *asset) {
             if ([asset isVideo]) {
-                NSLog(@"asset %@ is Video", asset.localIdentifier);
+//                NSLog(@"asset %@ is Video", asset.localIdentifier);
                 [ids addObject:asset.localIdentifier];
             }
         }];
-        NSLog(@"video has %d", ids.count);
+//        NSLog(@"video has %d", ids.count);
         result(ids);
     });
 }
