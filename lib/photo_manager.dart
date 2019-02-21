@@ -436,13 +436,13 @@ class AssetPathEntity {
 
   static var _all = AssetPathEntity()
     ..id = "allall--dfnsfkdfj2454AJJnfdkl"
-    ..name = "all"
+    ..name = "Recent"
     ..isAll = true
     ..hasVideo = true;
 
   static var _allVideo = AssetPathEntity()
     ..id = "videovideo--87yuhijn3cvx"
-    ..name = "all"
+    ..name = "Recent"
     ..isAll = true
     ..onlyVideo = true;
 
@@ -450,7 +450,7 @@ class AssetPathEntity {
     ..id = "imageimage--89hdsinvosd"
     ..onlyImage = true
     ..isAll = true
-    ..name = "all";
+    ..name = "Recent";
 
   /// all asset path
   static AssetPathEntity get all => _all;
