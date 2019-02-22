@@ -74,7 +74,8 @@ class _MyAppState extends State<MyApp> {
     var data = pathList[index];
     Widget widget = FutureBuilder<List<AssetEntity>>(
       future: data.assetList,
-      builder: (BuildContext context, AsyncSnapshot<List<AssetEntity>> snapshot) {
+      builder:
+          (BuildContext context, AsyncSnapshot<List<AssetEntity>> snapshot) {
         var assetList = snapshot.data;
         if (assetList == null || assetList.isEmpty) {
           return Container(
@@ -112,7 +113,8 @@ class _MyAppState extends State<MyApp> {
     }
 
     print("wait scan");
-    List<AssetPathEntity> list = await PhotoManager.getAssetPathList(hasVideo: true);
+    List<AssetPathEntity> list =
+        await PhotoManager.getAssetPathList(hasVideo: true);
 
     pathList.clear();
     pathList.addAll(list);

@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -46,7 +44,8 @@ class _PhotoListState extends State<PhotoList> {
     return FutureBuilder<Uint8List>(
       future: entity.thumbDataWithSize(150, 150),
       builder: (BuildContext context, AsyncSnapshot<Uint8List> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.data != null) {
           return InkWell(
             onTap: () => showInfo(entity),
             child: Stack(

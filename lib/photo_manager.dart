@@ -69,12 +69,14 @@ class PhotoManager {
   /// get video asset
   ///
   /// 获取视频列表
-  static Future<List<AssetPathEntity>> getVideoAsset({bool hasAll = true}) async {
+  static Future<List<AssetPathEntity>> getVideoAsset(
+      {bool hasAll = true}) async {
     List<AssetPathEntity> pathList = [];
     List idsResult = await _channel.invokeMethod("getVideoPathList");
     List<String> ids = idsResult.cast();
     // print(ids);
-    List<String> names = (await _channel.invokeMethod("getGalleryNameList", ids) as List).cast();
+    List<String> names =
+        (await _channel.invokeMethod("getGalleryNameList", ids) as List).cast();
 
     for (var i = 0; i < ids.length; i++) {
       var path = AssetPathEntity();
@@ -95,12 +97,14 @@ class PhotoManager {
   /// get image asset
   ///
   /// 获取图片列表
-  static Future<List<AssetPathEntity>> getImageAsset({bool hasAll = true}) async {
+  static Future<List<AssetPathEntity>> getImageAsset(
+      {bool hasAll = true}) async {
     List<AssetPathEntity> pathList = [];
     List idsResult = await _channel.invokeMethod("getImagePathList");
     List<String> ids = idsResult.cast();
     // print(ids);
-    List<String> names = (await _channel.invokeMethod("getGalleryNameList", ids) as List).cast();
+    List<String> names =
+        (await _channel.invokeMethod("getGalleryNameList", ids) as List).cast();
 
     for (var i = 0; i < ids.length; i++) {
       var path = AssetPathEntity();
@@ -121,7 +125,8 @@ class PhotoManager {
     _channel.invokeMethod("openSetting");
   }
 
-  static Future<List<AssetPathEntity>> _getPathList(List<String> idList, {bool hasVideo}) async {
+  static Future<List<AssetPathEntity>> _getPathList(List<String> idList,
+      {bool hasVideo}) async {
     hasVideo ??= true;
 
     /// 获取文件夹列表,这里主要是获取相册名称
@@ -252,7 +257,8 @@ class PhotoManager {
   }) async {
     Completer<Uint8List> completer = Completer();
     Future.delayed(Duration.zero, () async {
-      var result = await _channel.invokeMethod("getThumbBytesWithId", [id, width.toString(), height.toString()]);
+      var result = await _channel.invokeMethod(
+          "getThumbBytesWithId", [id, width.toString(), height.toString()]);
       if (result is Uint8List) {
         completer.complete(result);
       } else if (result is List<dynamic>) {
@@ -277,7 +283,8 @@ class PhotoManager {
       return false;
     }
     if (Platform.isIOS) {
-      var isICloud = await _channel.invokeMethod("isCloudWithImageId", assetEntity.id);
+      var isICloud =
+          await _channel.invokeMethod("isCloudWithImageId", assetEntity.id);
       return isICloud == "1";
     }
     return null;
