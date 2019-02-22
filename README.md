@@ -89,11 +89,51 @@ AssetType type = entity.type; // the type of asset enum of other,image,video
 Duration duration = await entity.duration; //if type is not video, then return null.
 ```
 
-## about ios build error
+## iOS plist config
 
-if your flutter print like the log. see [so](https://stackoverflow.com/questions/27776497/include-of-non-modular-header-inside-framework-module)
+Because the album is a privacy privilege, you need user permission to access it. You must to modify the `Info.plist` file in Runner project.
 
+like next
+
+```xml
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>App need your agree, can visit your album</string>
 ```
+
+xcode like image
+![in xcode](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/flutter_photo2.png)
+
+## android config
+
+### glide
+
+Android native use glide to create image thumb bytes, version is 4.9.0.
+
+If your other android library use the library, and version is not same, then you need edit your android project's build.gradle.
+
+```gradle
+rootProject.allprojects {
+
+    subprojects {
+        project.configurations.all {
+            resolutionStrategy.eachDependency { details ->
+                if (details.requested.group == 'com.github.bumptech.glide'
+                        && details.requested.name.contains('glide')) {
+                    details.useVersion "4.9.0"
+                }
+            }
+        }
+    }
+}
+```
+
+## common issues
+
+### ios build error
+
+if your flutter print like the log. see [stackoverflow](https://stackoverflow.com/questions/27776497/include-of-non-modular-header-inside-framework-module)
+
+```bash
 Xcode's output:
 ↳
     === BUILD TARGET Runner OF PROJECT Runner WITH CONFIGURATION Debug ===
@@ -111,17 +151,3 @@ Xcode's output:
      ~~~~~~~^
     2 errors generated.
 ```
-
-## about ios
-
-Because the album is a privacy privilege, you need user permission to access it. You must to modify the `Info.plist` file in Runner project.
-
-like next
-
-```plist
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>App need your agree, can visit your album</string>
-```
-
-xcode like image
-![in xcode](https://github.com/CaiJingLong/some_asset/blob/master/flutter_photo2.png)
