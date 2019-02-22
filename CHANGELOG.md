@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.2.2
+
+* Support Android X. 
+* Breaking change. Migrate from the deprecated original Android Support Library to AndroidX. This shouldn't result in any functional changes, but it requires any Android apps using this plugin to also migrate if they're using the original support library.
+
 ## 0.2.1
 
 add two method to load video / image
