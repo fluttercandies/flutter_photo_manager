@@ -19,6 +19,8 @@ dependencies:
   photo_manager: $latest_version
 ```
 
+If you need to use AndroidX version, you can use `0.22-beta.1` version.
+
 ## import
 
 ```dart
