@@ -4,11 +4,11 @@
 [![GitHub](https://img.shields.io/github/license/Caijinglong/flutter_photo_manager.svg)](https://github.com/Caijinglong/flutter_photo_manager)
 [![GitHub stars](https://img.shields.io/github/stars/Caijinglong/flutter_photo_manager.svg?style=social&label=Stars)](https://github.com/Caijinglong/flutter_photo_manager)
 
-A flutter api for photo, you can get image/video from ios or android
+A flutter api for photo, you can get image/video from ios or android.
 
 一个提供相册 api 的插件, android ios 可用,没有 ui,以便于自定义自己的界面, 你可以通过提供的 api 来制作图片相关的 ui 或插件
 
-or use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker .All UI comes from flutter.
+If you just need a picture selector, you can choose to use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker. All UI create by flutter.
 
 ## install
 
@@ -104,6 +104,35 @@ xcode like image
 ![in xcode](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/flutter_photo2.png)
 
 ## android config
+
+### about androidX
+
+Google recommends completing all support-to-AndroidX migrations in 2019. Documentation is also provided.
+
+This library has been migrated in version 0.2.2, but it brings a problem. Sometimes your upstream library has not been migrated yet. At this time, you need to add an option to deal with this problem.
+
+If you have error in build. You can refer to [flutter.io](https://flutter.io/docs/development/packages-and-plugins/androidx-compatibility).
+
+Or you can be configured as follows:
+
+1.  Edit your app level `build.gradle` and compileSdkVersion to 28.
+
+    ```gradle
+
+        android {
+            // ...
+            compileSdkVersion 28
+            // ...
+        }
+
+    ```
+
+2.  Add the following configuration options to `gradle.properties` at the project level.
+
+    ```properties
+    android.enableJetifier=true
+    android.useAndroidX=true
+    ```
 
 ### glide
 
