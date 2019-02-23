@@ -1,11 +1,13 @@
 # CHANGELOG
 
-## 0.2.2-beta.1
+## 0.2.2-beta.2
 
 It will be updated to stable version in the future.
 
 - Support Android X.
 - **Breaking change**. Migrate from the deprecated original Android Support Library to AndroidX. This shouldn't result in any functional changes, but it requires any Android apps using this plugin to also migrate if they're using the original support library.
+
+fix NPE for image crash on android.
 
 ## 0.2.1
 
