@@ -532,7 +532,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
     private fun filterImagePath() {
 
         for (img in imgList) {
-            if(img.type == AssetType.Image) {
+            if (img?.type == AssetType.Image) {
                 imagePathDirIdMap[img.dirId]?.add(img)
             }
         }
