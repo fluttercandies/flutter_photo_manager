@@ -47,4 +47,8 @@ typedef void (^asset_block)(PHCollection *collection, PHAsset *asset);
 - (void)getSizeWithId:(FlutterMethodCall *)call result:(FlutterResult)result;
 
 - (void)releaseMemCache:(FlutterMethodCall *)call result:(FlutterResult)result;
+
+- (void)createAssetWithIdWithCall:(FlutterMethodCall *)call result:(FlutterResult)result;
+
+- (id)handleAsset;
 @end

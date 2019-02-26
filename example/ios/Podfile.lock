@@ -5,18 +5,18 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `.symlinks/flutter/ios`)
-  - photo_manager (from `.symlinks/plugins/photo_manager/ios`)
+  - photo_manager (from `/Users/cai/Documents/GitHub/flutter_photo_manager/ios/photo_manager.podspec`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: ".symlinks/flutter/ios"
   photo_manager:
-    :path: ".symlinks/plugins/photo_manager/ios"
+    :path: "/Users/cai/Documents/GitHub/flutter_photo_manager/ios/photo_manager.podspec"
 
 SPEC CHECKSUMS:
   Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
   photo_manager: a406dfebdf49773f7eb25ba093e132f6d1f677e1
 
-PODFILE CHECKSUM: 1e5af4103afd21ca5ead147d7b81d06f494f51a2
+PODFILE CHECKSUM: dd4c3bacfcfe689bbee14d5309fa1c97c22898b6
 
 COCOAPODS: 1.5.3

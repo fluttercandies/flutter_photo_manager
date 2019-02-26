@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -12,6 +13,8 @@ class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => new _MyAppState();
 }
+
+const _cacheIosAssetId = "106E99A1-4F6A-45A2-B320-B0AD4A8E8473/L0/001";
 
 class _MyAppState extends State<MyApp> {
   var pathList = <AssetPathEntity>[];
@@ -33,6 +36,10 @@ class _MyAppState extends State<MyApp> {
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: _openSetting,
+          ),
+          IconButton(
+            icon: Icon(Icons.cached),
+            onPressed: showImageDialogWithAssetId,
           ),
         ],
       ),
@@ -138,5 +145,25 @@ class _MyAppState extends State<MyApp> {
     pathList.clear();
     pathList.addAll(list);
     setState(() {});
+  }
+
+  void showImageDialogWithAssetId() async {
+    String id;
+
+    if (Platform.isIOS) {
+      id = _cacheIosAssetId;
+    }
+
+    var asset = await createAssetEntityWithId(id);
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return GestureDetector(
+          child: _buildPreview(asset),
+          onTap: () => Navigator.pop(ctx),
+        );
+      },
+    );
   }
 }

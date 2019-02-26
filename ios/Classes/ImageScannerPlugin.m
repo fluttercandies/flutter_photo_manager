@@ -65,6 +65,8 @@
         [_scanner getAllImage:call result:result];
     } else if ([@"getOnlyImageWithPathId" isEqualToString:call.method]) {
         [_scanner getOnlyImageWithPathId:call result:result];
+    } else if ([@"createAssetWithId" isEqualToString:call.method]) {
+        [_scanner createAssetWithIdWithCall:call result:result];
     } else {
         result(FlutterMethodNotImplemented);
     }
