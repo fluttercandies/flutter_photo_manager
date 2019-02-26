@@ -11,6 +11,8 @@ add a method to create `AssetEntity` with id
 
 add `isCache` for method `getImageAsset`,`getVideoAsset` or `getAssetPathList`
 
+add observer for photo change.
+
 ## 0.2.1
 
 add two method to load video / image
