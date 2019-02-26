@@ -8,3 +8,4 @@ import 'package:flutter/services.dart';
 part './src/manager.dart';
 part './src/type.dart';
 part './src/entity.dart';
+part './src/factory.dart';

@@ -280,6 +280,17 @@ class PhotoManager {
     return Size(size["width"].toDouble(), size["height"].toDouble());
   }
 
+  /// nullable
+  static Future<AssetEntity> _createAssetEntityWithId(String id) async {
+    String createResult = await _channel.invokeMethod("createAssetWithId", id);
+    if (createResult == null) {
+      return null;
+    }
+    var entity = AssetEntity(id: id);
+    await _fetchType([entity]);
+    return entity;
+  }
+
   /// Release all native(ios/android) caches, normally no calls are required.
   ///
   /// The main purpose is to help clean up problems where memory usage may be too large when there are too many pictures.
