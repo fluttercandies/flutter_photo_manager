@@ -19,6 +19,7 @@ class _NotifyManager {
   }
 
   Future<dynamic> _notify(MethodCall call) async {
+    print("call.method = ${call.method}");
     if (call.method == "change") {
       _onChange(call);
     }

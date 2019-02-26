@@ -9,12 +9,14 @@
 #import <Photos/PHFetchOptions.h>
 #import <Photos/PHImageManager.h>
 #import <Photos/PHPhotoLibrary.h>
+#import <Foundation/Foundation.h>
 #import "MD5Utils.h"
 #import "PHAsset+PHAsset_checkType.h"
 #import "AssetEntity.h"
 #import "Reply.h"
+#import "PhotoChangeObserver.h"
 
-@interface ImageScanner () <PHPhotoLibraryChangeObserver>
+@interface ImageScanner ()
 
 @property(nonatomic, strong) NSMutableArray<PHCollection *> *galleryArray;
 @property(nonatomic, strong) NSMutableDictionary<NSString *, PHCollection *> *idCollectionDict;
@@ -24,6 +26,9 @@
 
 @property(nonatomic, strong) NSMutableDictionary<NSString *, NSMutableArray<PHAsset *> *> *idVideoArrayDict;
 @property(nonatomic, strong) NSMutableDictionary<NSString *, NSMutableArray<PHAsset *> *> *idImageArrayDict;
+
+
+@property(nonatomic, strong) PhotoChangeObserver *observer;
 
 @end
 
@@ -40,6 +45,8 @@
 
         _idVideoArrayDict = [NSMutableDictionary new];
         _idImageArrayDict = [NSMutableDictionary new];
+
+        _observer = [PhotoChangeObserver new];
     }
 
     return self;
@@ -49,7 +56,7 @@
 - (void)requestPermissionWithResult:(FlutterResult)result {
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
         if (status == PHAuthorizationStatusAuthorized) {
-            [PHPhotoLibrary.sharedPhotoLibrary registerChangeObserver:self];
+            [_observer initWithRegister:self.registrar];
             result(@1);
         } else {
             result(@0);
@@ -89,12 +96,6 @@
         }
         _idCollectionDict[collection.localIdentifier] = collection;
     }
-}
-
-- (void)photoLibraryDidChange:(PHChange *)changeInstance {
-    dispatch_async(_asyncQueue, ^{
-        [self refreshGallery];
-    });
 }
 
 - (void)refreshGallery {
