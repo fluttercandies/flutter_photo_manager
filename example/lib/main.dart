@@ -38,14 +38,14 @@ class _MyAppState extends State<MyApp> {
             onPressed: _onlyVideo,
           ),
           IconButton(
+            icon: Icon(Icons.create),
+            tooltip: "show cache id image",
+            onPressed: showImageDialogWithAssetId,
+          ),
+          IconButton(
             icon: Icon(Icons.settings),
             tooltip: "open application setting",
             onPressed: _openSetting,
-          ),
-          IconButton(
-            icon: Icon(Icons.image),
-            tooltip: "show cache id image",
-            onPressed: showImageDialogWithAssetId,
           ),
         ],
       ),
