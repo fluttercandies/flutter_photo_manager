@@ -22,6 +22,24 @@ class _MyAppState extends State<MyApp> {
   var pathList = <AssetPathEntity>[];
 
   @override
+  void initState() {
+    super.initState();
+    PhotoManager.addChangeCallback(changeNotify);
+    PhotoManager.startChangeNotify();
+  }
+
+  void changeNotify() {
+    print("on gallery change");
+  }
+
+  @override
+  void dispose() {
+    PhotoManager.removeChangeCallback(changeNotify);
+    PhotoManager.stopChangeNotify();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(

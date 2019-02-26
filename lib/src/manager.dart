@@ -4,6 +4,8 @@ part of '../photo_manager.dart';
 class PhotoManager {
   static const MethodChannel _channel = const MethodChannel('image_scanner');
 
+  static _NotifyManager _notifyManager = _NotifyManager();
+
   /// in android WRITE_EXTERNAL_STORAGE  READ_EXTERNAL_STORAGE
   ///
   /// in ios request the photo permission
@@ -332,4 +334,18 @@ class PhotoManager {
   static Future releaseCache() async {
     await _channel.invokeMethod("releaseMemCache");
   }
+
+  /// see [_NotifyManager]
+  static void addChangeCallback(VoidCallback callback) =>
+      _notifyManager.addCallback(callback);
+
+  /// see [_NotifyManager]
+  static void removeChangeCallback(VoidCallback callback) =>
+      _notifyManager.removeCallback(callback);
+
+  /// see [_NotifyManager]
+  static void startChangeNotify() => _notifyManager.startHandleNotify();
+
+  /// see [_NotifyManager]
+  static void stopChangeNotify() => _notifyManager.stopHandleNotify();
 }
