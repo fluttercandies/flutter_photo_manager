@@ -45,7 +45,7 @@ if (result) {
     // success
 } else {
     // fail
-    // if result is fail, you can call PhotoManger.openSetting();  to open android/ios applicaton's setting to get permission
+    /// if result is fail, you can call `PhotoManger.openSetting();`  to open android/ios applicaton's setting to get permission
 }
 ```
 
@@ -90,6 +90,19 @@ AssetType type = entity.type; // the type of asset enum of other,image,video
 
 Duration duration = await entity.duration; //if type is not video, then return null.
 ```
+
+## Usage
+
+### Create `AssetEntity` with id
+
+the `id` is `AssetEntity.id`
+
+```dart
+var asset = createAssetEntityWithId(id);
+```
+
+When this method is called, the image corresponding to ID has been deleted, and the return value is null.
+
 
 ## iOS plist config
 

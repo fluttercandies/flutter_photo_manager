@@ -560,8 +560,10 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
     fun createAssetWithId(call: MethodCall, result: MethodChannel.Result?) {
         val id = call.arguments as String
-        val asset = createAsset(id)
-        result?.success(asset?.imgId)
+        threadPool.execute {
+            val asset = createAsset(id)
+            result?.success(asset?.imgId)
+        }
     }
 
     private fun createAsset(path: String): Asset? {
