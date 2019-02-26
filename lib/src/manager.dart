@@ -22,6 +22,9 @@ class PhotoManager {
   /// [hasVideo] contains video
   /// [hasVideo] 包含视频
   ///
+  /// [isCache] getCache pathList
+  /// [isCache] 获取缓存的列表
+  ///
   static Future<List<AssetPathEntity>> getAssetPathList({
     bool hasAll = true,
     bool hasVideo = true,
@@ -49,6 +52,9 @@ class PhotoManager {
   /// get video asset
   ///
   /// 获取视频列表
+  ///
+  /// [isCache] getCache pathList
+  /// [isCache] 获取缓存的列表
   static Future<List<AssetPathEntity>> getVideoAsset({
     bool hasAll = true,
     bool isCache = false,
@@ -79,6 +85,9 @@ class PhotoManager {
   /// get image asset
   ///
   /// 获取图片列表
+  ///
+  /// [isCache] getCache pathList
+  /// [isCache] 获取缓存的列表
   static Future<List<AssetPathEntity>> getImageAsset({
     bool hasAll = true,
     bool isCache = false,
