@@ -1,5 +1,6 @@
 #import "ImageScannerPlugin.h"
 #import "Reply.h"
+#import "PhotoChangeObserver.h"
 
 @implementation ImageScannerPlugin {
 }
@@ -11,6 +12,7 @@
     [registrar addMethodCallDelegate:instance channel:channel];
 
     instance.scanner = [[ImageScanner alloc] init];
+    instance.scanner.registrar = registrar;
 
     NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
     NSLog(@"application path = %@", path);

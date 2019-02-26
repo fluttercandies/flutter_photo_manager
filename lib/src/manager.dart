@@ -332,4 +332,21 @@ class PhotoManager {
   static Future releaseCache() async {
     await _channel.invokeMethod("releaseMemCache");
   }
+
+  /// Notification class for managing photo changes.
+  static _NotifyManager _notifyManager = _NotifyManager();
+
+  /// see [_NotifyManager]
+  static void addChangeCallback(VoidCallback callback) =>
+      _notifyManager.addCallback(callback);
+
+  /// see [_NotifyManager]
+  static void removeChangeCallback(VoidCallback callback) =>
+      _notifyManager.removeCallback(callback);
+
+  /// see [_NotifyManager]
+  static void startChangeNotify() => _notifyManager.startHandleNotify();
+
+  /// see [_NotifyManager]
+  static void stopChangeNotify() => _notifyManager.stopHandleNotify();
 }

@@ -11,15 +11,21 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 
 class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
     companion object {
+        private val notifyChangeObserver = RefreshObserver()
+
         @JvmStatic
         fun registerWith(registrar: Registrar): Unit {
             val channel = MethodChannel(registrar.messenger(), "image_scanner")
             channel.setMethodCallHandler(ImageScannerPlugin(registrar))
+
+            notifyChangeObserver.initWith(registrar)
         }
     }
 
     val scanner = ImageScanner(registrar)
     private val permissionsUtils = PermissionsUtils()
+
+
 
     init {
         registrar.addRequestPermissionsResultListener { i, strings, ints ->

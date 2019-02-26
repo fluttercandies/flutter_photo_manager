@@ -22,6 +22,24 @@ class _MyAppState extends State<MyApp> {
   var pathList = <AssetPathEntity>[];
 
   @override
+  void initState() {
+    super.initState();
+    PhotoManager.addChangeCallback(changeNotify);
+    PhotoManager.startChangeNotify();
+  }
+
+  void changeNotify() {
+    print("on gallery change");
+  }
+
+  @override
+  void dispose() {
+    PhotoManager.removeChangeCallback(changeNotify);
+    PhotoManager.stopChangeNotify();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
@@ -73,7 +91,7 @@ class _MyAppState extends State<MyApp> {
       ),
       onTap: () async {
         var list = await data.assetList;
-        print("开启的相册为:${data.name} , 数量为 : ${list.length} , list = $list");
+        print("open gallery is:${data.name} , count : ${list.length} , list = $list");
         var page = PhotoPage(
           pathEntity: data,
           photos: list,
@@ -122,7 +140,7 @@ class _MyAppState extends State<MyApp> {
   void getImages() async {
     var result = await PhotoManager.requestPermission();
     if (!(result == true)) {
-      print("未授予权限");
+      print("You have to grant album privileges");
       return;
     }
 
@@ -139,11 +157,21 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _onlyVideo() async {
+    var result = await PhotoManager.requestPermission();
+    if (!(result == true)) {
+      print("You have to grant album privileges");
+      return;
+    }
     var pathList = await PhotoManager.getVideoAsset();
     updateDatas(pathList);
   }
 
   void _onlyImage() async {
+    var result = await PhotoManager.requestPermission();
+    if (!(result == true)) {
+      print("You have to grant album privileges");
+      return;
+    }
     var pathList = await PhotoManager.getImageAsset();
     updateDatas(pathList);
   }
