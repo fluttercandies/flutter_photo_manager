@@ -60,10 +60,19 @@
 
 - (void)getGalleryIdList:(FlutterMethodCall *)call result:(FlutterResult)result {
     dispatch_async(_asyncQueue, ^{
-        [self refreshGallery];
-        NSMutableArray *arr = [NSMutableArray new];
-        [self refreshGalleryDict:arr];
-        result(arr);
+        BOOL cached = [call.arguments boolValue];
+        if (!cached) {
+            [self refreshGallery];
+            NSMutableArray *arr = [NSMutableArray new];
+            [self refreshGalleryDict:arr];
+            result(arr);
+        } else {
+            NSMutableArray *arr = [NSMutableArray new];
+            for (PHCollection *collection in _galleryArray) {
+                [arr addObject:collection.localIdentifier];
+            }
+            result(arr);
+        }
     });
 }
 
@@ -557,6 +566,12 @@
 
 - (void)getVideoPathList:(FlutterMethodCall *)call result:(FlutterResult)result {
     dispatch_async(_asyncQueue, ^{
+        BOOL isCache = [call.arguments boolValue];
+        if (isCache) {
+            result(_idVideoArrayDict.allKeys);
+            return;
+        }
+
         [self refreshGallery];
         [self refreshGalleryDict:nil];
         if (!_idVideoArrayDict) {
@@ -612,6 +627,11 @@
 
 - (void)getImagePathList:(FlutterMethodCall *)call result:(FlutterResult)result {
     dispatch_async(_asyncQueue, ^{
+        BOOL isCache = [call.arguments boolValue];
+        if (isCache) {
+            result(_idVideoArrayDict.allKeys);
+            return;
+        }
         [self refreshGallery];
         [self refreshGalleryDict:nil];
         if (!_idImageArrayDict) {

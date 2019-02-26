@@ -93,6 +93,14 @@ Duration duration = await entity.duration; //if type is not video, then return n
 
 ## Usage
 
+### About isCache
+
+If `isCache` of the `getAssetPathList` is true, method will return cache data. Invalid if no method with cache = false has been called before.
+
+If the `isCache` = false method has not been invoked before, the data cannot be returned.
+
+If `releaseCache` method is called, then cache will be clear, you must call `getAssetPathList(isCache:false)` before `getAssetPathList(isCache:true)`
+
 ### Create `AssetEntity` with id
 
 the `id` is `AssetEntity.id`
@@ -102,7 +110,6 @@ var asset = createAssetEntityWithId(id);
 ```
 
 When this method is called, the image corresponding to ID has been deleted, and the return value is null.
-
 
 ## iOS plist config
 

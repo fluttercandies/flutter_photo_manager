@@ -138,9 +138,9 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                     r = null
                     when {
                         call.method == "requestPermission" -> localResult?.success(1)
-                        call.method == "getGalleryIdList" -> scanner.scanAndGetImageIdList(localResult)
-                        call.method == "getVideoPathList" -> scanner.getVideoPathIdList(localResult)
-                        call.method == "getImagePathList" -> scanner.getImagePathIdList(localResult)
+                        call.method == "getGalleryIdList" -> scanner.scanAndGetImageIdList(call, localResult)
+                        call.method == "getVideoPathList" -> scanner.getVideoPathIdList(call, localResult)
+                        call.method == "getImagePathList" -> scanner.getImagePathIdList(call, localResult)
                         call.method == "createAssetWithId" -> scanner.createAssetWithId(call, localResult)
                         else -> localResult?.notImplemented()
                     }
