@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.2.2
+## 0.3.0
 
 - Support Android X.
 - **Breaking change**. Migrate from the deprecated original Android Support Library to AndroidX. This shouldn't result in any functional changes, but it requires any Android apps using this plugin to also migrate if they're using the original support library.

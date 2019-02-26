@@ -209,8 +209,12 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         createVideoPath(dirId, dir)
     }
 
-    fun scanAndGetImageIdList(result: MethodChannel.Result?) {
+    fun scanAndGetImageIdList(call: MethodCall, result: MethodChannel.Result?) {
         threadPool.execute {
+            if (call.arguments()) {
+                result?.success(map.keys.toList())
+                return@execute
+            }
             scan()
             scanThumb()
             filter()
@@ -503,8 +507,12 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         result.success(1)
     }
 
-    fun getVideoPathIdList(result: MethodChannel.Result?) {
+    fun getVideoPathIdList(call: MethodCall, result: MethodChannel.Result?) {
         threadPool.execute {
+            if (call.arguments()) {
+                result?.success(videoPathDirIdMap.keys.toList())
+                return@execute
+            }
             videoPathDirIdMap.clear()
             scanVideo()
             scanThumb()
@@ -531,8 +539,12 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
     }
 
 
-    fun getImagePathIdList(result: MethodChannel.Result?) {
+    fun getImagePathIdList(call: MethodCall, result: MethodChannel.Result?) {
         threadPool.execute {
+            if (call.arguments()) {
+                result?.success(imagePathDirIdMap.keys.toList())
+                return@execute
+            }
             imagePathDirIdMap.clear()
             scanImage()
             scanThumb()

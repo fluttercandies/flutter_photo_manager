@@ -25,9 +25,10 @@ class PhotoManager {
   static Future<List<AssetPathEntity>> getAssetPathList({
     bool hasAll = true,
     bool hasVideo = true,
+    bool isCache = false,
   }) async {
     /// 获取id 列表
-    List list = await _channel.invokeMethod('getGalleryIdList');
+    List list = await _channel.invokeMethod('getGalleryIdList', isCache);
     if (list == null) {
       return [];
     }
@@ -48,10 +49,12 @@ class PhotoManager {
   /// get video asset
   ///
   /// 获取视频列表
-  static Future<List<AssetPathEntity>> getVideoAsset(
-      {bool hasAll = true}) async {
+  static Future<List<AssetPathEntity>> getVideoAsset({
+    bool hasAll = true,
+    bool isCache = false,
+  }) async {
     List<AssetPathEntity> pathList = [];
-    List idsResult = await _channel.invokeMethod("getVideoPathList");
+    List idsResult = await _channel.invokeMethod("getVideoPathList", isCache);
     List<String> ids = idsResult.cast();
     // print(ids);
     List<String> names =
@@ -76,10 +79,12 @@ class PhotoManager {
   /// get image asset
   ///
   /// 获取图片列表
-  static Future<List<AssetPathEntity>> getImageAsset(
-      {bool hasAll = true}) async {
+  static Future<List<AssetPathEntity>> getImageAsset({
+    bool hasAll = true,
+    bool isCache = false,
+  }) async {
     List<AssetPathEntity> pathList = [];
-    List idsResult = await _channel.invokeMethod("getImagePathList");
+    List idsResult = await _channel.invokeMethod("getImagePathList", isCache);
     List<String> ids = idsResult.cast();
     // print(ids);
     List<String> names =
