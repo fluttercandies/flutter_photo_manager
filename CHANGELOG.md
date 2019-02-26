@@ -9,6 +9,8 @@ fix NPE for image crash on android.
 
 add a method to create `AssetEntity` with id
 
+add `isCache` for method `getImageAsset`,`getVideoAsset` or `getAssetPathList`
+
 ## 0.2.1
 
 add two method to load video / image
