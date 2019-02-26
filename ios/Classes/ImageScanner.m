@@ -552,6 +552,7 @@
     result(@1);
 }
 
+
 #pragma mark - scan for video
 
 - (void)getVideoPathList:(FlutterMethodCall *)call result:(FlutterResult)result {
@@ -661,6 +662,31 @@
         [ids addObject:asset.localIdentifier];
     }
     result(ids);
+}
+
+# pragma mark - getAssetWithId
+
+- (void)createAssetWithIdWithCall:(FlutterMethodCall *)call result:(FlutterResult)result {
+    dispatch_async(_asyncQueue, ^{
+        NSString *localId = call.arguments;
+        PHFetchOptions *options = [PHFetchOptions new];
+        PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[localId] options:options];
+        if (fetchResult && fetchResult.count != 0) {
+            PHAsset *asset = fetchResult[0];
+            if (asset) {
+                [self handleAsset:asset];
+                result(asset.localIdentifier);
+            } else {
+                result(nil);
+            }
+        } else {
+            result(nil);
+        }
+    });
+}
+
+- (void)handleAsset:(PHAsset *)asset {
+    _idAssetDict[asset.localIdentifier] = asset;
 }
 
 @end

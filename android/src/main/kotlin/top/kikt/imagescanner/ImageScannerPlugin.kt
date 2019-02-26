@@ -141,6 +141,8 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                         call.method == "getGalleryIdList" -> scanner.scanAndGetImageIdList(localResult)
                         call.method == "getVideoPathList" -> scanner.getVideoPathIdList(localResult)
                         call.method == "getImagePathList" -> scanner.getImagePathIdList(localResult)
+                        call.method == "createAssetWithId" -> scanner.createAssetWithId(call, localResult)
+                        else -> localResult?.notImplemented()
                     }
                 }
             }

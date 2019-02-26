@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -13,6 +14,10 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => new _MyAppState();
 }
 
+const _cacheIosAssetId = "106E99A1-4F6A-45A2-B320-B0AD4A8E8473/L0/001";
+const _cacheAndroidAssetId =
+    "/storage/emulated/0/qqmusic/QQImage/1533629267497.jpg";
+
 class _MyAppState extends State<MyApp> {
   var pathList = <AssetPathEntity>[];
 
@@ -24,14 +29,22 @@ class _MyAppState extends State<MyApp> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.photo),
+            tooltip: "get image path list",
             onPressed: _onlyImage,
           ),
           IconButton(
             icon: Icon(Icons.videocam),
+            tooltip: "get video path list",
             onPressed: _onlyVideo,
           ),
           IconButton(
+            icon: Icon(Icons.create),
+            tooltip: "show cache id image",
+            onPressed: showImageDialogWithAssetId,
+          ),
+          IconButton(
             icon: Icon(Icons.settings),
+            tooltip: "open application setting",
             onPressed: _openSetting,
           ),
         ],
@@ -42,6 +55,7 @@ class _MyAppState extends State<MyApp> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.refresh),
+        tooltip: "get all asset list",
         onPressed: getImages,
       ),
     );
@@ -138,5 +152,31 @@ class _MyAppState extends State<MyApp> {
     pathList.clear();
     pathList.addAll(list);
     setState(() {});
+  }
+
+  void showImageDialogWithAssetId() async {
+    String id;
+
+    if (Platform.isIOS) {
+      id = _cacheIosAssetId;
+    } else if (Platform.isAndroid) {
+      id = _cacheAndroidAssetId;
+    }
+
+    if (id == null) {
+      return;
+    }
+
+    var asset = await createAssetEntityWithId(id);
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return GestureDetector(
+          child: _buildPreview(asset),
+          onTap: () => Navigator.pop(ctx),
+        );
+      },
+    );
   }
 }

@@ -86,5 +86,7 @@ class _PhotoListState extends State<PhotoList> {
       var size = await entity.size;
       print("${entity.id} size = $size");
     }
+
+    /// copy log id , and create AssetEntity with id from main.dart
   }
 }
