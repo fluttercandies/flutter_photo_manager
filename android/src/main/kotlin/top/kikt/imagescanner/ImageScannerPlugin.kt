@@ -113,6 +113,10 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                 scanner.getOnlyImageWithPathId(call, result)
                 true
             }
+            call.method == "getTimeStampWithIds" -> {
+                scanner.getTimeStampWithIds(call, result)
+                true
+            }
 
             else -> false
         }

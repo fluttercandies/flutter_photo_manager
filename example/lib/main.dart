@@ -91,7 +91,8 @@ class _MyAppState extends State<MyApp> {
       ),
       onTap: () async {
         var list = await data.assetList;
-        print("open gallery is:${data.name} , count : ${list.length} , list = $list");
+        print(
+            "open gallery is:${data.name} , count : ${list.length} , list = $list");
         var page = PhotoPage(
           pathEntity: data,
           photos: list,

@@ -1,7 +1,7 @@
 part of '../photo_manager.dart';
 
 /// manage photo changes
-/// 
+///
 /// 管理照片的类
 class _NotifyManager {
   static const MethodChannel _channel =
@@ -10,10 +10,10 @@ class _NotifyManager {
   /// callbacks
   var notifyCallback = <VoidCallback>[];
 
-  /// add callback 
+  /// add callback
   void addCallback(VoidCallback callback) => notifyCallback.add(callback);
 
-  /// remove callback 
+  /// remove callback
   void removeCallback(VoidCallback callback) => notifyCallback.remove(callback);
 
   /// start handle notify

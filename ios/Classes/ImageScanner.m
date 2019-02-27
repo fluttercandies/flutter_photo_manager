@@ -499,6 +499,21 @@
     });
 }
 
+
+- (void)getTimeStampWithIdsWithCall:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSArray<NSString *> *ids = call.arguments;
+    NSMutableArray<NSNumber *> *r = [NSMutableArray new];
+    for (NSString *id in ids) {
+        PHAsset *asset = _idAssetDict[id];
+        if (asset) {
+            [r addObject:@(asset.creationDate.timeIntervalSince1970 * 1000)];
+        } else {
+            [r addObject:@0];
+        }
+    }
+    result(r);
+}
+
 - (void)isCloudWithCall:(FlutterMethodCall *)call result:(FlutterResult)result {
 
     NSString *imageId = call.arguments;
