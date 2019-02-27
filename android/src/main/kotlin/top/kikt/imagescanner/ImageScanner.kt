@@ -7,6 +7,7 @@ import android.util.Log
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
+import top.kikt.imagescanner.ImageScanner.Companion.threadPool
 import top.kikt.imagescanner.thumb.ThumbnailUtil
 import java.io.File
 import java.util.concurrent.*
@@ -18,7 +19,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         private const val poolSize = 8
         private val thumbPool = ThreadPoolExecutor(poolSize, 1000, 200, TimeUnit.MINUTES, ArrayBlockingQueue<Runnable>(5))
 
-        private val threadPool: ThreadPoolExecutor = ThreadPoolExecutor(poolSize + 3, 1000, 200, TimeUnit.MINUTES, ArrayBlockingQueue<Runnable>(poolSize + 3))
+        internal val threadPool: ThreadPoolExecutor = ThreadPoolExecutor(poolSize + 3, 1000, 200, TimeUnit.MINUTES, ArrayBlockingQueue<Runnable>(poolSize + 3))
 
         var handler: Handler = Handler()
     }
@@ -478,7 +479,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
      *
      * id system data is [MediaStore.Images.ImageColumns.DATA] or [MediaStore.Video.VideoColumns.DATA]
      */
-    private fun getImageWithId(id: String) = pathAssetMap[id]
+    fun getImageWithId(id: String) = pathAssetMap[id]
 
     fun getSizeWithId(call: MethodCall, result: MethodChannel.Result) {
         val id = call.arguments<String>()
@@ -647,6 +648,19 @@ fun ImageScanner.getOnlyImageWithPathId(call: MethodCall, result: MethodChannel.
         list.add(asset.path)
     }
     result.success(list)
+}
+
+fun ImageScanner.getTimeStampWithIds(call: MethodCall, result: MethodChannel.Result) {
+    threadPool.execute {
+        val ids: List<String> = call.arguments()
+        val timeList = ArrayList<Long>()
+        for (id in ids) {
+            val asset = getImageWithId(id)
+            timeList.add(asset?.timeStamp ?: 0)
+        }
+
+        result.success(timeList)
+    }
 }
 
 class ImageCallBack(val assetList: List<Asset>, val thumbHelper: ThumbHelper) : Callable<Boolean> {

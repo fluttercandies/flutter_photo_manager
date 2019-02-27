@@ -129,6 +129,15 @@ class AssetEntity {
     }
   }
 
+  /// unix timestamp of asset, milliseconds
+  int createTime;
+
+  /// create time of asset
+  DateTime get createDateTime {
+    print(createTime);
+    return DateTime.fromMillisecondsSinceEpoch(createTime ?? 0);
+  }
+
   /// see [id]
   AssetEntity({this.id});
 

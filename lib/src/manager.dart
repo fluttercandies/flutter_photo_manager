@@ -178,14 +178,26 @@ class PhotoManager {
       }
     }
     var entityList = list.map((v) => AssetEntity(id: v.toString())).toList();
-    await _fetchType(entityList);
+    await _fetchTypeAndTime(entityList);
     return _filterType(entityList, path.hasVideo == true);
   }
 
-  static List<AssetEntity> _castAsset(List<dynamic> ids, AssetType type) {
-    return ids.map((v) {
-      return AssetEntity(id: v.toString())..type = type;
-    }).toList();
+  static Future<List<AssetEntity>> _castAsset(
+      List<dynamic> ids, AssetType type) async {
+    var timeStampList = await _getTimeStampWithIds(ids.cast());
+
+    var result = <AssetEntity>[];
+
+    for (var i = 0; i < ids.length; i++) {
+      var id = ids[i];
+      var entity = AssetEntity(id: id)
+        ..type = type
+        ..createTime = timeStampList[i];
+
+      result.add(entity);
+    }
+
+    return result;
   }
 
   static List<AssetEntity> _filterType(List<AssetEntity> list, bool hasVideo) {
@@ -200,13 +212,15 @@ class PhotoManager {
     }).toList();
   }
 
-  static Future _fetchType(List<AssetEntity> entityList) async {
+  static Future _fetchTypeAndTime(List<AssetEntity> entityList) async {
     var ids = entityList.map((v) => v.id).toList();
     List typeList = await _channel.invokeMethod("getAssetTypeWithIds", ids);
+    List<int> timeList = await _getTimeStampWithIds(ids);
 
     for (var i = 0; i < typeList.length; i++) {
       var entity = entityList[i];
       entity.type = _convertTypeFromString(typeList[i]);
+      entity.createTime = timeList[i];
     }
   }
 
@@ -288,6 +302,14 @@ class PhotoManager {
     return Duration(seconds: second);
   }
 
+  static Future<List<int>> _getTimeStampWithIds(List<String> ids) async {
+    List<dynamic> times = await _channel.invokeMethod(
+      "getTimeStampWithIds",
+      ids,
+    );
+    return times.map((v) => (v as num).floor()).toList();
+  }
+
   static Future<Size> _getSizeWithId(String id) async {
     Map r = await _channel.invokeMethod("getSizeWithId", id);
     Map<String, int> size = r.cast();
@@ -301,7 +323,7 @@ class PhotoManager {
       return null;
     }
     var entity = AssetEntity(id: id);
-    await _fetchType([entity]);
+    await _fetchTypeAndTime([entity]);
     return entity;
   }
 

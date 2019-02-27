@@ -13,6 +13,8 @@ add `isCache` for method `getImageAsset`,`getVideoAsset` or `getAssetPathList`
 
 add observer for photo change.
 
+add field `createTime` for `AssetEntity`
+
 ## 0.2.1
 
 add two method to load video / image

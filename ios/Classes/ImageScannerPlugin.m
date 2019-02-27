@@ -69,6 +69,8 @@
         [_scanner getOnlyImageWithPathId:call result:result];
     } else if ([@"createAssetWithId" isEqualToString:call.method]) {
         [_scanner createAssetWithIdWithCall:call result:result];
+    } else if ([@"getTimeStampWithIds" isEqualToString:call.method]) {
+        [_scanner getTimeStampWithIdsWithCall:call result:result];
     } else {
         result(FlutterMethodNotImplemented);
     }

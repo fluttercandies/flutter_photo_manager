@@ -81,10 +81,11 @@ class _PhotoListState extends State<PhotoList> {
       var file = await entity.file;
       var length = file.lengthSync();
       var size = await entity.size;
-      print("${entity.id} length = $length , size = $size");
+      print(
+          "${entity.id} length = $length , size = $size , dateTime = ${entity.createDateTime}");
     } else {
       var size = await entity.size;
-      print("${entity.id} size = $size");
+      print("${entity.id} size = $size, dateTime = ${entity.createDateTime}");
     }
 
     /// copy log id , and create AssetEntity with id from main.dart
