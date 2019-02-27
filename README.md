@@ -12,14 +12,16 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
 
 ## install
 
-the latest [![pub package](https://img.shields.io/pub/v/photo_manager.svg)](https://pub.dartlang.org/packages/photo_manager)
+the latest version is [![pub package](https://img.shields.io/pub/v/photo_manager.svg)](https://pub.dartlang.org/packages/photo_manager)
 
 ```yaml
 dependencies:
   photo_manager: $latest_version
 ```
 
-If you need to use AndroidX version, you can use `0.22-beta.1` version.
+### *Version*
+
+Because version `0.3.0` updates a lot of things, if you have problems using `0.3.0`, please use `0.2.1`.
 
 ## import
 
@@ -110,6 +112,20 @@ var asset = createAssetEntityWithId(id);
 ```
 
 When this method is called, the image corresponding to ID has been deleted, and the return value is null.
+
+### observer
+
+use `addChangeCallback` to regiser observe.
+
+```dart
+PhotoManager.addChangeCallback(changeNotify);
+PhotoManager.startChangeNotify();
+```
+
+```dart
+PhotoManager.removeChangeCallback(changeNotify);
+PhotoManager.stopChangeNotify();
+```
 
 ## iOS plist config
 
