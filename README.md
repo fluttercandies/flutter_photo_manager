@@ -149,28 +149,7 @@ Google recommends completing all support-to-AndroidX migrations in 2019. Documen
 
 This library has been migrated in version 0.2.2, but it brings a problem. Sometimes your upstream library has not been migrated yet. At this time, you need to add an option to deal with this problem.
 
-If you have error in build. You can refer to [flutter.io](https://flutter.io/docs/development/packages-and-plugins/androidx-compatibility).
-
-Or you can be configured as follows:
-
-1.  Edit your app level `build.gradle` and compileSdkVersion to 28.
-
-    ```gradle
-
-        android {
-            // ...
-            compileSdkVersion 28
-            // ...
-        }
-
-    ```
-
-2.  Add the following configuration options to `gradle.properties` at the project level.
-
-    ```properties
-    android.enableJetifier=true
-    android.useAndroidX=true
-    ```
+The complete migration method can be consulted [gitbook](https://caijinglong.gitbooks.io/migrate-flutter-to-androidx/content/).
 
 ### glide
 
