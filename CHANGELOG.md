@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.1
+
+`AssetEntity` add property: `exists`
+
 ## 0.3.0
 
 - Support Android X.
