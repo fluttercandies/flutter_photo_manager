@@ -71,6 +71,8 @@
         [_scanner createAssetWithIdWithCall:call result:result];
     } else if ([@"getTimeStampWithIds" isEqualToString:call.method]) {
         [_scanner getTimeStampWithIdsWithCall:call result:result];
+    }else if ([@"assetExistsWithId" isEqualToString:call.method]) {
+        [_scanner assetExistsWithId:call result:result];
     } else {
         result(FlutterMethodNotImplemented);
     }

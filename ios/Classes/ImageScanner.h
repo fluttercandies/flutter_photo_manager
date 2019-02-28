@@ -51,4 +51,6 @@ typedef void (^asset_block)(PHCollection *collection, PHAsset *asset);
 - (void)createAssetWithIdWithCall:(FlutterMethodCall *)call result:(FlutterResult)result;
 
 - (void)getTimeStampWithIdsWithCall:(FlutterMethodCall *)call result:(FlutterResult)result;
+
+- (void)assetExistsWithId:(FlutterMethodCall *)call result:(FlutterResult)result;
 @end

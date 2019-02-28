@@ -609,6 +609,12 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         return getImageWithId(path)
     }
 
+    fun checkAssetExists(call: MethodCall, result: MethodChannel.Result) {
+        val id = call.arguments<String>()
+        val exists = File(id).exists()
+        result.success(exists)
+    }
+
 }
 
 fun ImageScanner.getAllVideo(result: MethodChannel.Result) {

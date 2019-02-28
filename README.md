@@ -19,10 +19,6 @@ dependencies:
   photo_manager: $latest_version
 ```
 
-### *Version*
-
-Because version `0.3.0` updates a lot of things, if you have problems using `0.3.0`, please use `0.2.1`.
-
 ## import
 
 ```dart

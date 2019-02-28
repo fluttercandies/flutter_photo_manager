@@ -85,6 +85,9 @@ class AssetEntity {
   /// in ios is asset id
   String id;
 
+  /// see [id]
+  AssetEntity({this.id});
+
   /// the asset type
   ///
   /// see [AssetType]
@@ -138,8 +141,8 @@ class AssetEntity {
     return DateTime.fromMillisecondsSinceEpoch(createTime ?? 0);
   }
 
-  /// see [id]
-  AssetEntity({this.id});
+  /// If the asset is deleted, return false.
+  Future<bool> get exists => PhotoManager._assetExistsWithId(id);
 
   @override
   int get hashCode {
