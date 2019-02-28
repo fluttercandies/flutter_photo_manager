@@ -553,6 +553,15 @@
     result(dict);
 }
 
+- (void)assetExistsWithId:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSString *id = call.arguments;
+    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:[PHFetchOptions new]];
+    if (fetchResult != nil && fetchResult.count > 0) {
+        result(@YES);
+    } else {
+        result(@NO);
+    }
+}
 
 + (NSArray *)convertNSData:(NSData *)data {
     NSMutableArray *array = [NSMutableArray array];

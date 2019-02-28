@@ -117,6 +117,10 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                 scanner.getTimeStampWithIds(call, result)
                 true
             }
+call.method == "assetExistsWithId" -> {
+                scanner.checkAssetExists(call, result)
+                true
+            }
 
             else -> false
         }

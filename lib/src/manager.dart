@@ -327,6 +327,10 @@ class PhotoManager {
     return entity;
   }
 
+  static Future<bool> _assetExistsWithId(String id) async {
+    return await _channel.invokeMethod("assetExistsWithId", id);
+  }
+
   /// Release all native(ios/android) caches, normally no calls are required.
   ///
   /// The main purpose is to help clean up problems where memory usage may be too large when there are too many pictures.
