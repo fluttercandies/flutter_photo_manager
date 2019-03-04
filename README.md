@@ -104,7 +104,7 @@ If `releaseCache` method is called, then cache will be clear, you must call `get
 the `id` is `AssetEntity.id`
 
 ```dart
-var asset = createAssetEntityWithId(id);
+AssetEntity asset = await createAssetEntityWithId(id);
 ```
 
 When this method is called, the image corresponding to ID has been deleted, and the return value is null.
