@@ -224,11 +224,17 @@ class PhotoManager {
     }
   }
 
-  static Future<File> _getFullFileWithId(String id) async {
+  static Future<File> _getFullFileWithId(
+    String id, {
+    bool isOrigin = false,
+  }) async {
     if (Platform.isAndroid) {
       return File(id);
     } else if (Platform.isIOS) {
-      var path = await _channel.invokeMethod("getFullFileWithId", id);
+      var path = await _channel.invokeMethod("getFullFileWithId", {
+        "id": id,
+        "isOrigin": isOrigin,
+      });
       if (path == null) {
         return null;
       }

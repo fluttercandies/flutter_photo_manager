@@ -104,6 +104,9 @@ class AssetEntity {
   /// if you need upload file ,then you can use the file
   Future<File> get file async => PhotoManager._getFullFileWithId(id);
 
+  Future<File> get originFile async =>
+      PhotoManager._getFullFileWithId(id, isOrigin: true);
+
   /// the image's bytes ,
   Future<Uint8List> get fullData => PhotoManager._getDataWithId(id);
 

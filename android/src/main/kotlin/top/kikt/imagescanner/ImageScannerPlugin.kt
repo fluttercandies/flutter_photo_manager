@@ -26,7 +26,6 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
     private val permissionsUtils = PermissionsUtils()
 
 
-
     init {
         registrar.addRequestPermissionsResultListener { i, strings, ints ->
             permissionsUtils.dealResult(i, strings, ints)
@@ -117,7 +116,7 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                 scanner.getTimeStampWithIds(call, result)
                 true
             }
-call.method == "assetExistsWithId" -> {
+            call.method == "assetExistsWithId" -> {
                 scanner.checkAssetExists(call, result)
                 true
             }
