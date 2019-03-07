@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.2
+
+`AssetEntity` add property: `originFile`
+
 ## 0.3.1
 
 `AssetEntity` add property: `exists`

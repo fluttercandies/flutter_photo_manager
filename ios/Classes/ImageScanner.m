@@ -321,16 +321,20 @@
 }
 
 - (void)getFullFileWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult reply:(Reply *)reply {
+
+    NSDictionary *params = [call arguments];
+
     dispatch_async(_asyncQueue, ^{
         PHImageManager *manager = PHImageManager.defaultManager;
-
-        NSString *imgId = call.arguments;
+        BOOL isOri = [params[@"isOrigin"] boolValue];
+        NSString *imgId = params[@"id"];
 
         PHAsset *asset = self->_idAssetDict[imgId];
         __weak ImageScanner *wSelf = self;
 
         if ([asset isImage]) {
             PHImageRequestOptions *options = [PHImageRequestOptions new];
+            options.resizeMode = PHImageRequestOptionsResizeModeFast;
 
             [options setProgressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
                 if (progress == 1.0) {
@@ -338,33 +342,56 @@
                 }
             }];
 
-            [manager requestImageDataForAsset:asset options:options resultHandler:^(NSData *imageData, NSString *dataUTI,
-                    UIImageOrientation orientation, NSDictionary *info) {
+            if (!isOri) {
+                [manager requestImageForAsset:asset targetSize:CGSizeMake(asset.pixelWidth, asset.pixelHeight) contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage *result, NSDictionary *info) {
+                    BOOL downloadFinish = [self isFinishWithInfo:info];
+                    if (!downloadFinish) {
+                        return;
+                    }
+                    NSData *data = UIImageJPEGRepresentation(result, 100);
 
-                BOOL downloadFinined =
-                        ![[info objectForKey:PHImageCancelledKey] boolValue] &&
-                                ![info objectForKey:PHImageErrorKey] &&
-                                ![[info objectForKey:PHImageResultIsDegradedKey] boolValue];
-                if (!downloadFinined) {
-                    return;
-                }
+                    if (reply.isReply) {
+                        return;
+                    }
 
-                if (reply.isReply) {
-                    return;
-                }
+                    reply.isReply = YES;
 
-                reply.isReply = YES;
+                    reply.isReply = YES;
 
-                NSString *path = [wSelf writeFullFileWithAssetId:asset
-                                                       imageData:imageData];
-                flutterResult(path);
-            }];
+                    NSString *path = [wSelf writeFullFileWithAssetId:asset imageData:data postfix:@"_origin"];
+                    flutterResult(path);
+                }];
+            } else {
+                [manager requestImageDataForAsset:asset options:options resultHandler:^(NSData *imageData, NSString *dataUTI,
+                        UIImageOrientation orientation, NSDictionary *info) {
+
+                    BOOL downloadFinined = [self isFinishWithInfo:info];
+                    if (!downloadFinined) {
+                        return;
+                    }
+
+                    if (reply.isReply) {
+                        return;
+                    }
+
+                    reply.isReply = YES;
+
+                    NSString *path = [wSelf writeFullFileWithAssetId:asset imageData:imageData postfix:@"_exif"];
+                    flutterResult(path);
+                }];
+            }
         } else if ([asset isVideo]) {
             [self writeFullVideoFileWithAsset:asset result:flutterResult reply:reply];
         } else {
             flutterResult(nil);
         }
     });
+}
+
+- (BOOL)isFinishWithInfo:(NSDictionary *)info {
+    return ![info[PHImageCancelledKey] boolValue] &&
+            !info[PHImageErrorKey] &&
+            ![info[PHImageResultIsDegradedKey] boolValue];
 }
 
 - (void)writeFullVideoFileWithAsset:(PHAsset *)asset result:(FlutterResult)result reply:(Reply *)reply {
@@ -424,7 +451,7 @@
     });
 }
 
-- (NSString *)writeFullFileWithAssetId:(PHAsset *)asset imageData:(NSData *)imageData {
+- (NSString *)writeFullFileWithAssetId:(PHAsset *)asset imageData:(NSData *)imageData postfix:(NSString *)postfix {
     NSString *homePath = NSTemporaryDirectory();
     NSFileManager *manager = NSFileManager.defaultManager;
 
@@ -435,6 +462,9 @@
 
     [path appendString:@"/"];
     [path appendString:[MD5Utils getmd5WithString:asset.localIdentifier]];
+    if (postfix) {
+        [path appendString:postfix];
+    }
     [path appendString:@".jpg"];
 
     if ([manager fileExistsAtPath:path]) {
