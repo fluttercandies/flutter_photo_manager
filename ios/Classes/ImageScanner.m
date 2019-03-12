@@ -75,7 +75,7 @@
             result(arr);
         } else {
             NSMutableArray *arr = [NSMutableArray new];
-            for (PHCollection *collection in _galleryArray) {
+            for (PHCollection *collection in self->_galleryArray) {
                 [arr addObject:collection.localIdentifier];
             }
             result(arr);
@@ -172,6 +172,8 @@
                 fetchAssetCollectionsWithLocalIdentifiers:@[collection.localIdentifier] options:opt];
 
         for (PHAssetCollection *assetCollection in fetchResult) {
+            if (![assetCollection isKindOfClass:[PHAssetCollection class]]) continue;
+            
             PHFetchResult<PHAsset *> *assetResult = [PHAsset
                     fetchAssetsInAssetCollection:assetCollection options:opt];
             for (PHAsset *asset in assetResult) {
