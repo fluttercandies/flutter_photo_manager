@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.3
+
+Fix customizing album containing folders on iOS.
+
 ## 0.3.2
 
 `AssetEntity` add property: `originFile`
