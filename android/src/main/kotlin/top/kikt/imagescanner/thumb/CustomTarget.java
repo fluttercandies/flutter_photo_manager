@@ -1,22 +1,23 @@
 package top.kikt.imagescanner.thumb;
 
 import android.graphics.drawable.Drawable;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.bumptech.glide.request.Request;
 import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.util.Util;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 /**
  * Created by debuggerx on 18-9-27 下午1:40
  */
 public abstract class CustomTarget<T> implements Target<T> {
-    private final int     width;
-    private final int     height;
+    private final int width;
+    private final int height;
     @Nullable
-    private       Request request;
+    private Request request;
 
     /**
      * Creates a new {@link CustomTarget} that will attempt to load the resource in its original size.

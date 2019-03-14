@@ -37,6 +37,10 @@ object ThumbnailUtil {
                     override fun onLoadCleared(placeholder: Drawable?) {
                         reply(null)
                     }
+
+                    override fun onLoadFailed(errorDrawable: Drawable?) {
+                        reply(null)
+                    }
                 })
     }
 

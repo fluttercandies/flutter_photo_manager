@@ -138,6 +138,11 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         val date = mCursor.getLong(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN))
         val width = mCursor.getInt(mCursor.getColumnIndex(MediaStore.Images.Media.WIDTH))
         val height = mCursor.getInt(mCursor.getColumnIndex(MediaStore.Images.Media.HEIGHT))
+
+        if (width <= 0 || height <= 0) {
+            return
+        }
+
         val img = Asset(path, imgId, dir, dirId, title, thumb, AssetType.Image, date, null, width, height)
 
         val file = File(path)
@@ -192,6 +197,10 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         val height = mCursor.getInt(mCursor.getColumnIndex(MediaStore.Video.Media.HEIGHT))
 
         val img = Asset(path, imgId, dir, dirId, title, thumb, AssetType.Video, date, durationMs, width, height)
+
+        if (width <= 0 || height <= 0) {
+            return
+        }
 
         val file = File(path)
         if (file.exists().not()) {
