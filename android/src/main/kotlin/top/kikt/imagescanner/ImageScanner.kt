@@ -220,15 +220,16 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
     }
 
     fun scanAndGetImageIdList(call: MethodCall, result: MethodChannel.Result?) {
+        val resultHandler = ResultHandler(result)
         threadPool.execute {
             if (call.arguments()) {
-                result?.success(map.keys.toList())
+                resultHandler.reply(map.keys.toList())
                 return@execute
             }
             scan()
             scanThumb()
             filter()
-            result?.success(map.keys.toList())
+            resultHandler.reply(map.keys.toList())
         }
     }
 
@@ -251,6 +252,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
     }
 
     fun getPathListWithPathIds(call: MethodCall, result: MethodChannel.Result) {
+        val resultHandler = ResultHandler(result)
         threadPool.execute {
             val r = ArrayList<String>()
             val list = call.arguments as List<Any>
@@ -261,40 +263,43 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
                     }
                 }
             }
-            result.success(r)
+            resultHandler.reply(r)
         }
     }
 
     fun getImageListWithPathId(call: MethodCall, result: MethodChannel.Result) {
+        val resultHandler = ResultHandler(result)
         threadPool.execute {
             val pathId = call.arguments as String
             val list = map[pathId]
             val r = list?.map { img ->
                 img.path
             }
-            result.success(r)
+            resultHandler.reply(r)
         }
     }
 
 
     fun getAllImageList(call: MethodCall, result: MethodChannel.Result) {
+        val resultHandler = ResultHandler(result)
         threadPool.execute {
             val list = imgList.map {
                 it.path
             }.toList()
-            result.success(list)
+            resultHandler.reply(list)
         }
     }
 
 
     fun getImageThumbListWithPathId(call: MethodCall, result: MethodChannel.Result) {
+        val resultHandler = ResultHandler(result)
         threadPool.execute {
             val pathId = call.arguments as String
             val list = map[pathId]
             val r = list?.map { img ->
                 img.thumb
             }
-            result.success(r)
+            resultHandler.reply(r)
 //            refreshThumb(r)
         }
     }
@@ -343,15 +348,16 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
 
     fun createThumbWithPathId(call: MethodCall, result: MethodChannel.Result) {
+        val resultHandler = ResultHandler(result)
         val pathId = call.arguments as String
         val list = map[pathId]
         if (list == null || list.isEmpty()) {
-            result.success(true)
+            resultHandler.reply(true)
             return
         }
         val future = refreshThumb(list)
         threadPool.execute {
-            result.success(future.get())
+            resultHandler.reply(future.get())
         }
     }
 
@@ -362,8 +368,11 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         var endIndex = params[2] as Int
 
         val list = map[pathId]
+
+        val resultHandler = ResultHandler(result)
+
         if (list == null || list.isEmpty()) {
-            result.success(true)
+            resultHandler.reply(true)
             return
         }
         if (startIndex <= 0) {
@@ -375,7 +384,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         }
         val future = refreshThumb(list.subList(startIndex, endIndex))
         threadPool.execute {
-            result.success(future.get())
+            resultHandler.reply(future.get())
         }
     }
 
@@ -406,18 +415,19 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
     }
 
     fun getImageThumb(call: MethodCall, result: MethodChannel.Result) {
+        val resultHandler = ResultHandler(result)
         threadPool.execute {
             val path = call.arguments as String
             val img = getImageWithId(path)
             if (img == null) {
-                result.success(null)
+                resultHandler.reply(null)
             } else {
                 val thumbFromPath = getThumbFromPath(img)
                 if (thumbFromPath == null) {
                     val thumb = thumbHelper.getThumb(path, img.imgId)
-                    result.success(thumb)
+                    resultHandler.reply(thumb)
                 } else {
-                    result.success(thumbFromPath)
+                    resultHandler.reply(thumbFromPath)
                 }
             }
         }
@@ -425,6 +435,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
 
     fun getImageThumbData(call: MethodCall, result: MethodChannel.Result) {
+        val resultHandler = ResultHandler(result)
 
         val args = call.arguments as List<Any>
         val id = args[0] as String
@@ -432,21 +443,23 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         val img = if (imageWithId != null) {
             imageWithId
         } else {
-            result.success(null)
+            resultHandler.reply(null)
             return
         }
         val width = (args[1] as String).toInt()
         val height = (args[2] as String).toInt()
 
-//        result.success(thumbHelper.getThumbData(img))
+//        resultHandler.reply(thumbHelper.getThumbData(img))
         when (img.type) {
             AssetType.Image -> ThumbnailUtil.getThumbnailByGlide(registrar.activity(), img.path, width, height, result)
             AssetType.Video -> ThumbnailUtil.getThumbnailWithVideo(registrar.activity(), img, width, height, result)
-            else -> result.success(null)
+            else -> resultHandler.reply(null)
         }
     }
 
     fun getAssetTypeWithIds(call: MethodCall, result: MethodChannel.Result) {
+        val resultHandler = ResultHandler(result)
+
         val args = call.arguments as List<Any>
         val idList = args.map { it.toString() }
         val resultList = ArrayList<String>()
@@ -457,7 +470,7 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
                 resultList.add(typeFromEntity(this))
             }
         }
-        result.success(resultList)
+        resultHandler.reply(resultList)
     }
 
     private fun typeFromEntity(asset: Asset): String {
@@ -469,16 +482,18 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
     }
 
     fun getAssetDurationWithId(call: MethodCall, result: MethodChannel.Result) {
+        val resultHandler = ResultHandler(result)
+
         val id = call.arguments<String>()
         val img = getImageWithId(id)
         if (img == null || img.type != AssetType.Video) {
-            result.success(null)
+            resultHandler.reply(null)
         } else {
             val duration = img.duration
             if (duration == null) {
-                result.success(null)
+                resultHandler.reply(null)
             } else {
-                result.success(duration / 1000)
+                resultHandler.reply(duration / 1000)
             }
         }
     }
@@ -491,20 +506,24 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
     fun getImageWithId(id: String) = pathAssetMap[id]
 
     fun getSizeWithId(call: MethodCall, result: MethodChannel.Result) {
+        val resultHandler = ResultHandler(result)
+
         val id = call.arguments<String>()
         val img = getImageWithId(id)
         if (img == null) {
-            result.success(mapOf<String, Int>())
+            resultHandler.reply(mapOf<String, Int>())
             return
         }
         val sizeMap = mapOf(
                 "width" to img.width,
                 "height" to img.height
         )
-        result.success(sizeMap)
+        resultHandler.reply(sizeMap)
     }
 
     fun releaseMemCache(result: MethodChannel.Result) {
+        val resultHandler = ResultHandler(result)
+
         imgList.clear()
         idPathMap.clear()
         pathIdMap.clear()
@@ -514,20 +533,21 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
         videoPathDirIdMap.clear()
         imagePathDirIdMap.clear()
 
-        result.success(1)
+        resultHandler.reply(1)
     }
 
     fun getVideoPathIdList(call: MethodCall, result: MethodChannel.Result?) {
+        val resultHandler = ResultHandler(result)
         threadPool.execute {
             if (call.arguments()) {
-                result?.success(videoPathDirIdMap.keys.toList())
+                resultHandler.reply(videoPathDirIdMap.keys.toList())
                 return@execute
             }
             videoPathDirIdMap.clear()
             scanVideo()
             scanThumb()
             filterVideoPath()
-            result?.success(videoPathDirIdMap.keys.toList())
+            resultHandler.reply(videoPathDirIdMap.keys.toList())
         }
     }
 
@@ -550,16 +570,17 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
 
     fun getImagePathIdList(call: MethodCall, result: MethodChannel.Result?) {
+        val resultHandler = ResultHandler(result)
         threadPool.execute {
             if (call.arguments()) {
-                result?.success(imagePathDirIdMap.keys.toList())
+                resultHandler.reply(imagePathDirIdMap.keys.toList())
                 return@execute
             }
             imagePathDirIdMap.clear()
             scanImage()
             scanThumb()
             filterImagePath()
-            result?.success(imagePathDirIdMap.keys.toList())
+            resultHandler.reply(imagePathDirIdMap.keys.toList())
         }
     }
 
@@ -582,9 +603,10 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
 
     fun createAssetWithId(call: MethodCall, result: MethodChannel.Result?) {
         val id = call.arguments as String
+        val resultHandler = ResultHandler(result)
         threadPool.execute {
             val asset = createAsset(id)
-            result?.success(asset?.imgId)
+            resultHandler.reply(asset?.imgId)
         }
     }
 
@@ -619,53 +641,65 @@ class ImageScanner(val registrar: PluginRegistry.Registrar) {
     }
 
     fun checkAssetExists(call: MethodCall, result: MethodChannel.Result) {
+        val resultHandler = ResultHandler(result)
+
         val id = call.arguments<String>()
         val exists = File(id).exists()
-        result.success(exists)
+        resultHandler.reply(exists)
     }
 
 }
 
 fun ImageScanner.getAllVideo(result: MethodChannel.Result) {
+    val resultHandler = ResultHandler(result)
+
     val list = ArrayList<String>()
     for (entry in videoPathDirIdMap) {
         for (asset in entry.value) {
             list.add(asset.path)
         }
     }
-    result.success(list)
+    resultHandler.reply(list)
 }
 
 fun ImageScanner.getOnlyVideoWithPathId(call: MethodCall, result: MethodChannel.Result) {
+    val resultHandler = ResultHandler(result)
+
     val list = ArrayList<String>()
     val id = call.arguments<String>()
     videoPathDirIdMap[id]?.forEach { asset ->
         list.add(asset.path)
     }
-    result.success(list)
+    resultHandler.reply(list)
 }
 
 fun ImageScanner.getAllImage(result: MethodChannel.Result) {
+    val resultHandler = ResultHandler(result)
+
     val list = ArrayList<String>()
     for (entry in imagePathDirIdMap) {
         for (asset in entry.value) {
             list.add(asset.path)
         }
     }
-    result.success(list)
+    resultHandler.reply(list)
 }
 
 
 fun ImageScanner.getOnlyImageWithPathId(call: MethodCall, result: MethodChannel.Result) {
+    val resultHandler = ResultHandler(result)
+
     val list = ArrayList<String>()
     val id = call.arguments<String>()
     imagePathDirIdMap[id]?.forEach { asset ->
         list.add(asset.path)
     }
-    result.success(list)
+    resultHandler.reply(list)
 }
 
 fun ImageScanner.getTimeStampWithIds(call: MethodCall, result: MethodChannel.Result) {
+    val resultHandler = ResultHandler(result)
+
     threadPool.execute {
         val ids: List<String> = call.arguments()
         val timeList = ArrayList<Long>()
@@ -674,7 +708,7 @@ fun ImageScanner.getTimeStampWithIds(call: MethodCall, result: MethodChannel.Res
             timeList.add(asset?.timeStamp ?: 0)
         }
 
-        result.success(timeList)
+        resultHandler.reply(timeList)
     }
 }
 

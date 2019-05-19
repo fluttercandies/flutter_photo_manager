@@ -41,8 +41,9 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
     }
 
     override fun onMethodCall(call: MethodCall, result: Result): Unit {
+        val resultHandler = ResultHandler(result)
         if (call.method == "openSetting") {
-            result.success("")
+            resultHandler.reply("")
             permissionsUtils.getAppDetailSettingIntent(registrar.activity())
             return
         }
@@ -136,12 +137,11 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
             permissionsListener = object : PermissionsListener {
                 override fun onDenied(deniedPermissions: Array<out String>?) {
                     Log.i("permission", "onDenied call.method = ${call.method}")
-                    val localResult = r
                     r = null
                     if (call.method == "requestPermission") {
-                        localResult?.success(0)
+                        resultHandler.reply(0)
                     } else {
-                        localResult?.error("失败", "权限被拒绝", "")
+                        resultHandler.replyError("失败", "权限被拒绝", "")
                     }
                 }
 
@@ -150,12 +150,12 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                     val localResult = r
                     r = null
                     when {
-                        call.method == "requestPermission" -> localResult?.success(1)
+                        call.method == "requestPermission" -> resultHandler.reply(1)
                         call.method == "getGalleryIdList" -> scanner.scanAndGetImageIdList(call, localResult)
                         call.method == "getVideoPathList" -> scanner.getVideoPathIdList(call, localResult)
                         call.method == "getImagePathList" -> scanner.getImagePathIdList(call, localResult)
                         call.method == "createAssetWithId" -> scanner.createAssetWithId(call, localResult)
-                        else -> localResult?.notImplemented()
+                        else -> resultHandler.notImplemented()
                     }
                 }
             }

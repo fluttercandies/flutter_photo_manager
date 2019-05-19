@@ -7,6 +7,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.transition.Transition
 import io.flutter.plugin.common.MethodChannel
 import top.kikt.imagescanner.Asset
+import top.kikt.imagescanner.ResultHandler
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -16,14 +17,8 @@ import java.io.File
 object ThumbnailUtil {
 
     fun getThumbnailByGlide(ctx: Context, path: String, width: Int, height: Int, result: MethodChannel.Result) {
-        var isReply = false
-        fun reply(r: Any?) {
-            if (isReply) {
-                return
-            }
-            isReply = true
-            result.success(r)
-        }
+        val resultHandler = ResultHandler(result)
+
         Glide.with(ctx)
                 .asBitmap()
                 .load(File(path))
@@ -31,29 +26,21 @@ object ThumbnailUtil {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                         val bos = ByteArrayOutputStream()
                         resource.compress(Bitmap.CompressFormat.JPEG, 100, bos)
-                        reply(bos.toByteArray())
+                        resultHandler.reply(bos.toByteArray())
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {
-                        reply(null)
+                        resultHandler.reply(null)
                     }
 
                     override fun onLoadFailed(errorDrawable: Drawable?) {
-                        reply(null)
+                        resultHandler.reply(null)
                     }
                 })
     }
 
     fun getThumbnailWithVideo(ctx: Context, asset: Asset, width: Int, height: Int, result: MethodChannel.Result) {
-        var isReply = false
-
-        fun reply(r: Any?) {
-            if (isReply) {
-                return
-            }
-            isReply = true
-            result.success(r)
-        }
+        val resultHandler = ResultHandler(result)
 
         Glide.with(ctx)
                 .asBitmap()
@@ -62,11 +49,11 @@ object ThumbnailUtil {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                         val bos = ByteArrayOutputStream()
                         resource.compress(Bitmap.CompressFormat.JPEG, 100, bos)
-                        reply(bos.toByteArray())
+                        resultHandler.reply(bos.toByteArray())
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {
-                        reply(null)
+                        resultHandler.reply(null)
                     }
                 })
     }
