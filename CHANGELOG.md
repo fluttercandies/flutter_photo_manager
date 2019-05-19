@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.4
+
+Support flutter 1.6.0 android's thread changes for channel.
+
 ## 0.3.3
 
 Fix customizing album containing folders on iOS.
