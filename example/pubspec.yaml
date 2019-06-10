@@ -10,7 +10,7 @@ description: Demonstrates how to use the image_scanner plugin.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+  sdk: '>=2.0.0-dev.68.0 <3.0.0'
 
 dependencies:
   flutter:
@@ -19,13 +19,18 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   photo_manager:
     path: ../
+
+  # photo_manager:
+  #  git:
+  #    url: https://github.com/CaiJingLong/flutter_photo_manager
+  #    ref: 09c094e295b4495ffea81e2b4a725b4a98b45c23
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

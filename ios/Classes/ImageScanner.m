@@ -455,12 +455,6 @@
                 result(nil);
             }
 
-//            NSURL *fileURL = [asset valueForKey:@"URL"];
-//            NSData *beforeVideoData = [NSData dataWithContentsOfURL:fileURL];
-//            BOOL createResult = [manager createFileAtPath:path contents:beforeVideoData attributes:@{}];
-//            NSLog(@"write file to %@ , size = %lu , createResult = %@", path,
-//                    (unsigned long) beforeVideoData.length, createResult ? @"true" : @"false");
-
         }];
     });
 }
