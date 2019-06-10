@@ -443,12 +443,24 @@
 
             reply.isReply = YES;
 
-            NSURL *fileRUL = [asset valueForKey:@"URL"];
-            NSData *beforeVideoData = [NSData dataWithContentsOfURL:fileRUL];  //未压缩的视频流
-            BOOL createResult = [manager createFileAtPath:path contents:beforeVideoData attributes:@{}];
-            NSLog(@"write file to %@ , size = %lu , createResult = %@", path,
-                    (unsigned long) beforeVideoData.length, createResult ? @"true" : @"false");
-            result(path);
+            NSString *preset = AVAssetExportPresetHighestQuality;
+            AVAssetExportSession *exportSession = [AVAssetExportSession exportSessionWithAsset:asset presetName:preset];
+            if (exportSession) {
+                exportSession.outputFileType = AVFileTypeMPEG4;
+                exportSession.outputURL = [NSURL fileURLWithPath:path];
+                [exportSession exportAsynchronouslyWithCompletionHandler:^{
+                    result(path);
+                }];
+            } else {
+                result(nil);
+            }
+
+//            NSURL *fileURL = [asset valueForKey:@"URL"];
+//            NSData *beforeVideoData = [NSData dataWithContentsOfURL:fileURL];
+//            BOOL createResult = [manager createFileAtPath:path contents:beforeVideoData attributes:@{}];
+//            NSLog(@"write file to %@ , size = %lu , createResult = %@", path,
+//                    (unsigned long) beforeVideoData.length, createResult ? @"true" : @"false");
+
         }];
     });
 }
