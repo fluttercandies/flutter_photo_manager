@@ -43,7 +43,7 @@ if (result) {
     // success
 } else {
     // fail
-    /// if result is fail, you can call `PhotoManger.openSetting();`  to open android/ios applicaton's setting to get permission
+    /// if result is fail, you can call `PhotoManager.openSetting();`  to open android/ios applicaton's setting to get permission
 }
 ```
 
