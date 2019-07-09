@@ -68,7 +68,7 @@ List<AssetPathEntity> list = await PhotoManager.getVideoAsset();
 3. get asset list from imagePath
 
 ```dart
-AssetPathEntity data = list[0] //get list of media from a specific album
+AssetPathEntity data = list[0] // 1st album in the list, typically the "Recent" or "All" album
 List<AssetEntity> imageList = await data.assetList;
 ```
 
