@@ -86,7 +86,7 @@ Uint8List thumbDataWithSize = await entity.thumbDataWithSize(width,height); //Ju
 
 AssetType type = entity.type; // the type of asset enum of other,image,video
 
-Duration duration = await entity.duration; //if type is not video, then return null.
+Duration duration = await entity.videoDuration; //if type is not video, then return null.
 ```
 
 ## Usage
