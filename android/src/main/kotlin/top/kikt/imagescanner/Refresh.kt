@@ -10,10 +10,10 @@ import java.io.File
 import java.io.FileOutputStream
 
 
-class ThumbHelper(val registrar: PluginRegistry.Registrar) {
+class ThumbHelper(private val registrar: PluginRegistry.Registrar) {
 
     private fun makeThumb(path: String, id: String): String {
-        val thumbDir = registrar.activeContext().getExternalFilesDir(DIRECTORY_PICTURES).absolutePath + "/.thumb"
+        val thumbDir = registrar.activeContext()?.getExternalFilesDir(DIRECTORY_PICTURES)?.absolutePath + "/.thumb"
         val file = File(thumbDir).apply {
             mkdir()
         }
@@ -28,7 +28,7 @@ class ThumbHelper(val registrar: PluginRegistry.Registrar) {
     }
 
     fun getThumb(path: String, id: String): String {
-        val thumbPath = registrar.activeContext().getExternalFilesDir(DIRECTORY_PICTURES).absolutePath + "/.thumb"
+        val thumbPath = registrar.activeContext()?.getExternalFilesDir(DIRECTORY_PICTURES)?.absolutePath + "/.thumb"
         val thumbFile = File(thumbPath).apply {
             mkdir()
         }

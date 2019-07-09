@@ -13,7 +13,8 @@ import java.io.File
 import java.util.concurrent.*
 
 
-class ImageScanner(val registrar: PluginRegistry.Registrar) {
+@Suppress("UNCHECKED_CAST")
+class ImageScanner(private val registrar: PluginRegistry.Registrar) {
 
     companion object {
         private const val poolSize = 8
