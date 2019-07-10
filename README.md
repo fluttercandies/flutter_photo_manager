@@ -68,6 +68,7 @@ List<AssetPathEntity> list = await PhotoManager.getVideoAsset();
 3. get asset list from imagePath
 
 ```dart
+AssetPathEntity data = list[0]; // 1st album in the list, typically the "Recent" or "All" album
 List<AssetEntity> imageList = await data.assetList;
 ```
 
@@ -86,7 +87,7 @@ Uint8List thumbDataWithSize = await entity.thumbDataWithSize(width,height); //Ju
 
 AssetType type = entity.type; // the type of asset enum of other,image,video
 
-Duration duration = await entity.duration; //if type is not video, then return null.
+Duration duration = await entity.videoDuration; //if type is not video, then return null.
 ```
 
 ## Usage
