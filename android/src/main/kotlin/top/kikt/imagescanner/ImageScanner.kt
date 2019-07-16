@@ -3,12 +3,12 @@ package top.kikt.imagescanner
 import android.database.Cursor
 import android.os.Handler
 import android.provider.MediaStore
-import android.util.Log
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import top.kikt.imagescanner.ImageScanner.Companion.threadPool
 import top.kikt.imagescanner.thumb.ThumbnailUtil
+import top.kikt.imagescanner.util.LogUtils
 import java.io.File
 import java.util.concurrent.*
 
@@ -70,7 +70,7 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
     internal val imagePathDirIdMap = HashMap<String, ArrayList<Asset>>()
 
     private fun scan() {
-//        Log.i("K", "start scan")
+//        LogUtils.info("start scan")
         imgList.clear()
         idPathMap.clear()
         pathIdMap.clear()
@@ -114,7 +114,7 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
         val mContentResolver = registrar.activity().contentResolver
         val mCursor = MediaStore.Images.Media.query(mContentResolver, mImageUri, storeImageKeys, null, MediaStore.Images.Media.DATE_TAKEN)
         val num = mCursor.count
-        Log.i("K", "num = $num")
+        LogUtils.info("num = $num")
 
         if (num == 0) {
             mCursor.close()
@@ -169,7 +169,7 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
 
         val mCursor = MediaStore.Images.Media.query(mContentResolver, mImageUri, storeVideoKeys, null, MediaStore.Images.Media.DATE_TAKEN)
         val num = mCursor.count
-        Log.i("K", "num = $num")
+        LogUtils.info("num = $num")
 
         if (num == 0) {
             mCursor.close()
@@ -315,7 +315,7 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
             for (i in 0 until poolSize) {
                 val start = i * per
                 val end = if (i == poolSize - 1) count - 1 else (i + 1) * per
-                Log.i("img_count", "max = $count , start = $start , end = $end")
+                LogUtils.info("max = $count , start = $start , end = $end")
                 val subList = assetList.subList(start, end)
                 val futureTask = FutureTask(ImageCallBack(subList, thumbHelper))
                 futureList.add(futureTask)
@@ -336,7 +336,7 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
             val future: FutureTask<Boolean> = FutureTask(Callable {
                 assetList.forEachIndexed { index, img ->
                     val thumb = thumbHelper.getThumb(img.path, img.imgId)
-                    Log.i("image_thumb", "make thumb = $thumb ,progress = ${index + 1} / $count")
+                    LogUtils.info( "make thumb = $thumb ,progress = ${index + 1} / $count")
                 }
                 true
             })
@@ -717,7 +717,7 @@ class ImageCallBack(val assetList: List<Asset>, val thumbHelper: ThumbHelper) : 
     override fun call(): Boolean {
         assetList.forEachIndexed { index, img ->
             val thumb = thumbHelper.getThumb(img.path, img.imgId)
-            Log.i("image_thumb", "make thumb = $thumb ,progress = ${index + 1} / ${assetList.count()}")
+            LogUtils.info("make thumb = $thumb ,progress = ${index + 1} / ${assetList.count()}")
         }
         return true
     }

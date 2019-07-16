@@ -1,6 +1,7 @@
 #import "ImageScannerPlugin.h"
 #import "Reply.h"
 #import "PhotoChangeObserver.h"
+#import "PMLogUtils.h"
 
 @implementation ImageScannerPlugin {
 }
@@ -15,7 +16,8 @@
     instance.scanner.registrar = registrar;
 
     NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
-    NSLog(@"application path = %@", path);
+    NSString *pathLog = [NSString stringWithFormat:@"application path = %@", path];
+    [[PMLogUtils sharedInstance] info:pathLog];
     
     instance.registrar = registrar;
 }

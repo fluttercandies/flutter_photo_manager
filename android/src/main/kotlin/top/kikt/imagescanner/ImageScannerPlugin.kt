@@ -1,12 +1,12 @@
 package top.kikt.imagescanner
 
 import android.Manifest
-import android.util.Log
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import top.kikt.imagescanner.util.LogUtils
 
 
 class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
@@ -121,6 +121,10 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                 scanner.checkAssetExists(call, result)
                 true
             }
+            call.method == "log" -> {
+                LogUtils.isLog = call.arguments()
+                true
+            }
 
             else -> false
         }
@@ -136,7 +140,7 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
             withActivity(registrar.activity())
             permissionsListener = object : PermissionsListener {
                 override fun onDenied(deniedPermissions: Array<out String>?) {
-                    Log.i("permission", "onDenied call.method = ${call.method}")
+                    LogUtils.info("onDenied call.method = ${call.method}")
                     r = null
                     if (call.method == "requestPermission") {
                         resultHandler.reply(0)
@@ -146,7 +150,7 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                 }
 
                 override fun onGranted() {
-                    Log.i("permission", "onGranted call.method = ${call.method}")
+                    LogUtils.info("onGranted call.method = ${call.method}")
                     val localResult = r
                     r = null
                     when {

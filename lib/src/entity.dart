@@ -31,7 +31,10 @@ class AssetPathEntity {
   bool onlyImage = false;
 
   /// contains all asset
-  bool isAll = false;
+  bool _isAll = false;
+
+  /// contains all asset
+  bool get isAll => _isAll;
 
   AssetPathEntity({this.id, this.name, bool hasVideo}) : _hasVideo = hasVideo;
 
@@ -41,19 +44,19 @@ class AssetPathEntity {
   static var _all = AssetPathEntity()
     ..id = "allall--dfnsfkdfj2454AJJnfdkl"
     ..name = "Recent"
-    ..isAll = true
+    .._isAll = true
     ..hasVideo = true;
 
   static var _allVideo = AssetPathEntity()
     ..id = "videovideo--87yuhijn3cvx"
     ..name = "Recent"
-    ..isAll = true
+    .._isAll = true
     ..onlyVideo = true;
 
   static var _allImage = AssetPathEntity()
     ..id = "imageimage--89hdsinvosd"
     ..onlyImage = true
-    ..isAll = true
+    .._isAll = true
     ..name = "Recent";
 
   /// all asset path

@@ -49,6 +49,10 @@ class PhotoManager {
     return pathList;
   }
 
+  static Future<void> setLog(bool isLog) {
+    return _channel.invokeMethod("log", isLog);
+  }
+
   /// get video asset
   ///
   /// 获取视频列表

@@ -21,6 +21,8 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import top.kikt.imagescanner.util.LogUtils;
+
 /**
  * Created by Administrator on 2017/2/19.
  */
@@ -119,7 +121,7 @@ public final class PermissionsUtils {
 //                    , needToRequestPermissionsList.toArray(new String[needToRequestPermissionsList.size()])
 //                    , requestCode);
             for (int i = 0; i < needToRequestPermissionsList.size(); i++) {
-                System.out.println("需要申请的权限列表" + needToRequestPermissionsList.get(i));
+                LogUtils.info("需要申请的权限列表" + needToRequestPermissionsList.get(i));
             }
         } else if (mPermissionsListener != null) mPermissionsListener.onGranted();
         return this;
@@ -184,7 +186,7 @@ public final class PermissionsUtils {
 //            }
 
             for (int i = 0; i < permissions.length; i++) {
-                System.out.println("返回权限列表" + permissions[i]);
+                LogUtils.info("返回权限列表" + permissions[i]);
                 if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
                     deniedPermissionsList.add(permissions[i]);
                     if (tipList != null && deniedTipsList == null) {

@@ -15,6 +15,7 @@
 #import "AssetEntity.h"
 #import "Reply.h"
 #import "PhotoChangeObserver.h"
+#import "PMLogUtils.h"
 
 @interface ImageScanner ()
 
@@ -411,7 +412,7 @@
         [path appendFormat:@"%@/%@", @".video", filename];
         PHVideoRequestOptions *options = [PHVideoRequestOptions new];
         if ([manager fileExistsAtPath:path]) {
-            NSLog(@"read cache from %@", path);
+            [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
             reply.isReply = YES;
             result(path);
             return;
