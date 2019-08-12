@@ -19,14 +19,14 @@
     return _sharedInstance;
 }
 
-+ (void)info:(NSString *)info {
+- (void)info:(NSString *)info {
     if (!self.isLog) {
         return;
     }
     NSLog(@"PhotoManager info: %@", info);
 }
 
-+ (void)debug:(NSString *)info {
+- (void)debug:(NSString *)info {
     if (!self.isLog) {
         return;
     }
