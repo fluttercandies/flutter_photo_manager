@@ -338,7 +338,7 @@
         if ([asset isImage]) {
             PHImageRequestOptions *options = [PHImageRequestOptions new];
             options.resizeMode = PHImageRequestOptionsResizeModeFast;
-
+            [options setNetworkAccessAllowed:YES];
             [options setProgressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
                 if (progress == 1.0) {
                     [self getFullFileWithCall:call result:flutterResult reply:reply];
