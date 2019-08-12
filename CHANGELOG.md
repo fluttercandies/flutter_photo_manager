@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.3.5
+
+Fix
+
+- ICloud image problem.
+
 ## 0.3.4
 
 Support flutter 1.6.0 android's thread changes for channel.
