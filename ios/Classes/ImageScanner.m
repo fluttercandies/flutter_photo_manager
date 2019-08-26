@@ -165,6 +165,52 @@
     });
 }
 
+- (void)getImageListPaged:(FlutterMethodCall *)call result:(FlutterResult)flutterResult {
+    dispatch_async(_asyncQueue, ^{
+        if (!_idAssetDict) {
+            _idAssetDict = [NSMutableDictionary new];
+        }
+        NSUInteger page = [call.arguments[@"page"] unsignedIntegerValue];
+        NSUInteger pageSize = [call.arguments[@"pageSize"] unsignedIntegerValue];
+        BOOL hasVideo = [call.arguments[@"hasVideo"] boolValue];
+        NSString *pathId = call.arguments[@"id"];
+
+        PHFetchOptions *opt = [PHFetchOptions new];
+
+        NSEnumerator<PHAssetCollection*> *r;
+        if (pathId == nil) { // isAll == true
+            r = (id) [self->_idCollectionDict allValues];
+
+        } else { // isAll == false
+            PHCollection *collection = _idCollectionDict[pathId];
+
+            r = (id) [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[collection.localIdentifier] options:opt];
+        }
+
+        NSMutableArray<NSString *> *arr = [NSMutableArray new];
+
+        NSUInteger count = 0;
+        for (PHAssetCollection *assetCollection in r) {
+            PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection
+                                                                                  options:opt];
+            NSUInteger lowerBoundary = page * pageSize;
+            for (NSUInteger idx = lowerBoundary; idx < fetchResult.count && count < pageSize; ++idx) {
+                PHAsset *asset = fetchResult[idx];
+                if (!asset.isVideo || (asset.isVideo && hasVideo)) {
+                    ++count;
+                    NSString *id = asset.localIdentifier;
+                    _idAssetDict[id] = asset;
+                    [arr addObject:id];
+                }
+            }
+            if (count >= pageSize) break;
+        }
+
+        flutterResult(arr);
+    });
+}
+
+
 - (void)filterAssetWithBlock:(asset_block)block {
     [self refreshGallery];
     PHFetchOptions *opt = [PHFetchOptions new];

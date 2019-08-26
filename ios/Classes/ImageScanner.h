@@ -24,6 +24,8 @@ typedef void (^asset_block)(PHCollection *collection, PHAsset *asset);
 
 - (void)getImageListWithCall:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
 
+- (void)getImageListPaged:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
+
 - (void)filterAssetWithBlock:(asset_block)block;
 
 - (void)forEachAssetCollection:(FlutterMethodCall *)call result:(FlutterResult)flutterResult;
