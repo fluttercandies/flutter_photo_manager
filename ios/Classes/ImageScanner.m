@@ -176,25 +176,21 @@
         NSString *pathId = call.arguments[@"id"];
 
         PHFetchOptions *opt = [PHFetchOptions new];
+        opt.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
 
-        NSEnumerator<PHAssetCollection*> *r;
+        PHFetchResult<PHAsset *> *fetchResult;
         if (pathId == nil) { // isAll == true
-            r = (id) [self->_idCollectionDict allValues];
-
+            fetchResult = [PHAsset fetchAssetsWithOptions:opt];
         } else { // isAll == false
             PHCollection *collection = _idCollectionDict[pathId];
-
-            r = (id) [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[collection.localIdentifier] options:opt];
+            if ([collection isKindOfClass:[PHAssetCollection class]])
+                fetchResult = [PHAsset fetchAssetsInAssetCollection:(PHAssetCollection *) collection options:opt];
         }
 
         NSMutableArray<NSString *> *arr = [NSMutableArray new];
-
-        opt.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
-        NSUInteger count = 0;
-        NSUInteger lowerBoundary = page * pageSize;
-        for (PHAssetCollection *assetCollection in r) {
-            PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection
-                                                                                  options:opt];
+        if (fetchResult != nil) {
+            NSUInteger count = 0;
+            NSUInteger lowerBoundary = page * pageSize;
             for (NSUInteger idx = lowerBoundary; idx < fetchResult.count && count < pageSize; ++idx) {
                 PHAsset *asset = fetchResult[idx];
                 if (!asset.isVideo || (asset.isVideo && hasVideo)) {
@@ -204,8 +200,6 @@
                     [arr addObject:id];
                 }
             }
-            if (count >= pageSize) break;
-            lowerBoundary = MAX(lowerBoundary - fetchResult.count, 0);
         }
 
         flutterResult(arr);
