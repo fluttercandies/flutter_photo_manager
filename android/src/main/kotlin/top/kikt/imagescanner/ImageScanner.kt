@@ -97,7 +97,7 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
         videoCursor.close()
     }
 
-    private fun handleBucketCursor(mCursor: Cursor, isImage: Boolean = false, isVideo: Boolean=false) {
+    private fun handleBucketCursor(mCursor: Cursor, isImage: Boolean = false, isVideo: Boolean = false) {
         val dir = mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME))
         val dirId = mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_ID))
 
@@ -320,6 +320,105 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
                 img.path
             }
             resultHandler.reply(r)
+        }
+    }
+
+    fun getImageListPaged(call: MethodCall, result: MethodChannel.Result) {
+        val resultHandler = ResultHandler(result)
+        threadPool.execute {
+
+            val page = (call.arguments as Map<String, Any>)["page"] as Int
+            val pageSize = (call.arguments as Map<String, Any>)["pageSize"] as Int
+            val pathId = (call.arguments as Map<String, Any>)["id"] as String?
+
+            val mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            val mVideoUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            val mContentResolver = registrar.activity().contentResolver
+            val imageCursor = mContentResolver.query(mImageUri, storeImageKeys, "${MediaStore.Images.ImageColumns.BUCKET_ID} = $pathId", null, MediaStore.Images.Media.DATE_TAKEN)
+            if (imageCursor!!.count > 0) {
+                imageCursor.moveToLast()
+            } else {
+                imageCursor.close()
+            }
+            val videoCursor = mContentResolver.query(mVideoUri, storeBucketKeys, "${MediaStore.Video.VideoColumns.BUCKET_ID} = $pathId", null, MediaStore.Video.Media.DATE_TAKEN)
+            if (videoCursor!!.count > 0) {
+                videoCursor.moveToLast()
+            } else {
+                videoCursor.close()
+            }
+            val list = mutableListOf<String>()
+            var current: Long = 0
+            while (list.size < pageSize) {
+                var imageDate: Long = -1
+                var videoDate: Long = -1
+                if (!imageCursor.isClosed) {
+                    imageDate = imageCursor.getLong(imageCursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN))
+                }
+                if (!videoCursor.isClosed) {
+                    videoDate = videoCursor.getLong(videoCursor.getColumnIndex(MediaStore.Video.Media.DATE_TAKEN))
+                }
+                if (imageDate == -1L && videoDate == -1L) {
+                    break
+                }
+                if (imageDate >= videoDate) {
+                    if (current >= page * pageSize) {
+                        val path = imageCursor.getString(imageCursor
+                                .getColumnIndex(MediaStore.Images.Media.DATA))
+                        val dir = imageCursor.getString(imageCursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME))
+                        val dirId = imageCursor.getString(imageCursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_ID))
+                        val title = imageCursor.getString(imageCursor.getColumnIndex(MediaStore.Images.ImageColumns.TITLE))
+                        val thumb = imageCursor.getString(imageCursor.getColumnIndex(MediaStore.Images.ImageColumns.MINI_THUMB_MAGIC))
+                        val imgId = imageCursor.getString(imageCursor.getColumnIndex(MediaStore.Images.ImageColumns._ID))
+                        val date = imageCursor.getLong(imageCursor.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN))
+                        val width = imageCursor.getInt(imageCursor.getColumnIndex(MediaStore.Images.Media.WIDTH))
+                        val height = imageCursor.getInt(imageCursor.getColumnIndex(MediaStore.Images.Media.HEIGHT))
+
+                        if (width > 0 && height > 0) {
+                            val img = Asset(path, imgId, dir, dirId, title, thumb, AssetType.Image, date, null, width, height)
+
+                            val file = File(path)
+                            if (file.exists()) {
+                                pathAssetMap[path] = img
+                                list.add(img.path)
+                            }
+                        }
+                    }
+
+                    if (!imageCursor.moveToPrevious()) {
+                        imageCursor.close()
+                    }
+                } else {
+                    if (current >= page * pageSize) {
+                        val path = videoCursor.getString(videoCursor
+                                .getColumnIndex(MediaStore.Video.Media.DATA))
+                        val dir = videoCursor.getString(videoCursor.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME))
+                        val dirId = videoCursor.getString(videoCursor.getColumnIndex(MediaStore.Video.Media.BUCKET_ID))
+                        val title = videoCursor.getString(videoCursor.getColumnIndex(MediaStore.Video.Media.TITLE))
+                        val thumb = videoCursor.getString(videoCursor.getColumnIndex(MediaStore.Video.Media.MINI_THUMB_MAGIC))
+                        val imgId = videoCursor.getString(videoCursor.getColumnIndex(MediaStore.Video.Media._ID))
+                        val date = videoCursor.getLong(videoCursor.getColumnIndex(MediaStore.Video.Media.DATE_TAKEN))
+                        val durationMs = videoCursor.getLong(videoCursor.getColumnIndex(MediaStore.Video.Media.DURATION))
+
+                        val width = videoCursor.getInt(videoCursor.getColumnIndex(MediaStore.Video.Media.WIDTH))
+                        val height = videoCursor.getInt(videoCursor.getColumnIndex(MediaStore.Video.Media.HEIGHT))
+
+                        val img = Asset(path, imgId, dir, dirId, title, thumb, AssetType.Video, date, durationMs, width, height)
+
+                        if (width > 0 && height > 0) {
+                            val file = File(path)
+                            if (file.exists()) {
+                                pathAssetMap[path] = img
+                                list.add(img.path)
+                            }
+                        }
+                    }
+                    if (!videoCursor.moveToPrevious()) {
+                        videoCursor.close()
+                    }
+                }
+                ++current;
+            }
+            resultHandler.reply(list)
         }
     }
 

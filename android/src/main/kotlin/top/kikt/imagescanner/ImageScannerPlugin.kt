@@ -57,6 +57,10 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
                 scanner.getImageListWithPathId(call, result)
                 true
             }
+            call.method == "getImageListPaged" -> {
+                scanner.getImageListPaged(call, result)
+                true
+            }
             call.method == "getAllImageList" -> {
                 scanner.getAllImageList(call, result)
                 true
