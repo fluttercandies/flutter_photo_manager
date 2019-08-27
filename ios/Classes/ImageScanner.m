@@ -189,6 +189,7 @@
 
         NSMutableArray<NSString *> *arr = [NSMutableArray new];
 
+        opt.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
         NSUInteger count = 0;
         for (PHAssetCollection *assetCollection in r) {
             PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection
