@@ -55,6 +55,11 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
             MediaStore.Video.Media.DURATION //时长
     )
 
+    private val storeBucketKeys = arrayOf(
+            MediaStore.Images.Media.BUCKET_ID,
+            MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
+    )
+
 
     private var imgList = ArrayList<Asset>()
     /// dirId,AssetList
@@ -69,6 +74,43 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
     /// dirId,AssetList
     internal val imagePathDirIdMap = HashMap<String, ArrayList<Asset>>()
 
+    private fun scanBuckets() {
+        imgList.clear()
+        idPathMap.clear()
+        pathIdMap.clear()
+        pathAssetMap.clear()
+        val mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val mVideoUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        val mContentResolver = registrar.activity().contentResolver
+        val imageCursor = mContentResolver.query(mImageUri, storeBucketKeys, "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}", null, null)
+        val num = imageCursor!!.count
+        LogUtils.info("num = $num")
+        while (imageCursor.moveToNext()) {
+            handleBucketCursor(imageCursor, isImage = true)
+        }
+        val videoCursor = mContentResolver.query(mVideoUri, storeBucketKeys, "${MediaStore.Video.Media.BUCKET_ID} IS NOT NULL) GROUP BY (${MediaStore.Video.Media.BUCKET_ID}", null, null)
+        val vNum = videoCursor!!.count
+        LogUtils.info("num = $vNum")
+        while (videoCursor.moveToNext()) {
+            handleBucketCursor(videoCursor, isVideo = true)
+        }
+        videoCursor.close()
+    }
+
+    private fun handleBucketCursor(mCursor: Cursor, isImage: Boolean = false, isVideo: Boolean=false) {
+        val dir = mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME))
+        val dirId = mCursor.getString(mCursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_ID))
+
+        idPathMap[dirId] = dir
+        pathIdMap[dir] = dirId
+        map[dirId] = ArrayList()
+
+        if (isImage)
+            createImagePath(dirId, dir)
+        if (isVideo)
+            createVideoPath(dirId, dir)
+    }
+
     private fun scan() {
 //        LogUtils.info("start scan")
         imgList.clear()
@@ -79,6 +121,8 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
         scanVideo()
         scanImage()
         sortAsset()
+        scanThumb()
+        filter()
     }
 
     private fun onlyScanVideo() {
@@ -227,9 +271,7 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
                 resultHandler.reply(map.keys.toList())
                 return@execute
             }
-            scan()
-            scanThumb()
-            filter()
+            scanBuckets()
             resultHandler.reply(map.keys.toList())
         }
     }
@@ -271,6 +313,7 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
     fun getImageListWithPathId(call: MethodCall, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result)
         threadPool.execute {
+            if (imgList.isEmpty()) scan()
             val pathId = call.arguments as String
             val list = map[pathId]
             val r = list?.map { img ->
@@ -284,6 +327,7 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
     fun getAllImageList(call: MethodCall, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result)
         threadPool.execute {
+            if (imgList.isEmpty()) scan();
             val list = imgList.map {
                 it.path
             }.toList()
