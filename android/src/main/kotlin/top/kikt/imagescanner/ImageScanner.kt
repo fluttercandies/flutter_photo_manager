@@ -334,13 +334,13 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
             val mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val mVideoUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
             val mContentResolver = registrar.activity().contentResolver
-            val imageCursor = mContentResolver.query(mImageUri, storeImageKeys, "${MediaStore.Images.ImageColumns.BUCKET_ID} = $pathId", null, MediaStore.Images.Media.DATE_TAKEN)
+            val imageCursor = mContentResolver.query(mImageUri, storeImageKeys, if (pathId == null) null else "${MediaStore.Images.ImageColumns.BUCKET_ID} = $pathId", null, MediaStore.Images.Media.DATE_TAKEN)
             if (imageCursor!!.count > 0) {
                 imageCursor.moveToLast()
             } else {
                 imageCursor.close()
             }
-            val videoCursor = mContentResolver.query(mVideoUri, storeBucketKeys, "${MediaStore.Video.VideoColumns.BUCKET_ID} = $pathId", null, MediaStore.Video.Media.DATE_TAKEN)
+            val videoCursor = mContentResolver.query(mVideoUri, storeVideoKeys, if (pathId == null) null else "${MediaStore.Video.VideoColumns.BUCKET_ID} = $pathId", null, MediaStore.Video.Media.DATE_TAKEN)
             if (videoCursor!!.count > 0) {
                 videoCursor.moveToLast()
             } else {
