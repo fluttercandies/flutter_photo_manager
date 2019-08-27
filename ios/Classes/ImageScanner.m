@@ -191,10 +191,10 @@
 
         opt.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
         NSUInteger count = 0;
+        NSUInteger lowerBoundary = page * pageSize;
         for (PHAssetCollection *assetCollection in r) {
             PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection
                                                                                   options:opt];
-            NSUInteger lowerBoundary = page * pageSize;
             for (NSUInteger idx = lowerBoundary; idx < fetchResult.count && count < pageSize; ++idx) {
                 PHAsset *asset = fetchResult[idx];
                 if (!asset.isVideo || (asset.isVideo && hasVideo)) {
@@ -205,6 +205,7 @@
                 }
             }
             if (count >= pageSize) break;
+            lowerBoundary = MAX(lowerBoundary - fetchResult.count, 0);
         }
 
         flutterResult(arr);
