@@ -611,7 +611,8 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
                 } else {
                     null
                 }
-                img = Asset(path, imgId, dir, dirId, title, thumb, AssetType.Video, date, durationMs, width, height)
+                val type = if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) AssetType.Video else AssetType.Image
+                img = Asset(path, imgId, dir, dirId, title, thumb, type, date, durationMs, width, height)
             }
             cursor?.close()
         }
