@@ -330,12 +330,15 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
             val page = (call.arguments as Map<String, Any>)["page"] as Int
             val pageSize = (call.arguments as Map<String, Any>)["pageSize"] as Int
             val pathId = (call.arguments as Map<String, Any>)["id"] as String?
+            val hasVideo = (call.arguments as Map<String, Any>)["hasVideo"] as Boolean
 
             val cursor = registrar.activity().contentResolver.query(
                     MediaStore.Files.getContentUri("external"),
                     (storeImageKeys + storeVideoKeys + arrayOf(MediaStore.Files.FileColumns.MEDIA_TYPE)).distinct().toTypedArray(),
                     if (pathId == null) "" else " ${MediaStore.Images.ImageColumns.BUCKET_ID} = $pathId AND " +
-                            "${MediaStore.Files.FileColumns.MEDIA_TYPE} in (${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE}, ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO})",
+                            "${MediaStore.Files.FileColumns.MEDIA_TYPE} in (${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE}" +
+                            (if (hasVideo) ", ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO}" else "") +
+                            ")",
                     null,
                     "${MediaStore.Images.Media.DATE_TAKEN} DESC"
             )
