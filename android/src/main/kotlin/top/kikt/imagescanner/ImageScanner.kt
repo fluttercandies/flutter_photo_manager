@@ -592,7 +592,39 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
      *
      * id system data is [MediaStore.Images.ImageColumns.DATA] or [MediaStore.Video.VideoColumns.DATA]
      */
-    fun getImageWithId(id: String) = pathAssetMap[id]
+    fun getImageWithId(id: String): Asset? {
+        var img = pathAssetMap[id]
+        if (img == null) {
+            val cursor = registrar.activity().contentResolver.query(
+                    MediaStore.Files.getContentUri("external"),
+                    (storeImageKeys + storeVideoKeys + arrayOf(MediaStore.Files.FileColumns.MEDIA_TYPE)).distinct().toTypedArray(),
+                    "${MediaStore.Images.ImageColumns.DATA} = ? AND " +
+                            "${MediaStore.Files.FileColumns.MEDIA_TYPE} in (${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE}, ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO})",
+                    arrayOf(id),
+                    MediaStore.Images.ImageColumns.DATE_TAKEN
+            )
+            if (cursor != null && cursor.moveToFirst()) {
+                val mediaType = cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE))
+                val path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
+                val dir = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME))
+                val dirId = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_ID))
+                val title = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.TITLE))
+                val thumb = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.MINI_THUMB_MAGIC))
+                val imgId = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns._ID))
+                val date = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN))
+                val width = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media.WIDTH))
+                val height = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media.HEIGHT))
+                val durationMs = if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
+                    cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))
+                } else {
+                    null
+                }
+                img = Asset(path, imgId, dir, dirId, title, thumb, AssetType.Video, date, durationMs, width, height)
+            }
+            cursor?.close()
+        }
+        return img
+    }
 
     fun getSizeWithId(call: MethodCall, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result)
