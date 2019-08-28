@@ -342,23 +342,7 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
             val list = mutableListOf<String>()
             if (cursor != null && cursor.moveToPosition(page * pageSize)) {
                 while (list.size < pageSize && cursor.moveToNext()) {
-                    val mediaType = cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE))
                     val path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
-                    val dir = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME))
-                    val dirId = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_ID))
-                    val title = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.TITLE))
-                    val thumb = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.MINI_THUMB_MAGIC))
-                    val imgId = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns._ID))
-                    val date = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN))
-                    val width = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media.WIDTH))
-                    val height = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media.HEIGHT))
-                    val durationMs = if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
-                        cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.DURATION))
-                    } else {
-                        null
-                    }
-                    val img = Asset(path, imgId, dir, dirId, title, thumb, AssetType.Video, date, durationMs, width, height)
-                    pathAssetMap[path] = img
                     list.add(path)
                 }
             }
