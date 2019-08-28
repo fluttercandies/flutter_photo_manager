@@ -509,41 +509,45 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
 
     fun getImageThumbData(call: MethodCall, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result)
+        threadPool.execute {
 
-        val args = call.arguments as List<Any>
-        val id = args[0] as String
-        val imageWithId = getImageWithId(id)
-        val img = if (imageWithId != null) {
-            imageWithId
-        } else {
-            resultHandler.reply(null)
-            return
-        }
-        val width = (args[1] as String).toInt()
-        val height = (args[2] as String).toInt()
+            val args = call.arguments as List<Any>
+            val id = args[0] as String
+            val imageWithId = getImageWithId(id)
+            val img = if (imageWithId != null) {
+                imageWithId
+            } else {
+                resultHandler.reply(null)
+                return@execute
+            }
+            val width = (args[1] as String).toInt()
+            val height = (args[2] as String).toInt()
 
 //        resultHandler.reply(thumbHelper.getThumbData(img))
-        when (img.type) {
-            AssetType.Image -> ThumbnailUtil.getThumbnailByGlide(registrar.activity(), img.path, width, height, result)
-            AssetType.Video -> ThumbnailUtil.getThumbnailWithVideo(registrar.activity(), img, width, height, result)
-            else -> resultHandler.reply(null)
+            when (img.type) {
+                AssetType.Image -> ThumbnailUtil.getThumbnailByGlide(registrar.activity(), img.path, width, height, result)
+                AssetType.Video -> ThumbnailUtil.getThumbnailWithVideo(registrar.activity(), img, width, height, result)
+                else -> resultHandler.reply(null)
+            }
         }
     }
 
     fun getAssetTypeWithIds(call: MethodCall, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result)
+        threadPool.execute {
 
-        val args = call.arguments as List<Any>
-        val idList = args.map { it.toString() }
-        val resultList = ArrayList<String>()
+            val args = call.arguments as List<Any>
+            val idList = args.map { it.toString() }
+            val resultList = ArrayList<String>()
 
-        idList.forEach { id ->
-            val img = getImageWithId(id)
-            img?.apply {
-                resultList.add(typeFromEntity(this))
+            idList.forEach { id ->
+                val img = getImageWithId(id)
+                img?.apply {
+                    resultList.add(typeFromEntity(this))
+                }
             }
+            resultHandler.reply(resultList)
         }
-        resultHandler.reply(resultList)
     }
 
     private fun typeFromEntity(asset: Asset): String {
@@ -556,17 +560,18 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
 
     fun getAssetDurationWithId(call: MethodCall, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result)
-
-        val id = call.arguments<String>()
-        val img = getImageWithId(id)
-        if (img == null || img.type != AssetType.Video) {
-            resultHandler.reply(null)
-        } else {
-            val duration = img.duration
-            if (duration == null) {
+        threadPool.execute {
+            val id = call.arguments<String>()
+            val img = getImageWithId(id)
+            if (img == null || img.type != AssetType.Video) {
                 resultHandler.reply(null)
             } else {
-                resultHandler.reply(duration / 1000)
+                val duration = img.duration
+                if (duration == null) {
+                    resultHandler.reply(null)
+                } else {
+                    resultHandler.reply(duration / 1000)
+                }
             }
         }
     }
@@ -612,18 +617,19 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
 
     fun getSizeWithId(call: MethodCall, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result)
-
-        val id = call.arguments<String>()
-        val img = getImageWithId(id)
-        if (img == null) {
-            resultHandler.reply(mapOf<String, Int>())
-            return
+        threadPool.execute {
+            val id = call.arguments<String>()
+            val img = getImageWithId(id)
+            if (img == null) {
+                resultHandler.reply(mapOf<String, Int>())
+                return@execute
+            }
+            val sizeMap = mapOf(
+                    "width" to img.width,
+                    "height" to img.height
+            )
+            resultHandler.reply(sizeMap)
         }
-        val sizeMap = mapOf(
-                "width" to img.width,
-                "height" to img.height
-        )
-        resultHandler.reply(sizeMap)
     }
 
     fun releaseMemCache(result: MethodChannel.Result) {
