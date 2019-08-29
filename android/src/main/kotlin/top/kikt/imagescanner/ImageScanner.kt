@@ -332,20 +332,27 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
             val pathId = (call.arguments as Map<String, Any>)["id"] as String?
             val hasVideo = (call.arguments as Map<String, Any>)["hasVideo"] as Boolean
 
-            val cursor = registrar.activity().contentResolver.query(
-                    MediaStore.Files.getContentUri("external"),
-                    (storeImageKeys + storeVideoKeys + arrayOf(MediaStore.Files.FileColumns.MEDIA_TYPE)).distinct().toTypedArray(),
-                    if (pathId == null) "" else " ${MediaStore.Images.ImageColumns.BUCKET_ID} = $pathId AND " +
-                            "${MediaStore.Files.FileColumns.MEDIA_TYPE} in (${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE}" +
-                            (if (hasVideo) ", ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO}" else "") +
-                            ")",
-                    null,
-                    "${MediaStore.Images.Media.DATE_TAKEN} DESC"
-            )
+            val uri = MediaStore.Files.getContentUri("external")
+            val columns = arrayOf(MediaStore.MediaColumns.DATA)
+            val pathIdSelection = if (pathId == null) null else " ${MediaStore.Images.ImageColumns.BUCKET_ID} = $pathId"
+            val mediaTypeSelection = (MediaStore.Files.FileColumns.MEDIA_TYPE +
+                    " in (" +
+                    MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE +
+                    (if (hasVideo) ", ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO}" else "") +
+                    ")"
+                    )
+            val zeroSizeSelection = "${MediaStore.MediaColumns.WIDTH} > 0 AND ${MediaStore.MediaColumns.HEIGHT} > 0"
+            val selection = (if (pathIdSelection != null) "$pathIdSelection AND " else "") +
+                    "$mediaTypeSelection AND $zeroSizeSelection"
+
+            val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET ${page * pageSize}"
+
+            val cursor = registrar.activity().contentResolver.
+                    query(uri, columns, selection, null, sortOrder)
             val list = mutableListOf<String>()
-            if (cursor != null && cursor.moveToPosition(page * pageSize)) {
+            if (cursor != null) {
                 while (list.size < pageSize && cursor.moveToNext()) {
-                    val path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
+                    val path = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA))
                     list.add(path)
                 }
             }
