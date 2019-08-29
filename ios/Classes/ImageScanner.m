@@ -199,6 +199,8 @@
         PHFetchOptions *opt = [PHFetchOptions new];
 
         for (PHAssetCollection *assetCollection in collectionArray) {
+            if (![assetCollection isKindOfClass:[PHAssetCollection class]]) continue;
+
             PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection
                                                                                   options:opt];
             for (PHAsset *asset in fetchResult) {
