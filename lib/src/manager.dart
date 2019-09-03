@@ -186,6 +186,28 @@ class PhotoManager {
     return _filterType(entityList, path.hasVideo == true);
   }
 
+  /// get image entity with path with pagination
+  ///
+  /// Doesn't support AssetPathEntity with only(Video/Image) flag.
+  /// Throws UnsupportedError
+  static Future<List<AssetEntity>> _getAssetListPaged(
+      AssetPathEntity path, int page, int pageSize) async {
+    if (path.onlyImage || path.onlyVideo) throw UnsupportedError("Doesn't support AssetPathEntity with only(Video/Image) flag");
+    List<dynamic> list;
+    final Map<String, dynamic> args = {
+      "page": page,
+      "pageSize": pageSize,
+      "hasVideo": path.hasVideo,
+    };
+    if (path.isAll == false) {
+      args["id"] = path.id;
+    }
+    list = await _channel.invokeMethod("getImageListPaged", args);
+    var entityList = list.map((v) => AssetEntity(id: v.toString())).toList();
+    await _fetchTypeAndTime(entityList);
+    return entityList;
+  }
+
   static Future<List<AssetEntity>> _castAsset(
       List<dynamic> ids, AssetType type) async {
     var timeStampList = await _getTimeStampWithIds(ids.cast());

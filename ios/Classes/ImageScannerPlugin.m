@@ -37,6 +37,8 @@
         [_scanner getGalleryNameWithCall:call result:result];
     } else if ([@"getImageListWithPathId" isEqualToString:call.method]) {
         [_scanner getImageListWithCall:call result:result];
+    } else if ([@"getImageListPaged" isEqualToString:call.method]) {
+        [_scanner getImageListPaged:call result:result];
     } else if ([@"getAllImageList" isEqualToString:call.method]) {
         [_scanner forEachAssetCollection:call result:result];
     } else if ([@"getThumbPath" isEqualToString:call.method]) {
