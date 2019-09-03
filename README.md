@@ -72,6 +72,14 @@ AssetPathEntity data = list[0]; // 1st album in the list, typically the "Recent"
 List<AssetEntity> imageList = await data.assetList;
 ```
 
+paging:
+
+```dart
+// `page` is pageIndex ,starting 0.
+// `perPage` is your item count of page.
+final assetList = await path.getAssetListPaged(page, perPage); 
+```
+
 4. use the AssetEntity
 
 ```dart

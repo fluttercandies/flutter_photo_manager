@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -18,13 +19,30 @@ class _PagingPageState extends State<PagingPage> {
 
   int page = 0;
 
+  static const perPage = 14;
+
+  @override
+  void initState() {
+    super.initState();
+    onRefresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(path.name),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.more),
+            onPressed: _loadMore,
+            tooltip: "load more",
+          ),
+        ],
+      ),
       body: Container(
         child: RefreshIndicator(
-          onRefresh: _onLoadMore,
+          onRefresh: onRefresh,
           child: GridView.builder(
             physics: AlwaysScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -48,7 +66,7 @@ class _PagingPageState extends State<PagingPage> {
           return Center(
             child: SizedBox.fromSize(
               child: CircularProgressIndicator(),
-              size: Size.square(100),
+              size: Size.square(44),
             ),
           );
         }
@@ -57,10 +75,18 @@ class _PagingPageState extends State<PagingPage> {
     );
   }
 
-  Future<void> _onLoadMore() async {
-    final assetList = await path.getAssetListPaged(page, 15);
+  Future<void> _loadMore() async {
+    final assetList = await path.getAssetListPaged(page, perPage);
+    list.addAll(assetList);
+    page++;
+    setState(() {});
+  }
+
+  Future<void> onRefresh() async {
+    final assetList = await path.getAssetListPaged(0, perPage);
     list.clear();
     list.addAll(assetList);
+    page = 1;
     setState(() {});
   }
 }
