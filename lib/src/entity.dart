@@ -41,10 +41,15 @@ class AssetPathEntity {
   /// the image entity list
   Future<List<AssetEntity>> get assetList => PhotoManager._getAssetList(this);
 
-  /// the image  entity list with pagination
+  /// the image entity list with pagination
   ///
   /// Doesn't support AssetPathEntity with only(Video/Image) flag.
   /// Throws UnsupportedError
+  ///
+  /// [page] is starting 0.
+  ///
+  /// [pageSize] is item count of page.
+  ///
   Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) => PhotoManager._getAssetListPaged(this, page, pageSize);
 
   static var _all = AssetPathEntity()

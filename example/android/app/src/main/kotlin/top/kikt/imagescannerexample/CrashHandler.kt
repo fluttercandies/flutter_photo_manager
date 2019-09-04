@@ -10,14 +10,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /// create 2019/2/18 by cai
-
-
 @SuppressLint("StaticFieldLeak")
 object CrashHandler : Thread.UncaughtExceptionHandler {
 
-    lateinit var defaultHandler: Thread.UncaughtExceptionHandler
-    lateinit var context: Context
-
+    private lateinit var defaultHandler: Thread.UncaughtExceptionHandler
+    private lateinit var context: Context
 
     private var df = SimpleDateFormat("yyyy-MM-dd", Locale.CHINA)
     private var timeDf = SimpleDateFormat("hh:mm:ss", Locale.CHINA)
@@ -25,7 +22,8 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
     override fun uncaughtException(t: Thread, e: Throwable) {
 
 
-        val file = context.externalCacheDir.absoluteFile
+        val file = context.externalCacheDir?.absoluteFile ?: return
+
         val dt = df.format(Date())
         val fileName = "${file.absolutePath}/$dt.log"
 

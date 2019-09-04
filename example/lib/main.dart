@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:image_scanner_example/page/paging_page.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'photos.dart';
 
@@ -90,13 +91,16 @@ class _MyAppState extends State<MyApp> {
         title: Text(data.name),
       ),
       onTap: () async {
-        var list = await data.assetList;
-        print(
-            "open gallery is:${data.name} , count : ${list.length} , list = $list");
-        var page = PhotoPage(
-          pathEntity: data,
-          photos: list,
+        // var list = await data.assetList;
+        // var page = PhotoPage(
+        //   pathEntity: data,
+        //   photos: list,
+        // );
+
+        final page = PagingPage(
+          entity: data,
         );
+
         Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => page));
       },
     );
