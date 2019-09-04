@@ -327,10 +327,11 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
         val resultHandler = ResultHandler(result)
         threadPool.execute {
             pathAssetMap.clear()
-            val page = (call.arguments as Map<String, Any>)["page"] as Int
-            val pageSize = (call.arguments as Map<String, Any>)["pageSize"] as Int
-            val pathId = (call.arguments as Map<String, Any>)["id"] as String?
-            val hasVideo = (call.arguments as Map<String, Any>)["hasVideo"] as Boolean
+            val args = call.arguments as Map<String, Any>
+            val page = args["page"] as Int
+            val pageSize = args["pageSize"] as Int
+            val pathId = args["id"] as String?
+            val hasVideo = args["hasVideo"] as Boolean
 
             val uri = MediaStore.Files.getContentUri("external")
             val columns = (arrayOf(MediaStore.Files.FileColumns.MEDIA_TYPE) + storeVideoKeys + storeImageKeys).distinct().toTypedArray()
@@ -438,7 +439,7 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
             val future: FutureTask<Boolean> = FutureTask(Callable {
                 assetList.forEachIndexed { index, img ->
                     val thumb = thumbHelper.getThumb(img.path, img.imgId)
-                    LogUtils.info( "make thumb = $thumb ,progress = ${index + 1} / $count")
+                    LogUtils.info("make thumb = $thumb ,progress = ${index + 1} / $count")
                 }
                 true
             })

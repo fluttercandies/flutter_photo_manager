@@ -67,20 +67,24 @@ List<AssetPathEntity> list = await PhotoManager.getVideoAsset();
 
 3. get asset list from imagePath
 
+paging:
+
+```dart
+// page: The page number of the page, starting at 0.
+// perPage: The number of pages per page.
+final assetList = await path.getAssetListPaged(page, perPage);
+```
+
+The old version, it is not recommended for continued use, because there may be performance issues on some phones.
+
+Old version:
+
 ```dart
 AssetPathEntity data = list[0]; // 1st album in the list, typically the "Recent" or "All" album
 List<AssetEntity> imageList = await data.assetList;
 ```
 
-paging:
-
-```dart
-// `page` is pageIndex ,starting 0.
-// `perPage` is your item count of page.
-final assetList = await path.getAssetListPaged(page, perPage); 
-```
-
-4. use the AssetEntity
+1. use the AssetEntity
 
 ```dart
 AssetEntity entity = imageList[0];
