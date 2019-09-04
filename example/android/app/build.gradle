@@ -26,6 +26,14 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
+    signingConfigs {
+        release {
+            storeFile file("${rootDir.absolutePath}/photo-manager-keystore")
+            storePassword '123456'
+            keyAlias 'key0'
+            keyPassword '123456'
+        }
+    }
     compileSdkVersion 28
 
     sourceSets {
@@ -46,7 +54,10 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.release
         }
     }
 }
