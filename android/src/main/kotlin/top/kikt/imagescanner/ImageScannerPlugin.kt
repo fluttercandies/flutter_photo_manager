@@ -6,6 +6,10 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import top.kikt.imagescanner.core.*
+import top.kikt.imagescanner.core.permission.PermissionsListener
+import top.kikt.imagescanner.core.permission.PermissionsUtils
+import top.kikt.imagescanner.core.refresh.RefreshObserver
 import top.kikt.imagescanner.util.LogUtils
 
 

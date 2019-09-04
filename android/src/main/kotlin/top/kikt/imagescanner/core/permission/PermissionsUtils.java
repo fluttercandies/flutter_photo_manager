@@ -1,4 +1,4 @@
-package top.kikt.imagescanner;
+package top.kikt.imagescanner.core.permission;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -13,14 +13,12 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import top.kikt.imagescanner.util.LogUtils;
 
 /**
@@ -82,44 +80,31 @@ public final class PermissionsUtils {
      * @param permissions 要申请的权限数组
      * @return 返回 {@link PermissionsUtils} 自身，进行链式调用
      */
-    public PermissionsUtils getPermissions(Object object, int requestCode, String... permissions) {
-        getPermissionsWithTips(object, requestCode, null, permissions);
+    public PermissionsUtils getPermissions(Activity activity, int requestCode, String... permissions) {
+        getPermissionsWithTips(activity, requestCode, null, permissions);
         return this;
     }
 
     /**
      * 进行权限申请，带拒绝弹框提示
      *
-     * @param object      告诉工具是Activity申请权限还是Fragment申请权限
+     * @param activity    告诉工具是Activity申请权限还是Fragment申请权限
      * @param requestCode 指定该次申请的requestCode
      * @param tips        要申请的权限的被拒绝后的提示的数组
      * @param permissions 要申请的权限数组
      * @return 返回 {@link PermissionsUtils} 自身，进行链式调用
      */
     @TargetApi(23)
-    public PermissionsUtils getPermissionsWithTips(Object object, int requestCode, String[] tips, String... permissions) {
+    private PermissionsUtils getPermissionsWithTips(Activity activity, int requestCode, String[] tips, String... permissions) {
         if (mActivity == null) {
             throw new NullPointerException("获取权限的Activity不存在");
         }
         this.requestCode = requestCode;
         if (!checkPermissions(tips, permissions)) {
             // 通过上面的checkPermissions，可以知道能得到进入到这里面的都是6.0的机子
-            if (object instanceof Activity) {
-                ActivityCompat.requestPermissions(mActivity
-                        , needToRequestPermissionsList.toArray(new String[needToRequestPermissionsList.size()])
-                        , requestCode);
-            } else if (object instanceof Fragment) {
-                ((Fragment) object).requestPermissions(needToRequestPermissionsList.toArray(new String[needToRequestPermissionsList.size()])
-                        , requestCode);
-            } else if (object instanceof android.app.Fragment) {
-                ((android.app.Fragment) object).requestPermissions(needToRequestPermissionsList.toArray(new String[needToRequestPermissionsList.size()])
-                        , requestCode);
-            } else {
-                throw new IllegalArgumentException(object.getClass().getName() + "传入的Object不支持，请检查是否Activity或者Fragment");
-            }
-//            ActivityCompat.requestPermissions(mActivity
-//                    , needToRequestPermissionsList.toArray(new String[needToRequestPermissionsList.size()])
-//                    , requestCode);
+            ActivityCompat.requestPermissions(mActivity
+                    , needToRequestPermissionsList.toArray(new String[needToRequestPermissionsList.size()])
+                    , requestCode);
             for (int i = 0; i < needToRequestPermissionsList.size(); i++) {
                 LogUtils.info("需要申请的权限列表" + needToRequestPermissionsList.get(i));
             }
@@ -156,8 +141,7 @@ public final class PermissionsUtils {
                 }
             }
             // 全部权限获取成功返回true，否则返回false
-            if (needToRequestPermissionsList.isEmpty()) return true;
-            else return false;
+            return needToRequestPermissionsList.isEmpty();
         } else {
             return true;
         }

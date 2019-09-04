@@ -1,4 +1,4 @@
-package top.kikt.imagescanner
+package top.kikt.imagescanner.core
 
 import android.database.Cursor
 import android.os.Handler
@@ -6,8 +6,11 @@ import android.provider.MediaStore
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
-import top.kikt.imagescanner.ImageScanner.Companion.threadPool
-import top.kikt.imagescanner.thumb.ThumbnailUtil
+import top.kikt.imagescanner.Asset
+import top.kikt.imagescanner.AssetType
+import top.kikt.imagescanner.core.ImageScanner.Companion.threadPool
+import top.kikt.imagescanner.core.refresh.ThumbHelper
+import top.kikt.imagescanner.core.thumb.ThumbnailUtil
 import top.kikt.imagescanner.util.LogUtils
 import java.io.File
 import java.util.concurrent.*
