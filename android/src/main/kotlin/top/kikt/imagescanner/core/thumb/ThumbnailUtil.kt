@@ -1,4 +1,4 @@
-package top.kikt.imagescanner.thumb
+package top.kikt.imagescanner.core.thumb
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -7,7 +7,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.transition.Transition
 import io.flutter.plugin.common.MethodChannel
 import top.kikt.imagescanner.Asset
-import top.kikt.imagescanner.ResultHandler
+import top.kikt.imagescanner.core.ResultHandler
 import java.io.ByteArrayOutputStream
 import java.io.File
 

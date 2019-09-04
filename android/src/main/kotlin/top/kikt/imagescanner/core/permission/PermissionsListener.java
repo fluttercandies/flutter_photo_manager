@@ -1,4 +1,4 @@
-package top.kikt.imagescanner;
+package top.kikt.imagescanner.core.permission;
 
 /**
  * Created by Administrator on 2017/2/19.

@@ -1,4 +1,4 @@
-package top.kikt.imagescanner
+package top.kikt.imagescanner.core
 
 
 import android.os.Handler

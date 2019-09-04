@@ -1,10 +1,11 @@
-package top.kikt.imagescanner
+package top.kikt.imagescanner.core.refresh
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.ThumbnailUtils
 import android.os.Environment.DIRECTORY_PICTURES
 import io.flutter.plugin.common.PluginRegistry
+import top.kikt.imagescanner.Asset
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream

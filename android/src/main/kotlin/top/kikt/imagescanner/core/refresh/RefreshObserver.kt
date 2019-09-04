@@ -1,4 +1,4 @@
-package top.kikt.imagescanner
+package top.kikt.imagescanner.core.refresh
 
 import android.database.ContentObserver
 import android.os.Handler
