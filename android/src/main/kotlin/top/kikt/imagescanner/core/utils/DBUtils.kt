@@ -7,11 +7,14 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO
+import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.GalleryEntity
 
 /// create 2019-09-05 by cai
 object DBUtils {
+
+    val cacheContainer = CacheContainer()
 
     private const val TAG = "DBUtils"
 
@@ -91,7 +94,8 @@ object DBUtils {
         }
 
         val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
-        val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null) ?: return emptyList()
+        val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
+                ?: return emptyList()
         while (cursor.moveToNext()) {
             val id = cursor.getString(0)
             val name = cursor.getString(1)
@@ -130,7 +134,8 @@ object DBUtils {
         val keys = (storeImageKeys + storeVideoKeys + typeKeys).distinct().toTypedArray()
         val selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection"
         val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET ${page * pageSize}"
-        val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder) ?: return emptyList()
+        val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
+                ?: return emptyList()
 
         while (cursor.moveToNext()) {
             val id = cursor.getString(MediaStore.MediaColumns._ID)
@@ -142,11 +147,48 @@ object DBUtils {
             val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
             val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type))
             list.add(asset)
+            cacheContainer.putAsset(asset)
         }
 
         cursor.close()
 
         return list
+    }
+
+    @SuppressLint("Recycle")
+    fun getAssetEntity(context: Context, id: String): AssetEntity? {
+        val asset = cacheContainer.getAsset(id)
+        if (asset != null) {
+            return asset
+        }
+
+        val keys = (storeImageKeys + storeVideoKeys).distinct().toTypedArray()
+
+        val selection = "${MediaStore.Files.FileColumns.DATA} = ?"
+
+        val args = arrayOf(id)
+
+        val cursor = context.contentResolver.query(allUri, keys, selection, args, null)
+                ?: return null
+
+        if (cursor.moveToNext()) {
+            val databaseId = cursor.getString(MediaStore.MediaColumns._ID)
+            val path = cursor.getString(MediaStore.MediaColumns.DATA)
+            val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
+            val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
+            val duration = if (type == MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
+            val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
+            val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
+            val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type))
+
+            cacheContainer.putAsset(dbAsset)
+
+            cursor.close()
+            return dbAsset
+        } else {
+            cursor.close()
+            return null
+        }
     }
 
     private fun getMediaType(type: Int): Int {

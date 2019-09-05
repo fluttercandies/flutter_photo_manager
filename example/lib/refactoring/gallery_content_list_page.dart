@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -37,7 +38,18 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     final item = list[index];
     return AspectRatio(
       aspectRatio: 1,
-      child: Image.file(File(item.id)),
+      child: FutureBuilder<Uint8List>(
+        future: Plugin().getThumb(id: item.id),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text("error");
+          }
+          if (snapshot.hasData) {
+            return Image.memory(snapshot.data);
+          }
+          return Text("no data");
+        },
+      ),
     );
   }
 

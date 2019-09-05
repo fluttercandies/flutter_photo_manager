@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager/src/utils/convert_utils.dart';
@@ -44,5 +46,23 @@ class Plugin {
     });
 
     return ConvertUtils.convertAssetEntity(result);
+  }
+
+  Future<Uint8List> getThumb({
+    @required String id,
+    int width = 100,
+    int height = 100,
+  }) {
+    return _channel.invokeMethod("getThumb", {
+      "width": width,
+      "height": height,
+      "id": id,
+    });
+  }
+
+  Future<Uint8List> getOriginBytes(String id) {
+    return _channel.invokeMethod("getOrigin", {
+      "id": id,
+    });
   }
 }

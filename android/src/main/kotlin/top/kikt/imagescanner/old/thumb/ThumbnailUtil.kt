@@ -16,7 +16,7 @@ import java.io.File
  */
 object ThumbnailUtil {
 
-    fun getThumbnailByGlide(ctx: Context, path: String, width: Int, height: Int, result: MethodChannel.Result) {
+    fun getThumbnailByGlide(ctx: Context, path: String, width: Int, height: Int, result: MethodChannel.Result?) {
         val resultHandler = ResultHandler(result)
 
         Glide.with(ctx)
@@ -39,7 +39,7 @@ object ThumbnailUtil {
                 })
     }
 
-    fun getThumbnailWithVideo(ctx: Context, asset: Asset, width: Int, height: Int, result: MethodChannel.Result) {
+    fun getThumbnailWithVideo(ctx: Context, asset: Asset, width: Int, height: Int, result: MethodChannel.Result?) {
         val resultHandler = ResultHandler(result)
 
         Glide.with(ctx)

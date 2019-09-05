@@ -5,7 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import io.flutter.plugin.common.MethodChannel
 
-class ResultHandler(private var result: MethodChannel.Result?) {
+class ResultHandler(var result: MethodChannel.Result?) {
 
     companion object {
         private val handler = Handler(Looper.getMainLooper())

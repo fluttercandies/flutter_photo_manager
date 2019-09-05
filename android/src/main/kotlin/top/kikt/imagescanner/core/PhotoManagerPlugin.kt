@@ -51,21 +51,10 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
 
     private val photoManager = PhotoManager(registrar.context().applicationContext)
 
-    override fun onMethodCall(call: MethodCall?, result: MethodChannel.Result?) {
-        if (call == null || result == null) {
-            return
-        }
-
+    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result)
 
         val handleResult = when (call.method) {
-            "getGalleryList" -> {
-                runOnBackground {
-                    val list = photoManager.getGalleryList()
-                    resultHandler.reply(ConvertUtils.convertToGalleryResult(list))
-                }
-                true
-            }
             "getAssetWithGalleryId" -> {
                 runOnBackground {
                     val id = call.argument<String>("id") as String
@@ -75,6 +64,16 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                     val list = photoManager.getAssetList(id, page, pageCount, type)
                     resultHandler.reply(ConvertUtils.convertToAssetResult(list))
                 }
+                true
+            }
+            "getThumb" -> {
+                val id = call.argument<String>("id") as String
+                val width = call.argument<Int>("width") as Int
+                val height = call.argument<Int>("height") as Int
+                photoManager.getThumb(id, width, height, resultHandler)
+                true
+            }
+            "getOrigin" -> {
                 true
             }
             "log" -> {
@@ -104,6 +103,12 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                     LogUtils.info("onGranted call.method = ${call.method}")
                     when (call.method) {
                         "requestPermission" -> resultHandler.reply(1)
+                        "getGalleryList" -> {
+                            runOnBackground {
+                                val list = photoManager.getGalleryList()
+                                resultHandler.reply(ConvertUtils.convertToGalleryResult(list))
+                            }
+                        }
                         else -> resultHandler.notImplemented()
                     }
                 }
