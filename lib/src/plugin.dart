@@ -29,4 +29,20 @@ class Plugin {
   Future<bool> requestPermission() async {
     return (await _channel.invokeMethod("requestPermission")) == 1;
   }
+
+  Future<List<AssetEntity>> getAssetWithGalleryIdPaged(
+    String id, {
+    int page = 0,
+    int pageCount = 15,
+    int type = 0,
+  }) async {
+    final result = await _channel.invokeMethod("getAssetWithGalleryId", {
+      "id": id,
+      "page": page,
+      "pageCount": pageCount,
+      "type": type,
+    });
+
+    return ConvertUtils.convertAssetEntity(result);
+  }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
+import 'gallery_content_list_page.dart';
+
 class GalleryListPage extends StatefulWidget {
   final List<AssetPathEntity> galleryList;
 
@@ -29,6 +31,13 @@ class _GalleryListPageState extends State<GalleryListPage> {
     return ListTile(
       title: Text(item.name),
       subtitle: Text("count: ${item.assetCount}"),
+      onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => GalleryContentListPage(
+                    path: item,
+                  ),
+            ),
+          ),
     );
   }
 }

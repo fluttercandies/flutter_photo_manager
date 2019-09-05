@@ -122,7 +122,9 @@ object DBUtils {
                 args.add(MEDIA_TYPE_VIDEO.toString())
             }
             else -> {
-                typeSelection = ""
+                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} in (?,?)"
+                args.add(MEDIA_TYPE_IMAGE.toString())
+                args.add(MEDIA_TYPE_VIDEO.toString())
             }
         }
         val keys = (storeImageKeys + storeVideoKeys + typeKeys).distinct().toTypedArray()
