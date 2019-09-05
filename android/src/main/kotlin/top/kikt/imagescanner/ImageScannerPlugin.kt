@@ -6,10 +6,11 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
-import top.kikt.imagescanner.core.*
-import top.kikt.imagescanner.core.permission.PermissionsListener
-import top.kikt.imagescanner.core.permission.PermissionsUtils
-import top.kikt.imagescanner.core.refresh.RefreshObserver
+import top.kikt.imagescanner.core.PhotoManagerPlugin
+import top.kikt.imagescanner.old.*
+import top.kikt.imagescanner.old.permission.PermissionsListener
+import top.kikt.imagescanner.old.permission.PermissionsUtils
+import top.kikt.imagescanner.old.refresh.RefreshObserver
 import top.kikt.imagescanner.util.LogUtils
 
 
@@ -19,10 +20,13 @@ class ImageScannerPlugin(val registrar: Registrar) : MethodCallHandler {
 
         @JvmStatic
         fun registerWith(registrar: Registrar): Unit {
-            val channel = MethodChannel(registrar.messenger(), "image_scanner")
-            channel.setMethodCallHandler(ImageScannerPlugin(registrar))
+//            val channel = MethodChannel(registrar.messenger(), "image_scanner")
+//            channel.setMethodCallHandler(ImageScannerPlugin(registrar))
+//
+//            notifyChangeObserver.initWith(registrar)
 
-            notifyChangeObserver.initWith(registrar)
+            val newChannel = MethodChannel(registrar.messenger(), "top.kikt/photo_manager")
+            newChannel.setMethodCallHandler(PhotoManagerPlugin(registrar))
         }
     }
 

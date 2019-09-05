@@ -16,6 +16,9 @@ class AssetPathEntity {
   /// in ios is photos gallery name
   String name;
 
+  /// gallery asset count
+  int assetCount;
+
   bool _hasVideo;
 
   /// hasVideo
@@ -50,7 +53,8 @@ class AssetPathEntity {
   ///
   /// [pageSize] is item count of page.
   ///
-  Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) => PhotoManager._getAssetListPaged(this, page, pageSize);
+  Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) =>
+      PhotoManager._getAssetListPaged(this, page, pageSize);
 
   static var _all = AssetPathEntity()
     ..id = "allall--dfnsfkdfj2454AJJnfdkl"
@@ -88,7 +92,7 @@ class AssetPathEntity {
 
   @override
   String toString() {
-    return "AssetPathEntity{id:$id}";
+    return "AssetPathEntity{ name: $name id:$id , length = $assetCount}";
   }
 }
 
@@ -106,6 +110,13 @@ class AssetEntity {
   ///
   /// see [AssetType]
   AssetType type;
+
+  int typeInt;
+
+  int duration;
+
+  int width;
+  int height;
 
   // /// isCloud
   // Future get isCloud async => PhotoManager._isCloudWithAsset(this);
