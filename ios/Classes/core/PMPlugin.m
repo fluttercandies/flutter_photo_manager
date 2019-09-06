@@ -8,6 +8,7 @@
 #import "ResultHandler.h"
 #import "ConvertUtils.h"
 #import "PMAssetPathEntity.h"
+#import "PMLogUtils.h"
 
 
 @implementation PMPlugin {
@@ -74,11 +75,22 @@
 
     } else if ([call.method isEqualToString:@"getThumb"]) {
 
+        NSString *id = call.arguments[@"id"];
+        NSUInteger width = [call.arguments[@"width"] unsignedIntegerValue];
+        NSUInteger height = [call.arguments[@"height"] unsignedIntegerValue];
+
+        [manager getThumbWithId:id width:width height:height resultHandler:handler];
+
     } else if ([call.method isEqualToString:@"getOrigin"]) {
+
 
     } else if ([call.method isEqualToString:@"releaseMemCache"]) {
 
+        [manager clearCache];
+
     } else if ([call.method isEqualToString:@"log"]) {
+
+        PMLogUtils.sharedInstance.isLog = (BOOL) call.arguments;
 
     } else if ([call.method isEqualToString:@"openSetting"]) {
 

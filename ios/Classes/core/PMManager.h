@@ -6,6 +6,7 @@
 
 @class PMAssetPathEntity;
 @class PMAssetEntity;
+@class ResultHandler;
 
 @interface PMManager : NSObject
 
@@ -17,4 +18,11 @@
 
 - (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id type:(int)type page:(NSUInteger)page
                                                     pageCount:(NSUInteger)pageCount;
+
+- (PMAssetEntity *)getAssetEntity:(NSString *)assetId;
+
+- (void)clearCache;
+
+- (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height
+         resultHandler:(ResultHandler *)handler;
 @end

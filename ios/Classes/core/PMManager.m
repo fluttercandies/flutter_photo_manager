@@ -6,16 +6,20 @@
 #import "PMManager.h"
 #import "PMAssetPathEntity.h"
 #import "PHAsset+PHAsset_checkType.h"
+#import "PMCacheContainer.h"
+#import "ResultHandler.h"
 
 
 @implementation PMManager {
     BOOL __isAuth;
+    PMCacheContainer *cacheContainer;
 }
 
 - (instancetype)init {
     self = [super init];
     if (self) {
         __isAuth = NO;
+        cacheContainer = [PMCacheContainer new];
     }
 
     return self;
@@ -76,6 +80,9 @@
         return result;
     }
 
+    // type:
+    // 0: all , 1: image, 2:video
+
     if (type == 1) {
         options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeImage];
     } else if (type == 2) {
@@ -102,12 +109,16 @@
         PHAsset *asset = assetArray[i];
         PMAssetEntity *entity = [self convertPHAssetToAssetEntity:asset];
         [result addObject:entity];
+        [cacheContainer putAssetEntity:entity];
     }
 
     return result;
 }
 
 - (PMAssetEntity *)convertPHAssetToAssetEntity:(PHAsset *)asset {
+    // type:
+    // 0: all , 1: image, 2:video
+
     int type = 0;
     if (asset.isImage) {
         type = 1;
@@ -118,7 +129,116 @@
     NSDate *date = asset.creationDate;
     long createDt = (long) (date.timeIntervalSince1970 / 1000);
 
-    return [PMAssetEntity entityWithId:asset.localIdentifier createDt:createDt width:asset.pixelWidth height:asset.pixelHeight duration:(long) asset.duration type:type];
+    PMAssetEntity *entity = [PMAssetEntity entityWithId:asset.localIdentifier
+                                               createDt:createDt width:asset.pixelWidth
+                                                 height:asset.pixelHeight duration:(long) asset.duration type:type];
+    entity.phAsset = asset;
+    return entity;
 }
 
+- (PMAssetEntity *)getAssetEntity:(NSString *)assetId {
+    PMAssetEntity *entity = [cacheContainer getAssetEntity:assetId];
+    if (entity) {
+        return entity;
+    }
+    PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil];
+    if (result == nil || result.count == 0) {
+        return nil;
+    }
+
+    PHAsset *asset = result[0];
+    entity = [self convertPHAssetToAssetEntity:asset];
+    [cacheContainer putAssetEntity:entity];
+    return entity;
+}
+
+- (void)clearCache {
+    [cacheContainer clearCache];
+}
+
+- (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height
+         resultHandler:(ResultHandler *)handler {
+    PMAssetEntity *entity = [self getAssetEntity:id];
+    if (entity) {
+        PHAsset *asset = entity.phAsset;
+        if (asset) {
+            [self fetchThumb:asset width:width height:height resultHandler:handler];
+        } else {
+            [handler replyError:@"asset is not found"];
+        }
+    } else {
+        [handler replyError:@"asset is not found"];
+    }
+}
+
+- (void)fetchThumb:(PHAsset *)asset width:(NSUInteger)width height:(NSUInteger)height
+     resultHandler:(ResultHandler *)handler {
+
+    PHImageManager *manager = PHImageManager.defaultManager;
+    PHImageRequestOptions *options = [PHImageRequestOptions new];
+    [options setNetworkAccessAllowed:YES];
+    [options setProgressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
+        if (progress == 1.0) {
+            [self fetchThumb:asset width:width height:height resultHandler:handler];
+        }
+    }];
+    [manager requestImageForAsset:asset targetSize:CGSizeMake(width, height) contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage *result, NSDictionary *info) {
+
+        BOOL downloadFinished = [PMManager isDownloadFinish:info];
+
+        if (!downloadFinished) {
+            return;
+        }
+
+        if ([handler isReplied]) {
+            return;
+        }
+
+        NSData *imageData = UIImageJPEGRepresentation(result, 0.95);
+        FlutterStandardTypedData *data = [FlutterStandardTypedData typedDataWithBytes:imageData];
+        [handler reply:data];
+    }];
+}
+
+
+- (void)fetchFullSize:(PHAsset *)asset resultHandler:(ResultHandler *)handler {
+    PHImageManager *manager = PHImageManager.defaultManager;
+    PHImageRequestOptions *options = [PHImageRequestOptions new];
+
+
+    [options setNetworkAccessAllowed:YES];
+    [options setProgressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
+        if (progress == 1.0) {
+            [self fetchFullSize:asset resultHandler:handler];
+        }
+    }];
+    [manager requestImageDataForAsset:asset options:options resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
+
+        BOOL downloadFinished = [PMManager isDownloadFinish:info];
+        if (!downloadFinished) {
+            return;
+        }
+
+        if ([handler isReplied]) {
+            return;
+        }
+
+        FlutterStandardTypedData *data = [FlutterStandardTypedData typedDataWithBytes:imageData];
+
+        [handler reply:data];
+    }];
+}
+
++ (BOOL)isDownloadFinish:(NSDictionary *)info {
+    return ![info[PHImageCancelledKey] boolValue] && !info[PHImageErrorKey] && ![info[PHImageResultIsDegradedKey] boolValue];
+}
+
+- (NSArray *)convertNSData:(NSData *)data {
+    NSMutableArray *array = [NSMutableArray array];
+    Byte *bytes = data.bytes;
+    for (int i = 0; i < data.length; ++i) {
+        [array addObject:@(bytes[i])];
+    }
+    return array;
+}
 @end

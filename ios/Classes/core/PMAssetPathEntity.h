@@ -4,6 +4,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class PHAsset;
+
 
 @interface PMAssetPathEntity : NSObject
 
@@ -27,6 +29,7 @@
 @property(nonatomic, assign) int height;
 @property(nonatomic, assign) long duration;
 @property(nonatomic, assign) int type;
+@property(nonatomic, strong) PHAsset *phAsset;
 
 - (instancetype)initWithId:(NSString *)id createDt:(long)createDt width:(int)width height:(int)height
                   duration:(long)duration type:(int)type;

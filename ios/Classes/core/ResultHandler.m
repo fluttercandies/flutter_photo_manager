@@ -40,4 +40,7 @@
     self.result(error);
 }
 
+- (BOOL)isReplied {
+    return isReply;
+}
 @end

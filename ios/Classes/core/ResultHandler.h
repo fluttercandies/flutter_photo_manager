@@ -17,4 +17,5 @@
 
 - (void)reply:(id)obj;
 
+- (BOOL)isReplied;
 @end
