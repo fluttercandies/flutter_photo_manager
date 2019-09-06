@@ -10,7 +10,7 @@ class ConvertUtils {
       final entity = AssetPathEntity()
         ..id = item["id"]
         ..name = item["name"]
-        ..type = type
+        ..typeInt = type
         ..assetCount = item["length"];
 
       result.add(entity);

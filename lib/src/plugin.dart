@@ -75,4 +75,12 @@ class Plugin {
     return _channel
         .invokeMethod("getFullFile", {"id": id, "isOrigin": isOrigin});
   }
+
+  Future<void> setLog(bool isLog) async {
+    return _channel.invokeMethod("log", isLog);
+  }
+
+  void openSetting() {
+    _channel.invokeMethod("openSetting");
+  }
 }

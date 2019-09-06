@@ -34,13 +34,13 @@ class PhotoManager {
   }
 
   static Future<void> setLog(bool isLog) {
-    return _channel.invokeMethod("log", isLog);
+    return _plugin.setLog(isLog);
   }
 
   /// get video asset
   /// open setting page
   static void openSetting() {
-    _channel.invokeMethod("openSetting");
+    _plugin.openSetting();
   }
 
   static Future<List<AssetEntity>> _getAssetListPaged(
@@ -49,7 +49,7 @@ class PhotoManager {
       assetPathEntity.id,
       page: page,
       pageCount: pageCount,
-      type: assetPathEntity.type,
+      type: assetPathEntity.typeInt,
     );
   }
 

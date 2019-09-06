@@ -75,7 +75,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       path.id,
       page: 0,
       pageCount: 100,
-      type: path.type,
+      type: path.typeInt,
     );
     this.list.addAll(list);
     setState(() {});

@@ -19,7 +19,16 @@ class AssetPathEntity {
   /// gallery asset count
   int assetCount;
 
-  int type = 0;
+  RequestType _type;
+
+  RequestType get type => _type;
+
+  set type(RequestType type) {
+    _type = type;
+    typeInt = type.index;
+  }
+
+  int typeInt = 0;
 
   AssetPathEntity({this.id, this.name});
 
