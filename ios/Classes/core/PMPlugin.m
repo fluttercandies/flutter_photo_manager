@@ -83,6 +83,10 @@
 
     } else if ([call.method isEqualToString:@"getOrigin"]) {
 
+        NSString *id = call.arguments[@"id"];
+        BOOL isOrigin = [call.arguments[@"isOrigin"] boolValue];
+
+        [manager getFullSizeFileWithId:id resultHandler:handler];
 
     } else if ([call.method isEqualToString:@"releaseMemCache"]) {
 

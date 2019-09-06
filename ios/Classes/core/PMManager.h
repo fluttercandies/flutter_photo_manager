@@ -25,4 +25,6 @@
 
 - (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height
          resultHandler:(ResultHandler *)handler;
+
+- (void)getFullSizeFileWithId:(NSString *)id resultHandler:(ResultHandler *)handler;
 @end

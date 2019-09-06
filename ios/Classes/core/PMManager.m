@@ -8,6 +8,7 @@
 #import "PHAsset+PHAsset_checkType.h"
 #import "PMCacheContainer.h"
 #import "ResultHandler.h"
+#import "PMLogUtils.h"
 
 
 @implementation PMManager {
@@ -159,13 +160,9 @@
 - (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height
          resultHandler:(ResultHandler *)handler {
     PMAssetEntity *entity = [self getAssetEntity:id];
-    if (entity) {
+    if (entity && entity.phAsset) {
         PHAsset *asset = entity.phAsset;
-        if (asset) {
-            [self fetchThumb:asset width:width height:height resultHandler:handler];
-        } else {
-            [handler replyError:@"asset is not found"];
-        }
+        [self fetchThumb:asset width:width height:height resultHandler:handler];
     } else {
         [handler replyError:@"asset is not found"];
     }
@@ -200,6 +197,71 @@
     }];
 }
 
+- (void)getFullSizeFileWithId:(NSString *)id resultHandler:(ResultHandler *)handler {
+    PMAssetEntity *entity = [self getAssetEntity:id];
+    if (entity && entity.phAsset) {
+        PHAsset *asset = entity.phAsset;
+        if (asset.isVideo) {
+            [self fetchFullSizeVideo:asset handler:handler];
+            return;
+        } else {
+            [self fetchFullSize:asset resultHandler:handler];
+        }
+    } else {
+        [handler replyError:@"asset is not found"];
+    }
+}
+
+- (void)fetchFullSizeVideo:(PHAsset *)asset handler:(ResultHandler *)handler {
+    NSString *homePath = NSTemporaryDirectory();
+    NSFileManager *manager = NSFileManager.defaultManager;
+
+    NSMutableString *path = [NSMutableString stringWithString:homePath];
+
+    NSString *filename = [asset valueForKey:@"filename"];
+
+    NSString *dirPath = [NSString stringWithFormat:@"%@/%@", homePath, @".video"];
+    [manager createDirectoryAtPath:dirPath attributes:@{}];
+
+    [path appendFormat:@"%@/%@", @".video", filename];
+    PHVideoRequestOptions *options = [PHVideoRequestOptions new];
+    if ([manager fileExistsAtPath:path]) {
+        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
+        [handler reply:path];
+        return;
+    }
+
+    [options setProgressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
+        if (progress == 1.0) {
+            [self fetchFullSizeVideo:asset handler:handler];
+        }
+    }];
+
+    [options setNetworkAccessAllowed:YES];
+
+    [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:options resultHandler:^(AVAsset *_Nullable asset, AVAudioMix *_Nullable audioMix,
+            NSDictionary *_Nullable info) {
+
+        BOOL downloadFinish = [PMManager isDownloadFinish:info];
+
+        if (!downloadFinish) {
+            return;
+        }
+
+        NSString *preset = AVAssetExportPresetHighestQuality;
+        AVAssetExportSession *exportSession = [AVAssetExportSession exportSessionWithAsset:asset presetName:preset];
+        if (exportSession) {
+            exportSession.outputFileType = AVFileTypeMPEG4;
+            exportSession.outputURL = [NSURL fileURLWithPath:path];
+            [exportSession exportAsynchronouslyWithCompletionHandler:^{
+                [handler reply:path];
+            }];
+        } else {
+            [handler reply:NULL];
+        }
+
+    }];
+}
 
 - (void)fetchFullSize:(PHAsset *)asset resultHandler:(ResultHandler *)handler {
     PHImageManager *manager = PHImageManager.defaultManager;
@@ -233,12 +295,4 @@
     return ![info[PHImageCancelledKey] boolValue] && !info[PHImageErrorKey] && ![info[PHImageResultIsDegradedKey] boolValue];
 }
 
-- (NSArray *)convertNSData:(NSData *)data {
-    NSMutableArray *array = [NSMutableArray array];
-    Byte *bytes = data.bytes;
-    for (int i = 0; i < data.length; ++i) {
-        [array addObject:@(bytes[i])];
-    }
-    return array;
-}
 @end
