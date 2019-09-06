@@ -19,32 +19,9 @@ class AssetPathEntity {
   /// gallery asset count
   int assetCount;
 
-  bool _hasVideo;
-
   int type = 0;
 
-  /// hasVideo
-  set hasVideo(bool value) => _hasVideo = value;
-
-  /// hasVideo
-  bool get hasVideo => onlyVideo == true || _hasVideo == true;
-
-  /// only have video
-  bool onlyVideo = false;
-
-  /// only have image
-  bool onlyImage = false;
-
-  /// contains all asset
-  bool _isAll = false;
-
-  /// contains all asset
-  bool get isAll => _isAll;
-
-  AssetPathEntity({this.id, this.name, bool hasVideo}) : _hasVideo = hasVideo;
-
-  /// the image entity list
-  Future<List<AssetEntity>> get assetList => PhotoManager._getAssetList(this);
+  AssetPathEntity({this.id, this.name});
 
   /// the image entity list with pagination
   ///
@@ -57,27 +34,6 @@ class AssetPathEntity {
   ///
   Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) =>
       PhotoManager._getAssetListPaged(this, page, pageSize);
-
-  static var _all = AssetPathEntity()
-    ..id = "allall--dfnsfkdfj2454AJJnfdkl"
-    ..name = "Recent"
-    .._isAll = true
-    ..hasVideo = true;
-
-  static var _allVideo = AssetPathEntity()
-    ..id = "videovideo--87yuhijn3cvx"
-    ..name = "Recent"
-    .._isAll = true
-    ..onlyVideo = true;
-
-  static var _allImage = AssetPathEntity()
-    ..id = "imageimage--89hdsinvosd"
-    ..onlyImage = true
-    .._isAll = true
-    ..name = "Recent";
-
-  /// all asset path
-  static AssetPathEntity get all => _all;
 
   @override
   bool operator ==(other) {
@@ -129,25 +85,17 @@ class AssetEntity {
   int width;
   int height;
 
-  // /// isCloud
-  // Future get isCloud async => PhotoManager._isCloudWithAsset(this);
-
-  /// thumb path
-  ///
-  /// you can use File(path) to use
-  // Future<File> get thumb async => PhotoManager._getThumbWithId(id);
-
   /// if you need upload file ,then you can use the file
-  Future<File> get file async => PhotoManager._getFullFileWithId(id);
+  Future<File> get file async => PhotoManager._getFileWithId(this.id);
 
   /// This contains all the EXIF information, but in contrast, `Image` widget may not be able to display pictures.
   ///
   /// Usually, you can use the [file] attribute
   Future<File> get originFile async =>
-      PhotoManager._getFullFileWithId(id, isOrigin: true);
+      PhotoManager._getFileWithId(id, isOrigin: true);
 
   /// the image's bytes ,
-  Future<Uint8List> get fullData => PhotoManager._getDataWithId(id);
+  Future<Uint8List> get fullData => PhotoManager._getFullDataWithId(id);
 
   /// thumb data , for display
   Future<Uint8List> get thumbData => PhotoManager._getThumbDataWithId(id);
@@ -159,19 +107,12 @@ class AssetEntity {
 
   /// if not video ,duration is null
   Future<Duration> get videoDuration async {
-    if (type != AssetType.video) {
-      return null;
-    }
-    return PhotoManager._getDurationWithId(id);
+    return Duration(seconds: duration);
   }
 
   /// nullable, if the manager is null.
   Future<Size> get size async {
-    try {
-      return await PhotoManager._getSizeWithId(id);
-    } on Exception {
-      return null;
-    }
+    return Size(width.toDouble(), height.toDouble());
   }
 
   /// unix timestamp of asset, milliseconds

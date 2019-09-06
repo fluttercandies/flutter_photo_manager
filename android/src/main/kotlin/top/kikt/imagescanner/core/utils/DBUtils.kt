@@ -211,4 +211,8 @@ object DBUtils {
         return getLong(getColumnIndex(columnName))
     }
 
+    fun clearCache() {
+        cacheContainer.clearCache()
+    }
+
 }

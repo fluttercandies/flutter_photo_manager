@@ -5,6 +5,8 @@ import 'dart:ui';
 
 import 'package:flutter/services.dart';
 
+import 'src/plugin.dart';
+
 export 'src/plugin.dart';
 
 part './src/manager.dart';

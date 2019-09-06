@@ -80,6 +80,10 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                 }
                 true
             }
+            "releaseMemCache" -> {
+                photoManager.clearCache()
+                true
+            }
             "log" -> {
                 LogUtils.isLog = call.arguments()
                 true

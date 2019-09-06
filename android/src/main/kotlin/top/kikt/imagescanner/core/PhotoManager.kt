@@ -42,4 +42,8 @@ class PhotoManager(private val context: Context) {
         resultHandler.reply(byteArray)
     }
 
+    fun clearCache() {
+        DBUtils.clearCache()
+    }
+
 }

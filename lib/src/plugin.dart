@@ -21,11 +21,12 @@ class Plugin {
 
   /// [type] 0 : all , 1: image ,2 video
   Future<List<AssetPathEntity>> getAllGalleryList({int type = 0}) async {
-    final result = await _channel.invokeMethod("getGalleryList", {"type": type});
+    final result =
+        await _channel.invokeMethod("getGalleryList", {"type": type});
     if (result == null) {
       return [];
     }
-    return ConvertUtils.convertPath(result,type:type);
+    return ConvertUtils.convertPath(result, type: type);
   }
 
   Future<bool> requestPermission() async {
@@ -64,5 +65,14 @@ class Plugin {
     return _channel.invokeMethod("getOrigin", {
       "id": id,
     });
+  }
+
+  Future<void> releaseCache() async {
+    await _channel.invokeMethod("releaseMemCache");
+  }
+
+  Future<String> getFullFile(String id, {bool isOrigin}) async {
+    return _channel
+        .invokeMethod("getFullFile", {"id": id, "isOrigin": isOrigin});
   }
 }
