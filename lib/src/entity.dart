@@ -21,6 +21,8 @@ class AssetPathEntity {
 
   bool _hasVideo;
 
+  int type = 0;
+
   /// hasVideo
   set hasVideo(bool value) => _hasVideo = value;
 

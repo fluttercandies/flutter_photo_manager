@@ -25,7 +25,7 @@ class Plugin {
     if (result == null) {
       return [];
     }
-    return ConvertUtils.convertPath(result);
+    return ConvertUtils.convertPath(result,type:type);
   }
 
   Future<bool> requestPermission() async {
