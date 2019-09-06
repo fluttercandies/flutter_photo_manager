@@ -10,7 +10,7 @@ import top.kikt.imagescanner.Asset
 import top.kikt.imagescanner.AssetType
 import top.kikt.imagescanner.old.ImageScanner.Companion.threadPool
 import top.kikt.imagescanner.old.refresh.ThumbHelper
-import top.kikt.imagescanner.old.thumb.ThumbnailUtil
+import top.kikt.imagescanner.thumb.ThumbnailUtil
 import top.kikt.imagescanner.util.LogUtils
 import java.io.File
 import java.util.concurrent.*

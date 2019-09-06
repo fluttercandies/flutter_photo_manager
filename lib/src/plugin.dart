@@ -21,7 +21,7 @@ class Plugin {
 
   /// [type] 0 : all , 1: image ,2 video
   Future<List<AssetPathEntity>> getAllGalleryList({int type = 0}) async {
-    final result = await _channel.invokeMethod("getGalleryList", {"type": 0});
+    final result = await _channel.invokeMethod("getGalleryList", {"type": type});
     if (result == null) {
       return [];
     }

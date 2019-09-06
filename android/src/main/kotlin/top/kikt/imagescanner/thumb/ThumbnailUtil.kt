@@ -1,4 +1,4 @@
-package top.kikt.imagescanner.old.thumb
+package top.kikt.imagescanner.thumb
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -54,6 +54,25 @@ object ThumbnailUtil {
 
                     override fun onLoadCleared(placeholder: Drawable?) {
                         resultHandler.reply(null)
+                    }
+                })
+    }
+
+    fun getThumb(ctx: Context, path: String, width: Int, height: Int, callback: (ByteArray?) -> Unit) {
+
+        Glide.with(ctx)
+                .asBitmap()
+                .load(File(path))
+                .into(object : CustomTarget<Bitmap>(width, height) {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        val bos = ByteArrayOutputStream()
+                        resource.compress(Bitmap.CompressFormat.JPEG, 100, bos)
+                        resource.recycle()
+                        callback(bos.toByteArray())
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                        callback(null)
                     }
                 })
     }

@@ -71,7 +71,7 @@ object DBUtils {
     @SuppressLint("Recycle")
     fun getGalleryList(context: Context, requestType: Int = 0): List<GalleryEntity> {
         val list = ArrayList<GalleryEntity>()
-        val uri = convertTypeToUri(requestType)
+        val uri = allUri
         val projection = storeBucketKeys + arrayOf("count(1)")
 
         val args = ArrayList<String>()

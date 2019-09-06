@@ -217,7 +217,6 @@ class PhotoManager {
     for (var i = 0; i < ids.length; i++) {
       var id = ids[i];
       var entity = AssetEntity(id: id)
-        ..type = type
         ..createTime = timeStampList[i];
 
       result.add(entity);
@@ -245,7 +244,6 @@ class PhotoManager {
 
     for (var i = 0; i < typeList.length; i++) {
       var entity = entityList[i];
-      entity.type = _convertTypeFromString(typeList[i]);
       entity.createTime = timeList[i];
     }
   }

@@ -74,6 +74,10 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                 true
             }
             "getOrigin" -> {
+                runOnBackground {
+                    val id = call.argument<String>("id") as String
+                    photoManager.getOriginBytes(id, resultHandler)
+                }
                 true
             }
             "log" -> {
@@ -105,7 +109,8 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                         "requestPermission" -> resultHandler.reply(1)
                         "getGalleryList" -> {
                             runOnBackground {
-                                val list = photoManager.getGalleryList()
+                                val type = call.argument<Int>("type") as Int
+                                val list = photoManager.getGalleryList(type)
                                 resultHandler.reply(ConvertUtils.convertToGalleryResult(list))
                             }
                         }

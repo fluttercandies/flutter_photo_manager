@@ -109,7 +109,16 @@ class AssetEntity {
   /// the asset type
   ///
   /// see [AssetType]
-  AssetType type;
+  AssetType get type {
+    switch (typeInt) {
+      case 1:
+        return AssetType.image;
+      case 2:
+        return AssetType.video;
+      default:
+        return AssetType.other;
+    }
+  }
 
   int typeInt;
 

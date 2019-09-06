@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -27,9 +26,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: ListView.builder(
+      body: GridView.builder(
         itemBuilder: _buildItem,
         itemCount: list.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
       ),
     );
   }
@@ -39,22 +39,43 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     return AspectRatio(
       aspectRatio: 1,
       child: FutureBuilder<Uint8List>(
-        future: Plugin().getThumb(id: item.id),
+        future: Plugin().getThumb(id: item.id, width: 130, height: 130),
+        // future: Plugin().getOriginBytes(item.id),
         builder: (context, snapshot) {
+          Widget w;
           if (snapshot.hasError) {
-            return Text("error");
+            w = Text("error");
           }
           if (snapshot.hasData) {
-            return Image.memory(snapshot.data);
+            w = Image.memory(snapshot.data);
+          } else {
+            w = Text("no data");
           }
-          return Text("no data");
+
+          return Stack(
+            children: <Widget>[
+              w,
+              Align(
+                alignment: Alignment.topRight,
+                child: Container(
+                  width: 80,
+                  height: 20,
+                  child: Text(item.typeInt.toString()),
+                ),
+              ),
+            ],
+          );
         },
       ),
     );
   }
 
   void initData() async {
-    final list = await Plugin().getAssetWithGalleryIdPaged(path.id);
+    final list = await Plugin().getAssetWithGalleryIdPaged(
+      path.id,
+      page: 0,
+      pageCount: 100,
+    );
     this.list.addAll(list);
     setState(() {});
   }

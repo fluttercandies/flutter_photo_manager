@@ -1,4 +1,4 @@
-package top.kikt.imagescanner.old.thumb;
+package top.kikt.imagescanner.thumb;
 
 import android.graphics.drawable.Drawable;
 
