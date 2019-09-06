@@ -111,6 +111,7 @@
 				97C146EF1CF9000F007C117D /* Products */,
 				33579068190E942D6B2AFC18 /* Pods */,
 				7901A83E9CCDBDDD8124859C /* Frameworks */,
+				17FCBA57F27268F535E9A094 /* PMAssetEntity.m */,
 			);
 			sourceTree = "<group>";
 		};

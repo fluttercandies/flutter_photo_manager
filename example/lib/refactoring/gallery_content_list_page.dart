@@ -29,13 +29,15 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       body: GridView.builder(
         itemBuilder: _buildItem,
         itemCount: list.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
+        gridDelegate:
+            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
       ),
     );
   }
 
   Widget _buildItem(BuildContext context, int index) {
     final item = list[index];
+    print(item.id);
     return AspectRatio(
       aspectRatio: 1,
       child: FutureBuilder<Uint8List>(
@@ -71,12 +73,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   }
 
   void initData() async {
-    final list = await Plugin().getAssetWithGalleryIdPaged(
-      path.id,
-      page: 0,
-      pageCount: 100,
-      type: path.typeInt,
-    );
+    final list = await path.getAssetListPaged(1, 5);
+
+    print(list.length);
+
     this.list.addAll(list);
     setState(() {});
   }

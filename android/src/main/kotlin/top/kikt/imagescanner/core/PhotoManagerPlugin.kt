@@ -88,6 +88,10 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                 LogUtils.isLog = call.arguments()
                 true
             }
+            "openSetting" -> {
+                permissionsUtils.getAppDetailSettingIntent(registrar.activity())
+                true
+            }
             else -> false
         }
 
