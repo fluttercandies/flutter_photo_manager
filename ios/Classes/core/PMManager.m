@@ -73,7 +73,10 @@
                 entityWithId:collection.localIdentifier
                         name:collection.localizedTitle
                   assetCount:(int) fetchResult.count];
-        [array addObject:entity];
+
+        if (entity.assetCount && entity.assetCount > 0) {
+            [array addObject:entity];
+        }
     }
 }
 
@@ -106,6 +109,10 @@
     options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
 
     PHFetchResult<PHAsset *> *assetArray = [PHAsset fetchAssetsInAssetCollection:collection options:options];
+
+    if (assetArray.count == 0) {
+        return result;
+    }
 
     NSUInteger startIndex = page * pageCount;
     NSUInteger endIndex = startIndex + pageCount - 1;

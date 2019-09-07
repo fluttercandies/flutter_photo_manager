@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_scanner_example/refactoring/image_list_page.dart';
 import 'package:photo_manager/photo_manager.dart';
-
-import 'gallery_content_list_page.dart';
 
 class GalleryListPage extends StatefulWidget {
   final List<AssetPathEntity> galleryList;

@@ -36,7 +36,9 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("${path.name}"),
+      ),
       body: GridView.builder(
         itemBuilder: _buildItem,
         itemCount: list.length,
@@ -48,7 +50,6 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
 
   Widget _buildItem(BuildContext context, int index) {
     final item = list[index];
-    print(item.id);
     return AspectRatio(
       aspectRatio: 1,
       child: FutureBuilder<Uint8List>(
@@ -82,8 +83,6 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
 
   void initData() async {
     final list = await path.getAssetListPaged(0, 1000);
-
-    print(list.length);
 
     this.list.addAll(list);
     setState(() {});

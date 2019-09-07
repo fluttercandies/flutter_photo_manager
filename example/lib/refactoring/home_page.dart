@@ -52,8 +52,6 @@ class _NewHomePageState extends State<NewHomePage> {
   _scanGalleryList() async {
     var galleryList = await plugin.getAllGalleryList(type: type);
 
-    print(galleryList.length);
-
     galleryList.sort((s1, s2) {
       return s2.assetCount.compareTo(s1.assetCount);
     });

@@ -17,7 +17,7 @@ class PhotoManager {
   ///
   /// 获取相册"文件夹" 列表
   ///
-  /// [hasAll] contains all path
+  /// [hasAll] contains all path, such as "C"
   /// [hasAll] 包含所有文件
   ///
   /// [hasVideo] contains video

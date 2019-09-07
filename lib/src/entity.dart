@@ -129,7 +129,6 @@ class AssetEntity {
 
   /// create time of asset
   DateTime get createDateTime {
-    print(createTime);
     return DateTime.fromMillisecondsSinceEpoch(createTime ?? 0);
   }
 
