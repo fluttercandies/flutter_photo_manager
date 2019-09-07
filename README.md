@@ -67,7 +67,7 @@ List<AssetPathEntity> list = await PhotoManager.getVideoAsset();
 
 3. get asset list from imagePath
 
-paging:
+paged:
 
 ```dart
 // page: The page number of the page, starting at 0.
@@ -75,7 +75,7 @@ paging:
 final assetList = await path.getAssetListPaged(page, perPage);
 ```
 
-The old version, it is not recommended for continued use, because there may be performance issues on some phones.
+The old version, it is not recommended for continued use, because there may be performance issues on some phones. Now the internal implementation of this method is also paged, but the paged count is assetCount of AssetPathEntity.
 
 Old version:
 
