@@ -73,7 +73,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   }
 
   void initData() async {
-    final list = await path.getAssetListPaged(1, 5);
+    final list = await path.getAssetListPaged(0, 1000);
 
     print(list.length);
 

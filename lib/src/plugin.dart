@@ -39,7 +39,6 @@ class Plugin {
     int pageCount = 15,
     int type = 0,
   }) async {
-    print("type = $type");
     final result = await _channel.invokeMethod("getAssetWithGalleryId", {
       "id": id,
       "page": page,

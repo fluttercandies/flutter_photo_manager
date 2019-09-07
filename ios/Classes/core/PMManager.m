@@ -38,15 +38,19 @@
 - (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type {
     NSMutableArray <PMAssetPathEntity *> *array = [NSMutableArray new];
 
-    // type:
-    // 0: all , 1: image, 2:video
-
+    PHFetchOptions *fetchCollectionOptions = [PHFetchOptions new];
     PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection
             fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
                                   subtype:PHAssetCollectionSubtypeSmartAlbumUserLibrary
-                                  options:[PHFetchOptions new]];
+                                  options:fetchCollectionOptions];
+
+    PHFetchResult<PHCollection *> *topLevelResult = [PHAssetCollection fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
 
     PHFetchOptions *options = [PHFetchOptions new];
+
+    // type:
+    // 0: all , 1: image, 2:video
+
     if (type == 1) {
         options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeImage];
     } else if (type == 2) {
@@ -55,6 +59,13 @@
         options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d OR mediaType == %d", PHAssetMediaTypeImage, PHAssetMediaTypeVideo];
     }
 
+    [self injectAssetPathIntoArray:array result:result options:options];
+    [self injectAssetPathIntoArray:array result:topLevelResult options:options];
+
+    return array;
+}
+
+- (void)injectAssetPathIntoArray:(NSMutableArray<PMAssetPathEntity *> *)array result:(PHFetchResult<PHAssetCollection *> *)result options:(PHFetchOptions *)options {
     for (PHAssetCollection *collection in result) {
         PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:options];
 
@@ -64,8 +75,6 @@
                   assetCount:(int) fetchResult.count];
         [array addObject:entity];
     }
-
-    return array;
 }
 
 - (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id
