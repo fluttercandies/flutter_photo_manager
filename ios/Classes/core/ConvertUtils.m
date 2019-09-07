@@ -17,6 +17,7 @@
                 @"id": entity.id,
                 @"name": entity.name,
                 @"length": @(entity.assetCount),
+                @"isAll": @(entity.isAll),
         };
 
         [data addObject:item];

@@ -35,6 +35,8 @@ class AssetPathEntity {
   /// This is a field used internally by the library.
   int typeInt = 0;
 
+  bool isAll = false;
+
   AssetPathEntity({this.id, this.name});
 
   /// the image entity list with pagination

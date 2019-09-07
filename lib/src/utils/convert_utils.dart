@@ -11,6 +11,7 @@ class ConvertUtils {
         ..id = item["id"]
         ..name = item["name"]
         ..typeInt = type
+        ..isAll = item["isAll"]
         ..assetCount = item["length"];
 
       result.add(entity);

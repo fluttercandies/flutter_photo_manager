@@ -59,13 +59,13 @@
         options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d OR mediaType == %d", PHAssetMediaTypeImage, PHAssetMediaTypeVideo];
     }
 
-    [self injectAssetPathIntoArray:array result:result options:options];
-    [self injectAssetPathIntoArray:array result:topLevelResult options:options];
+    [self injectAssetPathIntoArray:array result:result options:options isAll:YES];
+    [self injectAssetPathIntoArray:array result:topLevelResult options:options isAll:NO];
 
     return array;
 }
 
-- (void)injectAssetPathIntoArray:(NSMutableArray<PMAssetPathEntity *> *)array result:(PHFetchResult<PHAssetCollection *> *)result options:(PHFetchOptions *)options {
+- (void)injectAssetPathIntoArray:(NSMutableArray<PMAssetPathEntity *> *)array result:(PHFetchResult<PHAssetCollection *> *)result options:(PHFetchOptions *)options isAll:(BOOL)isAll {
     for (PHAssetCollection *collection in result) {
         PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:options];
 
@@ -73,6 +73,8 @@
                 entityWithId:collection.localIdentifier
                         name:collection.localizedTitle
                   assetCount:(int) fetchResult.count];
+
+        entity.isAll = isAll;
 
         if (entity.assetCount && entity.assetCount > 0) {
             [array addObject:entity];

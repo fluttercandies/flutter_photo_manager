@@ -31,7 +31,8 @@ class _GalleryListPageState extends State<GalleryListPage> {
     final item = widget.galleryList[index];
     return ListTile(
       title: Text(item.name),
-      subtitle: Text("count: ${item.assetCount}"),
+      subtitle: Text("count : ${item.assetCount}"),
+      trailing: Text("isAll : ${item.isAll}"),
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => GalleryContentListPage(
