@@ -16,7 +16,9 @@ class _GalleryListPageState extends State<GalleryListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("Gallery list"),
+      ),
       body: Container(
         child: ListView.builder(
           itemBuilder: _buildItem,
@@ -32,12 +34,12 @@ class _GalleryListPageState extends State<GalleryListPage> {
       title: Text(item.name),
       subtitle: Text("count: ${item.assetCount}"),
       onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => GalleryContentListPage(
-                    path: item,
-                  ),
-            ),
+        MaterialPageRoute(
+          builder: (_) => GalleryContentListPage(
+            path: item,
           ),
+        ),
+      ),
     );
   }
 }

@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
@@ -13,6 +15,15 @@ class GalleryContentListPage extends StatefulWidget {
 
 class _GalleryContentListPageState extends State<GalleryContentListPage> {
   AssetPathEntity get path => widget.path;
+
+  static Widget _loadWidget = Center(
+    child: SizedBox.fromSize(
+      size: Size.square(30),
+      child: Platform.isIOS
+          ? CupertinoActivityIndicator()
+          : CircularProgressIndicator(),
+    ),
+  );
 
   List<AssetEntity> list = [];
 
@@ -46,27 +57,24 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
         builder: (context, snapshot) {
           Widget w;
           if (snapshot.hasError) {
-            w = Text("error");
+            w = Center(
+              child: Text("load error"),
+            );
           }
           if (snapshot.hasData) {
-            w = Image.memory(snapshot.data);
+            w = FittedBox(
+              fit: BoxFit.cover,
+              child: Image.memory(
+                snapshot.data,
+              ),
+            );
           } else {
-            w = Text("no data");
+            w = Center(
+              child: _loadWidget,
+            );
           }
 
-          return Stack(
-            children: <Widget>[
-              w,
-              Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                  width: 80,
-                  height: 20,
-                  child: Text(item.typeInt.toString()),
-                ),
-              ),
-            ],
-          );
+          return w;
         },
       ),
     );

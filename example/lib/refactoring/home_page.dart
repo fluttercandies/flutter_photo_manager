@@ -17,21 +17,32 @@ class _NewHomePageState extends State<NewHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("photo manager example"),
+      ),
       body: Column(
         children: <Widget>[
-          buildButton("scan", _scanGalleryList),
-          DropdownButton<int>(
-            items: <DropdownMenuItem<int>>[
-              _buildDropdownMenuItem(0),
-              _buildDropdownMenuItem(1),
-              _buildDropdownMenuItem(2),
+          buildButton("Get all gallery list", _scanGalleryList),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text("scan type"),
+              Container(
+                width: 10,
+              ),
+              DropdownButton<int>(
+                items: <DropdownMenuItem<int>>[
+                  _buildDropdownMenuItem(0),
+                  _buildDropdownMenuItem(1),
+                  _buildDropdownMenuItem(2),
+                ],
+                onChanged: (v) {
+                  this.type = v;
+                  setState(() {});
+                },
+                value: type,
+              ),
             ],
-            onChanged: (v) {
-              this.type = v;
-              setState(() {});
-            },
-            value: type,
           ),
         ],
       ),
@@ -57,8 +68,17 @@ class _NewHomePageState extends State<NewHomePage> {
   }
 
   DropdownMenuItem<int> _buildDropdownMenuItem(int i) {
+    String typeText;
+    if (i == 2) {
+      typeText = "video";
+    } else if (i == 1) {
+      typeText = "image";
+    } else {
+      typeText = "all";
+    }
+
     return DropdownMenuItem<int>(
-      child: Text(i.toString()),
+      child: Text(typeText),
       value: i,
     );
   }
