@@ -21,6 +21,8 @@ class AssetPathEntity {
 
   RequestType _type;
 
+  /// The value used internally by the user.
+  /// Used to indicate the value that should be available inside the path.
   RequestType get type => _type;
 
   set type(RequestType type) {
@@ -28,6 +30,9 @@ class AssetPathEntity {
     typeInt = type.index;
   }
 
+  /// Users should not edit this value.
+  ///
+  /// This is a field used internally by the library.
   int typeInt = 0;
 
   AssetPathEntity({this.id, this.name});
@@ -70,7 +75,7 @@ class AssetPathEntity {
 class AssetEntity {
   /// in android is full path
   ///
-  /// in ios is asset id
+  /// in ios is local id
   String id;
 
   /// see [id]
@@ -90,11 +95,20 @@ class AssetEntity {
     }
   }
 
+  /// Asset type int value.
+  ///
+  /// see [type]
   int typeInt;
 
+  /// Duration of video, unit is second.
+  ///
+  /// If [type] is [AssetType.image], then it's value is 0.
   int duration;
 
+  /// width of asset.
   int width;
+
+  /// height of asset.
   int height;
 
   /// if you need upload file ,then you can use the file, nullable.
