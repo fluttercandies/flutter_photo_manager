@@ -14,7 +14,8 @@ object ConvertUtils {
             val element = mapOf(
                     "id" to entity.id,
                     "name" to entity.name,
-                    "length" to entity.length
+                    "length" to entity.length,
+                    "isAll" to entity.isAll
             )
             data.add(element)
         }

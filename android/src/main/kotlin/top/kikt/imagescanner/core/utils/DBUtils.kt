@@ -14,7 +14,7 @@ import top.kikt.imagescanner.core.entity.GalleryEntity
 /// create 2019-09-05 by cai
 object DBUtils {
 
-    val cacheContainer = CacheContainer()
+    private val cacheContainer = CacheContainer()
 
     private const val TAG = "DBUtils"
 
@@ -109,11 +109,15 @@ object DBUtils {
 
     @SuppressLint("Recycle")
     fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int = 0): List<AssetEntity> {
+        val isAll = galleryId.isEmpty()
+
         val list = ArrayList<AssetEntity>()
         val uri = allUri
 
         val args = ArrayList<String>()
-        args.add(galleryId)
+        if (!isAll) {
+            args.add(galleryId)
+        }
         val typeSelection: String
 
         when (requestType) {
@@ -132,7 +136,11 @@ object DBUtils {
             }
         }
         val keys = (storeImageKeys + storeVideoKeys + typeKeys).distinct().toTypedArray()
-        val selection = "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection"
+        val selection = if (isAll) {
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection"
+        } else {
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection"
+        }
         val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET ${page * pageSize}"
         val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
                 ?: return emptyList()

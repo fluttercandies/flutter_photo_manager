@@ -13,12 +13,28 @@ import java.io.File
 
 class PhotoManager(private val context: Context) {
 
+    companion object {
+        const val ALL_ID = "isAll"
+    }
+
     fun getGalleryList(type: Int): List<GalleryEntity> {
-        return DBUtils.getGalleryList(context, type)
+        val fromDb = DBUtils.getGalleryList(context, type)
+
+        // make is all to the gallery list
+        val entity = fromDb.run {
+            var count = 0
+            for (item in this) {
+                count += item.length
+            }
+            GalleryEntity(ALL_ID, "Recent", count, type, true)
+        }
+
+        return listOf(entity) + fromDb
     }
 
     fun getAssetList(galleryId: String, page: Int, pageCount: Int, typeInt: Int = 0): List<AssetEntity> {
-        return DBUtils.getAssetFromGalleryId(context, galleryId, page, pageCount, typeInt)
+        val gId = if (galleryId == ALL_ID) "" else galleryId
+        return DBUtils.getAssetFromGalleryId(context, gId, page, pageCount, typeInt)
     }
 
     fun getThumb(id: String, width: Int, height: Int, resultHandler: ResultHandler) {
