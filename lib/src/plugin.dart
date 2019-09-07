@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
@@ -61,10 +62,17 @@ class Plugin {
     });
   }
 
-  Future<Uint8List> getOriginBytes(String id) {
-    return _channel.invokeMethod("getOrigin", {
-      "id": id,
-    });
+  Future<Uint8List> getOriginBytes(String id) async {
+    final path = await getFullFile(id, isOrigin: true);
+    if (path == null) {
+      return null;
+    }
+    final file = File(path);
+    if (!file.existsSync()) {
+      return null;
+    } else {
+      return Uint8List.fromList(file.readAsBytesSync());
+    }
   }
 
   Future<void> releaseCache() async {
@@ -72,6 +80,15 @@ class Plugin {
   }
 
   Future<String> getFullFile(String id, {bool isOrigin}) async {
+    if (Platform.isAndroid) {
+      final file = File(id);
+      if (file.existsSync()) {
+        return id;
+      } else {
+        return null;
+      }
+    }
+
     return _channel
         .invokeMethod("getFullFile", {"id": id, "isOrigin": isOrigin});
   }

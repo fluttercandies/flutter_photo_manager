@@ -81,7 +81,7 @@
 
         [manager getThumbWithId:id width:width height:height resultHandler:handler];
 
-    } else if ([call.method isEqualToString:@"getOrigin"]) {
+    } else if ([call.method isEqualToString:@"getFullFile"]) {
 
         NSString *id = call.arguments[@"id"];
         BOOL isOrigin = [call.arguments[@"isOrigin"] boolValue];

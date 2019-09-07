@@ -44,6 +44,9 @@ class AssetPathEntity {
   Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) =>
       PhotoManager._getAssetListPaged(this, page, pageSize);
 
+  Future<List<AssetEntity>> get assetList =>
+      PhotoManager._getAssetListPaged(this, 0, assetCount);
+
   @override
   bool operator ==(other) {
     if (other is! AssetPathEntity) {
@@ -94,7 +97,7 @@ class AssetEntity {
   int width;
   int height;
 
-  /// if you need upload file ,then you can use the file
+  /// if you need upload file ,then you can use the file, nullable.
   Future<File> get file async => PhotoManager._getFileWithId(this.id);
 
   /// This contains all the EXIF information, but in contrast, `Image` widget may not be able to display pictures.
@@ -115,14 +118,10 @@ class AssetEntity {
   }
 
   /// if not video ,duration is null
-  Future<Duration> get videoDuration async {
-    return Duration(seconds: duration);
-  }
+  Duration get videoDuration => Duration(seconds: duration);
 
   /// nullable, if the manager is null.
-  Future<Size> get size async {
-    return Size(width.toDouble(), height.toDouble());
-  }
+  Size get size => Size(width.toDouble(), height.toDouble());
 
   /// unix timestamp of asset, milliseconds
   int createTime;

@@ -33,6 +33,14 @@ class PhotoManager {
     return _plugin.getAllGalleryList(type: type.index);
   }
 
+  static Future<List<AssetPathEntity>> getImageAsset() {
+    return getAssetPathList(type: RequestType.image);
+  }
+
+  static Future<List<AssetPathEntity>> getVideoAsset() {
+    return getAssetPathList(type: RequestType.video);
+  }
+
   static Future<void> setLog(bool isLog) {
     return _plugin.setLog(isLog);
   }
@@ -131,7 +139,7 @@ class PhotoManager {
     return true;
   }
 
-  static Future<AssetEntity> _createAssetEntityWithId(String id) async{
+  static Future<AssetEntity> _createAssetEntityWithId(String id) async {
     return AssetEntity(id: id);
   }
 }
