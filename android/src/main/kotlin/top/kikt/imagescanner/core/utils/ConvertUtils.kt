@@ -17,7 +17,10 @@ object ConvertUtils {
                     "length" to entity.length,
                     "isAll" to entity.isAll
             )
-            data.add(element)
+
+            if (entity.length > 0) {
+                data.add(element)
+            }
         }
 
         return mapOf(
