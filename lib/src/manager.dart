@@ -97,11 +97,11 @@ class PhotoManager {
   static _NotifyManager _notifyManager = _NotifyManager();
 
   /// see [_NotifyManager]
-  static void addChangeCallback(VoidCallback callback) =>
+  static void addChangeCallback(ValueChanged<MethodCall> callback) =>
       _notifyManager.addCallback(callback);
 
   /// see [_NotifyManager]
-  static void removeChangeCallback(VoidCallback callback) =>
+  static void removeChangeCallback(ValueChanged<MethodCall> callback) =>
       _notifyManager.removeCallback(callback);
 
   /// see [_NotifyManager]

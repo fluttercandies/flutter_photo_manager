@@ -8,13 +8,15 @@ class _NotifyManager {
       const MethodChannel("top.kikt/photo_manager/notify");
 
   /// callbacks
-  var notifyCallback = <VoidCallback>[];
+  var notifyCallback = <ValueChanged<MethodCall>>[];
 
   /// add callback
-  void addCallback(VoidCallback callback) => notifyCallback.add(callback);
+  void addCallback(ValueChanged<MethodCall> callback) =>
+      notifyCallback.add(callback);
 
   /// remove callback
-  void removeCallback(VoidCallback callback) => notifyCallback.remove(callback);
+  void removeCallback(ValueChanged<MethodCall> callback) =>
+      notifyCallback.remove(callback);
 
   /// start handle notify
   void startHandleNotify() {
@@ -36,7 +38,7 @@ class _NotifyManager {
     return 1;
   }
 
-  Future<dynamic> _onChange(MethodCall call) async {
-    notifyCallback.forEach((callback) => callback?.call());
+  Future<dynamic> _onChange(MethodCall methodCall) async {
+    notifyCallback.forEach((callback) => callback?.call(methodCall));
   }
 }
