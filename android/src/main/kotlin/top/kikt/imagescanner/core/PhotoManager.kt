@@ -17,8 +17,8 @@ class PhotoManager(private val context: Context) {
         const val ALL_ID = "isAll"
     }
 
-    fun getGalleryList(type: Int): List<GalleryEntity> {
-        val fromDb = DBUtils.getGalleryList(context, type)
+    fun getGalleryList(type: Int, timeStamp: Long): List<GalleryEntity> {
+        val fromDb = DBUtils.getGalleryList(context, type, timeStamp)
 
         // make is all to the gallery list
         val entity = fromDb.run {
@@ -32,9 +32,9 @@ class PhotoManager(private val context: Context) {
         return listOf(entity) + fromDb
     }
 
-    fun getAssetList(galleryId: String, page: Int, pageCount: Int, typeInt: Int = 0): List<AssetEntity> {
+    fun getAssetList(galleryId: String, page: Int, pageCount: Int, typeInt: Int = 0, timeStamp: Long): List<AssetEntity> {
         val gId = if (galleryId == ALL_ID) "" else galleryId
-        return DBUtils.getAssetFromGalleryId(context, gId, page, pageCount, typeInt)
+        return DBUtils.getAssetFromGalleryId(context, gId, page, pageCount, typeInt, timeStamp)
     }
 
     fun getThumb(id: String, width: Int, height: Int, resultHandler: ResultHandler) {
@@ -60,6 +60,25 @@ class PhotoManager(private val context: Context) {
 
     fun clearCache() {
         DBUtils.clearCache()
+    }
+
+    fun getPathEntity(id: String, type: Int, timestamp: Long): GalleryEntity? {
+        if (id == ALL_ID) {
+            val allGalleryList = DBUtils.getGalleryList(context, type, timestamp)
+            return if (allGalleryList.isEmpty()) {
+                null
+            } else {
+                // make is all to the gallery list
+                allGalleryList.run {
+                    var count = 0
+                    for (item in this) {
+                        count += item.length
+                    }
+                    GalleryEntity(ALL_ID, "Recent", count, type, true)
+                }
+            }
+        }
+        return DBUtils.getGalleryEntity(context, id, type, timestamp)
     }
 
 }

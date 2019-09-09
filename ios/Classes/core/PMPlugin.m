@@ -59,7 +59,9 @@
     if ([call.method isEqualToString:@"getGalleryList"]) {
 
         int type = [call.arguments[@"type"] intValue];
-        NSArray<PMAssetPathEntity *> *array = [manager getGalleryList:type];
+        unsigned long timestamp = [self getTimestamp:call];
+        NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
+        NSArray<PMAssetPathEntity *> *array = [manager getGalleryList:type date:date];
         NSDictionary *dictionary = [ConvertUtils convertPathToMap:array];
         [handler reply:dictionary];
 
@@ -69,7 +71,10 @@
         int type = [call.arguments[@"type"] intValue];
         NSUInteger page = [call.arguments[@"page"] unsignedIntValue];
         NSUInteger pageCount = [call.arguments[@"pageCount"] unsignedIntValue];
-        NSArray<PMAssetEntity *> *array = [manager getAssetEntityListWithGalleryId:id type:type page:page pageCount:pageCount];
+        unsigned long timestamp = [self getTimestamp:call];
+        NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
+
+        NSArray<PMAssetEntity *> *array = [manager getAssetEntityListWithGalleryId:id type:type page:page pageCount:pageCount date:date];
         NSDictionary *dictionary = [ConvertUtils convertAssetToMap:array];
         [handler reply:dictionary];
 
@@ -96,9 +101,29 @@
 
         PMLogUtils.sharedInstance.isLog = (BOOL) call.arguments;
 
-    } else if ([call.method isEqualToString:@"openSetting"]) {
+    } else if ([call.method isEqualToString:@"fetchPathProperties"]) {
 
+        NSString *id = call.arguments[@"id"];
+        int requestType = [call.arguments[@"type"] intValue];
+        unsigned long timestamp = [call.arguments[@"timestamp"] unsignedLongValue];
+        NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
+
+        PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id type:requestType date:date];
+        if (pathEntity) {
+            NSDictionary *dictionary = [ConvertUtils convertPathToMap:@[pathEntity]];
+            [handler reply:dictionary];
+        } else {
+            [handler reply:nil];
+        }
+
+    } else if ([call.method isEqualToString:@"openSetting"]) {
+        [PMManager openSetting];
     }
+}
+
+- (unsigned long)getTimestamp:(FlutterMethodCall *)call {
+    unsigned long timestamp = [call.arguments[@"timestamp"] unsignedLongValue];
+    return timestamp;
 }
 
 @end

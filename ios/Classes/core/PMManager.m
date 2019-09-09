@@ -35,7 +35,7 @@
     __isAuth = auth;
 }
 
-- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type {
+- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type date:(NSDate *)date {
     NSMutableArray <PMAssetPathEntity *> *array = [NSMutableArray new];
 
     PHFetchOptions *fetchCollectionOptions = [PHFetchOptions new];
@@ -46,32 +46,32 @@
 
     PHFetchResult<PHCollection *> *topLevelResult = [PHAssetCollection fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
 
-    PHFetchOptions *options = [PHFetchOptions new];
+    PHFetchOptions *assetOptions = [self getAssetOptions:type date:date];
 
-    // type:
-    // 0: all , 1: image, 2:video
-
-    if (type == 1) {
-        options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeImage];
-    } else if (type == 2) {
-        options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeVideo];
-    } else {
-        options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d OR mediaType == %d", PHAssetMediaTypeImage, PHAssetMediaTypeVideo];
-    }
-
-    [self injectAssetPathIntoArray:array result:result options:options isAll:YES];
-    [self injectAssetPathIntoArray:array result:topLevelResult options:options isAll:NO];
+    [self injectAssetPathIntoArray:array result:result options:assetOptions isAll:YES];
+    [self injectAssetPathIntoArray:array result:topLevelResult options:assetOptions isAll:NO];
 
     return array;
 }
 
-- (void)injectAssetPathIntoArray:(NSMutableArray<PMAssetPathEntity *> *)array result:(PHFetchResult<PHAssetCollection *> *)result options:(PHFetchOptions *)options isAll:(BOOL)isAll {
-    for (PHAssetCollection *collection in result) {
-        PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:options];
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCDFAInspection"
+
+- (void)injectAssetPathIntoArray:(NSMutableArray<PMAssetPathEntity *> *)array
+                          result:(PHFetchResult *)result options:(PHFetchOptions *)options
+                           isAll:(BOOL)isAll {
+    for (id collection in result) {
+        if (![collection isMemberOfClass:[PHAssetCollection class]]) {
+            return;
+        }
+
+        PHAssetCollection *assetCollection = (PHAssetCollection *) collection;
+
+        PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
 
         PMAssetPathEntity *entity = [PMAssetPathEntity
-                entityWithId:collection.localIdentifier
-                        name:collection.localizedTitle
+                entityWithId:assetCollection.localIdentifier
+                        name:assetCollection.localizedTitle
                   assetCount:(int) fetchResult.count];
 
         entity.isAll = isAll;
@@ -82,10 +82,10 @@
     }
 }
 
-- (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id
-                                                         type:(int)type
-                                                         page:(NSUInteger)page
-                                                    pageCount:(NSUInteger)pageCount {
+#pragma clang diagnostic pop
+
+- (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id type:(int)type page:(NSUInteger)page
+                                                    pageCount:(NSUInteger)pageCount date:(NSDate *)date {
     NSMutableArray<PMAssetEntity *> *result = [NSMutableArray new];
 
     PHFetchOptions *options = [PHFetchOptions new];
@@ -95,22 +95,13 @@
         return result;
     }
 
-    // type:
-    // 0: all , 1: image, 2:video
-
-    if (type == 1) {
-        options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeImage];
-    } else if (type == 2) {
-        options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeVideo];
-    } else {
-        options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d OR mediaType == %d", PHAssetMediaTypeImage, PHAssetMediaTypeVideo];
-    }
+    PHFetchOptions *assetOptions = [self getAssetOptions:type date:date];
 
     PHAssetCollection *collection = fetchResult.firstObject;
 
     options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
 
-    PHFetchResult<PHAsset *> *assetArray = [PHAsset fetchAssetsInAssetCollection:collection options:options];
+    PHFetchResult<PHAsset *> *assetArray = [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
 
     if (assetArray.count == 0) {
         return result;
@@ -149,8 +140,11 @@
     long createDt = (long) (date.timeIntervalSince1970 / 1000);
 
     PMAssetEntity *entity = [PMAssetEntity entityWithId:asset.localIdentifier
-                                               createDt:createDt width:asset.pixelWidth
-                                                 height:asset.pixelHeight duration:(long) asset.duration type:type];
+                                               createDt:createDt
+                                                  width:asset.pixelWidth
+                                                 height:asset.pixelHeight
+                                               duration:(long) asset.duration
+                                                   type:type];
     entity.phAsset = asset;
     return entity;
 }
@@ -311,6 +305,43 @@
 
 + (BOOL)isDownloadFinish:(NSDictionary *)info {
     return ![info[PHImageCancelledKey] boolValue] && !info[PHImageErrorKey] && ![info[PHImageResultIsDegradedKey] boolValue];
+}
+
+- (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type date:(NSDate *)date {
+    PHFetchOptions *collectionFetchOptions = [PHFetchOptions new];
+    PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[id] options:collectionFetchOptions];
+
+    if (result == nil || result.count == 0) {
+        return nil;
+    }
+    PHAssetCollection *collection = result[0];
+    PHFetchOptions *assetOptions = [self getAssetOptions:type date:date];
+    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
+
+    return [PMAssetPathEntity entityWithId:id name:collection.localizedTitle assetCount:fetchResult.count];
+}
+
+- (PHFetchOptions *)getAssetOptions:(int)type date:(NSDate *)date {
+    PHFetchOptions *options = [PHFetchOptions new];
+
+    if (type == 1) {
+        options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d AND creationDate <= %@", PHAssetMediaTypeImage, date];
+    } else if (type == 2) {
+        options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d AND creationDate <= %@", PHAssetMediaTypeVideo, date];
+    } else {
+        options.predicate = [NSPredicate predicateWithFormat:@"(mediaType == %d OR mediaType == %d) AND creationDate <= %@", PHAssetMediaTypeImage, PHAssetMediaTypeVideo, date];
+    }
+
+    return options;
+}
+
++ (void)openSetting {
+    NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:^(BOOL success) {
+
+        }];
+    }
 }
 
 @end

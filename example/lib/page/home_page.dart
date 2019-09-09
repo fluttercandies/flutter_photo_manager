@@ -14,6 +14,8 @@ class _NewHomePageState extends State<NewHomePage> {
 
   int type = 0;
 
+  DateTime dt = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,13 +46,17 @@ class _NewHomePageState extends State<NewHomePage> {
               ),
             ],
           ),
+          _buildFecthDtPicker(),
         ],
       ),
     );
   }
 
   _scanGalleryList() async {
-    var galleryList = await plugin.getAllGalleryList(type: type);
+    var galleryList = await plugin.getAllGalleryList(
+      type: type,
+      dt: this.dt,
+    );
 
     galleryList.sort((s1, s2) {
       return s2.assetCount.compareTo(s1.assetCount);
@@ -79,6 +85,22 @@ class _NewHomePageState extends State<NewHomePage> {
       child: Text(typeText),
       value: i,
     );
+  }
+
+  Widget _buildFecthDtPicker() {
+    return buildButton("$dt", () async {
+      final pickDt = await showDatePicker(
+        context: context,
+        firstDate: DateTime(2018, 1, 1),
+        initialDate: dt,
+        lastDate: DateTime.now(),
+      );
+      if (pickDt != null) {
+        setState(() {
+          this.dt = pickDt;
+        });
+      }
+    });
   }
 }
 

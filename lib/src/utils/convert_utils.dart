@@ -1,7 +1,11 @@
 import 'package:photo_manager/photo_manager.dart';
 
 class ConvertUtils {
-  static List<AssetPathEntity> convertPath(Map data, {int type = 0}) {
+  static List<AssetPathEntity> convertPath(
+    Map data, {
+    int type = 0,
+    DateTime dt,
+  }) {
     List<AssetPathEntity> result = [];
 
     List list = data["data"];
@@ -12,6 +16,7 @@ class ConvertUtils {
         ..name = item["name"]
         ..typeInt = type
         ..isAll = item["isAll"]
+        ..fetchDatetime = dt
         ..assetCount = item["length"];
 
       result.add(entity);

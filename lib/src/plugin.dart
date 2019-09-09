@@ -11,6 +11,10 @@ class Plugin {
   static const MethodChannel _channel =
       const MethodChannel('top.kikt/photo_manager');
 
+  static DateTime _createDefaultFetchDatetime() {
+    return DateTime.now();
+  }
+
   static Plugin _plugin;
 
   factory Plugin() {
@@ -21,13 +25,20 @@ class Plugin {
   Plugin._();
 
   /// [type] 0 : all , 1: image ,2 video
-  Future<List<AssetPathEntity>> getAllGalleryList({int type = 0}) async {
-    final result =
-        await _channel.invokeMethod("getGalleryList", {"type": type});
+  Future<List<AssetPathEntity>> getAllGalleryList({
+    int type = 0,
+    DateTime dt,
+  }) async {
+    dt ??= _createDefaultFetchDatetime();
+
+    final result = await _channel.invokeMethod("getGalleryList", {
+      "type": type,
+      "timestamp": dt.millisecondsSinceEpoch,
+    });
     if (result == null) {
       return [];
     }
-    return ConvertUtils.convertPath(result, type: type);
+    return ConvertUtils.convertPath(result, type: type, dt: dt);
   }
 
   Future<bool> requestPermission() async {
@@ -39,12 +50,16 @@ class Plugin {
     int page = 0,
     int pageCount = 15,
     int type = 0,
+    DateTime pagedDt,
   }) async {
+    pagedDt ??= _createDefaultFetchDatetime();
+
     final result = await _channel.invokeMethod("getAssetWithGalleryId", {
       "id": id,
       "page": page,
       "pageCount": pageCount,
       "type": type,
+      "timestamp": pagedDt.millisecondsSinceEpoch,
     });
 
     return ConvertUtils.convertAssetEntity(result);
@@ -99,5 +114,18 @@ class Plugin {
 
   void openSetting() {
     _channel.invokeMethod("openSetting");
+  }
+
+  Future<Map> fetchPathProperties(
+      String id, int type, DateTime datetime) async {
+    datetime ??= _createDefaultFetchDatetime();
+    return _channel.invokeMethod(
+      "fetchPathProperties",
+      {
+        "id": id,
+        "timestamp": datetime.millisecondsSinceEpoch,
+        "type": type,
+      },
+    );
   }
 }

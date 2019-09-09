@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/services.dart';
+import 'package:photo_manager/src/utils/convert_utils.dart';
 
 import 'src/plugin.dart';
 

@@ -69,7 +69,7 @@ object DBUtils {
     }
 
     @SuppressLint("Recycle")
-    fun getGalleryList(context: Context, requestType: Int = 0): List<GalleryEntity> {
+    fun getGalleryList(context: Context, requestType: Int = 0, timeStamp: Long): List<GalleryEntity> {
         val list = ArrayList<GalleryEntity>()
         val uri = allUri
         val projection = storeBucketKeys + arrayOf("count(1)")
@@ -78,6 +78,47 @@ object DBUtils {
         val typeSelection: String
 
         when (requestType) {
+            1 -> {
+                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
+                args.add(MEDIA_TYPE_IMAGE.toString())
+
+            }
+            2 -> {
+                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
+                args.add(MEDIA_TYPE_VIDEO.toString())
+            }
+            else -> {
+                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} in (?,?)"
+                args.add(MEDIA_TYPE_IMAGE.toString())
+                args.add(MEDIA_TYPE_VIDEO.toString())
+            }
+        }
+
+        val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
+        args.add(timeStamp.toString())
+
+        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
+        val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
+                ?: return emptyList()
+        while (cursor.moveToNext()) {
+            val id = cursor.getString(0)
+            val name = cursor.getString(1)
+            val count = cursor.getInt(2)
+            list.add(GalleryEntity(id, name, count, 0))
+        }
+
+        cursor.close()
+        return list
+    }
+
+    fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long): GalleryEntity? {
+        val uri = allUri
+        val projection = storeBucketKeys + arrayOf("count(1)")
+
+        val args = ArrayList<String>()
+        val typeSelection: String
+
+        when (type) {
             1 -> {
                 typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
                 args.add(MEDIA_TYPE_IMAGE.toString())
@@ -93,22 +134,33 @@ object DBUtils {
             }
         }
 
-        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
-        val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
-                ?: return emptyList()
-        while (cursor.moveToNext()) {
+        val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
+        args.add(timeStamp.toString())
+
+        val idSelection: String
+        if (galleryId == "") {
+            idSelection = ""
+        } else {
+            idSelection = "AND ${MediaStore.Images.Media.BUCKET_ID} = ?"
+            args.add(galleryId)
+        }
+
+        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
+        val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null) ?: return null
+        return if (cursor.moveToNext()) {
             val id = cursor.getString(0)
             val name = cursor.getString(1)
             val count = cursor.getInt(2)
-            list.add(GalleryEntity(id, name, count, 0))
+            cursor.close()
+            GalleryEntity(id, name, count, 0)
+        } else {
+            cursor.close()
+            null
         }
-
-        cursor.close()
-        return list
     }
 
     @SuppressLint("Recycle")
-    fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int = 0): List<AssetEntity> {
+    fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int = 0, timeStamp: Long): List<AssetEntity> {
         val isAll = galleryId.isEmpty()
 
         val list = ArrayList<AssetEntity>()
@@ -135,12 +187,17 @@ object DBUtils {
                 args.add(MEDIA_TYPE_VIDEO.toString())
             }
         }
+
+        val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
+        args.add(timeStamp.toString())
+
         val keys = (storeImageKeys + storeVideoKeys + typeKeys).distinct().toTypedArray()
         val selection = if (isAll) {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection"
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection"
         } else {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection"
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection"
         }
+
         val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET ${page * pageSize}"
         val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
                 ?: return emptyList()

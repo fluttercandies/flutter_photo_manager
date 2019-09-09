@@ -19,6 +19,7 @@ class AssetPathEntity {
   /// gallery asset count
   int assetCount;
 
+  /// path asset type.
   RequestType _type;
 
   /// The value used internally by the user.
@@ -35,9 +36,23 @@ class AssetPathEntity {
   /// This is a field used internally by the library.
   int typeInt = 0;
 
+  /// This path is the path that contains all the assets.
   bool isAll = false;
 
+  /// The timestamp of the path, when the request page number is 0, reset it to the current time. When other page numbers are passed directly.
+  DateTime fetchDatetime;
+
   AssetPathEntity({this.id, this.name});
+
+  Future<void> refreshPathProperties({DateTime dt}) async {
+    dt ??= DateTime.now();
+    final result = await PhotoManager.fetchPathProperties(this, dt);
+    if (result != null) {
+      this.assetCount = result.assetCount;
+      this.fetchDatetime = result.fetchDatetime;
+      this.name = result.name;
+    }
+  }
 
   /// the image entity list with pagination
   ///
@@ -48,11 +63,12 @@ class AssetPathEntity {
   ///
   /// [pageSize] is item count of page.
   ///
-  Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) =>
-      PhotoManager._getAssetListPaged(this, page, pageSize);
+  Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) {
+    return PhotoManager._getAssetListPaged(this, page, pageSize, fetchDatetime);
+  }
 
-  Future<List<AssetEntity>> get assetList =>
-      PhotoManager._getAssetListPaged(this, 0, assetCount);
+  /// all of asset, It is recommended to use the latest api (pagination) [getAssetListPaged].
+  Future<List<AssetEntity>> get assetList => getAssetListPaged(0, assetCount);
 
   @override
   bool operator ==(other) {

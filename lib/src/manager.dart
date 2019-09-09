@@ -52,12 +52,16 @@ class PhotoManager {
   }
 
   static Future<List<AssetEntity>> _getAssetListPaged(
-      AssetPathEntity assetPathEntity, int page, int pageCount) async {
+      AssetPathEntity assetPathEntity,
+      int page,
+      int pageCount,
+      DateTime pagedDt) async {
     return _plugin.getAssetWithGalleryIdPaged(
       assetPathEntity.id,
       page: page,
       pageCount: pageCount,
       type: assetPathEntity.typeInt,
+      pagedDt: pagedDt,
     );
   }
 
@@ -141,5 +145,23 @@ class PhotoManager {
 
   static Future<AssetEntity> _createAssetEntityWithId(String id) async {
     return AssetEntity(id: id);
+  }
+
+  static Future<AssetPathEntity> fetchPathProperties(
+    AssetPathEntity entity,
+    DateTime time,
+  ) async {
+    var result =
+        await _plugin.fetchPathProperties(entity.id, entity.typeInt, time);
+    if (result == null) {
+      return null;
+    }
+    var list = result["data"];
+    if (list is List && list.isNotEmpty) {
+      return ConvertUtils.convertPath(result,
+          dt: time, type: entity.typeInt)[0];
+    } else {
+      return null;
+    }
   }
 }

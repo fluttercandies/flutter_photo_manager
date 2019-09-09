@@ -26,16 +26,16 @@
 
 @property(nonatomic, copy) NSString *id;
 @property(nonatomic, assign) long createDt;
-@property(nonatomic, assign) int width;
-@property(nonatomic, assign) int height;
+@property(nonatomic, assign) NSUInteger width;
+@property(nonatomic, assign) NSUInteger height;
 @property(nonatomic, assign) long duration;
 @property(nonatomic, assign) int type;
 @property(nonatomic, strong) PHAsset *phAsset;
 
-- (instancetype)initWithId:(NSString *)id createDt:(long)createDt width:(int)width height:(int)height
+- (instancetype)initWithId:(NSString *)id createDt:(long)createDt width:(NSUInteger)width height:(NSUInteger)height
                   duration:(long)duration type:(int)type;
 
-+ (instancetype)entityWithId:(NSString *)id createDt:(long)createDt width:(int)width height:(int)height
++ (instancetype)entityWithId:(NSString *)id createDt:(long)createDt width:(NSUInteger)width height:(NSUInteger)height
                     duration:(long)duration type:(int)type;
 
 

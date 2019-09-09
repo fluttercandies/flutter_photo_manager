@@ -12,12 +12,14 @@
 
 - (BOOL)isAuth;
 
++ (void)openSetting;
+
 - (void)setAuth:(BOOL)auth;
 
-- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type;
+- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type date:(NSDate *)date;
 
 - (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id type:(int)type page:(NSUInteger)page
-                                                    pageCount:(NSUInteger)pageCount;
+                                                    pageCount:(NSUInteger)pageCount date:(NSDate *)date;
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)assetId;
 
@@ -27,4 +29,6 @@
          resultHandler:(ResultHandler *)handler;
 
 - (void)getFullSizeFileWithId:(NSString *)id resultHandler:(ResultHandler *)handler;
+
+- (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type date:(NSDate *)date;
 @end

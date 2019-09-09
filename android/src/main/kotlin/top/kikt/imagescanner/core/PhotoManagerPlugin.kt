@@ -55,31 +55,6 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
         val resultHandler = ResultHandler(result)
 
         val handleResult = when (call.method) {
-            "getAssetWithGalleryId" -> {
-                runOnBackground {
-                    val id = call.argument<String>("id") as String
-                    val page = call.argument<Int>("page") as Int
-                    val pageCount = call.argument<Int>("pageCount") as Int
-                    val type = call.argument<Int>("type") as Int
-                    val list = photoManager.getAssetList(id, page, pageCount, type)
-                    resultHandler.reply(ConvertUtils.convertToAssetResult(list))
-                }
-                true
-            }
-            "getThumb" -> {
-                val id = call.argument<String>("id") as String
-                val width = call.argument<Int>("width") as Int
-                val height = call.argument<Int>("height") as Int
-                photoManager.getThumb(id, width, height, resultHandler)
-                true
-            }
-            "getOrigin" -> {
-                runOnBackground {
-                    val id = call.argument<String>("id") as String
-                    photoManager.getOriginBytes(id, resultHandler)
-                }
-                true
-            }
             "releaseMemCache" -> {
                 photoManager.clearCache()
                 true
@@ -92,6 +67,7 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                 permissionsUtils.getAppDetailSettingIntent(registrar.activity())
                 true
             }
+
             else -> false
         }
 
@@ -117,9 +93,48 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                         "requestPermission" -> resultHandler.reply(1)
                         "getGalleryList" -> {
                             runOnBackground {
-                                val type = call.argument<Int>("type") as Int
-                                val list = photoManager.getGalleryList(type)
+                                val type = call.argument<Int>("type")!!
+                                val timeStamp = call.getTimeStamp()
+                                val list = photoManager.getGalleryList(type, timeStamp)
                                 resultHandler.reply(ConvertUtils.convertToGalleryResult(list))
+                            }
+                        }
+                        "getAssetWithGalleryId" -> {
+                            runOnBackground {
+                                val id = call.argument<String>("id") as String
+                                val page = call.argument<Int>("page") as Int
+                                val pageCount = call.argument<Int>("pageCount") as Int
+                                val type = call.argument<Int>("type") as Int
+                                val timeStamp = call.getTimeStamp()
+
+                                val list = photoManager.getAssetList(id, page, pageCount, type, timeStamp)
+                                resultHandler.reply(ConvertUtils.convertToAssetResult(list))
+                            }
+                        }
+                        "getThumb" -> {
+                            val id = call.argument<String>("id") as String
+                            val width = call.argument<Int>("width") as Int
+                            val height = call.argument<Int>("height") as Int
+                            photoManager.getThumb(id, width, height, resultHandler)
+                        }
+                        "getOrigin" -> {
+                            runOnBackground {
+                                val id = call.argument<String>("id") as String
+                                photoManager.getOriginBytes(id, resultHandler)
+                            }
+                        }
+                        "fetchPathProperties" -> {
+                            runOnBackground {
+                                val id = call.argument<String>("id")!!
+                                val type = call.argument<Int>("type")!!
+                                val timestamp = call.getTimeStamp()
+                                val pathEntity = photoManager.getPathEntity(id, type, timestamp)
+                                if (pathEntity != null) {
+                                    val mapResult = ConvertUtils.convertToGalleryResult(listOf(pathEntity))
+                                    resultHandler.reply(mapResult)
+                                } else {
+                                    resultHandler.reply(null)
+                                }
                             }
                         }
                         else -> resultHandler.notImplemented()
@@ -128,5 +143,9 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
             }
         }.getPermissions(registrar.activity(), 3001, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
+    }
+
+    fun MethodCall.getTimeStamp(): Long {
+        return this.argument<Long>("timestamp")!!
     }
 }
