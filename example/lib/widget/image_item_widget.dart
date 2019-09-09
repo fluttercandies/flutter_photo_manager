@@ -26,7 +26,12 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
     Widget image;
 
     if (u8List != null) {
-      image = Image.memory(u8List);
+      return Image.memory(
+        u8List,
+        width: size.toDouble(),
+        height: size.toDouble(),
+        fit: BoxFit.cover,
+      );
     } else {
       image = FutureBuilder<Uint8List>(
         future: Plugin().getThumb(id: item.id, width: size, height: size),
@@ -57,10 +62,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
       );
     }
 
-    return AspectRatio(
-      aspectRatio: 1,
-      child: image,
-    );
+    return image;
   }
 
   @override
