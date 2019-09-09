@@ -19,6 +19,12 @@ class _NewHomePageState extends State<NewHomePage> {
   var hasAll = true;
 
   @override
+  void initState() {
+    super.initState();
+    PhotoManager.addChangeCallback(onChange);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -56,6 +62,7 @@ class _NewHomePageState extends State<NewHomePage> {
             mainAxisSize: MainAxisSize.min,
           ),
           _buildHasAllCheck(),
+          buildNotifyButton(),
         ],
       ),
     );
@@ -136,6 +143,23 @@ class _NewHomePageState extends State<NewHomePage> {
         this.dt = DateTime.now();
       });
     });
+  }
+
+  bool notifying = false;
+
+  Widget buildNotifyButton() {
+    return buildButton("onChanged", () {
+      notifying = !notifying;
+      if (notifying) {
+        PhotoManager.startChangeNotify();
+      } else {
+        PhotoManager.stopChangeNotify();
+      }
+    });
+  }
+
+  void onChange(call){
+    
   }
 }
 
