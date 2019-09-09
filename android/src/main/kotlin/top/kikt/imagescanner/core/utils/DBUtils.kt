@@ -12,6 +12,7 @@ import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.GalleryEntity
 
 /// create 2019-09-05 by cai
+/// Call the MediaStore API and get entity for the data.
 object DBUtils {
 
     private val cacheContainer = CacheContainer()

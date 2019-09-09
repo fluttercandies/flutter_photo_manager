@@ -9,8 +9,7 @@ import top.kikt.imagescanner.thumb.ThumbnailUtil
 import java.io.File
 
 /// create 2019-09-05 by cai
-
-
+/// Do some business logic assembly
 class PhotoManager(private val context: Context) {
 
     companion object {
