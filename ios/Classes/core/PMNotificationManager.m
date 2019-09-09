@@ -46,37 +46,43 @@
 #pragma "photo library notify"
 
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
-//    PHObjectChangeDetails *details = [changeInstance changeDetailsForObject:[PHObject new]];
-//    PHObject *object = details.objectAfterChanges;
-//
-//    if ([object isMemberOfClass:[PHAssetCollection class]]) {
-//        PHAssetCollection *collection = (PHAssetCollection *) object;
-//        [self onAssetCollectionChanged:collection];
-//    } else if ([object isMemberOfClass:[PHAsset class]]) {
-//        PHAsset *asset = (PHAsset *) object;
-//        [self onAssetChanged:asset];
-//    } else if ([object isMemberOfClass:[PHCollectionList class]]) {
-//        PHCollectionList *collectionList = (PHCollectionList *) object;
-//        [self onCollectionListChanged:collectionList];
-//    }
+    PHObjectChangeDetails *details = [changeInstance changeDetailsForObject:[PHObject new]];
+    PHObject *object = details.objectAfterChanges;
 
-    [channel invokeMethod:@"channel" arguments:@1];
+    if ([object isMemberOfClass:[PHAssetCollection class]]) {
+        PHAssetCollection *collection = (PHAssetCollection *) object;
+        [self onAssetCollectionChanged:collection];
+    } else if ([object isMemberOfClass:[PHAsset class]]) {
+        PHAsset *asset = (PHAsset *) object;
+        [self onAssetChanged:asset];
+    } else if ([object isMemberOfClass:[PHCollectionList class]]) {
+        PHCollectionList *collectionList = (PHCollectionList *) object;
+        [self onCollectionListChanged:collectionList];
+    }
 }
 
 - (void)onAssetChanged:(PHAsset *)asset {
-    [channel invokeMethod:@"asset" arguments:[ConvertUtils convertPHAssetToMap:asset]];
+    [channel invokeMethod:@"change" arguments:
+            @{
+                    @"ios-asset": [ConvertUtils convertPHAssetToMap:asset]
+            }
+    ];
 }
 
 - (void)onAssetCollectionChanged:(PHAssetCollection *)collection {
-    [channel invokeMethod:@"path" arguments:@{
-            @"id": collection.localIdentifier,
-    }];
+    [channel invokeMethod:@"change" arguments:
+            @{
+                    @"ios-collection": @{@"id": collection.localIdentifier,}
+            }
+    ];
 }
 
 - (void)onCollectionListChanged:(PHCollectionList *)list {
-    [channel invokeMethod:@"path" arguments:@{
-            @"id": list.localIdentifier,
-    }];
+    [channel invokeMethod:@"change" arguments:
+            @{
+                    @"ios-collectionList": @{@"id": list.localIdentifier,}
+            }
+    ];
 }
 
 - (BOOL)isNotifying {

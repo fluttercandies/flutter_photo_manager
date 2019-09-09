@@ -1,6 +1,7 @@
 package top.kikt.imagescanner.core
 
 import android.database.ContentObserver
+import android.net.Uri
 import android.os.Handler
 import android.provider.MediaStore
 import io.flutter.plugin.common.MethodChannel
@@ -38,22 +39,24 @@ class PhotoManagerNotifyChannel(val registry: PluginRegistry.Registrar, handler:
         context.contentResolver.unregisterContentObserver(videoObserver)
     }
 
-    fun onOuterChange() {
-        methodChannel.invokeMethod("change", 1)
+    fun onOuterChange(selfChange: Boolean, uri: Uri?) {
+        methodChannel.invokeMethod("change", mapOf(
+                "android-self" to selfChange,
+                "android-uri" to uri.toString()
+        ))
     }
 
     inner class VideoObserver(handler: Handler) : ContentObserver(handler) {
-
-        override fun onChange(selfChange: Boolean) {
-            super.onChange(selfChange)
-            onOuterChange()
+        override fun onChange(selfChange: Boolean, uri: Uri?) {
+            super.onChange(selfChange, uri)
+            onOuterChange(selfChange, uri)
         }
     }
 
     inner class ImageObserver(handler: Handler) : ContentObserver(handler) {
-        override fun onChange(selfChange: Boolean) {
-            super.onChange(selfChange)
-            onOuterChange()
+        override fun onChange(selfChange: Boolean, uri: Uri?) {
+            super.onChange(selfChange, uri)
+            onOuterChange(selfChange, uri)
         }
     }
 }
