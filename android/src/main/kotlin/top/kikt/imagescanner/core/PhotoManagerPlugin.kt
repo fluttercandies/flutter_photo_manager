@@ -1,6 +1,7 @@
 package top.kikt.imagescanner.core
 
 import android.Manifest
+import android.os.Handler
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
@@ -34,6 +35,7 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
     }
 
     private val permissionsUtils = PermissionsUtils()
+    private val notifyChannel = PhotoManagerNotifyChannel(registrar, Handler())
 
     init {
         registrar.addRequestPermissionsResultListener { i, strings, ints ->
@@ -135,6 +137,16 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                                     resultHandler.reply(mapResult)
                                 } else {
                                     resultHandler.reply(null)
+                                }
+                            }
+                        }
+                        "notify" -> {
+                            runOnBackground {
+                                val notify = call.argument<Boolean>("notify")
+                                if (notify == true) {
+                                    notifyChannel.startNotify()
+                                } else {
+                                    notifyChannel.stopNotify()
                                 }
                             }
                         }

@@ -2,6 +2,7 @@
 // Created by Caijinglong on 2019-09-06.
 //
 
+#import <Photos/Photos.h>
 #import "ConvertUtils.h"
 #import "PMAssetPathEntity.h"
 
@@ -45,4 +46,16 @@
 
     return @{@"data": data};
 }
+
++ (NSDictionary *)convertPHAssetToMap:(PHAsset *)asset {
+    int createDt = (int) (asset.creationDate.timeIntervalSince1970 / 1000);
+    return @{
+            @"id": asset.localIdentifier,
+            @"createDt": @(createDt),
+            @"width": @(asset.pixelWidth),
+            @"height": @(asset.pixelHeight),
+            @"duration": @((long) asset.duration),
+    };
+}
+
 @end

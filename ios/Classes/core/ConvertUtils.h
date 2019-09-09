@@ -13,4 +13,6 @@
 + (NSDictionary *)convertPathToMap:(NSArray <PMAssetPathEntity *> *)array;
 
 + (NSDictionary *)convertAssetToMap:(NSArray<PMAssetEntity *> *)array;
+
++ (NSDictionary *)convertPHAssetToMap:(PHAsset *)asset;
 @end

@@ -130,4 +130,10 @@ class Plugin {
       },
     );
   }
+
+  void notifyChange({bool start}) {
+    _channel.invokeMethod("notify", {
+      "notify": start,
+    });
+  }
 }

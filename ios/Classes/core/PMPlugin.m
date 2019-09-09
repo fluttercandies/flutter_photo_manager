@@ -9,18 +9,26 @@
 #import "ConvertUtils.h"
 #import "PMAssetPathEntity.h"
 #import "PMLogUtils.h"
+#import "PMNotificationManager.h"
 
 
 @implementation PMPlugin {
+    PMNotificationManager *_notificationManager;
 }
 
 - (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar {
+    [self nitNotificationManager:registrar];
+
     FlutterMethodChannel *channel = [FlutterMethodChannel methodChannelWithName:@"top.kikt/photo_manager" binaryMessenger:[registrar messenger]];
     PMPlugin *plugin = [PMPlugin new];
     [plugin setManager:[PMManager new]];
     [channel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
         [plugin onMethodCall:call result:result];
     }];
+}
+
+- (void)nitNotificationManager:(NSObject <FlutterPluginRegistrar> *)registrar {
+    _notificationManager = [PMNotificationManager managerWithRegistrar:registrar];
 }
 
 - (void)onMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
@@ -119,6 +127,16 @@
 
     } else if ([call.method isEqualToString:@"openSetting"]) {
         [PMManager openSetting];
+    } else if ([call.method isEqualToString:@"notify"]) {
+        BOOL notify = [call.arguments[@"notify"] boolValue];
+        if (notify) {
+            [_notificationManager startNotify];
+        } else {
+            [_notificationManager stopNotify];
+        }
+
+    } else if ([call.method isEqualToString:@"isNotifying"]) {
+        [handler reply:[_notificationManager isNotifying]];
     }
 }
 

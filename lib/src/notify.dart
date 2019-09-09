@@ -19,10 +19,12 @@ class _NotifyManager {
   /// start handle notify
   void startHandleNotify() {
     _channel.setMethodCallHandler(_notify);
+    _plugin.notifyChange(start: true);
   }
 
   /// stop handle notify
   void stopHandleNotify() {
+    _plugin.notifyChange(start: false);
     _channel.setMethodCallHandler(null);
   }
 
