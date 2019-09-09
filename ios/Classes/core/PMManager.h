@@ -16,7 +16,7 @@
 
 - (void)setAuth:(BOOL)auth;
 
-- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type date:(NSDate *)date;
+- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type date:(NSDate *)date hasAll:(BOOL)hasAll;
 
 - (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id type:(int)type page:(NSUInteger)page
                                                     pageCount:(NSUInteger)pageCount date:(NSDate *)date;

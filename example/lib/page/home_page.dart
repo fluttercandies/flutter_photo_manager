@@ -16,6 +16,8 @@ class _NewHomePageState extends State<NewHomePage> {
 
   DateTime dt = DateTime.now();
 
+  var hasAll = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,16 +48,24 @@ class _NewHomePageState extends State<NewHomePage> {
               ),
             ],
           ),
-          _buildFecthDtPicker(),
+          Row(
+            children: <Widget>[
+              _buildFecthDtPicker(),
+              _buildDateToNow(),
+            ],
+            mainAxisSize: MainAxisSize.min,
+          ),
+          _buildHasAllCheck(),
         ],
       ),
     );
   }
 
   _scanGalleryList() async {
-    var galleryList = await plugin.getAllGalleryList(
-      type: type,
-      dt: this.dt,
+    var galleryList = await PhotoManager.getAssetPathList(
+      fetchDateTime: this.dt,
+      type: RequestType.values[type],
+      hasAll: hasAll,
     );
 
     galleryList.sort((s1, s2) {
@@ -88,7 +98,9 @@ class _NewHomePageState extends State<NewHomePage> {
   }
 
   Widget _buildFecthDtPicker() {
-    return buildButton("$dt", () async {
+    return buildButton(
+        "${dt.year}-${dt.month}-${dt.day} ${dt.hour}:${dt.minute}:${dt.second}",
+        () async {
       final pickDt = await showDatePicker(
         context: context,
         firstDate: DateTime(2018, 1, 1),
@@ -100,6 +112,29 @@ class _NewHomePageState extends State<NewHomePage> {
           this.dt = pickDt;
         });
       }
+    });
+  }
+
+  Widget _buildHasAllCheck() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 80),
+      child: CheckboxListTile(
+        value: hasAll,
+        onChanged: (value) {
+          setState(() {
+            hasAll = value;
+          });
+        },
+        title: Text("hasAll"),
+      ),
+    );
+  }
+
+  Widget _buildDateToNow() {
+    return buildButton("Date to now", () {
+      setState(() {
+        this.dt = DateTime.now();
+      });
     });
   }
 }

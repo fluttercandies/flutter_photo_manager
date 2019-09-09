@@ -3,6 +3,8 @@ part of '../photo_manager.dart';
 Plugin _plugin = Plugin();
 
 /// use the class method to help user load asset list and asset info.
+///
+/// 这个类可以获取
 class PhotoManager {
   static const MethodChannel _channel = const MethodChannel('image_scanner');
 
@@ -17,20 +19,18 @@ class PhotoManager {
   ///
   /// 获取相册"文件夹" 列表
   ///
-  /// [hasAll] contains all path, such as "C"
-  /// [hasAll] 包含所有文件
-  ///
-  /// [hasVideo] contains video
-  /// [hasVideo] 包含视频
-  ///
-  /// [isCache] getCache pathList
-  /// [isCache] 获取缓存的列表
-  ///
+  /// [hasAll] contains all path, such as "Camera Roll" on ios or "Recent" on android.
+  /// [hasAll] 包含所有项目的相册
   static Future<List<AssetPathEntity>> getAssetPathList({
     bool hasAll = true,
     RequestType type,
+    DateTime fetchDateTime,
   }) async {
-    return _plugin.getAllGalleryList(type: type.index);
+    return _plugin.getAllGalleryList(
+      type: type.index,
+      dt: fetchDateTime,
+      hasAll: hasAll,
+    );
   }
 
   static Future<List<AssetPathEntity>> getImageAsset() {

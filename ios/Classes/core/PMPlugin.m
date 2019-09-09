@@ -60,8 +60,9 @@
 
         int type = [call.arguments[@"type"] intValue];
         unsigned long timestamp = [self getTimestamp:call];
+        BOOL hasAll = [call.arguments[@"hasAll"] boolValue];
         NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
-        NSArray<PMAssetPathEntity *> *array = [manager getGalleryList:type date:date];
+        NSArray<PMAssetPathEntity *> *array = [manager getGalleryList:type date:date hasAll:hasAll];
         NSDictionary *dictionary = [ConvertUtils convertPathToMap:array];
         [handler reply:dictionary];
 

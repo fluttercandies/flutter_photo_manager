@@ -28,12 +28,14 @@ class Plugin {
   Future<List<AssetPathEntity>> getAllGalleryList({
     int type = 0,
     DateTime dt,
+    bool hasAll = true,
   }) async {
     dt ??= _createDefaultFetchDatetime();
 
     final result = await _channel.invokeMethod("getGalleryList", {
       "type": type,
       "timestamp": dt.millisecondsSinceEpoch,
+      "hasAll": hasAll,
     });
     if (result == null) {
       return [];

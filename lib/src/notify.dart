@@ -2,10 +2,10 @@ part of '../photo_manager.dart';
 
 /// manage photo changes
 ///
-/// 管理照片的类
+/// 当相册发生变化时, 通知
 class _NotifyManager {
   static const MethodChannel _channel =
-      const MethodChannel("photo_manager/notify");
+      const MethodChannel("top.kikt/photo_manager/notify");
 
   /// callbacks
   var notifyCallback = <VoidCallback>[];

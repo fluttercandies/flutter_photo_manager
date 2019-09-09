@@ -35,20 +35,22 @@
     __isAuth = auth;
 }
 
-- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type date:(NSDate *)date {
+- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type date:(NSDate *)date hasAll:(BOOL)hasAll {
     NSMutableArray <PMAssetPathEntity *> *array = [NSMutableArray new];
-
-    PHFetchOptions *fetchCollectionOptions = [PHFetchOptions new];
-    PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection
-            fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
-                                  subtype:PHAssetCollectionSubtypeSmartAlbumUserLibrary
-                                  options:fetchCollectionOptions];
-
-    PHFetchResult<PHCollection *> *topLevelResult = [PHAssetCollection fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
 
     PHFetchOptions *assetOptions = [self getAssetOptions:type date:date];
 
-    [self injectAssetPathIntoArray:array result:result options:assetOptions isAll:YES];
+    PHFetchOptions *fetchCollectionOptions = [PHFetchOptions new];
+
+    if (hasAll) {
+        PHFetchResult<PHAssetCollection *> *allResult = [PHAssetCollection
+            fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
+                                  subtype:PHAssetCollectionSubtypeSmartAlbumUserLibrary
+                                  options:fetchCollectionOptions];
+        [self injectAssetPathIntoArray:array result:allResult options:assetOptions isAll:YES];
+    }
+
+    PHFetchResult<PHCollection *> *topLevelResult = [PHAssetCollection fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
     [self injectAssetPathIntoArray:array result:topLevelResult options:assetOptions isAll:NO];
 
     return array;

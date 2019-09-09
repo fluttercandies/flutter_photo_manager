@@ -95,7 +95,8 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                             runOnBackground {
                                 val type = call.argument<Int>("type")!!
                                 val timeStamp = call.getTimeStamp()
-                                val list = photoManager.getGalleryList(type, timeStamp)
+                                val hasAll = call.argument<Boolean>("hasAll")!!
+                                val list = photoManager.getGalleryList(type, timeStamp, hasAll)
                                 resultHandler.reply(ConvertUtils.convertToGalleryResult(list))
                             }
                         }

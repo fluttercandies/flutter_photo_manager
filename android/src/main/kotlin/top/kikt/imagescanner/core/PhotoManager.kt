@@ -16,8 +16,12 @@ class PhotoManager(private val context: Context) {
         const val ALL_ID = "isAll"
     }
 
-    fun getGalleryList(type: Int, timeStamp: Long): List<GalleryEntity> {
+    fun getGalleryList(type: Int, timeStamp: Long, hasAll: Boolean): List<GalleryEntity> {
         val fromDb = DBUtils.getGalleryList(context, type, timeStamp)
+
+        if (!hasAll) {
+            return fromDb
+        }
 
         // make is all to the gallery list
         val entity = fromDb.run {
