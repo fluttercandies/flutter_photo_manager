@@ -80,11 +80,11 @@ class _PhotoListState extends State<PhotoList> {
     if (entity.type == AssetType.video) {
       var file = await entity.file;
       var length = file.lengthSync();
-      var size = await entity.size;
+      var size = entity.size;
       print(
           "${entity.id} length = $length , size = $size , dateTime = ${entity.createDateTime}");
     } else {
-      var size = await entity.size;
+      var size = entity.size;
       print("${entity.id} size = $size, dateTime = ${entity.createDateTime}");
     }
 

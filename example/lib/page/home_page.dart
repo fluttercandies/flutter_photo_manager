@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:image_scanner_example/refactoring/gallery_list_page.dart';
+import 'package:image_scanner_example/page/gallery_list_page.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class NewHomePage extends StatefulWidget {

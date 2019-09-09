@@ -1,11 +1,8 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:image_scanner_example/page/paging_page.dart';
-import 'package:image_scanner_example/refactoring/home_page.dart';
-import 'package:photo_manager/photo_manager.dart';
+import 'package:image_scanner_example/page/home_page.dart';
 
-void main() => runApp(MaterialApp(
-      home: NewHomePage(),
-    ));
+void main() => runApp(
+      MaterialApp(
+        home: NewHomePage(),
+      ),
+    );

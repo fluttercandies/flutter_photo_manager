@@ -1,6 +1,9 @@
-import 'dart:typed_data';
+import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_scanner_example/widget/image_item_widget.dart';
+import 'package:image_scanner_example/widget/loading_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class GalleryContentListPage extends StatefulWidget {
@@ -21,19 +24,23 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   @override
   void initState() {
     super.initState();
-    initData();
+    _onRefresh();
   }
 
   @override
   Widget build(BuildContext context) {
     var length = path.assetCount;
 
-    if (list.length < length) {
+    if (list.length == 0) {
+      length = 0;
+    } else if (list.length < length) {
       length = list.length + 1;
     }
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("${path.name}"),
+      ),
       body: RefreshIndicator(
         onRefresh: _onRefresh,
         child: GridView.builder(
@@ -50,74 +57,43 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   Widget _buildItem(BuildContext context, int index) {
     if (list.length == index) {
       onLoadMore();
-      return Center(
-        child: SizedBox.fromSize(
-          size: Size.square(44),
-          child: CircularProgressIndicator(),
-        ),
-      );
+      return loadWidget;
     }
 
-    final item = list[index];
-    return AspectRatio(
-      aspectRatio: 1,
-      child: FutureBuilder<Uint8List>(
-        future: Plugin().getThumb(id: item.id, width: 130, height: 130),
-        // future: Plugin().getOriginBytes(item.id),
-        builder: (context, snapshot) {
-          Widget w;
-          if (snapshot.hasError) {
-            w = Text("error");
-          }
-          if (snapshot.hasData) {
-            w = Image.memory(snapshot.data);
-          } else {
-            w = Text("no data");
-          }
-
-          return Stack(
-            children: <Widget>[
-              w,
-              Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                  width: 80,
-                  height: 20,
-                  child: Text(item.typeInt.toString()),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
+    final entity = list[index];
+    return ImageItemWidget(
+      key: ValueKey(entity),
+      entity: entity,
     );
   }
 
-  void initData() async {
-    final list = await path.getAssetListPaged(0, loadCount);
-
-    print(list.length);
-
-    this.list.addAll(list);
-    setState(() {});
-  }
-
-  final loadCount = 32;
+  final loadCount = 80;
 
   Future<void> onLoadMore() async {
+    if (!mounted) {
+      print("on load more, but it's unmounted");
+      return;
+    }
     print("on load more");
     final list = await path.getAssetListPaged(page + 1, loadCount);
     page = page + 1;
-    this.list.clear();
     this.list.addAll(list);
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _onRefresh() async {
+    if (!mounted) {
+      return;
+    }
     final list = await path.getAssetListPaged(0, loadCount);
     page = 0;
     this.list.clear();
     this.list.addAll(list);
     setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 }
