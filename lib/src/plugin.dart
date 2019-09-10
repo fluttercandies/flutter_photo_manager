@@ -97,17 +97,10 @@ class Plugin {
   }
 
   Future<String> getFullFile(String id, {bool isOrigin}) async {
-    if (Platform.isAndroid) {
-      final file = File(id);
-      if (file.existsSync()) {
-        return id;
-      } else {
-        return null;
-      }
-    }
-
-    return _channel
-        .invokeMethod("getFullFile", {"id": id, "isOrigin": isOrigin});
+    return _channel.invokeMethod("getFullFile", {
+      "id": id,
+      "isOrigin": isOrigin,
+    });
   }
 
   Future<void> setLog(bool isLog) async {

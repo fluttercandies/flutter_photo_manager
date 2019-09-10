@@ -10,5 +10,6 @@ data class AssetEntity(
         val createDt: Long,
         val width: Int,
         val height: Int,
-        val type: Int
+        val type: Int,
+        val mimeType: String
 )

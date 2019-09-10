@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_scanner_example/page/detail_page.dart';
 import 'package:image_scanner_example/widget/image_item_widget.dart';
 import 'package:image_scanner_example/widget/loading_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -10,6 +11,7 @@ class GalleryContentListPage extends StatefulWidget {
   final AssetPathEntity path;
 
   const GalleryContentListPage({Key key, this.path}) : super(key: key);
+
   @override
   _GalleryContentListPageState createState() => _GalleryContentListPageState();
 }
@@ -61,9 +63,21 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     }
 
     final entity = list[index];
-    return ImageItemWidget(
-      key: ValueKey(entity),
-      entity: entity,
+    return GestureDetector(
+      onTap: () async {
+        final f = await entity.file;
+        final page = DetailPage(
+          file: f,
+        );
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (BuildContext context) {
+          return page;
+        }));
+      },
+      child: ImageItemWidget(
+        key: ValueKey(entity),
+        entity: entity,
+      ),
     );
   }
 

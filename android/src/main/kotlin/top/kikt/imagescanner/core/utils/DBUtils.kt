@@ -13,6 +13,7 @@ import top.kikt.imagescanner.core.entity.GalleryEntity
 
 /// create 2019-09-05 by cai
 /// Call the MediaStore API and get entity for the data.
+@Suppress("DEPRECATION")
 object DBUtils {
 
     private val cacheContainer = CacheContainer()
@@ -30,6 +31,7 @@ object DBUtils {
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME, // dir name 目录名字
             MediaStore.Images.Media.WIDTH, // 宽
             MediaStore.Images.Media.HEIGHT, // 高
+            MediaStore.Images.Media.MIME_TYPE, // 高
             MediaStore.Images.Media.DATE_TAKEN //日期
     )
 
@@ -45,6 +47,7 @@ object DBUtils {
             MediaStore.Video.Media.DATE_TAKEN, //日期
             MediaStore.Video.Media.WIDTH, // 宽
             MediaStore.Video.Media.HEIGHT, // 高
+            MediaStore.Video.Media.MIME_TYPE, // 高
             MediaStore.Video.Media.DURATION //时长
     )
 
@@ -60,6 +63,10 @@ object DBUtils {
     private val allUri = MediaStore.Files.getContentUri("external")
     private val imageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     private val videoUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+
+    fun allUri(): Uri {
+        return allUri
+    }
 
     private fun convertTypeToUri(type: Int): Uri {
         return when (type) {
@@ -211,7 +218,8 @@ object DBUtils {
             val duration = if (requestType == 1) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
             val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
             val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
-            val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type))
+            val mimeType = cursor.getString(MediaStore.Images.Media.MIME_TYPE)
+            val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), mimeType)
             list.add(asset)
             cacheContainer.putAsset(asset)
         }
@@ -245,8 +253,9 @@ object DBUtils {
             val duration = if (type == MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
             val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
             val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
-            val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type))
+            val mimeType = cursor.getString(MediaStore.Images.Media.MIME_TYPE)
 
+            val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), mimeType)
             cacheContainer.putAsset(dbAsset)
 
             cursor.close()

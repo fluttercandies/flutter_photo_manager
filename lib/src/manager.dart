@@ -111,9 +111,7 @@ class PhotoManager {
   static void stopChangeNotify() => _notifyManager.stopHandleNotify();
 
   static Future<File> _getFileWithId(String id, {bool isOrigin = false}) async {
-    if (Platform.isAndroid) {
-      return File(id);
-    } else if (Platform.isIOS) {
+    if (Platform.isIOS || Platform.isAndroid) {
       final path = await _plugin.getFullFile(id, isOrigin: isOrigin);
       if (path == null) {
         return null;
