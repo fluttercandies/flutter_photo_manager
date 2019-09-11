@@ -11,8 +11,6 @@ class ImageScannerPlugin(val registrar: Registrar) {
 
         @JvmStatic
         fun registerWith(registrar: Registrar): Unit {
-//            notifyChangeObserver.initWith(registrar)
-
             val newChannel = MethodChannel(registrar.messenger(), "top.kikt/photo_manager")
             newChannel.setMethodCallHandler(PhotoManagerPlugin(registrar))
         }

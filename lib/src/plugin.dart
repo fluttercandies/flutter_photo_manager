@@ -129,4 +129,15 @@ class Plugin {
       "notify": start,
     });
   }
+
+  bool androidQExperimental = false;
+
+  Future<void> setAndroidQExperimental(bool open) async {
+    if (Platform.isAndroid) {
+      await _channel.invokeMethod("androidQExperimental", {
+        "open": open,
+      });
+      androidQExperimental = open;
+    }
+  }
 }

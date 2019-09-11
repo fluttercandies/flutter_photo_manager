@@ -46,6 +46,10 @@ class PhotoManagerNotifyChannel(val registry: PluginRegistry.Registrar, handler:
         ))
     }
 
+    fun setAndroidQExperimental(open: Boolean) {
+        methodChannel.invokeMethod("setAndroidQExperimental", mapOf("open" to open))
+    }
+
     inner class VideoObserver(handler: Handler) : ContentObserver(handler) {
         override fun onChange(selfChange: Boolean, uri: Uri?) {
             super.onChange(selfChange, uri)

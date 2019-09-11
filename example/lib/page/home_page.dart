@@ -63,6 +63,7 @@ class _NewHomePageState extends State<NewHomePage> {
           ),
           _buildHasAllCheck(),
           buildNotifyButton(),
+          buildAndroidQSwitch(),
         ],
       ),
     );
@@ -123,17 +124,14 @@ class _NewHomePageState extends State<NewHomePage> {
   }
 
   Widget _buildHasAllCheck() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 80),
-      child: CheckboxListTile(
-        value: hasAll,
-        onChanged: (value) {
-          setState(() {
-            hasAll = value;
-          });
-        },
-        title: Text("hasAll"),
-      ),
+    return CheckboxListTile(
+      value: hasAll,
+      onChanged: (value) {
+        setState(() {
+          hasAll = value;
+        });
+      },
+      title: Text("hasAll"),
     );
   }
 
@@ -158,8 +156,16 @@ class _NewHomePageState extends State<NewHomePage> {
     });
   }
 
-  void onChange(call){
-    
+  void onChange(call) {}
+
+  Widget buildAndroidQSwitch() {
+    return CheckboxListTile(
+      onChanged: (check) {
+        PhotoManager.setAndroidQExperimental(check);
+        setState(() {});
+      },
+      value: PhotoManager.androidQExperimental,
+    );
   }
 }
 

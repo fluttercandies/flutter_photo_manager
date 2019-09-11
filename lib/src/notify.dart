@@ -34,6 +34,8 @@ class _NotifyManager {
     if (call.method == "change") {
       print(call.arguments);
       _onChange(call);
+    }else if(call.method == "setAndroidQExperimental"){
+      PhotoManager.androidQExperimental = call.arguments["open"];
     }
     return 1;
   }

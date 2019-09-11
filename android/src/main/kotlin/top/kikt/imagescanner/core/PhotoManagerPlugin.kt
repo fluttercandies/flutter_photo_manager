@@ -1,6 +1,7 @@
 package top.kikt.imagescanner.core
 
 import android.Manifest
+import android.os.Build
 import android.os.Handler
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -69,6 +70,12 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                 permissionsUtils.getAppDetailSettingIntent(registrar.activity())
                 true
             }
+            "androidQExperimental" -> {
+                val open = call.argument<Boolean>("open")!!
+                photoManager.androidQExperimental = open
+                resultHandler.reply(1)
+                true
+            }
 
             else -> false
         }
@@ -94,6 +101,10 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                     when (call.method) {
                         "requestPermission" -> resultHandler.reply(1)
                         "getGalleryList" -> {
+                            if (Build.VERSION.SDK_INT >= 29) {
+                                photoManager.androidQExperimental = true
+                                notifyChannel.setAndroidQExperimental(true)
+                            }
                             runOnBackground {
                                 val type = call.argument<Int>("type")!!
                                 val timeStamp = call.getTimeStamp()

@@ -33,7 +33,7 @@ object ConvertUtils {
 
         for (entity in list) {
             val element = mapOf(
-                    "id" to entity.path,
+                    "id" to entity.id,
                     "duration" to entity.duration,
                     "type" to entity.type,
                     "createDt" to entity.duration / 1000,

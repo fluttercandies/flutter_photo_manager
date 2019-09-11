@@ -162,4 +162,12 @@ class PhotoManager {
       return null;
     }
   }
+
+  static bool get androidQExperimental => _plugin.androidQExperimental;
+
+  static set androidQExperimental(bool value)=> _plugin.androidQExperimental = value;
+
+  static Future<void> setAndroidQExperimental(bool open) async {
+    await _plugin.setAndroidQExperimental(open);
+  }
 }

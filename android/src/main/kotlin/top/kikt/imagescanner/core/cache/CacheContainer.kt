@@ -9,7 +9,7 @@ class CacheContainer {
     private val assetMap = HashMap<String, AssetEntity>()
 
     fun putAsset(assetEntity: AssetEntity) {
-        assetMap[assetEntity.path] = assetEntity
+        assetMap[assetEntity.id] = assetEntity
     }
 
     fun getAsset(id: String): AssetEntity? {

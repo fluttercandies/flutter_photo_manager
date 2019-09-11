@@ -2,7 +2,6 @@ package top.kikt.imagescanner.core.utils
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
@@ -10,63 +9,23 @@ import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.GalleryEntity
+import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeBucketKeys
+import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeImageKeys
+import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeVideoKeys
+import top.kikt.imagescanner.core.utils.IDBUtils.Companion.typeKeys
+
 
 /// create 2019-09-05 by cai
 /// Call the MediaStore API and get entity for the data.
 @Suppress("DEPRECATION")
-object DBUtils {
-
-    private val cacheContainer = CacheContainer()
+object DBUtils : IDBUtils {
 
     private const val TAG = "DBUtils"
 
-    private val storeImageKeys = arrayOf(
-            MediaStore.Images.Media.DISPLAY_NAME, // 显示的名字
-            MediaStore.Images.Media.DATA, // 数据
-            MediaStore.Images.Media.LONGITUDE, // 经度
-            MediaStore.Images.Media._ID, // id
-            MediaStore.Images.Media.MINI_THUMB_MAGIC, // id
-            MediaStore.Images.Media.TITLE, // id
-            MediaStore.Images.Media.BUCKET_ID, // dir id 目录
-            MediaStore.Images.Media.BUCKET_DISPLAY_NAME, // dir name 目录名字
-            MediaStore.Images.Media.WIDTH, // 宽
-            MediaStore.Images.Media.HEIGHT, // 高
-            MediaStore.Images.Media.MIME_TYPE, // 高
-            MediaStore.Images.Media.DATE_TAKEN //日期
-    )
-
-    private val storeVideoKeys = arrayOf(
-            MediaStore.Video.Media.DISPLAY_NAME, // 显示的名字
-            MediaStore.Video.Media.DATA, // 数据
-            MediaStore.Video.Media.LONGITUDE, // 经度
-            MediaStore.Video.Media._ID, // id
-            MediaStore.Video.Media.MINI_THUMB_MAGIC, // id
-            MediaStore.Video.Media.TITLE, // id
-            MediaStore.Video.Media.BUCKET_ID, // dir id 目录
-            MediaStore.Video.Media.BUCKET_DISPLAY_NAME, // dir name 目录名字
-            MediaStore.Video.Media.DATE_TAKEN, //日期
-            MediaStore.Video.Media.WIDTH, // 宽
-            MediaStore.Video.Media.HEIGHT, // 高
-            MediaStore.Video.Media.MIME_TYPE, // 高
-            MediaStore.Video.Media.DURATION //时长
-    )
-
-    private val typeKeys = arrayOf(
-            MediaStore.Files.FileColumns.MEDIA_TYPE
-    )
-
-    private val storeBucketKeys = arrayOf(
-            MediaStore.Images.Media.BUCKET_ID,
-            MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
-    )
-
-    private val allUri = MediaStore.Files.getContentUri("external")
     private val imageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     private val videoUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
 
-    fun allUri(): Uri {
-        return allUri
-    }
+    private val cacheContainer = CacheContainer()
 
     private fun convertTypeToUri(type: Int): Uri {
         return when (type) {
@@ -77,7 +36,7 @@ object DBUtils {
     }
 
     @SuppressLint("Recycle")
-    fun getGalleryList(context: Context, requestType: Int = 0, timeStamp: Long): List<GalleryEntity> {
+    override fun getGalleryList(context: Context, requestType: Int, timeStamp: Long): List<GalleryEntity> {
         val list = ArrayList<GalleryEntity>()
         val uri = allUri
         val projection = storeBucketKeys + arrayOf("count(1)")
@@ -119,7 +78,7 @@ object DBUtils {
         return list
     }
 
-    fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long): GalleryEntity? {
+    override fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long): GalleryEntity? {
         val uri = allUri
         val projection = storeBucketKeys + arrayOf("count(1)")
 
@@ -168,7 +127,9 @@ object DBUtils {
     }
 
     @SuppressLint("Recycle")
-    fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int = 0, timeStamp: Long): List<AssetEntity> {
+    override fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int, timeStamp: Long, cacheContainer: CacheContainer?): List<AssetEntity> {
+        val cache = cacheContainer ?: this.cacheContainer
+
         val isAll = galleryId.isEmpty()
 
         val list = ArrayList<AssetEntity>()
@@ -219,9 +180,11 @@ object DBUtils {
             val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
             val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
             val mimeType = cursor.getString(MediaStore.Images.Media.MIME_TYPE)
-            val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), mimeType)
+            val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
+
+            val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), mimeType, displayName)
             list.add(asset)
-            cacheContainer.putAsset(asset)
+            cache.putAsset(asset)
         }
 
         cursor.close()
@@ -230,7 +193,7 @@ object DBUtils {
     }
 
     @SuppressLint("Recycle")
-    fun getAssetEntity(context: Context, id: String): AssetEntity? {
+    override fun getAssetEntity(context: Context, id: String): AssetEntity? {
         val asset = cacheContainer.getAsset(id)
         if (asset != null) {
             return asset
@@ -254,8 +217,9 @@ object DBUtils {
             val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
             val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
             val mimeType = cursor.getString(MediaStore.Images.Media.MIME_TYPE)
+            val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
 
-            val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), mimeType)
+            val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), mimeType, displayName)
             cacheContainer.putAsset(dbAsset)
 
             cursor.close()
@@ -266,27 +230,12 @@ object DBUtils {
         }
     }
 
-    private fun getMediaType(type: Int): Int {
-        return when (type) {
-            MEDIA_TYPE_IMAGE -> 1
-            MEDIA_TYPE_VIDEO -> 2
-            else -> 0
-        }
+    override fun getFilePath(context: Context, id: String): String? {
+        val assetEntity = getAssetEntity(context, id) ?: return null
+        return assetEntity.path
     }
 
-    private fun Cursor.getInt(columnName: String): Int {
-        return getInt(getColumnIndex(columnName))
-    }
-
-    private fun Cursor.getString(columnName: String): String {
-        return getString(getColumnIndex(columnName))
-    }
-
-    private fun Cursor.getLong(columnName: String): Long {
-        return getLong(getColumnIndex(columnName))
-    }
-
-    fun clearCache() {
+    override fun clearCache() {
         cacheContainer.clearCache()
     }
 
