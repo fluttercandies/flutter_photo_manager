@@ -63,7 +63,7 @@ class _NewHomePageState extends State<NewHomePage> {
           ),
           _buildHasAllCheck(),
           buildNotifyButton(),
-          buildAndroidQSwitch(),
+          // buildAndroidQSwitch(),
         ],
       ),
     );
@@ -158,15 +158,15 @@ class _NewHomePageState extends State<NewHomePage> {
 
   void onChange(call) {}
 
-  Widget buildAndroidQSwitch() {
-    return CheckboxListTile(
-      onChanged: (check) {
-        PhotoManager.setAndroidQExperimental(check);
-        setState(() {});
-      },
-      value: PhotoManager.androidQExperimental,
-    );
-  }
+  // Widget buildAndroidQSwitch() {
+  //   return CheckboxListTile(
+  //     onChanged: (check) {
+  //       PhotoManager.setAndroidQExperimental(check);
+  //       setState(() {});
+  //     },
+  //     value: PhotoManager.androidQExperimental,
+  //   );
+  // }
 }
 
 Widget buildButton(String text, Function function) {
