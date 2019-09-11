@@ -2,7 +2,9 @@ package top.kikt.imagescanner.core.utils
 
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
 import android.provider.MediaStore
+import android.provider.MediaStore.VOLUME_EXTERNAL
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.GalleryEntity
@@ -58,7 +60,7 @@ interface IDBUtils {
     }
 
     val allUri
-        get() = MediaStore.Files.getContentUri("external")
+        get() = MediaStore.Files.getContentUri(VOLUME_EXTERNAL)
 
     fun getGalleryList(context: Context, requestType: Int = 0, timeStamp: Long): List<GalleryEntity>
 
@@ -90,5 +92,7 @@ interface IDBUtils {
     fun clearCache()
 
     fun getFilePath(context: Context, id: String): String?
+
+    fun getThumb(context: Context, id: String, width: Int, height: Int): Bitmap?
 
 }

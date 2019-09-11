@@ -2,16 +2,20 @@ package top.kikt.imagescanner.core.utils
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
+import android.util.Size
+import androidx.annotation.RequiresApi
 import top.kikt.imagescanner.core.cache.AndroidQCache
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.GalleryEntity
 
-
 /// create 2019-09-11 by cai
+@RequiresApi(Build.VERSION_CODES.Q)
 object AndroidQDBUtils : IDBUtils {
-
     private val cacheContainer = CacheContainer()
 
     private var androidQCache = AndroidQCache()
@@ -50,7 +54,8 @@ object AndroidQDBUtils : IDBUtils {
 
         val selections = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection"
 
-        val cursor = context.contentResolver.query(allUri, galleryKeys, selections, args.toTypedArray(), null) ?: return list
+        val cursor = context.contentResolver.query(allUri, galleryKeys, selections, args.toTypedArray(), null)
+                ?: return list
 
         val nameMap = HashMap<String, String>()
         val countMap = HashMap<String, Int>()
@@ -83,7 +88,8 @@ object AndroidQDBUtils : IDBUtils {
     }
 
     override fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int, timeStamp: Long, cacheContainer: CacheContainer?): List<AssetEntity> {
-        return DBUtils.getAssetFromGalleryId(context, galleryId, page, pageSize, requestType, timeStamp, cacheContainer ?: this.cacheContainer)
+        return DBUtils.getAssetFromGalleryId(context, galleryId, page, pageSize, requestType, timeStamp, cacheContainer
+                ?: this.cacheContainer)
     }
 
     override fun getAssetEntity(context: Context, id: String): AssetEntity? {
@@ -128,7 +134,8 @@ object AndroidQDBUtils : IDBUtils {
         }
 
         val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection"
-        val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null) ?: return null
+        val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
+                ?: return null
 
         val name: String
         if (cursor.moveToNext()) {
@@ -148,6 +155,12 @@ object AndroidQDBUtils : IDBUtils {
         val assetEntity = getAssetEntity(context, id) ?: return null
         val cacheFile = androidQCache.getCacheFile(context, id, assetEntity.displayName)
         return cacheFile.path
+    }
+
+    override fun getThumb(context: Context, id: String, width: Int, height: Int): Bitmap? {
+        val uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+        val original = MediaStore.setRequireOriginal(uri)
+        return context.contentResolver.loadThumbnail(original, Size(width, height), null)
     }
 
 }

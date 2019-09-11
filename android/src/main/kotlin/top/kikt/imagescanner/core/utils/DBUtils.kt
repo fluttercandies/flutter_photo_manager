@@ -2,6 +2,7 @@ package top.kikt.imagescanner.core.utils
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
@@ -126,6 +127,10 @@ object DBUtils : IDBUtils {
         }
     }
 
+    override fun getThumb(context: Context, id: String, width: Int, height: Int): Bitmap? {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     @SuppressLint("Recycle")
     override fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int, timeStamp: Long, cacheContainer: CacheContainer?): List<AssetEntity> {
         val cache = cacheContainer ?: this.cacheContainer
@@ -201,7 +206,7 @@ object DBUtils : IDBUtils {
 
         val keys = (storeImageKeys + storeVideoKeys).distinct().toTypedArray()
 
-        val selection = "${MediaStore.Files.FileColumns.DATA} = ?"
+        val selection = "${MediaStore.Files.FileColumns._ID} = ?"
 
         val args = arrayOf(id)
 

@@ -1,6 +1,7 @@
 package top.kikt.imagescanner.core
 
 import android.content.Context
+import android.os.Build
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.GalleryEntity
 import top.kikt.imagescanner.core.utils.AndroidQDBUtils
@@ -26,6 +27,9 @@ class PhotoManager(private val context: Context) {
             } else {
                 dbUtils = DBUtils
             }
+        }
+        get() {
+            return Build.VERSION.SDK_INT >= 29
         }
 
     private var dbUtils: IDBUtils = DBUtils
@@ -55,21 +59,19 @@ class PhotoManager(private val context: Context) {
     }
 
     fun getThumb(id: String, width: Int, height: Int, resultHandler: ResultHandler) {
-        val asset = dbUtils.getAssetEntity(context, id)
-        if (asset == null) {
-            resultHandler.replyError("The asset not found!")
-            return
-        }
         if (!androidQExperimental) {
+            val asset = dbUtils.getAssetEntity(context, id)
+            if (asset == null) {
+                resultHandler.replyError("The asset not found!")
+                return
+            }
             ThumbnailUtil.getThumbnailByGlide(context, asset.path, width, height, resultHandler.result)
         } else {
             // need use android Q  MediaStore thumbnail api
-            val filePath = DBUtils.getFilePath(context, id)
-            if (filePath == null) {
-                resultHandler.replyError("The file not found, so thumb can't be decode", null, null)
-                return
+            val bitmap = dbUtils.getThumb(context, id, width, height)
+            ThumbnailUtil.getThumb(context, bitmap, width, height) {
+                resultHandler.reply(it)
             }
-            ThumbnailUtil.getThumbnailByGlide(context, filePath, width, height, resultHandler.result)
         }
     }
 

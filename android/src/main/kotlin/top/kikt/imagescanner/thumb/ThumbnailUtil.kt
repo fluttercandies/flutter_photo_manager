@@ -77,5 +77,23 @@ object ThumbnailUtil {
                 })
     }
 
+    fun getThumb(ctx: Context, bitmap: Bitmap?, width: Int, height: Int, callback: (ByteArray?) -> Unit) {
+        Glide.with(ctx)
+                .asBitmap()
+                .load(bitmap)
+                .into(object : CustomTarget<Bitmap>(width, height) {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        val bos = ByteArrayOutputStream()
+                        resource.compress(Bitmap.CompressFormat.JPEG, 100, bos)
+                        resource.recycle()
+                        callback(bos.toByteArray())
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                        callback(null)
+                    }
+                })
+    }
+
 
 }
