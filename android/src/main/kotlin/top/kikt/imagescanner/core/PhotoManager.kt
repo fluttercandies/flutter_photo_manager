@@ -63,6 +63,7 @@ class PhotoManager(private val context: Context) {
         if (!androidQExperimental) {
             ThumbnailUtil.getThumbnailByGlide(context, asset.path, width, height, resultHandler.result)
         } else {
+            // need use android Q  MediaStore thumbnail api
             val filePath = DBUtils.getFilePath(context, id)
             if (filePath == null) {
                 resultHandler.replyError("The file not found, so thumb can't be decode", null, null)
