@@ -140,4 +140,8 @@ class Plugin {
       androidQExperimental = open;
     }
   }
+
+  Future<void> forceOldApi() async {
+    await _channel.invokeMethod("forceOldApi");
+  }
 }

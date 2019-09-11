@@ -160,6 +160,14 @@ This library has been migrated in version 0.2.2, but it brings a problem. Someti
 
 The complete migration method can be consulted [gitbook](https://caijinglong.gitbooks.io/migrate-flutter-to-androidx/content/).
 
+### Android Q privacy
+
+Now, the android part of the plugin uses api 29 to compile the plugin, so android sdk must contain api 29 (androidQ).
+
+AndroidQ has a new privacy policy, users can't access the original file.
+
+If your compileSdkVersion and targetSdkVersion are both below 28, you can use `PhotoManager.forceOldApi` to force the old api to access the album. If you are not sure about this part, don't call this method.
+
 ### glide
 
 Android native use glide to create image thumb bytes, version is 4.9.0.

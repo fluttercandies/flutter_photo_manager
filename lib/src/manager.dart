@@ -163,6 +163,10 @@ class PhotoManager {
     }
   }
 
+  static Future<void> forceOldApi() async{
+    await _plugin.forceOldApi();
+  }
+
   // static bool get androidQExperimental => _plugin.androidQExperimental;
 
   // static set androidQExperimental(bool value)=> _plugin.androidQExperimental = value;

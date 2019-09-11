@@ -19,20 +19,22 @@ class PhotoManager(private val context: Context) {
         const val ALL_ID = "isAll"
     }
 
+    var useOldApi: Boolean = false
+
     var androidQExperimental: Boolean = false
         set(value) {
             field = value
-            if (value) {
-                dbUtils = AndroidQDBUtils
-            } else {
-                dbUtils = DBUtils
-            }
         }
         get() {
             return Build.VERSION.SDK_INT >= 29
         }
 
-    private var dbUtils: IDBUtils = DBUtils
+    private val dbUtils: IDBUtils
+        get() = if (useOldApi || Build.VERSION.SDK_INT < 29) {
+            DBUtils
+        } else {
+            AndroidQDBUtils
+        }
 
     fun getGalleryList(type: Int, timeStamp: Long, hasAll: Boolean): List<GalleryEntity> {
         val fromDb = dbUtils.getGalleryList(context, type, timeStamp)

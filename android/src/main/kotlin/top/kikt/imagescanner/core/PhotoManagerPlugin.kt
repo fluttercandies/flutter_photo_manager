@@ -76,6 +76,11 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                 resultHandler.reply(1)
                 true
             }
+            "forceOldApi" -> {
+                photoManager.useOldApi = true
+                resultHandler.reply(1)
+                true
+            }
 
             else -> false
         }
