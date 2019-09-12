@@ -29,7 +29,7 @@ class AndroidQCache {
     fun getCacheFile(context: Context, assetId: String, extName: String): File {
         val name = "${assetId}_$extName"
 
-        val targetFile = File(name)
+        val targetFile = File(context.cacheDir, name)
 
         if (targetFile.exists()) {
             return targetFile
@@ -37,8 +37,7 @@ class AndroidQCache {
 
         val contentResolver = context.contentResolver
         val uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, assetId)
-        val originalUri = MediaStore.setRequireOriginal(uri)
-        val inputStream = contentResolver.openInputStream(originalUri)
+        val inputStream = contentResolver.openInputStream(uri)
         val outputStream = FileOutputStream(targetFile)
         outputStream.use {
             inputStream?.copyTo(it)

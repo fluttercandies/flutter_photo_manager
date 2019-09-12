@@ -19,9 +19,7 @@ interface IDBUtils {
         val storeImageKeys = arrayOf(
                 MediaStore.Images.Media.DISPLAY_NAME, // 显示的名字
                 MediaStore.Images.Media.DATA, // 数据
-                MediaStore.Images.Media.LONGITUDE, // 经度
                 MediaStore.Images.Media._ID, // id
-                MediaStore.Images.Media.MINI_THUMB_MAGIC, // id
                 MediaStore.Images.Media.TITLE, // id
                 MediaStore.Images.Media.BUCKET_ID, // dir id 目录
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME, // dir name 目录名字
@@ -34,9 +32,7 @@ interface IDBUtils {
         val storeVideoKeys = arrayOf(
                 MediaStore.Video.Media.DISPLAY_NAME, // 显示的名字
                 MediaStore.Video.Media.DATA, // 数据
-                MediaStore.Video.Media.LONGITUDE, // 经度
                 MediaStore.Video.Media._ID, // id
-                MediaStore.Video.Media.MINI_THUMB_MAGIC, // id
                 MediaStore.Video.Media.TITLE, // id
                 MediaStore.Video.Media.BUCKET_ID, // dir id 目录
                 MediaStore.Video.Media.BUCKET_DISPLAY_NAME, // dir name 目录名字
