@@ -14,6 +14,7 @@ import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeBucketKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeImageKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeVideoKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.typeKeys
+import java.io.File
 
 
 /// create 2019-09-05 by cai
@@ -184,10 +185,9 @@ object DBUtils : IDBUtils {
             val duration = if (requestType == 1) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
             val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
             val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
-            val mimeType = cursor.getString(MediaStore.Images.Media.MIME_TYPE)
-            val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
+            val displayName = File(path).name
 
-            val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), mimeType, displayName)
+            val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName)
             list.add(asset)
             cache.putAsset(asset)
         }
@@ -221,10 +221,9 @@ object DBUtils : IDBUtils {
             val duration = if (type == MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
             val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
             val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
-            val mimeType = cursor.getString(MediaStore.Images.Media.MIME_TYPE)
-            val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
+            val displayName = File(path).name
 
-            val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), mimeType, displayName)
+            val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), displayName)
             cacheContainer.putAsset(dbAsset)
 
             cursor.close()

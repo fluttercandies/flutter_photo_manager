@@ -140,10 +140,9 @@ object AndroidQDBUtils : IDBUtils {
             val duration = if (requestType == 1) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
             val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
             val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
-            val mimeType = cursor.getString(MediaStore.Images.Media.MIME_TYPE)
             val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
 
-            val asset = AssetEntity(id, path, duration, date, width, height, DBUtils.getMediaType(type), mimeType, displayName)
+            val asset = AssetEntity(id, path, duration, date, width, height, DBUtils.getMediaType(type), displayName)
             list.add(asset)
             cache.putAsset(asset)
         }
@@ -167,28 +166,28 @@ object AndroidQDBUtils : IDBUtils {
         val args = arrayOf(id)
 
         val cursor = context.contentResolver.query(DBUtils.allUri, keys, selection, args, null)
-                ?: return null
+        cursor?.use {
+            if (cursor.moveToNext()) {
+                val databaseId = cursor.getString(MediaStore.MediaColumns._ID)
+                val path = cursor.getString(MediaStore.MediaColumns.DATA)
+                val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
+                val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
+                val duration = if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
+                val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
+                val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
+                val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
 
-        if (cursor.moveToNext()) {
-            val databaseId = cursor.getString(MediaStore.MediaColumns._ID)
-            val path = cursor.getString(MediaStore.MediaColumns.DATA)
-            val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
-            val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
-            val duration = if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
-            val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
-            val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
-            val mimeType = cursor.getString(MediaStore.Images.Media.MIME_TYPE)
-            val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
+                val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, DBUtils.getMediaType(type), displayName)
+                cacheContainer.putAsset(dbAsset)
 
-            val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, DBUtils.getMediaType(type), mimeType, displayName)
-            cacheContainer.putAsset(dbAsset)
-
-            cursor.close()
-            return dbAsset
-        } else {
-            cursor.close()
-            return null
+                cursor.close()
+                return dbAsset
+            } else {
+                cursor.close()
+                return null
+            }
         }
+        return null
     }
 
     @SuppressLint("Recycle")

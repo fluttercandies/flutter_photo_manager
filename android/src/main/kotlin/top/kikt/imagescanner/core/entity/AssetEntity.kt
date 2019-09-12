@@ -11,6 +11,5 @@ data class AssetEntity(
         val width: Int,
         val height: Int,
         val type: Int,
-        val mimeType: String,
         val displayName:String
 )
