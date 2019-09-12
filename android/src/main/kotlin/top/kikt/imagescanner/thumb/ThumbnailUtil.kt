@@ -22,12 +22,12 @@ object ThumbnailUtil {
         Glide.with(ctx)
                 .asBitmap()
                 .load(File(path))
-                .into(object : CustomTarget<Bitmap>(width, height) {
+                .into(object : BitmapTarget(width, height) {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        super.onResourceReady(resource, transition)
                         val bos = ByteArrayOutputStream()
                         resource.compress(Bitmap.CompressFormat.JPEG, 100, bos)
                         resultHandler.reply(bos.toByteArray())
-                        resource.recycle()
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {
@@ -46,12 +46,12 @@ object ThumbnailUtil {
         Glide.with(ctx)
                 .asBitmap()
                 .load(File(asset.path))
-                .into(object : CustomTarget<Bitmap>(width, height) {
+                .into(object : BitmapTarget(width, height) {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        super.onResourceReady(resource, transition)
                         val bos = ByteArrayOutputStream()
                         resource.compress(Bitmap.CompressFormat.JPEG, 100, bos)
                         resultHandler.reply(bos.toByteArray())
-                        resource.recycle()
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {
@@ -65,11 +65,11 @@ object ThumbnailUtil {
         Glide.with(ctx)
                 .asBitmap()
                 .load(File(path))
-                .into(object : CustomTarget<Bitmap>(width, height) {
+                .into(object : BitmapTarget(width, height) {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        super.onResourceReady(resource, transition)
                         val bos = ByteArrayOutputStream()
                         resource.compress(Bitmap.CompressFormat.JPEG, 100, bos)
-                        resource.recycle()
                         callback(bos.toByteArray())
                     }
 
@@ -83,11 +83,11 @@ object ThumbnailUtil {
         Glide.with(ctx)
                 .asBitmap()
                 .load(bitmap)
-                .into(object : CustomTarget<Bitmap>(width, height) {
+                .into(object : BitmapTarget(width, height) {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        super.onResourceReady(resource, transition)
                         val bos = ByteArrayOutputStream()
                         resource.compress(Bitmap.CompressFormat.JPEG, 100, bos)
-                        resource.recycle()
                         callback(bos.toByteArray())
                     }
 
