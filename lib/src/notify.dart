@@ -2,39 +2,45 @@ part of '../photo_manager.dart';
 
 /// manage photo changes
 ///
-/// 管理照片的类
+/// 当相册发生变化时, 通知
 class _NotifyManager {
   static const MethodChannel _channel =
-      const MethodChannel("photo_manager/notify");
+      const MethodChannel("top.kikt/photo_manager/notify");
 
   /// callbacks
-  var notifyCallback = <VoidCallback>[];
+  var notifyCallback = <ValueChanged<MethodCall>>[];
 
   /// add callback
-  void addCallback(VoidCallback callback) => notifyCallback.add(callback);
+  void addCallback(ValueChanged<MethodCall> callback) =>
+      notifyCallback.add(callback);
 
   /// remove callback
-  void removeCallback(VoidCallback callback) => notifyCallback.remove(callback);
+  void removeCallback(ValueChanged<MethodCall> callback) =>
+      notifyCallback.remove(callback);
 
   /// start handle notify
   void startHandleNotify() {
     _channel.setMethodCallHandler(_notify);
+    _plugin.notifyChange(start: true);
   }
 
   /// stop handle notify
   void stopHandleNotify() {
+    _plugin.notifyChange(start: false);
     _channel.setMethodCallHandler(null);
   }
 
   Future<dynamic> _notify(MethodCall call) async {
-    print("call.method = ${call.method}");
     if (call.method == "change") {
+      print(call.arguments);
       _onChange(call);
+    } else if (call.method == "setAndroidQExperimental") {
+      // PhotoManager.androidQExperimental = call.arguments["open"];
     }
     return 1;
   }
 
-  Future<dynamic> _onChange(MethodCall call) async {
-    notifyCallback.forEach((callback) => callback?.call());
+  Future<dynamic> _onChange(MethodCall methodCall) async {
+    notifyCallback.forEach((callback) => callback?.call(methodCall));
   }
 }

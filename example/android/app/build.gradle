@@ -21,6 +21,11 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+def compileVersion = localProperties.getProperty('android.version')
+if (compileVersion == null) {
+    compileVersion = "28"
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
@@ -34,7 +39,8 @@ android {
             keyPassword '123456'
         }
     }
-    compileSdkVersion 28
+
+    compileSdkVersion compileVersion.toInteger()
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -47,7 +53,7 @@ android {
     defaultConfig {
         applicationId "top.kikt.imagescannerexample"
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion compileVersion.toInteger()
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

@@ -6,7 +6,7 @@ import android.util.Log;
 
 public class LogUtils {
 
-    private static final String TAG = "PhotoManager";
+    private static final String TAG = "PhotoManagerPlugin";
 
     public static boolean isLog = false;
 

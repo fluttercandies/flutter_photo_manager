@@ -2,24 +2,14 @@
 #import "Reply.h"
 #import "PhotoChangeObserver.h"
 #import "PMLogUtils.h"
+#import "PMPlugin.h"
+#import "PMNotificationManager.h"
 
 @implementation ImageScannerPlugin {
 }
 + (void)registerWithRegistrar:(NSObject <FlutterPluginRegistrar> *)registrar {
-    FlutterMethodChannel *channel = [FlutterMethodChannel
-            methodChannelWithName:@"image_scanner"
-                  binaryMessenger:[registrar messenger]];
-    ImageScannerPlugin *instance = [[ImageScannerPlugin alloc] init];
-    [registrar addMethodCallDelegate:instance channel:channel];
-
-    instance.scanner = [[ImageScanner alloc] init];
-    instance.scanner.registrar = registrar;
-
-    NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
-    NSString *pathLog = [NSString stringWithFormat:@"application path = %@", path];
-    [[PMLogUtils sharedInstance] info:pathLog];
-    
-    instance.registrar = registrar;
+    PMPlugin *plugin = [PMPlugin new];
+    [plugin registerPlugin:registrar];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {

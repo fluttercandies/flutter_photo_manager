@@ -67,7 +67,7 @@ List<AssetPathEntity> list = await PhotoManager.getVideoAsset();
 
 3. get asset list from imagePath
 
-paging:
+paged:
 
 ```dart
 // page: The page number of the page, starting at 0.
@@ -75,7 +75,7 @@ paging:
 final assetList = await path.getAssetListPaged(page, perPage);
 ```
 
-The old version, it is not recommended for continued use, because there may be performance issues on some phones.
+The old version, it is not recommended for continued use, because there may be performance issues on some phones. Now the internal implementation of this method is also paged, but the paged count is assetCount of AssetPathEntity.
 
 Old version:
 
@@ -99,18 +99,16 @@ Uint8List thumbDataWithSize = await entity.thumbDataWithSize(width,height); //Ju
 
 AssetType type = entity.type; // the type of asset enum of other,image,video
 
-Duration duration = await entity.videoDuration; //if type is not video, then return null.
+Duration duration = entity.videoDuration; //if type is not video, then return null.
+
+Size size = entity.size
+
+int width = entity.width;
+
+int height = entity.height;
 ```
 
 ## Usage
-
-### About isCache
-
-If `isCache` of the `getAssetPathList` is true, method will return cache data. Invalid if no method with cache = false has been called before.
-
-If the `isCache` = false method has not been invoked before, the data cannot be returned.
-
-If `releaseCache` method is called, then cache will be clear, you must call `getAssetPathList(isCache:false)` before `getAssetPathList(isCache:true)`
 
 ### Create `AssetEntity` with id
 
@@ -159,6 +157,14 @@ Google recommends completing all support-to-AndroidX migrations in 2019. Documen
 This library has been migrated in version 0.2.2, but it brings a problem. Sometimes your upstream library has not been migrated yet. At this time, you need to add an option to deal with this problem.
 
 The complete migration method can be consulted [gitbook](https://caijinglong.gitbooks.io/migrate-flutter-to-androidx/content/).
+
+### Android Q privacy
+
+Now, the android part of the plugin uses api 29 to compile the plugin, so your android sdk environment must contain api 29 (androidQ).
+
+AndroidQ has a new privacy policy, users can't access the original file.
+
+If your compileSdkVersion and targetSdkVersion are both below 28, you can use `PhotoManager.forceOldApi` to force the old api to access the album. If you are not sure about this part, don't call this method.
 
 ### glide
 

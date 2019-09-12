@@ -15,3 +15,9 @@ enum AssetType {
   /// video
   video,
 }
+
+enum RequestType {
+  all,
+  image,
+  video,
+}

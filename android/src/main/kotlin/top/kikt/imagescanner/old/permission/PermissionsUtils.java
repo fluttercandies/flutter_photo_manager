@@ -1,4 +1,4 @@
-package top.kikt.imagescanner.core.permission;
+package top.kikt.imagescanner.old.permission;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

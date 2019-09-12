@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 0.4.0
+
+Breaking change.
+
+- Some properties in the entity were modified from asynchronous to synchronous.
+- Remove `isCache` params. Now, `getAssetPathList` will reload info everytime. If user want to cache `List<AssetPathEntity>`, then user must do it self.
+
+Added:
+
+- Added a method `getAssetListPaged` for paging loading resources to path. The paging implementation is lazy loading, that is, the resource corresponding information is loaded when requested. The entity corresponding to the path is no longer placed in the memory, but is implemented by PHPhoto (ios) and sqlite's limit offset (android).
+- Support AndroidQ privacy.
+
 ## 0.3.5
 
 Fix
