@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_scanner_example/page/detail_page.dart';

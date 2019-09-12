@@ -99,18 +99,16 @@ Uint8List thumbDataWithSize = await entity.thumbDataWithSize(width,height); //Ju
 
 AssetType type = entity.type; // the type of asset enum of other,image,video
 
-Duration duration = await entity.videoDuration; //if type is not video, then return null.
+Duration duration = entity.videoDuration; //if type is not video, then return null.
+
+Size size = entity.size
+
+int width = entity.width;
+
+int height = entity.height;
 ```
 
 ## Usage
-
-### About isCache
-
-If `isCache` of the `getAssetPathList` is true, method will return cache data. Invalid if no method with cache = false has been called before.
-
-If the `isCache` = false method has not been invoked before, the data cannot be returned.
-
-If `releaseCache` method is called, then cache will be clear, you must call `getAssetPathList(isCache:false)` before `getAssetPathList(isCache:true)`
 
 ### Create `AssetEntity` with id
 
@@ -162,7 +160,7 @@ The complete migration method can be consulted [gitbook](https://caijinglong.git
 
 ### Android Q privacy
 
-Now, the android part of the plugin uses api 29 to compile the plugin, so android sdk must contain api 29 (androidQ).
+Now, the android part of the plugin uses api 29 to compile the plugin, so your android sdk environment must contain api 29 (androidQ).
 
 AndroidQ has a new privacy policy, users can't access the original file.
 

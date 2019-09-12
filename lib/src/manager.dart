@@ -141,9 +141,9 @@ class PhotoManager {
     return true;
   }
 
-  static Future<AssetEntity> _createAssetEntityWithId(String id) async {
-    return AssetEntity(id: id);
-  }
+  // static Future<AssetEntity> _createAssetEntityWithId(String id) async {
+  //   return AssetEntity(id: id);
+  // }
 
   static Future<AssetPathEntity> fetchPathProperties(
     AssetPathEntity entity,
