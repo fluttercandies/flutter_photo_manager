@@ -72,6 +72,7 @@ class PhotoManager(private val context: Context) {
             // need use android Q  MediaStore thumbnail api
             val bitmap = dbUtils.getThumb(context, id, width, height)
             ThumbnailUtil.getThumb(context, bitmap, width, height) {
+                bitmap?.recycle()
                 resultHandler.reply(it)
             }
         }

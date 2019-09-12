@@ -27,6 +27,7 @@ object ThumbnailUtil {
                         val bos = ByteArrayOutputStream()
                         resource.compress(Bitmap.CompressFormat.JPEG, 100, bos)
                         resultHandler.reply(bos.toByteArray())
+                        resource.recycle()
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {
@@ -50,6 +51,7 @@ object ThumbnailUtil {
                         val bos = ByteArrayOutputStream()
                         resource.compress(Bitmap.CompressFormat.JPEG, 100, bos)
                         resultHandler.reply(bos.toByteArray())
+                        resource.recycle()
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {
