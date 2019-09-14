@@ -3,7 +3,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import <Photos/Photos.h>
 @class PMAssetPathEntity;
 @class PMAssetEntity;
 
