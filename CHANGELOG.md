@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.4.1
+
+Fix:
+
+- Fix ios build error.
+
 ## 0.4.0
 
 Breaking change.
