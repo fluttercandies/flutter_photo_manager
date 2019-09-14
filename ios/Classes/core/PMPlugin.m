@@ -136,7 +136,8 @@
         }
 
     } else if ([call.method isEqualToString:@"isNotifying"]) {
-        [handler reply:[_notificationManager isNotifying]];
+        BOOL isNotifying = [_notificationManager isNotifying];
+        [handler reply: @(isNotifying)];
     }
 }
 
