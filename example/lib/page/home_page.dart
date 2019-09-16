@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:image_scanner_example/model/photo_provider.dart';
 import 'package:image_scanner_example/page/gallery_list_page.dart';
+import 'package:image_scanner_example/widget/change_notifier_builder.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:provider/provider.dart';
 
 class NewHomePage extends StatefulWidget {
   @override
@@ -8,15 +11,7 @@ class NewHomePage extends StatefulWidget {
 }
 
 class _NewHomePageState extends State<NewHomePage> {
-  Plugin plugin = Plugin();
-
-  List<AssetPathEntity> list = [];
-
-  int type = 0;
-
-  DateTime dt = DateTime.now();
-
-  var hasAll = true;
+  PhotoProvider get provider => Provider.of<PhotoProvider>(context);
 
   @override
   void initState() {
@@ -26,63 +21,55 @@ class _NewHomePageState extends State<NewHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("photo manager example"),
-      ),
-      body: Column(
-        children: <Widget>[
-          buildButton("Get all gallery list", _scanGalleryList),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text("scan type"),
-              Container(
-                width: 10,
-              ),
-              DropdownButton<int>(
-                items: <DropdownMenuItem<int>>[
-                  _buildDropdownMenuItem(0),
-                  _buildDropdownMenuItem(1),
-                  _buildDropdownMenuItem(2),
-                ],
-                onChanged: (v) {
-                  this.type = v;
-                  setState(() {});
-                },
-                value: type,
-              ),
-            ],
+    return ChangeNotifierBuilder(
+      value: provider,
+      builder: (_, __) => Scaffold(
+            appBar: AppBar(
+              title: Text("photo manager example"),
+            ),
+            body: Column(
+              children: <Widget>[
+                buildButton("Get all gallery list", _scanGalleryList),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text("scan type"),
+                    Container(
+                      width: 10,
+                    ),
+                    DropdownButton<int>(
+                      items: <DropdownMenuItem<int>>[
+                        _buildDropdownMenuItem(0),
+                        _buildDropdownMenuItem(1),
+                        _buildDropdownMenuItem(2),
+                      ],
+                      onChanged: (v) {
+                        provider.changeType(v);
+                      },
+                      value: provider.type,
+                    ),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    _buildFecthDtPicker(),
+                    _buildDateToNow(),
+                  ],
+                  mainAxisSize: MainAxisSize.min,
+                ),
+                _buildHasAllCheck(),
+                buildNotifyButton(),
+                // buildAndroidQSwitch(),
+              ],
+            ),
           ),
-          Row(
-            children: <Widget>[
-              _buildFecthDtPicker(),
-              _buildDateToNow(),
-            ],
-            mainAxisSize: MainAxisSize.min,
-          ),
-          _buildHasAllCheck(),
-          buildNotifyButton(),
-          // buildAndroidQSwitch(),
-        ],
-      ),
     );
   }
 
   _scanGalleryList() async {
-    var galleryList = await PhotoManager.getAssetPathList(
-      fetchDateTime: this.dt,
-      type: RequestType.values[type],
-      hasAll: hasAll,
-    );
+    await provider.refreshGalleryList();
 
-    galleryList.sort((s1, s2) {
-      return s2.assetCount.compareTo(s1.assetCount);
-    });
-
-    final page = GalleryListPage(
-      galleryList: galleryList,
-    );
+    final page = GalleryListPage();
 
     Navigator.of(context).push(MaterialPageRoute(
       builder: (ctx) => page,
@@ -106,6 +93,7 @@ class _NewHomePageState extends State<NewHomePage> {
   }
 
   Widget _buildFecthDtPicker() {
+    final dt = provider.dt;
     return buildButton(
         "${dt.year}-${dt.month}-${dt.day} ${dt.hour}:${dt.minute}:${dt.second}",
         () async {
@@ -116,20 +104,16 @@ class _NewHomePageState extends State<NewHomePage> {
         lastDate: DateTime.now(),
       );
       if (pickDt != null) {
-        setState(() {
-          this.dt = pickDt;
-        });
+        provider.changeDate(pickDt);
       }
     });
   }
 
   Widget _buildHasAllCheck() {
     return CheckboxListTile(
-      value: hasAll,
+      value: provider.hasAll,
       onChanged: (value) {
-        setState(() {
-          hasAll = value;
-        });
+        provider.changeHasAll(value);
       },
       title: Text("hasAll"),
     );
@@ -137,9 +121,7 @@ class _NewHomePageState extends State<NewHomePage> {
 
   Widget _buildDateToNow() {
     return buildButton("Date to now", () {
-      setState(() {
-        this.dt = DateTime.now();
-      });
+      provider.changeDateToNow();
     });
   }
 

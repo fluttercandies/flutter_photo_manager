@@ -4,6 +4,8 @@
 
 #import <Foundation/Foundation.h>
 
+typedef void(^ChangeIds)(NSArray<NSString *> *);
+
 @class PMAssetPathEntity;
 @class PMAssetEntity;
 @class ResultHandler;
@@ -31,4 +33,10 @@
 - (void)getFullSizeFileWithId:(NSString *)id resultHandler:(ResultHandler *)handler;
 
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type date:(NSDate *)date;
+
+- (void)deleteWithIds:(NSArray<NSString *> *)ids changedBlock:(ChangeIds)block;
+
+- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id type:(NSUInteger)type start:(NSUInteger)start
+                                                      end:(NSUInteger)end date:(NSDate *)date;
 @end
+

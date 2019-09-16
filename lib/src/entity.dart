@@ -87,6 +87,10 @@ class AssetPathEntity {
   String toString() {
     return "AssetPathEntity{ name: $name id:$id , length = $assetCount}";
   }
+
+  Future<List<AssetEntity>> getAssetListRange({int start, int end}) async {
+    return PhotoManager.getAssetWithRange(entity: this, start: start, end: end);
+  }
 }
 
 /// Used to describe a picture or video

@@ -14,11 +14,16 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.of(context).pop(),
-      child: Container(
-        color: Colors.black,
-        child: _buildImage(),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Asset file"),
+      ),
+      body: GestureDetector(
+        onTap: () => Navigator.of(context).pop(),
+        child: Container(
+          color: Colors.black,
+          child: _buildImage(),
+        ),
       ),
     );
   }

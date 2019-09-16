@@ -144,4 +144,33 @@ class Plugin {
   Future<void> forceOldApi() async {
     await _channel.invokeMethod("forceOldApi");
   }
+
+  Future<bool> deleteWithId(String id) async {
+    final ids = await deleteWithIds([id]);
+    return ids.contains(id);
+  }
+
+  Future<List<String>> deleteWithIds(List<String> ids) async {
+    final List<dynamic> deleted =
+        (await _channel.invokeMethod("deleteWithIds", {"ids": ids}));
+    return deleted.cast<String>();
+  }
+
+  Future<List<AssetEntity>> getAssetWithRange(
+    String id,
+    int typeInt,
+    int start,
+    int end,
+    DateTime fetchDt,
+  ) async {
+    final Map map = await _channel.invokeMethod("getAssetListWithRange", {
+      "galleryId": id,
+      "type": typeInt,
+      "start": start,
+      "end": end,
+      "timestamp": fetchDt.millisecondsSinceEpoch,
+    });
+
+    return ConvertUtils.convertAssetEntity(map);
+  }
 }

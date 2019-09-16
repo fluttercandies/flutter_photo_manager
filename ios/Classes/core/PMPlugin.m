@@ -87,6 +87,19 @@
         NSDictionary *dictionary = [ConvertUtils convertAssetToMap:array];
         [handler reply:dictionary];
 
+    } else if ([call.method isEqualToString:@"getAssetListWithRange"]) {
+
+        NSString *galleryId = call.arguments[@"galleryId"];
+        NSUInteger type = [call.arguments[@"type"] unsignedIntegerValue];
+        NSUInteger start = [call.arguments[@"start"] unsignedIntegerValue];
+        NSUInteger end = [call.arguments[@"end"] unsignedIntegerValue];
+
+        unsigned long timestamp = [call.arguments[@"timestamp"] unsignedLongValue];
+        NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
+        NSArray<PMAssetEntity *> *array = [manager getAssetEntityListWithRange:galleryId type:type start:start end:end date:date];
+        NSDictionary *dictionary = [ConvertUtils convertAssetToMap:array];
+        [handler reply:dictionary];
+
     } else if ([call.method isEqualToString:@"getThumb"]) {
 
         NSString *id = call.arguments[@"id"];
@@ -137,7 +150,13 @@
 
     } else if ([call.method isEqualToString:@"isNotifying"]) {
         BOOL isNotifying = [_notificationManager isNotifying];
-        [handler reply: @(isNotifying)];
+        [handler reply:@(isNotifying)];
+
+    } else if ([call.method isEqualToString:@"deleteWithIds"]) {
+        NSArray<NSString *> *ids = call.arguments[@"ids"];
+        [manager deleteWithIds:ids changedBlock:^(NSArray<NSString *> *array) {
+            [handler reply:array];
+        }];
     }
 }
 

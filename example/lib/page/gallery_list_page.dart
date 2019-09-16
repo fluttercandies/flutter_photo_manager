@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:image_scanner_example/model/photo_provider.dart';
 import 'package:image_scanner_example/page/image_list_page.dart';
-import 'package:photo_manager/photo_manager.dart';
+import 'package:provider/provider.dart';
 
 class GalleryListPage extends StatefulWidget {
-  final List<AssetPathEntity> galleryList;
-
-  const GalleryListPage({Key key, this.galleryList}) : super(key: key);
+  const GalleryListPage({Key key}) : super(key: key);
 
   @override
   _GalleryListPageState createState() => _GalleryListPageState();
 }
 
 class _GalleryListPageState extends State<GalleryListPage> {
+  PhotoProvider get provider => Provider.of<PhotoProvider>(context);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,14 +22,14 @@ class _GalleryListPageState extends State<GalleryListPage> {
       body: Container(
         child: ListView.builder(
           itemBuilder: _buildItem,
-          itemCount: widget.galleryList.length,
+          itemCount: provider.list.length,
         ),
       ),
     );
   }
 
   Widget _buildItem(BuildContext context, int index) {
-    final item = widget.galleryList[index];
+    final item = provider.list[index];
     return ListTile(
       title: Text(item.name),
       subtitle: Text("count : ${item.assetCount}"),
