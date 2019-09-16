@@ -72,6 +72,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
           return page;
         }));
       },
+      onLongPress: () => _deleteCurrent(entity),
       child: ImageItemWidget(
         key: ValueKey(entity),
         entity: entity,
@@ -106,6 +107,19 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     setState(() {});
     if (mounted) {
       setState(() {});
+    }
+  }
+
+  void _deleteCurrent(AssetEntity entity) async {
+    final result = await PhotoManager.deleteWithIds([entity.id]);
+    if (result.isNotEmpty) {
+      await path.refreshPathProperties(dt: path.fetchDatetime);
+      final list =
+          await path.getAssetListRange(start: 0, end: page * loadCount);
+      setState(() {
+        this.list.clear();
+        this.list.addAll(list);
+      });
     }
   }
 }

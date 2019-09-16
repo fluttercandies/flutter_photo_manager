@@ -55,10 +55,17 @@ class PhotoManager(private val context: Context) {
         return listOf(entity) + fromDb
     }
 
-    fun getAssetList(galleryId: String, page: Int, pageCount: Int, typeInt: Int = 0, timeStamp: Long): List<AssetEntity> {
+    fun getAssetList(galleryId: String, page: Int, pageCount: Int, typeInt: Int = 0, timestamp: Long): List<AssetEntity> {
         val gId = if (galleryId == ALL_ID) "" else galleryId
-        return dbUtils.getAssetFromGalleryId(context, gId, page, pageCount, typeInt, timeStamp)
+        return dbUtils.getAssetFromGalleryId(context, gId, page, pageCount, typeInt, timestamp)
     }
+
+
+    fun getAssetListWithRange(galleryId: String, type: Int, start: Int, end: Int, timestamp: Long): List<AssetEntity> {
+        val gId = if (galleryId == ALL_ID) "" else galleryId
+        return dbUtils.getAssetFromGalleryIdRange(context, gId, start, end, type, timestamp)
+    }
+
 
     fun getThumb(id: String, width: Int, height: Int, resultHandler: ResultHandler) {
         if (!androidQExperimental) {
@@ -116,6 +123,10 @@ class PhotoManager(private val context: Context) {
     fun getFile(id: String, resultHandler: ResultHandler) {
         val path = dbUtils.getFilePath(context, id)
         resultHandler.reply(path)
+    }
+
+    fun deleteAssetWithIds(ids: List<String>): List<String> {
+        return dbUtils.deleteWithIds(context, ids)
     }
 
 }

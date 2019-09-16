@@ -23,7 +23,8 @@ dependencies:
   photo_manager:
     path: ../
   oktoast: ^2.2.0
-  
+  provider: ^3.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

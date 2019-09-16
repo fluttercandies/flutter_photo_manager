@@ -6,6 +6,7 @@ import android.os.Handler
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
+import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.utils.ConvertUtils
 import top.kikt.imagescanner.old.ResultHandler
 import top.kikt.imagescanner.old.permission.PermissionsListener
@@ -130,6 +131,17 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                                 resultHandler.reply(ConvertUtils.convertToAssetResult(list))
                             }
                         }
+                        "getAssetListWithRange" -> {
+                            val galleryId = call.getString("galleryId")
+                            val type = call.getInt("type")
+                            val start = call.getInt("start")
+                            val end = call.getInt("end")
+                            val timestamp = call.getTimeStamp()
+                            runOnBackground {
+                                val list: List<AssetEntity> = photoManager.getAssetListWithRange(galleryId, type, start, end, timestamp)
+                                resultHandler.reply(ConvertUtils.convertToAssetResult(list))
+                            }
+                        }
                         "getThumb" -> {
                             val id = call.argument<String>("id") as String
                             val width = call.argument<Int>("width") as Int
@@ -173,6 +185,13 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                                 }
                             }
                         }
+                        "deleteWithIds" -> {
+                            runOnBackground {
+                                val ids = call.argument<List<String>>("ids")!!
+                                val list: List<String> = photoManager.deleteAssetWithIds(ids)
+                                resultHandler.reply(list)
+                            }
+                        }
                         else -> resultHandler.notImplemented()
                     }
                 }
@@ -183,5 +202,13 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
 
     fun MethodCall.getTimeStamp(): Long {
         return this.argument<Long>("timestamp")!!
+    }
+
+    fun MethodCall.getString(key: String): String {
+        return this.argument<String>(key)!!
+    }
+
+    fun MethodCall.getInt(key: String): Int {
+        return this.argument<Int>(key)!!
     }
 }

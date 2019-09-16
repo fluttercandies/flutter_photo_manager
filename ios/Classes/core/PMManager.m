@@ -127,6 +127,47 @@
     return result;
 }
 
+- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id type:(NSUInteger)type start:(NSUInteger)start
+                                                      end:(NSUInteger)end date:(NSDate *)date {
+    NSMutableArray<PMAssetEntity *> *result = [NSMutableArray new];
+
+    PHFetchOptions *options = [PHFetchOptions new];
+
+    PHFetchResult<PHAssetCollection *> *fetchResult = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[id] options:options];
+    if (fetchResult && fetchResult.count == 0) {
+        return result;
+    }
+
+    PHFetchOptions *assetOptions = [self getAssetOptions:type date:date];
+
+    PHAssetCollection *collection = fetchResult.firstObject;
+
+    options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
+
+    PHFetchResult<PHAsset *> *assetArray = [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
+
+    if (assetArray.count == 0) {
+        return result;
+    }
+
+    NSUInteger startIndex = start;
+    NSUInteger endIndex = end - 1;
+
+    NSUInteger count = assetArray.count;
+    if (endIndex >= count) {
+        endIndex = count - 1;
+    }
+
+    for (NSUInteger i = startIndex; i <= endIndex; i++) {
+        PHAsset *asset = assetArray[i];
+        PMAssetEntity *entity = [self convertPHAssetToAssetEntity:asset];
+        [result addObject:entity];
+        [cacheContainer putAssetEntity:entity];
+    }
+
+    return result;
+}
+
 - (PMAssetEntity *)convertPHAssetToAssetEntity:(PHAsset *)asset {
     // type:
     // 0: all , 1: image, 2:video
@@ -353,6 +394,20 @@
 
         }];
     }
+}
+
+- (void)deleteWithIds:(NSArray<NSString *> *)ids changedBlock:(ChangeIds)block {
+    [[PHPhotoLibrary sharedPhotoLibrary]
+            performChanges:^{
+                PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:ids options:[PHFetchOptions new]];
+                [PHAssetChangeRequest deleteAssets:result];
+            } completionHandler:^(BOOL success, NSError *error) {
+        if (success) {
+            block(ids);
+        } else {
+            block(@[]);
+        }
+    }];
 }
 
 @end

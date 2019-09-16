@@ -163,8 +163,26 @@ class PhotoManager {
     }
   }
 
-  static Future<void> forceOldApi() async{
+  static Future<void> forceOldApi() async {
     await _plugin.forceOldApi();
+  }
+
+  static Future<List<String>> deleteWithIds(List<String> ids) async {
+    return _plugin.deleteWithIds(ids);
+  }
+
+  static Future<List<AssetEntity>> getAssetWithRange({
+    @required AssetPathEntity entity,
+    @required int start,
+    @required int end,
+  }) {
+    return _plugin.getAssetWithRange(
+      entity.id,
+      entity.typeInt,
+      start,
+      end,
+      entity.fetchDatetime,
+    );
   }
 
   // static bool get androidQExperimental => _plugin.androidQExperimental;

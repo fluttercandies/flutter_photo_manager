@@ -91,4 +91,21 @@ interface IDBUtils {
 
     fun getThumb(context: Context, id: String, width: Int, height: Int): Bitmap?
 
+    fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long): List<AssetEntity>
+
+    fun deleteWithIds(context: Context, ids: List<String>): List<String> {
+        val where = "${MediaStore.MediaColumns._ID} in (?)"
+        val idsArgs = ids.joinToString()
+        return try {
+            val lines = context.contentResolver.delete(allUri, where, arrayOf(idsArgs))
+            if (lines > 0) {
+                ids
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
 }

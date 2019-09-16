@@ -153,6 +153,73 @@ object AndroidQDBUtils : IDBUtils {
 
     }
 
+    override fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long): List<AssetEntity> {
+        val cache = cacheContainer
+
+        val isAll = gId.isEmpty()
+
+        val list = ArrayList<AssetEntity>()
+        val uri = DBUtils.allUri
+
+        val args = ArrayList<String>()
+        if (!isAll) {
+            args.add(gId)
+        }
+        val typeSelection: String
+
+        when (requestType) {
+            1 -> {
+                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
+                args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString())
+            }
+            2 -> {
+                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
+                args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString())
+            }
+            else -> {
+                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} in (?,?)"
+                args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString())
+                args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString())
+            }
+        }
+
+        val dateSelection = "AND ${MediaStore.Images.Media.DATE_ADDED} <= ?"
+        args.add(timestamp.toString())
+
+        val keys = (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys).distinct().toTypedArray()
+        val selection = if (isAll) {
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection"
+        } else {
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection"
+        }
+
+        val pageSize = end - start
+
+        val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET $start"
+        val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
+                ?: return emptyList()
+
+        while (cursor.moveToNext()) {
+            val id = cursor.getString(MediaStore.MediaColumns._ID)
+            val path = cursor.getString(MediaStore.MediaColumns.DATA)
+            val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
+            val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
+            val duration = if (requestType == 1) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
+            val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
+            val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
+            val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
+
+            val asset = AssetEntity(id, path, duration, date, width, height, DBUtils.getMediaType(type), displayName)
+            list.add(asset)
+            cache.putAsset(asset)
+        }
+
+        cursor.close()
+
+        return list
+
+    }
+
     override fun getAssetEntity(context: Context, id: String): AssetEntity? {
         val asset = cacheContainer.getAsset(id)
         if (asset != null) {
