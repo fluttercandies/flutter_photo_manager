@@ -235,7 +235,7 @@
     NSString *filename = [asset valueForKey:@"filename"];
 
     NSString *dirPath = [NSString stringWithFormat:@"%@/%@", homePath, @".video"];
-    [manager createDirectoryAtPath:dirPath attributes:@{}];
+    [manager createDirectoryAtPath:dirPath withIntermediateDirectories:true attributes:@{} error:nil];
 
     [path appendFormat:@"%@/%@", @".video", filename];
     PHVideoRequestOptions *options = [PHVideoRequestOptions new];
@@ -271,7 +271,7 @@
                 [handler reply:path];
             }];
         } else {
-            [handler reply:NULL];
+            [handler reply:nil];
         }
 
     }];
@@ -281,6 +281,10 @@
     PHImageManager *manager = PHImageManager.defaultManager;
     PHImageRequestOptions *options = [PHImageRequestOptions new];
 
+    // Temp dir image asset
+    NSString *homePath = NSTemporaryDirectory();
+    NSString *dirPath = [NSString stringWithFormat:@"%@/%@", homePath, @".image"];
+    [NSFileManager.defaultManager createDirectoryAtPath:dirPath withIntermediateDirectories:true attributes:@{} error:nil];
 
     [options setNetworkAccessAllowed:YES];
     [options setProgressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
@@ -288,7 +292,8 @@
             [self fetchFullSize:asset resultHandler:handler];
         }
     }];
-    [manager requestImageDataForAsset:asset options:options resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
+
+    [manager requestImageForAsset:asset targetSize:PHImageManagerMaximumSize contentMode:PHImageContentModeDefault options: options resultHandler:^(UIImage * _Nullable image, NSDictionary * _Nullable info) {
 
         BOOL downloadFinished = [PMManager isDownloadFinish:info];
         if (!downloadFinished) {
@@ -299,9 +304,13 @@
             return;
         }
 
-        FlutterStandardTypedData *data = [FlutterStandardTypedData typedDataWithBytes:imageData];
+        NSMutableString *path = [NSMutableString stringWithString: homePath];
+        NSString* filename = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/"
+                                                                              withString:@"_"];
+        [path appendFormat:@"%@/%@.jpg", @".image", filename];
+        [UIImageJPEGRepresentation(image, 1.0) writeToFile:path atomically:YES];
 
-        [handler reply:data];
+        [handler reply:path];
     }];
 }
 
