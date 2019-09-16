@@ -192,6 +192,20 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                                 resultHandler.reply(list)
                             }
                         }
+                        "saveImage" -> {
+                            runOnBackground {
+                                val image = call.argument<ByteArray>("image")!!
+                                val title = call.argument<String>("title")!!
+                                val desc = call.argument<String>("desc")!!
+                                val entity = photoManager.saveImage(image, title, desc)
+                                if (entity == null) {
+                                    resultHandler.reply(null)
+                                    return@runOnBackground
+                                }
+                                val map = ConvertUtils.convertToAssetResult(entity)
+                                resultHandler.reply(map)
+                            }
+                        }
                         else -> resultHandler.notImplemented()
                     }
                 }

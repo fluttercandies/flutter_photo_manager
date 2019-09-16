@@ -129,4 +129,8 @@ class PhotoManager(private val context: Context) {
         return dbUtils.deleteWithIds(context, ids)
     }
 
+    fun saveImage(image: ByteArray, title: String, description: String): AssetEntity? {
+        return dbUtils.saveImage(context, image, title, description)
+    }
+
 }

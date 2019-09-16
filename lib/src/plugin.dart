@@ -173,4 +173,14 @@ class Plugin {
 
     return ConvertUtils.convertAssetEntity(map);
   }
+
+  Future<bool> saveImage(Uint8List uint8list) async {
+    await _channel.invokeMethod(
+      "saveImage",
+      {
+        "image": uint8list,
+      },
+    );
+    return false;
+  }
 }
