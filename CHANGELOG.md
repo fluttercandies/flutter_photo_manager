@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.4.2
+
+- Fix ios get full file size error.
+
 ## 0.4.1
 
 Fix:
