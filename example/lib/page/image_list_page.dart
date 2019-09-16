@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_scanner_example/model/photo_provider.dart';
 import 'package:image_scanner_example/page/detail_page.dart';
+import 'package:image_scanner_example/widget/change_notifier_builder.dart';
 import 'package:image_scanner_example/widget/image_item_widget.dart';
 import 'package:image_scanner_example/widget/loading_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:provider/provider.dart';
 
 class GalleryContentListPage extends StatefulWidget {
   final AssetPathEntity path;
@@ -17,47 +22,58 @@ class GalleryContentListPage extends StatefulWidget {
 class _GalleryContentListPageState extends State<GalleryContentListPage> {
   AssetPathEntity get path => widget.path;
 
-  List<AssetEntity> list = [];
-
-  var page = 0;
+  PathProvider get provider =>
+      Provider.of<PhotoProvider>(context).getOrCreatePathProvider(path);
 
   @override
   void initState() {
     super.initState();
-    _onRefresh();
   }
 
   @override
   Widget build(BuildContext context) {
-    var length = path.assetCount;
-
-    if (list.length == 0) {
-      length = 0;
-    } else if (list.length < length) {
-      length = list.length + 1;
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("${path.name}"),
-      ),
-      body: RefreshIndicator(
-        onRefresh: _onRefresh,
-        child: GridView.builder(
-          itemBuilder: _buildItem,
-          itemCount: length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
+    return ChangeNotifierBuilder(
+      value: provider,
+      builder: (_, __) {
+        var length = path.assetCount;
+        return Scaffold(
+          appBar: AppBar(
+            title: Text("${path.name}"),
           ),
+          body: buildRefreshIndicator(length),
+        );
+      },
+    );
+  }
+
+  Widget buildRefreshIndicator(int length) {
+    if (!provider.isInit) {
+      provider.onRefresh();
+      return Center(
+        child: Text("loading"),
+      );
+    }
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      child: GridView.builder(
+        itemBuilder: _buildItem,
+        itemCount: length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
         ),
       ),
     );
   }
 
   Widget _buildItem(BuildContext context, int index) {
+    final list = provider.list;
     if (list.length == index) {
       onLoadMore();
       return loadWidget;
+    }
+
+    if (index > list.length) {
+      return Container();
     }
 
     final entity = list[index];
@@ -80,46 +96,42 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     );
   }
 
-  final loadCount = 80;
-
   Future<void> onLoadMore() async {
     if (!mounted) {
-      print("on load more, but it's unmounted");
       return;
     }
-    print("on load more");
-    final list = await path.getAssetListPaged(page + 1, loadCount);
-    page = page + 1;
-    this.list.addAll(list);
-    if (mounted) {
-      setState(() {});
-    }
+    await provider.onLoadMore();
   }
 
   Future<void> _onRefresh() async {
     if (!mounted) {
       return;
     }
-    final list = await path.getAssetListPaged(0, loadCount);
-    page = 0;
-    this.list.clear();
-    this.list.addAll(list);
-    setState(() {});
-    if (mounted) {
-      setState(() {});
-    }
+    await provider.onRefresh();
   }
 
   void _deleteCurrent(AssetEntity entity) async {
-    final result = await PhotoManager.deleteWithIds([entity.id]);
-    if (result.isNotEmpty) {
-      await path.refreshPathProperties(dt: path.fetchDatetime);
-      final list =
-          await path.getAssetListRange(start: 0, end: page * loadCount);
-      setState(() {
-        this.list.clear();
-        this.list.addAll(list);
-      });
+    if (Platform.isAndroid) {
+      final dialog = AlertDialog(
+        title: Text("Delete the asset"),
+        actions: <Widget>[
+          FlatButton(
+            child: Text(
+              "delete",
+              style: const TextStyle(color: Colors.red),
+            ),
+            onPressed: () async {
+              provider.delete(entity);
+              Navigator.pop(context);
+            },
+          ),
+          FlatButton(
+            child: Text("cancel"),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      );
+      showDialog(context: context, builder: (_) => dialog);
     }
   }
 }

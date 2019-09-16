@@ -67,19 +67,9 @@ class _NewHomePageState extends State<NewHomePage> {
   }
 
   _scanGalleryList() async {
-    var galleryList = await PhotoManager.getAssetPathList(
-      fetchDateTime: provider.dt,
-      type: RequestType.values[provider.type],
-      hasAll: provider.hasAll,
-    );
+    await provider.refreshGalleryList();
 
-    galleryList.sort((s1, s2) {
-      return s2.assetCount.compareTo(s1.assetCount);
-    });
-
-    final page = GalleryListPage(
-      galleryList: galleryList,
-    );
+    final page = GalleryListPage();
 
     Navigator.of(context).push(MaterialPageRoute(
       builder: (ctx) => page,
