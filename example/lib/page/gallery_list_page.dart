@@ -30,10 +30,12 @@ class _GalleryListPageState extends State<GalleryListPage> {
 
   Widget _buildItem(BuildContext context, int index) {
     final item = provider.list[index];
-    return ListTile(
-      title: Text(item.name),
-      subtitle: Text("count : ${item.assetCount}"),
-      trailing: Text("isAll : ${item.isAll}"),
+    return GestureDetector(
+      child: ListTile(
+        title: Text(item.name),
+        subtitle: Text("count : ${item.assetCount}"),
+        trailing: Text("isAll : ${item.isAll}"),
+      ),
       onTap: () => Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => GalleryContentListPage(
@@ -44,6 +46,14 @@ class _GalleryListPageState extends State<GalleryListPage> {
       onLongPress: () async {
         await item.refreshPathProperties();
         setState(() {});
+      },
+      onDoubleTap: () async {
+        final list =
+            await item.getAssetListRange(start: 0, end: item.assetCount);
+        for (var i = 0; i < list.length; i++) {
+          final asset = list[i];
+          debugPrint("$i : ${asset.id}");
+        }
       },
     );
   }

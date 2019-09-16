@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:image_scanner_example/main.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class PhotoProvider extends ChangeNotifier {
@@ -69,6 +70,14 @@ class PathProvider extends ChangeNotifier {
 
   var page = 0;
 
+  int get showItemCount {
+    if (list.length == path.assetCount) {
+      return path.assetCount;
+    } else {
+      return path.assetCount;
+    }
+  }
+
   Future onRefresh() async {
     final list = await path.getAssetListPaged(0, loadCount);
     page = 0;
@@ -76,13 +85,19 @@ class PathProvider extends ChangeNotifier {
     this.list.addAll(list);
     isInit = true;
     notifyListeners();
+    printListLength("onRefresh");
   }
 
   Future<void> onLoadMore() async {
+    if (showItemCount > path.assetCount) {
+      print("already max");
+      return;
+    }
     final list = await path.getAssetListPaged(page + 1, loadCount);
     page = page + 1;
     this.list.addAll(list);
     notifyListeners();
+    printListLength("loadmore");
   }
 
   void delete(AssetEntity entity) async {
@@ -90,11 +105,15 @@ class PathProvider extends ChangeNotifier {
     if (result.isNotEmpty) {
       await path.refreshPathProperties(dt: path.fetchDatetime);
       final list =
-          await path.getAssetListRange(start: 0, end: (page + 1) * loadCount);
-      print("new list = ${list.length}");
+          await path.getAssetListRange(start: 0, end: provider.list.length);
+      printListLength("deleted");
       this.list.clear();
       this.list.addAll(list);
       notifyListeners();
     }
+  }
+
+  void printListLength(String tag) {
+    print("$tag length : ${list.length}");
   }
 }

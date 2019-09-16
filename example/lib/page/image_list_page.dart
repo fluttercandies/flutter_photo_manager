@@ -57,7 +57,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       onRefresh: _onRefresh,
       child: GridView.builder(
         itemBuilder: _buildItem,
-        itemCount: length,
+        itemCount: provider.showItemCount,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 4,
         ),
