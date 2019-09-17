@@ -121,10 +121,10 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                         }
                         "getAssetWithGalleryId" -> {
                             runOnBackground {
-                                val id = call.argument<String>("id") as String
-                                val page = call.argument<Int>("page") as Int
-                                val pageCount = call.argument<Int>("pageCount") as Int
-                                val type = call.argument<Int>("type") as Int
+                                val id = call.argument<String>("id")!!
+                                val page = call.argument<Int>("page")!!
+                                val pageCount = call.argument<Int>("pageCount")!!
+                                val type = call.argument<Int>("type")!!
                                 val timeStamp = call.getTimeStamp()
 
                                 val list = photoManager.getAssetList(id, page, pageCount, type, timeStamp)
@@ -143,14 +143,14 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                             }
                         }
                         "getThumb" -> {
-                            val id = call.argument<String>("id") as String
-                            val width = call.argument<Int>("width") as Int
-                            val height = call.argument<Int>("height") as Int
+                            val id = call.argument<String>("id")!!
+                            val width = call.argument<Int>("width")!!
+                            val height = call.argument<Int>("height")!!
                             photoManager.getThumb(id, width, height, resultHandler)
                         }
                         "getOrigin" -> {
                             runOnBackground {
-                                val id = call.argument<String>("id") as String
+                                val id = call.argument<String>("id")!!
                                 photoManager.getOriginBytes(id, resultHandler)
                             }
                         }
@@ -198,6 +198,20 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                                 val title = call.argument<String>("title")!!
                                 val desc = call.argument<String>("desc")!!
                                 val entity = photoManager.saveImage(image, title, desc)
+                                if (entity == null) {
+                                    resultHandler.reply(null)
+                                    return@runOnBackground
+                                }
+                                val map = ConvertUtils.convertToAssetResult(entity)
+                                resultHandler.reply(map)
+                            }
+                        }
+                        "saveVideo" -> {
+                            runOnBackground {
+                                val videoPath = call.argument<String>("path")!!
+                                val title = call.argument<String>("title")!!
+                                val desc = call.argument<String>("desc")!!
+                                val entity = photoManager.saveVideo(videoPath, title, desc)
                                 if (entity == null) {
                                     resultHandler.reply(null)
                                     return@runOnBackground

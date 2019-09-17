@@ -1,16 +1,14 @@
 package top.kikt.imagescanner.core.utils
 
-import android.content.ContentUris
-import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.provider.MediaStore
 import android.provider.MediaStore.VOLUME_EXTERNAL
-import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.GalleryEntity
+import java.io.InputStream
 
 
 /// create 2019-09-11 by cai
@@ -112,48 +110,8 @@ interface IDBUtils {
         }
     }
 
-    fun saveImage(context: Context, image: ByteArray, title: String, desc: String): AssetEntity? {
-        val cr = context.contentResolver
-        val stream = image.inputStream()
-//        val mimeType = URLConnection.guessContentTypeFromStream(stream)
-        val exifInterface = ExifInterface(stream)
-        val values = ContentValues().apply {
-            val timestamp = System.currentTimeMillis() / 1000
-            put(MediaStore.Files.FileColumns.TITLE, title)
-            put(MediaStore.Images.ImageColumns.DESCRIPTION, title)
-            put(MediaStore.Images.ImageColumns.DATE_ADDED, timestamp)
-            put(MediaStore.Images.ImageColumns.DATE_MODIFIED, timestamp)
-            put(MediaStore.Images.ImageColumns.DATE_ADDED, timestamp)
-            put(MediaStore.Images.ImageColumns.WIDTH, exifInterface.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 800))
-            put(MediaStore.Images.ImageColumns.HEIGHT, exifInterface.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 800))
+    fun saveImage(context: Context, image: ByteArray, title: String, desc: String): AssetEntity?
 
-        }
-        val contentUri = cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-                ?: return null
-        val id = ContentUris.parseId(contentUri)
-        return null
-    }
-
-    fun saveVideo(context: Context, image: ByteArray, title: String, desc: String): AssetEntity? {
-        val cr = context.contentResolver
-        val stream = image.inputStream()
-//        val mimeType = URLConnection.guessContentTypeFromStream(stream)
-        val exifInterface = ExifInterface(stream)
-        val values = ContentValues().apply {
-            val timestamp = System.currentTimeMillis() / 1000
-            put(MediaStore.Files.FileColumns.TITLE, title)
-            put(MediaStore.Images.ImageColumns.DESCRIPTION, title)
-            put(MediaStore.Images.ImageColumns.DATE_ADDED, timestamp)
-            put(MediaStore.Images.ImageColumns.DATE_MODIFIED, timestamp)
-            put(MediaStore.Images.ImageColumns.DATE_ADDED, timestamp)
-            put(MediaStore.Images.ImageColumns.WIDTH, exifInterface.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 800))
-            put(MediaStore.Images.ImageColumns.HEIGHT, exifInterface.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 800))
-
-        }
-        val contentUri = cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-                ?: return null
-        val id = ContentUris.parseId(contentUri)
-        return null
-    }
+    fun saveVideo(context: Context, inputStream: InputStream, title: String, desc: String): AssetEntity?
 
 }

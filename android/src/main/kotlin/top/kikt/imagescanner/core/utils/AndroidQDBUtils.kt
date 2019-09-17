@@ -1,6 +1,8 @@
 package top.kikt.imagescanner.core.utils
 
 import android.annotation.SuppressLint
+import android.content.ContentUris
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
@@ -12,6 +14,9 @@ import top.kikt.imagescanner.core.cache.AndroidQCache
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.GalleryEntity
+import java.io.ByteArrayInputStream
+import java.io.InputStream
+import java.net.URLConnection
 
 /// create 2019-09-11 by cai
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -220,6 +225,7 @@ object AndroidQDBUtils : IDBUtils {
 
     }
 
+
     override fun getAssetEntity(context: Context, id: String): AssetEntity? {
         val asset = cacheContainer.getAsset(id)
         if (asset != null) {
@@ -322,6 +328,72 @@ object AndroidQDBUtils : IDBUtils {
         val uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
 //        val original = MediaStore.setRequireOriginal(uri)
         return context.contentResolver.loadThumbnail(uri, Size(width, height), null)
+    }
+
+    override fun saveImage(context: Context, image: ByteArray, title: String, desc: String): AssetEntity? {
+        val inputStream = ByteArrayInputStream(image)
+
+        val cr = context.contentResolver
+        val timestamp = System.currentTimeMillis() / 1000
+
+        val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
+
+        val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, title)
+            put(MediaStore.Images.ImageColumns.MIME_TYPE, typeFromStream)
+            put(MediaStore.Images.ImageColumns.TITLE, title)
+            put(MediaStore.Images.ImageColumns.DESCRIPTION, desc)
+            put(MediaStore.Images.ImageColumns.DATE_ADDED, timestamp)
+            put(MediaStore.Images.ImageColumns.DATE_MODIFIED, timestamp)
+        }
+
+        val contentUri = cr.insert(uri, values) ?: return null
+        val outputStream = cr.openOutputStream(contentUri)
+
+        outputStream?.use {
+            inputStream.use {
+                inputStream.copyTo(outputStream)
+            }
+        }
+
+        val id = ContentUris.parseId(contentUri)
+
+        cr.notifyChange(contentUri, null)
+        return DBUtils.getAssetEntity(context, id.toString())
+    }
+
+    override fun saveVideo(context: Context, inputStream: InputStream, title: String, desc: String): AssetEntity? {
+        val cr = context.contentResolver
+        val timestamp = System.currentTimeMillis() / 1000
+
+        val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
+
+        val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, title)
+            put(MediaStore.Video.VideoColumns.MIME_TYPE, typeFromStream)
+            put(MediaStore.Video.VideoColumns.TITLE, title)
+            put(MediaStore.Video.VideoColumns.DESCRIPTION, desc)
+            put(MediaStore.Video.VideoColumns.DATE_ADDED, timestamp)
+            put(MediaStore.Video.VideoColumns.DATE_MODIFIED, timestamp)
+        }
+
+        val contentUri = cr.insert(uri, values) ?: return null
+        val outputStream = cr.openOutputStream(contentUri)
+
+        outputStream?.use {
+            inputStream.use {
+                inputStream.copyTo(outputStream)
+            }
+        }
+
+        val id = ContentUris.parseId(contentUri)
+
+        cr.notifyChange(contentUri, null)
+        return DBUtils.getAssetEntity(context, id.toString())
     }
 
 }
