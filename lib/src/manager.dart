@@ -15,6 +15,8 @@ class PhotoManager {
     return _plugin.requestPermission();
   }
 
+  static Editor editor = Editor();
+
   /// get gallery list
   ///
   /// 获取相册"文件夹" 列表
@@ -167,10 +169,6 @@ class PhotoManager {
     await _plugin.forceOldApi();
   }
 
-  static Future<List<String>> deleteWithIds(List<String> ids) async {
-    return _plugin.deleteWithIds(ids);
-  }
-
   static Future<List<AssetEntity>> getAssetWithRange({
     @required AssetPathEntity entity,
     @required int start,
@@ -185,11 +183,7 @@ class PhotoManager {
     );
   }
 
-  // static bool get androidQExperimental => _plugin.androidQExperimental;
 
-  // static set androidQExperimental(bool value)=> _plugin.androidQExperimental = value;
-
-  // static Future<void> setAndroidQExperimental(bool open) async {
-  //   await _plugin.setAndroidQExperimental(open);
-  // }
 }
+
+

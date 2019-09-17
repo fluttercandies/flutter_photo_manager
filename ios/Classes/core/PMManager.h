@@ -3,12 +3,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <Photos/Photos.h>
 
 typedef void(^ChangeIds)(NSArray<NSString *> *);
 
 @class PMAssetPathEntity;
 @class PMAssetEntity;
 @class ResultHandler;
+
+typedef void(^AssetResult)(PMAssetEntity *);
 
 @interface PMManager : NSObject
 
@@ -38,5 +41,9 @@ typedef void(^ChangeIds)(NSArray<NSString *> *);
 
 - (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id type:(NSUInteger)type start:(NSUInteger)start
                                                       end:(NSUInteger)end date:(NSDate *)date;
+
+- (void)saveImage:(NSData *)data title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block;
+
+- (void)saveVideo:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block;
 @end
 

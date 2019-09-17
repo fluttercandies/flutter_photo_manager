@@ -157,6 +157,27 @@
         [manager deleteWithIds:ids changedBlock:^(NSArray<NSString *> *array) {
             [handler reply:array];
         }];
+
+    } else if ([call.method isEqualToString:@"saveImage"]) {
+        NSData *data = [call.arguments[@"image"] data];
+        NSString *title = call.arguments[@"title"];
+        NSString *desc = call.arguments[@"desc"];
+
+        [manager saveImage:data title:title desc:desc block:^(PMAssetEntity *asset) {
+            NSDictionary *resultData = [ConvertUtils convertPMAssetToMap:asset];
+            [handler reply:@{@"data": resultData}];
+        }];
+
+    } else if ([call.method isEqualToString:@"saveVideo"]) {
+        NSString *videoPath = call.arguments[@"path"];
+        NSString *title = call.arguments[@"title"];
+        NSString *desc = call.arguments[@"desc"];
+
+        [manager saveVideo:videoPath title:title desc:desc block:^(PMAssetEntity *asset) {
+            NSDictionary *resultData = [ConvertUtils convertPMAssetToMap:asset];
+            [handler reply:@{@"data": resultData}];
+        }];
+
     }
 }
 

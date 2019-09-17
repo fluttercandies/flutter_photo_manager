@@ -5,6 +5,7 @@
 #import <Photos/Photos.h>
 #import "ConvertUtils.h"
 #import "PMAssetPathEntity.h"
+#import "PHAsset+PHAsset_checkType.h"
 
 
 @implementation ConvertUtils {
@@ -49,12 +50,34 @@
 
 + (NSDictionary *)convertPHAssetToMap:(PHAsset *)asset {
     int createDt = (int) (asset.creationDate.timeIntervalSince1970 / 1000);
+
+    int typeInt = 0;
+
+    if (asset.isVideo) {
+        typeInt = 2;
+    }
+    if (asset.isImage) {
+        typeInt = 1;
+    }
+
     return @{
             @"id": asset.localIdentifier,
             @"createDt": @(createDt),
             @"width": @(asset.pixelWidth),
             @"height": @(asset.pixelHeight),
             @"duration": @((long) asset.duration),
+            @"type": @(typeInt),
+    };
+}
+
++ (NSDictionary *)convertPMAssetToMap:(PMAssetEntity *)asset {
+    return @{
+            @"id": asset.id,
+            @"createDt": @(asset.createDt),
+            @"width": @(asset.width),
+            @"height": @(asset.height),
+            @"duration": @(asset.duration),
+            @"type": @(asset.type),
     };
 }
 
