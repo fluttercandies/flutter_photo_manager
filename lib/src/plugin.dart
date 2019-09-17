@@ -64,7 +64,7 @@ class Plugin {
       "timestamp": pagedDt.millisecondsSinceEpoch,
     });
 
-    return ConvertUtils.convertAssetEntity(result);
+    return ConvertUtils.convertToAssetList(result);
   }
 
   Future<Uint8List> getThumb({
@@ -171,16 +171,38 @@ class Plugin {
       "timestamp": fetchDt.millisecondsSinceEpoch,
     });
 
-    return ConvertUtils.convertAssetEntity(map);
+    return ConvertUtils.convertToAssetList(map);
   }
 
-  Future<bool> saveImage(Uint8List uint8list) async {
-    await _channel.invokeMethod(
+  Future<AssetEntity> saveImage(Uint8List uint8list,
+      {String title, String desc = ""}) async {
+    title ??= "image_${DateTime.now().millisecondsSinceEpoch / 1000}";
+
+    final result = await _channel.invokeMethod(
       "saveImage",
       {
         "image": uint8list,
+        "title": title,
+        "desc": desc,
       },
     );
-    return false;
+
+    return ConvertUtils.convertToAsset(result);
+  }
+
+  Future<AssetEntity> saveVideo(File file,
+      {String title, String desc = ""}) async {
+    if (file.existsSync()) {
+      return null;
+    }
+    final result = await _channel.invokeMethod(
+      "saveVideo",
+      {
+        "path": file.absolute.path,
+        "title": title,
+        "desc": desc,
+      },
+    );
+    return ConvertUtils.convertToAsset(result);
   }
 }

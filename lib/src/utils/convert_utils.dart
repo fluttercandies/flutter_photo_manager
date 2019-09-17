@@ -25,7 +25,7 @@ class ConvertUtils {
     return result;
   }
 
-  static List<AssetEntity> convertAssetEntity(Map data) {
+  static List<AssetEntity> convertToAssetList(Map data) {
     List<AssetEntity> result = [];
 
     List list = data["data"];
@@ -42,5 +42,23 @@ class ConvertUtils {
     }
 
     return result;
+  }
+
+  static AssetEntity convertToAsset(Map map) {
+    if (map == null) {
+      return null;
+    }
+
+    Map data = map["data"];
+
+    final entity = AssetEntity()
+      ..id = data["id"]
+      ..createTime = data["createDt"]
+      ..width = data["width"]
+      ..height = data["height"]
+      ..duration = data["duration"]
+      ..typeInt = data["type"];
+
+    return entity;
   }
 }
