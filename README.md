@@ -12,6 +12,8 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
 
 ## install
 
+### Add to pubspec
+
 the latest version is [![pub package](https://img.shields.io/pub/v/photo_manager.svg)](https://pub.dartlang.org/packages/photo_manager)
 
 ```yaml
@@ -19,21 +21,15 @@ dependencies:
   photo_manager: $latest_version
 ```
 
-## import
+### import in dart code
 
 ```dart
 import 'package:photo_manager/photo_manager.dart';
 ```
 
-## use
+## Usage
 
-see the example/lib/main.dart
-
-or see next
-
-## example
-
-1. request permission
+### request permission
 
 You must get the user's permission on android/ios.
 
@@ -47,7 +43,7 @@ if (result) {
 }
 ```
 
-2. you get all of asset list (gallery)
+### you get all of asset list (gallery)
 
 ```dart
 List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
@@ -65,9 +61,9 @@ or
 List<AssetPathEntity> list = await PhotoManager.getVideoAsset();
 ```
 
-3. get asset list from imagePath
+### get asset list from imagePath
 
-paged:
+#### paged
 
 ```dart
 // page: The page number of the page, starting at 0.
@@ -77,14 +73,21 @@ final assetList = await path.getAssetListPaged(page, perPage);
 
 The old version, it is not recommended for continued use, because there may be performance issues on some phones. Now the internal implementation of this method is also paged, but the paged count is assetCount of AssetPathEntity.
 
-Old version:
+#### range
+
+```dart
+final assetList = await path.getAssetListRange(start: 0, end: 88); // use start and end to get asset.
+// Example: 0~10 will return 10 assets. Special case: If there are only 5, return 5
+```
+
+#### Old version
 
 ```dart
 AssetPathEntity data = list[0]; // 1st album in the list, typically the "Recent" or "All" album
 List<AssetEntity> imageList = await data.assetList;
 ```
 
-1. use the AssetEntity
+### AssetEntity
 
 ```dart
 AssetEntity entity = imageList[0];
@@ -107,18 +110,6 @@ int width = entity.width;
 
 int height = entity.height;
 ```
-
-## Usage
-
-### Create `AssetEntity` with id
-
-the `id` is `AssetEntity.id`
-
-```dart
-AssetEntity asset = await createAssetEntityWithId(id);
-```
-
-When this method is called, the image corresponding to ID has been deleted, and the return value is null.
 
 ### observer
 
