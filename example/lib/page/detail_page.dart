@@ -37,7 +37,10 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget _buildImage() {
-    return Image.file(widget.file);
+    return Image.file(
+      widget.file,
+      filterQuality: FilterQuality.low,
+    );
   }
 
   void _showInfo() {

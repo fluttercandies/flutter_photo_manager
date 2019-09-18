@@ -49,6 +49,7 @@ class PhotoProvider extends ChangeNotifier {
       return s2.assetCount.compareTo(s1.assetCount);
     });
 
+    this.list.clear();
     this.list.addAll(galleryList);
   }
 
