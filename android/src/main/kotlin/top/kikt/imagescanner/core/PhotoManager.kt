@@ -10,6 +10,7 @@ import top.kikt.imagescanner.core.utils.IDBUtils
 import top.kikt.imagescanner.old.ResultHandler
 import top.kikt.imagescanner.thumb.ThumbnailUtil
 import java.io.File
+import java.io.FileInputStream
 
 /// create 2019-09-05 by cai
 /// Do some business logic assembly
@@ -137,7 +138,7 @@ class PhotoManager(private val context: Context) {
         if (!File(path).exists()) {
             return null
         }
-        return dbUtils.saveVideo(context, path, title, desc)
+        return dbUtils.saveVideo(context, FileInputStream(path), title, desc)
     }
 
 }

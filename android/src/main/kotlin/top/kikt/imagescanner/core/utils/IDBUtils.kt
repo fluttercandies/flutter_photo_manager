@@ -3,6 +3,7 @@ package top.kikt.imagescanner.core.utils
 import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
+import android.net.Uri
 import android.provider.MediaStore
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import top.kikt.imagescanner.core.cache.CacheContainer
@@ -57,8 +58,14 @@ interface IDBUtils {
 
     }
 
-    val allUri
+    val allUri: Uri
         get() = MediaStore.Files.getContentUri(VOLUME_EXTERNAL)
+
+
+    val sizeWhere: String
+        get() {
+            return "AND ${MediaStore.MediaColumns.WIDTH} > 0 AND ${MediaStore.MediaColumns.HEIGHT} > 0"
+        }
 
     fun getGalleryList(context: Context, requestType: Int = 0, timeStamp: Long): List<GalleryEntity>
 

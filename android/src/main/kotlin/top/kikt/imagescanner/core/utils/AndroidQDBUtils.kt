@@ -57,7 +57,7 @@ object AndroidQDBUtils : IDBUtils {
         val dateSelection = "AND ${MediaStore.MediaColumns.DATE_ADDED} <= ?"
         args.add(timeStamp.toString())
 
-        val selections = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection"
+        val selections = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
 
         val cursor = context.contentResolver.query(allUri, galleryKeys, selections, args.toTypedArray(), null)
                 ?: return list
@@ -128,9 +128,9 @@ object AndroidQDBUtils : IDBUtils {
 
         val keys = (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys).distinct().toTypedArray()
         val selection = if (isAll) {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection"
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
         } else {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection"
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
         }
 
         val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET ${page * pageSize}"
@@ -193,9 +193,9 @@ object AndroidQDBUtils : IDBUtils {
 
         val keys = (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys).distinct().toTypedArray()
         val selection = if (isAll) {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection"
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
         } else {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection"
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
         }
 
         val pageSize = end - start
@@ -300,7 +300,7 @@ object AndroidQDBUtils : IDBUtils {
             args.add(galleryId)
         }
 
-        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection"
+        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere"
         val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
                 ?: return null
 

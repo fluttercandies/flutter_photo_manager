@@ -71,7 +71,7 @@ object DBUtils : IDBUtils {
         val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
         args.add(timeStamp.toString())
 
-        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
+        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
         val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
                 ?: return emptyList()
         while (cursor.moveToNext()) {
@@ -119,7 +119,7 @@ object DBUtils : IDBUtils {
             args.add(galleryId)
         }
 
-        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
+        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
         val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null) ?: return null
         return if (cursor.moveToNext()) {
             val id = cursor.getString(0)
@@ -173,9 +173,9 @@ object DBUtils : IDBUtils {
 
         val keys = (storeImageKeys + storeVideoKeys + typeKeys).distinct().toTypedArray()
         val selection = if (isAll) {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection"
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
         } else {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection"
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
         }
 
         val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET ${page * pageSize}"
@@ -237,9 +237,9 @@ object DBUtils : IDBUtils {
 
         val keys = (storeImageKeys + storeVideoKeys + typeKeys).distinct().toTypedArray()
         val selection = if (isAll) {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection"
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
         } else {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection"
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
         }
 
         val pageSize = end - start
