@@ -32,10 +32,11 @@ class ConvertUtils {
     for (final Map item in list) {
       final entity = AssetEntity()
         ..id = item["id"]
-        ..createTime = item["createDt"]
+        ..createDtSecond = item["createDt"]
         ..width = item["width"]
         ..height = item["height"]
         ..duration = item["duration"]
+        ..modifiedDateSecond = item["modifiedDt"]
         ..typeInt = item["type"];
 
       result.add(entity);
@@ -53,10 +54,11 @@ class ConvertUtils {
 
     final entity = AssetEntity()
       ..id = data["id"]
-      ..createTime = data["createDt"]
+      ..createDtSecond = data["createDt"]
       ..width = data["width"]
       ..height = data["height"]
       ..duration = data["duration"]
+      ..modifiedDateSecond = data["modifiedDt"]
       ..typeInt = data["type"];
 
     return entity;

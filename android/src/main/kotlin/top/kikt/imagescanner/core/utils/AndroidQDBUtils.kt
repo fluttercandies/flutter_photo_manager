@@ -146,8 +146,9 @@ object AndroidQDBUtils : IDBUtils {
             val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
             val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
             val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
+            val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
 
-            val asset = AssetEntity(id, path, duration, date, width, height, DBUtils.getMediaType(type), displayName)
+            val asset = AssetEntity(id, path, duration, date, width, height, DBUtils.getMediaType(type), displayName, modifiedDate)
             list.add(asset)
             cache.putAsset(asset)
         }
@@ -213,8 +214,9 @@ object AndroidQDBUtils : IDBUtils {
             val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
             val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
             val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
+            val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
 
-            val asset = AssetEntity(id, path, duration, date, width, height, DBUtils.getMediaType(type), displayName)
+            val asset = AssetEntity(id, path, duration, date, width, height, DBUtils.getMediaType(type), displayName, modifiedDate)
             list.add(asset)
             cache.putAsset(asset)
         }
@@ -249,8 +251,9 @@ object AndroidQDBUtils : IDBUtils {
                 val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
                 val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
                 val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
+                val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
 
-                val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, DBUtils.getMediaType(type), displayName)
+                val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, DBUtils.getMediaType(type), displayName, modifiedDate)
                 cacheContainer.putAsset(dbAsset)
 
                 cursor.close()

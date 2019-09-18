@@ -28,6 +28,7 @@ interface IDBUtils {
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME, // dir name 目录名字
                 MediaStore.Images.Media.WIDTH, // 宽
                 MediaStore.Images.Media.HEIGHT, // 高
+                MediaStore.Images.Media.DATE_MODIFIED, // 修改时间
                 MediaStore.Images.Media.MIME_TYPE, // 高
                 MediaStore.Images.Media.DATE_TAKEN //日期
         )
@@ -42,6 +43,7 @@ interface IDBUtils {
                 MediaStore.Video.Media.DATE_TAKEN, //日期
                 MediaStore.Video.Media.WIDTH, // 宽
                 MediaStore.Video.Media.HEIGHT, // 高
+                MediaStore.Images.Media.DATE_MODIFIED, // 修改时间
                 MediaStore.Video.Media.MIME_TYPE, // 高
                 MediaStore.Video.Media.DURATION //时长
         )

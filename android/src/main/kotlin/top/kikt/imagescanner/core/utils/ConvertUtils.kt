@@ -36,9 +36,10 @@ object ConvertUtils {
                     "id" to entity.id,
                     "duration" to entity.duration,
                     "type" to entity.type,
-                    "createDt" to entity.duration / 1000,
+                    "createDt" to entity.createDt / 1000,
                     "width" to entity.width,
-                    "height" to entity.height
+                    "height" to entity.height,
+                    "modifiedDt" to entity.modifiedDate
             )
             data.add(element)
         }
@@ -54,9 +55,10 @@ object ConvertUtils {
                 "id" to entity.id,
                 "duration" to entity.duration,
                 "type" to entity.type,
-                "createDt" to entity.duration / 1000,
+                "createDt" to entity.createDt / 1000,
                 "width" to entity.width,
-                "height" to entity.height
+                "height" to entity.height,
+                "modifiedDt" to entity.modifiedDate
         )
 
         return mapOf(

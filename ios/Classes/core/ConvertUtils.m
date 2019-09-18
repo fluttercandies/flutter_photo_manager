@@ -31,16 +31,8 @@
 + (NSDictionary *)convertAssetToMap:(NSArray<PMAssetEntity *> *)array {
     NSMutableArray *data = [NSMutableArray new];
 
-    for (PMAssetEntity *entity in array) {
-        NSDictionary *item = @{
-                @"id": entity.id,
-                @"createDt": @(entity.createDt),
-                @"width": @(entity.width),
-                @"height": @(entity.height),
-                @"duration": @(entity.duration),
-                @"type": @(entity.type),
-        };
-
+    for (PMAssetEntity *asset in array) {
+        NSDictionary *item = [ConvertUtils convertPMAssetToMap:asset];
         [data addObject:item];
     }
 
@@ -49,7 +41,8 @@
 }
 
 + (NSDictionary *)convertPHAssetToMap:(PHAsset *)asset {
-    int createDt = (int) (asset.creationDate.timeIntervalSince1970 / 1000);
+    long createDt = (int) asset.creationDate.timeIntervalSince1970;
+    long modifiedDt = (int) asset.modificationDate.timeIntervalSince1970;
 
     int typeInt = 0;
 
@@ -67,6 +60,7 @@
             @"height": @(asset.pixelHeight),
             @"duration": @((long) asset.duration),
             @"type": @(typeInt),
+            @"modifiedDt": @(modifiedDt),
     };
 }
 
@@ -78,6 +72,7 @@
             @"height": @(asset.height),
             @"duration": @(asset.duration),
             @"type": @(asset.type),
+            @"modifiedDt": @(asset.modifiedDt),
     };
 }
 

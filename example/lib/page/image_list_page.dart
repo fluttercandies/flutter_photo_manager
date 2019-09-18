@@ -84,6 +84,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
         final f = await entity.file;
         final page = DetailPage(
           file: f,
+          entity:entity,
         );
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (BuildContext context) {

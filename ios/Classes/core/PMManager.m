@@ -180,7 +180,10 @@
     }
 
     NSDate *date = asset.creationDate;
-    long createDt = (long) (date.timeIntervalSince1970 / 1000);
+    long createDt = (long) date.timeIntervalSince1970;
+
+    NSDate *modifiedDate = asset.modificationDate;
+    long modifiedTimeStamp = (long)modifiedDate.timeIntervalSince1970;
 
     PMAssetEntity *entity = [PMAssetEntity entityWithId:asset.localIdentifier
                                                createDt:createDt
@@ -189,6 +192,7 @@
                                                duration:(long) asset.duration
                                                    type:type];
     entity.phAsset = asset;
+    entity.modifiedDt = modifiedTimeStamp;
     return entity;
 }
 
