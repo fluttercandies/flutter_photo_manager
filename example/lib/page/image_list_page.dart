@@ -55,11 +55,13 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     }
     return RefreshIndicator(
       onRefresh: _onRefresh,
-      child: GridView.builder(
-        itemBuilder: _buildItem,
-        itemCount: provider.showItemCount,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
+      child: Scrollbar(
+        child: GridView.builder(
+          itemBuilder: _buildItem,
+          itemCount: provider.showItemCount,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+          ),
         ),
       ),
     );
