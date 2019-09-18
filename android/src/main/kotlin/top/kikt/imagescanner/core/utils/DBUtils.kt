@@ -1,8 +1,11 @@
 package top.kikt.imagescanner.core.utils
 
 import android.annotation.SuppressLint
+import android.content.ContentUris
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
@@ -15,6 +18,8 @@ import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeImageKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeVideoKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.typeKeys
 import java.io.File
+import java.io.InputStream
+import java.net.URLConnection
 
 
 /// create 2019-09-05 by cai
@@ -66,7 +71,7 @@ object DBUtils : IDBUtils {
         val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
         args.add(timeStamp.toString())
 
-        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
+        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
         val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
                 ?: return emptyList()
         while (cursor.moveToNext()) {
@@ -114,7 +119,7 @@ object DBUtils : IDBUtils {
             args.add(galleryId)
         }
 
-        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
+        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
         val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null) ?: return null
         return if (cursor.moveToNext()) {
             val id = cursor.getString(0)
@@ -168,9 +173,9 @@ object DBUtils : IDBUtils {
 
         val keys = (storeImageKeys + storeVideoKeys + typeKeys).distinct().toTypedArray()
         val selection = if (isAll) {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection"
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
         } else {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection"
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
         }
 
         val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET ${page * pageSize}"
@@ -232,9 +237,9 @@ object DBUtils : IDBUtils {
 
         val keys = (storeImageKeys + storeVideoKeys + typeKeys).distinct().toTypedArray()
         val selection = if (isAll) {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection"
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
         } else {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection"
+            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
         }
 
         val pageSize = end - start
@@ -309,4 +314,42 @@ object DBUtils : IDBUtils {
         cacheContainer.clearCache()
     }
 
+    override fun saveImage(context: Context, image: ByteArray, title: String, desc: String): AssetEntity? {
+        val bmp = BitmapFactory.decodeByteArray(image, 0, image.count())
+        val insertImage = MediaStore.Images.Media.insertImage(context.contentResolver, bmp, title, desc)
+        val id = ContentUris.parseId(Uri.parse(insertImage))
+        return getAssetEntity(context, id.toString())
+    }
+
+    override fun saveVideo(context: Context, inputStream: InputStream, title: String, desc: String): AssetEntity? {
+        val cr = context.contentResolver
+        val timestamp = System.currentTimeMillis() / 1000
+
+        val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
+
+        val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, title)
+            put(MediaStore.Video.VideoColumns.MIME_TYPE, typeFromStream)
+            put(MediaStore.Video.VideoColumns.TITLE, title)
+            put(MediaStore.Video.VideoColumns.DESCRIPTION, desc)
+            put(MediaStore.Video.VideoColumns.DATE_ADDED, timestamp)
+            put(MediaStore.Video.VideoColumns.DATE_MODIFIED, timestamp)
+        }
+
+        val contentUri = cr.insert(uri, values) ?: return null
+        val outputStream = cr.openOutputStream(contentUri)
+
+        outputStream?.use {
+            inputStream.use {
+                inputStream.copyTo(outputStream)
+            }
+        }
+
+        val id = ContentUris.parseId(contentUri)
+
+        cr.notifyChange(contentUri, null)
+        return getAssetEntity(context, id.toString())
+    }
 }

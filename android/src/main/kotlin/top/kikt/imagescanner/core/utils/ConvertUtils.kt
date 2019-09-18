@@ -47,4 +47,22 @@ object ConvertUtils {
                 "data" to data
         )
     }
+
+    fun convertToAssetResult(entity: AssetEntity): Map<String, Any?> {
+
+        val data = mapOf(
+                "id" to entity.id,
+                "duration" to entity.duration,
+                "type" to entity.type,
+                "createDt" to entity.duration / 1000,
+                "width" to entity.width,
+                "height" to entity.height
+        )
+
+        return mapOf(
+                "data" to data
+        )
+    }
+
+
 }

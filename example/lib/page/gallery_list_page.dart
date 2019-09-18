@@ -20,9 +20,11 @@ class _GalleryListPageState extends State<GalleryListPage> {
         title: Text("Gallery list"),
       ),
       body: Container(
-        child: ListView.builder(
-          itemBuilder: _buildItem,
-          itemCount: provider.list.length,
+        child: Scrollbar(
+          child: ListView.builder(
+            itemBuilder: _buildItem,
+            itemCount: provider.list.length,
+          ),
         ),
       ),
     );

@@ -17,3 +17,4 @@ part './src/type.dart';
 part './src/entity.dart';
 part './src/factory.dart';
 part './src/notify.dart';
+part './src/editor.dart';

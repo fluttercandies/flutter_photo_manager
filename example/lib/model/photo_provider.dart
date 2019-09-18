@@ -101,7 +101,7 @@ class PathProvider extends ChangeNotifier {
   }
 
   void delete(AssetEntity entity) async {
-    final result = await PhotoManager.deleteWithIds([entity.id]);
+    final result = await PhotoManager.editor.deleteWithIds([entity.id]);
     if (result.isNotEmpty) {
       await path.refreshPathProperties(dt: path.fetchDatetime);
       final list =

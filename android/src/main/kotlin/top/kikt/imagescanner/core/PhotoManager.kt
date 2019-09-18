@@ -10,6 +10,7 @@ import top.kikt.imagescanner.core.utils.IDBUtils
 import top.kikt.imagescanner.old.ResultHandler
 import top.kikt.imagescanner.thumb.ThumbnailUtil
 import java.io.File
+import java.io.FileInputStream
 
 /// create 2019-09-05 by cai
 /// Do some business logic assembly
@@ -127,6 +128,17 @@ class PhotoManager(private val context: Context) {
 
     fun deleteAssetWithIds(ids: List<String>): List<String> {
         return dbUtils.deleteWithIds(context, ids)
+    }
+
+    fun saveImage(image: ByteArray, title: String, description: String): AssetEntity? {
+        return dbUtils.saveImage(context, image, title, description)
+    }
+
+    fun saveVideo(path: String, title: String, desc: String): AssetEntity? {
+        if (!File(path).exists()) {
+            return null
+        }
+        return dbUtils.saveVideo(context, FileInputStream(path), title, desc)
     }
 
 }

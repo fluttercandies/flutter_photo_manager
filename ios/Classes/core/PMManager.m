@@ -2,7 +2,7 @@
 // Created by Caijinglong on 2019-09-06.
 //
 
-#import <Photos/Photos.h>
+
 #import "PMManager.h"
 #import "PMAssetPathEntity.h"
 #import "PHAsset+PHAsset_checkType.h"
@@ -406,6 +406,46 @@
             block(ids);
         } else {
             block(@[]);
+        }
+    }];
+}
+
+- (void)saveImage:(NSData *)data title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block {
+    PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
+    [[PHPhotoLibrary sharedPhotoLibrary]
+            performChanges:^{
+                PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
+                [options setOriginalFilename:title];
+                [request addResourceWithType:PHAssetResourceTypePhoto data:data options:options];
+            } completionHandler:^(BOOL success, NSError *error) {
+        if (success) {
+            NSString *id = request.placeholderForCreatedAsset.localIdentifier;
+            NSLog(@"create asset : id = %@", id);
+            block([self getAssetEntity:id]);
+        } else {
+            NSLog(@"create fail");
+            block(nil);
+        }
+    }];
+}
+
+- (void)saveVideo:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block {
+    NSURL *fileURL = [NSURL fileURLWithPath:path];
+    PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAssetFromVideoAtFileURL:fileURL];
+
+    [[PHPhotoLibrary sharedPhotoLibrary]
+            performChanges:^{
+                PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
+                [options setOriginalFilename:title];
+                [request addResourceWithType:PHAssetResourceTypeVideo fileURL:fileURL options:options];
+            } completionHandler:^(BOOL success, NSError *error) {
+        if (success) {
+            NSString *id = request.placeholderForCreatedAsset.localIdentifier;
+            NSLog(@"create asset : id = %@", id);
+            block([self getAssetEntity:id]);
+        } else {
+            NSLog(@"create fail");
+            block(nil);
         }
     }];
 }
