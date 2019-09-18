@@ -125,6 +125,28 @@ PhotoManager.removeChangeCallback(changeNotify);
 PhotoManager.stopChangeNotify();
 ```
 
+### Experimental
+
+#### Delete item
+
+```dart
+final List<String> result = await PhotoManager.editor.deleteWithIds([entity.id]); // The deleted id will be returned, if it fails, an empty array will be returned.
+```
+
+Tip: You need to call the corresponding `PathEntity`'s `refreshPathProperties` method to refresh the latest assetCount.
+
+And [range](#range) way to get the latest data to ensure the accuracy of the current data. Such as [example](https://github.com/CaiJingLong/flutter_photo_manager/blob/0298d19464c05b231e2e97989f068ec3a72b0ab0/example/lib/model/photo_provider.dart#L104-L113).
+
+#### Insert new item
+
+```dart
+final AssetEntity imageEntity = await PhotoManager.editor.saveImage(uint8list); // nullable
+
+
+File videoFile = File("video path");
+final AssetEntity videoEntity = await await PhotoManager.editor.saveVideo(videoFile); // nullable
+```
+
 ## iOS plist config
 
 Because the album is a privacy privilege, you need user permission to access it. You must to modify the `Info.plist` file in Runner project.
