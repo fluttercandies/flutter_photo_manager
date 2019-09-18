@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.4.3
+
+- Delete asset.
+- Add Image.
+- Add Video.
+
 ## 0.4.2
 
 - Fix ios get full file size error.
