@@ -2,9 +2,16 @@
 
 ## 0.4.3
 
+Add:
+
 - Delete asset.
 - Add Image.
 - Add Video.
+- Add modifiDate property.
+
+Fix:
+
+- CreateDate error.
 
 ## 0.4.2
 

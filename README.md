@@ -109,6 +109,10 @@ Size size = entity.size
 int width = entity.width;
 
 int height = entity.height;
+
+DateTime createDt = entity.createDateTime;
+
+DateTime modifiedDt = entity.modifiedDateTime;
 ```
 
 ### observer

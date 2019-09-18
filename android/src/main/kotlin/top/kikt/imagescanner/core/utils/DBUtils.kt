@@ -186,13 +186,14 @@ object DBUtils : IDBUtils {
             val id = cursor.getString(MediaStore.MediaColumns._ID)
             val path = cursor.getString(MediaStore.MediaColumns.DATA)
             val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
+            val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
             val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
             val duration = if (requestType == 1) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
             val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
             val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
             val displayName = File(path).name
 
-            val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName)
+            val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
             list.add(asset)
             cache.putAsset(asset)
         }
@@ -257,8 +258,9 @@ object DBUtils : IDBUtils {
             val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
             val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
             val displayName = File(path).name
+            val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
 
-            val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName)
+            val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
             list.add(asset)
             cache.putAsset(asset)
         }
@@ -293,8 +295,9 @@ object DBUtils : IDBUtils {
             val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
             val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
             val displayName = File(path).name
+            val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
 
-            val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), displayName)
+            val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
             cacheContainer.putAsset(dbAsset)
 
             cursor.close()

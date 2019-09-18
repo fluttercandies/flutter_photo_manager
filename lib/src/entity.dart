@@ -160,11 +160,20 @@ class AssetEntity {
   Size get size => Size(width.toDouble(), height.toDouble());
 
   /// unix timestamp of asset, milliseconds
-  int createTime;
+  int createDtSecond;
 
   /// create time of asset
   DateTime get createDateTime {
-    return DateTime.fromMillisecondsSinceEpoch(createTime ?? 0);
+    final sec = (createDtSecond ?? 0);
+    return DateTime.fromMillisecondsSinceEpoch(sec * 1000);
+  }
+
+  /// second of modified.
+  int modifiedDateSecond;
+
+  DateTime get modifiedDateTime {
+    final sec = modifiedDateSecond ?? 0;
+    return DateTime.fromMillisecondsSinceEpoch(sec * 1000);
   }
 
   /// If the asset is deleted, return false.

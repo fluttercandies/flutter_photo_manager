@@ -31,6 +31,7 @@
 @property(nonatomic, assign) long duration;
 @property(nonatomic, assign) int type;
 @property(nonatomic, strong) PHAsset *phAsset;
+@property(nonatomic, assign) long modifiedDt;
 
 - (instancetype)initWithId:(NSString *)id createDt:(long)createDt width:(NSUInteger)width height:(NSUInteger)height
                   duration:(long)duration type:(int)type;
