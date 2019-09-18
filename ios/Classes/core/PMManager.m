@@ -101,8 +101,6 @@
 
     PHAssetCollection *collection = fetchResult.firstObject;
 
-    options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
-
     PHFetchResult<PHAsset *> *assetArray = [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
 
     if (assetArray.count == 0) {
@@ -141,9 +139,6 @@
     PHFetchOptions *assetOptions = [self getAssetOptions:type date:date];
 
     PHAssetCollection *collection = fetchResult.firstObject;
-
-    options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
-
     PHFetchResult<PHAsset *> *assetArray = [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
 
     if (assetArray.count == 0) {
@@ -379,6 +374,7 @@
 
 - (PHFetchOptions *)getAssetOptions:(int)type date:(NSDate *)date {
     PHFetchOptions *options = [PHFetchOptions new];
+    options.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending: NO] ];
 
     if (type == 1) {
         options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d AND creationDate <= %@", PHAssetMediaTypeImage, date];
