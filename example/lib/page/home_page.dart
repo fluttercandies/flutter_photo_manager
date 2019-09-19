@@ -58,7 +58,7 @@ class _NewHomePageState extends State<NewHomePage> {
                   mainAxisSize: MainAxisSize.min,
                 ),
                 _buildHasAllCheck(),
-                buildNotifyCheck(),
+                _buildNotifyCheck(),
                 // buildAndroidQSwitch(),
               ],
             ),
@@ -125,18 +125,14 @@ class _NewHomePageState extends State<NewHomePage> {
     });
   }
 
-  bool notifying = false;
-
-  Widget buildNotifyCheck() {
+  Widget _buildNotifyCheck() {
     return CheckboxListTile(
-      value: notifying,
+      value: provider.notifying,
       title: Text("onChanged"),
       onChanged: (value) {
-        setState(() {
-          notifying = value;
-        });
+        provider.notifying = value;
 
-        if (notifying) {
+        if (value) {
           PhotoManager.startChangeNotify();
         } else {
           PhotoManager.stopChangeNotify();

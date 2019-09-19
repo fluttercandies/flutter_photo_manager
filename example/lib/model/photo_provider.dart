@@ -13,6 +13,15 @@ class PhotoProvider extends ChangeNotifier {
 
   Map<AssetPathEntity, PathProvider> pathProviderMap = {};
 
+  bool _notifying = false;
+
+  bool get notifying => _notifying;
+
+  set notifying(bool notifying) {
+    _notifying = notifying;
+    notifyListeners();
+  }
+
   void changeType(int v) {
     this.type = v;
     notifyListeners();
