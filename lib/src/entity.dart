@@ -154,7 +154,7 @@ class AssetEntity {
   }
 
   /// if not video ,duration is null
-  Duration get videoDuration => Duration(seconds: duration);
+  Duration get videoDuration => Duration(seconds: duration ?? 0);
 
   /// nullable, if the manager is null.
   Size get size => Size(width.toDouble(), height.toDouble());
