@@ -37,6 +37,17 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget _buildImage() {
+    if (widget.entity.type == AssetType.video) {
+      return FutureBuilder(
+        future: widget.entity.thumbData,
+        builder: (_, snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
+          return Image.memory(snapshot.data);
+        },
+      );
+    }
     return Image.file(
       widget.file,
       filterQuality: FilterQuality.low,
@@ -57,6 +68,7 @@ class _DetailPageState extends State<DetailPage> {
               buildInfoItem("create", entity.createDateTime.toString()),
               buildInfoItem("modified", entity.modifiedDateTime.toString()),
               buildInfoItem("size", entity.size.toString()),
+              buildInfoItem("duration", entity.videoDuration.toString()),
             ],
           ),
         ),
