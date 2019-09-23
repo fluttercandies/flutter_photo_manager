@@ -48,6 +48,7 @@ class PhotoProvider extends ChangeNotifier {
   }
 
   Future<void> refreshGalleryList() async {
+    reset();
     var galleryList = await PhotoManager.getAssetPathList(
       fetchDateTime: dt,
       type: RequestType.values[type],
