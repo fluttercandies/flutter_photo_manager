@@ -8,6 +8,7 @@ Add:
 - Add Image.
 - Add Video.
 - Add modifiDate property.
+- Fix videoDuration error.
 
 Fix:
 
