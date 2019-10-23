@@ -332,9 +332,7 @@
             [self fetchFullSize:asset resultHandler:handler];
         }
     }];
-
-    [manager requestImageForAsset:asset targetSize:PHImageManagerMaximumSize contentMode:PHImageContentModeDefault options: options resultHandler:^(UIImage * _Nullable image, NSDictionary * _Nullable info) {
-
+    [manager requestImageDataForAsset:asset options:nil resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
         BOOL downloadFinished = [PMManager isDownloadFinish:info];
         if (!downloadFinished) {
             return;
@@ -347,9 +345,25 @@
         NSMutableString *path = [NSMutableString stringWithString: homePath];
         NSString* filename = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/"
                                                                               withString:@"_"];
-        [path appendFormat:@"%@/%@.jpg", @".image", filename];
-        [UIImageJPEGRepresentation(image, 1.0) writeToFile:path atomically:YES];
-
+        NSString* suffix;
+        uint8_t firstByte;
+        [imageData getBytes:&firstByte length:1];
+        switch (firstByte) {
+            case 0xFF:
+                suffix = @".jpg";
+                break;
+            case 0x89:
+                suffix = @".png";
+                break;
+            case 0x47:
+                suffix = @".gif";
+                break;
+            default:
+                suffix = @".jpg";
+                imageData = UIImageJPEGRepresentation([UIImage imageWithData:imageData], 1);
+        }
+        [path appendFormat:@"%@/%@%@", @".image", filename, suffix];
+        [imageData writeToFile:path atomically:YES];
         [handler reply:path];
     }];
 }
