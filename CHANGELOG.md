@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.4.4
+
+Fix:
+
+- Compatibility code, when the width and height of the video is empty, it can still be scanned.
+- Add a default value to `type` of `getAssetPathList`.
+
 ## 0.4.3
 
 Add:

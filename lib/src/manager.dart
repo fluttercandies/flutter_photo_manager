@@ -25,7 +25,7 @@ class PhotoManager {
   /// [hasAll] 包含所有项目的相册
   static Future<List<AssetPathEntity>> getAssetPathList({
     bool hasAll = true,
-    RequestType type,
+    RequestType type = RequestType.all,
     DateTime fetchDateTime,
   }) async {
     return _plugin.getAllGalleryList(
@@ -182,8 +182,4 @@ class PhotoManager {
       entity.fetchDatetime,
     );
   }
-
-
 }
-
-
