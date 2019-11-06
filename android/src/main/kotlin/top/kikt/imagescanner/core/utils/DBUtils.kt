@@ -70,6 +70,8 @@ object DBUtils : IDBUtils {
 
         val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
         args.add(timeStamp.toString())
+    
+        val sizeWhere = AndroidQDBUtils.sizeWhere(requestType)
 
         val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
         val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
@@ -118,6 +120,8 @@ object DBUtils : IDBUtils {
             idSelection = "AND ${MediaStore.Images.Media.BUCKET_ID} = ?"
             args.add(galleryId)
         }
+    
+        val sizeWhere = AndroidQDBUtils.sizeWhere(null)
 
         val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
         val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null) ?: return null
@@ -170,6 +174,8 @@ object DBUtils : IDBUtils {
 
         val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
         args.add(timeStamp.toString())
+    
+        val sizeWhere = AndroidQDBUtils.sizeWhere(requestType)
 
         val keys = (storeImageKeys + storeVideoKeys + typeKeys).distinct().toTypedArray()
         val selection = if (isAll) {
@@ -235,6 +241,8 @@ object DBUtils : IDBUtils {
 
         val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
         args.add(timestamp.toString())
+    
+        val sizeWhere = AndroidQDBUtils.sizeWhere(requestType)
 
         val keys = (storeImageKeys + storeVideoKeys + typeKeys).distinct().toTypedArray()
         val selection = if (isAll) {
