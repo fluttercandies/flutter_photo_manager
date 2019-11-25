@@ -36,14 +36,44 @@ class _VideoWidgetState extends State<VideoWidget> {
         ? AspectRatio(
             aspectRatio: _controller.value.aspectRatio,
             child: GestureDetector(
-              child: VideoPlayer(_controller),
+              child: buildVideoPlayer(),
               onTap: () {
                 _controller.value.isPlaying
                     ? _controller.pause()
                     : _controller.play();
+                setState(() {});
               },
             ),
           )
         : Container();
+  }
+
+  buildVideoPlayer() {
+    var children = <Widget>[
+      VideoPlayer(_controller),
+    ];
+
+    if (!_controller.value.isPlaying) {
+      children.add(
+        IgnorePointer(
+          child: Center(
+              child: Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.black38,
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Icon(
+              Icons.play_arrow,
+              color: Colors.white,
+            ),
+          )),
+        ),
+      );
+    }
+
+    return Stack(
+      children: children,
+    );
   }
 }
