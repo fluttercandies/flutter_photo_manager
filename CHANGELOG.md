@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.4.5
+
+Fix:
+
+- Can't get thumb/file of video on androidQ.
+
 ## 0.4.4
 
 Fix:
