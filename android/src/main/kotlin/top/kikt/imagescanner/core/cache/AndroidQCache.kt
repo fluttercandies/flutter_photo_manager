@@ -26,7 +26,7 @@ class AndroidQCache {
 
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    fun getCacheFile(context: Context, assetId: String, extName: String): File {
+    fun getCacheFile(context: Context, assetId: String, extName: String, type: Int): File {
         val name = "${assetId}_$extName"
 
         val targetFile = File(context.cacheDir, name)
@@ -36,7 +36,11 @@ class AndroidQCache {
         }
 
         val contentResolver = context.contentResolver
-        val uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, assetId)
+      val uri =
+        if(type ==  1)
+          Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, assetId)
+        else
+          Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, assetId)
         val inputStream = contentResolver.openInputStream(uri)
         val outputStream = FileOutputStream(targetFile)
         outputStream.use {
