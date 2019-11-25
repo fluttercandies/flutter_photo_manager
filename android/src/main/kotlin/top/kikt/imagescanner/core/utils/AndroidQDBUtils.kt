@@ -330,12 +330,19 @@ object AndroidQDBUtils : IDBUtils {
     
     override fun getFilePath(context: Context, id: String): String? {
         val assetEntity = getAssetEntity(context, id) ?: return null
-        val cacheFile = androidQCache.getCacheFile(context, id, assetEntity.displayName)
+        val cacheFile = androidQCache.getCacheFile(context, id, assetEntity.displayName,assetEntity.type)
         return cacheFile.path
     }
     
-    override fun getThumb(context: Context, id: String, width: Int, height: Int): Bitmap? {
-        val uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+    override fun getThumb(context: Context, id: String, width: Int, height: Int, type: Int?): Bitmap? {
+        if(type == null){
+            return null
+        }
+        val uri =
+            if(type ==  1)
+                Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+            else
+                Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,id)
 //        val original = MediaStore.setRequireOriginal(uri)
         return context.contentResolver.loadThumbnail(uri, Size(width, height), null)
     }

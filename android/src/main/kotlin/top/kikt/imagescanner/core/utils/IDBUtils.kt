@@ -113,7 +113,7 @@ interface IDBUtils {
     
     fun getFilePath(context: Context, id: String): String?
     
-    fun getThumb(context: Context, id: String, width: Int, height: Int): Bitmap?
+    fun getThumb(context: Context, id: String, width: Int, height: Int, type: Int?): Bitmap?
     
     fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long): List<AssetEntity>
     

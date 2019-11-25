@@ -44,5 +44,10 @@
 
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>You must agree with the photo album to see your pictures</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+	<true/>
+	</dict>
 </dict>
 </plist>

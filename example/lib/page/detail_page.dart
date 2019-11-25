@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_scanner_example/widget/video_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class DetailPage extends StatefulWidget {
@@ -26,31 +27,33 @@ class _DetailPageState extends State<DetailPage> {
           ),
         ],
       ),
-      body: GestureDetector(
-        onTap: () => Navigator.of(context).pop(),
+      body: Center(
         child: Container(
           color: Colors.black,
-          child: _buildImage(),
+          child: _buildContent(),
         ),
       ),
     );
   }
 
-  Widget _buildImage() {
+  Widget _buildContent() {
     if (widget.entity.type == AssetType.video) {
-      return FutureBuilder(
-        future: widget.entity.thumbData,
-        builder: (_, snapshot) {
-          if (!snapshot.hasData) {
-            return Container();
-          }
-          return Image.memory(snapshot.data);
-        },
-      );
+      return buildVideo();
+    } else {
+      return buildImage();
     }
+  }
+
+  Widget buildImage() {
     return Image.file(
       widget.file,
       filterQuality: FilterQuality.low,
+    );
+  }
+
+  Widget buildVideo() {
+    return VideoWidget(
+      file: widget.file,
     );
   }
 

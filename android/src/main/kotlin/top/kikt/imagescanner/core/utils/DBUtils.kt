@@ -137,7 +137,7 @@ object DBUtils : IDBUtils {
         }
     }
 
-    override fun getThumb(context: Context, id: String, width: Int, height: Int): Bitmap? {
+    override fun getThumb(context: Context, id: String, width: Int, height: Int, type: Int?): Bitmap? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
