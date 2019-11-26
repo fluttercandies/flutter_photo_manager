@@ -43,3 +43,4 @@ Icon?
 
 Pods/
 .symlinks/
+flutter_export_environment.sh
