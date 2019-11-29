@@ -65,8 +65,10 @@
 }
 
 + (NSDictionary *)convertPMAssetToMap:(PMAssetEntity *)asset {
+
     return @{
             @"id": asset.id,
+            @"name": asset.name,
             @"createDt": @(asset.createDt),
             @"width": @(asset.width),
             @"height": @(asset.height),

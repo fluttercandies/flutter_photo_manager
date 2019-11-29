@@ -179,8 +179,13 @@
 
     NSDate *modifiedDate = asset.modificationDate;
     long modifiedTimeStamp = (long)modifiedDate.timeIntervalSince1970;
+    
+
+    
+    NSString *filename = [asset valueForKey:@"filename"];
 
     PMAssetEntity *entity = [PMAssetEntity entityWithId:asset.localIdentifier
+                                                   name:filename
                                                createDt:createDt
                                                   width:asset.pixelWidth
                                                  height:asset.pixelHeight

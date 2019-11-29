@@ -32,6 +32,7 @@ class ConvertUtils {
     for (final Map item in list) {
       final entity = AssetEntity()
         ..id = item["id"]
+        ..name=item["name"]
         ..createDtSecond = item["createDt"]
         ..width = item["width"]
         ..height = item["height"]

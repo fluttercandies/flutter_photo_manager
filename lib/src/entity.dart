@@ -100,6 +100,8 @@ class AssetEntity {
   /// in ios is local id
   String id;
 
+  String name;
+
   /// see [id]
   AssetEntity({this.id});
 

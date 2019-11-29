@@ -29,14 +29,15 @@
 @property(nonatomic, assign) NSUInteger width;
 @property(nonatomic, assign) NSUInteger height;
 @property(nonatomic, assign) long duration;
+@property(nonatomic, assign) NSString *name;
 @property(nonatomic, assign) int type;
 @property(nonatomic, strong) PHAsset *phAsset;
 @property(nonatomic, assign) long modifiedDt;
 
-- (instancetype)initWithId:(NSString *)id createDt:(long)createDt width:(NSUInteger)width height:(NSUInteger)height
+- (instancetype)initWithId:(NSString *)id name:(NSString *)name createDt:(long)createDt width:(NSUInteger)width height:(NSUInteger)height
                   duration:(long)duration type:(int)type;
 
-+ (instancetype)entityWithId:(NSString *)id createDt:(long)createDt width:(NSUInteger)width height:(NSUInteger)height
++ (instancetype)entityWithId:(NSString *)id name:(NSString *)name createDt:(long)createDt width:(NSUInteger)width height:(NSUInteger)height
                     duration:(long)duration type:(int)type;
 
 
