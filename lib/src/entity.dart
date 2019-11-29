@@ -99,7 +99,7 @@ class AssetEntity {
   ///
   /// in ios is local id
   String id;
-
+  /// video or image name
   String name;
 
   /// see [id]
