@@ -227,6 +227,14 @@
     }
 }
 
+- (void)getThumbFromUrl:(NSString *)url width:(NSUInteger)width height:(NSUInteger)height
+         resultHandler:(ResultHandler *)handler {
+    NSURL *nsUrl = [NSURL URLWithString:url];
+    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithALAssetURLs:@[nsUrl] options:nil];
+    PHAsset *asset = fetchResult.firstObject;
+    [self fetchThumb:asset width:width height:height resultHandler:handler];
+}
+
 - (void)fetchThumb:(PHAsset *)asset width:(NSUInteger)width height:(NSUInteger)height
      resultHandler:(ResultHandler *)handler {
 
@@ -272,17 +280,21 @@
 }
 
 - (void)fetchFullSizeVideo:(PHAsset *)asset handler:(ResultHandler *)handler {
-    NSString *homePath = NSTemporaryDirectory();
+//    NSString *homePath = NSTemporaryDirectory();
+    NSArray *searchPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *homePath = [searchPaths objectAtIndex:0];
+    
     NSFileManager *manager = NSFileManager.defaultManager;
 
     NSMutableString *path = [NSMutableString stringWithString:homePath];
 
     NSString *filename = [asset valueForKey:@"filename"];
 
-    NSString *dirPath = [NSString stringWithFormat:@"%@/%@", homePath, @".video"];
+    NSString *dirPath = [NSString stringWithFormat:@"%@/%@", homePath, @".eggplant_video"];
     [manager createDirectoryAtPath:dirPath withIntermediateDirectories:true attributes:@{} error:nil];
 
-    [path appendFormat:@"%@/%@", @".video", filename];
+    [path appendFormat:@"/%@/%@", @".eggplant_video", filename];
+    NSLog(@"path====%@",path);
     PHVideoRequestOptions *options = [PHVideoRequestOptions new];
     if ([manager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];

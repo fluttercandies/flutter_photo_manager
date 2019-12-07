@@ -450,10 +450,10 @@
 
         NSString *filename = [asset valueForKey:@"filename"];
 
-        NSString *dirPath = [NSString stringWithFormat:@"%@/%@", homePath, @".video"];
+        NSString *dirPath = [NSString stringWithFormat:@"%@/%@", homePath, @".eggplant_video"];
         [manager createDirectoryAtPath:dirPath attributes:@{}];
 
-        [path appendFormat:@"%@/%@", @".video", filename];
+        [path appendFormat:@"%@/%@", @".eggplant_video", filename];
         PHVideoRequestOptions *options = [PHVideoRequestOptions new];
         if ([manager fileExistsAtPath:path]) {
             [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];

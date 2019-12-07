@@ -33,6 +33,9 @@ typedef void(^AssetResult)(PMAssetEntity *);
 - (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height
          resultHandler:(ResultHandler *)handler;
 
+- (void)getThumbFromUrl:(NSString *)url width:(NSUInteger)width height:(NSUInteger)height
+resultHandler:(ResultHandler *)handler;
+
 - (void)getFullSizeFileWithId:(NSString *)id resultHandler:(ResultHandler *)handler;
 
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type date:(NSDate *)date;
@@ -45,5 +48,8 @@ typedef void(^AssetResult)(PMAssetEntity *);
 - (void)saveImage:(NSData *)data title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block;
 
 - (void)saveVideo:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block;
+
+- (void)getVideoWithAsset:(PHAsset *)asset completion:(void (^)(AVPlayerItem *, NSDictionary *))completion ;
+- (void)getVideoWithAsset:(PHAsset *)asset progressHandler:(void (^)(double progress, NSError *error, BOOL *stop, NSDictionary *info))progressHandler completion:(void (^)(AVPlayerItem *, NSDictionary *))completion ;
 @end
 

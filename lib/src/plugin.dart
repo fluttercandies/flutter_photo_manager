@@ -79,6 +79,18 @@ class Plugin {
     });
   }
 
+  Future<Uint8List> getThumbFromUrl({
+    @required String url,
+    int width = 100,
+    int height = 100,
+  }) {
+    return _channel.invokeMethod("getThumb", {
+      "width": width,
+      "height": height,
+      "url": url,
+    });
+  }
+
   Future<Uint8List> getOriginBytes(String id) async {
     final path = await getFullFile(id, isOrigin: true);
     if (path == null) {

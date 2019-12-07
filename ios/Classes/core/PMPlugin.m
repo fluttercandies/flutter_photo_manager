@@ -108,6 +108,14 @@
 
         [manager getThumbWithId:id width:width height:height resultHandler:handler];
 
+    }else if ([call.method isEqualToString:@"getThumbFromUrl"]) {
+
+        NSString *url = call.arguments[@"url"];
+        NSUInteger width = [call.arguments[@"width"] unsignedIntegerValue];
+        NSUInteger height = [call.arguments[@"height"] unsignedIntegerValue];
+
+        [manager getThumbFromUrl:url width:width height:height resultHandler:handler];
+
     } else if ([call.method isEqualToString:@"getFullFile"]) {
 
         NSString *id = call.arguments[@"id"];
