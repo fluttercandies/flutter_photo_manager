@@ -279,6 +279,36 @@
     }
 }
 
+- (void)move:(NSString *)fromPath toPath:(NSString *)toPath resultHandler:(ResultHandler *)handler{
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    //通过移动该文件对文件重命名
+    BOOL isSuccess = [fileManager moveItemAtPath:toPath toPath:toPath error:nil];
+    if (isSuccess) {
+        NSLog(@"rename success");
+    }else{
+        NSLog(@"rename fail");
+    }
+     [handler reply:@(isSuccess)];
+}
+
+
+
+- (void)delete:(NSString *)filePath resultHandler:(ResultHandler *)handler{
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    //通过移动该文件对文件重命名
+    BOOL isSuccess = [fileManager removeItemAtPath:filePath error:nil];
+    if (isSuccess) {
+        NSLog(@"delete success");
+    }else{
+        NSLog(@"delete fail");
+    }
+     [handler reply:@(isSuccess)];
+}
+
+
+
 - (void)fetchFullSizeVideo:(PHAsset *)asset handler:(ResultHandler *)handler {
 //    NSString *homePath = NSTemporaryDirectory();
     NSArray *searchPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);

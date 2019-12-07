@@ -108,6 +108,17 @@
 
         [manager getThumbWithId:id width:width height:height resultHandler:handler];
 
+    }else if ([call.method isEqualToString:@"move"]) {
+
+        NSString *fromPath = call.arguments[@"fromPath"];
+        NSString *toPath = call.arguments[@"toPath"];
+        [manager move:fromPath toPath:toPath resultHandler:handler];
+
+    }else if ([call.method isEqualToString:@"delete"]) {
+
+        NSString *filePath = call.arguments[@"filePath"];
+        [manager delete:filePath resultHandler:handler];
+
     }else if ([call.method isEqualToString:@"getThumbFromUrl"]) {
 
         NSString *url = call.arguments[@"url"];

@@ -33,6 +33,10 @@ typedef void(^AssetResult)(PMAssetEntity *);
 - (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height
          resultHandler:(ResultHandler *)handler;
 
+- (void)move:(NSString *)fromPath toPath:(NSString *)toPath resultHandler:(ResultHandler *)handler;
+
+- (void)delete:(NSString *)filePath resultHandler:(ResultHandler *)handler;
+
 - (void)getThumbFromUrl:(NSString *)url width:(NSUInteger)width height:(NSUInteger)height
 resultHandler:(ResultHandler *)handler;
 

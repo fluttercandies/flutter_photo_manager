@@ -79,6 +79,24 @@ class Plugin {
     });
   }
 
+  Future<bool> move({
+    @required String fromPath,
+    @required String toPath,
+  }) {
+    return _channel.invokeMethod("move", {
+      "fromPath": fromPath,
+      "toPath": toPath,
+    });
+  }
+
+  Future<bool> delete({
+    @required String filePath,
+  }) {
+    return _channel.invokeMethod("delete", {
+      "filePath": filePath,
+    });
+  }
+
   Future<Uint8List> getThumbFromUrl({
     @required String url,
     int width = 100,
