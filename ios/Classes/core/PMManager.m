@@ -42,16 +42,14 @@
 
     PHFetchOptions *fetchCollectionOptions = [PHFetchOptions new];
 
-    if (hasAll) {
-        PHFetchResult<PHAssetCollection *> *allResult = [PHAssetCollection
-            fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
-                                  subtype:PHAssetCollectionSubtypeSmartAlbumUserLibrary
-                                  options:fetchCollectionOptions];
-        [self injectAssetPathIntoArray:array result:allResult options:assetOptions isAll:YES];
-    }
+    PHFetchResult<PHAssetCollection *> *smartAlbumResult = [PHAssetCollection
+        fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
+                              subtype:PHAssetCollectionSubtypeAlbumRegular
+                              options:fetchCollectionOptions];
+    [self injectAssetPathIntoArray:array result:smartAlbumResult options:assetOptions hasAll: hasAll];
 
     PHFetchResult<PHCollection *> *topLevelResult = [PHAssetCollection fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
-    [self injectAssetPathIntoArray:array result:topLevelResult options:assetOptions isAll:NO];
+    [self injectAssetPathIntoArray:array result:topLevelResult options:assetOptions hasAll: hasAll];
 
     return array;
 }
@@ -61,7 +59,7 @@
 
 - (void)injectAssetPathIntoArray:(NSMutableArray<PMAssetPathEntity *> *)array
                           result:(PHFetchResult *)result options:(PHFetchOptions *)options
-                           isAll:(BOOL)isAll {
+                          hasAll:(BOOL)hasAll{
     for (id collection in result) {
         if (![collection isMemberOfClass:[PHAssetCollection class]]) {
             return;
@@ -76,8 +74,12 @@
                         name:assetCollection.localizedTitle
                   assetCount:(int) fetchResult.count];
 
-        entity.isAll = isAll;
-
+        entity.isAll = assetCollection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumUserLibrary;
+        
+        if(!hasAll && entity.isAll){
+            continue;
+        }
+        
         if (entity.assetCount && entity.assetCount > 0) {
             [array addObject:entity];
         }
