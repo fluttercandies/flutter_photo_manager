@@ -7,6 +7,7 @@ import 'package:image_scanner_example/page/detail_page.dart';
 import 'package:image_scanner_example/widget/change_notifier_builder.dart';
 import 'package:image_scanner_example/widget/image_item_widget.dart';
 import 'package:image_scanner_example/widget/loading_widget.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
@@ -82,9 +83,18 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     return GestureDetector(
       onTap: () async {
         final f = await entity.file;
+        if (f == null) {
+          final data = await entity.fullData;
+          print("data length = ${data?.length}");
+          showToast(
+            "The file is null, please see issue #128.",
+            duration: const Duration(milliseconds: 3500),
+          );
+          return;
+        }
         final page = DetailPage(
           file: f,
-          entity:entity,
+          entity: entity,
         );
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (BuildContext context) {
