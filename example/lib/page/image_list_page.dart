@@ -40,6 +40,12 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
         return Scaffold(
           appBar: AppBar(
             title: Text("${path.name}"),
+            actions: <Widget>[
+              Tooltip(
+                child: Icon(Icons.info_outline),
+                message: "Long tap to delete item.",
+              ),
+            ],
           ),
           body: buildRefreshIndicator(length),
         );
@@ -145,6 +151,8 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
         ],
       );
       showDialog(context: context, builder: (_) => dialog);
+    } else {
+      provider.delete(entity);
     }
   }
 }
