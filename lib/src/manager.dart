@@ -6,8 +6,6 @@ Plugin _plugin = Plugin();
 ///
 /// 这个类可以获取
 class PhotoManager {
-  static const MethodChannel _channel = const MethodChannel('image_scanner');
-
   /// in android WRITE_EXTERNAL_STORAGE  READ_EXTERNAL_STORAGE
   ///
   /// in ios request the photo permission
