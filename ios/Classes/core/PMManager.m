@@ -138,7 +138,7 @@
         return result;
     }
 
-    PHFetchOptions *assetOptions = [self getAssetOptions:type date:date];
+    PHFetchOptions *assetOptions = [self getAssetOptions:(int)type date:date];
 
     PHAssetCollection *collection = fetchResult.firstObject;
     PHFetchResult<PHAsset *> *assetArray = [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
@@ -371,7 +371,7 @@
     PHFetchOptions *assetOptions = [self getAssetOptions:type date:date];
     PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
 
-    return [PMAssetPathEntity entityWithId:id name:collection.localizedTitle assetCount:fetchResult.count];
+    return [PMAssetPathEntity entityWithId:id name:collection.localizedTitle assetCount:(int)fetchResult.count];
 }
 
 - (PHFetchOptions *)getAssetOptions:(int)type date:(NSDate *)date {
