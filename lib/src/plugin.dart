@@ -109,18 +109,6 @@ class Plugin {
     });
   }
 
-  static getThumbDataWithId(
-      String id, {
-        int width = 150,
-        int height = 150,
-      }) {
-    return _plugin.getThumb(
-      id: id,
-      width: width,
-      height: height,
-    );
-  }
-
   Future<Uint8List> getOriginBytes(String id) async {
     final path = await getFullFile(id, isOrigin: true);
     if (path == null) {
