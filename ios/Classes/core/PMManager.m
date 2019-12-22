@@ -229,10 +229,28 @@
 
 - (void)getThumbFromUrl:(NSString *)url width:(NSUInteger)width height:(NSUInteger)height
          resultHandler:(ResultHandler *)handler {
-    NSURL *nsUrl = [NSURL URLWithString:url];
-    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithALAssetURLs:@[nsUrl] options:nil];
-    PHAsset *asset = fetchResult.firstObject;
-    [self fetchThumb:asset width:width height:height resultHandler:handler];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+
+            NSURL *sourceMovieURL = [NSURL fileURLWithPath:url];
+            AVURLAsset *sourceAsset = [AVURLAsset URLAssetWithURL:sourceMovieURL options:nil];
+            AVAssetImageGenerator *gen = [[AVAssetImageGenerator alloc] initWithAsset:sourceAsset];
+            // 设定缩略图的方向
+            // 如果不设定，可能会在视频旋转90/180/270°时，获取到的缩略图是被旋转过的，而不是正向的
+            gen.appliesPreferredTrackTransform = YES;
+            // 设置图片的最大size(分辨率)
+            gen.maximumSize = CGSizeMake(300, 169);
+            CMTime time = CMTimeMake(1,1);//第一帧,1s想取1帧
+            NSError *error = nil;
+            CMTime actualTime;
+            CGImageRef image = [gen copyCGImageAtTime:time actualTime:&actualTime error:&error];
+            if (!error) {
+                UIImage *thumb = [[UIImage alloc] initWithCGImage:image];
+                NSData *imageData = UIImageJPEGRepresentation(thumb, 0.95);
+                FlutterStandardTypedData *data = [FlutterStandardTypedData typedDataWithBytes:imageData];
+                 [handler reply:data];
+            }
+
+        });
 }
 
 - (void)fetchThumb:(PHAsset *)asset width:(NSUInteger)width height:(NSUInteger)height
