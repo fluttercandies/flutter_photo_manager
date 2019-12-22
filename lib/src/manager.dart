@@ -139,6 +139,18 @@ class PhotoManager {
     );
   }
 
+  static getThumbFromUrl(
+    String path, {
+    int width = 100,
+    int height = 100,
+  }) {
+    return _plugin.getThumbFromUrl(
+      url: path,
+      width: width,
+      height: height,
+    );
+  }
+
   static Future<bool> _assetExistsWithId(String id) async {
     return true;
   }
