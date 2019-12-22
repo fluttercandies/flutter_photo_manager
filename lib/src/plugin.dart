@@ -109,7 +109,7 @@ class Plugin {
     });
   }
 
-  static _getThumbDataWithId(
+  static getThumbDataWithId(
       String id, {
         int width = 150,
         int height = 150,
