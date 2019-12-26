@@ -7,3 +7,6 @@ pubspec.lock
 
 build/
 .idea/
+
+fvm
+.vscode/settings.json
