@@ -143,4 +143,9 @@ class PhotoManager(private val context: Context) {
     return dbUtils.saveVideo(context, FileInputStream(path), title, desc)
   }
   
+  fun assetExists(id: String, resultHandler: ResultHandler) {
+    val exists: Boolean = dbUtils.exists(context, id)
+    resultHandler.reply(exists)
+  }
+  
 }

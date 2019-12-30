@@ -178,6 +178,10 @@
             [handler reply:@{@"data": resultData}];
         }];
 
+    } else if ([call.method isEqualToString:@"assetExists"]) {
+        NSString *assetId = call.arguments[@"id"];
+        BOOL exists = [manager existsWithId:assetId];
+        [handler reply:@(exists)];
     }
 }
 

@@ -136,4 +136,14 @@ interface IDBUtils {
     
     fun saveVideo(context: Context, inputStream: InputStream, title: String, desc: String): AssetEntity?
     
+    fun exists(context: Context, id: String): Boolean{
+            val columns = arrayOf(MediaStore.Files.FileColumns._ID)
+            context.contentResolver.query(DBUtils.allUri, columns, "MediaStore.Files.FileColumns._ID = ?", arrayOf(id), null).use {
+                if (it == null) {
+                    return false
+                }
+                return it.count >=1
+            }
+    }
+    
 }

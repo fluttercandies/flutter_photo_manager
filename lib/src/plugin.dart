@@ -205,4 +205,8 @@ class Plugin {
     );
     return ConvertUtils.convertToAsset(result);
   }
+
+  Future<bool> assetExistsWithId(String id) {
+    return _channel.invokeMethod("assetExists", {"id": id});
+  }
 }

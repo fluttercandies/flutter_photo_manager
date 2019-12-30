@@ -54,6 +54,15 @@
     return array;
 }
 
+- (BOOL)existsWithId:(NSString *)assetId {
+  PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[ assetId ]
+                                                                      options:[PHFetchOptions new]];
+  if (!result) {
+    return NO;
+  }
+  return result.count >= 1;
+}
+
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
 

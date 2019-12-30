@@ -154,6 +154,12 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                                 photoManager.getOriginBytes(id, resultHandler)
                             }
                         }
+                        "assetExists"->{
+                            runOnBackground {
+                                val id = call.argument<String>("id")!!
+                                photoManager.assetExists(id,resultHandler)
+                            }
+                        }
                         "getFullFile" -> {
                             runOnBackground {
                                 val id = call.argument<String>("id")!!

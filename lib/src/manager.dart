@@ -137,8 +137,8 @@ class PhotoManager {
     );
   }
 
-  static Future<bool> _assetExistsWithId(String id) async {
-    return true;
+  static Future<bool> _assetExistsWithId(String id) {
+    return _plugin.assetExistsWithId(id);
   }
 
   // static Future<AssetEntity> _createAssetEntityWithId(String id) async {

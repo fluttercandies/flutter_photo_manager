@@ -45,5 +45,7 @@ typedef void(^AssetResult)(PMAssetEntity *);
 - (void)saveImage:(NSData *)data title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block;
 
 - (void)saveVideo:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block;
+
+- (BOOL)existsWithId:(NSString *) assetId;
 @end
 
