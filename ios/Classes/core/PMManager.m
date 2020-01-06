@@ -71,7 +71,7 @@
                           hasAll:(BOOL)hasAll {
     for (id collection in result) {
         if (![collection isMemberOfClass:[PHAssetCollection class]]) {
-            return;
+            continue;
         }
 
         PHAssetCollection *assetCollection = (PHAssetCollection *) collection;
