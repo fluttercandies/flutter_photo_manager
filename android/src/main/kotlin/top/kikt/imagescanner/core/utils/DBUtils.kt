@@ -26,341 +26,381 @@ import java.net.URLConnection
 /// Call the MediaStore API and get entity for the data.
 @Suppress("DEPRECATION")
 object DBUtils : IDBUtils {
-
-    private const val TAG = "DBUtils"
-
-    private val imageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-    private val videoUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-
-    private val cacheContainer = CacheContainer()
-
-    private fun convertTypeToUri(type: Int): Uri {
-        return when (type) {
-            1 -> imageUri
-            2 -> videoUri
-            else -> allUri
-        }
+  
+  private const val TAG = "DBUtils"
+  
+  private val imageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+  private val videoUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+  
+  private val cacheContainer = CacheContainer()
+  
+  private val locationKeys = arrayOf(
+    MediaStore.Images.ImageColumns.LONGITUDE,
+    MediaStore.Images.ImageColumns.LATITUDE
+  )
+  
+  private fun convertTypeToUri(type: Int): Uri {
+    return when (type) {
+      1 -> imageUri
+      2 -> videoUri
+      else -> allUri
     }
-
-    @SuppressLint("Recycle")
-    override fun getGalleryList(context: Context, requestType: Int, timeStamp: Long): List<GalleryEntity> {
-        val list = ArrayList<GalleryEntity>()
-        val uri = allUri
-        val projection = storeBucketKeys + arrayOf("count(1)")
-
-        val args = ArrayList<String>()
-        val typeSelection: String
-
-        when (requestType) {
-            1 -> {
-                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
-                args.add(MEDIA_TYPE_IMAGE.toString())
-
-            }
-            2 -> {
-                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
-                args.add(MEDIA_TYPE_VIDEO.toString())
-            }
-            else -> {
-                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} in (?,?)"
-                args.add(MEDIA_TYPE_IMAGE.toString())
-                args.add(MEDIA_TYPE_VIDEO.toString())
-            }
-        }
-
-        val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
-        args.add(timeStamp.toString())
+  }
+  
+  @SuppressLint("Recycle")
+  override fun getGalleryList(context: Context, requestType: Int, timeStamp: Long): List<GalleryEntity> {
+    val list = ArrayList<GalleryEntity>()
+    val uri = allUri
+    val projection = storeBucketKeys + arrayOf("count(1)")
     
-        val sizeWhere = AndroidQDBUtils.sizeWhere(requestType)
-
-        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
-        val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
-                ?: return emptyList()
-        while (cursor.moveToNext()) {
-            val id = cursor.getString(0)
-            val name = cursor.getString(1)
-            val count = cursor.getInt(2)
-            list.add(GalleryEntity(id, name, count, 0))
-        }
-
-        cursor.close()
-        return list
-    }
-
-    override fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long): GalleryEntity? {
-        val uri = allUri
-        val projection = storeBucketKeys + arrayOf("count(1)")
-
-        val args = ArrayList<String>()
-        val typeSelection: String
-
-        when (type) {
-            1 -> {
-                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
-                args.add(MEDIA_TYPE_IMAGE.toString())
-            }
-            2 -> {
-                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
-                args.add(MEDIA_TYPE_VIDEO.toString())
-            }
-            else -> {
-                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} in (?,?)"
-                args.add(MEDIA_TYPE_IMAGE.toString())
-                args.add(MEDIA_TYPE_VIDEO.toString())
-            }
-        }
-
-        val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
-        args.add(timeStamp.toString())
-
-        val idSelection: String
-        if (galleryId == "") {
-            idSelection = ""
-        } else {
-            idSelection = "AND ${MediaStore.Images.Media.BUCKET_ID} = ?"
-            args.add(galleryId)
-        }
+    val args = ArrayList<String>()
+    val typeSelection: String
     
-        val sizeWhere = AndroidQDBUtils.sizeWhere(null)
-
-        val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
-        val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null) ?: return null
-        return if (cursor.moveToNext()) {
-            val id = cursor.getString(0)
-            val name = cursor.getString(1)
-            val count = cursor.getInt(2)
-            cursor.close()
-            GalleryEntity(id, name, count, 0)
-        } else {
-            cursor.close()
-            null
-        }
+    when (requestType) {
+      1 -> {
+        typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
+        args.add(MEDIA_TYPE_IMAGE.toString())
+        
+      }
+      2 -> {
+        typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
+        args.add(MEDIA_TYPE_VIDEO.toString())
+      }
+      else -> {
+        typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} in (?,?)"
+        args.add(MEDIA_TYPE_IMAGE.toString())
+        args.add(MEDIA_TYPE_VIDEO.toString())
+      }
     }
     
-    override fun getThumb(context: Context, id: String, width: Int, height: Int, type: Int?): Bitmap? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    @SuppressLint("Recycle")
-    override fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int, timeStamp: Long, cacheContainer: CacheContainer?): List<AssetEntity> {
-        val cache = cacheContainer ?: this.cacheContainer
-
-        val isAll = galleryId.isEmpty()
-
-        val list = ArrayList<AssetEntity>()
-        val uri = allUri
-
-        val args = ArrayList<String>()
-        if (!isAll) {
-            args.add(galleryId)
-        }
-        val typeSelection: String
-
-        when (requestType) {
-            1 -> {
-                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
-                args.add(MEDIA_TYPE_IMAGE.toString())
-            }
-            2 -> {
-                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
-                args.add(MEDIA_TYPE_VIDEO.toString())
-            }
-            else -> {
-                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} in (?,?)"
-                args.add(MEDIA_TYPE_IMAGE.toString())
-                args.add(MEDIA_TYPE_VIDEO.toString())
-            }
-        }
-
-        val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
-        args.add(timeStamp.toString())
+    val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
+    args.add(timeStamp.toString())
     
-        val sizeWhere = AndroidQDBUtils.sizeWhere(requestType)
-
-        val keys = (storeImageKeys + storeVideoKeys + typeKeys).distinct().toTypedArray()
-        val selection = if (isAll) {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
-        } else {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
-        }
-
-        val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET ${page * pageSize}"
-        val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
-                ?: return emptyList()
-
-        while (cursor.moveToNext()) {
-            val id = cursor.getString(MediaStore.MediaColumns._ID)
-            val path = cursor.getString(MediaStore.MediaColumns.DATA)
-            val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
-            val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
-            val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
-            val duration = if (requestType == 1) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
-            val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
-            val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
-            val displayName = File(path).name
-
-            val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
-            list.add(asset)
-            cache.putAsset(asset)
-        }
-
-        cursor.close()
-
-        return list
-    }
-
-    override fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long): List<AssetEntity> {
-        val cache = cacheContainer
-
-        val isAll = gId.isEmpty()
-
-        val list = ArrayList<AssetEntity>()
-        val uri = allUri
-
-        val args = ArrayList<String>()
-        if (!isAll) {
-            args.add(gId)
-        }
-        val typeSelection: String
-
-        when (requestType) {
-            1 -> {
-                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
-                args.add(MEDIA_TYPE_IMAGE.toString())
-            }
-            2 -> {
-                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
-                args.add(MEDIA_TYPE_VIDEO.toString())
-            }
-            else -> {
-                typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} in (?,?)"
-                args.add(MEDIA_TYPE_IMAGE.toString())
-                args.add(MEDIA_TYPE_VIDEO.toString())
-            }
-        }
-
-        val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
-        args.add(timestamp.toString())
+    val sizeWhere = AndroidQDBUtils.sizeWhere(requestType)
     
-        val sizeWhere = AndroidQDBUtils.sizeWhere(requestType)
-
-        val keys = (storeImageKeys + storeVideoKeys + typeKeys).distinct().toTypedArray()
-        val selection = if (isAll) {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
-        } else {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
-        }
-
-        val pageSize = end - start
-
-        val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET $start"
-        val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
-                ?: return emptyList()
-
-        while (cursor.moveToNext()) {
-            val id = cursor.getString(MediaStore.MediaColumns._ID)
-            val path = cursor.getString(MediaStore.MediaColumns.DATA)
-            val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
-            val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
-            val duration = if (requestType == 1) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
-            val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
-            val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
-            val displayName = File(path).name
-            val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
-
-            val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
-            list.add(asset)
-            cache.putAsset(asset)
-        }
-
-        cursor.close()
-
-        return list
+    val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
+    val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
+      ?: return emptyList()
+    while (cursor.moveToNext()) {
+      val id = cursor.getString(0)
+      val name = cursor.getString(1)
+      val count = cursor.getInt(2)
+      list.add(GalleryEntity(id, name, count, 0))
     }
-
-    @SuppressLint("Recycle")
-    override fun getAssetEntity(context: Context, id: String): AssetEntity? {
-        val asset = cacheContainer.getAsset(id)
-        if (asset != null) {
-            return asset
-        }
-
-        val keys = (storeImageKeys + storeVideoKeys).distinct().toTypedArray()
-
-        val selection = "${MediaStore.Files.FileColumns._ID} = ?"
-
-        val args = arrayOf(id)
-
-        val cursor = context.contentResolver.query(allUri, keys, selection, args, null)
-                ?: return null
-
-        if (cursor.moveToNext()) {
-            val databaseId = cursor.getString(MediaStore.MediaColumns._ID)
-            val path = cursor.getString(MediaStore.MediaColumns.DATA)
-            val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
-            val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
-            val duration = if (type == MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
-            val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
-            val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
-            val displayName = File(path).name
-            val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
-
-            val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
-            cacheContainer.putAsset(dbAsset)
-
-            cursor.close()
-            return dbAsset
-        } else {
-            cursor.close()
-            return null
-        }
+    
+    cursor.close()
+    return list
+  }
+  
+  override fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long): GalleryEntity? {
+    val uri = allUri
+    val projection = storeBucketKeys + arrayOf("count(1)")
+    
+    val args = ArrayList<String>()
+    val typeSelection: String
+    
+    when (type) {
+      1 -> {
+        typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
+        args.add(MEDIA_TYPE_IMAGE.toString())
+      }
+      2 -> {
+        typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
+        args.add(MEDIA_TYPE_VIDEO.toString())
+      }
+      else -> {
+        typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} in (?,?)"
+        args.add(MEDIA_TYPE_IMAGE.toString())
+        args.add(MEDIA_TYPE_VIDEO.toString())
+      }
     }
-
-    override fun getFilePath(context: Context, id: String): String? {
-        val assetEntity = getAssetEntity(context, id) ?: return null
-        return assetEntity.path
+    
+    val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
+    args.add(timeStamp.toString())
+    
+    val idSelection: String
+    if (galleryId == "") {
+      idSelection = ""
+    } else {
+      idSelection = "AND ${MediaStore.Images.Media.BUCKET_ID} = ?"
+      args.add(galleryId)
     }
-
-    override fun clearCache() {
-        cacheContainer.clearCache()
+    
+    val sizeWhere = AndroidQDBUtils.sizeWhere(null)
+    
+    val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
+    val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null) ?: return null
+    return if (cursor.moveToNext()) {
+      val id = cursor.getString(0)
+      val name = cursor.getString(1)
+      val count = cursor.getInt(2)
+      cursor.close()
+      GalleryEntity(id, name, count, 0)
+    } else {
+      cursor.close()
+      null
     }
-
-    override fun saveImage(context: Context, image: ByteArray, title: String, desc: String): AssetEntity? {
-        val bmp = BitmapFactory.decodeByteArray(image, 0, image.count())
-        val insertImage = MediaStore.Images.Media.insertImage(context.contentResolver, bmp, title, desc)
-        val id = ContentUris.parseId(Uri.parse(insertImage))
-        return getAssetEntity(context, id.toString())
+  }
+  
+  override fun getThumb(context: Context, id: String, width: Int, height: Int, type: Int?): Bitmap? {
+    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+  }
+  
+  @SuppressLint("Recycle")
+  override fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int, timeStamp: Long, cacheContainer: CacheContainer?): List<AssetEntity> {
+    val cache = cacheContainer ?: this.cacheContainer
+    
+    val isAll = galleryId.isEmpty()
+    
+    val list = ArrayList<AssetEntity>()
+    val uri = allUri
+    
+    val args = ArrayList<String>()
+    if (!isAll) {
+      args.add(galleryId)
     }
-
-    override fun saveVideo(context: Context, inputStream: InputStream, title: String, desc: String): AssetEntity? {
-        val cr = context.contentResolver
-        val timestamp = System.currentTimeMillis() / 1000
-
-        val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
-
-        val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-
-        val values = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, title)
-            put(MediaStore.Video.VideoColumns.MIME_TYPE, typeFromStream)
-            put(MediaStore.Video.VideoColumns.TITLE, title)
-            put(MediaStore.Video.VideoColumns.DESCRIPTION, desc)
-            put(MediaStore.Video.VideoColumns.DATE_ADDED, timestamp)
-            put(MediaStore.Video.VideoColumns.DATE_MODIFIED, timestamp)
-        }
-
-        val contentUri = cr.insert(uri, values) ?: return null
-        val outputStream = cr.openOutputStream(contentUri)
-
-        outputStream?.use {
-            inputStream.use {
-                inputStream.copyTo(outputStream)
-            }
-        }
-
-        val id = ContentUris.parseId(contentUri)
-
-        cr.notifyChange(contentUri, null)
-        return getAssetEntity(context, id.toString())
+    val typeSelection: String
+    
+    when (requestType) {
+      1 -> {
+        typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
+        args.add(MEDIA_TYPE_IMAGE.toString())
+      }
+      2 -> {
+        typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
+        args.add(MEDIA_TYPE_VIDEO.toString())
+      }
+      else -> {
+        typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} in (?,?)"
+        args.add(MEDIA_TYPE_IMAGE.toString())
+        args.add(MEDIA_TYPE_VIDEO.toString())
+      }
     }
+    
+    val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
+    args.add(timeStamp.toString())
+    
+    val sizeWhere = AndroidQDBUtils.sizeWhere(requestType)
+    
+    val keys = (storeImageKeys + storeVideoKeys + typeKeys + locationKeys).distinct().toTypedArray()
+    val selection = if (isAll) {
+      "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
+    } else {
+      "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
+    }
+    
+    val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET ${page * pageSize}"
+    val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
+      ?: return emptyList()
+    
+    while (cursor.moveToNext()) {
+      val id = cursor.getString(MediaStore.MediaColumns._ID)
+      val path = cursor.getString(MediaStore.MediaColumns.DATA)
+      val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
+      val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
+      val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
+      val duration = if (requestType == 1) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
+      val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
+      val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
+      val displayName = File(path).name
+      
+      val lat = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
+      val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LATITUDE)
+      
+      val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
+      
+      if (lat != 0.0) {
+        asset.lat = lat
+      }
+      if (lng != 0.0) {
+        asset.lng = lng
+      }
+      
+      list.add(asset)
+      cache.putAsset(asset)
+    }
+    
+    cursor.close()
+    
+    return list
+  }
+  
+  override fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long): List<AssetEntity> {
+    val cache = cacheContainer
+    
+    val isAll = gId.isEmpty()
+    
+    val list = ArrayList<AssetEntity>()
+    val uri = allUri
+    
+    val args = ArrayList<String>()
+    if (!isAll) {
+      args.add(gId)
+    }
+    val typeSelection: String
+    
+    when (requestType) {
+      1 -> {
+        typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
+        args.add(MEDIA_TYPE_IMAGE.toString())
+      }
+      2 -> {
+        typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
+        args.add(MEDIA_TYPE_VIDEO.toString())
+      }
+      else -> {
+        typeSelection = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} in (?,?)"
+        args.add(MEDIA_TYPE_IMAGE.toString())
+        args.add(MEDIA_TYPE_VIDEO.toString())
+      }
+    }
+    
+    val dateSelection = "AND ${MediaStore.Images.Media.DATE_TAKEN} <= ?"
+    args.add(timestamp.toString())
+    
+    val sizeWhere = AndroidQDBUtils.sizeWhere(requestType)
+    
+    val keys = (storeImageKeys + storeVideoKeys + typeKeys + locationKeys).distinct().toTypedArray()
+    val selection = if (isAll) {
+      "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
+    } else {
+      "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
+    }
+    
+    val pageSize = end - start
+    
+    val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET $start"
+    val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
+      ?: return emptyList()
+    
+    while (cursor.moveToNext()) {
+      val id = cursor.getString(MediaStore.MediaColumns._ID)
+      val path = cursor.getString(MediaStore.MediaColumns.DATA)
+      val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
+      val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
+      val duration = if (requestType == 1) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
+      val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
+      val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
+      val displayName = File(path).name
+      val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
+      
+      val lat = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
+      val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LATITUDE)
+      
+      val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
+  
+      if (lat != 0.0) {
+        asset.lat = lat
+      }
+      if (lng != 0.0) {
+        asset.lng = lng
+      }
+  
+      list.add(asset)
+      cache.putAsset(asset)
+    }
+    
+    cursor.close()
+    
+    return list
+  }
+  
+  @SuppressLint("Recycle")
+  override fun getAssetEntity(context: Context, id: String): AssetEntity? {
+    val asset = cacheContainer.getAsset(id)
+    if (asset != null) {
+      return asset
+    }
+    
+    val keys = (storeImageKeys + storeVideoKeys + locationKeys).distinct().toTypedArray()
+    
+    val selection = "${MediaStore.Files.FileColumns._ID} = ?"
+    
+    val args = arrayOf(id)
+    
+    val cursor = context.contentResolver.query(allUri, keys, selection, args, null)
+      ?: return null
+    
+    if (cursor.moveToNext()) {
+      val databaseId = cursor.getString(MediaStore.MediaColumns._ID)
+      val path = cursor.getString(MediaStore.MediaColumns.DATA)
+      val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
+      val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
+      val duration = if (type == MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
+      val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
+      val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
+      val displayName = File(path).name
+      val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
+      val lat = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
+      val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LATITUDE)
+      
+      val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
+  
+      if (lat != 0.0) {
+        dbAsset.lat = lat
+      }
+      if (lng != 0.0) {
+        dbAsset.lng = lng
+      }
+  
+      dbAsset.lat = lat
+      dbAsset.lng = lng
+      
+      cacheContainer.putAsset(dbAsset)
+      
+      cursor.close()
+      return dbAsset
+    } else {
+      cursor.close()
+      return null
+    }
+  }
+  
+  override fun getFilePath(context: Context, id: String): String? {
+    val assetEntity = getAssetEntity(context, id) ?: return null
+    return assetEntity.path
+  }
+  
+  override fun clearCache() {
+    cacheContainer.clearCache()
+  }
+  
+  override fun saveImage(context: Context, image: ByteArray, title: String, desc: String): AssetEntity? {
+    val bmp = BitmapFactory.decodeByteArray(image, 0, image.count())
+    val insertImage = MediaStore.Images.Media.insertImage(context.contentResolver, bmp, title, desc)
+    val id = ContentUris.parseId(Uri.parse(insertImage))
+    return getAssetEntity(context, id.toString())
+  }
+  
+  override fun saveVideo(context: Context, inputStream: InputStream, title: String, desc: String): AssetEntity? {
+    val cr = context.contentResolver
+    val timestamp = System.currentTimeMillis() / 1000
+    
+    val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
+    
+    val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+    
+    val values = ContentValues().apply {
+      put(MediaStore.MediaColumns.DISPLAY_NAME, title)
+      put(MediaStore.Video.VideoColumns.MIME_TYPE, typeFromStream)
+      put(MediaStore.Video.VideoColumns.TITLE, title)
+      put(MediaStore.Video.VideoColumns.DESCRIPTION, desc)
+      put(MediaStore.Video.VideoColumns.DATE_ADDED, timestamp)
+      put(MediaStore.Video.VideoColumns.DATE_MODIFIED, timestamp)
+    }
+    
+    val contentUri = cr.insert(uri, values) ?: return null
+    val outputStream = cr.openOutputStream(contentUri)
+    
+    outputStream?.use {
+      inputStream.use {
+        inputStream.copyTo(outputStream)
+      }
+    }
+    
+    val id = ContentUris.parseId(contentUri)
+    
+    cr.notifyChange(contentUri, null)
+    return getAssetEntity(context, id.toString())
+  }
 }

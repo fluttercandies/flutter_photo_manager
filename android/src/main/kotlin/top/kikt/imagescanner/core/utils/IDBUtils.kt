@@ -107,6 +107,10 @@ interface IDBUtils {
         return getLong(getColumnIndex(columnName))
     }
     
+    fun Cursor.getDouble(columnName: String): Double{
+        return getDouble(getColumnIndex(columnName))
+    }
+    
     fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long): GalleryEntity?
     
     fun clearCache()

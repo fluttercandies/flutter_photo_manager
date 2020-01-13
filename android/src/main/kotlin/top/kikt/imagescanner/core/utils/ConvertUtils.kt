@@ -7,64 +7,68 @@ import top.kikt.imagescanner.core.entity.GalleryEntity
 
 
 object ConvertUtils {
-    fun convertToGalleryResult(list: List<GalleryEntity>): Map<String, Any> {
-        val data = ArrayList<Map<String, Any>>()
-
-        for (entity in list) {
-            val element = mapOf(
-                    "id" to entity.id,
-                    "name" to entity.name,
-                    "length" to entity.length,
-                    "isAll" to entity.isAll
-            )
-
-            if (entity.length > 0) {
-                data.add(element)
-            }
-        }
-
-        return mapOf(
-                "data" to data
-        )
+  fun convertToGalleryResult(list: List<GalleryEntity>): Map<String, Any> {
+    val data = ArrayList<Map<String, Any>>()
+    
+    for (entity in list) {
+      val element = mapOf(
+        "id" to entity.id,
+        "name" to entity.name,
+        "length" to entity.length,
+        "isAll" to entity.isAll
+      )
+      
+      if (entity.length > 0) {
+        data.add(element)
+      }
     }
-
-    fun convertToAssetResult(list: List<AssetEntity>): Map<String, Any?> {
-        val data = ArrayList<Map<String, Any?>>()
-
-        for (entity in list) {
-            val element = mapOf(
-                    "id" to entity.id,
-                    "duration" to entity.duration / 1000,
-                    "type" to entity.type,
-                    "createDt" to entity.createDt / 1000,
-                    "width" to entity.width,
-                    "height" to entity.height,
-                    "modifiedDt" to entity.modifiedDate
-            )
-            data.add(element)
-        }
-
-        return mapOf(
-                "data" to data
-        )
+    
+    return mapOf(
+      "data" to data
+    )
+  }
+  
+  fun convertToAssetResult(list: List<AssetEntity>): Map<String, Any?> {
+    val data = ArrayList<Map<String, Any?>>()
+    
+    for (entity in list) {
+      val element = mapOf(
+        "id" to entity.id,
+        "duration" to entity.duration / 1000,
+        "type" to entity.type,
+        "createDt" to entity.createDt / 1000,
+        "width" to entity.width,
+        "height" to entity.height,
+        "modifiedDt" to entity.modifiedDate,
+        "lat" to entity.lat,
+        "lng" to entity.lng
+      )
+      data.add(element)
     }
-
-    fun convertToAssetResult(entity: AssetEntity): Map<String, Any?> {
-
-        val data = mapOf(
-                "id" to entity.id,
-                "duration" to entity.duration,
-                "type" to entity.type,
-                "createDt" to entity.createDt / 1000,
-                "width" to entity.width,
-                "height" to entity.height,
-                "modifiedDt" to entity.modifiedDate
-        )
-
-        return mapOf(
-                "data" to data
-        )
-    }
-
-
+    
+    return mapOf(
+      "data" to data
+    )
+  }
+  
+  fun convertToAssetResult(entity: AssetEntity): Map<String, Any?> {
+    
+    val data = mapOf(
+      "id" to entity.id,
+      "duration" to entity.duration,
+      "type" to entity.type,
+      "createDt" to entity.createDt / 1000,
+      "width" to entity.width,
+      "height" to entity.height,
+      "modifiedDt" to entity.modifiedDate,
+      "lat" to entity.lat,
+      "lng" to entity.lng
+    )
+    
+    return mapOf(
+      "data" to data
+    )
+  }
+  
+  
 }
