@@ -199,6 +199,8 @@
                                                    type:type];
     entity.phAsset = asset;
     entity.modifiedDt = modifiedTimeStamp;
+    entity.lat = asset.location.coordinate.latitude;
+    entity.lng = asset.location.coordinate.longitude;
     return entity;
 }
 

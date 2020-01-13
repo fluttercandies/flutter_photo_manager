@@ -61,6 +61,8 @@
             @"duration": @((long) asset.duration),
             @"type": @(typeInt),
             @"modifiedDt": @(modifiedDt),
+            @"lng":@(asset.location.coordinate.longitude),
+            @"lat":@(asset.location.coordinate.latitude),
     };
 }
 
@@ -73,6 +75,8 @@
             @"duration": @(asset.duration),
             @"type": @(asset.type),
             @"modifiedDt": @(asset.modifiedDt),
+            @"lng":@(asset.lng),
+            @"lat":@(asset.lat),
     };
 }
 

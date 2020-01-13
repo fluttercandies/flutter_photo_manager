@@ -133,6 +133,12 @@ class AssetEntity {
   /// height of asset.
   int height;
 
+  /// Gps information when shooting, nullable
+  double latitude;
+
+  /// Gps information when shooting, nullable
+  double longitude;
+
   /// if you need upload file ,then you can use the file, nullable.
   Future<File> get file async => PhotoManager._getFileWithId(this.id);
 

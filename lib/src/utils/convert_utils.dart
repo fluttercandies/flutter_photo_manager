@@ -37,7 +37,9 @@ class ConvertUtils {
         ..height = item["height"]
         ..duration = item["duration"]
         ..modifiedDateSecond = item["modifiedDt"]
-        ..typeInt = item["type"];
+        ..typeInt = item["type"]
+        ..longitude = item["lng"]
+        ..latitude = item["lat"];
 
       result.add(entity);
     }
@@ -59,7 +61,10 @@ class ConvertUtils {
       ..height = data["height"]
       ..duration = data["duration"]
       ..modifiedDateSecond = data["modifiedDt"]
-      ..typeInt = data["type"];
+      ..typeInt = data["type"]
+      ..longitude = data["lng"]
+      ..latitude = data["lat"];
+    ;
 
     return entity;
   }
