@@ -266,9 +266,9 @@
     }];
     [manager requestImageForAsset:asset targetSize:CGSizeMake(width, height) contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage *result, NSDictionary *info) {
 
-        BOOL downloadFinished = [PMManager isDownloadFinish:info];
+        BOOL exportFinined = [PMManager isExportFinined:info];
 
-        if (!downloadFinished) {
+        if (!exportFinined) {
             return;
         }
 
@@ -361,9 +361,9 @@
     [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:options resultHandler:^(AVAsset *_Nullable asset, AVAudioMix *_Nullable audioMix,
             NSDictionary *_Nullable info) {
 
-        BOOL downloadFinish = [PMManager isDownloadFinish:info];
+        BOOL exportFinined = [PMManager isExportFinined:info];
 
-        if (!downloadFinish) {
+        if (!exportFinined) {
             return;
         }
 
@@ -400,8 +400,8 @@
 
     [manager requestImageForAsset:asset targetSize:PHImageManagerMaximumSize contentMode:PHImageContentModeDefault options: options resultHandler:^(UIImage * _Nullable image, NSDictionary * _Nullable info) {
 
-        BOOL downloadFinished = [PMManager isDownloadFinish:info];
-        if (!downloadFinished) {
+        BOOL exportFinined = [PMManager isExportFinined:info];
+        if (!exportFinined) {
             return;
         }
 
@@ -419,7 +419,7 @@
     }];
 }
 
-+ (BOOL)isDownloadFinish:(NSDictionary *)info {
++ (BOOL)isExportFinined:(NSDictionary *)info {
     return ![info[PHImageCancelledKey] boolValue] && !info[PHImageErrorKey] && ![info[PHImageResultIsDegradedKey] boolValue];
 }
 
@@ -494,7 +494,7 @@
     }];
 }
 
-- (void)saveVideo:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block {
+- (void)export:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block {
     NSURL *fileURL = [NSURL fileURLWithPath:path];
     PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAssetFromVideoAtFileURL:fileURL];
 

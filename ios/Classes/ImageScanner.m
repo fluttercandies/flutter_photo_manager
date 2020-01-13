@@ -272,11 +272,11 @@
                               options:[PHImageRequestOptions new]
                         resultHandler:^(UIImage *result, NSDictionary *info) {
 
-                            BOOL downloadFinined =
+                            BOOL exportFinined =
                                     ![[info objectForKey:PHImageCancelledKey] boolValue] &&
                                             ![info objectForKey:PHImageErrorKey] &&
                                             ![[info objectForKey:PHImageResultIsDegradedKey] boolValue];
-                            if (!downloadFinined) {
+                            if (!exportFinined) {
                                 flutterResult(nil);
                                 return;
                             }
@@ -317,11 +317,11 @@
                         resultHandler:^(UIImage *result, NSDictionary *info) {
 //                            NSLog(@"image width = %f , height = "
 //                                  "%f", result.size.width, result.size.height);
-                            BOOL downloadFinined =
+                            BOOL exportFinined =
                                     ![[info objectForKey:PHImageCancelledKey] boolValue] &&
                                             ![info objectForKey:PHImageErrorKey] &&
                                             ![[info objectForKey:PHImageResultIsDegradedKey] boolValue];
-                            if (!downloadFinined) {
+                            if (!exportFinined) {
                                 return;
                             }
                             NSData *data = UIImageJPEGRepresentation(result, 100);
@@ -391,8 +391,8 @@
 
             if (!isOri) {
                 [manager requestImageForAsset:asset targetSize:CGSizeMake(asset.pixelWidth, asset.pixelHeight) contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage *result, NSDictionary *info) {
-                    BOOL downloadFinish = [self isFinishWithInfo:info];
-                    if (!downloadFinish) {
+                    BOOL exportFinined = [self isFinishWithInfo:info];
+                    if (!exportFinined) {
                         return;
                     }
                     NSData *data = UIImageJPEGRepresentation(result, 100);
@@ -412,8 +412,8 @@
                 [manager requestImageDataForAsset:asset options:options resultHandler:^(NSData *imageData, NSString *dataUTI,
                         UIImageOrientation orientation, NSDictionary *info) {
 
-                    BOOL downloadFinined = [self isFinishWithInfo:info];
-                    if (!downloadFinined) {
+                    BOOL exportFinined = [self isFinishWithInfo:info];
+                    if (!exportFinined) {
                         return;
                     }
 
@@ -473,11 +473,11 @@
         [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:options resultHandler:^(AVAsset *_Nullable asset, AVAudioMix *_Nullable audioMix,
                 NSDictionary *_Nullable info) {
 
-            BOOL downloadFinined =
+            BOOL exportFinined =
                     ![info[PHImageCancelledKey] boolValue] &&
                             !info[PHImageErrorKey] &&
                             ![info[PHImageResultIsDegradedKey] boolValue];
-            if (!downloadFinined) {
+            if (!exportFinined) {
                 result(nil);
                 return;
             }
@@ -543,11 +543,11 @@
         }];
         [manager requestImageDataForAsset:asset options:options resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
 
-            BOOL downloadFinined =
+            BOOL exportFinined =
                     ![info[PHImageCancelledKey] boolValue] &&
                             !info[PHImageErrorKey] &&
                             ![info[PHImageResultIsDegradedKey] boolValue];
-            if (!downloadFinined) {
+            if (!exportFinined) {
                 flutterResult(nil);
                 return;
             }

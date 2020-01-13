@@ -187,12 +187,12 @@
             [handler reply:@{@"data": resultData}];
         }];
 
-    } else if ([call.method isEqualToString:@"saveVideo"]) {
+    } else if ([call.method isEqualToString:@"export"]) {
         NSString *videoPath = call.arguments[@"path"];
         NSString *title = call.arguments[@"title"];
         NSString *desc = call.arguments[@"desc"];
 
-        [manager saveVideo:videoPath title:title desc:desc block:^(PMAssetEntity *asset) {
+        [manager export:videoPath title:title desc:desc block:^(PMAssetEntity *asset) {
             NSDictionary *resultData = [ConvertUtils convertPMAssetToMap:asset];
             [handler reply:@{@"data": resultData}];
         }];

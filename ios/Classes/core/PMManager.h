@@ -51,7 +51,7 @@ resultHandler:(ResultHandler *)handler;
 
 - (void)saveImage:(NSData *)data title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block;
 
-- (void)saveVideo:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block;
+- (void)export:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block;
 
 - (void)getVideoWithAsset:(PHAsset *)asset completion:(void (^)(AVPlayerItem *, NSDictionary *))completion ;
 - (void)getVideoWithAsset:(PHAsset *)asset progressHandler:(void (^)(double progress, NSError *error, BOOL *stop, NSDictionary *info))progressHandler completion:(void (^)(AVPlayerItem *, NSDictionary *))completion ;
