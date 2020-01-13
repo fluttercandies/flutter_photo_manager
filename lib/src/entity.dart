@@ -167,6 +167,10 @@ class AssetEntity {
     _longitude = longitude;
   }
 
+  Future<LatLng> latlngAsync() {
+    return _plugin.getLatLngAsync(this);
+  }
+
   /// if you need upload file ,then you can use the file, nullable.
   Future<File> get file async => PhotoManager._getFileWithId(this.id);
 
@@ -230,4 +234,9 @@ class AssetEntity {
   String toString() {
     return "AssetEntity{id:$id}";
   }
+}
+
+class LatLng {
+  double longitude;
+  double latitude;
 }
