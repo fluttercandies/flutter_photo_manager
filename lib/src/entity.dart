@@ -133,10 +133,14 @@ class AssetEntity {
   /// height of asset.
   int height;
 
-  /// Gps information when shooting, nullable
+  /// Gps information when shooting, nullable.
+  ///
+  /// When the device is android10 or above, always null.
   double latitude;
 
-  /// Gps information when shooting, nullable
+  /// Gps information when shooting, nullable.
+  ///
+  /// When the device is android10 or above, always null.
   double longitude;
 
   /// if you need upload file ,then you can use the file, nullable.

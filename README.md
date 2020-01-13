@@ -113,7 +113,13 @@ int height = entity.height;
 DateTime createDt = entity.createDateTime;
 
 DateTime modifiedDt = entity.modifiedDateTime;
+
+/// gps info of asset. nullable, When the device is android10 or above, always null.
+double latitude = entity.latitude;
+double longitude = entiry.longitude;
 ```
+
+#### GPS info
 
 ### observer
 
