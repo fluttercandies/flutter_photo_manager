@@ -136,12 +136,36 @@ class AssetEntity {
   /// Gps information when shooting, nullable.
   ///
   /// When the device is android10 or above, always null.
-  double latitude;
+  double _latitude;
 
   /// Gps information when shooting, nullable.
   ///
   /// When the device is android10 or above, always null.
-  double longitude;
+  double get latitude => _latitude ?? 0;
+
+  /// Gps information when shooting, nullable.
+  ///
+  /// When the device is android10 or above, always null.
+  set latitude(double latitude) {
+    _latitude = latitude;
+  }
+
+  /// Gps information when shooting, nullable.
+  ///
+  /// When the device is android10 or above, always null.
+  double _longitude;
+
+  /// Gps information when shooting, nullable.
+  ///
+  /// When the device is android10 or above, always null.
+  double get longitude => _longitude ?? 0;
+
+  /// Gps information when shooting, nullable.
+  ///
+  /// When the device is android10 or above, always null.
+  set longitude(double longitude) {
+    _longitude = longitude;
+  }
 
   /// if you need upload file ,then you can use the file, nullable.
   Future<File> get file async => PhotoManager._getFileWithId(this.id);
