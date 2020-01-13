@@ -119,7 +119,9 @@ double latitude = entity.latitude;
 double longitude = entiry.longitude;
 ```
 
-#### GPS info
+#### GPS info of android Q
+
+Because of AndroidQ's privacy policy issues, it is necessary to locate permissions in order to obtain the original image, and to obtain location information by reading the Exif metadata of the data.
 
 ### observer
 
