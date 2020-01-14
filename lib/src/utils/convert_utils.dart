@@ -64,7 +64,6 @@ class ConvertUtils {
       ..typeInt = data["type"]
       ..longitude = data["lng"]
       ..latitude = data["lat"];
-    ;
 
     return entity;
   }
