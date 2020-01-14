@@ -239,7 +239,7 @@ object AndroidQDBUtils : IDBUtils {
       return asset
     }
     
-    val keys = (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys).distinct().toTypedArray()
+    val keys = (IDBUtils.storeImageKeys + IDBUtils.typeKeys + IDBUtils.storeVideoKeys).distinct().toTypedArray()
     
     val selection = "${MediaStore.Files.FileColumns._ID} = ?"
     
@@ -325,7 +325,6 @@ object AndroidQDBUtils : IDBUtils {
   }
   
   override fun getExif(context: Context, id: String): ExifInterface? {
-    
     try {
       val asset = getAssetEntity(context, id) ?: return null
       
@@ -337,9 +336,8 @@ object AndroidQDBUtils : IDBUtils {
       
       val originalUri = MediaStore.setRequireOriginal(uri)
       
-      
-      val fd = context.contentResolver.openInputStream(originalUri) ?: return null
-      return ExifInterface(fd)
+      val inputStream = context.contentResolver.openInputStream(originalUri) ?: return null
+      return ExifInterface(inputStream)
     } catch (e: Exception) {
       return null
     }
@@ -349,9 +347,9 @@ object AndroidQDBUtils : IDBUtils {
     cacheContainer.clearCache()
   }
   
-  override fun getFilePath(context: Context, id: String): String? {
+  override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
     val assetEntity = getAssetEntity(context, id) ?: return null
-    val cacheFile = androidQCache.getCacheFile(context, id, assetEntity.displayName, assetEntity.type)
+    val cacheFile = androidQCache.getCacheFile(context, id, assetEntity.displayName, assetEntity.type, origin)
     return cacheFile.path
   }
   

@@ -93,6 +93,13 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
         needLocationPermissions = true
         false
       }
+      "getFullFile" -> {
+        val isOrigin = call.argument<Boolean>("isOrigin")!!
+        if (isOrigin && Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+          needLocationPermissions = true
+        }
+        false
+      }
       else -> false
     }
     
@@ -174,7 +181,7 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
               runOnBackground {
                 val id = call.argument<String>("id")!!
                 val isOrigin = call.argument<Boolean>("isOrigin")!!
-                photoManager.getFile(id, resultHandler)
+                photoManager.getFile(id, isOrigin, resultHandler)
               }
             }
             "fetchPathProperties" -> {

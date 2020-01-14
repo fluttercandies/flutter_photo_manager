@@ -125,6 +125,8 @@ class AssetEntity {
   /// Duration of video, unit is second.
   ///
   /// If [type] is [AssetType.image], then it's value is 0.
+  ///
+  /// Also see [videoDuration]
   int duration;
 
   /// width of asset.
@@ -167,6 +169,11 @@ class AssetEntity {
     _longitude = longitude;
   }
 
+  /// Get latitude and longitude from MediaStore(android) / Photos(iOS).
+  ///
+  /// except : In androidQ, the location info come from exif.
+  ///
+  /// [LatLng.latitude] or [LatLng.longitude] maybe zero or null.
   Future<LatLng> latlngAsync() {
     return _plugin.getLatLngAsync(this);
   }

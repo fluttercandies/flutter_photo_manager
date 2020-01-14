@@ -123,8 +123,8 @@ class PhotoManager(private val context: Context) {
     return dbUtils.getGalleryEntity(context, id, type, timestamp)
   }
   
-  fun getFile(id: String, resultHandler: ResultHandler) {
-    val path = dbUtils.getFilePath(context, id)
+  fun getFile(id: String, isOrigin: Boolean, resultHandler: ResultHandler) {
+    val path = dbUtils.getFilePath(context, id,isOrigin)
     resultHandler.reply(path)
   }
   

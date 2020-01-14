@@ -116,7 +116,7 @@ interface IDBUtils {
   
   fun clearCache()
   
-  fun getFilePath(context: Context, id: String): String?
+  fun getFilePath(context: Context, id: String, origin: Boolean): String?
   
   fun getThumb(context: Context, id: String, width: Int, height: Int, type: Int?): Bitmap?
   

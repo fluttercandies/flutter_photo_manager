@@ -362,7 +362,7 @@ object DBUtils : IDBUtils {
     return ExifInterface(asset.path)
   }
   
-  override fun getFilePath(context: Context, id: String): String? {
+  override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
     val assetEntity = getAssetEntity(context, id) ?: return null
     return assetEntity.path
   }
