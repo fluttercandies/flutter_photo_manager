@@ -17,6 +17,7 @@ class _NewHomePageState extends State<NewHomePage> {
   void initState() {
     super.initState();
     PhotoManager.addChangeCallback(onChange);
+    PhotoManager.setLog(true);
   }
 
   @override
@@ -24,45 +25,45 @@ class _NewHomePageState extends State<NewHomePage> {
     return ChangeNotifierBuilder(
       value: provider,
       builder: (_, __) => Scaffold(
-            appBar: AppBar(
-              title: Text("photo manager example"),
-            ),
-            body: Column(
+        appBar: AppBar(
+          title: Text("photo manager example"),
+        ),
+        body: Column(
+          children: <Widget>[
+            buildButton("Get all gallery list", _scanGalleryList),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                buildButton("Get all gallery list", _scanGalleryList),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text("scan type"),
-                    Container(
-                      width: 10,
-                    ),
-                    DropdownButton<int>(
-                      items: <DropdownMenuItem<int>>[
-                        _buildDropdownMenuItem(0),
-                        _buildDropdownMenuItem(1),
-                        _buildDropdownMenuItem(2),
-                      ],
-                      onChanged: (v) {
-                        provider.changeType(v);
-                      },
-                      value: provider.type,
-                    ),
-                  ],
+                Text("scan type"),
+                Container(
+                  width: 10,
                 ),
-                Row(
-                  children: <Widget>[
-                    _buildFecthDtPicker(),
-                    _buildDateToNow(),
+                DropdownButton<int>(
+                  items: <DropdownMenuItem<int>>[
+                    _buildDropdownMenuItem(0),
+                    _buildDropdownMenuItem(1),
+                    _buildDropdownMenuItem(2),
                   ],
-                  mainAxisSize: MainAxisSize.min,
+                  onChanged: (v) {
+                    provider.changeType(v);
+                  },
+                  value: provider.type,
                 ),
-                _buildHasAllCheck(),
-                _buildNotifyCheck(),
-                // buildAndroidQSwitch(),
               ],
             ),
-          ),
+            Row(
+              children: <Widget>[
+                _buildFecthDtPicker(),
+                _buildDateToNow(),
+              ],
+              mainAxisSize: MainAxisSize.min,
+            ),
+            _buildHasAllCheck(),
+            _buildNotifyCheck(),
+            // buildAndroidQSwitch(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -127,18 +128,17 @@ class _NewHomePageState extends State<NewHomePage> {
 
   Widget _buildNotifyCheck() {
     return CheckboxListTile(
-      value: provider.notifying,
-      title: Text("onChanged"),
-      onChanged: (value) {
-        provider.notifying = value;
+        value: provider.notifying,
+        title: Text("onChanged"),
+        onChanged: (value) {
+          provider.notifying = value;
 
-        if (value) {
-          PhotoManager.startChangeNotify();
-        } else {
-          PhotoManager.stopChangeNotify();
-        }
-      }
-    );
+          if (value) {
+            PhotoManager.startChangeNotify();
+          } else {
+            PhotoManager.stopChangeNotify();
+          }
+        });
   }
 
   void onChange(call) {}

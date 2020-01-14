@@ -180,4 +180,8 @@ class PhotoManager {
       entity.fetchDatetime,
     );
   }
+
+  static Future<String> systemVersion() async {
+    return _plugin.getSystemVersion();
+  }
 }

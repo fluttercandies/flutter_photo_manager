@@ -125,6 +125,8 @@ class AssetEntity {
   /// Duration of video, unit is second.
   ///
   /// If [type] is [AssetType.image], then it's value is 0.
+  ///
+  /// Also see [videoDuration]
   int duration;
 
   /// width of asset.
@@ -132,6 +134,49 @@ class AssetEntity {
 
   /// height of asset.
   int height;
+
+  /// Gps information when shooting, nullable.
+  ///
+  /// When the device is android10 or above, always null.
+  double _latitude;
+
+  /// Gps information when shooting, nullable.
+  ///
+  /// When the device is android10 or above, always null.
+  double get latitude => _latitude ?? 0;
+
+  /// Gps information when shooting, nullable.
+  ///
+  /// When the device is android10 or above, always null.
+  set latitude(double latitude) {
+    _latitude = latitude;
+  }
+
+  /// Gps information when shooting, nullable.
+  ///
+  /// When the device is android10 or above, always null.
+  double _longitude;
+
+  /// Gps information when shooting, nullable.
+  ///
+  /// When the device is android10 or above, always null.
+  double get longitude => _longitude ?? 0;
+
+  /// Gps information when shooting, nullable.
+  ///
+  /// When the device is android10 or above, always null.
+  set longitude(double longitude) {
+    _longitude = longitude;
+  }
+
+  /// Get latitude and longitude from MediaStore(android) / Photos(iOS).
+  ///
+  /// except : In androidQ, the location info come from exif.
+  ///
+  /// [LatLng.latitude] or [LatLng.longitude] maybe zero or null.
+  Future<LatLng> latlngAsync() {
+    return _plugin.getLatLngAsync(this);
+  }
 
   /// if you need upload file ,then you can use the file, nullable.
   Future<File> get file async => PhotoManager._getFileWithId(this.id);
@@ -196,4 +241,9 @@ class AssetEntity {
   String toString() {
     return "AssetEntity{id:$id}";
   }
+}
+
+class LatLng {
+  double longitude;
+  double latitude;
 }

@@ -209,4 +209,27 @@ class Plugin {
   Future<bool> assetExistsWithId(String id) {
     return _channel.invokeMethod("assetExists", {"id": id});
   }
+
+  Future<String> getSystemVersion() async {
+    return _channel.invokeMethod("systemVersion");
+  }
+
+  Future<LatLng> getLatLngAsync(AssetEntity assetEntity) async {
+    if (Platform.isAndroid) {
+      final version = int.parse(await getSystemVersion());
+      if (version >= 29) {
+        final map = await _channel
+            .invokeMethod("getLatLngAndroidQ", {"id": assetEntity.id});
+        if (map is Map) {
+          /// 将返回的数据传入map
+          return LatLng()
+            ..latitude = map["lat"]
+            ..longitude = map["lng"];
+        }
+      }
+    }
+    return LatLng()
+      ..latitude = assetEntity.latitude
+      ..longitude = assetEntity.longitude;
+  }
 }

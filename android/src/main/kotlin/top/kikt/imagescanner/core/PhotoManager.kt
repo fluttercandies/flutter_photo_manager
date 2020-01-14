@@ -123,8 +123,8 @@ class PhotoManager(private val context: Context) {
     return dbUtils.getGalleryEntity(context, id, type, timestamp)
   }
   
-  fun getFile(id: String, resultHandler: ResultHandler) {
-    val path = dbUtils.getFilePath(context, id)
+  fun getFile(id: String, isOrigin: Boolean, resultHandler: ResultHandler) {
+    val path = dbUtils.getFilePath(context, id,isOrigin)
     resultHandler.reply(path)
   }
   
@@ -146,6 +146,22 @@ class PhotoManager(private val context: Context) {
   fun assetExists(id: String, resultHandler: ResultHandler) {
     val exists: Boolean = dbUtils.exists(context, id)
     resultHandler.reply(exists)
+  }
+  
+  fun getLocation(id: String): Map<String, Double> {
+    val exifInfo = dbUtils.getExif(context, id)
+    val latLong = exifInfo?.latLong
+    return if (latLong == null) {
+      mapOf(
+        "lat" to 0.0,
+        "lng" to 0.0
+      )
+    } else {
+      mapOf(
+        "lat" to latLong[0],
+        "lng" to latLong[1]
+      )
+    }
   }
   
 }

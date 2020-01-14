@@ -13,6 +13,8 @@ class _SaveImageExampleState extends State<SaveImageExample> {
   final imageUrl =
       "https://ww4.sinaimg.cn/bmiddle/005TR3jLly1ga48shax8zj30u02ickjl.jpg";
 
+  final haveExifUrl = "http://172.16.100.7:2393/IMG_20200107_182905.jpg";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,6 +26,8 @@ class _SaveImageExampleState extends State<SaveImageExample> {
           child: Text("Save image"),
           onPressed: () async {
             final client = HttpClient();
+            // Replace to your have exif image url to test the android Q exif info.
+            // final req = await client.getUrl(Uri.parse(haveExifUrl));
             final req = await client.getUrl(Uri.parse(imageUrl));
             final resp = await req.close();
             List<int> bytes = [];

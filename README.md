@@ -113,7 +113,17 @@ int height = entity.height;
 DateTime createDt = entity.createDateTime;
 
 DateTime modifiedDt = entity.modifiedDateTime;
+
+/// Gps info of asset. If latitude and longitude is 0, it means that no positioning information was obtained.
+/// This information is not necessarily available, because the photo source is not necessarily the camera.
+/// Even the camera, due to privacy issues, this property must not be available on androidQ and above.
+double latitude = entity.latitude;
+double longitude = entiry.longitude;
 ```
+
+#### location info of android Q
+
+Because of AndroidQ's privacy policy issues, it is necessary to locate permissions in order to obtain the original image, and to obtain location information by reading the Exif metadata of the data.
 
 ### observer
 
