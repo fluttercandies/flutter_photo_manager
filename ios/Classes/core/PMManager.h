@@ -4,6 +4,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
+#import "PMFileHelper.h"
 
 typedef void(^ChangeIds)(NSArray<NSString *> *);
 
@@ -33,7 +34,7 @@ typedef void(^AssetResult)(PMAssetEntity *);
 - (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height
          resultHandler:(ResultHandler *)handler;
 
-- (void)getFullSizeFileWithId:(NSString *)id resultHandler:(ResultHandler *)handler;
+- (void)getFullSizeFileWithId:(NSString *)id isOrigin:(Boolean)isOrigin resultHandler:(ResultHandler *)handler;
 
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type date:(NSDate *)date;
 

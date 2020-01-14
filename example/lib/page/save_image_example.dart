@@ -26,7 +26,8 @@ class _SaveImageExampleState extends State<SaveImageExample> {
           child: Text("Save image"),
           onPressed: () async {
             final client = HttpClient();
-            // final req = await client.getUrl(Uri.parse(haveExifUrl)); // Replace to your have exif image url to test the android Q exif info.
+            // Replace to your have exif image url to test the android Q exif info.
+            // final req = await client.getUrl(Uri.parse(haveExifUrl));
             final req = await client.getUrl(Uri.parse(imageUrl));
             final resp = await req.close();
             List<int> bytes = [];

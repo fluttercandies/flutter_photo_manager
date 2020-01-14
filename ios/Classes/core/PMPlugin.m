@@ -113,7 +113,7 @@
         NSString *id = call.arguments[@"id"];
         BOOL isOrigin = [call.arguments[@"isOrigin"] boolValue];
 
-        [manager getFullSizeFileWithId:id resultHandler:handler];
+        [manager getFullSizeFileWithId:id isOrigin:isOrigin resultHandler:handler];
 
     } else if ([call.method isEqualToString:@"releaseMemCache"]) {
 
