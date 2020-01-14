@@ -42,7 +42,13 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             title: Text("${path.name}"),
             actions: <Widget>[
               Tooltip(
-                child: Icon(Icons.info_outline),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Icon(
+                    Icons.info_outline,
+                    size: 22,
+                  ),
+                ),
                 message: "Long tap to delete item.",
               ),
             ],

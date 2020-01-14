@@ -10,6 +10,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO
+import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.GalleryEntity
@@ -288,14 +289,14 @@ object DBUtils : IDBUtils {
       val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LATITUDE)
       
       val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
-  
+      
       if (lat != 0.0) {
         asset.lat = lat
       }
       if (lng != 0.0) {
         asset.lng = lng
       }
-  
+      
       list.add(asset)
       cache.putAsset(asset)
     }
@@ -335,14 +336,14 @@ object DBUtils : IDBUtils {
       val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LATITUDE)
       
       val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
-  
+      
       if (lat != 0.0) {
         dbAsset.lat = lat
       }
       if (lng != 0.0) {
         dbAsset.lng = lng
       }
-  
+      
       dbAsset.lat = lat
       dbAsset.lng = lng
       
@@ -354,6 +355,11 @@ object DBUtils : IDBUtils {
       cursor.close()
       return null
     }
+  }
+  
+  override fun getExif(context: Context, id: String): ExifInterface? {
+    val asset = getAssetEntity(context, id) ?: return null
+    return ExifInterface(asset.path)
   }
   
   override fun getFilePath(context: Context, id: String): String? {

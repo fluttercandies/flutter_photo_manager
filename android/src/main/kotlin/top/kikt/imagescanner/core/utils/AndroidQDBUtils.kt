@@ -10,6 +10,7 @@ import android.os.Build
 import android.provider.MediaStore
 import android.util.Size
 import androidx.annotation.RequiresApi
+import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.cache.AndroidQCache
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
@@ -101,7 +102,7 @@ object AndroidQDBUtils : IDBUtils {
     val isAll = galleryId.isEmpty()
     
     val list = ArrayList<AssetEntity>()
-    val uri = DBUtils.allUri
+    val uri = allUri
     
     val args = ArrayList<String>()
     if (!isAll) {
@@ -152,7 +153,7 @@ object AndroidQDBUtils : IDBUtils {
       val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
       val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
       
-      val asset = AssetEntity(id, path, duration, date, width, height, DBUtils.getMediaType(type), displayName, modifiedDate)
+      val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
       list.add(asset)
       cache.putAsset(asset)
     }
@@ -169,7 +170,7 @@ object AndroidQDBUtils : IDBUtils {
     val isAll = gId.isEmpty()
     
     val list = ArrayList<AssetEntity>()
-    val uri = DBUtils.allUri
+    val uri = allUri
     
     val args = ArrayList<String>()
     if (!isAll) {
@@ -221,7 +222,7 @@ object AndroidQDBUtils : IDBUtils {
       val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
       val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
       
-      val asset = AssetEntity(id, path, duration, date, width, height, DBUtils.getMediaType(type), displayName, modifiedDate)
+      val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
       list.add(asset)
       cache.putAsset(asset)
     }
@@ -244,7 +245,7 @@ object AndroidQDBUtils : IDBUtils {
     
     val args = arrayOf(id)
     
-    val cursor = context.contentResolver.query(DBUtils.allUri, keys, selection, args, null)
+    val cursor = context.contentResolver.query(allUri, keys, selection, args, null)
     cursor?.use {
       if (cursor.moveToNext()) {
         val databaseId = cursor.getString(MediaStore.MediaColumns._ID)
@@ -257,7 +258,7 @@ object AndroidQDBUtils : IDBUtils {
         val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
         val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
         
-        val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, DBUtils.getMediaType(type), displayName, modifiedDate)
+        val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
         cacheContainer.putAsset(dbAsset)
         
         cursor.close()
@@ -272,7 +273,7 @@ object AndroidQDBUtils : IDBUtils {
   
   @SuppressLint("Recycle")
   override fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long): GalleryEntity? {
-    val uri = DBUtils.allUri
+    val uri = allUri
     val projection = IDBUtils.storeBucketKeys
     
     val isAll = galleryId == ""
@@ -321,6 +322,27 @@ object AndroidQDBUtils : IDBUtils {
       return null
     }
     return GalleryEntity(galleryId, name, cursor.count, type, isAll)
+  }
+  
+  override fun getExif(context: Context, id: String): ExifInterface? {
+    
+    try {
+      val asset = getAssetEntity(context, id) ?: return null
+      
+      val uri =
+        if (asset.type == 1)
+          Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, asset.id)
+        else
+          Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, asset.id)
+      
+      val originalUri = MediaStore.setRequireOriginal(uri)
+      
+      
+      val fd = context.contentResolver.openInputStream(originalUri) ?: return null
+      return ExifInterface(fd)
+    } catch (e: Exception) {
+      return null
+    }
   }
   
   override fun clearCache() {
@@ -377,7 +399,7 @@ object AndroidQDBUtils : IDBUtils {
     val id = ContentUris.parseId(contentUri)
     
     cr.notifyChange(contentUri, null)
-    return DBUtils.getAssetEntity(context, id.toString())
+    return getAssetEntity(context, id.toString())
   }
   
   override fun saveVideo(context: Context, inputStream: InputStream, title: String, desc: String): AssetEntity? {
@@ -409,7 +431,7 @@ object AndroidQDBUtils : IDBUtils {
     val id = ContentUris.parseId(contentUri)
     
     cr.notifyChange(contentUri, null)
-    return DBUtils.getAssetEntity(context, id.toString())
+    return getAssetEntity(context, id.toString())
   }
   
 }

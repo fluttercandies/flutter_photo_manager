@@ -57,8 +57,11 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  void _showInfo() {
+  void _showInfo() async {
     final entity = widget.entity;
+
+    final latlng = await entity.latlngAsync();
+
     Widget w = Center(
       child: Container(
         color: Colors.white,
@@ -73,9 +76,9 @@ class _DetailPageState extends State<DetailPage> {
               buildInfoItem("size", entity.size.toString()),
               buildInfoItem("duration", entity.videoDuration.toString()),
               buildInfoItem(
-                  "lng", entity.longitude?.toStringAsFixed(6) ?? "null"),
+                  "lng", latlng.longitude?.toStringAsFixed(6) ?? "null"),
               buildInfoItem(
-                  "lat", entity.latitude?.toStringAsFixed(6) ?? "null"),
+                  "lat", latlng.latitude?.toStringAsFixed(6) ?? "null"),
             ],
           ),
         ),

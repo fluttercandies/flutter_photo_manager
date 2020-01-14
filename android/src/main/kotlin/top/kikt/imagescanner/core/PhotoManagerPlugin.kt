@@ -85,7 +85,7 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
         true
       }
       "systemVersion" -> {
-        resultHandler.reply(Build.VERSION.SDK_INT)
+        resultHandler.reply(Build.VERSION.SDK_INT.toString())
         true
       }
       "getLatLngAndroidQ" -> {
@@ -195,6 +195,8 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
               runOnBackground {
                 val id = call.argument<String>("id")!!
                 // 读取id
+                val location = photoManager.getLocation(id)
+                resultHandler.reply(location)
               }
             }
             "notify" -> {
@@ -216,30 +218,40 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
             }
             "saveImage" -> {
               runOnBackground {
-                val image = call.argument<ByteArray>("image")!!
-                val title = call.argument<String>("title")!!
-                val desc = call.argument<String>("desc")!!
-                val entity = photoManager.saveImage(image, title, desc)
-                if (entity == null) {
+                try {
+                  val image = call.argument<ByteArray>("image")!!
+                  val title = call.argument<String>("title") ?: ""
+                  val desc = call.argument<String>("desc") ?: ""
+                  val entity = photoManager.saveImage(image, title, desc)
+                  if (entity == null) {
+                    resultHandler.reply(null)
+                    return@runOnBackground
+                  }
+                  val map = ConvertUtils.convertToAssetResult(entity)
+                  resultHandler.reply(map)
+                } catch (e: Exception) {
+                  LogUtils.error("save image error", e)
                   resultHandler.reply(null)
-                  return@runOnBackground
                 }
-                val map = ConvertUtils.convertToAssetResult(entity)
-                resultHandler.reply(map)
               }
             }
             "saveVideo" -> {
               runOnBackground {
-                val videoPath = call.argument<String>("path")!!
-                val title = call.argument<String>("title")!!
-                val desc = call.argument<String>("desc")!!
-                val entity = photoManager.saveVideo(videoPath, title, desc)
-                if (entity == null) {
+                try {
+                  val videoPath = call.argument<String>("path")!!
+                  val title = call.argument<String>("title")!!
+                  val desc = call.argument<String>("desc") ?: ""
+                  val entity = photoManager.saveVideo(videoPath, title, desc)
+                  if (entity == null) {
+                    resultHandler.reply(null)
+                    return@runOnBackground
+                  }
+                  val map = ConvertUtils.convertToAssetResult(entity)
+                  resultHandler.reply(map)
+                } catch (e: Exception) {
+                  LogUtils.error("save video error", e)
                   resultHandler.reply(null)
-                  return@runOnBackground
                 }
-                val map = ConvertUtils.convertToAssetResult(entity)
-                resultHandler.reply(map)
               }
             }
             else -> resultHandler.notImplemented()
@@ -256,15 +268,26 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
         Manifest.permission.WRITE_EXTERNAL_STORAGE
       )
     } else {
-      utils.getPermissions(
-        registrar.activity(),
-        3001,
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_BACKGROUND_LOCATION
-      )
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        utils.getPermissions(
+          registrar.activity(),
+          3001,
+          Manifest.permission.READ_EXTERNAL_STORAGE,
+          Manifest.permission.WRITE_EXTERNAL_STORAGE,
+          Manifest.permission.ACCESS_FINE_LOCATION,
+          Manifest.permission.ACCESS_COARSE_LOCATION,
+          Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        )
+      } else {
+        utils.getPermissions(
+          registrar.activity(),
+          3001,
+          Manifest.permission.READ_EXTERNAL_STORAGE,
+          Manifest.permission.WRITE_EXTERNAL_STORAGE,
+          Manifest.permission.ACCESS_FINE_LOCATION,
+          Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+      }
     }
     
   }

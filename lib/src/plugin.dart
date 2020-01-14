@@ -222,6 +222,9 @@ class Plugin {
             .invokeMethod("getLatLngAndroidQ", {"id": assetEntity.id});
         if (map is Map) {
           /// 将返回的数据传入map
+          return LatLng()
+            ..latitude = map["lat"]
+            ..longitude = map["lng"];
         }
       }
     }
