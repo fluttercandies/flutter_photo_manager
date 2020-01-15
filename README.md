@@ -175,6 +175,8 @@ like next
 xcode like image
 ![in xcode](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/flutter_photo2.png)
 
+In ios11+, if you want to save or delete asset, you also need add `NSPhotoLibraryAddUsageDescription` to plist.
+
 ## android config
 
 ### about androidX
