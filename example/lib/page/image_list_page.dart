@@ -95,15 +95,16 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     return GestureDetector(
       onTap: () async {
         final originFile = await entity.originFile;
-        if (originFile == null) {
-          if (!originFile.existsSync())
-            print("data length = ${originFile?.length}");
+        if (originFile == null || !originFile.existsSync()) {
+          print("data length = ${originFile?.lengthSync()}");
           showToast(
             "The file is null, please see issue #128.",
             duration: const Duration(milliseconds: 3500),
           );
           return;
         }
+        print(
+            "origin file length = ${originFile.lengthSync()}, path = ${originFile.absolute.path}");
         final page = DetailPage(
           file: originFile,
           entity: entity,
