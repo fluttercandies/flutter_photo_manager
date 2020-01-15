@@ -75,6 +75,7 @@ class _DetailPageState extends State<DetailPage> {
               buildInfoItem("modified", entity.modifiedDateTime.toString()),
               buildInfoItem("size", entity.size.toString()),
               buildInfoItem("duration", entity.videoDuration.toString()),
+              buildInfoItem("title", entity.title ?? "null"),
               buildInfoItem(
                   "lng", latlng.longitude?.toStringAsFixed(6) ?? "null"),
               buildInfoItem(

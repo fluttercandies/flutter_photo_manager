@@ -100,6 +100,11 @@ class AssetEntity {
   /// in ios is local id
   String id;
 
+  /// It is title `MediaStore.MediaColumns.DISPLAY_NAME` in MediaStore on android.
+  ///
+  /// It is `PHAssetResource.originalFilename` on iOS.
+  String title;
+
   /// see [id]
   AssetEntity({this.id});
 
