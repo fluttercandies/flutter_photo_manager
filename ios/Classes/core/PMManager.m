@@ -189,8 +189,6 @@
   // type:
   // 0: all , 1: image, 2:video
 
-  PHAssetResource *targetResource;
-
   int type = 0;
   if (asset.isImage) {
     type = 1;
@@ -294,7 +292,11 @@
   if (entity && entity.phAsset) {
     PHAsset *asset = entity.phAsset;
     if (asset.isVideo) {
-      [self fetchFullSizeVideo:asset handler:handler];
+      if (isOrigin) {
+        [self fetchOriginVideoFile:asset handler:handler];
+      } else {
+        [self fetchFullSizeVideo:asset handler:handler];
+      }
       return;
     } else {
       if (isOrigin) {
@@ -306,6 +308,46 @@
   } else {
     [handler replyError:@"asset is not found"];
   }
+}
+
+- (void)fetchOriginVideoFile:(PHAsset *)asset handler:(ResultHandler *)handler {
+  NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:asset];
+  // find asset
+  NSLog(@"The asset has %lu resources.", (unsigned long)resources.count);
+  PHAssetResource *dstResource;
+  for (PHAssetResource *resource in resources) {
+    if (resource.type == PHAssetResourceTypeVideo) {
+      dstResource = resource;
+      break;
+    }
+  }
+
+  if (!dstResource) {
+    [handler reply:nil];
+    return;
+  }
+
+  PHAssetResourceManager *manager = PHAssetResourceManager.defaultManager;
+
+  NSString *path = [self makeAssetOutputPath:asset isOrigin:YES];
+  NSURL *fileUrl = [NSURL fileURLWithPath:path];
+
+  [PMFileHelper deleteFile:path];
+
+  PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
+  [options setNetworkAccessAllowed:YES];
+
+  [manager writeDataForAssetResource:dstResource
+                              toFile:fileUrl
+                             options:options
+                   completionHandler:^(NSError *_Nullable error) {
+                     if (error) {
+                       NSLog(@"error = %@", error);
+                       [handler reply:nil];
+                     } else {
+                       [handler reply:path];
+                     }
+                   }];
 }
 
 - (void)fetchFullSizeVideo:(PHAsset *)asset handler:(ResultHandler *)handler {
@@ -361,18 +403,26 @@
                }];
 }
 
-- (NSMutableString *)makeAssetOutputPath:(PHAsset *)asset isOrigin:(Boolean)isOrigin {
+- (NSString *)makeAssetOutputPath:(PHAsset *)asset isOrigin:(Boolean)isOrigin {
   NSString *homePath = NSTemporaryDirectory();
-  NSString *dirPath = [NSString stringWithFormat:@"%@/%@", homePath, @".image"];
+  NSString *cachePath = asset.isVideo ? @".video" : @".image";
+  NSString *dirPath = [NSString stringWithFormat:@"%@%@", homePath, cachePath];
   [NSFileManager.defaultManager createDirectoryAtPath:dirPath
                           withIntermediateDirectories:true
                                            attributes:@{}
                                                 error:nil];
+    
+    NSLog(@"cache path = %@", dirPath);
 
-  NSMutableString *path = [NSMutableString stringWithString:homePath];
+  NSString *title = [asset title];
+  NSMutableString *path = [NSMutableString stringWithString:dirPath];
   NSString *filename = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/"
                                                                         withString:@"_"];
-  [path appendFormat:@"%@/%@%@.jpg", @".image", filename, isOrigin ? @"_origin" : @""];
+  if (isOrigin) {
+      return [NSString stringWithFormat:@"%@/%@", dirPath, title];
+  } else {
+    [path appendFormat:@"%@/%@%@.jpg", cachePath, filename, isOrigin ? @"_origin" : @""];
+  }
   return path;
 }
 
