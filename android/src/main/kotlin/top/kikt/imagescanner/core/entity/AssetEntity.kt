@@ -14,7 +14,6 @@ data class AssetEntity(
   val displayName: String,
   val modifiedDate: Long
 ) {
-  
   var lat: Double? = null
   var lng: Double? = null
   

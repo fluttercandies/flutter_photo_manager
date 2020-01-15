@@ -21,32 +21,32 @@ interface IDBUtils {
   companion object {
     
     val storeImageKeys = arrayOf(
-      MediaStore.Images.Media.DISPLAY_NAME, // 显示的名字
-      MediaStore.Images.Media.DATA, // 数据
-      MediaStore.Images.Media._ID, // id
-      MediaStore.Images.Media.TITLE, // id
-      MediaStore.Images.Media.BUCKET_ID, // dir id 目录
-      MediaStore.Images.Media.BUCKET_DISPLAY_NAME, // dir name 目录名字
-      MediaStore.Images.Media.WIDTH, // 宽
-      MediaStore.Images.Media.HEIGHT, // 高
-      MediaStore.Images.Media.DATE_MODIFIED, // 修改时间
-      MediaStore.Images.Media.MIME_TYPE, // 高
-      MediaStore.Images.Media.DATE_TAKEN //日期
+      MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
+      MediaStore.MediaColumns.DATA, // 数据
+      MediaStore.MediaColumns._ID, // id
+      MediaStore.MediaColumns.TITLE, // id
+      MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
+      MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
+      MediaStore.MediaColumns.WIDTH, // 宽
+      MediaStore.MediaColumns.HEIGHT, // 高
+      MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
+      MediaStore.MediaColumns.MIME_TYPE, // 高
+      MediaStore.MediaColumns.DATE_TAKEN //日期
     )
     
     val storeVideoKeys = arrayOf(
-      MediaStore.Video.Media.DISPLAY_NAME, // 显示的名字
-      MediaStore.Video.Media.DATA, // 数据
-      MediaStore.Video.Media._ID, // id
-      MediaStore.Video.Media.TITLE, // id
-      MediaStore.Video.Media.BUCKET_ID, // dir id 目录
-      MediaStore.Video.Media.BUCKET_DISPLAY_NAME, // dir name 目录名字
-      MediaStore.Video.Media.DATE_TAKEN, //日期
-      MediaStore.Video.Media.WIDTH, // 宽
-      MediaStore.Video.Media.HEIGHT, // 高
-      MediaStore.Images.Media.DATE_MODIFIED, // 修改时间
-      MediaStore.Video.Media.MIME_TYPE, // 高
-      MediaStore.Video.Media.DURATION //时长
+      MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
+      MediaStore.MediaColumns.DATA, // 数据
+      MediaStore.MediaColumns._ID, // id
+      MediaStore.MediaColumns.TITLE, // id
+      MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
+      MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
+      MediaStore.MediaColumns.DATE_TAKEN, //日期
+      MediaStore.MediaColumns.WIDTH, // 宽
+      MediaStore.MediaColumns.HEIGHT, // 高
+      MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
+      MediaStore.MediaColumns.MIME_TYPE, // 高
+      MediaStore.MediaColumns.DURATION //时长
     )
     
     val typeKeys = arrayOf(

@@ -6,7 +6,6 @@
 
 @class PHAsset;
 
-
 @interface PMAssetPathEntity : NSObject
 
 @property(nonatomic, copy) NSString *id;
@@ -18,9 +17,7 @@
 
 + (instancetype)entityWithId:(NSString *)id name:(NSString *)name assetCount:(int)assetCount;
 
-
 @end
-
 
 @interface PMAssetEntity : NSObject
 
@@ -34,12 +31,20 @@
 @property(nonatomic, assign) long modifiedDt;
 @property(nonatomic, assign) double lat;
 @property(nonatomic, assign) double lng;
+@property(nonatomic, copy) NSString *title;
 
-- (instancetype)initWithId:(NSString *)id createDt:(long)createDt width:(NSUInteger)width height:(NSUInteger)height
-                  duration:(long)duration type:(int)type;
+- (instancetype)initWithId:(NSString *)id
+                  createDt:(long)createDt
+                     width:(NSUInteger)width
+                    height:(NSUInteger)height
+                  duration:(long)duration
+                      type:(int)type;
 
-+ (instancetype)entityWithId:(NSString *)id createDt:(long)createDt width:(NSUInteger)width height:(NSUInteger)height
-                    duration:(long)duration type:(int)type;
-
++ (instancetype)entityWithId:(NSString *)id
+                    createDt:(long)createDt
+                       width:(NSUInteger)width
+                      height:(NSUInteger)height
+                    duration:(long)duration
+                        type:(int)type;
 
 @end

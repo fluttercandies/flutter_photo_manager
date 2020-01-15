@@ -41,7 +41,8 @@ object ConvertUtils {
         "height" to entity.height,
         "modifiedDt" to entity.modifiedDate,
         "lat" to entity.lat,
-        "lng" to entity.lng
+        "lng" to entity.lng,
+        "title" to entity.displayName
       )
       data.add(element)
     }
@@ -62,7 +63,8 @@ object ConvertUtils {
       "height" to entity.height,
       "modifiedDt" to entity.modifiedDate,
       "lat" to entity.lat,
-      "lng" to entity.lng
+      "lng" to entity.lng,
+      "title" to entity.displayName
     )
     
     return mapOf(

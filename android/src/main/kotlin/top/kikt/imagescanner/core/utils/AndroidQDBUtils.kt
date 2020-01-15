@@ -255,7 +255,7 @@ object AndroidQDBUtils : IDBUtils {
         val duration = if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
         val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
         val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
-        val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
+        val displayName = cursor.getString(MediaStore.MediaColumns.DISPLAY_NAME)
         val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
         
         val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
