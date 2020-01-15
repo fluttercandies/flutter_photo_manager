@@ -34,13 +34,12 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
       );
     } else {
       image = FutureBuilder<Uint8List>(
-        future: Plugin().getThumb(id: item.id, width: size, height: size),
-        // future: Plugin().getOriginBytes(item.id),
+        future: item.thumbDataWithSize(size, size),
         builder: (context, snapshot) {
           Widget w;
           if (snapshot.hasError) {
             w = Center(
-              child: Text("load error"),
+              child: Text("load error, error: ${snapshot.error}"),
             );
           }
           if (snapshot.hasData) {

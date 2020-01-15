@@ -362,6 +362,7 @@ object AndroidQDBUtils : IDBUtils {
         Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
       else
         Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+    
     return context.contentResolver.loadThumbnail(uri, Size(width, height), null)
   }
   

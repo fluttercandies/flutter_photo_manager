@@ -2,6 +2,7 @@ package top.kikt.imagescanner.core
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.GalleryEntity
 import top.kikt.imagescanner.core.utils.AndroidQDBUtils
@@ -9,6 +10,7 @@ import top.kikt.imagescanner.core.utils.DBUtils
 import top.kikt.imagescanner.core.utils.IDBUtils
 import top.kikt.imagescanner.old.ResultHandler
 import top.kikt.imagescanner.thumb.ThumbnailUtil
+import top.kikt.imagescanner.util.LogUtils
 import java.io.File
 import java.io.FileInputStream
 
@@ -67,24 +69,29 @@ class PhotoManager(private val context: Context) {
     return dbUtils.getAssetFromGalleryIdRange(context, gId, start, end, type, timestamp)
   }
   
-  
   fun getThumb(id: String, width: Int, height: Int, resultHandler: ResultHandler) {
-    if (!androidQExperimental) {
-      val asset = dbUtils.getAssetEntity(context, id)
-      if (asset == null) {
-        resultHandler.replyError("The asset not found!")
-        return
+    try {
+      if (!androidQExperimental) {
+        val asset = dbUtils.getAssetEntity(context, id)
+        if (asset == null) {
+          resultHandler.replyError("The asset not found!")
+          return
+        }
+        ThumbnailUtil.getThumbnailByGlide(context, asset.path, width, height, resultHandler.result)
+      } else {
+        // need use android Q  MediaStore thumbnail api
+        
+        val asset = dbUtils.getAssetEntity(context, id)
+        val type = asset?.type
+        val bitmap = dbUtils.getThumb(context, id, width, height, type)
+        ThumbnailUtil.getThumb(context, bitmap, width, height) {
+          resultHandler.reply(it)
+          bitmap?.recycle()
+        }
       }
-      ThumbnailUtil.getThumbnailByGlide(context, asset.path, width, height, resultHandler.result)
-    } else {
-      // need use android Q  MediaStore thumbnail api
-      val asset = dbUtils.getAssetEntity(context, id)
-      val type = asset?.type
-      val bitmap = dbUtils.getThumb(context, id, width, height, type)
-      ThumbnailUtil.getThumb(context, bitmap, width, height) {
-        resultHandler.reply(it)
-        bitmap?.recycle()
-      }
+    } catch (e: Exception) {
+      Log.e(LogUtils.TAG, "get thumb error", e)
+      resultHandler.replyError("201", "get thumb error", e)
     }
   }
   
@@ -124,7 +131,7 @@ class PhotoManager(private val context: Context) {
   }
   
   fun getFile(id: String, isOrigin: Boolean, resultHandler: ResultHandler) {
-    val path = dbUtils.getFilePath(context, id,isOrigin)
+    val path = dbUtils.getFilePath(context, id, isOrigin)
     resultHandler.reply(path)
   }
   

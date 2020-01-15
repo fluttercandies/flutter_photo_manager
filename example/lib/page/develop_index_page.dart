@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:photo_manager/photo_manager.dart';
 
+import 'video_page.dart';
+
 class DeveloperIndexPage extends StatefulWidget {
   @override
   _DeveloperIndexPageState createState() => _DeveloperIndexPageState();
@@ -26,6 +28,15 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
           RaisedButton(
             child: Text("Save video to photos."),
             onPressed: _saveVideo,
+          ),
+          RaisedButton(
+            child: Text("Display androidQ video."),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => VidePage(),
+              ),
+            ),
           ),
         ],
       ),
