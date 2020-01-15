@@ -94,10 +94,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     final entity = list[index];
     return GestureDetector(
       onTap: () async {
-        final f = await entity.file;
-        if (f == null) {
-          final data = await entity.fullData;
-          print("data length = ${data?.length}");
+        final originFile = await entity.originFile;
+        if (originFile == null) {
+          if (!originFile.existsSync())
+            print("data length = ${originFile?.length}");
           showToast(
             "The file is null, please see issue #128.",
             duration: const Duration(milliseconds: 3500),
@@ -105,7 +105,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
           return;
         }
         final page = DetailPage(
-          file: f,
+          file: originFile,
           entity: entity,
         );
         Navigator.of(context)
