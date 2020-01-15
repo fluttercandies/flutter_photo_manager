@@ -192,7 +192,7 @@ class Plugin {
 
   Future<AssetEntity> saveVideo(File file,
       {String title, String desc = ""}) async {
-    if (file.existsSync()) {
+    if (!file.existsSync()) {
       return null;
     }
     final result = await _channel.invokeMethod(

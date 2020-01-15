@@ -58,7 +58,7 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     val resultHandler = ResultHandler(result)
     
-    var needLocationPermissions = false;
+    var needLocationPermissions = false
     
     val handleResult = when (call.method) {
       "releaseMemCache" -> {
