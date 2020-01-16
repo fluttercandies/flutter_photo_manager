@@ -58,7 +58,7 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     val resultHandler = ResultHandler(result)
     
-    var needLocationPermissions = false;
+    var needLocationPermissions = false
     
     val handleResult = when (call.method) {
       "releaseMemCache" -> {
@@ -95,7 +95,7 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
       }
       "getFullFile" -> {
         val isOrigin = call.argument<Boolean>("isOrigin")!!
-        if (isOrigin && Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+        if (isOrigin && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
           needLocationPermissions = true
         }
         false
@@ -283,7 +283,8 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
           Manifest.permission.WRITE_EXTERNAL_STORAGE,
           Manifest.permission.ACCESS_FINE_LOCATION,
           Manifest.permission.ACCESS_COARSE_LOCATION,
-          Manifest.permission.ACCESS_BACKGROUND_LOCATION
+          Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+          Manifest.permission.ACCESS_MEDIA_LOCATION
         )
       } else {
         utils.getPermissions(

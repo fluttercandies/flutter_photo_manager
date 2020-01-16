@@ -204,9 +204,9 @@ object DBUtils : IDBUtils {
       val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
       val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
       val displayName = File(path).name
-      
-      val lat = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
-      val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LATITUDE)
+  
+      val lat = cursor.getDouble(MediaStore.Images.ImageColumns.LATITUDE)
+      val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
       
       val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
       
@@ -284,9 +284,9 @@ object DBUtils : IDBUtils {
       val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
       val displayName = File(path).name
       val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
-      
-      val lat = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
-      val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LATITUDE)
+  
+      val lat = cursor.getDouble(MediaStore.Images.ImageColumns.LATITUDE)
+      val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
       
       val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
       
@@ -313,7 +313,7 @@ object DBUtils : IDBUtils {
       return asset
     }
     
-    val keys = (storeImageKeys + storeVideoKeys + locationKeys).distinct().toTypedArray()
+    val keys = (storeImageKeys + storeVideoKeys + locationKeys + typeKeys).distinct().toTypedArray()
     
     val selection = "${MediaStore.Files.FileColumns._ID} = ?"
     
@@ -332,8 +332,8 @@ object DBUtils : IDBUtils {
       val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
       val displayName = File(path).name
       val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
-      val lat = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
-      val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LATITUDE)
+      val lat = cursor.getDouble(MediaStore.Images.ImageColumns.LATITUDE)
+      val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
       
       val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
       
@@ -382,7 +382,11 @@ object DBUtils : IDBUtils {
     val cr = context.contentResolver
     val timestamp = System.currentTimeMillis() / 1000
     
-    val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
+    var typeFromStream: String? = URLConnection.guessContentTypeFromStream(inputStream)
+    
+    if (typeFromStream == null) {
+      typeFromStream = "video/${File(title).extension}"
+    }
     
     val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
     
