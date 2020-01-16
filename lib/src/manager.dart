@@ -204,7 +204,10 @@ class PhotoManager {
       } else {
         return (await assetEntity.originFile).readAsBytes();
       }
-    } else if (Platform.isIOS) {}
+    } else if (Platform.isIOS) {
+      final file = await assetEntity.originFile;
+      return file.readAsBytes();
+    }
     return null;
   }
 }
