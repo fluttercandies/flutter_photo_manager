@@ -6,13 +6,13 @@
 #import <Photos/Photos.h>
 #import "PMFileHelper.h"
 
-typedef void(^ChangeIds)(NSArray<NSString *> *);
+typedef void (^ChangeIds)(NSArray<NSString *> *);
 
 @class PMAssetPathEntity;
 @class PMAssetEntity;
 @class ResultHandler;
 
-typedef void(^AssetResult)(PMAssetEntity *);
+typedef void (^AssetResult)(PMAssetEntity *);
 
 @interface PMManager : NSObject
 
@@ -24,29 +24,45 @@ typedef void(^AssetResult)(PMAssetEntity *);
 
 - (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type date:(NSDate *)date hasAll:(BOOL)hasAll;
 
-- (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id type:(int)type page:(NSUInteger)page
-                                                    pageCount:(NSUInteger)pageCount date:(NSDate *)date;
+- (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id
+                                                         type:(int)type
+                                                         page:(NSUInteger)page
+                                                    pageCount:(NSUInteger)pageCount
+                                                         date:(NSDate *)date;
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)assetId;
 
 - (void)clearCache;
 
-- (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height
+- (void)getThumbWithId:(NSString *)id
+                 width:(NSUInteger)width
+                height:(NSUInteger)height
+                format:(NSUInteger)format
          resultHandler:(ResultHandler *)handler;
 
-- (void)getFullSizeFileWithId:(NSString *)id isOrigin:(Boolean)isOrigin resultHandler:(ResultHandler *)handler;
+- (void)getFullSizeFileWithId:(NSString *)id
+                     isOrigin:(Boolean)isOrigin
+                resultHandler:(ResultHandler *)handler;
 
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type date:(NSDate *)date;
 
 - (void)deleteWithIds:(NSArray<NSString *> *)ids changedBlock:(ChangeIds)block;
 
-- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id type:(NSUInteger)type start:(NSUInteger)start
-                                                      end:(NSUInteger)end date:(NSDate *)date;
+- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id
+                                                     type:(NSUInteger)type
+                                                    start:(NSUInteger)start
+                                                      end:(NSUInteger)end
+                                                     date:(NSDate *)date;
 
-- (void)saveImage:(NSData *)data title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block;
+- (void)saveImage:(NSData *)data
+            title:(NSString *)title
+             desc:(NSString *)desc
+            block:(AssetResult)block;
 
-- (void)saveVideo:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(AssetResult)block;
+- (void)saveVideo:(NSString *)path
+            title:(NSString *)title
+             desc:(NSString *)desc
+            block:(AssetResult)block;
 
-- (BOOL)existsWithId:(NSString *) assetId;
+- (BOOL)existsWithId:(NSString *)assetId;
 @end
-

@@ -209,8 +209,17 @@ class AssetEntity {
   Future<Uint8List> get thumbData => PhotoManager._getThumbDataWithId(id);
 
   /// get thumb with size
-  Future<Uint8List> thumbDataWithSize(int width, int height) {
-    return PhotoManager._getThumbDataWithId(id, width: width, height: height);
+  Future<Uint8List> thumbDataWithSize(
+    int width,
+    int height, {
+    ThumbFormat format = ThumbFormat.jpeg,
+  }) {
+    return PhotoManager._getThumbDataWithId(
+      id,
+      width: width,
+      height: height,
+      format: format,
+    );
   }
 
   /// if not video ,duration is null

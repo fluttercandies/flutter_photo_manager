@@ -129,11 +129,13 @@ class PhotoManager {
     String id, {
     int width = 150,
     int height = 150,
+    ThumbFormat format = ThumbFormat.jpeg,
   }) {
     return _plugin.getThumb(
       id: id,
       width: width,
       height: height,
+      format: format,
     );
   }
 

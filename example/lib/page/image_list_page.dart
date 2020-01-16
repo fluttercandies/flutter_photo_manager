@@ -101,7 +101,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       previewOriginBytesWidget = Container();
     } else {
       previewOriginBytesWidget = RaisedButton(
-        child: Text("Show origin bytes image"),
+        child: Text("Show origin bytes image in dialog"),
         onPressed: () => showOriginBytes(entity),
       );
     }
@@ -113,6 +113,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
           builder: (_) => ListDialog(
             children: <Widget>[
               previewOriginBytesWidget,
+              RaisedButton(
+                child: Text("Show thumb image in dialog"),
+                onPressed: () => showThumbImageDialog(entity, 500, 500),
+              ),
               RaisedButton(
                 child: Text("Show detail page"),
                 onPressed: () => routeToDetailPage(entity),
@@ -201,7 +205,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
 
   showOriginBytes(AssetEntity entity) {
     print("entity.title = ${entity.title}");
-    if (entity.title.endsWith(".HEIC") || entity.title.endsWith(".heic")) {
+    if (entity.title.toLowerCase().endsWith(".heic")) {
       showToast("Heic no support by Flutter.");
       return;
     }
@@ -213,6 +217,38 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             builder: (BuildContext context, snapshot) {
               Widget w;
               if (snapshot.hasData) {
+                w = Image.memory(snapshot.data);
+              } else {
+                w = Center(
+                  child: Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.all(20),
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+              return GestureDetector(
+                child: w,
+                onTap: () => Navigator.pop(context),
+              );
+            },
+          );
+        });
+  }
+
+  void showThumbImageDialog(AssetEntity entity, int width, int height) async {
+    final format = ThumbFormat.jpeg;
+    // final format = ThumbFormat.png;
+
+    showDialog(
+        context: context,
+        builder: (_) {
+          return FutureBuilder<Uint8List>(
+            future: entity.thumbDataWithSize(width, height, format: format),
+            builder: (BuildContext context, snapshot) {
+              Widget w;
+              if (snapshot.hasData) {
+                print("$format image length : ${snapshot.data.length}");
                 w = Image.memory(snapshot.data);
               } else {
                 w = Center(
