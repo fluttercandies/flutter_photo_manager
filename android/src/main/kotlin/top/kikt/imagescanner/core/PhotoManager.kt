@@ -8,6 +8,7 @@ import top.kikt.imagescanner.core.entity.GalleryEntity
 import top.kikt.imagescanner.core.utils.AndroidQDBUtils
 import top.kikt.imagescanner.core.utils.DBUtils
 import top.kikt.imagescanner.core.utils.IDBUtils
+import top.kikt.imagescanner.core.utils.IDBUtils.Companion.isAndroidQ
 import top.kikt.imagescanner.old.ResultHandler
 import top.kikt.imagescanner.thumb.ThumbnailUtil
 import top.kikt.imagescanner.util.LogUtils
@@ -95,16 +96,23 @@ class PhotoManager(private val context: Context) {
     }
   }
   
-  fun getOriginBytes(id: String, resultHandler: ResultHandler) {
+  fun getOriginBytes(id: String, cacheOriginBytes: Boolean, resultHandler: ResultHandler) {
     val asset = dbUtils.getAssetEntity(context, id)
     
     if (asset == null) {
       resultHandler.replyError("The asset not found")
       return
     }
-    
-    val byteArray = File(asset.path).readBytes()
-    resultHandler.reply(byteArray)
+    if (!isAndroidQ) {
+      val byteArray = File(asset.path).readBytes()
+      resultHandler.reply(byteArray)
+    } else {
+      val byteArray = dbUtils.getOriginBytes(context, asset)
+      resultHandler.reply(byteArray)
+      if (cacheOriginBytes) {
+        dbUtils.cacheOriginFile(context, asset, byteArray)
+      }
+    }
   }
   
   fun clearCache() {

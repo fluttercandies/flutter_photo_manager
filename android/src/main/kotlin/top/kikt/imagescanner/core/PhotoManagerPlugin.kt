@@ -34,6 +34,8 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
     fun runOnBackground(runnable: () -> Unit) {
       threadPool.execute(runnable)
     }
+    
+    var cacheOriginBytes = true
   }
   
   private val permissionsUtils = PermissionsUtils()
@@ -88,6 +90,12 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
         resultHandler.reply(Build.VERSION.SDK_INT.toString())
         true
       }
+      "cacheOriginBytes" -> {
+        val cacheOriginBytes = call.arguments<Boolean>()
+        PhotoManagerPlugin.cacheOriginBytes = cacheOriginBytes
+        resultHandler.reply(cacheOriginBytes)
+        true
+      }
       "getLatLngAndroidQ" -> {
         /// 这里不拦截, 然后额外添加gps权限
         needLocationPermissions = true
@@ -98,6 +106,10 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
         if (isOrigin && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
           needLocationPermissions = true
         }
+        false
+      }
+      "getOriginBytes" -> {
+        needLocationPermissions = true
         false
       }
       else -> false
@@ -165,12 +177,6 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
               val height = call.argument<Int>("height")!!
               photoManager.getThumb(id, width, height, resultHandler)
             }
-            "getOrigin" -> {
-              runOnBackground {
-                val id = call.argument<String>("id")!!
-                photoManager.getOriginBytes(id, resultHandler)
-              }
-            }
             "assetExists" -> {
               runOnBackground {
                 val id = call.argument<String>("id")!!
@@ -182,6 +188,12 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                 val id = call.argument<String>("id")!!
                 val isOrigin = call.argument<Boolean>("isOrigin")!!
                 photoManager.getFile(id, isOrigin, resultHandler)
+              }
+            }
+            "getOriginBytes" -> {
+              runOnBackground {
+                val id = call.argument<String>("id")!!
+                photoManager.getOriginBytes(id, cacheOriginBytes, resultHandler)
               }
             }
             "fetchPathProperties" -> {

@@ -80,16 +80,7 @@ class Plugin {
   }
 
   Future<Uint8List> getOriginBytes(String id) async {
-    final path = await getFullFile(id, isOrigin: true);
-    if (path == null) {
-      return null;
-    }
-    final file = File(path);
-    if (!file.existsSync()) {
-      return null;
-    } else {
-      return Uint8List.fromList(file.readAsBytesSync());
-    }
+    return _channel.invokeMethod("getOriginBytes", {"id": id});
   }
 
   Future<void> releaseCache() async {
@@ -231,5 +222,9 @@ class Plugin {
     return LatLng()
       ..latitude = assetEntity.latitude
       ..longitude = assetEntity.longitude;
+  }
+
+  Future<bool> cacheOriginBytes(bool cache) {
+    return _channel.invokeMethod("cacheOriginBytes");
   }
 }

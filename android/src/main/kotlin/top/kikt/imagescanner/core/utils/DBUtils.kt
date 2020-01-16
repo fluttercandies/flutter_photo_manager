@@ -357,6 +357,14 @@ object DBUtils : IDBUtils {
     }
   }
   
+  override fun getOriginBytes(context: Context, asset: AssetEntity): ByteArray {
+    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+  }
+  
+  override fun cacheOriginFile(context: Context, asset: AssetEntity, byteArray: ByteArray) {
+    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+  }
+  
   override fun getExif(context: Context, id: String): ExifInterface? {
     val asset = getAssetEntity(context, id) ?: return null
     return ExifInterface(asset.path)

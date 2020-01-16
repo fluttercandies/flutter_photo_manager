@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import androidx.exifinterface.media.ExifInterface
@@ -19,6 +20,7 @@ import java.io.InputStream
 interface IDBUtils {
   
   companion object {
+    val isAndroidQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
     
     val storeImageKeys = arrayOf(
       MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
@@ -152,5 +154,9 @@ interface IDBUtils {
   }
   
   fun getExif(context: Context, id: String): ExifInterface?
+  
+  fun getOriginBytes(context: Context, asset: AssetEntity): ByteArray
+  
+  fun cacheOriginFile(context: Context, asset: AssetEntity, byteArray: ByteArray)
   
 }
