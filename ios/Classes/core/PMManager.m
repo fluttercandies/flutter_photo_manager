@@ -241,11 +241,12 @@
 - (void)getThumbWithId:(NSString *)id
                  width:(NSUInteger)width
                 height:(NSUInteger)height
+                format:(NSUInteger)format
          resultHandler:(ResultHandler *)handler {
   PMAssetEntity *entity = [self getAssetEntity:id];
   if (entity && entity.phAsset) {
     PHAsset *asset = entity.phAsset;
-    [self fetchThumb:asset width:width height:height resultHandler:handler];
+    [self fetchThumb:asset width:width height:height format:format resultHandler:handler];
   } else {
     [handler replyError:@"asset is not found"];
   }
@@ -254,13 +255,14 @@
 - (void)fetchThumb:(PHAsset *)asset
              width:(NSUInteger)width
             height:(NSUInteger)height
+            format:(NSUInteger)format
      resultHandler:(ResultHandler *)handler {
   PHImageManager *manager = PHImageManager.defaultManager;
   PHImageRequestOptions *options = [PHImageRequestOptions new];
   [options setNetworkAccessAllowed:YES];
   [options setProgressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
     if (progress == 1.0) {
-      [self fetchThumb:asset width:width height:height resultHandler:handler];
+      [self fetchThumb:asset width:width height:height format:format resultHandler:handler];
     }
   }];
   [manager requestImageForAsset:asset
@@ -277,8 +279,13 @@
                     if ([handler isReplied]) {
                       return;
                     }
+                    NSData *imageData;
+                    if (format == 1) {
+                      imageData = UIImagePNGRepresentation(result);
+                    } else {
+                      imageData = UIImageJPEGRepresentation(result, 0.95);
+                    }
 
-                    NSData *imageData = UIImageJPEGRepresentation(result, 0.95);
                     FlutterStandardTypedData *data =
                         [FlutterStandardTypedData typedDataWithBytes:imageData];
                     [handler reply:data];
@@ -411,15 +418,15 @@
                           withIntermediateDirectories:true
                                            attributes:@{}
                                                 error:nil];
-    
-    NSLog(@"cache path = %@", dirPath);
+
+  NSLog(@"cache path = %@", dirPath);
 
   NSString *title = [asset title];
   NSMutableString *path = [NSMutableString stringWithString:dirPath];
   NSString *filename = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/"
                                                                         withString:@"_"];
   if (isOrigin) {
-      return [NSString stringWithFormat:@"%@/%@", dirPath, title];
+    return [NSString stringWithFormat:@"%@/%@", dirPath, title];
   } else {
     [path appendFormat:@"%@/%@%@.jpg", cachePath, filename, isOrigin ? @"_origin" : @""];
   }

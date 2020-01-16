@@ -21,3 +21,6 @@ enum RequestType {
   image,
   video,
 }
+
+/// For generality, only support jpg and png.
+enum ThumbFormat { jpeg, png }

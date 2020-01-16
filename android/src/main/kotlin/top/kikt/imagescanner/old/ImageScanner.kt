@@ -10,8 +10,8 @@ import top.kikt.imagescanner.Asset
 import top.kikt.imagescanner.AssetType
 import top.kikt.imagescanner.old.ImageScanner.Companion.threadPool
 import top.kikt.imagescanner.old.refresh.ThumbHelper
-import top.kikt.imagescanner.thumb.ThumbnailUtil
 import top.kikt.imagescanner.util.LogUtils
+import top.kikt.imagescanner.util.ResultHandler
 import java.io.File
 import java.util.concurrent.*
 
@@ -540,76 +540,7 @@ class ImageScanner(private val registrar: PluginRegistry.Registrar) {
         }
     }
 
-
-    fun getImageThumbData(call: MethodCall, result: MethodChannel.Result) {
-        val resultHandler = ResultHandler(result)
-        threadPool.execute {
-
-            val args = call.arguments as List<Any>
-            val id = args[0] as String
-            val imageWithId = getImageWithId(id)
-            val img = if (imageWithId != null) {
-                imageWithId
-            } else {
-                resultHandler.reply(null)
-                return@execute
-            }
-            val width = (args[1] as String).toInt()
-            val height = (args[2] as String).toInt()
-
-//        resultHandler.reply(thumbHelper.getThumbData(img))
-            when (img.type) {
-                AssetType.Image -> ThumbnailUtil.getThumbnailByGlide(registrar.activity(), img.path, width, height, result)
-                AssetType.Video -> ThumbnailUtil.getThumbnailWithVideo(registrar.activity(), img, width, height, result)
-                else -> resultHandler.reply(null)
-            }
-        }
-    }
-
-    fun getAssetTypeWithIds(call: MethodCall, result: MethodChannel.Result) {
-        val resultHandler = ResultHandler(result)
-        threadPool.execute {
-
-            val args = call.arguments as List<Any>
-            val idList = args.map { it.toString() }
-            val resultList = ArrayList<String>()
-
-            idList.forEach { id ->
-                val img = getImageWithId(id)
-                img?.apply {
-                    resultList.add(typeFromEntity(this))
-                }
-            }
-            resultHandler.reply(resultList)
-        }
-    }
-
-    private fun typeFromEntity(asset: Asset): String {
-        return when (asset.type) {
-            AssetType.Image -> "1"
-            AssetType.Video -> "2"
-            AssetType.Other -> "0"
-        }
-    }
-
-    fun getAssetDurationWithId(call: MethodCall, result: MethodChannel.Result) {
-        val resultHandler = ResultHandler(result)
-        threadPool.execute {
-            val id = call.arguments<String>()
-            val img = getImageWithId(id)
-            if (img == null || img.type != AssetType.Video) {
-                resultHandler.reply(null)
-            } else {
-                val duration = img.duration
-                if (duration == null) {
-                    resultHandler.reply(null)
-                } else {
-                    resultHandler.reply(duration / 1000)
-                }
-            }
-        }
-    }
-
+    
     /**
      * [id] id image path
      *

@@ -9,9 +9,9 @@ import top.kikt.imagescanner.core.utils.AndroidQDBUtils
 import top.kikt.imagescanner.core.utils.DBUtils
 import top.kikt.imagescanner.core.utils.IDBUtils
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.isAndroidQ
-import top.kikt.imagescanner.old.ResultHandler
 import top.kikt.imagescanner.thumb.ThumbnailUtil
 import top.kikt.imagescanner.util.LogUtils
+import top.kikt.imagescanner.util.ResultHandler
 import java.io.File
 import java.io.FileInputStream
 
@@ -70,7 +70,7 @@ class PhotoManager(private val context: Context) {
     return dbUtils.getAssetFromGalleryIdRange(context, gId, start, end, type, timestamp)
   }
   
-  fun getThumb(id: String, width: Int, height: Int, resultHandler: ResultHandler) {
+  fun getThumb(id: String, width: Int, height: Int, format: Int, resultHandler: ResultHandler) {
     try {
       if (!androidQExperimental) {
         val asset = dbUtils.getAssetEntity(context, id)
@@ -78,14 +78,14 @@ class PhotoManager(private val context: Context) {
           resultHandler.replyError("The asset not found!")
           return
         }
-        ThumbnailUtil.getThumbnailByGlide(context, asset.path, width, height, resultHandler.result)
+        ThumbnailUtil.getThumbnailByGlide(context, asset.path, width, height, format, resultHandler.result)
       } else {
         // need use android Q  MediaStore thumbnail api
         
         val asset = dbUtils.getAssetEntity(context, id)
         val type = asset?.type
         val bitmap = dbUtils.getThumb(context, id, width, height, type)
-        ThumbnailUtil.getThumb(context, bitmap, width, height) {
+        ThumbnailUtil.getThumb(context, bitmap, width, height, format) {
           resultHandler.reply(it)
           bitmap?.recycle()
         }

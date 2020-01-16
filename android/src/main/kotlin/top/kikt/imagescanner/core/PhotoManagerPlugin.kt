@@ -8,7 +8,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.utils.ConvertUtils
-import top.kikt.imagescanner.old.ResultHandler
+import top.kikt.imagescanner.util.ResultHandler
 import top.kikt.imagescanner.old.permission.PermissionsListener
 import top.kikt.imagescanner.old.permission.PermissionsUtils
 import top.kikt.imagescanner.util.LogUtils
@@ -175,7 +175,8 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
               val id = call.argument<String>("id")!!
               val width = call.argument<Int>("width")!!
               val height = call.argument<Int>("height")!!
-              photoManager.getThumb(id, width, height, resultHandler)
+              val format = call.argument<Int>("format")!!
+              photoManager.getThumb(id, width, height, format, resultHandler)
             }
             "assetExists" -> {
               runOnBackground {
