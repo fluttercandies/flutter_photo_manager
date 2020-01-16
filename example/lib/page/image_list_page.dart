@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_scanner_example/model/photo_provider.dart';
 import 'package:image_scanner_example/page/detail_page.dart';
 import 'package:image_scanner_example/widget/change_notifier_builder.dart';
+import 'package:image_scanner_example/widget/dialog/list_dialog.dart';
 import 'package:image_scanner_example/widget/image_item_widget.dart';
 import 'package:image_scanner_example/widget/loading_widget.dart';
 import 'package:oktoast/oktoast.dart';
@@ -92,32 +94,66 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     }
 
     final entity = list[index];
+
+    Widget previewOriginBytesWidget;
+
+    if (entity.type != AssetType.image) {
+      previewOriginBytesWidget = Container();
+    } else {
+      previewOriginBytesWidget = RaisedButton(
+        child: Text("Show origin bytes image"),
+        onPressed: () => showOriginBytes(entity),
+      );
+    }
+
     return GestureDetector(
       onTap: () async {
-        final originFile = await entity.originFile;
-        if (originFile == null || !originFile.existsSync()) {
-          print("data length = ${originFile?.lengthSync()}");
-          showToast(
-            "The file is null, please see issue #128.",
-            duration: const Duration(milliseconds: 3500),
-          );
-          return;
-        }
-        print(
-            "origin file length = ${originFile.lengthSync()}, path = ${originFile.absolute.path}");
-        final page = DetailPage(
-          file: originFile,
-          entity: entity,
+        showDialog(
+          context: context,
+          builder: (_) => ListDialog(
+            children: <Widget>[
+              previewOriginBytesWidget,
+              RaisedButton(
+                child: Text("Show detail page"),
+                onPressed: () => routeToDetailPage(entity),
+              ),
+              RaisedButton(
+                child: Text("Delete item"),
+                onPressed: () => _deleteCurrent(entity),
+              ),
+            ],
+          ),
         );
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (BuildContext context) {
-          return page;
-        }));
+        // routeToDetailPage(entity);
       },
-      onLongPress: () => _deleteCurrent(entity),
       child: ImageItemWidget(
         key: ValueKey(entity),
         entity: entity,
+      ),
+    );
+  }
+
+  void routeToDetailPage(AssetEntity entity) async {
+    final originFile = await entity.originFile;
+    if (originFile == null || !originFile.existsSync()) {
+      print("data length = ${originFile?.lengthSync()}");
+      showToast(
+        "The file is null, please see issue #128.",
+        duration: const Duration(milliseconds: 3500),
+      );
+      return;
+    }
+    print(
+        "origin file length = ${originFile.lengthSync()}, path = ${originFile.absolute.path}");
+    final page = DetailPage(
+      file: originFile,
+      entity: entity,
+    );
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return page;
+        },
       ),
     );
   }
@@ -161,5 +197,33 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     } else {
       provider.delete(entity);
     }
+  }
+
+  showOriginBytes(AssetEntity entity) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return FutureBuilder<Uint8List>(
+            future: entity.originBytes,
+            builder: (BuildContext context, snapshot) {
+              Widget w;
+              if (snapshot.hasData) {
+                w = Image.memory(snapshot.data);
+              } else {
+                w = Center(
+                  child: Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.all(20),
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+              return GestureDetector(
+                child: w,
+                onTap: () => Navigator.pop(context),
+              );
+            },
+          );
+        });
   }
 }

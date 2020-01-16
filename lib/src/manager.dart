@@ -181,7 +181,33 @@ class PhotoManager {
     );
   }
 
+  static Future<bool> _isAndroidQ() async {
+    if (!Platform.isAndroid) {
+      return false;
+    }
+    final systemVersion = await _plugin.getSystemVersion();
+    return int.parse(systemVersion) >= 29;
+  }
+
   static Future<String> systemVersion() async {
     return _plugin.getSystemVersion();
+  }
+
+  static Future<bool> setCacheAtOriginBytes(bool cache) =>
+      _plugin.cacheOriginBytes(cache);
+
+  static Future<Uint8List> _getOriginBytes(AssetEntity assetEntity) async {
+    assert(Platform.isAndroid || Platform.isIOS);
+    if (Platform.isAndroid) {
+      if (await _isAndroidQ()) {
+        return _plugin.getOriginBytes(assetEntity.id);
+      } else {
+        return (await assetEntity.originFile).readAsBytes();
+      }
+    } else if (Platform.isIOS) {
+      final file = await assetEntity.originFile;
+      return file.readAsBytes();
+    }
+    return null;
   }
 }

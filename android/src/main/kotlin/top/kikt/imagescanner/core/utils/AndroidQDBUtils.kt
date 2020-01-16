@@ -15,7 +15,9 @@ import top.kikt.imagescanner.core.cache.AndroidQCache
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.GalleryEntity
+import top.kikt.imagescanner.util.LogUtils
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.net.URLConnection
 
@@ -357,13 +359,52 @@ object AndroidQDBUtils : IDBUtils {
     if (type == null) {
       return null
     }
-    val uri =
+    val uri = getUri(id, type)
+    return context.contentResolver.loadThumbnail(uri, Size(width, height), null)
+  }
+  
+  private fun getUri(asset: AssetEntity, isOrigin: Boolean = false): Uri = getUri(asset.id, asset.type, isOrigin)
+  
+  private fun getUri(id: String, type: Int, isOrigin: Boolean = false): Uri {
+    var uri =
       if (type == 1)
         Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
       else
         Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
     
-    return context.contentResolver.loadThumbnail(uri, Size(width, height), null)
+    if (isOrigin) {
+      uri = MediaStore.setRequireOriginal(uri)
+    }
+    return uri
+  }
+  
+  override fun getOriginBytes(context: Context, asset: AssetEntity): ByteArray {
+    val file = androidQCache.getCacheFile(context, asset.id, asset.displayName, true)
+    if (file.exists()) {
+      LogUtils.info("the origin bytes come from ${file.absolutePath}")
+      return file.readBytes()
+    }
+    
+    val uri = getUri(asset, true)
+    val inputStream = context.contentResolver.openInputStream(uri)
+    
+    LogUtils.info("the cache file no exists, will read from MediaStore: $uri")
+    
+    val outputStream = ByteArrayOutputStream()
+    inputStream?.use {
+      outputStream.write(it.readBytes())
+    }
+    val byteArray = outputStream.toByteArray()
+    
+    if (LogUtils.isLog) {
+      LogUtils.info("The asset ${asset.id} origin byte length : ${byteArray.count()}")
+    }
+    
+    return byteArray
+  }
+  
+  override fun cacheOriginFile(context: Context, asset: AssetEntity, byteArray: ByteArray) {
+    androidQCache.saveAssetCache(context, asset, byteArray, true)
   }
   
   override fun saveImage(context: Context, image: ByteArray, title: String, desc: String): AssetEntity? {

@@ -192,8 +192,18 @@ class AssetEntity {
   Future<File> get originFile async =>
       PhotoManager._getFileWithId(id, isOrigin: true);
 
-  /// the image's bytes ,
+  /// The asset's bytes.
+  ///
+  /// Use [originBytes]
+  ///
+  /// The property will be remove in 0.5.0.
+  @Deprecated("Use FileMode.append instead")
   Future<Uint8List> get fullData => PhotoManager._getFullDataWithId(id);
+
+  /// The raw data stored in the device, the data may be large.
+  ///
+  /// This property is not recommended for video types.
+  Future<Uint8List> get originBytes => PhotoManager._getOriginBytes(this);
 
   /// thumb data , for display
   Future<Uint8List> get thumbData => PhotoManager._getThumbDataWithId(id);
