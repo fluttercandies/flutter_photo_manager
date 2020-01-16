@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 0.4.6
+
+Fix:
+
+- originFile of `AssetEntity`
+
+Add:
+
+- location(`latitude`,`longitude`) of `AssetEntity`
+- `title` of `AssetEntity`
+- `originBytes` of `AssetEntity`
+- param `format` in `thumbDataWithSize` of assetEntity.
+
 ## 0.4.5
 
 Fix:

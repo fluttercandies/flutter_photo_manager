@@ -10,6 +10,32 @@ A flutter api for photo, you can get image/video from ios or android.
 
 If you just need a picture selector, you can choose to use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker. All UI create by flutter.
 
+- [photo_manager](#photomanager)
+  - [install](#install)
+    - [Add to pubspec](#add-to-pubspec)
+    - [import in dart code](#import-in-dart-code)
+  - [Usage](#usage)
+    - [request permission](#request-permission)
+    - [you get all of asset list (gallery)](#you-get-all-of-asset-list-gallery)
+    - [get asset list from imagePath](#get-asset-list-from-imagepath)
+      - [paged](#paged)
+      - [range](#range)
+      - [Old version](#old-version)
+    - [AssetEntity](#assetentity)
+      - [location info of android Q](#location-info-of-android-q)
+      - [Origin description](#origin-description)
+    - [observer](#observer)
+    - [Experimental](#experimental)
+      - [Delete item](#delete-item)
+      - [Insert new item](#insert-new-item)
+  - [iOS plist config](#ios-plist-config)
+  - [android config](#android-config)
+    - [about androidX](#about-androidx)
+    - [Android Q privacy](#android-q-privacy)
+    - [glide](#glide)
+  - [common issues](#common-issues)
+    - [ios build error](#ios-build-error)
+
 ## install
 
 ### Add to pubspec
@@ -94,11 +120,11 @@ AssetEntity entity = imageList[0];
 
 File file = await entity.file; // image file
 
-List<int> fileData = await entity.fullData; // image/video file bytes
+Uint8List originBytes = await entity.originBytes; // image/video original file content,
 
 Uint8List thumbBytes = await entity.thumbData; // thumb data ,you can use Image.memory(thumbBytes); size is 64px*64px;
 
-Uint8List thumbDataWithSize = await entity.thumbDataWithSize(width,height); //Just like thumbnails, you can specify your own size. unit is px;
+Uint8List thumbDataWithSize = await entity.thumbDataWithSize(width,height); //Just like thumbnails, you can specify your own size. unit is px; format is optional support jpg and png.
 
 AssetType type = entity.type; // the type of asset enum of other,image,video
 
@@ -119,11 +145,21 @@ DateTime modifiedDt = entity.modifiedDateTime;
 /// Even the camera, due to privacy issues, this property must not be available on androidQ and above.
 double latitude = entity.latitude;
 double longitude = entiry.longitude;
+
+Latlng latlng = await entity.latlngAsync(); // In androidQ or higher, need use the method to get location info.
 ```
 
 #### location info of android Q
 
 Because of AndroidQ's privacy policy issues, it is necessary to locate permissions in order to obtain the original image, and to obtain location information by reading the Exif metadata of the data.
+
+#### Origin description
+
+The `originFile` and `originBytes` will return the original content.
+
+Not guaranteed to be available in flutter.  
+Because flutter's Image does not support heic.  
+The video is also the original format, non-exported format, compatibility does not guarantee usability.
 
 ### observer
 
