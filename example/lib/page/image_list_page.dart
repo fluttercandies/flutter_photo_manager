@@ -205,7 +205,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
 
   showOriginBytes(AssetEntity entity) {
     print("entity.title = ${entity.title}");
-    if (entity.title.endsWith(".HEIC") || entity.title.endsWith(".heic")) {
+    if (entity.title.toLowerCase().endsWith(".heic")) {
       showToast("Heic no support by Flutter.");
       return;
     }
