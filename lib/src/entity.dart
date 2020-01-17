@@ -22,6 +22,8 @@ class AssetPathEntity {
   /// path asset type.
   RequestType _type;
 
+  final FilterOption filterOption;
+
   /// The value used internally by the user.
   /// Used to indicate the value that should be available inside the path.
   RequestType get type => _type;
@@ -42,7 +44,7 @@ class AssetPathEntity {
   /// The timestamp of the path, when the request page number is 0, reset it to the current time. When other page numbers are passed directly.
   DateTime fetchDatetime;
 
-  AssetPathEntity({this.id, this.name});
+  AssetPathEntity({this.id, this.name, this.filterOption});
 
   Future<void> refreshPathProperties({DateTime dt}) async {
     dt ??= DateTime.now();
@@ -64,7 +66,16 @@ class AssetPathEntity {
   /// [pageSize] is item count of page.
   ///
   Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) {
-    return PhotoManager._getAssetListPaged(this, page, pageSize, fetchDatetime);
+    assert(pageSize > 0, "The pageSize must better than 0.");
+    return PhotoManager._getAssetListPaged(this, page, pageSize);
+  }
+
+  /// The [start] and [end] like the [String.substring].
+  Future<List<AssetEntity>> getAssetListRange({int start, int end}) async {
+    assert(start >= 0, "The start must better than 0.");
+    assert(end > start, "The end must better than start.");
+    return PhotoManager._getAssetWithRange(
+        entity: this, start: start, end: end);
   }
 
   /// all of asset, It is recommended to use the latest api (pagination) [getAssetListPaged].
@@ -86,10 +97,6 @@ class AssetPathEntity {
   @override
   String toString() {
     return "AssetPathEntity{ name: $name id:$id , length = $assetCount}";
-  }
-
-  Future<List<AssetEntity>> getAssetListRange({int start, int end}) async {
-    return PhotoManager.getAssetWithRange(entity: this, start: start, end: end);
   }
 }
 

@@ -29,6 +29,7 @@ class Plugin {
     int type = 0,
     DateTime dt,
     bool hasAll = true,
+    FilterOption fliterOption,
   }) async {
     dt ??= _createDefaultFetchDatetime();
 
@@ -36,11 +37,17 @@ class Plugin {
       "type": type,
       "timestamp": dt.millisecondsSinceEpoch,
       "hasAll": hasAll,
+      "filterOpt": fliterOption.toMap(),
     });
     if (result == null) {
       return [];
     }
-    return ConvertUtils.convertPath(result, type: type, dt: dt);
+    return ConvertUtils.convertPath(
+      result,
+      type: type,
+      dt: dt,
+      fliterOption: fliterOption,
+    );
   }
 
   Future<bool> requestPermission() async {
@@ -53,6 +60,7 @@ class Plugin {
     int pageCount = 15,
     int type = 0,
     DateTime pagedDt,
+    FilterOption filterOption,
   }) async {
     pagedDt ??= _createDefaultFetchDatetime();
 
@@ -150,18 +158,20 @@ class Plugin {
   }
 
   Future<List<AssetEntity>> getAssetWithRange(
-    String id,
+    String id, {
     int typeInt,
     int start,
     int end,
     DateTime fetchDt,
-  ) async {
+    FilterOption filterOption,
+  }) async {
     final Map map = await _channel.invokeMethod("getAssetListWithRange", {
       "galleryId": id,
       "type": typeInt,
       "start": start,
       "end": end,
       "timestamp": fetchDt.millisecondsSinceEpoch,
+      "option": filterOption.toMap()
     });
 
     return ConvertUtils.convertToAssetList(map);
