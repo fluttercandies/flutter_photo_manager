@@ -3,19 +3,20 @@
 //
 
 #import "PMPlugin.h"
-#import <Photos/Photos.h>
 #import "ConvertUtils.h"
 #import "PMAssetPathEntity.h"
+#import "PMFilterOption.h"
 #import "PMLogUtils.h"
 #import "PMManager.h"
 #import "PMNotificationManager.h"
 #import "ResultHandler.h"
+#import <Photos/Photos.h>
 
 @implementation PMPlugin {
   PMNotificationManager *_notificationManager;
 }
 
-- (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar {
+- (void)registerPlugin:(NSObject<FlutterPluginRegistrar> *)registrar {
   [self nitNotificationManager:registrar];
 
   FlutterMethodChannel *channel =
@@ -23,12 +24,13 @@
                                   binaryMessenger:[registrar messenger]];
   PMPlugin *plugin = [PMPlugin new];
   [plugin setManager:[PMManager new]];
-  [channel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
-      [plugin onMethodCall:call result:result];
-  }];
+  [channel
+      setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
+        [plugin onMethodCall:call result:result];
+      }];
 }
 
-- (void)nitNotificationManager:(NSObject <FlutterPluginRegistrar> *)registrar {
+- (void)nitNotificationManager:(NSObject<FlutterPluginRegistrar> *)registrar {
   _notificationManager = [PMNotificationManager managerWithRegistrar:registrar];
 }
 
@@ -38,25 +40,25 @@
 
   if ([call.method isEqualToString:@"requestPermission"]) {
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-        BOOL auth = PHAuthorizationStatusAuthorized == status;
-        [manager setAuth:auth];
-        if (auth) {
-          [handler reply:@1];
-        } else {
-          [handler reply:@0];
-        }
+      BOOL auth = PHAuthorizationStatusAuthorized == status;
+      [manager setAuth:auth];
+      if (auth) {
+        [handler reply:@1];
+      } else {
+        [handler reply:@0];
+      }
     }];
   } else if (manager.isAuth) {
     [self onAuth:call result:result];
   } else {
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-        BOOL auth = PHAuthorizationStatusAuthorized == status;
-        [manager setAuth:auth];
-        if (auth) {
-          [self onAuth:call result:result];
-        } else {
-          [handler replyError:@"need permission"];
-        }
+      BOOL auth = PHAuthorizationStatusAuthorized == status;
+      [manager setAuth:auth];
+      if (auth) {
+        [self onAuth:call result:result];
+      } else {
+        [handler replyError:@"need permission"];
+      }
     }];
   }
 }
@@ -70,8 +72,12 @@
     unsigned long timestamp = [self getTimestamp:call];
     BOOL hasAll = [call.arguments[@"hasAll"] boolValue];
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
-    PMFilterOption *option = [ConvertUtils convertMapToPMFilterOption:call.arguments[@"option"]];
-    NSArray<PMAssetPathEntity *> *array = [manager getGalleryList:type date:date hasAll:hasAll option:option];
+    PMFilterOption *option =
+        [ConvertUtils convertMapToPMFilterOption:call.arguments[@"option"]];
+    NSArray<PMAssetPathEntity *> *array = [manager getGalleryList:type
+                                                             date:date
+                                                           hasAll:hasAll
+                                                           option:option];
     NSDictionary *dictionary = [ConvertUtils convertPathToMap:array];
     [handler reply:dictionary];
 
@@ -82,9 +88,17 @@
     NSUInteger pageCount = [call.arguments[@"pageCount"] unsignedIntValue];
     unsigned long timestamp = [self getTimestamp:call];
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
-    PMFilterOption *option = [ConvertUtils convertMapToPMFilterOption:call.arguments[@"option"]];
-    NSArray<PMAssetEntity *> *array = [manager getAssetEntityListWithGalleryId:id type:type page:page pageCount:pageCount date:date filterOption:option];
-    NSDictionary *dictionary = [ConvertUtils convertAssetToMap:array];
+    PMFilterOption *option =
+        [ConvertUtils convertMapToPMFilterOption:call.arguments[@"option"]];
+    NSArray<PMAssetEntity *> *array =
+        [manager getAssetEntityListWithGalleryId:id
+                                            type:type
+                                            page:page
+                                       pageCount:pageCount
+                                            date:date
+                                    filterOption:option];
+    NSDictionary *dictionary =
+        [ConvertUtils convertAssetToMap:array needTitle:option.needTitle];
     [handler reply:dictionary];
 
   } else if ([call.method isEqualToString:@"getAssetListWithRange"]) {
@@ -95,9 +109,17 @@
 
     unsigned long timestamp = [call.arguments[@"timestamp"] unsignedLongValue];
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
-    PMFilterOption *option = [ConvertUtils convertMapToPMFilterOption:call.arguments[@"option"]];
-    NSArray<PMAssetEntity *> *array = [manager getAssetEntityListWithRange:galleryId type:type start:start end:end date:date filterOption:option];
-    NSDictionary *dictionary = [ConvertUtils convertAssetToMap:array];
+    PMFilterOption *option =
+        [ConvertUtils convertMapToPMFilterOption:call.arguments[@"option"]];
+    NSArray<PMAssetEntity *> *array =
+        [manager getAssetEntityListWithRange:galleryId
+                                        type:type
+                                       start:start
+                                         end:end
+                                        date:date
+                                filterOption:option];
+    NSDictionary *dictionary =
+        [ConvertUtils convertAssetToMap:array needTitle:option.needTitle];
     [handler reply:dictionary];
 
   } else if ([call.method isEqualToString:@"getThumb"]) {
@@ -106,7 +128,11 @@
     NSUInteger height = [call.arguments[@"height"] unsignedIntegerValue];
     NSUInteger format = [call.arguments[@"format"] unsignedIntegerValue];
 
-    [manager getThumbWithId:id width:width height:height format:format resultHandler:handler];
+    [manager getThumbWithId:id
+                      width:width
+                     height:height
+                     format:format
+              resultHandler:handler];
 
   } else if ([call.method isEqualToString:@"getFullFile"]) {
     NSString *id = call.arguments[@"id"];
@@ -118,17 +144,22 @@
     [manager clearCache];
 
   } else if ([call.method isEqualToString:@"log"]) {
-    PMLogUtils.sharedInstance.isLog = (BOOL) call.arguments;
+    PMLogUtils.sharedInstance.isLog = (BOOL)call.arguments;
 
   } else if ([call.method isEqualToString:@"fetchPathProperties"]) {
     NSString *id = call.arguments[@"id"];
     int requestType = [call.arguments[@"type"] intValue];
     unsigned long timestamp = [call.arguments[@"timestamp"] unsignedLongValue];
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
-    PMFilterOption *option = [ConvertUtils convertMapToPMFilterOption:call.arguments[@"option"]];
-    PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id type:requestType date:date filterOption:option];
+    PMFilterOption *option =
+        [ConvertUtils convertMapToPMFilterOption:call.arguments[@"option"]];
+    PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id
+                                                            type:requestType
+                                                            date:date
+                                                    filterOption:option];
     if (pathEntity) {
-      NSDictionary *dictionary = [ConvertUtils convertPathToMap:@[pathEntity]];
+      NSDictionary *dictionary =
+          [ConvertUtils convertPathToMap:@[ pathEntity ]];
       [handler reply:dictionary];
     } else {
       [handler reply:nil];
@@ -152,7 +183,7 @@
     NSArray<NSString *> *ids = call.arguments[@"ids"];
     [manager deleteWithIds:ids
               changedBlock:^(NSArray<NSString *> *array) {
-                  [handler reply:array];
+                [handler reply:array];
               }];
 
   } else if ([call.method isEqualToString:@"saveImage"]) {
@@ -164,8 +195,9 @@
                  title:title
                   desc:desc
                  block:^(PMAssetEntity *asset) {
-                     NSDictionary *resultData = [ConvertUtils convertPMAssetToMap:asset];
-                     [handler reply:@{@"data": resultData}];
+                   NSDictionary *resultData =
+                       [ConvertUtils convertPMAssetToMap:asset needTitle:NO];
+                   [handler reply:@{@"data" : resultData}];
                  }];
 
   } else if ([call.method isEqualToString:@"saveVideo"]) {
@@ -177,8 +209,9 @@
                  title:title
                   desc:desc
                  block:^(PMAssetEntity *asset) {
-                     NSDictionary *resultData = [ConvertUtils convertPMAssetToMap:asset];
-                     [handler reply:@{@"data": resultData}];
+                   NSDictionary *resultData =
+                       [ConvertUtils convertPMAssetToMap:asset needTitle:NO];
+                   [handler reply:@{@"data" : resultData}];
                  }];
 
   } else if ([call.method isEqualToString:@"assetExists"]) {

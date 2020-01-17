@@ -60,7 +60,7 @@ class _NewHomePageState extends State<NewHomePage> {
             ),
             _buildHasAllCheck(),
             _buildNotifyCheck(),
-            // buildAndroidQSwitch(),
+            _buildFilterOption(provider.option),
           ],
         ),
       ),
@@ -142,6 +142,17 @@ class _NewHomePageState extends State<NewHomePage> {
   }
 
   void onChange(call) {}
+
+  Widget _buildFilterOption(FilterOption option) {
+    return Column(
+      children: <Widget>[
+        TextField(),
+        TextField(),
+        TextField(),
+        TextField(),
+      ],
+    );
+  }
 
   // Widget buildAndroidQSwitch() {
   //   return CheckboxListTile(

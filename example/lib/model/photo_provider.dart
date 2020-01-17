@@ -22,6 +22,8 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  FilterOption option = const FilterOption();
+
   void changeType(int v) {
     this.type = v;
     notifyListeners();

@@ -16,11 +16,13 @@ class _DevelopingExampleState extends State<DevelopingExample> {
           child: Text("Test title speed"),
           onPressed: () async {
             final start = DateTime.now();
-            int count = 10000;
+            int count = 1000;
             var result = await PhotoManager.requestPermission();
             if (result) {
               List<AssetEntity> imageList = [];
-              List<AssetPathEntity> list = await PhotoManager.getImageAsset();
+              List<AssetPathEntity> list = await PhotoManager.getAssetPathList(
+                type: RequestType.image,
+              );
               if (list != null)
                 for (AssetPathEntity path in list)
                   imageList.addAll(await path.getAssetListRange(

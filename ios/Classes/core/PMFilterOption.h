@@ -6,17 +6,17 @@
 
 typedef struct PMSizeConstraint {
 
-    unsigned int minWidth;
-    unsigned int maxWidth;
-    unsigned int minHeight;
-    unsigned int maxHeight;
+  unsigned int minWidth;
+  unsigned int maxWidth;
+  unsigned int minHeight;
+  unsigned int maxHeight;
 
 } PMSizeConstraint;
 
 typedef struct PMDurationConstraint {
 
-    double minDuration;
-    double maxDuration;
+  double minDuration;
+  double maxDuration;
 
 } PMDurationConstraint;
 
@@ -25,5 +25,13 @@ typedef struct PMDurationConstraint {
 @property(nonatomic, assign) BOOL needTitle;
 @property(nonatomic, assign) PMSizeConstraint sizeConstraint;
 @property(nonatomic, assign) PMDurationConstraint durationConstraint;
+
+- (NSString *)sizeCond;
+
+- (NSArray *)sizeArgs;
+
+- (NSString *)durationCond;
+
+- (NSArray *)durationArgs;
 
 @end
