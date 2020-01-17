@@ -6,6 +6,7 @@
 #import <Photos/Photos.h>
 @class PMAssetPathEntity;
 @class PMAssetEntity;
+@class PMFilterOption;
 
 
 @interface ConvertUtils : NSObject
@@ -17,4 +18,7 @@
 + (NSDictionary *)convertPHAssetToMap:(PHAsset *)asset;
 
 + (NSDictionary *)convertPMAssetToMap:(PMAssetEntity *)asset;
+
++ (PMFilterOption *)convertMapToPMFilterOption:(NSDictionary *)map;
+
 @end

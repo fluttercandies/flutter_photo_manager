@@ -9,6 +9,7 @@
 #import "PMCacheContainer.h"
 #import "PMLogUtils.h"
 #import "ResultHandler.h"
+#import "PMFilterOption.h"
 
 @implementation PMManager {
   BOOL __isAuth;
@@ -33,10 +34,11 @@
   __isAuth = auth;
 }
 
-- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type date:(NSDate *)date hasAll:(BOOL)hasAll {
+- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type date:(NSDate *)date hasAll:(BOOL)hasAll
+                                          option:(PMFilterOption *)option {
   NSMutableArray<PMAssetPathEntity *> *array = [NSMutableArray new];
 
-  PHFetchOptions *assetOptions = [self getAssetOptions:type date:date];
+  PHFetchOptions *assetOptions = [self getAssetOptions:type date:date filterOption:option];
 
   PHFetchOptions *fetchCollectionOptions = [PHFetchOptions new];
 
@@ -98,22 +100,20 @@
 
 #pragma clang diagnostic pop
 
-- (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id
-                                                         type:(int)type
-                                                         page:(NSUInteger)page
-                                                    pageCount:(NSUInteger)pageCount
-                                                         date:(NSDate *)date {
+- (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id type:(int)type page:(NSUInteger)page
+                                                    pageCount:(NSUInteger)pageCount date:(NSDate *)date
+                                                 filterOption:(PMFilterOption *)filterOption {
   NSMutableArray<PMAssetEntity *> *result = [NSMutableArray new];
 
   PHFetchOptions *options = [PHFetchOptions new];
 
   PHFetchResult<PHAssetCollection *> *fetchResult =
-      [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[ id ] options:options];
+      [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[id] options:options];
   if (fetchResult && fetchResult.count == 0) {
     return result;
   }
 
-  PHFetchOptions *assetOptions = [self getAssetOptions:type date:date];
+  PHFetchOptions *assetOptions = [self getAssetOptions:type date:date filterOption:filterOption];
 
   PHAssetCollection *collection = fetchResult.firstObject;
 
@@ -142,22 +142,20 @@
   return result;
 }
 
-- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id
-                                                     type:(NSUInteger)type
-                                                    start:(NSUInteger)start
-                                                      end:(NSUInteger)end
-                                                     date:(NSDate *)date {
+- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id type:(NSUInteger)type start:(NSUInteger)start
+                                                      end:(NSUInteger)end date:(NSDate *)date
+                                             filterOption:(PMFilterOption *)filterOption {
   NSMutableArray<PMAssetEntity *> *result = [NSMutableArray new];
 
   PHFetchOptions *options = [PHFetchOptions new];
 
   PHFetchResult<PHAssetCollection *> *fetchResult =
-      [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[ id ] options:options];
+      [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[id] options:options];
   if (fetchResult && fetchResult.count == 0) {
     return result;
   }
 
-  PHFetchOptions *assetOptions = [self getAssetOptions:(int)type date:date];
+  PHFetchOptions *assetOptions = [self getAssetOptions:(int) type date:date filterOption:filterOption];
 
   PHAssetCollection *collection = fetchResult.firstObject;
   PHFetchResult<PHAsset *> *assetArray = [PHAsset fetchAssetsInAssetCollection:collection
@@ -512,29 +510,30 @@
          ![info[PHImageResultIsDegradedKey] boolValue];  // thumbnail
 }
 
-- (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type date:(NSDate *)date {
+- (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type date:(NSDate *)date
+                              filterOption:(PMFilterOption *)filterOption {
   PHFetchOptions *collectionFetchOptions = [PHFetchOptions new];
   PHFetchResult<PHAssetCollection *> *result =
-      [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[ id ]
+      [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[id]
                                                            options:collectionFetchOptions];
 
   if (result == nil || result.count == 0) {
     return nil;
   }
   PHAssetCollection *collection = result[0];
-  PHFetchOptions *assetOptions = [self getAssetOptions:type date:date];
+  PHFetchOptions *assetOptions = [self getAssetOptions:type date:date filterOption:filterOption];
   PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection
                                                                         options:assetOptions];
 
   return [PMAssetPathEntity entityWithId:id
                                     name:collection.localizedTitle
-                              assetCount:(int)fetchResult.count];
+                              assetCount:(int) fetchResult.count];
 }
 
-- (PHFetchOptions *)getAssetOptions:(int)type date:(NSDate *)date {
+- (PHFetchOptions *)getAssetOptions:(int)type date:(NSDate *)date filterOption:(PMFilterOption *)filterOption {
   PHFetchOptions *options = [PHFetchOptions new];
-  options.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"creationDate"
-                                                             ascending:NO] ];
+  options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate"
+                                                            ascending:NO]];
 
   if (type == 1) {
     options.predicate = [NSPredicate

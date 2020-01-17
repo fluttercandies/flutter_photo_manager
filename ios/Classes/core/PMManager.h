@@ -22,13 +22,12 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (void)setAuth:(BOOL)auth;
 
-- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type date:(NSDate *)date hasAll:(BOOL)hasAll;
+- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type date:(NSDate *)date hasAll:(BOOL)hasAll
+                                          option:(PMFilterOption *)option;
 
-- (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id
-                                                         type:(int)type
-                                                         page:(NSUInteger)page
-                                                    pageCount:(NSUInteger)pageCount
-                                                         date:(NSDate *)date;
+- (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id type:(int)type page:(NSUInteger)page
+                                                    pageCount:(NSUInteger)pageCount date:(NSDate *)date
+                                                 filterOption:(PMFilterOption *)filterOption;
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)assetId;
 
@@ -44,15 +43,14 @@ typedef void (^AssetResult)(PMAssetEntity *);
                      isOrigin:(Boolean)isOrigin
                 resultHandler:(ResultHandler *)handler;
 
-- (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type date:(NSDate *)date;
+- (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type date:(NSDate *)date
+                              filterOption:(PMFilterOption *)filterOption;
 
 - (void)deleteWithIds:(NSArray<NSString *> *)ids changedBlock:(ChangeIds)block;
 
-- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id
-                                                     type:(NSUInteger)type
-                                                    start:(NSUInteger)start
-                                                      end:(NSUInteger)end
-                                                     date:(NSDate *)date;
+- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id type:(NSUInteger)type start:(NSUInteger)start
+                                                      end:(NSUInteger)end date:(NSDate *)date
+                                             filterOption:(PMFilterOption *)filterOption;
 
 - (void)saveImage:(NSData *)data
             title:(NSString *)title

@@ -172,15 +172,19 @@ class PhotoManager {
     AssetPathEntity entity,
     DateTime time,
   ) async {
-    var result =
-        await _plugin.fetchPathProperties(entity.id, entity.typeInt, time);
+    var result = await _plugin.fetchPathProperties(
+        entity.id, entity.typeInt, time, entity.filterOption);
     if (result == null) {
       return null;
     }
     var list = result["data"];
     if (list is List && list.isNotEmpty) {
-      return ConvertUtils.convertPath(result,
-          dt: time, type: entity.typeInt)[0];
+      return ConvertUtils.convertPath(
+        result,
+        dt: time,
+        type: entity.typeInt,
+        fliterOption: entity.filterOption,
+      )[0];
     } else {
       return null;
     }

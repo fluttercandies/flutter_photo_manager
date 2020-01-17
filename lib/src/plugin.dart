@@ -37,7 +37,7 @@ class Plugin {
       "type": type,
       "timestamp": dt.millisecondsSinceEpoch,
       "hasAll": hasAll,
-      "filterOpt": fliterOption.toMap(),
+      "option": fliterOption.toMap(),
     });
     if (result == null) {
       return [];
@@ -70,9 +70,30 @@ class Plugin {
       "pageCount": pageCount,
       "type": type,
       "timestamp": pagedDt.millisecondsSinceEpoch,
+      "option": filterOption.toMap(),
     });
 
     return ConvertUtils.convertToAssetList(result);
+  }
+
+  Future<List<AssetEntity>> getAssetWithRange(
+    String id, {
+    int typeInt,
+    int start,
+    int end,
+    DateTime fetchDt,
+    FilterOption filterOption,
+  }) async {
+    final Map map = await _channel.invokeMethod("getAssetListWithRange", {
+      "galleryId": id,
+      "type": typeInt,
+      "start": start,
+      "end": end,
+      "timestamp": fetchDt.millisecondsSinceEpoch,
+      "option": filterOption.toMap(),
+    });
+
+    return ConvertUtils.convertToAssetList(map);
   }
 
   Future<Uint8List> getThumb({
@@ -113,7 +134,7 @@ class Plugin {
   }
 
   Future<Map> fetchPathProperties(
-      String id, int type, DateTime datetime) async {
+      String id, int type, DateTime datetime, FilterOption filterOption) async {
     datetime ??= _createDefaultFetchDatetime();
     return _channel.invokeMethod(
       "fetchPathProperties",
@@ -121,6 +142,7 @@ class Plugin {
         "id": id,
         "timestamp": datetime.millisecondsSinceEpoch,
         "type": type,
+        "option": filterOption.toMap(),
       },
     );
   }
@@ -155,26 +177,6 @@ class Plugin {
     final List<dynamic> deleted =
         (await _channel.invokeMethod("deleteWithIds", {"ids": ids}));
     return deleted.cast<String>();
-  }
-
-  Future<List<AssetEntity>> getAssetWithRange(
-    String id, {
-    int typeInt,
-    int start,
-    int end,
-    DateTime fetchDt,
-    FilterOption filterOption,
-  }) async {
-    final Map map = await _channel.invokeMethod("getAssetListWithRange", {
-      "galleryId": id,
-      "type": typeInt,
-      "start": start,
-      "end": end,
-      "timestamp": fetchDt.millisecondsSinceEpoch,
-      "option": filterOption.toMap()
-    });
-
-    return ConvertUtils.convertToAssetList(map);
   }
 
   Future<AssetEntity> saveImage(Uint8List uint8list,

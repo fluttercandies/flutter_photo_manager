@@ -3,13 +3,14 @@
 //
 
 #import "ConvertUtils.h"
-#import <Photos/Photos.h>
 #import "PHAsset+PHAsset_checkType.h"
 #import "PHAsset+PHAsset_getTitle.h"
 #import "PMAssetPathEntity.h"
+#import "PMFilterOption.h"
 
 @implementation ConvertUtils {
 }
+
 + (NSDictionary *)convertPathToMap:(NSArray<PMAssetPathEntity *> *)array {
   NSMutableArray *data = [NSMutableArray new];
 
@@ -67,17 +68,44 @@
 
 + (NSDictionary *)convertPMAssetToMap:(PMAssetEntity *)asset {
   return @{
-    @"id" : asset.id,
-    @"createDt" : @(asset.createDt),
-    @"width" : @(asset.width),
-    @"height" : @(asset.height),
-    @"duration" : @(asset.duration),
-    @"type" : @(asset.type),
-    @"modifiedDt" : @(asset.modifiedDt),
-    @"lng" : @(asset.lng),
-    @"lat" : @(asset.lat),
-    @"title" : asset.title,
+          @"id": asset.id,
+          @"createDt": @(asset.createDt),
+          @"width": @(asset.width),
+          @"height": @(asset.height),
+          @"duration": @(asset.duration),
+          @"type": @(asset.type),
+          @"modifiedDt": @(asset.modifiedDt),
+          @"lng": @(asset.lng),
+          @"lat": @(asset.lat),
+          @"title": asset.title,
   };
+}
+
++ (PMFilterOption *)convertMapToPMFilterOption:(NSDictionary *)map {
+    PMFilterOption *option = [PMFilterOption new];
+    option.needTitle = [map[@"title"] boolValue];
+
+    NSDictionary *sizeMap = map[@"size"];
+    NSDictionary *durationMap = map[@"duration"];
+
+    PMSizeConstraint sizeConstraint;
+    sizeConstraint.minWidth = [sizeMap[@"minWidth"] unsignedIntValue];
+    sizeConstraint.maxWidth = [sizeMap[@"maxWidth"] unsignedIntValue];
+    sizeConstraint.minHeight = [sizeMap[@"minHeight"] unsignedIntValue];
+    sizeConstraint.maxHeight = [sizeMap[@"maxHeight"] unsignedIntValue];
+    option.sizeConstraint = sizeConstraint;
+
+    PMDurationConstraint durationConstraint;
+    durationConstraint.minDuration = [ConvertUtils convertNSNumberToSecond:durationMap[@"min"]];
+    durationConstraint.maxDuration = [ConvertUtils convertNSNumberToSecond:durationMap[@"max"]];
+    option.durationConstraint = durationConstraint;
+
+    return option;
+}
+
++ (double)convertNSNumberToSecond:(NSNumber *)number {
+    unsigned int i = number.unsignedIntValue;
+    return (double) i / 1000.0;
 }
 
 @end
