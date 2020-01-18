@@ -1,9 +1,15 @@
-/// Filter option
+/// Filter option for get asset.
 class FilterOption {
+  /// This property affects performance on iOS. If not needed, please pass false, default is false.
   final bool needTitle;
+
+  /// See [SizeConstraint]
   final SizeConstraint sizeConstraint;
+
+  /// See [DurationConstraint]
   final DurationConstraint durationConstraint;
 
+  /// See [needTitle], [sizeConstraint] and [durationConstraint]
   const FilterOption({
     this.needTitle = false,
     this.sizeConstraint = const SizeConstraint(),
@@ -19,6 +25,7 @@ class FilterOption {
   }
 }
 
+/// Constraints of asset pixel width and height.
 class SizeConstraint {
   final int minWidth;
   final int maxWidth;
@@ -42,6 +49,9 @@ class SizeConstraint {
   }
 }
 
+/// Constraints of duration.
+/// 
+/// The Image type ignores this constraints.
 class DurationConstraint {
   final Duration min;
   final Duration max;

@@ -10,7 +10,7 @@ A flutter api for photo, you can get image/video from ios or android.
 
 If you just need a picture selector, you can choose to use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker. All UI create by flutter.
 
-- [photo_manager](#photomanager)
+- [photo_manager](#photo_manager)
   - [install](#install)
     - [Add to pubspec](#add-to-pubspec)
     - [import in dart code](#import-in-dart-code)
@@ -20,6 +20,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
     - [get asset list from imagePath](#get-asset-list-from-imagepath)
       - [paged](#paged)
       - [range](#range)
+      - [FilterOption](#filteroption)
       - [Old version](#old-version)
     - [AssetEntity](#assetentity)
       - [location info of android Q](#location-info-of-android-q)
@@ -105,6 +106,15 @@ The old version, it is not recommended for continued use, because there may be p
 final assetList = await path.getAssetListRange(start: 0, end: 88); // use start and end to get asset.
 // Example: 0~10 will return 10 assets. Special case: If there are only 5, return 5
 ```
+
+#### FilterOption
+
+The class define in [filter_option_page.dart](https://github.com/CaiJingLong/flutter_photo_manager/blob/filter-option/example/lib/page/filter_option_page.dart).
+
+Constraint the size, duration.
+
+About **needTitle**:The title property of `AssetEntity` is very expensive on iOS.
+If needTitle is false, `AssetEntity.title` is empty, default is false. Unless you need this property, please keep it false.
 
 #### Old version
 

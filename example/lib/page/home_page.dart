@@ -5,6 +5,8 @@ import 'package:image_scanner_example/widget/change_notifier_builder.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
+import 'filter_option_page.dart';
+
 class NewHomePage extends StatefulWidget {
   @override
   _NewHomePageState createState() => _NewHomePageState();
@@ -144,37 +146,14 @@ class _NewHomePageState extends State<NewHomePage> {
   void onChange(call) {}
 
   Widget _buildFilterOption(PhotoProvider provider) {
-    final dialog = Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        buildInput(provider.minWidth, "minWidth", (value) {
-          provider.minWidth = value;
-        }),
-        buildInput(provider.maxWidth, "maxWidth", (value) {
-          provider.maxWidth = value;
-        }),
-        buildInput(provider.minHeight, "minHeight", (value) {
-          provider.minHeight = value;
-        }),
-        buildInput(provider.maxHeight, "maxHeight", (value) {
-          provider.maxHeight = value;
-        }),
-      ],
-    );
-
     return RaisedButton(
-      child: Text("Change size option."),
+      child: Text("Change filter options."),
       onPressed: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (BuildContext context) {
-              return Scaffold(
-                appBar: AppBar(
-                  title: Text("Change size option."),
-                ),
-                body: Material(child: dialog),
-              );
+              return FilterOptionPage();
             },
           ),
         );
@@ -182,21 +161,6 @@ class _NewHomePageState extends State<NewHomePage> {
     );
   }
 
-  Widget buildInput(
-    String initValue,
-    String hintText,
-    void onChanged(String value),
-  ) {
-    return TextFormField(
-      decoration: InputDecoration(
-        hintText: hintText,
-        contentPadding: EdgeInsets.all(8),
-      ),
-      onChanged: onChanged,
-      initialValue: initValue,
-      keyboardType: TextInputType.number,
-    );
-  }
 }
 
 Widget buildButton(String text, Function function) {

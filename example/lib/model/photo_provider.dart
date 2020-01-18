@@ -16,12 +16,38 @@ class PhotoProvider extends ChangeNotifier {
 
   bool _notifying = false;
 
+  bool _needTitle = false;
+
+  bool get needTitle => _needTitle;
+
+  set needTitle(bool needTitle) {
+    _needTitle = needTitle;
+    notifyListeners();
+  }
+
   bool get notifying => _notifying;
 
-  String minWidth;
-  String maxWidth;
-  String minHeight;
-  String maxHeight;
+  String minWidth = "0";
+  String maxWidth = "10000";
+  String minHeight = "0";
+  String maxHeight = "10000";
+
+  Duration _minDuration = Duration(seconds: 10);
+
+  Duration get minDuration => _minDuration;
+
+  set minDuration(Duration minDuration) {
+    _minDuration = minDuration;
+    notifyListeners();
+  }
+  Duration _maxDuration = Duration(days: 1);
+
+  Duration get maxDuration => _maxDuration;
+
+  set maxDuration(Duration maxDuration) {
+    _maxDuration = maxDuration;
+    notifyListeners();
+  }
 
   set notifying(bool notifying) {
     _notifying = notifying;
@@ -57,6 +83,7 @@ class PhotoProvider extends ChangeNotifier {
     final option = makeOption();
 
     if (option == null) {
+      assert(option != null);
       return;
     }
 
@@ -98,8 +125,16 @@ class PhotoProvider extends ChangeNotifier {
       showToast("Cannot convert your size.");
       return null;
     }
+
+    DurationConstraint durationConstraint = DurationConstraint(
+      min: minDuration,
+      max: maxDuration,
+    );
+
     return FilterOption(
       sizeConstraint: sizeConstraint,
+      durationConstraint: durationConstraint,
+      needTitle: needTitle,
     );
   }
 }
