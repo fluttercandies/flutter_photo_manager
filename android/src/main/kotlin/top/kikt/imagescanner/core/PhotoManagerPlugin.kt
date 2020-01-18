@@ -7,6 +7,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import top.kikt.imagescanner.core.entity.AssetEntity
+import top.kikt.imagescanner.core.entity.FilterOptions
 import top.kikt.imagescanner.core.utils.ConvertUtils
 import top.kikt.imagescanner.util.ResultHandler
 import top.kikt.imagescanner.old.permission.PermissionsListener
@@ -20,27 +21,27 @@ import java.util.concurrent.TimeUnit
 
 
 class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : MethodChannel.MethodCallHandler {
-  
+
   companion object {
     private const val poolSize = 8
     private val threadPool: ThreadPoolExecutor = ThreadPoolExecutor(
-      poolSize + 3,
-      1000,
-      200,
-      TimeUnit.MINUTES,
-      ArrayBlockingQueue<Runnable>(poolSize + 3)
+        poolSize + 3,
+        1000,
+        200,
+        TimeUnit.MINUTES,
+        ArrayBlockingQueue<Runnable>(poolSize + 3)
     )
-    
+
     fun runOnBackground(runnable: () -> Unit) {
       threadPool.execute(runnable)
     }
-    
+
     var cacheOriginBytes = true
   }
-  
+
   private val permissionsUtils = PermissionsUtils()
   private val notifyChannel = PhotoManagerNotifyChannel(registrar, Handler())
-  
+
   init {
     registrar.addRequestPermissionsResultListener { i, strings, ints ->
       permissionsUtils.dealResult(i, strings, ints)
@@ -49,19 +50,19 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
     permissionsUtils.permissionsListener = object : PermissionsListener {
       override fun onDenied(deniedPermissions: Array<out String>?) {
       }
-      
+
       override fun onGranted() {
       }
     }
   }
-  
+
   private val photoManager = PhotoManager(registrar.context().applicationContext)
-  
+
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     val resultHandler = ResultHandler(result)
-    
+
     var needLocationPermissions = false
-    
+
     val handleResult = when (call.method) {
       "releaseMemCache" -> {
         photoManager.clearCache()
@@ -114,11 +115,11 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
       }
       else -> false
     }
-    
+
     if (handleResult) {
       return
     }
-    
+
     val utils = permissionsUtils.apply {
       withActivity(registrar.activity())
       permissionsListener = object : PermissionsListener {
@@ -130,7 +131,7 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
             resultHandler.replyError("失败", "权限被拒绝", "")
           }
         }
-        
+
         override fun onGranted() {
           LogUtils.info("onGranted call.method = ${call.method}")
           when (call.method) {
@@ -144,7 +145,8 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                 val type = call.argument<Int>("type")!!
                 val timeStamp = call.getTimeStamp()
                 val hasAll = call.argument<Boolean>("hasAll")!!
-                val list = photoManager.getGalleryList(type, timeStamp, hasAll)
+                val option = call.getOption()
+                val list = photoManager.getGalleryList(type, timeStamp, hasAll, option)
                 resultHandler.reply(ConvertUtils.convertToGalleryResult(list))
               }
             }
@@ -155,19 +157,20 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                 val pageCount = call.argument<Int>("pageCount")!!
                 val type = call.argument<Int>("type")!!
                 val timeStamp = call.getTimeStamp()
-                
-                val list = photoManager.getAssetList(id, page, pageCount, type, timeStamp)
+                val option = call.getOption()
+                val list = photoManager.getAssetList(id, page, pageCount, type, timeStamp, option)
                 resultHandler.reply(ConvertUtils.convertToAssetResult(list))
               }
             }
             "getAssetListWithRange" -> {
-              val galleryId = call.getString("galleryId")
-              val type = call.getInt("type")
-              val start = call.getInt("start")
-              val end = call.getInt("end")
-              val timestamp = call.getTimeStamp()
               runOnBackground {
-                val list: List<AssetEntity> = photoManager.getAssetListWithRange(galleryId, type, start, end, timestamp)
+                val galleryId = call.getString("galleryId")
+                val type = call.getInt("type")
+                val start = call.getInt("start")
+                val end = call.getInt("end")
+                val timestamp = call.getTimeStamp()
+                val option = call.getOption()
+                val list: List<AssetEntity> = photoManager.getAssetListWithRange(galleryId, type, start, end, timestamp, option)
                 resultHandler.reply(ConvertUtils.convertToAssetResult(list))
               }
             }
@@ -202,7 +205,8 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
                 val id = call.argument<String>("id")!!
                 val type = call.argument<Int>("type")!!
                 val timestamp = call.getTimeStamp()
-                val pathEntity = photoManager.getPathEntity(id, type, timestamp)
+                val option = call.getOption()
+                val pathEntity = photoManager.getPathEntity(id, type, timestamp, option)
                 if (pathEntity != null) {
                   val mapResult = ConvertUtils.convertToGalleryResult(listOf(pathEntity))
                   resultHandler.reply(mapResult)
@@ -279,50 +283,54 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
         }
       }
     }
-    
+
     if (!needLocationPermissions) {
       utils.getPermissions(
-        registrar.activity(),
-        3001,
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
+          registrar.activity(),
+          3001,
+          Manifest.permission.READ_EXTERNAL_STORAGE,
+          Manifest.permission.WRITE_EXTERNAL_STORAGE
       )
     } else {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         utils.getPermissions(
-          registrar.activity(),
-          3001,
-          Manifest.permission.READ_EXTERNAL_STORAGE,
-          Manifest.permission.WRITE_EXTERNAL_STORAGE,
-          Manifest.permission.ACCESS_FINE_LOCATION,
-          Manifest.permission.ACCESS_COARSE_LOCATION,
-          Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-          Manifest.permission.ACCESS_MEDIA_LOCATION
+            registrar.activity(),
+            3001,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+            Manifest.permission.ACCESS_MEDIA_LOCATION
         )
       } else {
         utils.getPermissions(
-          registrar.activity(),
-          3001,
-          Manifest.permission.READ_EXTERNAL_STORAGE,
-          Manifest.permission.WRITE_EXTERNAL_STORAGE,
-          Manifest.permission.ACCESS_FINE_LOCATION,
-          Manifest.permission.ACCESS_COARSE_LOCATION
+            registrar.activity(),
+            3001,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
         )
       }
     }
-    
+
   }
-  
+
   fun MethodCall.getTimeStamp(): Long {
     return this.argument<Long>("timestamp")!!
   }
-  
+
   fun MethodCall.getString(key: String): String {
     return this.argument<String>(key)!!
   }
-  
+
   fun MethodCall.getInt(key: String): Int {
     return this.argument<Int>(key)!!
   }
-  
+
+  fun MethodCall.getOption(): FilterOptions {
+    val arguments = argument<Map<*, *>>("option")!!
+    return ConvertUtils.convertFilterOptionsFromMap(arguments)
+  }
 }
