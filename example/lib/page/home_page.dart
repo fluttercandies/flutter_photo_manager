@@ -60,7 +60,7 @@ class _NewHomePageState extends State<NewHomePage> {
             ),
             _buildHasAllCheck(),
             _buildNotifyCheck(),
-            _buildFilterOption(provider.option),
+            _buildFilterOption(provider),
           ],
         ),
       ),
@@ -143,26 +143,60 @@ class _NewHomePageState extends State<NewHomePage> {
 
   void onChange(call) {}
 
-  Widget _buildFilterOption(FilterOption option) {
-    return Column(
+  Widget _buildFilterOption(PhotoProvider provider) {
+    final dialog = Column(
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        TextField(),
-        TextField(),
-        TextField(),
-        TextField(),
+        buildInput(provider.minWidth, "minWidth", (value) {
+          provider.minWidth = value;
+        }),
+        buildInput(provider.maxWidth, "maxWidth", (value) {
+          provider.maxWidth = value;
+        }),
+        buildInput(provider.minHeight, "minHeight", (value) {
+          provider.minHeight = value;
+        }),
+        buildInput(provider.maxHeight, "maxHeight", (value) {
+          provider.maxHeight = value;
+        }),
       ],
+    );
+
+    return RaisedButton(
+      child: Text("Change size option."),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text("Change size option."),
+                ),
+                body: Material(child: dialog),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
-  // Widget buildAndroidQSwitch() {
-  //   return CheckboxListTile(
-  //     onChanged: (check) {
-  //       PhotoManager.setAndroidQExperimental(check);
-  //       setState(() {});
-  //     },
-  //     value: PhotoManager.androidQExperimental,
-  //   );
-  // }
+  Widget buildInput(
+    String initValue,
+    String hintText,
+    void onChanged(String value),
+  ) {
+    return TextFormField(
+      decoration: InputDecoration(
+        hintText: hintText,
+        contentPadding: EdgeInsets.all(8),
+      ),
+      onChanged: onChanged,
+      initialValue: initValue,
+      keyboardType: TextInputType.number,
+    );
+  }
 }
 
 Widget buildButton(String text, Function function) {
