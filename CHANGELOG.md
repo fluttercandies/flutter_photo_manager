@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.4.7
+
+New feature:
+
+- Add `FilterOption` for method `getAssetPathList`.
+
 ## 0.4.6
 
 Fix:

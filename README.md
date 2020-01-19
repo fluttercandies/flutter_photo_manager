@@ -10,7 +10,7 @@ A flutter api for photo, you can get image/video from ios or android.
 
 If you just need a picture selector, you can choose to use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker. All UI create by flutter.
 
-- [photo_manager](#photo_manager)
+- [photo_manager](#photomanager)
   - [install](#install)
     - [Add to pubspec](#add-to-pubspec)
     - [import in dart code](#import-in-dart-code)
@@ -115,6 +115,10 @@ Constraint the size, duration.
 
 About **needTitle**:The title property of `AssetEntity` is very expensive on iOS.
 If needTitle is false, `AssetEntity.title` is empty, default is false. Unless you need this property, please keep it false.
+
+`SizeConstraint` are valid in both pictures and videos.
+
+`DurationConstraint` will be ignore with image type.
 
 #### Old version
 
