@@ -78,7 +78,7 @@ class _DetailPageState extends State<DetailPage> {
               buildInfoItem("modified", entity.modifiedDateTime.toString()),
               buildInfoItem("size", entity.size.toString()),
               buildInfoItem("duration", entity.videoDuration.toString()),
-              buildInfoItem("title", entity.title ?? "null"),
+              buildInfoItemAsync("title", entity.titleAsync),
               buildInfoItem("lat", lat?.toString() ?? "null"),
               buildInfoItem("lng", lng?.toString() ?? "null"),
             ],
@@ -108,6 +108,18 @@ class _DetailPageState extends State<DetailPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget buildInfoItemAsync(String title, Future<String> info) {
+    return FutureBuilder(
+      future: info,
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (!snapshot.hasData) {
+          return buildInfoItem(title, "");
+        }
+        return buildInfoItem(title, snapshot.data);
+      },
     );
   }
 }

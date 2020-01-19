@@ -739,4 +739,12 @@ getAssetEntityListWithGalleryId:(NSString *)id
        }];
 }
 
+-(NSString *)getTitleAsyncWithAssetId:(NSString *)assetId{
+    PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
+    if(asset){
+        return [asset title];
+    }
+    return @"";
+}
+
 @end

@@ -76,4 +76,7 @@ typedef void (^AssetResult)(PMAssetEntity *);
             block:(AssetResult)block;
 
 - (BOOL)existsWithId:(NSString *)assetId;
+
+- (NSString*)getTitleAsyncWithAssetId: (NSString *) assetId;
+
 @end

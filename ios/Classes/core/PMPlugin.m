@@ -218,6 +218,12 @@
     NSString *assetId = call.arguments[@"id"];
     BOOL exists = [manager existsWithId:assetId];
     [handler reply:@(exists)];
+  } else if([call.method isEqualToString:@"getTitleAsync"]){
+      NSString *assetId = call.arguments[@"id"];
+      NSString *title = [manager getTitleAsyncWithAssetId: assetId];
+      [handler reply:title];
+  } else{
+      [handler notImplemented];
   }
 }
 

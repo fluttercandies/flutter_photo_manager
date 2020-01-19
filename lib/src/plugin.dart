@@ -241,4 +241,17 @@ class Plugin {
   Future<bool> cacheOriginBytes(bool cache) {
     return _channel.invokeMethod("cacheOriginBytes");
   }
+
+  Future<String> getTitleAsync(AssetEntity assetEntity) async {
+    assert(Platform.isAndroid || Platform.isIOS);
+    if (Platform.isAndroid) {
+      return assetEntity.title;
+    }
+
+    if (Platform.isIOS) {
+      return _channel.invokeMethod("getTitleAsync", {"id": assetEntity.id});
+    }
+
+    return "";
+  }
 }
