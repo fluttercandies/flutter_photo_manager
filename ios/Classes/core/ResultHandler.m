@@ -40,6 +40,14 @@
     self.result(error);
 }
 
+-(void)notImplemented{
+    if (isReply) {
+       return;
+    }
+    isReply = YES;
+    self.result(FlutterMethodNotImplemented);
+}
+
 - (BOOL)isReplied {
     return isReply;
 }

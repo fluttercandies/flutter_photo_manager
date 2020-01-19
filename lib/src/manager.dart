@@ -25,11 +25,13 @@ class PhotoManager {
     bool hasAll = true,
     RequestType type = RequestType.all,
     DateTime fetchDateTime,
+    FilterOption fliterOption = const FilterOption(),
   }) async {
     return _plugin.getAllGalleryList(
       type: type.index,
       dt: fetchDateTime,
       hasAll: hasAll,
+      fliterOption: fliterOption,
     );
   }
 
@@ -52,16 +54,35 @@ class PhotoManager {
   }
 
   static Future<List<AssetEntity>> _getAssetListPaged(
-      AssetPathEntity assetPathEntity,
-      int page,
-      int pageCount,
-      DateTime pagedDt) async {
+    AssetPathEntity entity,
+    int page,
+    int pageCount,
+  ) async {
     return _plugin.getAssetWithGalleryIdPaged(
-      assetPathEntity.id,
+      entity.id,
       page: page,
       pageCount: pageCount,
-      type: assetPathEntity.typeInt,
-      pagedDt: pagedDt,
+      type: entity.typeInt,
+      pagedDt: entity.fetchDatetime,
+      filterOption: entity.filterOption,
+    );
+  }
+
+  static Future<List<AssetEntity>> _getAssetWithRange({
+    @required AssetPathEntity entity,
+    @required int start,
+    @required int end,
+  }) {
+    if (end > entity.assetCount) {
+      end = entity.assetCount;
+    }
+    return _plugin.getAssetWithRange(
+      entity.id,
+      typeInt: entity.typeInt,
+      start: start,
+      end: end,
+      fetchDt: entity.fetchDatetime,
+      filterOption: entity.filterOption,
     );
   }
 
@@ -151,15 +172,19 @@ class PhotoManager {
     AssetPathEntity entity,
     DateTime time,
   ) async {
-    var result =
-        await _plugin.fetchPathProperties(entity.id, entity.typeInt, time);
+    var result = await _plugin.fetchPathProperties(
+        entity.id, entity.typeInt, time, entity.filterOption);
     if (result == null) {
       return null;
     }
     var list = result["data"];
     if (list is List && list.isNotEmpty) {
-      return ConvertUtils.convertPath(result,
-          dt: time, type: entity.typeInt)[0];
+      return ConvertUtils.convertPath(
+        result,
+        dt: time,
+        type: entity.typeInt,
+        fliterOption: entity.filterOption,
+      )[0];
     } else {
       return null;
     }
@@ -167,20 +192,6 @@ class PhotoManager {
 
   static Future<void> forceOldApi() async {
     await _plugin.forceOldApi();
-  }
-
-  static Future<List<AssetEntity>> getAssetWithRange({
-    @required AssetPathEntity entity,
-    @required int start,
-    @required int end,
-  }) {
-    return _plugin.getAssetWithRange(
-      entity.id,
-      entity.typeInt,
-      start,
-      end,
-      entity.fetchDatetime,
-    );
   }
 
   static Future<bool> _isAndroidQ() async {

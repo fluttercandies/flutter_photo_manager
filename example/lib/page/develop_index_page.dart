@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_scanner_example/page/dev_title_page.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class DeveloperIndexPage extends StatefulWidget {
@@ -26,6 +27,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
           RaisedButton(
             child: Text("Save video to photos."),
             onPressed: _saveVideo,
+          ),
+          RaisedButton(
+            child: Text("Open test title page"),
+            onPressed: _navigatorSpeedOfTitle,
           ),
         ],
       ),
@@ -89,5 +94,12 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
         print("result is null");
       }
     });
+  }
+
+  void _navigatorSpeedOfTitle() {
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+      final widget = DevelopingExample();
+      return widget;
+    }));
   }
 }

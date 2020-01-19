@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:image_scanner_example/main.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class PhotoProvider extends ChangeNotifier {
@@ -15,7 +16,38 @@ class PhotoProvider extends ChangeNotifier {
 
   bool _notifying = false;
 
+  bool _needTitle = false;
+
+  bool get needTitle => _needTitle;
+
+  set needTitle(bool needTitle) {
+    _needTitle = needTitle;
+    notifyListeners();
+  }
+
   bool get notifying => _notifying;
+
+  String minWidth = "0";
+  String maxWidth = "10000";
+  String minHeight = "0";
+  String maxHeight = "10000";
+
+  Duration _minDuration = Duration(seconds: 10);
+
+  Duration get minDuration => _minDuration;
+
+  set minDuration(Duration minDuration) {
+    _minDuration = minDuration;
+    notifyListeners();
+  }
+  Duration _maxDuration = Duration(days: 1);
+
+  Duration get maxDuration => _maxDuration;
+
+  set maxDuration(Duration maxDuration) {
+    _maxDuration = maxDuration;
+    notifyListeners();
+  }
 
   set notifying(bool notifying) {
     _notifying = notifying;
@@ -48,11 +80,19 @@ class PhotoProvider extends ChangeNotifier {
   }
 
   Future<void> refreshGalleryList() async {
+    final option = makeOption();
+
+    if (option == null) {
+      assert(option != null);
+      return;
+    }
+
     reset();
     var galleryList = await PhotoManager.getAssetPathList(
       fetchDateTime: dt,
       type: RequestType.values[type],
       hasAll: hasAll,
+      fliterOption: option,
     );
 
     galleryList.sort((s1, s2) {
@@ -66,6 +106,36 @@ class PhotoProvider extends ChangeNotifier {
   PathProvider getOrCreatePathProvider(AssetPathEntity pathEntity) {
     pathProviderMap[pathEntity] ??= PathProvider(pathEntity);
     return pathProviderMap[pathEntity];
+  }
+
+  FilterOption makeOption() {
+    SizeConstraint sizeConstraint;
+    try {
+      final minW = int.tryParse(minWidth);
+      final maxW = int.tryParse(maxWidth);
+      final minH = int.tryParse(minHeight);
+      final maxH = int.tryParse(maxHeight);
+      sizeConstraint = SizeConstraint(
+        minWidth: minW,
+        maxWidth: maxW,
+        minHeight: minH,
+        maxHeight: maxH,
+      );
+    } catch (e) {
+      showToast("Cannot convert your size.");
+      return null;
+    }
+
+    DurationConstraint durationConstraint = DurationConstraint(
+      min: minDuration,
+      max: maxDuration,
+    );
+
+    return FilterOption(
+      sizeConstraint: sizeConstraint,
+      durationConstraint: durationConstraint,
+      needTitle: needTitle,
+    );
   }
 }
 

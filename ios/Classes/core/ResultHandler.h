@@ -17,5 +17,7 @@
 
 - (void)reply:(id)obj;
 
+- (void)notImplemented;
+
 - (BOOL)isReplied;
 @end

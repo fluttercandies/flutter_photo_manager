@@ -5,6 +5,8 @@ import 'package:image_scanner_example/widget/change_notifier_builder.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
+import 'filter_option_page.dart';
+
 class NewHomePage extends StatefulWidget {
   @override
   _NewHomePageState createState() => _NewHomePageState();
@@ -60,7 +62,7 @@ class _NewHomePageState extends State<NewHomePage> {
             ),
             _buildHasAllCheck(),
             _buildNotifyCheck(),
-            // buildAndroidQSwitch(),
+            _buildFilterOption(provider),
           ],
         ),
       ),
@@ -143,15 +145,22 @@ class _NewHomePageState extends State<NewHomePage> {
 
   void onChange(call) {}
 
-  // Widget buildAndroidQSwitch() {
-  //   return CheckboxListTile(
-  //     onChanged: (check) {
-  //       PhotoManager.setAndroidQExperimental(check);
-  //       setState(() {});
-  //     },
-  //     value: PhotoManager.androidQExperimental,
-  //   );
-  // }
+  Widget _buildFilterOption(PhotoProvider provider) {
+    return RaisedButton(
+      child: Text("Change filter options."),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return FilterOptionPage();
+            },
+          ),
+        );
+      },
+    );
+  }
+
 }
 
 Widget buildButton(String text, Function function) {

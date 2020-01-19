@@ -6,13 +6,13 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
-  - Flutter (from `.symlinks/flutter/ios`)
+  - Flutter (from `Flutter`)
   - photo_manager (from `/Users/cai/Documents/GitHub/flutter_photo_manager/ios/photo_manager.podspec`)
   - "video_player (from `/Users/cai/.pub-cache/hosted/pub.flutter-io.cn/video_player-0.10.2+5/ios/video_player.podspec`)"
 
 EXTERNAL SOURCES:
   Flutter:
-    :path: ".symlinks/flutter/ios"
+    :path: Flutter
   photo_manager:
     :path: "/Users/cai/Documents/GitHub/flutter_photo_manager/ios/photo_manager.podspec"
   video_player:
@@ -23,6 +23,6 @@ SPEC CHECKSUMS:
   photo_manager: f7c619c2cc8c2adb8d85c63363babac477de9c67
   video_player: 69c5f029fac4ffe4fc8a85ea7f7b793709661549
 
-PODFILE CHECKSUM: 8b58f31fded30bde36cce630d32e6ed46a38f44e
+PODFILE CHECKSUM: 4d8d59437a9bee20e84f185bba22b518812142d3
 
 COCOAPODS: 1.8.4

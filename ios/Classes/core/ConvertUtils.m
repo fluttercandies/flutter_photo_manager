@@ -3,13 +3,14 @@
 //
 
 #import "ConvertUtils.h"
-#import <Photos/Photos.h>
 #import "PHAsset+PHAsset_checkType.h"
 #import "PHAsset+PHAsset_getTitle.h"
 #import "PMAssetPathEntity.h"
+#import "PMFilterOption.h"
 
 @implementation ConvertUtils {
 }
+
 + (NSDictionary *)convertPathToMap:(NSArray<PMAssetPathEntity *> *)array {
   NSMutableArray *data = [NSMutableArray new];
 
@@ -27,18 +28,21 @@
   return @{@"data" : data};
 }
 
-+ (NSDictionary *)convertAssetToMap:(NSArray<PMAssetEntity *> *)array {
++ (NSDictionary *)convertAssetToMap:(NSArray<PMAssetEntity *> *)array
+                          needTitle:(BOOL)needTitle {
   NSMutableArray *data = [NSMutableArray new];
 
   for (PMAssetEntity *asset in array) {
-    NSDictionary *item = [ConvertUtils convertPMAssetToMap:asset];
+    NSDictionary *item = [ConvertUtils convertPMAssetToMap:asset
+                                                 needTitle:needTitle];
     [data addObject:item];
   }
 
   return @{@"data" : data};
 }
 
-+ (NSDictionary *)convertPHAssetToMap:(PHAsset *)asset {
++ (NSDictionary *)convertPHAssetToMap:(PHAsset *)asset
+                            needTitle:(BOOL)needTitle {
   long createDt = (int)asset.creationDate.timeIntervalSince1970;
   long modifiedDt = (int)asset.modificationDate.timeIntervalSince1970;
 
@@ -61,11 +65,12 @@
     @"modifiedDt" : @(modifiedDt),
     @"lng" : @(asset.location.coordinate.longitude),
     @"lat" : @(asset.location.coordinate.latitude),
-    @"title" : [asset title],
+    @"title" : needTitle ? [asset title] : @"",
   };
 }
 
-+ (NSDictionary *)convertPMAssetToMap:(PMAssetEntity *)asset {
++ (NSDictionary *)convertPMAssetToMap:(PMAssetEntity *)asset
+                            needTitle:(BOOL)needTitle {
   return @{
     @"id" : asset.id,
     @"createDt" : @(asset.createDt),
@@ -76,8 +81,37 @@
     @"modifiedDt" : @(asset.modifiedDt),
     @"lng" : @(asset.lng),
     @"lat" : @(asset.lat),
-    @"title" : asset.title,
+    @"title" : needTitle ? asset.title : @"",
   };
+}
+
++ (PMFilterOption *)convertMapToPMFilterOption:(NSDictionary *)map {
+  PMFilterOption *option = [PMFilterOption new];
+  option.needTitle = [map[@"title"] boolValue];
+
+  NSDictionary *sizeMap = map[@"size"];
+  NSDictionary *durationMap = map[@"duration"];
+
+  PMSizeConstraint sizeConstraint;
+  sizeConstraint.minWidth = [sizeMap[@"minWidth"] unsignedIntValue];
+  sizeConstraint.maxWidth = [sizeMap[@"maxWidth"] unsignedIntValue];
+  sizeConstraint.minHeight = [sizeMap[@"minHeight"] unsignedIntValue];
+  sizeConstraint.maxHeight = [sizeMap[@"maxHeight"] unsignedIntValue];
+  option.sizeConstraint = sizeConstraint;
+
+  PMDurationConstraint durationConstraint;
+  durationConstraint.minDuration =
+      [ConvertUtils convertNSNumberToSecond:durationMap[@"min"]];
+  durationConstraint.maxDuration =
+      [ConvertUtils convertNSNumberToSecond:durationMap[@"max"]];
+  option.durationConstraint = durationConstraint;
+
+  return option;
+}
+
++ (double)convertNSNumberToSecond:(NSNumber *)number {
+  unsigned int i = number.unsignedIntValue;
+  return (double)i / 1000.0;
 }
 
 @end
