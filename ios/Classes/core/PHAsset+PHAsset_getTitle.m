@@ -7,16 +7,19 @@
 
 #import "PHAsset+PHAsset_getTitle.h"
 #import "PHAsset+PHAsset_checkType.h"
+#import "PMLogUtils.h"
 
 @implementation PHAsset (PHAsset_getTitle)
 
 - (NSString *)title {
+    PMLogUtils *logger = [PMLogUtils sharedInstance];
+    NSLog(@"get title start");
     @try {
-        NSString *result = [self valueForKey:@"originalFilename"];
-        NSLog(@"get title from kvo");
+        NSString *result = [self valueForKey:@"filename"];
+        [logger info:@"get title from kvo"];
         return result;
     } @catch (NSException *exception) {
-        NSLog(@"get title from PHAssetResource");
+        [logger info: @"get title from PHAssetResource"];
         NSArray *array = [PHAssetResource assetResourcesForAsset:self];
         for (PHAssetResource *resource in array) {
           if ([self isImage] && resource.type == PHAssetResourceTypePhoto) {
