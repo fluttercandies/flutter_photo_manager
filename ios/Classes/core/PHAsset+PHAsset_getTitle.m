@@ -11,25 +11,28 @@
 @implementation PHAsset (PHAsset_getTitle)
 
 - (NSString *)title {
-    return [self valueForKey:@"originalFilename"];
-//  NSArray *array = [PHAssetResource assetResourcesForAsset:self];
-//  for (PHAssetResource *resource in array) {
-//    if ([self isImage] && resource.type == PHAssetResourceTypePhoto) {
-//      return resource.originalFilename;
-//    } else if ([self isVideo] && resource.type == PHAssetResourceTypeVideo) {
-//      return resource.originalFilename;
-//    }
-//  }
-//
-//  /// If code run there, the type maybe have problem.
-//  /// Use first resource name.
-//
-//  PHAssetResource *firstRes = array.firstObject;
-//  if (firstRes) {
-//    return firstRes.originalFilename;
-//  }
+    @try {
+        NSString *result = [self valueForKey:@"originalFilename"];
+        NSLog(@"get title from kvo");
+        return result;
+    } @catch (NSException *exception) {
+        NSLog(@"get title from PHAssetResource");
+        NSArray *array = [PHAssetResource assetResourcesForAsset:self];
+        for (PHAssetResource *resource in array) {
+          if ([self isImage] && resource.type == PHAssetResourceTypePhoto) {
+            return resource.originalFilename;
+          } else if ([self isVideo] && resource.type == PHAssetResourceTypeVideo) {
+            return resource.originalFilename;
+          }
+        }
 
-//  return @"";
+        PHAssetResource *firstRes = array.firstObject;
+        if (firstRes) {
+          return firstRes.originalFilename;
+        }
+
+        return @"";
+    }
 }
 
 @end

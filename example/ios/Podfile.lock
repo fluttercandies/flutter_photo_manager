@@ -7,16 +7,16 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - photo_manager (from `/Users/cai/Documents/GitHub/flutter_photo_manager/ios/photo_manager.podspec`)
-  - "video_player (from `/Users/cai/.pub-cache/hosted/pub.flutter-io.cn/video_player-0.10.2+5/ios/video_player.podspec`)"
+  - photo_manager (from `/Users/caijinglong/Documents/GitHub/flutter_photo_manager/ios/photo_manager.podspec`)
+  - "video_player (from `/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/video_player-0.10.2+5/ios/video_player.podspec`)"
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
   photo_manager:
-    :path: "/Users/cai/Documents/GitHub/flutter_photo_manager/ios/photo_manager.podspec"
+    :path: "/Users/caijinglong/Documents/GitHub/flutter_photo_manager/ios/photo_manager.podspec"
   video_player:
-    :path: "/Users/cai/.pub-cache/hosted/pub.flutter-io.cn/video_player-0.10.2+5/ios/video_player.podspec"
+    :path: "/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/video_player-0.10.2+5/ios/video_player.podspec"
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
