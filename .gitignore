@@ -10,3 +10,5 @@ build/
 
 fvm
 .vscode/settings.json
+
+android/.settings/org.eclipse.buildship.core.prefs
