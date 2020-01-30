@@ -35,10 +35,14 @@ class PhotoManager {
     );
   }
 
+  /// Use [getAssetPathList] replaced.
+  @Deprecated("Use getAssetPathList replaced.")
   static Future<List<AssetPathEntity>> getImageAsset() {
     return getAssetPathList(type: RequestType.image);
   }
 
+  /// Use [getAssetPathList] replaced.
+  @Deprecated("Use getAssetPathList replaced.")
   static Future<List<AssetPathEntity>> getVideoAsset() {
     return getAssetPathList(type: RequestType.video);
   }

@@ -38,7 +38,7 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
   }
 
   void _upload() async {
-    final path = await PhotoManager.getImageAsset();
+    final path = await PhotoManager.getAssetPathList(type: RequestType.image);
     final assetList = await path[0].getAssetListRange(start: 0, end: 5);
     final asset = assetList[0];
 

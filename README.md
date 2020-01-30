@@ -10,17 +10,17 @@ A flutter api for photo, you can get image/video from ios or android.
 
 If you just need a picture selector, you can choose to use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker. All UI create by flutter.
 
-- [photo_manager](#photomanager)
+- [photo_manager](#photo_manager)
   - [install](#install)
     - [Add to pubspec](#add-to-pubspec)
     - [import in dart code](#import-in-dart-code)
   - [Usage](#usage)
     - [request permission](#request-permission)
     - [you get all of asset list (gallery)](#you-get-all-of-asset-list-gallery)
-    - [get asset list from imagePath](#get-asset-list-from-imagepath)
+      - [FilterOption](#filteroption)
+    - [Get asset list from `AssetPathEntity`](#get-asset-list-from-assetpathentity)
       - [paged](#paged)
       - [range](#range)
-      - [FilterOption](#filteroption)
       - [Old version](#old-version)
     - [AssetEntity](#assetentity)
       - [location info of android Q](#location-info-of-android-q)
@@ -76,19 +76,24 @@ if (result) {
 List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
 ```
 
-or
+| name          | description                                                                                   |
+| ------------- | --------------------------------------------------------------------------------------------- |
+| hasAll        | Is there an album containing "all"                                                            |
+| type          | image/video/all , default all.                                                                |
+| fetchDateTime | Only include resources older than that time.(Will be included in filterOption in the future.) |
+| fliterOption  | See FilterOption.                                                                             |
 
-```dart
-List<AssetPathEntity> list = await PhotoManager.getImageAsset();
-```
+#### FilterOption
 
-or
+| name               | description                                                                                                                                                                               |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| needTitle          | The title attribute of the picture must be included in android (even if it is false), it is more performance-consuming in iOS, please consider whether you need it. The default is false. |
+| sizeConstraint     | Constraints on resource size.                                                                                                                                                             |
+| durationConstraint | Constraints of time, pictures will ignore this constraint.                                                                                                                                |
 
-```dart
-List<AssetPathEntity> list = await PhotoManager.getVideoAsset();
-```
+Example see [filter_option_page.dart](https://github.com/CaiJingLong/flutter_photo_manager/blob/filter-option/example/lib/page/filter_option_page.dart).
 
-### get asset list from imagePath
+### Get asset list from `AssetPathEntity`
 
 #### paged
 
@@ -106,19 +111,6 @@ The old version, it is not recommended for continued use, because there may be p
 final assetList = await path.getAssetListRange(start: 0, end: 88); // use start and end to get asset.
 // Example: 0~10 will return 10 assets. Special case: If there are only 5, return 5
 ```
-
-#### FilterOption
-
-The class define in [filter_option_page.dart](https://github.com/CaiJingLong/flutter_photo_manager/blob/filter-option/example/lib/page/filter_option_page.dart).
-
-Constraint the size, duration.
-
-About **needTitle**:The title property of `AssetEntity` is very expensive on iOS.
-If needTitle is false, `AssetEntity.title` is empty, default is false. Unless you need this property, please keep it false.
-
-`SizeConstraint` are valid in both pictures and videos.
-
-`DurationConstraint` will be ignore with image type.
 
 #### Old version
 
