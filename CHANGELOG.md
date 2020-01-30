@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.4.8
+
+Fixes:
+
+- [#169](https://github.com/CaiJingLong/flutter_photo_manager/issues/169)
+- [#170](https://github.com/CaiJingLong/flutter_photo_manager/issues/170)
+
 ## 0.4.7
 
 New feature:
