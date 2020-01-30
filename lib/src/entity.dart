@@ -211,7 +211,7 @@ class AssetEntity {
   /// Use [originBytes]
   ///
   /// The property will be remove in 0.5.0.
-  @Deprecated("Use FileMode.append instead")
+  @Deprecated("Use originBytes instead")
   Future<Uint8List> get fullData => PhotoManager._getFullDataWithId(id);
 
   /// The raw data stored in the device, the data may be large.

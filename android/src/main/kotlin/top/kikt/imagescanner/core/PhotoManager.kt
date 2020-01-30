@@ -26,10 +26,7 @@ class PhotoManager(private val context: Context) {
 
   var useOldApi: Boolean = false
 
-  var androidQExperimental: Boolean = false
-    set(value) {
-      field = value
-    }
+  val androidQExperimental: Boolean
     get() {
       return Build.VERSION.SDK_INT >= 29
     }
@@ -97,7 +94,7 @@ class PhotoManager(private val context: Context) {
     }
   }
 
-  fun getOriginBytes(id: String, cacheOriginBytes: Boolean, resultHandler: ResultHandler) {
+  fun getOriginBytes(id: String, cacheOriginBytes: Boolean, haveLocationPermission: Boolean, resultHandler: ResultHandler) {
     val asset = dbUtils.getAssetEntity(context, id)
 
     if (asset == null) {
@@ -108,7 +105,7 @@ class PhotoManager(private val context: Context) {
       val byteArray = File(asset.path).readBytes()
       resultHandler.reply(byteArray)
     } else {
-      val byteArray = dbUtils.getOriginBytes(context, asset)
+      val byteArray = dbUtils.getOriginBytes(context, asset, haveLocationPermission)
       resultHandler.reply(byteArray)
       if (cacheOriginBytes) {
         dbUtils.cacheOriginFile(context, asset, byteArray)
@@ -169,13 +166,13 @@ class PhotoManager(private val context: Context) {
     val latLong = exifInfo?.latLong
     return if (latLong == null) {
       mapOf(
-          "lat" to 0.0,
-          "lng" to 0.0
+              "lat" to 0.0,
+              "lng" to 0.0
       )
     } else {
       mapOf(
-          "lat" to latLong[0],
-          "lng" to latLong[1]
+              "lat" to latLong[0],
+              "lng" to latLong[1]
       )
     }
   }

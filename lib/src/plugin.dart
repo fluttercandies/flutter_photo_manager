@@ -153,17 +153,6 @@ class Plugin {
     });
   }
 
-  bool androidQExperimental = false;
-
-  Future<void> setAndroidQExperimental(bool open) async {
-    if (Platform.isAndroid) {
-      await _channel.invokeMethod("androidQExperimental", {
-        "open": open,
-      });
-      androidQExperimental = open;
-    }
-  }
-
   Future<void> forceOldApi() async {
     await _channel.invokeMethod("forceOldApi");
   }

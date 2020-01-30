@@ -30,8 +30,8 @@ object AndroidQDBUtils : IDBUtils {
   private var androidQCache = AndroidQCache()
 
   private val galleryKeys = arrayOf(
-      MediaStore.Images.Media.BUCKET_ID,
-      MediaStore.Images.Media.BUCKET_DISPLAY_NAME
+          MediaStore.Images.Media.BUCKET_ID,
+          MediaStore.Images.Media.BUCKET_DISPLAY_NAME
   )
 
   @SuppressLint("Recycle")
@@ -49,7 +49,7 @@ object AndroidQDBUtils : IDBUtils {
     val selections = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
 
     val cursor = context.contentResolver.query(allUri, galleryKeys, selections, args.toTypedArray(), null)
-        ?: return list
+            ?: return list
 
     val nameMap = HashMap<String, String>()
     val countMap = HashMap<String, Int>()
@@ -110,7 +110,7 @@ object AndroidQDBUtils : IDBUtils {
 
     val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET ${page * pageSize}"
     val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
-        ?: return emptyList()
+            ?: return emptyList()
 
     while (cursor.moveToNext()) {
       val id = cursor.getString(MediaStore.MediaColumns._ID)
@@ -164,7 +164,7 @@ object AndroidQDBUtils : IDBUtils {
 
     val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET $start"
     val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
-        ?: return emptyList()
+            ?: return emptyList()
 
     while (cursor.moveToNext()) {
       val id = cursor.getString(MediaStore.MediaColumns._ID)
@@ -251,7 +251,7 @@ object AndroidQDBUtils : IDBUtils {
 
     val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere"
     val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
-        ?: return null
+            ?: return null
 
     val name: String
     if (cursor.moveToNext()) {
@@ -268,10 +268,10 @@ object AndroidQDBUtils : IDBUtils {
       val asset = getAssetEntity(context, id) ?: return null
 
       val uri =
-          if (asset.type == 1)
-            Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, asset.id)
-          else
-            Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, asset.id)
+              if (asset.type == 1)
+                Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, asset.id)
+              else
+                Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, asset.id)
 
       val originalUri = MediaStore.setRequireOriginal(uri)
 
@@ -304,10 +304,10 @@ object AndroidQDBUtils : IDBUtils {
 
   private fun getUri(id: String, type: Int, isOrigin: Boolean = false): Uri {
     var uri =
-        if (type == 1)
-          Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-        else
-          Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+            if (type == 1)
+              Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+            else
+              Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
 
     if (isOrigin) {
       uri = MediaStore.setRequireOriginal(uri)
@@ -315,14 +315,14 @@ object AndroidQDBUtils : IDBUtils {
     return uri
   }
 
-  override fun getOriginBytes(context: Context, asset: AssetEntity): ByteArray {
+  override fun getOriginBytes(context: Context, asset: AssetEntity, haveLocationPermission: Boolean): ByteArray {
     val file = androidQCache.getCacheFile(context, asset.id, asset.displayName, true)
     if (file.exists()) {
       LogUtils.info("the origin bytes come from ${file.absolutePath}")
       return file.readBytes()
     }
 
-    val uri = getUri(asset, true)
+    val uri = getUri(asset, haveLocationPermission)
     val inputStream = context.contentResolver.openInputStream(uri)
 
     LogUtils.info("the cache file no exists, will read from MediaStore: $uri")

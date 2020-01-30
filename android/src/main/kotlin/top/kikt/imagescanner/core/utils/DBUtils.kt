@@ -9,7 +9,6 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
-import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO
 import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
@@ -37,8 +36,8 @@ object DBUtils : IDBUtils {
   private val cacheContainer = CacheContainer()
 
   private val locationKeys = arrayOf(
-      MediaStore.Images.ImageColumns.LONGITUDE,
-      MediaStore.Images.ImageColumns.LATITUDE
+          MediaStore.Images.ImageColumns.LONGITUDE,
+          MediaStore.Images.ImageColumns.LATITUDE
   )
 
   private fun convertTypeToUri(type: Int): Uri {
@@ -65,7 +64,7 @@ object DBUtils : IDBUtils {
 
     val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
     val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
-        ?: return emptyList()
+            ?: return emptyList()
     while (cursor.moveToNext()) {
       val id = cursor.getString(0)
       val name = cursor.getString(1)
@@ -98,7 +97,8 @@ object DBUtils : IDBUtils {
     val sizeWhere = AndroidQDBUtils.sizeWhere(null)
 
     val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
-    val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null) ?: return null
+    val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
+            ?: return null
     return if (cursor.moveToNext()) {
       val id = cursor.getString(0)
       val name = cursor.getString(1)
@@ -117,14 +117,14 @@ object DBUtils : IDBUtils {
 
   @SuppressLint("Recycle")
   override fun getAssetFromGalleryId(
-      context: Context,
-      galleryId: String,
-      page: Int,
-      pageSize: Int,
-      requestType: Int,
-      timeStamp: Long,
-      option: FilterOptions,
-      cacheContainer: CacheContainer?
+          context: Context,
+          galleryId: String,
+          page: Int,
+          pageSize: Int,
+          requestType: Int,
+          timeStamp: Long,
+          option: FilterOptions,
+          cacheContainer: CacheContainer?
   ): List<AssetEntity> {
     val cache = cacheContainer ?: this.cacheContainer
 
@@ -153,7 +153,7 @@ object DBUtils : IDBUtils {
 
     val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET ${page * pageSize}"
     val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
-        ?: return emptyList()
+            ?: return emptyList()
 
     while (cursor.moveToNext()) {
       val id = cursor.getString(MediaStore.MediaColumns._ID)
@@ -217,7 +217,7 @@ object DBUtils : IDBUtils {
 
     val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET $start"
     val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
-        ?: return emptyList()
+            ?: return emptyList()
 
     while (cursor.moveToNext()) {
       val id = cursor.getString(MediaStore.MediaColumns._ID)
@@ -265,7 +265,7 @@ object DBUtils : IDBUtils {
     val args = arrayOf(id)
 
     val cursor = context.contentResolver.query(allUri, keys, selection, args, null)
-        ?: return null
+            ?: return null
 
     if (cursor.moveToNext()) {
       val databaseId = cursor.getString(MediaStore.MediaColumns._ID)
@@ -302,7 +302,7 @@ object DBUtils : IDBUtils {
     }
   }
 
-  override fun getOriginBytes(context: Context, asset: AssetEntity): ByteArray {
+  override fun getOriginBytes(context: Context, asset: AssetEntity, haveLocationPermission: Boolean): ByteArray {
     TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
   }
 
