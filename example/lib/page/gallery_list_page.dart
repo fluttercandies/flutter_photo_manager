@@ -39,12 +39,12 @@ class _GalleryListPageState extends State<GalleryListPage> {
         trailing: Text("isAll : ${item.isAll}"),
       ),
       onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => GalleryContentListPage(
-                    path: item,
-                  ),
-            ),
+        MaterialPageRoute(
+          builder: (_) => GalleryContentListPage(
+            path: item,
           ),
+        ),
+      ),
       onLongPress: () async {
         await item.refreshPathProperties();
         setState(() {});

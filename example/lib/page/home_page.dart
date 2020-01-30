@@ -160,7 +160,6 @@ class _NewHomePageState extends State<NewHomePage> {
       },
     );
   }
-
 }
 
 Widget buildButton(String text, Function function) {

@@ -40,6 +40,7 @@ class PhotoProvider extends ChangeNotifier {
     _minDuration = minDuration;
     notifyListeners();
   }
+
   Duration _maxDuration = Duration(days: 1);
 
   Duration get maxDuration => _maxDuration;

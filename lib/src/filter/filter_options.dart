@@ -50,7 +50,7 @@ class SizeConstraint {
 }
 
 /// Constraints of duration.
-/// 
+///
 /// The Image type ignores this constraints.
 class DurationConstraint {
   final Duration min;
