@@ -12,6 +12,7 @@ import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOptions
 import top.kikt.imagescanner.core.entity.GalleryEntity
+import top.kikt.imagescanner.util.LogUtils
 import java.io.InputStream
 
 
@@ -24,42 +25,42 @@ interface IDBUtils {
     val isAndroidQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
     val storeImageKeys = arrayOf(
-            MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
-            MediaStore.MediaColumns.DATA, // 数据
-            MediaStore.MediaColumns._ID, // id
-            MediaStore.MediaColumns.TITLE, // id
-            MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
-            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
-            MediaStore.MediaColumns.WIDTH, // 宽
-            MediaStore.MediaColumns.HEIGHT, // 高
-            MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
-            MediaStore.MediaColumns.MIME_TYPE, // 高
-            MediaStore.MediaColumns.DATE_TAKEN //日期
+        MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
+        MediaStore.MediaColumns.DATA, // 数据
+        MediaStore.MediaColumns._ID, // id
+        MediaStore.MediaColumns.TITLE, // id
+        MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
+        MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
+        MediaStore.MediaColumns.WIDTH, // 宽
+        MediaStore.MediaColumns.HEIGHT, // 高
+        MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
+        MediaStore.MediaColumns.MIME_TYPE, // 高
+        MediaStore.MediaColumns.DATE_TAKEN //日期
     )
 
     val storeVideoKeys = arrayOf(
-            MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
-            MediaStore.MediaColumns.DATA, // 数据
-            MediaStore.MediaColumns._ID, // id
-            MediaStore.MediaColumns.TITLE, // id
-            MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
-            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
-            MediaStore.MediaColumns.DATE_TAKEN, //日期
-            MediaStore.MediaColumns.WIDTH, // 宽
-            MediaStore.MediaColumns.HEIGHT, // 高
-            MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
-            MediaStore.MediaColumns.MIME_TYPE, // 高
-            MediaStore.MediaColumns.DURATION //时长
+        MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
+        MediaStore.MediaColumns.DATA, // 数据
+        MediaStore.MediaColumns._ID, // id
+        MediaStore.MediaColumns.TITLE, // id
+        MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
+        MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
+        MediaStore.MediaColumns.DATE_TAKEN, //日期
+        MediaStore.MediaColumns.WIDTH, // 宽
+        MediaStore.MediaColumns.HEIGHT, // 高
+        MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
+        MediaStore.MediaColumns.MIME_TYPE, // 高
+        MediaStore.MediaColumns.DURATION //时长
     )
 
     val typeKeys = arrayOf(
-            MediaStore.Files.FileColumns.MEDIA_TYPE,
-            MediaStore.Images.Media.DISPLAY_NAME
+        MediaStore.Files.FileColumns.MEDIA_TYPE,
+        MediaStore.Images.Media.DISPLAY_NAME
     )
 
     val storeBucketKeys = arrayOf(
-            MediaStore.Images.Media.BUCKET_ID,
-            MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
+        MediaStore.Images.Media.BUCKET_ID,
+        MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
     )
 
   }
@@ -82,7 +83,7 @@ interface IDBUtils {
       "AND $size"
     } else {
       "AND (${MediaStore.Files.FileColumns.MEDIA_TYPE} = ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO} or (" +
-              "${MediaStore.Files.FileColumns.MEDIA_TYPE} = ${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE} AND $size))"
+          "${MediaStore.Files.FileColumns.MEDIA_TYPE} = ${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE} AND $size))"
     }
   }
 
@@ -200,4 +201,22 @@ interface IDBUtils {
 
     return condString
   }
+
+  fun logRowWithId(context: Context, id: String) {
+    if (LogUtils.isLog) {
+      val splitter = "".padStart(40, '-')
+      LogUtils.info("log error row $id start $splitter")
+      val cursor = context.contentResolver.query(allUri, null, "${MediaStore.Files.FileColumns._ID} = ?", arrayOf(id), null)
+      cursor?.use {
+        val names = it.columnNames
+        if (cursor.moveToNext()) {
+          for (i in 0 until names.count()) {
+            LogUtils.info("${names[i]} : ${cursor.getString(i)}")
+          }
+        }
+      }
+      LogUtils.info("log error row $id end $splitter")
+    }
+  }
+
 }

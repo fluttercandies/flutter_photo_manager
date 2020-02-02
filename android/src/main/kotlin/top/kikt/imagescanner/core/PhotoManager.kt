@@ -26,11 +26,6 @@ class PhotoManager(private val context: Context) {
 
   var useOldApi: Boolean = false
 
-  val androidQExperimental: Boolean
-    get() {
-      return Build.VERSION.SDK_INT >= 29
-    }
-
   private val dbUtils: IDBUtils
     get() = if (useOldApi || Build.VERSION.SDK_INT < 29) {
       DBUtils
@@ -70,7 +65,7 @@ class PhotoManager(private val context: Context) {
 
   fun getThumb(id: String, width: Int, height: Int, format: Int, resultHandler: ResultHandler) {
     try {
-      if (!androidQExperimental) {
+      if (!isAndroidQ) {
         val asset = dbUtils.getAssetEntity(context, id)
         if (asset == null) {
           resultHandler.replyError("The asset not found!")
@@ -89,7 +84,8 @@ class PhotoManager(private val context: Context) {
         }
       }
     } catch (e: Exception) {
-      Log.e(LogUtils.TAG, "get thumb error", e)
+      Log.e(LogUtils.TAG, "get $id thumb error, width : $width, height: $height", e)
+      dbUtils.logRowWithId(context, id)
       resultHandler.replyError("201", "get thumb error", e)
     }
   }
@@ -101,15 +97,20 @@ class PhotoManager(private val context: Context) {
       resultHandler.replyError("The asset not found")
       return
     }
-    if (!isAndroidQ) {
-      val byteArray = File(asset.path).readBytes()
-      resultHandler.reply(byteArray)
-    } else {
-      val byteArray = dbUtils.getOriginBytes(context, asset, haveLocationPermission)
-      resultHandler.reply(byteArray)
-      if (cacheOriginBytes) {
-        dbUtils.cacheOriginFile(context, asset, byteArray)
+    try {
+      if (!isAndroidQ) {
+        val byteArray = File(asset.path).readBytes()
+        resultHandler.reply(byteArray)
+      } else {
+        val byteArray = dbUtils.getOriginBytes(context, asset, haveLocationPermission)
+        resultHandler.reply(byteArray)
+        if (cacheOriginBytes) {
+          dbUtils.cacheOriginFile(context, asset, byteArray)
+        }
       }
+    } catch (e: Exception) {
+      dbUtils.logRowWithId(context, id)
+      resultHandler.replyError("202", "get origin Bytes error", e)
     }
   }
 
@@ -166,13 +167,13 @@ class PhotoManager(private val context: Context) {
     val latLong = exifInfo?.latLong
     return if (latLong == null) {
       mapOf(
-              "lat" to 0.0,
-              "lng" to 0.0
+          "lat" to 0.0,
+          "lng" to 0.0
       )
     } else {
       mapOf(
-              "lat" to latLong[0],
-              "lng" to latLong[1]
+          "lat" to latLong[0],
+          "lng" to latLong[1]
       )
     }
   }
