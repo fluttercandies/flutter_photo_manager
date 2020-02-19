@@ -2,8 +2,17 @@ package top.kikt.imagescanner.core.entity
 
 import android.annotation.SuppressLint
 import android.provider.MediaStore
+import top.kikt.imagescanner.AssetType
+import top.kikt.imagescanner.core.utils.ConvertUtils
 
-class FilterOptions {
+class FilterOption(map: Map<*, *>) {
+
+  val videoOption = ConvertUtils.getOptionFromType(map, AssetType.Video)
+  val imageOption = ConvertUtils.getOptionFromType(map, AssetType.Image)
+
+}
+
+class FilterCond {
   var isShowTitle = false
   lateinit var sizeConstraint: SizeConstraint
   lateinit var durationConstraint: DurationConstraint

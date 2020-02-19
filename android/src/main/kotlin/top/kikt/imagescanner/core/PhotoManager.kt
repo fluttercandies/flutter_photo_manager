@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import top.kikt.imagescanner.core.entity.AssetEntity
-import top.kikt.imagescanner.core.entity.FilterOptions
+import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
 import top.kikt.imagescanner.core.utils.AndroidQDBUtils
 import top.kikt.imagescanner.core.utils.DBUtils
@@ -33,7 +33,7 @@ class PhotoManager(private val context: Context) {
       AndroidQDBUtils
     }
 
-  fun getGalleryList(type: Int, timeStamp: Long, hasAll: Boolean, option: FilterOptions): List<GalleryEntity> {
+  fun getGalleryList(type: Int, timeStamp: Long, hasAll: Boolean, option: FilterOption): List<GalleryEntity> {
     val fromDb = dbUtils.getGalleryList(context, type, timeStamp, option)
 
     if (!hasAll) {
@@ -52,13 +52,13 @@ class PhotoManager(private val context: Context) {
     return listOf(entity) + fromDb
   }
 
-  fun getAssetList(galleryId: String, page: Int, pageCount: Int, typeInt: Int = 0, timestamp: Long, option: FilterOptions): List<AssetEntity> {
+  fun getAssetList(galleryId: String, page: Int, pageCount: Int, typeInt: Int = 0, timestamp: Long, option: FilterOption): List<AssetEntity> {
     val gId = if (galleryId == ALL_ID) "" else galleryId
     return dbUtils.getAssetFromGalleryId(context, gId, page, pageCount, typeInt, timestamp, option)
   }
 
 
-  fun getAssetListWithRange(galleryId: String, type: Int, start: Int, end: Int, timestamp: Long, option: FilterOptions): List<AssetEntity> {
+  fun getAssetListWithRange(galleryId: String, type: Int, start: Int, end: Int, timestamp: Long, option: FilterOption): List<AssetEntity> {
     val gId = if (galleryId == ALL_ID) "" else galleryId
     return dbUtils.getAssetFromGalleryIdRange(context, gId, start, end, type, timestamp, option)
   }
@@ -118,7 +118,7 @@ class PhotoManager(private val context: Context) {
     dbUtils.clearCache()
   }
 
-  fun getPathEntity(id: String, type: Int, timestamp: Long, option: FilterOptions): GalleryEntity? {
+  fun getPathEntity(id: String, type: Int, timestamp: Long, option: FilterOption): GalleryEntity? {
     if (id == ALL_ID) {
       val allGalleryList = dbUtils.getGalleryList(context, type, timestamp, option)
       return if (allGalleryList.isEmpty()) {

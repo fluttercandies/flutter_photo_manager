@@ -25,8 +25,9 @@ class PhotoManager {
     bool hasAll = true,
     RequestType type = RequestType.all,
     DateTime fetchDateTime,
-    FilterOption fliterOption = const FilterOption(),
+    FilterOptions fliterOption,
   }) async {
+    fliterOption ??= FilterOptions();
     return _plugin.getAllGalleryList(
       type: type.index,
       dt: fetchDateTime,
@@ -177,7 +178,11 @@ class PhotoManager {
     DateTime time,
   ) async {
     var result = await _plugin.fetchPathProperties(
-        entity.id, entity.typeInt, time, entity.filterOption);
+      entity.id,
+      entity.typeInt,
+      time,
+      entity.filterOption,
+    );
     if (result == null) {
       return null;
     }

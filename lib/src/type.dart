@@ -1,5 +1,3 @@
-part of '../photo_manager.dart';
-
 /// asset type
 ///
 /// 用于资源类型属性

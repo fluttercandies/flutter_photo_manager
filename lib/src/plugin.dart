@@ -29,7 +29,7 @@ class Plugin {
     int type = 0,
     DateTime dt,
     bool hasAll = true,
-    FilterOption fliterOption,
+    FilterOptions fliterOption,
   }) async {
     dt ??= _createDefaultFetchDatetime();
 
@@ -60,7 +60,7 @@ class Plugin {
     int pageCount = 15,
     int type = 0,
     DateTime pagedDt,
-    FilterOption filterOption,
+    FilterOptions filterOption,
   }) async {
     pagedDt ??= _createDefaultFetchDatetime();
 
@@ -82,7 +82,7 @@ class Plugin {
     int start,
     int end,
     DateTime fetchDt,
-    FilterOption filterOption,
+    FilterOptions filterOption,
   }) async {
     final Map map = await _channel.invokeMethod("getAssetListWithRange", {
       "galleryId": id,
@@ -134,7 +134,7 @@ class Plugin {
   }
 
   Future<Map> fetchPathProperties(
-      String id, int type, DateTime datetime, FilterOption filterOption) async {
+      String id, int type, DateTime datetime, FilterOptions filterOption) async {
     datetime ??= _createDefaultFetchDatetime();
     return _channel.invokeMethod(
       "fetchPathProperties",

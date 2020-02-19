@@ -12,7 +12,7 @@ import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
 import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
-import top.kikt.imagescanner.core.entity.FilterOptions
+import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeBucketKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeImageKeys
@@ -49,7 +49,7 @@ object DBUtils : IDBUtils {
   }
 
   @SuppressLint("Recycle")
-  override fun getGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOptions): List<GalleryEntity> {
+  override fun getGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity> {
     val list = ArrayList<GalleryEntity>()
     val uri = allUri
     val projection = storeBucketKeys + arrayOf("count(1)")
@@ -76,7 +76,7 @@ object DBUtils : IDBUtils {
     return list
   }
 
-  override fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long, option: FilterOptions): GalleryEntity? {
+  override fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long, option: FilterOption): GalleryEntity? {
     val uri = allUri
     val projection = storeBucketKeys + arrayOf("count(1)")
 
@@ -123,7 +123,7 @@ object DBUtils : IDBUtils {
           pageSize: Int,
           requestType: Int,
           timeStamp: Long,
-          option: FilterOptions,
+          option: FilterOption,
           cacheContainer: CacheContainer?
   ): List<AssetEntity> {
     val cache = cacheContainer ?: this.cacheContainer
@@ -187,7 +187,7 @@ object DBUtils : IDBUtils {
     return list
   }
 
-  override fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOptions): List<AssetEntity> {
+  override fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOption): List<AssetEntity> {
     val cache = cacheContainer
 
     val isAll = gId.isEmpty()

@@ -5,7 +5,7 @@ class ConvertUtils {
     Map data, {
     int type = 0,
     DateTime dt,
-    FilterOption fliterOption,
+    FilterOptions fliterOption,
   }) {
     List<AssetPathEntity> result = [];
 

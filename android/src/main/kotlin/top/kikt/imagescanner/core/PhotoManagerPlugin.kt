@@ -6,8 +6,9 @@ import android.os.Handler
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
+import top.kikt.imagescanner.AssetType
 import top.kikt.imagescanner.core.entity.AssetEntity
-import top.kikt.imagescanner.core.entity.FilterOptions
+import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.utils.ConvertUtils
 import top.kikt.imagescanner.util.ResultHandler
 import top.kikt.imagescanner.old.permission.PermissionsListener
@@ -310,7 +311,7 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
     return this.argument<Int>(key)!!
   }
 
-  fun MethodCall.getOption(): FilterOptions {
+  fun MethodCall.getOption(): FilterOption {
     val arguments = argument<Map<*, *>>("option")!!
     return ConvertUtils.convertFilterOptionsFromMap(arguments)
   }
