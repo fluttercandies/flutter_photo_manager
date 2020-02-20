@@ -1,4 +1,42 @@
+import '../type.dart';
+
 /// Filter option for get asset.
+/// 
+/// 筛选选项, 可以分别设置图片类型和视频类型对应的[FilterOption]
+/// 
+/// See [FilterOption]
+class FilterOptionGroup {
+
+  /// A empty option
+  FilterOptionGroup.empty();
+
+  FilterOptionGroup() {
+    setOption(AssetType.image, FilterOption());
+    setOption(AssetType.video, FilterOption());
+  }
+
+  final Map<AssetType, FilterOption> _map = {};
+
+  void setOption(AssetType type, FilterOption option) {
+    _map[type] = option;
+  }
+
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> result = {};
+    if (_map.containsKey(AssetType.image)) {
+      result["image"] = _map[AssetType.image].toMap();
+    }
+    if (_map.containsKey(AssetType.video)) {
+      result["video"] = _map[AssetType.video].toMap();
+    }
+
+    return result;
+  }
+}
+
+/// Filter option
+/// 
+/// 筛选选项的详细情况
 class FilterOption {
   /// This property affects performance on iOS. If not needed, please pass false, default is false.
   final bool needTitle;
@@ -6,7 +44,7 @@ class FilterOption {
   /// See [SizeConstraint]
   final SizeConstraint sizeConstraint;
 
-  /// See [DurationConstraint]
+  /// See [DurationConstraint], ignore in [AssetType.image].
   final DurationConstraint durationConstraint;
 
   /// See [needTitle], [sizeConstraint] and [durationConstraint]

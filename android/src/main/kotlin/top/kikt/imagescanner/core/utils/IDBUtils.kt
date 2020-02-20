@@ -10,7 +10,7 @@ import android.provider.MediaStore.VOLUME_EXTERNAL
 import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
-import top.kikt.imagescanner.core.entity.FilterOptions
+import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
 import top.kikt.imagescanner.util.LogUtils
 import java.io.InputStream
@@ -25,42 +25,42 @@ interface IDBUtils {
     val isAndroidQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
     val storeImageKeys = arrayOf(
-        MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
-        MediaStore.MediaColumns.DATA, // 数据
-        MediaStore.MediaColumns._ID, // id
-        MediaStore.MediaColumns.TITLE, // id
-        MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
-        MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
-        MediaStore.MediaColumns.WIDTH, // 宽
-        MediaStore.MediaColumns.HEIGHT, // 高
-        MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
-        MediaStore.MediaColumns.MIME_TYPE, // 高
-        MediaStore.MediaColumns.DATE_TAKEN //日期
+            MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
+            MediaStore.MediaColumns.DATA, // 数据
+            MediaStore.MediaColumns._ID, // id
+            MediaStore.MediaColumns.TITLE, // id
+            MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
+            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
+            MediaStore.MediaColumns.WIDTH, // 宽
+            MediaStore.MediaColumns.HEIGHT, // 高
+            MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
+            MediaStore.MediaColumns.MIME_TYPE, // 高
+            MediaStore.MediaColumns.DATE_TAKEN //日期
     )
 
     val storeVideoKeys = arrayOf(
-        MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
-        MediaStore.MediaColumns.DATA, // 数据
-        MediaStore.MediaColumns._ID, // id
-        MediaStore.MediaColumns.TITLE, // id
-        MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
-        MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
-        MediaStore.MediaColumns.DATE_TAKEN, //日期
-        MediaStore.MediaColumns.WIDTH, // 宽
-        MediaStore.MediaColumns.HEIGHT, // 高
-        MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
-        MediaStore.MediaColumns.MIME_TYPE, // 高
-        MediaStore.MediaColumns.DURATION //时长
+            MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
+            MediaStore.MediaColumns.DATA, // 数据
+            MediaStore.MediaColumns._ID, // id
+            MediaStore.MediaColumns.TITLE, // id
+            MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
+            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
+            MediaStore.MediaColumns.DATE_TAKEN, //日期
+            MediaStore.MediaColumns.WIDTH, // 宽
+            MediaStore.MediaColumns.HEIGHT, // 高
+            MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
+            MediaStore.MediaColumns.MIME_TYPE, // 高
+            MediaStore.MediaColumns.DURATION //时长
     )
 
     val typeKeys = arrayOf(
-        MediaStore.Files.FileColumns.MEDIA_TYPE,
-        MediaStore.Images.Media.DISPLAY_NAME
+            MediaStore.Files.FileColumns.MEDIA_TYPE,
+            MediaStore.Images.Media.DISPLAY_NAME
     )
 
     val storeBucketKeys = arrayOf(
-        MediaStore.Images.Media.BUCKET_ID,
-        MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
+            MediaStore.Images.Media.BUCKET_ID,
+            MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
     )
 
   }
@@ -83,13 +83,13 @@ interface IDBUtils {
       "AND $size"
     } else {
       "AND (${MediaStore.Files.FileColumns.MEDIA_TYPE} = ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO} or (" +
-          "${MediaStore.Files.FileColumns.MEDIA_TYPE} = ${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE} AND $size))"
+              "${MediaStore.Files.FileColumns.MEDIA_TYPE} = ${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE} AND $size))"
     }
   }
 
-  fun getGalleryList(context: Context, requestType: Int = 0, timeStamp: Long, option: FilterOptions): List<GalleryEntity>
+  fun getGalleryList(context: Context, requestType: Int = 0, timeStamp: Long, option: FilterOption): List<GalleryEntity>
 
-  fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int = 0, timeStamp: Long, option: FilterOptions, cacheContainer: CacheContainer? = null): List<AssetEntity>
+  fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int = 0, timeStamp: Long, option: FilterOption, cacheContainer: CacheContainer? = null): List<AssetEntity>
 
   fun getAssetEntity(context: Context, id: String): AssetEntity?
 
@@ -117,7 +117,7 @@ interface IDBUtils {
     return getDouble(getColumnIndex(columnName))
   }
 
-  fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long, option: FilterOptions): GalleryEntity?
+  fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long, option: FilterOption): GalleryEntity?
 
   fun clearCache()
 
@@ -125,7 +125,7 @@ interface IDBUtils {
 
   fun getThumb(context: Context, id: String, width: Int, height: Int, type: Int?): Bitmap?
 
-  fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOptions): List<AssetEntity>
+  fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOption): List<AssetEntity>
 
   fun deleteWithIds(context: Context, ids: List<String>): List<String> {
     val where = "${MediaStore.MediaColumns._ID} in (?)"
@@ -162,40 +162,50 @@ interface IDBUtils {
 
   fun cacheOriginFile(context: Context, asset: AssetEntity, byteArray: ByteArray)
 
-  fun getCondFromType(type: Int, filterOptions: FilterOptions, args: ArrayList<String>): String {
-    var condString = ""
-
-    val sizeCond = filterOptions.sizeCond()
-    val sizeArgs = filterOptions.sizeArgs()
-    val durationCond = filterOptions.durationCond()
-    val durationArgs = filterOptions.durationArgs()
-
+  fun getCondFromType(type: Int, filterOption: FilterOption, args: ArrayList<String>): String {
+    var condString: String
     val typeKey = MediaStore.Files.FileColumns.MEDIA_TYPE
 
     when (type) {
       1 -> {
-        condString = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
+        val imageCond = filterOption.imageOption
+
+        val sizeCond = imageCond.sizeCond()
+        val sizeArgs = imageCond.sizeArgs()
+        condString = "AND $typeKey = ?"
         args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString())
 
         condString += "AND $sizeCond"
         args.addAll(sizeArgs)
       }
       2 -> {
-        condString = "AND ${MediaStore.Files.FileColumns.MEDIA_TYPE} = ?"
-        args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString())
+        val videoCond = filterOption.videoOption
 
-        condString += "AND $sizeCond"
-        args.addAll(sizeArgs)
+        val durationCond = videoCond.durationCond()
+        val durationArgs = videoCond.durationArgs()
+
+        condString = "AND $typeKey = ?"
+        args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString())
 
         condString += "AND $durationCond"
         args.addAll(durationArgs)
       }
       else -> {
-        condString = "AND ($typeKey = ? OR ($typeKey = ? AND $durationCond)) AND $sizeCond"
+        val imageCond = filterOption.imageOption
+        val sizeCond = imageCond.sizeCond()
+        val sizeArgs = imageCond.sizeArgs()
+        val imageCondString = "$typeKey = ? AND $sizeCond"
         args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString())
+        args.addAll(sizeArgs)
+
+        val videoCond = filterOption.videoOption
+        val durationCond = videoCond.durationCond()
+        val durationArgs = videoCond.durationArgs()
+        val videoCondString = "$typeKey = ? AND $durationCond"
         args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString())
         args.addAll(durationArgs)
-        args.addAll(sizeArgs)
+
+        condString = "AND (($imageCondString) OR ($videoCondString))"
       }
     }
 

@@ -5,14 +5,14 @@ class ConvertUtils {
     Map data, {
     int type = 0,
     DateTime dt,
-    FilterOption fliterOption,
+    FilterOptionGroup optionGroup,
   }) {
     List<AssetPathEntity> result = [];
 
     List list = data["data"];
 
     for (final Map item in list) {
-      final entity = AssetPathEntity(filterOption: fliterOption)
+      final entity = AssetPathEntity(filterOption: optionGroup)
         ..id = item["id"]
         ..name = item["name"]
         ..typeInt = type

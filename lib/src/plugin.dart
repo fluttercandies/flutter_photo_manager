@@ -29,7 +29,7 @@ class Plugin {
     int type = 0,
     DateTime dt,
     bool hasAll = true,
-    FilterOption fliterOption,
+    FilterOptionGroup optionGroup,
   }) async {
     dt ??= _createDefaultFetchDatetime();
 
@@ -37,7 +37,7 @@ class Plugin {
       "type": type,
       "timestamp": dt.millisecondsSinceEpoch,
       "hasAll": hasAll,
-      "option": fliterOption.toMap(),
+      "option": optionGroup.toMap(),
     });
     if (result == null) {
       return [];
@@ -46,7 +46,7 @@ class Plugin {
       result,
       type: type,
       dt: dt,
-      fliterOption: fliterOption,
+      optionGroup: optionGroup,
     );
   }
 
@@ -60,7 +60,7 @@ class Plugin {
     int pageCount = 15,
     int type = 0,
     DateTime pagedDt,
-    FilterOption filterOption,
+    FilterOptionGroup optionGroup,
   }) async {
     pagedDt ??= _createDefaultFetchDatetime();
 
@@ -70,7 +70,7 @@ class Plugin {
       "pageCount": pageCount,
       "type": type,
       "timestamp": pagedDt.millisecondsSinceEpoch,
-      "option": filterOption.toMap(),
+      "option": optionGroup.toMap(),
     });
 
     return ConvertUtils.convertToAssetList(result);
@@ -82,7 +82,7 @@ class Plugin {
     int start,
     int end,
     DateTime fetchDt,
-    FilterOption filterOption,
+    FilterOptionGroup optionGroup,
   }) async {
     final Map map = await _channel.invokeMethod("getAssetListWithRange", {
       "galleryId": id,
@@ -90,7 +90,7 @@ class Plugin {
       "start": start,
       "end": end,
       "timestamp": fetchDt.millisecondsSinceEpoch,
-      "option": filterOption.toMap(),
+      "option": optionGroup.toMap(),
     });
 
     return ConvertUtils.convertToAssetList(map);
@@ -134,7 +134,7 @@ class Plugin {
   }
 
   Future<Map> fetchPathProperties(
-      String id, int type, DateTime datetime, FilterOption filterOption) async {
+      String id, int type, DateTime datetime, FilterOptionGroup optionGroup) async {
     datetime ??= _createDefaultFetchDatetime();
     return _channel.invokeMethod(
       "fetchPathProperties",
@@ -142,7 +142,7 @@ class Plugin {
         "id": id,
         "timestamp": datetime.millisecondsSinceEpoch,
         "type": type,
-        "option": filterOption.toMap(),
+        "option": optionGroup.toMap(),
       },
     );
   }

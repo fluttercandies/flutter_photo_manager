@@ -10,12 +10,13 @@ import 'package:photo_manager/src/utils/convert_utils.dart';
 import 'src/filter/filter_options.dart';
 
 import 'src/plugin.dart';
+import 'src/type.dart';
 
 export 'src/plugin.dart';
 export 'src/filter/filter_options.dart';
+export 'src/type.dart';
 
 part './src/manager.dart';
-part './src/type.dart';
 part './src/entity.dart';
 part './src/factory.dart';
 part './src/notify.dart';

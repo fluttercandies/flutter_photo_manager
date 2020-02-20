@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_scanner_example/model/photo_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_duration_picker/flutter_duration_picker.dart';
 
 class FilterOptionPage extends StatefulWidget {
   @override
@@ -93,13 +92,21 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
           title: Text(
               "${value.inHours.toString().padLeft(2, '0')}h : ${(value.inMinutes % 60).toString().padLeft(2, '0')}m"),
           onTap: () async {
-            final duration = await showDurationPicker(
-              context: context,
-              initialTime: value,
-              snapToMins: 0.5,
-            );
-            if (duration != null) {
-              onChanged(duration);
+            // final duration = await showDurationPicker(
+            //   context: context,
+            //   initialTime: value,
+            //   snapToMins: 0.5,
+            // );
+            final timeOfDay =
+                TimeOfDay(hour: value.inHours, minute: value.inMinutes);
+            final result =
+                await showTimePicker(context: context, initialTime: timeOfDay);
+            if (result != null) {
+              final duration =
+                  Duration(hours: result.hour, minutes: result.minute);
+              if (duration != null) {
+                onChanged(duration);
+              }
             }
           },
         );

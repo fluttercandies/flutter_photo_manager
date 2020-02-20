@@ -37,7 +37,7 @@
 - (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type
                                             date:(NSDate *)date
                                           hasAll:(BOOL)hasAll
-                                          option:(PMFilterOption *)option {
+                                          option:(PMFilterOptionGroup *)option {
   NSMutableArray<PMAssetPathEntity *> *array = [NSMutableArray new];
 
   PHFetchOptions *assetOptions = [self getAssetOptions:type
@@ -118,7 +118,7 @@ getAssetEntityListWithGalleryId:(NSString *)id
                            page:(NSUInteger)page
                       pageCount:(NSUInteger)pageCount
                            date:(NSDate *)date
-                   filterOption:(PMFilterOption *)filterOption {
+                   filterOption:(PMFilterOptionGroup *)filterOption {
   NSMutableArray<PMAssetEntity *> *result = [NSMutableArray new];
 
   PHFetchOptions *options = [PHFetchOptions new];
@@ -151,11 +151,18 @@ getAssetEntityListWithGalleryId:(NSString *)id
     endIndex = count - 1;
   }
 
+  BOOL imageNeedTitle = filterOption.imageOption.needTitle;
+  BOOL videoNeedTitle = filterOption.videoOption.needTitle;
+
   for (NSUInteger i = startIndex; i <= endIndex; i++) {
     PHAsset *asset = assetArray[i];
-    PMAssetEntity *entity =
-            [self convertPHAssetToAssetEntity:asset
-                                    needTitle:filterOption.needTitle];
+    BOOL needTitle = NO;
+    if ([asset isVideo]) {
+      needTitle = videoNeedTitle;
+    } else if ([asset isImage]) {
+      needTitle = imageNeedTitle;
+    }
+    PMAssetEntity *entity = [self convertPHAssetToAssetEntity:asset needTitle:needTitle];
     [result addObject:entity];
     [cacheContainer putAssetEntity:entity];
   }
@@ -168,7 +175,7 @@ getAssetEntityListWithGalleryId:(NSString *)id
                                                     start:(NSUInteger)start
                                                       end:(NSUInteger)end
                                                      date:(NSDate *)date
-                                             filterOption:(PMFilterOption *)
+                                             filterOption:(PMFilterOptionGroup *)
                                                      filterOption {
   NSMutableArray<PMAssetEntity *> *result = [NSMutableArray new];
 
@@ -202,10 +209,19 @@ getAssetEntityListWithGalleryId:(NSString *)id
   }
 
   for (NSUInteger i = startIndex; i <= endIndex; i++) {
+    BOOL needTitle;
+
     PHAsset *asset = assetArray[i];
-    PMAssetEntity *entity =
-            [self convertPHAssetToAssetEntity:asset
-                                    needTitle:filterOption.needTitle];
+
+    if ([asset isVideo]) {
+      needTitle = filterOption.videoOption.needTitle;
+    } else if ([asset isImage]) {
+      needTitle = filterOption.imageOption.needTitle;
+    } else {
+      needTitle = NO;
+    }
+
+    PMAssetEntity *entity = [self convertPHAssetToAssetEntity:asset needTitle:needTitle];
     [result addObject:entity];
     [cacheContainer putAssetEntity:entity];
   }
@@ -571,7 +587,7 @@ getAssetEntityListWithGalleryId:(NSString *)id
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id
                                       type:(int)type
                                       date:(NSDate *)date
-                              filterOption:(PMFilterOption *)filterOption {
+                              filterOption:(PMFilterOptionGroup *)filterOption {
   PHFetchOptions *collectionFetchOptions = [PHFetchOptions new];
   PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection
           fetchAssetCollectionsWithLocalIdentifiers:@[id]
@@ -594,55 +610,66 @@ getAssetEntityListWithGalleryId:(NSString *)id
 
 - (PHFetchOptions *)getAssetOptions:(int)type
                                date:(NSDate *)date
-                       filterOption:(PMFilterOption *)filterOption {
+                       filterOption:(PMFilterOptionGroup *)optionGroup {
   PHFetchOptions *options = [PHFetchOptions new];
-  options.sortDescriptors =
-          @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate"
-                                          ascending:NO]];
+  options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
 
   NSMutableString *cond = [NSMutableString new];
   NSMutableArray *args = [NSMutableArray new];
 
-  NSString *sizeCond = [filterOption sizeCond];
-  NSArray *sizeArgs = [filterOption sizeArgs];
-
-  NSString *durationCond = [filterOption durationCond];
-  NSArray *durationArgs = [filterOption durationArgs];
-
-  BOOL appendDuration = NO;
-
   if (type == 1) {
+    PMFilterOption *imageOption = optionGroup.imageOption;
+
+    NSString *sizeCond = [imageOption sizeCond];
+    NSArray *sizeArgs = [imageOption sizeArgs];
+
     [cond appendString:@"mediaType == %d AND creationDate <= %@"];
     [args addObject:@(PHAssetMediaTypeImage)];
     [args addObject:date];
 
+    [cond appendString:@" AND "];
+    [cond appendString:sizeCond];
+    [args addObjectsFromArray:sizeArgs];
+
   } else if (type == 2) {
+    PMFilterOption *videoOption = optionGroup.videoOption;
+
     [cond appendString:@"mediaType == %d AND creationDate <= %@"];
     [args addObject:@(PHAssetMediaTypeVideo)];
     [args addObject:date];
 
+    NSString *durationCond = [videoOption durationCond];
+    NSArray *durationArgs = [videoOption durationArgs];
     [cond appendString:@" AND "];
     [cond appendString:durationCond];
     [args addObjectsFromArray:durationArgs];
   } else {
-    [cond appendString:@"(mediaType == %d OR ("];
+    [cond appendString:@"("]; //1
+
+    PMFilterOption *imageOption = optionGroup.imageOption;
+    NSString *sizeCond = [imageOption sizeCond];
+    NSArray *sizeArgs = [imageOption sizeArgs];
+
+    [cond appendString:@"(mediaType = %d AND "]; //2
+    [cond appendString:sizeCond];
+    [cond appendString:@" )"]; //2
     [args addObject:@(PHAssetMediaTypeImage)];
+    [args addObjectsFromArray:sizeArgs];
 
-    [cond appendString:@"mediaType == %d"];
-    [args addObject:@(PHAssetMediaTypeVideo)];
+    PMFilterOption *videoOption = optionGroup.videoOption;
+    NSString *durationCond = [videoOption durationCond];
+    NSArray *durationArgs = [videoOption durationArgs];
 
-    [cond appendString:@" AND "];
-
+    [cond appendString:@"OR (mediaType == %d AND "]; //3
     [cond appendString:durationCond];
+    [cond appendString:@" )"]; //3
+    [args addObject:@(PHAssetMediaTypeVideo)];
     [args addObjectsFromArray:durationArgs];
 
-    [cond appendString:@")) AND creationDate <= %@"];
+    [cond appendString:@" )"]; //1
+    [cond appendString:@" AND creationDate <= %@"];
     [args addObject:date];
   }
-
-  [cond appendString:@" AND "];
-  [cond appendString:sizeCond];
-  [args addObjectsFromArray:sizeArgs];
 
   options.predicate = [NSPredicate predicateWithFormat:cond argumentArray:args];
 
@@ -739,12 +766,12 @@ getAssetEntityListWithGalleryId:(NSString *)id
        }];
 }
 
--(NSString *)getTitleAsyncWithAssetId:(NSString *)assetId{
-    PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
-    if(asset){
-        return [asset title];
-    }
-    return @"";
+- (NSString *)getTitleAsyncWithAssetId:(NSString *)assetId {
+  PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
+  if (asset) {
+    return [asset title];
+  }
+  return @"";
 }
 
 @end

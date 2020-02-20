@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_scanner_example/page/home_page.dart';
 
-import 'develop_index_page.dart';
+import 'developer/develop_index_page.dart';
 import 'save_image_example.dart';
 
 class IndexPage extends StatefulWidget {

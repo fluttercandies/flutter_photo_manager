@@ -3,8 +3,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_scanner_example/page/dev_title_page.dart';
 import 'package:photo_manager/photo_manager.dart';
+
+import 'dev_title_page.dart';
 
 class DeveloperIndexPage extends StatefulWidget {
   @override

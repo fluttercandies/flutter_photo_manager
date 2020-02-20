@@ -25,13 +25,14 @@ class PhotoManager {
     bool hasAll = true,
     RequestType type = RequestType.all,
     DateTime fetchDateTime,
-    FilterOption fliterOption = const FilterOption(),
+    FilterOptionGroup fliterOption,
   }) async {
+    fliterOption ??= FilterOptionGroup();
     return _plugin.getAllGalleryList(
       type: type.index,
       dt: fetchDateTime,
       hasAll: hasAll,
-      fliterOption: fliterOption,
+      optionGroup: fliterOption,
     );
   }
 
@@ -68,7 +69,7 @@ class PhotoManager {
       pageCount: pageCount,
       type: entity.typeInt,
       pagedDt: entity.fetchDatetime,
-      filterOption: entity.filterOption,
+      optionGroup: entity.filterOption,
     );
   }
 
@@ -86,7 +87,7 @@ class PhotoManager {
       start: start,
       end: end,
       fetchDt: entity.fetchDatetime,
-      filterOption: entity.filterOption,
+      optionGroup: entity.filterOption,
     );
   }
 
@@ -177,7 +178,11 @@ class PhotoManager {
     DateTime time,
   ) async {
     var result = await _plugin.fetchPathProperties(
-        entity.id, entity.typeInt, time, entity.filterOption);
+      entity.id,
+      entity.typeInt,
+      time,
+      entity.filterOption,
+    );
     if (result == null) {
       return null;
     }
@@ -187,7 +192,7 @@ class PhotoManager {
         result,
         dt: time,
         type: entity.typeInt,
-        fliterOption: entity.filterOption,
+        optionGroup: entity.filterOption,
       )[0];
     } else {
       return null;
