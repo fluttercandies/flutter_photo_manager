@@ -12,6 +12,7 @@ typedef void (^ChangeIds)(NSArray<NSString *> *);
 @class PMAssetEntity;
 @class ResultHandler;
 @class PMFilterOption;
+@class PMFilterOptionGroup;
 
 typedef void (^AssetResult)(PMAssetEntity *);
 
@@ -26,15 +27,15 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type
                                             date:(NSDate *)date
                                           hasAll:(BOOL)hasAll
-                                          option:(PMFilterOption *)option;
+                                          option:(PMFilterOptionGroup *)option;
 
 - (NSArray<PMAssetEntity *> *)
-    getAssetEntityListWithGalleryId:(NSString *)id
-                               type:(int)type
-                               page:(NSUInteger)page
-                          pageCount:(NSUInteger)pageCount
-                               date:(NSDate *)date
-                       filterOption:(PMFilterOption *)filterOption;
+getAssetEntityListWithGalleryId:(NSString *)id
+                           type:(int)type
+                           page:(NSUInteger)page
+                      pageCount:(NSUInteger)pageCount
+                           date:(NSDate *)date
+                   filterOption:(PMFilterOptionGroup *)filterOption;
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)assetId needTitle:(BOOL)needTitle;
 
@@ -53,7 +54,7 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id
                                       type:(int)type
                                       date:(NSDate *)date
-                              filterOption:(PMFilterOption *)filterOption;
+                              filterOption:(PMFilterOptionGroup *)filterOption;
 
 - (void)deleteWithIds:(NSArray<NSString *> *)ids changedBlock:(ChangeIds)block;
 
@@ -63,7 +64,7 @@ typedef void (^AssetResult)(PMAssetEntity *);
                                                       end:(NSUInteger)end
                                                      date:(NSDate *)date
                                              filterOption:
-                                                 (PMFilterOption *)filterOption;
+                                                 (PMFilterOptionGroup *)filterOption;
 
 - (void)saveImage:(NSData *)data
             title:(NSString *)title

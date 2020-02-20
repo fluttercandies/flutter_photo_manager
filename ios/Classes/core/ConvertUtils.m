@@ -16,35 +16,46 @@
 
   for (PMAssetPathEntity *entity in array) {
     NSDictionary *item = @{
-      @"id" : entity.id,
-      @"name" : entity.name,
-      @"length" : @(entity.assetCount),
-      @"isAll" : @(entity.isAll),
+            @"id": entity.id,
+            @"name": entity.name,
+            @"length": @(entity.assetCount),
+            @"isAll": @(entity.isAll),
     };
 
     [data addObject:item];
   }
 
-  return @{@"data" : data};
+  return @{@"data": data};
 }
 
 + (NSDictionary *)convertAssetToMap:(NSArray<PMAssetEntity *> *)array
-                          needTitle:(BOOL)needTitle {
+                        optionGroup:(PMFilterOptionGroup *)optionGroup {
   NSMutableArray *data = [NSMutableArray new];
 
+  BOOL videoShowTitle = optionGroup.videoOption.needTitle;
+  BOOL imageShowTitle = optionGroup.imageOption.needTitle;
+
   for (PMAssetEntity *asset in array) {
-    NSDictionary *item = [ConvertUtils convertPMAssetToMap:asset
-                                                 needTitle:needTitle];
+
+    NSDictionary *item;
+
+    if ([asset.phAsset isImage]) {
+      item = [ConvertUtils convertPMAssetToMap:asset needTitle:imageShowTitle];
+    } else if ([asset.phAsset isVideo]) {
+      item = [ConvertUtils convertPMAssetToMap:asset needTitle:videoShowTitle];
+    } else {
+      continue;
+    }
     [data addObject:item];
   }
 
-  return @{@"data" : data};
+  return @{@"data": data};
 }
 
 + (NSDictionary *)convertPHAssetToMap:(PHAsset *)asset
                             needTitle:(BOOL)needTitle {
-  long createDt = (int)asset.creationDate.timeIntervalSince1970;
-  long modifiedDt = (int)asset.modificationDate.timeIntervalSince1970;
+  long createDt = (int) asset.creationDate.timeIntervalSince1970;
+  long modifiedDt = (int) asset.modificationDate.timeIntervalSince1970;
 
   int typeInt = 0;
 
@@ -56,33 +67,44 @@
   }
 
   return @{
-    @"id" : asset.localIdentifier,
-    @"createDt" : @(createDt),
-    @"width" : @(asset.pixelWidth),
-    @"height" : @(asset.pixelHeight),
-    @"duration" : @((long)asset.duration),
-    @"type" : @(typeInt),
-    @"modifiedDt" : @(modifiedDt),
-    @"lng" : @(asset.location.coordinate.longitude),
-    @"lat" : @(asset.location.coordinate.latitude),
-    @"title" : needTitle ? [asset title] : @"",
+          @"id": asset.localIdentifier,
+          @"createDt": @(createDt),
+          @"width": @(asset.pixelWidth),
+          @"height": @(asset.pixelHeight),
+          @"duration": @((long) asset.duration),
+          @"type": @(typeInt),
+          @"modifiedDt": @(modifiedDt),
+          @"lng": @(asset.location.coordinate.longitude),
+          @"lat": @(asset.location.coordinate.latitude),
+          @"title": needTitle ? [asset title] : @"",
   };
 }
 
 + (NSDictionary *)convertPMAssetToMap:(PMAssetEntity *)asset
                             needTitle:(BOOL)needTitle {
   return @{
-    @"id" : asset.id,
-    @"createDt" : @(asset.createDt),
-    @"width" : @(asset.width),
-    @"height" : @(asset.height),
-    @"duration" : @(asset.duration),
-    @"type" : @(asset.type),
-    @"modifiedDt" : @(asset.modifiedDt),
-    @"lng" : @(asset.lng),
-    @"lat" : @(asset.lat),
-    @"title" : needTitle ? asset.title : @"",
+          @"id": asset.id,
+          @"createDt": @(asset.createDt),
+          @"width": @(asset.width),
+          @"height": @(asset.height),
+          @"duration": @(asset.duration),
+          @"type": @(asset.type),
+          @"modifiedDt": @(asset.modifiedDt),
+          @"lng": @(asset.lng),
+          @"lat": @(asset.lat),
+          @"title": needTitle ? asset.title : @"",
   };
+}
+
++ (PMFilterOptionGroup *)convertMapToOptionContainer:(NSDictionary *)map {
+  PMFilterOptionGroup *container = [PMFilterOptionGroup alloc];
+  NSDictionary *image = map[@"image"];
+  NSDictionary *video = map[@"video"];
+
+  container.imageOption = [self convertMapToPMFilterOption:image];
+  container.videoOption = [self convertMapToPMFilterOption:video];
+
+  return container;
 }
 
 + (PMFilterOption *)convertMapToPMFilterOption:(NSDictionary *)map {
@@ -101,9 +123,9 @@
 
   PMDurationConstraint durationConstraint;
   durationConstraint.minDuration =
-      [ConvertUtils convertNSNumberToSecond:durationMap[@"min"]];
+          [ConvertUtils convertNSNumberToSecond:durationMap[@"min"]];
   durationConstraint.maxDuration =
-      [ConvertUtils convertNSNumberToSecond:durationMap[@"max"]];
+          [ConvertUtils convertNSNumberToSecond:durationMap[@"max"]];
   option.durationConstraint = durationConstraint;
 
   return option;
@@ -111,7 +133,7 @@
 
 + (double)convertNSNumberToSecond:(NSNumber *)number {
   unsigned int i = number.unsignedIntValue;
-  return (double)i / 1000.0;
+  return (double) i / 1000.0;
 }
 
 @end

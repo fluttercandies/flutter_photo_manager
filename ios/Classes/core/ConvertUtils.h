@@ -7,13 +7,14 @@
 @class PMAssetPathEntity;
 @class PMAssetEntity;
 @class PMFilterOption;
+@class PMFilterOptionGroup;
 
 @interface ConvertUtils : NSObject
 
 + (NSDictionary *)convertPathToMap:(NSArray<PMAssetPathEntity *> *)array;
 
 + (NSDictionary *)convertAssetToMap:(NSArray<PMAssetEntity *> *)array
-                          needTitle:(BOOL)needTitle;
+                        optionGroup:(PMFilterOptionGroup *)optionGroup;
 
 + (NSDictionary *)convertPHAssetToMap:(PHAsset *)asset
                             needTitle:(BOOL)needTitle;
@@ -23,4 +24,5 @@
 
 + (PMFilterOption *)convertMapToPMFilterOption:(NSDictionary *)map;
 
++ (PMFilterOptionGroup *)convertMapToOptionContainer:(NSDictionary *)map;
 @end

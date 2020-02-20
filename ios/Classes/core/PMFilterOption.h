@@ -6,17 +6,17 @@
 
 typedef struct PMSizeConstraint {
 
-  unsigned int minWidth;
-  unsigned int maxWidth;
-  unsigned int minHeight;
-  unsigned int maxHeight;
+    unsigned int minWidth;
+    unsigned int maxWidth;
+    unsigned int minHeight;
+    unsigned int maxHeight;
 
 } PMSizeConstraint;
 
 typedef struct PMDurationConstraint {
 
-  double minDuration;
-  double maxDuration;
+    double minDuration;
+    double maxDuration;
 
 } PMDurationConstraint;
 
@@ -33,5 +33,12 @@ typedef struct PMDurationConstraint {
 - (NSString *)durationCond;
 
 - (NSArray *)durationArgs;
+
+@end
+
+@interface PMFilterOptionGroup : NSObject
+
+@property(nonatomic, strong) PMFilterOption *imageOption;
+@property(nonatomic, strong) PMFilterOption *videoOption;
 
 @end

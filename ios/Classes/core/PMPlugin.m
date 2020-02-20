@@ -72,8 +72,8 @@
     unsigned long timestamp = [self getTimestamp:call];
     BOOL hasAll = [call.arguments[@"hasAll"] boolValue];
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
-    PMFilterOption *option =
-        [ConvertUtils convertMapToPMFilterOption:call.arguments[@"option"]];
+    PMFilterOptionGroup *option =
+        [ConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
     NSArray<PMAssetPathEntity *> *array = [manager getGalleryList:type
                                                              date:date
                                                            hasAll:hasAll
@@ -88,8 +88,8 @@
     NSUInteger pageCount = [call.arguments[@"pageCount"] unsignedIntValue];
     unsigned long timestamp = [self getTimestamp:call];
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
-    PMFilterOption *option =
-        [ConvertUtils convertMapToPMFilterOption:call.arguments[@"option"]];
+    PMFilterOptionGroup *option =
+        [ConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
     NSArray<PMAssetEntity *> *array =
         [manager getAssetEntityListWithGalleryId:id
                                             type:type
@@ -98,7 +98,7 @@
                                             date:date
                                     filterOption:option];
     NSDictionary *dictionary =
-        [ConvertUtils convertAssetToMap:array needTitle:option.needTitle];
+            [ConvertUtils convertAssetToMap:array optionGroup:option];
     [handler reply:dictionary];
 
   } else if ([call.method isEqualToString:@"getAssetListWithRange"]) {
@@ -109,8 +109,8 @@
 
     unsigned long timestamp = [call.arguments[@"timestamp"] unsignedLongValue];
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
-    PMFilterOption *option =
-        [ConvertUtils convertMapToPMFilterOption:call.arguments[@"option"]];
+    PMFilterOptionGroup *option =
+        [ConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
     NSArray<PMAssetEntity *> *array =
         [manager getAssetEntityListWithRange:galleryId
                                         type:type
@@ -119,7 +119,7 @@
                                         date:date
                                 filterOption:option];
     NSDictionary *dictionary =
-        [ConvertUtils convertAssetToMap:array needTitle:option.needTitle];
+            [ConvertUtils convertAssetToMap:array optionGroup:option];
     [handler reply:dictionary];
 
   } else if ([call.method isEqualToString:@"getThumb"]) {
@@ -151,8 +151,8 @@
     int requestType = [call.arguments[@"type"] intValue];
     unsigned long timestamp = [call.arguments[@"timestamp"] unsignedLongValue];
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
-    PMFilterOption *option =
-        [ConvertUtils convertMapToPMFilterOption:call.arguments[@"option"]];
+    PMFilterOptionGroup *option =
+        [ConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
     PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id
                                                             type:requestType
                                                             date:date
