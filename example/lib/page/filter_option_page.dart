@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_scanner_example/model/photo_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_duration_picker/flutter_duration_picker.dart';
 
 class FilterOptionPage extends StatefulWidget {
   @override
