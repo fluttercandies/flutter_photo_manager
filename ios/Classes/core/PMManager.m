@@ -617,9 +617,6 @@ getAssetEntityListWithGalleryId:(NSString *)id
   NSMutableString *cond = [NSMutableString new];
   NSMutableArray *args = [NSMutableArray new];
 
-
-  BOOL appendDuration = NO;
-
   if (type == 1) {
     PMFilterOption *imageOption = optionGroup.imageOption;
 
