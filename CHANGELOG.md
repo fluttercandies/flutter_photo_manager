@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.5.0-dev.1
+
+Update
+
+- **Breaking change**, Split video filter and image filter
+
 ## 0.4.8
 
 Fixes:

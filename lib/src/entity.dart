@@ -22,7 +22,7 @@ class AssetPathEntity {
   /// path asset type.
   RequestType _type;
 
-  final FilterOptions filterOption;
+  final FilterOptionGroup filterOption;
 
   /// The value used internally by the user.
   /// Used to indicate the value that should be available inside the path.

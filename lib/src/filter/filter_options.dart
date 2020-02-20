@@ -2,15 +2,15 @@ import '../type.dart';
 
 /// Filter option for get asset.
 /// 
-/// 筛选选项, 可以分别设置图片类型和视频类型
+/// 筛选选项, 可以分别设置图片类型和视频类型对应的[FilterOption]
 /// 
 /// See [FilterOption]
-class FilterOptions {
+class FilterOptionGroup {
 
   /// A empty option
-  FilterOptions.empty();
+  FilterOptionGroup.empty();
 
-  FilterOptions() {
+  FilterOptionGroup() {
     setOption(AssetType.image, FilterOption());
     setOption(AssetType.video, FilterOption());
   }

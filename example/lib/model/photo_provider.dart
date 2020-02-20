@@ -109,7 +109,7 @@ class PhotoProvider extends ChangeNotifier {
     return pathProviderMap[pathEntity];
   }
 
-  FilterOptions makeOption() {
+  FilterOptionGroup makeOption() {
     SizeConstraint sizeConstraint;
     try {
       final minW = int.tryParse(minWidth);
@@ -138,7 +138,7 @@ class PhotoProvider extends ChangeNotifier {
       needTitle: needTitle,
     );
 
-    return FilterOptions()
+    return FilterOptionGroup()
       ..setOption(AssetType.video, option)
       ..setOption(AssetType.image, option);
   }
