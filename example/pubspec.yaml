@@ -22,7 +22,7 @@ dependencies:
 
   photo_manager:
     path: ../
-  oktoast: ^2.2.0
+  oktoast: ^2.3.1
   provider: ^3.1.0
   video_player: ^0.10.0
   http: ^0.12.0+4
