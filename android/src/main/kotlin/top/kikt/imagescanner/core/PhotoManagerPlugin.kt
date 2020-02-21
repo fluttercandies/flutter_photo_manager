@@ -192,11 +192,13 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
         }
       }
       "getThumb" -> {
-        val id = call.argument<String>("id")!!
-        val width = call.argument<Int>("width")!!
-        val height = call.argument<Int>("height")!!
-        val format = call.argument<Int>("format")!!
-        photoManager.getThumb(id, width, height, format, resultHandler)
+        runOnBackground {
+          val id = call.argument<String>("id")!!
+          val width = call.argument<Int>("width")!!
+          val height = call.argument<Int>("height")!!
+          val format = call.argument<Int>("format")!!
+          photoManager.getThumb(id, width, height, format, resultHandler)
+        }
       }
       "assetExists" -> {
         runOnBackground {
