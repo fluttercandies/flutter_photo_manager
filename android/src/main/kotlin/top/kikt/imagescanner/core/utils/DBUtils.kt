@@ -67,7 +67,7 @@ object DBUtils : IDBUtils {
             ?: return emptyList()
     while (cursor.moveToNext()) {
       val id = cursor.getString(0)
-      val name = cursor.getString(1)
+      val name = cursor.getString(1) ?: ""
       val count = cursor.getInt(2)
       list.add(GalleryEntity(id, name, count, 0))
     }
@@ -101,7 +101,7 @@ object DBUtils : IDBUtils {
             ?: return null
     return if (cursor.moveToNext()) {
       val id = cursor.getString(0)
-      val name = cursor.getString(1)
+      val name = cursor.getString(1)?: ""
       val count = cursor.getInt(2)
       cursor.close()
       GalleryEntity(id, name, count, 0)
