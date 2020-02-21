@@ -61,7 +61,7 @@ object AndroidQDBUtils : IDBUtils {
         countMap[galleryId] = countMap[galleryId]!! + 1
         continue
       }
-      val galleryName = cursor.getString(1)
+      val galleryName = cursor.getString(1) ?: ""
 
       nameMap[galleryId] = galleryName
       countMap[galleryId] = 1
@@ -253,9 +253,9 @@ object AndroidQDBUtils : IDBUtils {
     val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
             ?: return null
 
-    val name: String
+    val name: String?
     if (cursor.moveToNext()) {
-      name = cursor.getString(1)
+      name = cursor.getString(1) ?: ""
     } else {
       cursor.close()
       return null
