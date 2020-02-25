@@ -539,6 +539,10 @@ getAssetEntityListWithGalleryId:(NSString *)id
                   }];
 }
 
+- (BOOL)isImage:(PHAssetResource *)resource {
+  return resource.type == PHAssetResourceTypePhoto || resource.type == PHAssetResourceTypeFullSizePhoto;
+}
+
 - (void)fetchOriginImageFile:(PHAsset *)asset
                resultHandler:(ResultHandler *)handler {
   NSArray<PHAssetResource *> *resources =
@@ -547,11 +551,11 @@ getAssetEntityListWithGalleryId:(NSString *)id
   NSLog(@"The asset has %lu resources.", (unsigned long) resources.count);
   PHAssetResource *imageResource;
 
-  if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypePhoto) {
+  if (resources.lastObject && [self isImage:resources.lastObject]) {
     imageResource = resources.lastObject;
   } else {
-    for (PHAssetResource *resource in resources) {
-      if (resource.type == PHAssetResourceTypePhoto) {
+    for (PHAssetResource *resource in [resources reverseObjectEnumerator]) {
+      if ([self isImage:resource]) {
         imageResource = resource;
         break;
       }
