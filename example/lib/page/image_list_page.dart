@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_scanner_example/develop/upload_to_dev_serve.dart';
 import 'package:image_scanner_example/model/photo_provider.dart';
 import 'package:image_scanner_example/page/detail_page.dart';
 import 'package:image_scanner_example/widget/change_notifier_builder.dart';
@@ -115,7 +116,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               previewOriginBytesWidget,
               RaisedButton(
                 child: Text("Show thumb image in dialog"),
-                onPressed: () => showThumbImageDialog(entity, 500, 500),
+                onPressed: () => showThumbImageDialog(entity, entity.width, entity.height),
               ),
               RaisedButton(
                 child: Text("Show detail page"),
@@ -124,6 +125,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               RaisedButton(
                 child: Text("Delete item"),
                 onPressed: () => _deleteCurrent(entity),
+              ),
+              RaisedButton(
+                child: Text("Upload to my test server."),
+                onPressed: () => UploadToDevServer().upload(entity),
               ),
             ],
           ),
