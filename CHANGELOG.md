@@ -5,6 +5,14 @@
 Update
 
 - **Breaking change**, Split video filter and image filter
+- iOS code is running background thread.
+- getThumb is running in background thread.
+
+Fix
+
+- exists error on android.
+- use edited origin file on iOS.
+- galleryName maybe is null in android.
 
 ## 0.4.8
 
