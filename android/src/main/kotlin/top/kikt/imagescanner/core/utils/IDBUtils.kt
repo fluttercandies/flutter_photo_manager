@@ -148,7 +148,7 @@ interface IDBUtils {
 
   fun exists(context: Context, id: String): Boolean {
     val columns = arrayOf(MediaStore.Files.FileColumns._ID)
-    context.contentResolver.query(DBUtils.allUri, columns, "MediaStore.Files.FileColumns._ID = ?", arrayOf(id), null).use {
+    context.contentResolver.query(DBUtils.allUri, columns, "${MediaStore.Files.FileColumns._ID} = ?", arrayOf(id), null).use {
       if (it == null) {
         return false
       }
