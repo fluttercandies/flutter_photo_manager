@@ -27,7 +27,7 @@ class PhotoManager {
     DateTime fetchDateTime,
     FilterOptionGroup filterOption,
   }) async {
-    fliterOption ??= FilterOptionGroup();
+    filterOption ??= FilterOptionGroup();
     return _plugin.getAllGalleryList(
       type: type.index,
       dt: fetchDateTime,
