@@ -25,14 +25,14 @@ class PhotoManager {
     bool hasAll = true,
     RequestType type = RequestType.all,
     DateTime fetchDateTime,
-    FilterOptionGroup fliterOption,
+    FilterOptionGroup filterOption,
   }) async {
-    fliterOption ??= FilterOptionGroup();
+    filterOption ??= FilterOptionGroup();
     return _plugin.getAllGalleryList(
       type: type.index,
       dt: fetchDateTime,
       hasAll: hasAll,
-      optionGroup: fliterOption,
+      optionGroup: filterOption,
     );
   }
 

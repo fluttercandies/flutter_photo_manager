@@ -93,7 +93,7 @@ class PhotoProvider extends ChangeNotifier {
       fetchDateTime: dt,
       type: RequestType.values[type],
       hasAll: hasAll,
-      fliterOption: option,
+      filterOption: option,
     );
 
     galleryList.sort((s1, s2) {
