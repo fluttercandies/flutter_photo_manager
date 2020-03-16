@@ -5,9 +5,6 @@
       location = "group:Runner.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:../../../../../../../../Volumes/Samsung-T5/code/media_projects/ijkplayer/flutter_ijk/ios/IJKMediaPlayer/IJKMediaPlayer.xcodeproj">
-   </FileRef>
-   <FileRef
       location = "group:Pods/Pods.xcodeproj">
    </FileRef>
 </Workspace>

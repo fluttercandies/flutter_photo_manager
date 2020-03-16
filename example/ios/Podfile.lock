@@ -2,8 +2,8 @@ PODS:
   - Flutter (1.0.0)
   - flutter_ijkplayer (0.0.1):
     - Flutter
-    - FlutterIJK (~> 0.1.0)
-  - FlutterIJK (0.1.1)
+    - FlutterIJK (~> 0.2.0)
+  - FlutterIJK (0.2.0)
   - photo_manager (0.0.1):
     - Flutter
   - video_player (0.0.1):
@@ -13,7 +13,7 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - "flutter_ijkplayer (from `/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/flutter_ijkplayer-0.3.5+1/ios/flutter_ijkplayer.podspec`)"
+  - flutter_ijkplayer (from `/Volumes/Samsung-T5/code/flutter/plugins/flutter_ijkplayer/ios/flutter_ijkplayer.podspec`)
   - photo_manager (from `/Users/caijinglong/code/flutter/plugin/flutter_photo_manager/ios/photo_manager.podspec`)
   - video_player (from `/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/video_player-0.10.7/ios/video_player.podspec`)
   - video_player_web (from `/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/video_player_web-0.1.2/ios/video_player_web.podspec`)
@@ -26,7 +26,7 @@ EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
   flutter_ijkplayer:
-    :path: "/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/flutter_ijkplayer-0.3.5+1/ios/flutter_ijkplayer.podspec"
+    :path: "/Volumes/Samsung-T5/code/flutter/plugins/flutter_ijkplayer/ios/flutter_ijkplayer.podspec"
   photo_manager:
     :path: "/Users/caijinglong/code/flutter/plugin/flutter_photo_manager/ios/photo_manager.podspec"
   video_player:
@@ -36,8 +36,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_ijkplayer: ef9006131553deb6d8ae6d7fbd3bcbf93b135930
-  FlutterIJK: f3c0ead9ca31b93d993d46dda53156fdc7b22d2c
+  flutter_ijkplayer: f19c2873e1351868c5f614a73f5b912eb1cda57f
+  FlutterIJK: c1c06b442d8991062845f0674066a1610bcdaf89
   photo_manager: f7c619c2cc8c2adb8d85c63363babac477de9c67
   video_player: 69c5f029fac4ffe4fc8a85ea7f7b793709661549
   video_player_web: da8cadb8274ed4f8dbee8d7171b420dedd437ce7
