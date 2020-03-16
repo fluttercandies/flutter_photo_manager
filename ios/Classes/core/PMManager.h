@@ -80,4 +80,5 @@ getAssetEntityListWithGalleryId:(NSString *)id
 
 - (NSString*)getTitleAsyncWithAssetId: (NSString *) assetId;
 
+- (void)getMediaUrl:(NSString *)assetId resultHandler:(ResultHandler *)handler;
 @end

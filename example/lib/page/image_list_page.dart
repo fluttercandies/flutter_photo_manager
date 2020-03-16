@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_scanner_example/develop/upload_to_dev_serve.dart';
 import 'package:image_scanner_example/model/photo_provider.dart';
 import 'package:image_scanner_example/page/detail_page.dart';
+import 'package:image_scanner_example/page/ijkplayer_page.dart';
 import 'package:image_scanner_example/widget/change_notifier_builder.dart';
 import 'package:image_scanner_example/widget/dialog/list_dialog.dart';
 import 'package:image_scanner_example/widget/image_item_widget.dart';
@@ -116,7 +117,8 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               previewOriginBytesWidget,
               RaisedButton(
                 child: Text("Show thumb image in dialog"),
-                onPressed: () => showThumbImageDialog(entity, entity.width, entity.height),
+                onPressed: () =>
+                    showThumbImageDialog(entity, entity.width, entity.height),
               ),
               RaisedButton(
                 child: Text("Show detail page"),
@@ -129,6 +131,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               RaisedButton(
                 child: Text("Upload to my test server."),
                 onPressed: () => UploadToDevServer().upload(entity),
+              ),
+              RaisedButton(
+                child: Text("Show in ijkplayer."),
+                onPressed: () => showInIjkPlayer(entity),
               ),
             ],
           ),
@@ -239,6 +245,11 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             },
           );
         });
+  }
+
+  showInIjkPlayer(AssetEntity entity) {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (_) => IjkPlayerPage(entity: entity)));
   }
 
   void showThumbImageDialog(AssetEntity entity, int width, int height) async {

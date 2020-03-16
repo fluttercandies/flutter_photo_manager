@@ -153,6 +153,8 @@ double latitude = entity.latitude;
 double longitude = entiry.longitude;
 
 Latlng latlng = await entity.latlngAsync(); // In androidQ or higher, need use the method to get location info.
+
+String mediaUrl = await entity.getMediaUrl(); /// It can be used in some video player plugin to preview, such as [flutter_ijkplayer](https://pub.dev/packages/flutter_ijkplayer)
 ```
 
 #### location info of android Q

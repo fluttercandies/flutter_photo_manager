@@ -108,6 +108,9 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
         needLocationPermissions = true
         false
       }
+      "getMediaUrl" -> {
+        false
+      }
       else -> false
     }
 
@@ -217,6 +220,13 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
         runOnBackground {
           val id = call.argument<String>("id")!!
           photoManager.getOriginBytes(id, cacheOriginBytes, haveLocationPermission, resultHandler)
+        }
+      }
+      "getMediaUrl" ->{
+        runOnBackground {
+          val id = call.argument<String>("id")!!
+          val mediaUri = photoManager.getMediaUri(id)
+          resultHandler.reply(mediaUri)
         }
       }
       "fetchPathProperties" -> {

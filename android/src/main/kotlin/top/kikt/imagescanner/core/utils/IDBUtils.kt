@@ -229,4 +229,5 @@ interface IDBUtils {
     }
   }
 
+  fun getMediaUri(context: Context, id: String): String
 }

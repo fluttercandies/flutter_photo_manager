@@ -410,4 +410,8 @@ object AndroidQDBUtils : IDBUtils {
     return getAssetEntity(context, id.toString())
   }
 
+  override fun getMediaUri(context:Context, id:String):String{
+    val uri = getUri(id, 2, false)
+    return uri.toString()
+  }
 }

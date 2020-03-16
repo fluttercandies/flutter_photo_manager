@@ -133,8 +133,8 @@ class Plugin {
     _channel.invokeMethod("openSetting");
   }
 
-  Future<Map> fetchPathProperties(
-      String id, int type, DateTime datetime, FilterOptionGroup optionGroup) async {
+  Future<Map> fetchPathProperties(String id, int type, DateTime datetime,
+      FilterOptionGroup optionGroup) async {
     datetime ??= _createDefaultFetchDatetime();
     return _channel.invokeMethod(
       "fetchPathProperties",
@@ -242,5 +242,9 @@ class Plugin {
     }
 
     return "";
+  }
+
+  Future<String> getMediaUrl(AssetEntity assetEntity) {
+    return _channel.invokeMethod("getMediaUrl", {"id": assetEntity.id});
   }
 }

@@ -4,30 +4,31 @@
 
 #import "PMCacheContainer.h"
 #import "PMAssetPathEntity.h"
+#import <AVFoundation/AVAsset.h>
 
 @implementation PMCacheContainer {
-    NSMutableDictionary<NSString *, PMAssetEntity *> *map;
+  NSMutableDictionary<NSString *, PMAssetEntity *> *map;
 }
 
 - (instancetype)init {
-    self = [super init];
-    if (self) {
-        map = [NSMutableDictionary new];
-    }
+  self = [super init];
+  if (self) {
+    map = [NSMutableDictionary new];
+  }
 
-    return self;
+  return self;
 }
 
 - (void)putAssetEntity:(PMAssetEntity *)entity {
-    map[entity.id] = entity;
+  map[entity.id] = entity;
 }
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)id {
-    return map[id];
+  return map[id];
 }
 
 - (void)clearCache {
-    [map removeAllObjects];
+  [map removeAllObjects];
 }
 
 @end
