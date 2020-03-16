@@ -5,6 +5,7 @@
 #import <Foundation/Foundation.h>
 
 @class PMAssetEntity;
+@class AVPlayerItem;
 
 @interface PMCacheContainer : NSObject
 
@@ -13,4 +14,5 @@
 - (PMAssetEntity *)getAssetEntity:(NSString *)id;
 
 - (void)clearCache;
+
 @end

@@ -1,27 +1,46 @@
 PODS:
   - Flutter (1.0.0)
+  - flutter_ijkplayer (0.0.1):
+    - Flutter
+    - FlutterIJK (~> 0.2.0)
+  - FlutterIJK (0.2.0)
   - photo_manager (0.0.1):
     - Flutter
   - video_player (0.0.1):
     - Flutter
+  - video_player_web (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - photo_manager (from `/Users/caijinglong/Documents/GitHub/flutter_photo_manager/ios/photo_manager.podspec`)
-  - "video_player (from `/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/video_player-0.10.2+5/ios/video_player.podspec`)"
+  - flutter_ijkplayer (from `/Volumes/Samsung-T5/code/flutter/plugins/flutter_ijkplayer/ios/flutter_ijkplayer.podspec`)
+  - photo_manager (from `/Users/caijinglong/code/flutter/plugin/flutter_photo_manager/ios/photo_manager.podspec`)
+  - video_player (from `/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/video_player-0.10.7/ios/video_player.podspec`)
+  - video_player_web (from `/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/video_player_web-0.1.2/ios/video_player_web.podspec`)
+
+SPEC REPOS:
+  trunk:
+    - FlutterIJK
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  flutter_ijkplayer:
+    :path: "/Volumes/Samsung-T5/code/flutter/plugins/flutter_ijkplayer/ios/flutter_ijkplayer.podspec"
   photo_manager:
-    :path: "/Users/caijinglong/Documents/GitHub/flutter_photo_manager/ios/photo_manager.podspec"
+    :path: "/Users/caijinglong/code/flutter/plugin/flutter_photo_manager/ios/photo_manager.podspec"
   video_player:
-    :path: "/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/video_player-0.10.2+5/ios/video_player.podspec"
+    :path: "/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/video_player-0.10.7/ios/video_player.podspec"
+  video_player_web:
+    :path: "/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/video_player_web-0.1.2/ios/video_player_web.podspec"
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_ijkplayer: f19c2873e1351868c5f614a73f5b912eb1cda57f
+  FlutterIJK: c1c06b442d8991062845f0674066a1610bcdaf89
   photo_manager: f7c619c2cc8c2adb8d85c63363babac477de9c67
   video_player: 69c5f029fac4ffe4fc8a85ea7f7b793709661549
+  video_player_web: da8cadb8274ed4f8dbee8d7171b420dedd437ce7
 
 PODFILE CHECKSUM: 4d8d59437a9bee20e84f185bba22b518812142d3
 

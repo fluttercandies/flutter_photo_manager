@@ -26,6 +26,13 @@ dependencies:
   provider: ^3.1.0
   video_player: ^0.10.0
   http: ^0.12.0+4
+  # flutter_ijkplayer: 0.3.5+1
+  # flutter_ijkplayer:
+  #   path: /Volumes/Samsung-T5/code/flutter/plugins/flutter_ijkplayer
+  flutter_ijkplayer: 
+    git:
+      url: https://github.com/CaiJingLong/flutter_ijkplayer.git
+      ref: b6c5c41796e3cde5cdb769d3bd214c4ea7e1d347
 
 dev_dependencies:
   flutter_test:

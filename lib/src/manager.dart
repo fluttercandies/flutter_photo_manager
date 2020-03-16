@@ -232,4 +232,9 @@ class PhotoManager {
     }
     return null;
   }
+
+  static Future<String> _getMediaUrl(AssetEntity assetEntity) {
+    assert(Platform.isAndroid || Platform.isIOS);
+    return _plugin.getMediaUrl(assetEntity);
+  }
 }

@@ -228,6 +228,8 @@
         NSString *assetId = call.arguments[@"id"];
         NSString *title = [manager getTitleAsyncWithAssetId:assetId];
         [handler reply:title];
+      } else if ([@"getMediaUrl" isEqualToString:call.method]) {
+        [manager getMediaUrl:call.arguments[@"id"] resultHandler:handler];
       } else {
         [handler notImplemented];
       }

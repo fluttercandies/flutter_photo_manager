@@ -366,4 +366,10 @@ object DBUtils : IDBUtils {
     cr.notifyChange(contentUri, null)
     return getAssetEntity(context, id.toString())
   }
+
+  override fun getMediaUri(context: Context, id: String): String {
+    val asset = getAssetEntity(context, id) ?: return ""
+    return "file://${asset.path}"
+  }
+
 }
