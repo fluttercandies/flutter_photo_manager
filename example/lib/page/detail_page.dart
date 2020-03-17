@@ -7,8 +7,8 @@ import 'package:photo_manager/photo_manager.dart';
 class DetailPage extends StatefulWidget {
   final File file;
   final AssetEntity entity;
-
-  const DetailPage({Key key, this.file, this.entity}) : super(key: key);
+final String mediaUrl;
+  const DetailPage({Key key, this.file, this.entity,this.mediaUrl, }) : super(key: key);
 
   @override
   _DetailPageState createState() => _DetailPageState();
@@ -54,6 +54,7 @@ class _DetailPageState extends State<DetailPage> {
   Widget buildVideo() {
     return VideoWidget(
       file: widget.file,
+      mediaUrl: widget.mediaUrl,
     );
   }
 

@@ -158,11 +158,13 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       );
       return;
     }
+    final mediaUrl =await entity.getMediaUrl();
     print(
         "origin file length = ${originFile.lengthSync()}, path = ${originFile.absolute.path}");
     final page = DetailPage(
       file: originFile,
       entity: entity,
+      mediaUrl:mediaUrl,
     );
     Navigator.of(context).push(
       MaterialPageRoute(
