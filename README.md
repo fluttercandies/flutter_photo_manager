@@ -228,7 +228,12 @@ In ios11+, if you want to save or delete asset, you also need add `NSPhotoLibrar
 By default iOS will retrieve system album names only in English whatever the device's language currently set.
 To change this you need to open the ios project of your flutter app using xCode
 
+![in xcode](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterProjectEditinginXcode.png)
+
 Select the project "Runner" and in the localizations table, click on the + icon
+
+![in xcode](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterAddLocalization.png)
+
 Select the adequate language(s) you want to retrieve localized strings.
 Validate the popup screen without any modification
 Close xCode
