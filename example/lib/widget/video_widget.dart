@@ -5,8 +5,9 @@ import 'package:video_player/video_player.dart';
 
 class VideoWidget extends StatefulWidget {
   final File file;
+  final String mediaUrl;
 
-  const VideoWidget({Key key, @required this.file}) : super(key: key);
+  const VideoWidget({Key key, @required this.file,this.mediaUrl,}) : super(key: key);
 
   @override
   _VideoWidgetState createState() => _VideoWidgetState();
@@ -18,7 +19,8 @@ class _VideoWidgetState extends State<VideoWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.file(widget.file)
+    // _controller = VideoPlayerController.file(widget.file)
+    _controller = VideoPlayerController.network(widget.mediaUrl)
       ..initialize().then((_) {
         setState(() {});
       });

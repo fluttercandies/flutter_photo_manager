@@ -32,7 +32,7 @@ dependencies:
   flutter_ijkplayer: 
     git:
       url: https://github.com/CaiJingLong/flutter_ijkplayer.git
-      ref: b6c5c41796e3cde5cdb769d3bd214c4ea7e1d347
+      ref: 16f94d92cdfbf38c4946d07670d070e3414e91fe
 
 dev_dependencies:
   flutter_test:
