@@ -19,6 +19,7 @@ class _IjkPlayerPageState extends State<IjkPlayerPage> {
     super.initState();
     useHardwareDecoding();// some h265 video need hardware-decoding
     widget.entity.getMediaUrl().then((url) async {
+      print(url);
       await controller.setDataSource(DataSource.photoManagerUrl(url));
       await controller.play();
     });
