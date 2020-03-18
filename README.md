@@ -31,7 +31,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
       - [Insert new item](#insert-new-item)
   - [iOS config](#ios-config)
     - [iOS plist config](#ios-plist-config)
-    - [enabling localized system albums names in iOS](#ios-enabling-localized-system-albums-names)
+    - [enabling localized system albums names](#ios-enabling-localized-system-albums-names)
   - [android config](#android-config)
     - [about androidX](#about-androidx)
     - [Android Q privacy](#android-q-privacy)
