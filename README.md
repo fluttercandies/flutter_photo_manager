@@ -223,7 +223,7 @@ xcode like image
 
 In ios11+, if you want to save or delete asset, you also need add `NSPhotoLibraryAddUsageDescription` to plist.
 
-### enabling localized system albums names in iOS
+### enabling localized system albums names
 
 By default iOS will retrieve system album names only in English whatever the device's language currently set.
 To change this you need to open the ios project of your flutter app using xCode
