@@ -9,6 +9,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
 import androidx.exifinterface.media.ExifInterface
+import top.kikt.imagescanner.core.PhotoManager
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
@@ -74,7 +75,33 @@ object DBUtils : IDBUtils {
     cursor.close()
     return list
   }
-
+  
+  override fun getOnlyGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity> {
+    val list = ArrayList<GalleryEntity>()
+  
+    val args = ArrayList<String>()
+    val typeSelection: String = AndroidQDBUtils.getCondFromType(requestType, option, args)
+    val projection = storeBucketKeys + arrayOf("count(1)")
+    
+    val dateSelection = "AND ${MediaStore.MediaColumns.DATE_ADDED} <= ?"
+    args.add(timeStamp.toString())
+  
+    val sizeWhere = AndroidQDBUtils.sizeWhere(requestType)
+  
+    val selections = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
+  
+    val cursor = context.contentResolver.query(allUri, projection, selections, args.toTypedArray(), null)
+      ?: return list
+  
+    cursor.use {
+      val count = cursor.count
+      val galleryEntity = GalleryEntity(PhotoManager.ALL_ID, "Recent", count, requestType, true)
+      list.add(galleryEntity)
+    }
+    
+    return list
+  }
+  
   override fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long, option: FilterOption): GalleryEntity? {
     val uri = allUri
     val projection = storeBucketKeys + arrayOf("count(1)")
@@ -113,7 +140,7 @@ object DBUtils : IDBUtils {
   override fun getThumbUri(context: Context, id: String, width: Int, height: Int, type: Int?): Uri? {
     TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
   }
-
+  
   @SuppressLint("Recycle")
   override fun getAssetFromGalleryId(
           context: Context,

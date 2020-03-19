@@ -21,18 +21,27 @@ class PhotoManager {
   ///
   /// [hasAll] contains all path, such as "Camera Roll" on ios or "Recent" on android.
   /// [hasAll] 包含所有项目的相册
+  ///
+  /// [onlyAll] If true, Return only one album with all resources.
+  /// [onlyAll] 如果为真, 则只返回一个包含所有项目的相册
   static Future<List<AssetPathEntity>> getAssetPathList({
     bool hasAll = true,
+    bool onlyAll = false,
     RequestType type = RequestType.all,
     DateTime fetchDateTime,
     FilterOptionGroup filterOption,
   }) async {
     assert(hasAll != null);
+    assert(onlyAll != null);
+    if (onlyAll) {
+      assert(hasAll, "If only is true, then the hasAll must be not null.");
+    }
     filterOption ??= FilterOptionGroup();
     return _plugin.getAllGalleryList(
       type: type.index,
       dt: fetchDateTime,
       hasAll: hasAll,
+      onlyAll: onlyAll,
       optionGroup: filterOption,
     );
   }

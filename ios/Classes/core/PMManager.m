@@ -34,29 +34,53 @@
   __isAuth = auth;
 }
 
-- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type
-                                            date:(NSDate *)date
-                                          hasAll:(BOOL)hasAll
+- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type date:(NSDate *)date hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll
                                           option:(PMFilterOptionGroup *)option {
   NSMutableArray<PMAssetPathEntity *> *array = [NSMutableArray new];
-
   PHFetchOptions *assetOptions = [self getAssetOptions:type
                                                   date:date
                                           filterOption:option];
 
   PHFetchOptions *fetchCollectionOptions = [PHFetchOptions new];
 
+
+  if (onlyAll) {
+//    PHFetchResult<PHCollection *> *result = [PHAssetCollection fetchTopLevelUserCollectionsWithOptions:assetOptions];
+      PHFetchResult<PHCollection *> *result = [PHAssetCollection
+      fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
+                            subtype:PHAssetCollectionSubtypeAlbumRegular
+                            options:fetchCollectionOptions];
+
+    if (result && result.count) {
+      for (PHCollection *phCollection in result) {
+        if (![phCollection isMemberOfClass:PHAssetCollection.class]) {
+          continue;
+        }
+        PHAssetCollection *collection = (PHAssetCollection *) phCollection;
+        if (collection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumUserLibrary) {
+          PHFetchResult<PHAsset *> *assetResult = [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
+          PMAssetPathEntity *pathEntity = [PMAssetPathEntity entityWithId:collection.localIdentifier name:collection.localizedTitle assetCount:assetResult.count];
+          pathEntity.isAll = YES;
+          [array addObject:pathEntity];
+          break;
+        }
+      }
+    }
+
+    return array;
+  }
+
   PHFetchResult<PHAssetCollection *> *smartAlbumResult = [PHAssetCollection
-          fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
-                                subtype:PHAssetCollectionSubtypeAlbumRegular
-                                options:fetchCollectionOptions];
+      fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
+                            subtype:PHAssetCollectionSubtypeAlbumRegular
+                            options:fetchCollectionOptions];
   [self injectAssetPathIntoArray:array
                           result:smartAlbumResult
                          options:assetOptions
                           hasAll:hasAll];
 
   PHFetchResult<PHCollection *> *topLevelResult = [PHAssetCollection
-          fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
+      fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
   [self injectAssetPathIntoArray:array
                           result:topLevelResult
                          options:assetOptions

@@ -76,13 +76,11 @@
         int type = [call.arguments[@"type"] intValue];
         unsigned long timestamp = [self getTimestamp:call];
         BOOL hasAll = [call.arguments[@"hasAll"] boolValue];
+        BOOL onlyAll = [call.arguments[@"onlyAll"] boolValue];
         NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
         PMFilterOptionGroup *option =
                 [ConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
-        NSArray<PMAssetPathEntity *> *array = [manager getGalleryList:type
-                                                                 date:date
-                                                               hasAll:hasAll
-                                                               option:option];
+        NSArray<PMAssetPathEntity *> *array = [manager getGalleryList:type date:date hasAll:hasAll onlyAll:onlyAll option:option];
         NSDictionary *dictionary = [ConvertUtils convertPathToMap:array];
         [handler reply:dictionary];
 

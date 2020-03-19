@@ -12,6 +12,8 @@ class PhotoProvider extends ChangeNotifier {
 
   var hasAll = true;
 
+  var onlyAll = false;
+
   Map<AssetPathEntity, PathProvider> pathProviderMap = {};
 
   bool _notifying = false;
@@ -65,6 +67,11 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void changeOnlyAll(bool value) {
+    this.onlyAll = value;
+    notifyListeners();
+  }
+
   void changeDateToNow() {
     this.dt = DateTime.now();
     notifyListeners();
@@ -93,6 +100,7 @@ class PhotoProvider extends ChangeNotifier {
       fetchDateTime: dt,
       type: RequestType.values[type],
       hasAll: hasAll,
+      onlyAll: onlyAll,
       filterOption: option,
     );
 

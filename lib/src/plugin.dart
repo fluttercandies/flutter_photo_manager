@@ -30,6 +30,7 @@ class Plugin {
     DateTime dt,
     bool hasAll = true,
     FilterOptionGroup optionGroup,
+    bool onlyAll,
   }) async {
     dt ??= _createDefaultFetchDatetime();
 
@@ -37,6 +38,7 @@ class Plugin {
       "type": type,
       "timestamp": dt.millisecondsSinceEpoch,
       "hasAll": hasAll,
+      "onlyAll": onlyAll,
       "option": optionGroup.toMap(),
     });
     if (result == null) {

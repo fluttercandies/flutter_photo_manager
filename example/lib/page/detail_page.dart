@@ -5,13 +5,13 @@ import 'package:image_scanner_example/widget/video_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class DetailPage extends StatefulWidget {
-  final File file;
   final AssetEntity entity;
   final String mediaUrl;
+  final File imageOriginFile;
   const DetailPage({
     Key key,
-    this.file,
     this.entity,
+    this.imageOriginFile,
     this.mediaUrl,
   }) : super(key: key);
 
@@ -24,7 +24,7 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Asset file"),
+        title: Text("Asset detail"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.info),
@@ -51,14 +51,13 @@ class _DetailPageState extends State<DetailPage> {
 
   Widget buildImage() {
     return Image.file(
-      widget.file,
+      widget.imageOriginFile,
       filterQuality: FilterQuality.low,
     );
   }
 
   Widget buildVideo() {
     return VideoWidget(
-      file: widget.file,
       mediaUrl: widget.mediaUrl,
     );
   }

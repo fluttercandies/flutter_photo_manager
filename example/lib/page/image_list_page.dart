@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:image_scanner_example/develop/upload_to_dev_serve.dart';
 import 'package:image_scanner_example/model/photo_provider.dart';
 import 'package:image_scanner_example/page/detail_page.dart';
-import 'package:image_scanner_example/page/ijkplayer_page.dart';
 import 'package:image_scanner_example/widget/change_notifier_builder.dart';
 import 'package:image_scanner_example/widget/dialog/list_dialog.dart';
 import 'package:image_scanner_example/widget/image_item_widget.dart';
@@ -133,11 +132,9 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                 child: Text("Upload to my test server."),
                 onPressed: () => UploadToDevServer().upload(entity),
               ),
-              _buildIjkPlayerItem(entity),
             ],
           ),
         );
-        // routeToDetailPage(entity);
       },
       child: ImageItemWidget(
         key: ValueKey(entity),
@@ -147,22 +144,20 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   }
 
   void routeToDetailPage(AssetEntity entity) async {
-    final originFile = await entity.originFile;
-    if (originFile == null || !originFile.existsSync()) {
-      print("data length = ${originFile?.lengthSync()}");
-      showToast(
-        "The file is null, please see issue #128.",
-        duration: const Duration(milliseconds: 3500),
-      );
-      return;
-    }
     final mediaUrl = await entity.getMediaUrl();
-    print(
-        "origin file length = ${originFile.lengthSync()}, path = ${originFile.absolute.path}");
+    File imageFile;
+    if (entity.type == AssetType.image) {
+      imageFile = await entity.originFile;
+      print(
+          "origin file is ${imageFile.absolute.path}, length = ${imageFile.lengthSync()}");
+    } else {
+      print("play media url: $mediaUrl");
+    }
+
     final page = DetailPage(
-      file: originFile,
       entity: entity,
       mediaUrl: mediaUrl,
+      imageOriginFile: imageFile,
     );
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -247,11 +242,6 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
         });
   }
 
-  showInIjkPlayer(AssetEntity entity) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (_) => IjkPlayerPage(entity: entity)));
-  }
-
   void showThumbImageDialog(AssetEntity entity, int width, int height) async {
     final format = ThumbFormat.jpeg;
     width = width ~/ 4;
@@ -295,15 +285,5 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             },
           );
         });
-  }
-
-  Widget _buildIjkPlayerItem(AssetEntity entity) {
-    if (entity.type != AssetType.video) {
-      return Container();
-    }
-    return RaisedButton(
-      child: Text("Show in ijkplayer."),
-      onPressed: () => showInIjkPlayer(entity),
-    );
   }
 }
