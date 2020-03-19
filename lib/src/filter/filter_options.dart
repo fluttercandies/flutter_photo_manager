@@ -1,12 +1,11 @@
 import '../type.dart';
 
 /// Filter option for get asset.
-/// 
+///
 /// 筛选选项, 可以分别设置图片类型和视频类型对应的[FilterOption]
-/// 
+///
 /// See [FilterOption]
 class FilterOptionGroup {
-
   /// A empty option
   FilterOptionGroup.empty();
 
@@ -35,7 +34,7 @@ class FilterOptionGroup {
 }
 
 /// Filter option
-/// 
+///
 /// 筛选选项的详细情况
 class FilterOption {
   /// This property affects performance on iOS. If not needed, please pass false, default is false.
