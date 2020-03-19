@@ -26,12 +26,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
     Widget image;
 
     if (u8List != null) {
-      return Image.memory(
-        u8List,
-        width: size.toDouble(),
-        height: size.toDouble(),
-        fit: BoxFit.cover,
-      );
+      return _buildImageWidget(item, u8List, size);
     } else {
       image = FutureBuilder<Uint8List>(
         future: item.thumbDataWithSize(size, size),
@@ -44,12 +39,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
           }
           if (snapshot.hasData) {
             ImageLruCache.setData(item, size, snapshot.data);
-            w = FittedBox(
-              fit: BoxFit.cover,
-              child: Image.memory(
-                snapshot.data,
-              ),
-            );
+            w = _buildImageWidget(item, snapshot.data, size);
           } else {
             w = Center(
               child: loadWidget,
@@ -62,6 +52,15 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
     }
 
     return image;
+  }
+
+  Widget _buildImageWidget(AssetEntity entity, Uint8List uint8list, num size) {
+    return Image.memory(
+      uint8list,
+      width: size.toDouble(),
+      height: size.toDouble(),
+      fit: BoxFit.cover,
+    );
   }
 
   @override

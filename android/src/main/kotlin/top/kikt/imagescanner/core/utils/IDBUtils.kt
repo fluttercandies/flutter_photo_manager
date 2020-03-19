@@ -33,6 +33,7 @@ interface IDBUtils {
             MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
             MediaStore.MediaColumns.WIDTH, // 宽
             MediaStore.MediaColumns.HEIGHT, // 高
+            MediaStore.MediaColumns.ORIENTATION, // 角度
             MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
             MediaStore.MediaColumns.MIME_TYPE, // 高
             MediaStore.MediaColumns.DATE_TAKEN //日期
@@ -48,6 +49,7 @@ interface IDBUtils {
             MediaStore.MediaColumns.DATE_TAKEN, //日期
             MediaStore.MediaColumns.WIDTH, // 宽
             MediaStore.MediaColumns.HEIGHT, // 高
+            MediaStore.MediaColumns.ORIENTATION, // 角度
             MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
             MediaStore.MediaColumns.MIME_TYPE, // 高
             MediaStore.MediaColumns.DURATION //时长

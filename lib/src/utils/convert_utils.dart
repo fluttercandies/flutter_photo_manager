@@ -36,6 +36,7 @@ class ConvertUtils {
         ..createDtSecond = item["createDt"]
         ..width = item["width"]
         ..height = item["height"]
+        ..orientation = (item["orientation"] ?? 0)
         ..duration = item["duration"]
         ..modifiedDateSecond = item["modifiedDt"]
         ..typeInt = item["type"]

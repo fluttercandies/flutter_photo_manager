@@ -12,7 +12,8 @@ data class AssetEntity(
   val height: Int,
   val type: Int,
   val displayName: String,
-  val modifiedDate: Long
+  val modifiedDate: Long,
+  val orientation:Int
 ) {
   var lat: Double? = null
   var lng: Double? = null

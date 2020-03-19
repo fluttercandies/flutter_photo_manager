@@ -2,6 +2,10 @@
 
 ## 0.5.0-dev.1
 
+Feature:
+
+- Add `orientation` for `AssetEntity`.
+
 Update
 
 - **Breaking change**, Split video filter and image filter

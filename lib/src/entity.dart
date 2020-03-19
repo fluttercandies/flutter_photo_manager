@@ -263,11 +263,11 @@ class AssetEntity {
   Future<bool> get exists => PhotoManager._assetExistsWithId(id);
 
   /// The url is provided to some video player. Such as [flutter_ijkplayer](https://pub.dev/packages/flutter_ijkplayer)
-  /// 
+  ///
   /// It is such as `file:///var/mobile/Media/DCIM/118APPLE/IMG_8371.MOV` in iOS.
-  /// 
+  ///
   /// Android28 or lower: `file:///storage/emulated/0/DCIM/Camera/20201020_202020.MP4`
-  /// 
+  ///
   /// AndroidQ or higher: `content://media/external/video/media/894857`
   Future<String> getMediaUrl() {
     if (type == AssetType.video) {
@@ -275,6 +275,12 @@ class AssetEntity {
     }
     return null;
   }
+
+  /// Orientation of android MediaStore. See [ORIENTATION](https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#ORIENTATION)
+  /// Example values for android: 0 90 180 270
+  ///
+  /// The value always 0 in iOS.
+  int orientation;
 
   @override
   int get hashCode {

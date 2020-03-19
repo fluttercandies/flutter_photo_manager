@@ -1,7 +1,10 @@
 package top.kikt.imagescanner.core.utils
 
 import top.kikt.imagescanner.AssetType
-import top.kikt.imagescanner.core.entity.*
+import top.kikt.imagescanner.core.entity.AssetEntity
+import top.kikt.imagescanner.core.entity.FilterCond
+import top.kikt.imagescanner.core.entity.FilterOption
+import top.kikt.imagescanner.core.entity.GalleryEntity
 
 /// create 2019-09-05 by cai
 
@@ -39,6 +42,7 @@ object ConvertUtils {
               "createDt" to entity.createDt / 1000,
               "width" to entity.width,
               "height" to entity.height,
+              "orientation" to entity.orientation,
               "modifiedDt" to entity.modifiedDate,
               "lat" to entity.lat,
               "lng" to entity.lng,
