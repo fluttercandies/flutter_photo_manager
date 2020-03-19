@@ -24,9 +24,7 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (void)setAuth:(BOOL)auth;
 
-- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type
-                                            date:(NSDate *)date
-                                          hasAll:(BOOL)hasAll
+- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type date:(NSDate *)date hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll
                                           option:(PMFilterOptionGroup *)option;
 
 - (NSArray<PMAssetEntity *> *)

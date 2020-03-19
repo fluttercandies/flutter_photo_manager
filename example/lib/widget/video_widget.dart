@@ -1,13 +1,13 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoWidget extends StatefulWidget {
-  final File file;
   final String mediaUrl;
 
-  const VideoWidget({Key key, @required this.file,this.mediaUrl,}) : super(key: key);
+  const VideoWidget({
+    Key key,
+    @required this.mediaUrl,
+  }) : super(key: key);
 
   @override
   _VideoWidgetState createState() => _VideoWidgetState();

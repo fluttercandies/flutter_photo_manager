@@ -61,6 +61,7 @@ class _NewHomePageState extends State<NewHomePage> {
               mainAxisSize: MainAxisSize.min,
             ),
             _buildHasAllCheck(),
+            _buildOnlyAllCheck(),
             _buildNotifyCheck(),
             _buildFilterOption(provider),
           ],
@@ -119,6 +120,16 @@ class _NewHomePageState extends State<NewHomePage> {
         provider.changeHasAll(value);
       },
       title: Text("hasAll"),
+    );
+  }
+
+  Widget _buildOnlyAllCheck() {
+    return CheckboxListTile(
+      value: provider.onlyAll,
+      onChanged: (value) {
+        provider.changeOnlyAll(value);
+      },
+      title: Text("onlyAll"),
     );
   }
 

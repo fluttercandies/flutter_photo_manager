@@ -6,14 +6,13 @@ import android.os.Handler
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
-import top.kikt.imagescanner.AssetType
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.utils.ConvertUtils
-import top.kikt.imagescanner.util.ResultHandler
 import top.kikt.imagescanner.old.permission.PermissionsListener
 import top.kikt.imagescanner.old.permission.PermissionsUtils
 import top.kikt.imagescanner.util.LogUtils
+import top.kikt.imagescanner.util.ResultHandler
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -22,27 +21,27 @@ import java.util.concurrent.TimeUnit
 
 
 class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : MethodChannel.MethodCallHandler {
-
+  
   companion object {
     private const val poolSize = 8
     private val threadPool: ThreadPoolExecutor = ThreadPoolExecutor(
-            poolSize + 3,
-            1000,
-            200,
-            TimeUnit.MINUTES,
-            ArrayBlockingQueue<Runnable>(poolSize + 3)
+      poolSize + 3,
+      1000,
+      200,
+      TimeUnit.MINUTES,
+      ArrayBlockingQueue<Runnable>(poolSize + 3)
     )
-
+    
     fun runOnBackground(runnable: () -> Unit) {
       threadPool.execute(runnable)
     }
-
+    
     var cacheOriginBytes = true
   }
-
+  
   private val permissionsUtils = PermissionsUtils()
   private val notifyChannel = PhotoManagerNotifyChannel(registrar, Handler())
-
+  
   init {
     registrar.addRequestPermissionsResultListener { i, strings, ints ->
       permissionsUtils.dealResult(i, strings, ints)
@@ -51,19 +50,19 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
     permissionsUtils.permissionsListener = object : PermissionsListener {
       override fun onDenied(deniedPermissions: MutableList<String>, grantedPermissions: MutableList<String>) {
       }
-
+      
       override fun onGranted() {
       }
     }
   }
-
+  
   private val photoManager = PhotoManager(registrar.context().applicationContext)
-
+  
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     val resultHandler = ResultHandler(result)
-
+    
     var needLocationPermissions = false
-
+    
     val handleResult = when (call.method) {
       "releaseMemCache" -> {
         photoManager.clearCache()
@@ -113,11 +112,11 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
       }
       else -> false
     }
-
+    
     if (handleResult) {
       return
     }
-
+    
     val utils = permissionsUtils.apply {
       withActivity(registrar.activity())
       permissionsListener = object : PermissionsListener {
@@ -133,26 +132,26 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
             }
           }
         }
-
+        
         override fun onGranted() {
           onHandlePermissionResult(call, resultHandler, true)
         }
       }
     }
-
+    
     val permissions = arrayListOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
+    
     if (needLocationPermissions && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       permissions.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
     }
-
+    
     utils.getPermissions(registrar.activity(), 3001, permissions)
   }
-
+  
   private fun replyPermissionError(resultHandler: ResultHandler) {
     resultHandler.replyError("Request for permission failed.", "User denied permission.", null)
   }
-
+  
   private fun onHandlePermissionResult(call: MethodCall, resultHandler: ResultHandler, haveLocationPermission: Boolean) {
     LogUtils.info("onGranted call.method = ${call.method}")
     when (call.method) {
@@ -166,7 +165,9 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
           val timeStamp = call.getTimeStamp()
           val hasAll = call.argument<Boolean>("hasAll")!!
           val option = call.getOption()
-          val list = photoManager.getGalleryList(type, timeStamp, hasAll, option)
+          val onlyAll = call.argument<Boolean>("onlyAll")!!
+          
+          val list = photoManager.getGalleryList(type, timeStamp, hasAll, onlyAll, option)
           resultHandler.reply(ConvertUtils.convertToGalleryResult(list))
         }
       }
@@ -222,7 +223,7 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
           photoManager.getOriginBytes(id, cacheOriginBytes, haveLocationPermission, resultHandler)
         }
       }
-      "getMediaUrl" ->{
+      "getMediaUrl" -> {
         runOnBackground {
           val id = call.argument<String>("id")!!
           val mediaUri = photoManager.getMediaUri(id)
@@ -310,19 +311,19 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
       else -> resultHandler.notImplemented()
     }
   }
-
+  
   fun MethodCall.getTimeStamp(): Long {
     return this.argument<Long>("timestamp")!!
   }
-
+  
   fun MethodCall.getString(key: String): String {
     return this.argument<String>(key)!!
   }
-
+  
   fun MethodCall.getInt(key: String): Int {
     return this.argument<Int>(key)!!
   }
-
+  
   fun MethodCall.getOption(): FilterOption {
     val arguments = argument<Map<*, *>>("option")!!
     return ConvertUtils.convertFilterOptionsFromMap(arguments)

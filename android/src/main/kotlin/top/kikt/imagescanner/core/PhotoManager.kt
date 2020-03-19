@@ -33,7 +33,11 @@ class PhotoManager(private val context: Context) {
       AndroidQDBUtils
     }
   
-  fun getGalleryList(type: Int, timeStamp: Long, hasAll: Boolean, option: FilterOption): List<GalleryEntity> {
+  fun getGalleryList(type: Int, timeStamp: Long, hasAll: Boolean, onlyAll: Boolean, option: FilterOption): List<GalleryEntity> {
+    if (onlyAll) {
+      return dbUtils.getOnlyGalleryList(context, type, timeStamp, option)
+    }
+    
     val fromDb = dbUtils.getGalleryList(context, type, timeStamp, option)
     
     if (!hasAll) {

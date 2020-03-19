@@ -10,12 +10,12 @@
 
 @property(nonatomic, copy) NSString *id;
 @property(nonatomic, copy) NSString *name;
-@property(nonatomic, assign) int assetCount;
+@property(nonatomic, assign) NSUInteger assetCount;
 @property(nonatomic, assign) BOOL isAll;
 
-- (instancetype)initWithId:(NSString *)id name:(NSString *)name assetCount:(int)assetCount;
+- (instancetype)initWithId:(NSString *)id name:(NSString *)name assetCount:(NSUInteger)assetCount;
 
-+ (instancetype)entityWithId:(NSString *)id name:(NSString *)name assetCount:(int)assetCount;
++ (instancetype)entityWithId:(NSString *)id name:(NSString *)name assetCount:(NSUInteger)assetCount;
 
 @end
 

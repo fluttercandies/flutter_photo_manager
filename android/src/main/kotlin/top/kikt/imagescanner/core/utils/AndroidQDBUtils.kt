@@ -9,6 +9,7 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import androidx.exifinterface.media.ExifInterface
+import top.kikt.imagescanner.core.PhotoManager
 import top.kikt.imagescanner.core.cache.AndroidQCache
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
@@ -78,7 +79,32 @@ object AndroidQDBUtils : IDBUtils {
 
     return list
   }
-
+  
+  override fun getOnlyGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity> {
+    val list = ArrayList<GalleryEntity>()
+  
+    val args = ArrayList<String>()
+    val typeSelection: String = getCondFromType(requestType, option, args)
+  
+    val dateSelection = "AND ${MediaStore.MediaColumns.DATE_ADDED} <= ?"
+    args.add(timeStamp.toString())
+  
+    val sizeWhere = sizeWhere(requestType)
+  
+    val selections = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
+  
+    val cursor = context.contentResolver.query(allUri, galleryKeys, selections, args.toTypedArray(), null)
+      ?: return list
+  
+    cursor.use {
+      val count = cursor.count
+      val galleryEntity = GalleryEntity(PhotoManager.ALL_ID, "Recent", count, requestType, true)
+      list.add(galleryEntity)
+    }
+    
+    return list
+  }
+  
   @SuppressLint("Recycle")
   override fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int, timeStamp: Long, option: FilterOption, cacheContainer: CacheContainer?): List<AssetEntity> {
     val cache = cacheContainer ?: this.cacheContainer
@@ -298,7 +324,7 @@ object AndroidQDBUtils : IDBUtils {
     }
     return getUri(id, type)
   }
-
+  
   private fun getUri(asset: AssetEntity, isOrigin: Boolean = false): Uri = getUri(asset.id, asset.type, isOrigin)
 
   private fun getUri(id: String, type: Int, isOrigin: Boolean = false): Uri {

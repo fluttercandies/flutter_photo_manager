@@ -5,6 +5,7 @@
 Feature:
 
 - Add `orientation` for `AssetEntity`.
+- Add `onlyAll` for `getAssetPathList`.
 
 Update
 

@@ -9,7 +9,7 @@
 @implementation PMAssetPathEntity {
 
 }
-- (instancetype)initWithId:(NSString *)id name:(NSString *)name assetCount:(int)assetCount {
+- (instancetype)initWithId:(NSString *)id name:(NSString *)name assetCount:(NSUInteger)assetCount {
     self = [super init];
     if (self) {
         self.id = id;
@@ -20,7 +20,7 @@
     return self;
 }
 
-+ (instancetype)entityWithId:(NSString *)id name:(NSString *)name assetCount:(int)assetCount {
++ (instancetype)entityWithId:(NSString *)id name:(NSString *)name assetCount:(NSUInteger)assetCount {
     return [[self alloc] initWithId:id name:name assetCount:assetCount];
 }
 
