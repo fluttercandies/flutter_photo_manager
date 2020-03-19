@@ -29,7 +29,9 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
     - [Experimental](#experimental)
       - [Delete item](#delete-item)
       - [Insert new item](#insert-new-item)
-  - [iOS plist config](#ios-plist-config)
+  - [iOS config](#ios-config)
+    - [iOS plist config](#ios-plist-config)
+    - [enabling localized system albums names](#enabling-localized-system-albums-names)
   - [android config](#android-config)
     - [about androidX](#about-androidx)
     - [Android Q privacy](#android-q-privacy)
@@ -205,7 +207,9 @@ File videoFile = File("video path");
 final AssetEntity videoEntity = await await PhotoManager.editor.saveVideo(videoFile); // nullable
 ```
 
-## iOS plist config
+## iOS config
+
+### iOS plist config
 
 Because the album is a privacy privilege, you need user permission to access it. You must to modify the `Info.plist` file in Runner project.
 
@@ -220,6 +224,23 @@ xcode like image
 ![in xcode](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/flutter_photo2.png)
 
 In ios11+, if you want to save or delete asset, you also need add `NSPhotoLibraryAddUsageDescription` to plist.
+
+### enabling localized system albums names
+
+By default iOS will retrieve system album names only in English whatever the device's language currently set.
+To change this you need to open the ios project of your flutter app using xCode
+
+![in xcode](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterProjectEditinginXcode.png)
+
+Select the project "Runner" and in the localizations table, click on the + icon
+
+![in xcode](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterAddLocalization.png)
+
+Select the adequate language(s) you want to retrieve localized strings.
+Validate the popup screen without any modification
+Close xCode
+Rebuild your flutter project
+Now, the system albums should be displayed according to the device's language
 
 ## android config
 
