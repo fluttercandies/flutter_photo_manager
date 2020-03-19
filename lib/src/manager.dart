@@ -27,6 +27,7 @@ class PhotoManager {
     DateTime fetchDateTime,
     FilterOptionGroup filterOption,
   }) async {
+    assert(hasAll != null);
     filterOption ??= FilterOptionGroup();
     return _plugin.getAllGalleryList(
       type: type.index,
@@ -49,6 +50,7 @@ class PhotoManager {
   }
 
   static Future<void> setLog(bool isLog) {
+    assert(isLog != null);
     return _plugin.setLog(isLog);
   }
 
@@ -78,6 +80,7 @@ class PhotoManager {
     @required int start,
     @required int end,
   }) {
+    assert(entity != null && start != null && end != null);
     if (end > entity.assetCount) {
       end = entity.assetCount;
     }
@@ -177,6 +180,7 @@ class PhotoManager {
     AssetPathEntity entity,
     DateTime time,
   ) async {
+    assert(entity != null);
     var result = await _plugin.fetchPathProperties(
       entity.id,
       entity.typeInt,
