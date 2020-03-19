@@ -17,6 +17,10 @@
     return [self mediaType] == PHAssetMediaTypeVideo;
 }
 
+-(bool)isAudio{
+    return [self mediaType] == PHAssetMediaTypeAudio;
+}
+
 -(bool)isImageOrVideo{
     return [self isVideo] || [self isImage];
 }

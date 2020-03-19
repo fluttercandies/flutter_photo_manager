@@ -122,8 +122,8 @@ object AndroidQDBUtils : IDBUtils {
       val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
       val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
       val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
-
-      val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
+      val orientation: Int = cursor.getInt(MediaStore.MediaColumns.ORIENTATION)
+      val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate, orientation)
       list.add(asset)
       cache.putAsset(asset)
     }
@@ -176,8 +176,9 @@ object AndroidQDBUtils : IDBUtils {
       val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
       val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
       val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
-
-      val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
+      val orientation:Int = cursor.getInt(MediaStore.MediaColumns.ORIENTATION)
+  
+      val asset = AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate, orientation)
       list.add(asset)
       cache.putAsset(asset)
     }
@@ -212,8 +213,9 @@ object AndroidQDBUtils : IDBUtils {
         val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
         val displayName = cursor.getString(MediaStore.MediaColumns.DISPLAY_NAME)
         val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
-
-        val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate)
+        val orientation:Int = cursor.getInt(MediaStore.MediaColumns.ORIENTATION)
+  
+        val dbAsset = AssetEntity(databaseId, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate, orientation)
         cacheContainer.putAsset(dbAsset)
 
         cursor.close()
