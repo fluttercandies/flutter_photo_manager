@@ -17,7 +17,7 @@ class _IjkPlayerPageState extends State<IjkPlayerPage> {
   @override
   void initState() {
     super.initState();
-    useHardwareDecoding();// some h265 video need hardware-decoding
+    useHardwareDecoding(); // some h265 video need hardware-decoding
     widget.entity.getMediaUrl().then((url) async {
       print(url);
       await controller.setDataSource(DataSource.photoManagerUrl(url));
@@ -32,7 +32,7 @@ class _IjkPlayerPageState extends State<IjkPlayerPage> {
     ], [
       IjkOption(IjkOptionCategory.player, 'videotoolbox', 1),
       IjkOption(IjkOptionCategory.player, 'video-max-frame-width-default', 1),
-      IjkOption(IjkOptionCategory.player, 'videotoolbox-max-frame-width', 1920),
+      IjkOption(IjkOptionCategory.player, 'videotoolbox-max-frame-width', 960),
       IjkOption(IjkOptionCategory.player, 'mediacodec', 1),
       IjkOption(IjkOptionCategory.player, 'mediacodec-hevc', 1),
     ]);
