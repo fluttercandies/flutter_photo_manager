@@ -14,6 +14,7 @@ import 'package:image_scanner_example/widget/loading_widget.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
+import 'dart:ui' as ui;
 
 class GalleryContentListPage extends StatefulWidget {
   final AssetPathEntity path;
@@ -253,7 +254,16 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
 
   void showThumbImageDialog(AssetEntity entity, int width, int height) async {
     final format = ThumbFormat.jpeg;
-    // final format = ThumbFormat.png;
+    width = width ~/ 4;
+    height = height ~/ 4;
+
+    print("will show ${width}x$height image");
+
+    if (entity.orientation == 90 || entity.orientation == 270) {
+      int tmp = width;
+      width = height;
+      height = tmp;
+    }
 
     showDialog(
         context: context,
@@ -263,6 +273,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             builder: (BuildContext context, snapshot) {
               Widget w;
               if (snapshot.hasData) {
+                ui.decodeImageFromList(snapshot.data, (decodingImage) {
+                  print(
+                      "the thumb of image is ${decodingImage.width}x${decodingImage.height}");
+                });
                 print("$format image length : ${snapshot.data.length}");
                 w = Image.memory(snapshot.data);
               } else {

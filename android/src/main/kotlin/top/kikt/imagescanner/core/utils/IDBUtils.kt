@@ -2,7 +2,6 @@ package top.kikt.imagescanner.core.utils
 
 import android.content.Context
 import android.database.Cursor
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -125,7 +124,7 @@ interface IDBUtils {
 
   fun getFilePath(context: Context, id: String, origin: Boolean): String?
 
-  fun getThumb(context: Context, id: String, width: Int, height: Int, type: Int?): Bitmap?
+  fun getThumbUri(context: Context, id: String, width: Int, height: Int, type: Int?): Uri?
 
   fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOption): List<AssetEntity>
 

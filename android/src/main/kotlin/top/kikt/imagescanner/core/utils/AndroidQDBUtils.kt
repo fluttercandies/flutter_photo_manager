@@ -4,11 +4,9 @@ import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Size
 import androidx.annotation.RequiresApi
 import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.cache.AndroidQCache
@@ -294,12 +292,11 @@ object AndroidQDBUtils : IDBUtils {
     return cacheFile.path
   }
 
-  override fun getThumb(context: Context, id: String, width: Int, height: Int, type: Int?): Bitmap? {
+  override fun getThumbUri(context: Context, id: String, width: Int, height: Int, type: Int?): Uri? {
     if (type == null) {
       return null
     }
-    val uri = getUri(id, type)
-    return context.contentResolver.loadThumbnail(uri, Size(width, height), null)
+    return getUri(id, type)
   }
 
   private fun getUri(asset: AssetEntity, isOrigin: Boolean = false): Uri = getUri(asset.id, asset.type, isOrigin)
