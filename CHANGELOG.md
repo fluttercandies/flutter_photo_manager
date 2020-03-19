@@ -17,6 +17,7 @@ Fix
 - exists error on android.
 - use edited origin file on iOS.
 - galleryName maybe is null in android.
+- thumb of android 10.
 
 ## 0.4.8
 
