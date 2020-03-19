@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
@@ -111,7 +110,7 @@ object DBUtils : IDBUtils {
     }
   }
 
-  override fun getThumb(context: Context, id: String, width: Int, height: Int, type: Int?): Bitmap? {
+  override fun getThumbUri(context: Context, id: String, width: Int, height: Int, type: Int?): Uri? {
     TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
   }
 

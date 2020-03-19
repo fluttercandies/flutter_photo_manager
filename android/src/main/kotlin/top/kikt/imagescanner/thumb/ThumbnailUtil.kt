@@ -3,6 +3,7 @@ package top.kikt.imagescanner.thumb
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.transition.Transition
 import io.flutter.plugin.common.MethodChannel
@@ -82,6 +83,33 @@ object ThumbnailUtil {
           callback(bos.toByteArray())
         }
         
+        override fun onLoadCleared(placeholder: Drawable?) {
+          callback(null)
+        }
+      })
+  }
+  
+  fun getThumbOfUri(context: Context, uri: Uri, width: Int, height: Int, format: Int, callback: (ByteArray?) -> Unit){
+    val cr = context.contentResolver
+    Glide.with(context)
+      .asBitmap()
+      .load(uri)
+      .into(object : BitmapTarget(width, height) {
+        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+          super.onResourceReady(resource, transition)
+          val bos = ByteArrayOutputStream()
+    
+          val compressFormat =
+            if (format == 1) {
+              Bitmap.CompressFormat.PNG
+            } else {
+              Bitmap.CompressFormat.JPEG
+            }
+    
+          resource.compress(compressFormat, 100, bos)
+          callback(bos.toByteArray())
+        }
+  
         override fun onLoadCleared(placeholder: Drawable?) {
           callback(null)
         }
