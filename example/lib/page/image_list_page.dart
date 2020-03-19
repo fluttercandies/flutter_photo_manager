@@ -132,10 +132,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                 child: Text("Upload to my test server."),
                 onPressed: () => UploadToDevServer().upload(entity),
               ),
-              RaisedButton(
-                child: Text("Show in ijkplayer."),
-                onPressed: () => showInIjkPlayer(entity),
-              ),
+              _buildIjkPlayerItem(entity),
             ],
           ),
         );
@@ -158,13 +155,13 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       );
       return;
     }
-    final mediaUrl =await entity.getMediaUrl();
+    final mediaUrl = await entity.getMediaUrl();
     print(
         "origin file length = ${originFile.lengthSync()}, path = ${originFile.absolute.path}");
     final page = DetailPage(
       file: originFile,
       entity: entity,
-      mediaUrl:mediaUrl,
+      mediaUrl: mediaUrl,
     );
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -284,5 +281,15 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             },
           );
         });
+  }
+
+  Widget _buildIjkPlayerItem(AssetEntity entity) {
+    if (entity.type != AssetType.video) {
+      return Container();
+    }
+    return RaisedButton(
+      child: Text("Show in ijkplayer."),
+      onPressed: () => showInIjkPlayer(entity),
+    );
   }
 }
