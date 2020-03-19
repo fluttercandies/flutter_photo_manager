@@ -445,6 +445,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = top.kikt.imageScannerExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "arm64 arm64e armv7s";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -470,6 +471,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = top.kikt.imageScannerExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "arm64 arm64e armv7s";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
