@@ -40,19 +40,9 @@ class _NewHomePageState extends State<NewHomePage> {
                 Container(
                   width: 10,
                 ),
-                DropdownButton<int>(
-                  items: <DropdownMenuItem<int>>[
-                    _buildDropdownMenuItem(0),
-                    _buildDropdownMenuItem(1),
-                    _buildDropdownMenuItem(2),
-                  ],
-                  onChanged: (v) {
-                    provider.changeType(v);
-                  },
-                  value: provider.type,
-                ),
               ],
             ),
+            _buildTypeChecks(provider),
             Row(
               children: <Widget>[
                 _buildFecthDtPicker(),
@@ -70,6 +60,47 @@ class _NewHomePageState extends State<NewHomePage> {
     );
   }
 
+  Widget _buildTypeChecks(PhotoProvider provider) {
+    final currentType = provider.type;
+    Widget buildType(RequestType type) {
+      String typeText;
+      if (type.containsImage()) {
+        typeText = "image";
+      } else if (type.containsVideo()) {
+        typeText = "video";
+      } else if (type.containsAudio()) {
+        typeText = "audio";
+      } else {
+        typeText = "";
+      }
+
+      return Expanded(
+        child: CheckboxListTile(
+          title: Text(typeText),
+          value: currentType.containsType(type),
+          onChanged: (bool value) {
+            if (value) {
+              provider.changeType(currentType + type);
+            } else {
+              provider.changeType(currentType - type);
+            }
+          },
+        ),
+      );
+    }
+
+    return Container(
+      height: 50,
+      child: Row(
+        children: <Widget>[
+          buildType(RequestType.image),
+          buildType(RequestType.video),
+          buildType(RequestType.audio),
+        ],
+      ),
+    );
+  }
+
   _scanGalleryList() async {
     await provider.refreshGalleryList();
 
@@ -78,22 +109,6 @@ class _NewHomePageState extends State<NewHomePage> {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (ctx) => page,
     ));
-  }
-
-  DropdownMenuItem<int> _buildDropdownMenuItem(int i) {
-    String typeText;
-    if (i == 2) {
-      typeText = "video";
-    } else if (i == 1) {
-      typeText = "image";
-    } else {
-      typeText = "all";
-    }
-
-    return DropdownMenuItem<int>(
-      child: Text(typeText),
-      value: i,
-    );
   }
 
   Widget _buildFecthDtPicker() {

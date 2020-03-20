@@ -70,23 +70,37 @@ interface IDBUtils {
     get() = MediaStore.Files.getContentUri(VOLUME_EXTERNAL)
   
   
-  fun sizeWhere(type: Int?): String {
-    // return "" // 5491
-    // image : 5484
-    
-    if (type == null || type == 2) {
+  /**
+   * Just filter [MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE]
+   */
+  fun sizeWhere(requestType: Int?): String {
+    if (requestType == null || !typeUtils.containsImage(requestType)) {
       return ""
+    }
+    val mediaType = MediaStore.Files.FileColumns.MEDIA_TYPE
+    
+    
+    var result = ""
+    
+    if (typeUtils.containsVideo(requestType)) {
+      result = "OR ( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO} )"
+    }
+    
+    if (typeUtils.containsAudio(requestType)) {
+      result = "$result OR ( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO} )"
     }
     
     val size = "${MediaStore.MediaColumns.WIDTH} > 0 AND ${MediaStore.MediaColumns.HEIGHT} > 0"
     
-    return if (type == 1) {
-      "AND $size"
-    } else {
-      "AND (${MediaStore.Files.FileColumns.MEDIA_TYPE} = ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO} or (" +
-        "${MediaStore.Files.FileColumns.MEDIA_TYPE} = ${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE} AND $size))"
-    }
+    val imageCondString = "( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE} AND $size )"
+    
+    result = "AND ($imageCondString $result)"
+    
+    return result
   }
+  
+  private val typeUtils: RequestTypeUtils
+    get() = RequestTypeUtils
   
   fun getGalleryList(context: Context, requestType: Int = 0, timeStamp: Long, option: FilterOption): List<GalleryEntity>
   
@@ -98,6 +112,7 @@ interface IDBUtils {
     return when (type) {
       MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE -> 1
       MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> 2
+      MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO -> 3
       else -> 0
     }
   }
@@ -164,53 +179,76 @@ interface IDBUtils {
   fun cacheOriginFile(context: Context, asset: AssetEntity, byteArray: ByteArray)
   
   fun getCondFromType(type: Int, filterOption: FilterOption, args: ArrayList<String>): String {
-    var condString: String
+    val cond = StringBuilder();
     val typeKey = MediaStore.Files.FileColumns.MEDIA_TYPE
     
-    when (type) {
-      1 -> {
-        val imageCond = filterOption.imageOption
-        
-        val sizeCond = imageCond.sizeCond()
-        val sizeArgs = imageCond.sizeArgs()
-        condString = "AND $typeKey = ?"
-        args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString())
-        
-        condString += "AND $sizeCond"
-        args.addAll(sizeArgs)
-      }
-      2 -> {
-        val videoCond = filterOption.videoOption
-        
-        val durationCond = videoCond.durationCond()
-        val durationArgs = videoCond.durationArgs()
-        
-        condString = "AND $typeKey = ?"
-        args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString())
-        
-        condString += "AND $durationCond"
-        args.addAll(durationArgs)
-      }
-      else -> {
-        val imageCond = filterOption.imageOption
-        val sizeCond = imageCond.sizeCond()
-        val sizeArgs = imageCond.sizeArgs()
-        val imageCondString = "$typeKey = ? AND $sizeCond"
-        args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString())
-        args.addAll(sizeArgs)
-        
-        val videoCond = filterOption.videoOption
-        val durationCond = videoCond.durationCond()
-        val durationArgs = videoCond.durationArgs()
-        val videoCondString = "$typeKey = ? AND $durationCond"
-        args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString())
-        args.addAll(durationArgs)
-        
-        condString = "AND (($imageCondString) OR ($videoCondString))"
-      }
+    val haveImage = RequestTypeUtils.containsImage(type)
+    val haveVideo = RequestTypeUtils.containsVideo(type)
+    val haveAudio = RequestTypeUtils.containsAudio(type)
+    
+    var imageCondString = ""
+    var videoCondString = ""
+    var audioCondString = ""
+    
+    if (haveImage) {
+      val imageCond = filterOption.imageOption
+      val sizeCond = imageCond.sizeCond()
+      val sizeArgs = imageCond.sizeArgs()
+      imageCondString = "$typeKey = ? AND $sizeCond"
+      args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString())
+      args.addAll(sizeArgs)
     }
     
+    if (haveVideo) {
+      val videoCond = filterOption.videoOption
+      val durationCond = videoCond.durationCond()
+      val durationArgs = videoCond.durationArgs()
+      videoCondString = "$typeKey = ? AND $durationCond"
+      args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString())
+      args.addAll(durationArgs)
+    }
+    
+    if (haveAudio) {
+      val audioCond = filterOption.audioOption
+      val durationCond = audioCond.durationCond()
+      val durationArgs = audioCond.durationArgs()
+      audioCondString = "$typeKey = ? AND $durationCond"
+      args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO.toString())
+      args.addAll(durationArgs)
+    }
+    
+    if (haveImage) {
+      cond.append("( $imageCondString )")
+    }
+  
+    if (haveVideo) {
+      if (cond.isNotEmpty()) {
+        cond.append("OR ")
+      }
+    
+      cond.append("( $videoCondString )")
+    }
+  
+  
+    if (haveAudio) {
+      if (cond.isNotEmpty()) {
+        cond.append("OR ")
+      }
+    
+      cond.append("( $audioCondString )")
+    }
+  
+    val condString = "AND ( $cond )"
+    
     return condString
+  }
+  
+  private fun getCond(cond: Boolean, condString: String): String {
+    if (cond) {
+      return condString
+    } else {
+      return "1 == 0"
+    }
   }
   
   fun logRowWithId(context: Context, id: String) {
@@ -230,7 +268,8 @@ interface IDBUtils {
     }
   }
   
-  fun getMediaUri(context: Context, id: String): String
+  fun getMediaUri(context: Context, id: String, type: Int): String
   
   fun getOnlyGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity>
+  
 }

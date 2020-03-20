@@ -12,6 +12,7 @@ class FilterOptionGroup {
   FilterOptionGroup() {
     setOption(AssetType.image, FilterOption());
     setOption(AssetType.video, FilterOption());
+    setOption(AssetType.audio, FilterOption());
   }
 
   final Map<AssetType, FilterOption> _map = {};
@@ -27,6 +28,9 @@ class FilterOptionGroup {
     }
     if (_map.containsKey(AssetType.video)) {
       result["video"] = _map[AssetType.video].toMap();
+    }
+    if (_map.containsKey(AssetType.video)) {
+      result["audio"] = _map[AssetType.audio].toMap();
     }
 
     return result;

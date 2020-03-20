@@ -9,6 +9,7 @@ class FilterOption(map: Map<*, *>) {
 
   val videoOption = ConvertUtils.getOptionFromType(map, AssetType.Video)
   val imageOption = ConvertUtils.getOptionFromType(map, AssetType.Image)
+  val audioOption = ConvertUtils.getOptionFromType(map, AssetType.Audio)
 
 }
 

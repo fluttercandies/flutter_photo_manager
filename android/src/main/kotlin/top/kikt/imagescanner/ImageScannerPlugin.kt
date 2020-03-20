@@ -38,4 +38,5 @@ enum class AssetType {
     Other,
     Image,
     Video,
+    Audio,
 }

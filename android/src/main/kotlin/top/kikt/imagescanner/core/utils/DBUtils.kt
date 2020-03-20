@@ -349,7 +349,7 @@ object DBUtils : IDBUtils {
     return getAssetEntity(context, id.toString())
   }
   
-  override fun getMediaUri(context: Context, id: String): String {
+  override fun getMediaUri(context: Context, id: String, type: Int): String {
     val asset = getAssetEntity(context, id) ?: return ""
     return File(asset.path).toURI().toString()
   }

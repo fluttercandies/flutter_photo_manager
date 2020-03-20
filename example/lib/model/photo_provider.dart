@@ -6,7 +6,7 @@ import 'package:photo_manager/photo_manager.dart';
 class PhotoProvider extends ChangeNotifier {
   List<AssetPathEntity> list = [];
 
-  int type = 0;
+  RequestType type = RequestType.all;
 
   DateTime dt = DateTime.now();
 
@@ -57,8 +57,8 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeType(int v) {
-    this.type = v;
+  void changeType(RequestType type) {
+    this.type = type;
     notifyListeners();
   }
 
@@ -98,7 +98,7 @@ class PhotoProvider extends ChangeNotifier {
     reset();
     var galleryList = await PhotoManager.getAssetPathList(
       fetchDateTime: dt,
-      type: RequestType.values[type],
+      type: type,
       hasAll: hasAll,
       onlyAll: onlyAll,
       filterOption: option,
@@ -148,7 +148,8 @@ class PhotoProvider extends ChangeNotifier {
 
     return FilterOptionGroup()
       ..setOption(AssetType.video, option)
-      ..setOption(AssetType.image, option);
+      ..setOption(AssetType.image, option)
+      ..setOption(AssetType.audio, option);
   }
 }
 

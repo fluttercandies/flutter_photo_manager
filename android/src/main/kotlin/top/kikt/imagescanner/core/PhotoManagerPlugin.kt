@@ -226,7 +226,8 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
       "getMediaUrl" -> {
         runOnBackground {
           val id = call.argument<String>("id")!!
-          val mediaUri = photoManager.getMediaUri(id)
+          val type = call.argument<Int>("type")!!
+          val mediaUri = photoManager.getMediaUri(id, type)
           resultHandler.reply(mediaUri)
         }
       }

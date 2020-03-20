@@ -247,6 +247,9 @@ class Plugin {
   }
 
   Future<String> getMediaUrl(AssetEntity assetEntity) {
-    return _channel.invokeMethod("getMediaUrl", {"id": assetEntity.id});
+    return _channel.invokeMethod("getMediaUrl", {
+      "id": assetEntity.id,
+      "type": assetEntity.typeInt,
+    });
   }
 }
