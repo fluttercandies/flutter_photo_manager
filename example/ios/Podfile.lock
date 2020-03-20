@@ -1,9 +1,5 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_ijkplayer (0.0.1):
-    - Flutter
-    - FlutterIJK (~> 0.2.3)
-  - FlutterIJK (0.2.3)
   - photo_manager (0.0.1):
     - Flutter
   - video_player (0.0.1):
@@ -11,19 +7,12 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - flutter_ijkplayer (from `/Users/cai/.pub-cache/git/flutter_ijkplayer-468040c4222c26f65eb63ab22676362f9d350b9b/ios/flutter_ijkplayer.podspec`)
   - photo_manager (from `/Users/cai/Documents/GitHub/flutter_photo_manager/ios/photo_manager.podspec`)
   - "video_player (from `/Users/cai/.pub-cache/hosted/pub.flutter-io.cn/video_player-0.10.2+5/ios/video_player.podspec`)"
-
-SPEC REPOS:
-  trunk:
-    - FlutterIJK
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
-  flutter_ijkplayer:
-    :path: "/Users/cai/.pub-cache/git/flutter_ijkplayer-468040c4222c26f65eb63ab22676362f9d350b9b/ios/flutter_ijkplayer.podspec"
   photo_manager:
     :path: "/Users/cai/Documents/GitHub/flutter_photo_manager/ios/photo_manager.podspec"
   video_player:
@@ -31,8 +20,6 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_ijkplayer: a8f1ef22fa3e22e1ea80b70e6cb70b049cf88063
-  FlutterIJK: f3715f94cea893b0e643b2b27b781033a1bb5007
   photo_manager: f7c619c2cc8c2adb8d85c63363babac477de9c67
   video_player: 69c5f029fac4ffe4fc8a85ea7f7b793709661549
 
