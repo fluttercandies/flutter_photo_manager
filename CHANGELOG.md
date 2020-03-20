@@ -1,11 +1,12 @@
 # CHANGELOG
 
-## 0.5.0-dev.1
+## 0.5.0-dev.2
 
 Feature:
 
 - Add `orientation` for `AssetEntity`.
 - Add `onlyAll` for `getAssetPathList`.
+- Support audio type(Only android, iOS Photos have no audio)
 
 Update
 

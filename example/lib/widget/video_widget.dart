@@ -3,10 +3,12 @@ import 'package:video_player/video_player.dart';
 
 class VideoWidget extends StatefulWidget {
   final String mediaUrl;
+  final bool isAudio;
 
   const VideoWidget({
     Key key,
     @required this.mediaUrl,
+    this.isAudio = false,
   }) : super(key: key);
 
   @override
@@ -19,7 +21,7 @@ class _VideoWidgetState extends State<VideoWidget> {
   @override
   void initState() {
     super.initState();
-    // _controller = VideoPlayerController.file(widget.file)
+    print(widget.isAudio);
     _controller = VideoPlayerController.network(widget.mediaUrl)
       ..initialize().then((_) {
         setState(() {});
@@ -36,7 +38,7 @@ class _VideoWidgetState extends State<VideoWidget> {
   Widget build(BuildContext context) {
     return _controller.value.initialized
         ? AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
+            aspectRatio: widget.isAudio ? 1 : _controller.value.aspectRatio,
             child: GestureDetector(
               child: buildVideoPlayer(),
               onTap: () {
@@ -51,9 +53,24 @@ class _VideoWidgetState extends State<VideoWidget> {
   }
 
   buildVideoPlayer() {
-    var children = <Widget>[
-      VideoPlayer(_controller),
-    ];
+    Widget contentWidget;
+
+    if (!widget.isAudio) {
+      contentWidget = VideoPlayer(_controller);
+    } else {
+      contentWidget = Container(
+        color: Colors.white,
+        child: Center(
+          child: Icon(
+            Icons.audiotrack,
+            size: 200,
+            color: Colors.grey,
+          ),
+        ),
+      );
+    }
+
+    var children = <Widget>[contentWidget];
 
     if (!_controller.value.isPlaying) {
       children.add(

@@ -27,7 +27,7 @@ class PhotoManager {
   static Future<List<AssetPathEntity>> getAssetPathList({
     bool hasAll = true,
     bool onlyAll = false,
-    RequestType type = RequestType.all,
+    RequestType type = RequestType.common,
     DateTime fetchDateTime,
     FilterOptionGroup filterOption,
   }) async {

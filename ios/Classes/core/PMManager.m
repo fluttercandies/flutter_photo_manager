@@ -10,6 +10,8 @@
 #import "PMFilterOption.h"
 #import "PMLogUtils.h"
 #import "ResultHandler.h"
+#import "PMRequestTypeUtils.h"
+#import "NSString+PM_COMMON.h"
 
 @implementation PMManager {
   BOOL __isAuth;
@@ -653,59 +655,77 @@ getAssetEntityListWithGalleryId:(NSString *)id
   NSMutableString *cond = [NSMutableString new];
   NSMutableArray *args = [NSMutableArray new];
 
-  if (type == 1) {
+  BOOL containsImage = [PMRequestTypeUtils containsImage:type];
+  BOOL containsVideo = [PMRequestTypeUtils containsVideo:type];
+  BOOL containsAudio = [PMRequestTypeUtils containsAudio:type];
+
+  if (containsImage) {
+    [cond appendString:@"("];
+
     PMFilterOption *imageOption = optionGroup.imageOption;
 
     NSString *sizeCond = [imageOption sizeCond];
     NSArray *sizeArgs = [imageOption sizeArgs];
 
-    [cond appendString:@"mediaType == %d AND creationDate <= %@"];
+    [cond appendString:@"mediaType == %d"];
     [args addObject:@(PHAssetMediaTypeImage)];
-    [args addObject:date];
 
     [cond appendString:@" AND "];
     [cond appendString:sizeCond];
     [args addObjectsFromArray:sizeArgs];
 
-  } else if (type == 2) {
-    PMFilterOption *videoOption = optionGroup.videoOption;
-
-    [cond appendString:@"mediaType == %d AND creationDate <= %@"];
-    [args addObject:@(PHAssetMediaTypeVideo)];
-    [args addObject:date];
-
-    NSString *durationCond = [videoOption durationCond];
-    NSArray *durationArgs = [videoOption durationArgs];
-    [cond appendString:@" AND "];
-    [cond appendString:durationCond];
-    [args addObjectsFromArray:durationArgs];
-  } else {
-    [cond appendString:@"("]; //1
-
-    PMFilterOption *imageOption = optionGroup.imageOption;
-    NSString *sizeCond = [imageOption sizeCond];
-    NSArray *sizeArgs = [imageOption sizeArgs];
-
-    [cond appendString:@"(mediaType = %d AND "]; //2
-    [cond appendString:sizeCond];
-    [cond appendString:@" )"]; //2
-    [args addObject:@(PHAssetMediaTypeImage)];
-    [args addObjectsFromArray:sizeArgs];
-
-    PMFilterOption *videoOption = optionGroup.videoOption;
-    NSString *durationCond = [videoOption durationCond];
-    NSArray *durationArgs = [videoOption durationArgs];
-
-    [cond appendString:@"OR (mediaType == %d AND "]; //3
-    [cond appendString:durationCond];
-    [cond appendString:@" )"]; //3
-    [args addObject:@(PHAssetMediaTypeVideo)];
-    [args addObjectsFromArray:durationArgs];
-
-    [cond appendString:@" )"]; //1
-    [cond appendString:@" AND creationDate <= %@"];
-    [args addObject:date];
+    [cond appendString:@")"];
   }
+
+  if (containsVideo) {
+    if (![cond isEmpty]) {
+      [cond appendString:@" OR "];
+    }
+
+    [cond appendString:@" ( "];
+
+    PMFilterOption *videoOption = optionGroup.videoOption;
+
+    [cond appendString:@"mediaType == %d"];
+    [args addObject:@(PHAssetMediaTypeVideo)];
+
+    NSString *durationCond = [videoOption durationCond];
+    NSArray *durationArgs = [videoOption durationArgs];
+    [cond appendString:@" AND "];
+    [cond appendString:durationCond];
+    [args addObjectsFromArray:durationArgs];
+
+    [cond appendString:@" ) "];
+  }
+
+  if (containsAudio) {
+    if (![cond isEmpty]) {
+      [cond appendString:@" OR "];
+    }
+
+    [cond appendString:@" ( "];
+
+    PMFilterOption *videoOption = optionGroup.audioOption;
+
+    [cond appendString:@"mediaType == %d"];
+    [args addObject:@(PHAssetMediaTypeAudio)];
+
+    NSString *durationCond = [videoOption durationCond];
+    NSArray *durationArgs = [videoOption durationArgs];
+    [cond appendString:@" AND "];
+    [cond appendString:durationCond];
+    [args addObjectsFromArray:durationArgs];
+      
+      NSLog(@"duration = %.2f ~ %.2f", [durationArgs[0] floatValue], [durationArgs[1] floatValue]);
+
+    [cond appendString:@" ) "];
+  }
+
+  [cond insertString:@"(" atIndex:0];
+  [cond appendString:@")"];
+
+  [cond appendString:@" AND ( creationDate <= %@ )"];
+  [args addObject:date];
 
   options.predicate = [NSPredicate predicateWithFormat:cond argumentArray:args];
 

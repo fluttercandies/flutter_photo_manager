@@ -19,6 +19,14 @@ class ImageItemWidget extends StatefulWidget {
 class _ImageItemWidgetState extends State<ImageItemWidget> {
   @override
   Widget build(BuildContext context) {
+    if (widget.entity.type == AssetType.audio) {
+      return Center(
+        child: Icon(
+          Icons.audiotrack,
+          size: 30,
+        ),
+      );
+    }
     final item = widget.entity;
     final size = 130;
     final u8List = ImageLruCache.getData(item, size);

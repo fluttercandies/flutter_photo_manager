@@ -44,6 +44,8 @@ class _DetailPageState extends State<DetailPage> {
   Widget _buildContent() {
     if (widget.entity.type == AssetType.video) {
       return buildVideo();
+    } else if (widget.entity.type == AssetType.audio) {
+      return buildVideo();
     } else {
       return buildImage();
     }
@@ -58,6 +60,7 @@ class _DetailPageState extends State<DetailPage> {
 
   Widget buildVideo() {
     return VideoWidget(
+      isAudio: widget.entity.type == AssetType.audio,
       mediaUrl: widget.mediaUrl,
     );
   }
@@ -126,6 +129,14 @@ class _DetailPageState extends State<DetailPage> {
         }
         return buildInfoItem(title, snapshot.data);
       },
+    );
+  }
+
+  Widget buildAudio() {
+    return Container(
+      child: Center(
+        child: Icon(Icons.audiotrack),
+      ),
     );
   }
 }

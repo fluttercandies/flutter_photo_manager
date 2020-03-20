@@ -40,5 +40,6 @@ typedef struct PMDurationConstraint {
 
 @property(nonatomic, strong) PMFilterOption *imageOption;
 @property(nonatomic, strong) PMFilterOption *videoOption;
+@property(nonatomic, strong) PMFilterOption *audioOption;
 
 @end

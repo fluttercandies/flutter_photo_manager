@@ -198,7 +198,8 @@ object AndroidQDBUtils : IDBUtils {
     val path = cursor.getString(MediaStore.MediaColumns.DATA)
     val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
     val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
-    val duration = if (requestType == 1) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
+    
+    val duration = if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
     val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
     val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
     val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
@@ -312,10 +313,11 @@ object AndroidQDBUtils : IDBUtils {
   
   private fun getUri(id: String, type: Int, isOrigin: Boolean = false): Uri {
     var uri =
-      if (type == 1)
-        Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-      else
-        Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+      when (type) {
+        1 -> Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+        2 -> Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+        else -> Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+      }
     
     if (isOrigin) {
       uri = MediaStore.setRequireOriginal(uri)
@@ -418,8 +420,8 @@ object AndroidQDBUtils : IDBUtils {
     return getAssetEntity(context, id.toString())
   }
   
-  override fun getMediaUri(context: Context, id: String): String {
-    val uri = getUri(id, 2, false)
+  override fun getMediaUri(context: Context, id: String, type: Int): String {
+    val uri = getUri(id, type, false)
     return uri.toString()
   }
 }

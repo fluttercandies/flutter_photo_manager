@@ -61,9 +61,10 @@
 
   if (asset.isVideo) {
     typeInt = 2;
-  }
-  if (asset.isImage) {
+  } else if (asset.isImage) {
     typeInt = 1;
+  } else if (asset.isAudio) {
+    typeInt = 3;
   }
 
   return @{
@@ -100,9 +101,11 @@
   PMFilterOptionGroup *container = [PMFilterOptionGroup alloc];
   NSDictionary *image = map[@"image"];
   NSDictionary *video = map[@"video"];
+  NSDictionary *audio = map[@"audio"];
 
   container.imageOption = [self convertMapToPMFilterOption:image];
   container.videoOption = [self convertMapToPMFilterOption:video];
+  container.audioOption = [self convertMapToPMFilterOption:audio];
 
   return container;
 }

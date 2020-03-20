@@ -131,6 +131,8 @@ class AssetEntity {
         return AssetType.image;
       case 2:
         return AssetType.video;
+      case 3:
+        return AssetType.audio;
       default:
         return AssetType.other;
     }
@@ -272,9 +274,10 @@ class AssetEntity {
   ///
   /// AndroidQ or higher: `content://media/external/video/media/894857`
   Future<String> getMediaUrl() {
-    if (type == AssetType.video) {
+    if (type == AssetType.video || type == AssetType.audio) {
       return PhotoManager._getMediaUrl(this);
     }
+
     return null;
   }
 
