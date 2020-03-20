@@ -205,10 +205,14 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   }
 
   Future<void> showOriginBytes(AssetEntity entity) async {
-    final title = await entity.titleAsync;
+    var title = entity.title;
+    if (entity.title == null || entity.title.isEmpty) {
+      title = await entity.titleAsync;
+    }
     print("entity.title = $title");
     if (title.toLowerCase().endsWith(".heic")) {
-      showToast("Heic no support by Flutter.");
+      showToast(
+          "Heic no support by Flutter. Try to use entity.thumbDataWithSize to get thumb.");
       return;
     }
     showDialog(
