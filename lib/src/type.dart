@@ -30,6 +30,7 @@ class RequestType {
   static const video = RequestType(_videoValue);
   static const audio = RequestType(_audioValue);
   static const all = RequestType(_imageValue | _videoValue | _audioValue);
+  static const common = RequestType(_imageValue | _videoValue);
 
   const RequestType(this.value);
 

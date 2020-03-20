@@ -6,7 +6,7 @@ import 'package:photo_manager/photo_manager.dart';
 class PhotoProvider extends ChangeNotifier {
   List<AssetPathEntity> list = [];
 
-  RequestType type = RequestType.all;
+  RequestType type = RequestType.common;
 
   DateTime dt = DateTime.now();
 
