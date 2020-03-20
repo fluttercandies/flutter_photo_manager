@@ -116,11 +116,6 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             children: <Widget>[
               previewOriginBytesWidget,
               RaisedButton(
-                child: Text("Show thumb image in dialog"),
-                onPressed: () =>
-                    showThumbImageDialog(entity, entity.width, entity.height),
-              ),
-              RaisedButton(
                 child: Text("Show detail page"),
                 onPressed: () => routeToDetailPage(entity),
               ),
@@ -209,9 +204,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     }
   }
 
-  showOriginBytes(AssetEntity entity) {
-    print("entity.title = ${entity.title}");
-    if (entity.title.toLowerCase().endsWith(".heic")) {
+  Future<void> showOriginBytes(AssetEntity entity) async {
+    final title = await entity.titleAsync;
+    print("entity.title = $title");
+    if (title.toLowerCase().endsWith(".heic")) {
       showToast("Heic no support by Flutter.");
       return;
     }
@@ -222,7 +218,9 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             future: entity.originBytes,
             builder: (BuildContext context, snapshot) {
               Widget w;
-              if (snapshot.hasData) {
+              if (snapshot.hasError) {
+                return ErrorWidget(snapshot.error);
+              } else if (snapshot.hasData) {
                 w = Image.memory(snapshot.data);
               } else {
                 w = Center(
