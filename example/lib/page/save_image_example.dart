@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class SaveImageExample extends StatefulWidget {
@@ -14,6 +15,24 @@ class _SaveImageExampleState extends State<SaveImageExample> {
       "https://ww4.sinaimg.cn/bmiddle/005TR3jLly1ga48shax8zj30u02ickjl.jpg";
 
   final haveExifUrl = "http://172.16.100.7:2393/IMG_20200107_182905.jpg";
+
+  @override
+  void initState() {
+    super.initState();
+    PhotoManager.addChangeCallback(_onChange);
+    PhotoManager.startChangeNotify();
+  }
+
+  void _onChange(MethodCall call) {
+    print(call.arguments);
+  }
+
+  @override
+  void dispose() {
+    PhotoManager.stopChangeNotify();
+    PhotoManager.removeChangeCallback(_onChange);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

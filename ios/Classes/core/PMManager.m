@@ -47,18 +47,13 @@
 
 
   if (onlyAll) {
-//    PHFetchResult<PHCollection *> *result = [PHAssetCollection fetchTopLevelUserCollectionsWithOptions:assetOptions];
-      PHFetchResult<PHCollection *> *result = [PHAssetCollection
-      fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
-                            subtype:PHAssetCollectionSubtypeAlbumRegular
-                            options:fetchCollectionOptions];
+      PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection
+          fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
+                                subtype:PHAssetCollectionSubtypeAlbumRegular
+                                options:fetchCollectionOptions];
 
     if (result && result.count) {
-      for (PHCollection *phCollection in result) {
-        if (![phCollection isMemberOfClass:PHAssetCollection.class]) {
-          continue;
-        }
-        PHAssetCollection *collection = (PHAssetCollection *) phCollection;
+      for (PHAssetCollection *collection in result) {
         if (collection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumUserLibrary) {
           PHFetchResult<PHAsset *> *assetResult = [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
           PMAssetPathEntity *pathEntity = [PMAssetPathEntity entityWithId:collection.localIdentifier name:collection.localizedTitle assetCount:assetResult.count];
