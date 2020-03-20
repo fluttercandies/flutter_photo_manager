@@ -25,9 +25,29 @@
 }
 
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
-//    NSLog(@"photo library is change");
+    PHAssetCollection *collection = [self getRecentCollection];
+    if (!collection) {
+        [self.handler invokeMethod:@"change" arguments:@1];
+        return;
+    }
+
+    PHObjectChangeDetails *details = [changeInstance changeDetailsForObject:collection];
+    PHObject *object = details.objectAfterChanges;
+    NSLog(@"%@, %@", object.localIdentifier, object.class);
+
     [self.handler invokeMethod:@"change" arguments:@1];
 }
 
+- (PHAssetCollection *)getRecentCollection {
+    if (PHPhotoLibrary.authorizationStatus == PHAuthorizationStatusAuthorized) {
+        PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAny options:nil];
 
+        for (PHAssetCollection *collection in result) {
+            if (collection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumUserLibrary) {
+                return collection;
+            }
+        }
+    }
+    return nil;
+}
 @end

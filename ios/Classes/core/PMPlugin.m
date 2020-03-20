@@ -13,25 +13,23 @@
 #import <Photos/Photos.h>
 
 @implementation PMPlugin {
-  PMNotificationManager *_notificationManager;
 }
 
 - (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar {
-  [self nitNotificationManager:registrar];
+  [self initNotificationManager:registrar];
 
   FlutterMethodChannel *channel =
           [FlutterMethodChannel methodChannelWithName:@"top.kikt/photo_manager"
                                       binaryMessenger:[registrar messenger]];
-  PMPlugin *plugin = [PMPlugin new];
-  [plugin setManager:[PMManager new]];
+  [self setManager:[PMManager new]];
   [channel
           setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
-              [plugin onMethodCall:call result:result];
+              [self onMethodCall:call result:result];
           }];
 }
 
-- (void)nitNotificationManager:(NSObject <FlutterPluginRegistrar> *)registrar {
-  _notificationManager = [PMNotificationManager managerWithRegistrar:registrar];
+- (void)initNotificationManager:(NSObject <FlutterPluginRegistrar> *)registrar {
+  self.notificationManager = [PMNotificationManager managerWithRegistrar:registrar];
 }
 
 - (void)onMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
@@ -70,6 +68,8 @@
 - (void)onAuth:(FlutterMethodCall *)call result:(FlutterResult)result {
   ResultHandler *handler = [ResultHandler handlerWithResult:result];
   PMManager *manager = self.manager;
+  __block  PMNotificationManager *notificationManager = self.notificationManager;
+    
   [self runInBackground:^{
       if ([call.method isEqualToString:@"getGalleryList"]) {
 
@@ -174,13 +174,13 @@
       } else if ([call.method isEqualToString:@"notify"]) {
         BOOL notify = [call.arguments[@"notify"] boolValue];
         if (notify) {
-          [_notificationManager startNotify];
+          [notificationManager startNotify];
         } else {
-          [_notificationManager stopNotify];
+          [notificationManager stopNotify];
         }
 
       } else if ([call.method isEqualToString:@"isNotifying"]) {
-        BOOL isNotifying = [_notificationManager isNotifying];
+        BOOL isNotifying = [notificationManager isNotifying];
         [handler reply:@(isNotifying)];
 
       } else if ([call.method isEqualToString:@"deleteWithIds"]) {
