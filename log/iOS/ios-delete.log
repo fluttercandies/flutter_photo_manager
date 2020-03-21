@@ -1,0 +1,48 @@
+2020-03-21 15:37:43.017767+0800 Runner[90808:13081731] changed = (
+)
+2020-03-21 15:38:38.530711+0800 Runner[90808:13083568] inserted = (
+    "<PHAsset: 0x7fc793700300> AA3ED26E-539B-4CE4-922D-B6AB8045A600/L0/001 mediaType=1/0, sourceType=1, (440x1325), creationDate=2020-03-21 07:37:42 +0000, location=0, hidden=0, favorite=0, adjusted=0 "
+)
+2020-03-21 15:38:38.531083+0800 Runner[90808:13083568] removed = (
+    "<PHAsset: 0x7fc795e0ede0> CF326521-70F6-4854-9E0C-0EA51C53ACD0/L0/001 mediaType=1/0, sourceType=1, (440x1325), creationDate=2020-03-20 13:14:09 +0000, location=0, hidden=0, favorite=0, adjusted=0 "
+)
+2020-03-21 15:38:38.531560+0800 Runner[90808:13083568] on change result = {
+    create =     (
+                {
+            id = "AA3ED26E-539B-4CE4-922D-B6AB8045A600/L0/001";
+        }
+    );
+    delete =     (
+                {
+            id = "CF326521-70F6-4854-9E0C-0EA51C53ACD0/L0/001";
+        }
+    );
+    update =     (
+    );
+}
+2020-03-21 15:38:38.532677+0800 Runner[90808:13081752] flutter: {delete: [{id: CF326521-70F6-4854-9E0C-0EA51C53ACD0/L0/001}], create: [{id: AA3ED26E-539B-4CE4-922D-B6AB8045A600/L0/001}], update: []}
+2020-03-21 15:38:38.533622+0800 Runner[90808:13081752] flutter: {delete: [{id: CF326521-70F6-4854-9E0C-0EA51C53ACD0/L0/001}], create: [{id: AA3ED26E-539B-4CE4-922D-B6AB8045A600/L0/001}], update: []}
+2020-03-21 15:38:38.825192+0800 Runner[90808:13083969] changed = (
+    "<PHAsset: 0x7fc79352d360> CF326521-70F6-4854-9E0C-0EA51C53ACD0/L0/001 mediaType=1/0, sourceType=1, (440x1325), creationDate=2020-03-20 13:14:09 +0000, location=0, hidden=0, favorite=0, adjusted=0 ",
+    "<PHAsset: 0x7fc79352d550> 22A83F21-FB93-408D-B6BD-0A10E44F1180/L0/001 mediaType=1/0, sourceType=1, (440x1325), creationDate=2020-03-20 13:14:51 +0000, location=0, hidden=0, favorite=0, adjusted=0 "
+)
+2020-03-21 15:38:38.825463+0800 Runner[90808:13083969] inserted = (
+)
+2020-03-21 15:38:38.825620+0800 Runner[90808:13083969] removed = (
+)
+2020-03-21 15:38:38.825837+0800 Runner[90808:13083969] on change result = {
+    create =     (
+    );
+    delete =     (
+    );
+    update =     (
+                {
+            id = "CF326521-70F6-4854-9E0C-0EA51C53ACD0/L0/001";
+        },
+                {
+            id = "22A83F21-FB93-408D-B6BD-0A10E44F1180/L0/001";
+        }
+    );
+}
+2020-03-21 15:38:38.827341+0800 Runner[90808:13081752] flutter: {delete: [], create: [], update: [{id: CF326521-70F6-4854-9E0C-0EA51C53ACD0/L0/001}, {id: 22A83F21-FB93-408D-B6BD-0A10E44F1180/L0/001}]}
+2020-03-21 15:38:38.827810+0800 Runner[90808:13081752] flutter: {delete: [], create: [], update: [{id: CF326521-70F6-4854-9E0C-0EA51C53ACD0/L0/001}, {id: 22A83F21-FB93-408D-B6BD-0A10E44F1180/L0/001}]}

@@ -1,0 +1,37 @@
+2020-03-21 15:37:38.493108+0800 Runner[90808:13081766] flutter: Observatory listening on http://127.0.0.1:55083/75DfBE07g2M=/
+2020-03-21 15:37:41.312862+0800 Runner[90808:13081731] [core] "Error returned from daemon: Error Domain=com.apple.accounts Code=7 "(null)""
+2020-03-21 15:37:42.999059+0800 Runner[90808:13081729] create asset : id = AA3ED26E-539B-4CE4-922D-B6AB8045A600/L0/001
+2020-03-21 15:37:43.017767+0800 Runner[90808:13081731] changed = (
+)
+2020-03-21 15:37:43.018169+0800 Runner[90808:13081731] inserted = (
+    "<PHAsset: 0x7fc793437000> AA3ED26E-539B-4CE4-922D-B6AB8045A600/L0/001 mediaType=1/0, sourceType=1, (440x1325), creationDate=2020-03-21 07:37:42 +0000, location=0, hidden=0, favorite=0, adjusted=0 "
+)
+2020-03-21 15:37:43.018342+0800 Runner[90808:13081731] removed = (
+)
+2020-03-21 15:37:43.018990+0800 Runner[90808:13081752] flutter: AssetEntity{id:AA3ED26E-539B-4CE4-922D-B6AB8045A600/L0/001}
+2020-03-21 15:37:43.019402+0800 Runner[90808:13081731] on change result = {
+    create =     (
+                {
+            id = "AA3ED26E-539B-4CE4-922D-B6AB8045A600/L0/001";
+        }
+    );
+    delete =     (
+    );
+    update =     (
+    );
+}
+2020-03-21 15:37:43.025146+0800 Runner[90808:13081752] flutter: {delete: [], create: [{id: AA3ED26E-539B-4CE4-922D-B6AB8045A600/L0/001}], update: []}
+2020-03-21 15:37:43.026938+0800 Runner[90808:13081752] flutter: {delete: [], create: [{id: AA3ED26E-539B-4CE4-922D-B6AB8045A600/L0/001}], update: []}
+2020-03-21 15:37:43.340886+0800 Runner[90808:13081728] changed = (null)
+2020-03-21 15:37:43.341043+0800 Runner[90808:13081728] inserted = (null)
+2020-03-21 15:37:43.341174+0800 Runner[90808:13081728] removed = (null)
+2020-03-21 15:37:43.341329+0800 Runner[90808:13081728] on change result = {
+    create =     (
+    );
+    delete =     (
+    );
+    update =     (
+    );
+}
+2020-03-21 15:37:43.342040+0800 Runner[90808:13081752] flutter: {delete: [], create: [], update: []}
+2020-03-21 15:37:43.342530+0800 Runner[90808:13081752] flutter: {delete: [], create: [], update: []}
