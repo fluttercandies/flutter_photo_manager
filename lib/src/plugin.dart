@@ -103,12 +103,14 @@ class Plugin {
     int width = 100,
     int height = 100,
     ThumbFormat format,
+    int quality,
   }) {
     return _channel.invokeMethod("getThumb", {
       "width": width,
       "height": height,
       "id": id,
       "format": format.index,
+      "quality": quality,
     });
   }
 

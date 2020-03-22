@@ -68,8 +68,8 @@
 - (void)onAuth:(FlutterMethodCall *)call result:(FlutterResult)result {
   ResultHandler *handler = [ResultHandler handlerWithResult:result];
   PMManager *manager = self.manager;
-  __block  PMNotificationManager *notificationManager = self.notificationManager;
-    
+  __block PMNotificationManager *notificationManager = self.notificationManager;
+
   [self runInBackground:^{
       if ([call.method isEqualToString:@"getGalleryList"]) {
 
@@ -131,12 +131,9 @@
         NSUInteger width = [call.arguments[@"width"] unsignedIntegerValue];
         NSUInteger height = [call.arguments[@"height"] unsignedIntegerValue];
         NSUInteger format = [call.arguments[@"format"] unsignedIntegerValue];
+        NSUInteger quality = [call.arguments[@"quality"] unsignedIntegerValue];
 
-        [manager getThumbWithId:id
-                          width:width
-                         height:height
-                         format:format
-                  resultHandler:handler];
+        [manager getThumbWithId:id width:width height:height format:format quality:quality resultHandler:handler];
 
       } else if ([call.method isEqualToString:@"getFullFile"]) {
         NSString *id = call.arguments[@"id"];

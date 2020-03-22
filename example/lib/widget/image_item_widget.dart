@@ -2,8 +2,11 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_scanner_example/core/lru_map.dart';
+import 'package:image_scanner_example/model/photo_provider.dart';
+import 'package:image_scanner_example/widget/change_notifier_builder.dart';
 import 'package:image_scanner_example/widget/loading_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:provider/provider.dart';
 
 class ImageItemWidget extends StatefulWidget {
   final AssetEntity entity;
@@ -19,6 +22,18 @@ class ImageItemWidget extends StatefulWidget {
 class _ImageItemWidgetState extends State<ImageItemWidget> {
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<PhotoProvider>(context);
+    return ChangeNotifierBuilder(
+      builder: (c, p) {
+        final format = provider.thumbFormat;
+        print(format);
+        return buildContent(format);
+      },
+      value: provider,
+    );
+  }
+
+  Widget buildContent(ThumbFormat format) {
     if (widget.entity.type == AssetType.audio) {
       return Center(
         child: Icon(
@@ -29,7 +44,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
     }
     final item = widget.entity;
     final size = 130;
-    final u8List = ImageLruCache.getData(item, size);
+    final u8List = ImageLruCache.getData(item, size, format);
 
     Widget image;
 
@@ -37,7 +52,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
       return _buildImageWidget(item, u8List, size);
     } else {
       image = FutureBuilder<Uint8List>(
-        future: item.thumbDataWithSize(size, size),
+        future: item.thumbDataWithSize(size, size, format: format),
         builder: (context, snapshot) {
           Widget w;
           if (snapshot.hasError) {
@@ -46,7 +61,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
             );
           }
           if (snapshot.hasData) {
-            ImageLruCache.setData(item, size, snapshot.data);
+            ImageLruCache.setData(item, size, format, snapshot.data);
             w = _buildImageWidget(item, snapshot.data, size);
           } else {
             w = Center(

@@ -39,11 +39,7 @@ getAssetEntityListWithGalleryId:(NSString *)id
 
 - (void)clearCache;
 
-- (void)getThumbWithId:(NSString *)id
-                 width:(NSUInteger)width
-                height:(NSUInteger)height
-                format:(NSUInteger)format
-         resultHandler:(ResultHandler *)handler;
+- (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality resultHandler:(ResultHandler *)handler;
 
 - (void)getFullSizeFileWithId:(NSString *)id
                      isOrigin:(BOOL)isOrigin

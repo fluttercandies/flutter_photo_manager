@@ -40,20 +40,23 @@ class LRUMap<K, V> {
 class ImageLruCache {
   static LRUMap<_ImageCacheEntity, Uint8List> _map = LRUMap(500);
 
-  static Uint8List getData(AssetEntity entity, [int size = 64]) {
-    return _map.get(_ImageCacheEntity(entity, size));
+  static Uint8List getData(AssetEntity entity,
+      [int size = 64, ThumbFormat format = ThumbFormat.jpeg]) {
+    return _map.get(_ImageCacheEntity(entity, size, format));
   }
 
-  static void setData(AssetEntity entity, int size, Uint8List list) {
-    _map.put(_ImageCacheEntity(entity, size), list);
+  static void setData(
+      AssetEntity entity, int size, ThumbFormat format, Uint8List list) {
+    _map.put(_ImageCacheEntity(entity, size, format), list);
   }
 }
 
 class _ImageCacheEntity {
   AssetEntity entity;
   int size;
+  ThumbFormat format;
 
-  _ImageCacheEntity(this.entity, this.size);
+  _ImageCacheEntity(this.entity, this.size, this.format);
 
   @override
   bool operator ==(Object other) =>
@@ -61,8 +64,9 @@ class _ImageCacheEntity {
       other is _ImageCacheEntity &&
           runtimeType == other.runtimeType &&
           entity == other.entity &&
-          size == other.size;
+          size == other.size &&
+          format == other.format;
 
   @override
-  int get hashCode => entity.hashCode ^ size.hashCode;
+  int get hashCode => entity.hashCode * size.hashCode * format.hashCode;
 }
