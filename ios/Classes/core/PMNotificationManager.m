@@ -84,6 +84,7 @@
   [self addToResult:dictionary key:@"create" objects:insertedObjects];
   [self addToResult:dictionary key:@"delete" objects:removedObjects];
 
+//  return @{@"platform": @"iOS", result: dictionary};
   return dictionary;
 }
 
