@@ -27,6 +27,15 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  var _thumbFormat = ThumbFormat.png;
+
+  ThumbFormat get thumbFormat => _thumbFormat;
+
+  set thumbFormat(thumbFormat) {
+    _thumbFormat = thumbFormat;
+    notifyListeners();
+  }
+
   bool get notifying => _notifying;
 
   String minWidth = "0";
@@ -158,6 +167,14 @@ class PhotoProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void changeThumbFormat() {
+    if (thumbFormat == ThumbFormat.jpeg) {
+      thumbFormat = ThumbFormat.png;
+    } else {
+      thumbFormat = ThumbFormat.jpeg;
+    }
+  }
 }
 
 class PathProvider extends ChangeNotifier {
@@ -212,7 +229,6 @@ class PathProvider extends ChangeNotifier {
       printListLength("deleted");
       this.list.clear();
       this.list.addAll(list);
-      
     }
   }
 

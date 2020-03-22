@@ -13,7 +13,6 @@ import 'package:image_scanner_example/widget/loading_widget.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
-import 'dart:ui' as ui;
 
 class GalleryContentListPage extends StatefulWidget {
   final AssetPathEntity path;
@@ -26,6 +25,8 @@ class GalleryContentListPage extends StatefulWidget {
 
 class _GalleryContentListPageState extends State<GalleryContentListPage> {
   AssetPathEntity get path => widget.path;
+
+  PhotoProvider get photoProvider => Provider.of<PhotoProvider>(context);
 
   PathProvider get provider =>
       Provider.of<PhotoProvider>(context).getOrCreatePathProvider(path);
@@ -45,6 +46,22 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
           appBar: AppBar(
             title: Text("${path.name}"),
             actions: <Widget>[
+              ChangeNotifierBuilder(
+                builder: (context, provider) {
+                  final formatType = provider.thumbFormat == ThumbFormat.jpeg
+                      ? ThumbFormat.png
+                      : ThumbFormat.jpeg;
+                  return IconButton(
+                    icon: Icon(Icons.swap_horiz),
+                    iconSize: 22,
+                    tooltip: "Use another format.",
+                    onPressed: () {
+                      provider.thumbFormat = formatType;
+                    },
+                  );
+                },
+                value: photoProvider,
+              ),
               Tooltip(
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
@@ -225,51 +242,6 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               if (snapshot.hasError) {
                 return ErrorWidget(snapshot.error);
               } else if (snapshot.hasData) {
-                w = Image.memory(snapshot.data);
-              } else {
-                w = Center(
-                  child: Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.all(20),
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              }
-              return GestureDetector(
-                child: w,
-                onTap: () => Navigator.pop(context),
-              );
-            },
-          );
-        });
-  }
-
-  void showThumbImageDialog(AssetEntity entity, int width, int height) async {
-    final format = ThumbFormat.jpeg;
-    width = width ~/ 4;
-    height = height ~/ 4;
-
-    print("will show ${width}x$height image");
-
-    if (entity.orientation == 90 || entity.orientation == 270) {
-      int tmp = width;
-      width = height;
-      height = tmp;
-    }
-
-    showDialog(
-        context: context,
-        builder: (_) {
-          return FutureBuilder<Uint8List>(
-            future: entity.thumbDataWithSize(width, height, format: format),
-            builder: (BuildContext context, snapshot) {
-              Widget w;
-              if (snapshot.hasData) {
-                ui.decodeImageFromList(snapshot.data, (decodingImage) {
-                  print(
-                      "the thumb of image is ${decodingImage.width}x${decodingImage.height}");
-                });
-                print("$format image length : ${snapshot.data.length}");
                 w = Image.memory(snapshot.data);
               } else {
                 w = Center(

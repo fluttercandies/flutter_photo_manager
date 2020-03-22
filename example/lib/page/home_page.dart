@@ -52,6 +52,7 @@ class _NewHomePageState extends State<NewHomePage> {
             ),
             _buildHasAllCheck(),
             _buildOnlyAllCheck(),
+            _buildPngCheck(),
             _buildNotifyCheck(),
             _buildFilterOption(provider),
           ],
@@ -135,6 +136,16 @@ class _NewHomePageState extends State<NewHomePage> {
         provider.changeHasAll(value);
       },
       title: Text("hasAll"),
+    );
+  }
+
+  Widget _buildPngCheck() {
+    return CheckboxListTile(
+      value: provider.thumbFormat == ThumbFormat.png,
+      onChanged: (value) {
+        provider.changeThumbFormat();
+      },
+      title: Text("thumb png"),
     );
   }
 
