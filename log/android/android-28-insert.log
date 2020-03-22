@@ -1,0 +1,44 @@
+2020-03-22 10:36:36.453 5798-5798/top.kikt.handledeletemedia I/My-Tag: 发生变化 = content://media/external/images/media/83
+2020-03-22 10:36:36.536 5798-5798/top.kikt.handledeletemedia I/My-Tag: cursor 数量 = 1
+2020-03-22 10:36:36.537 5798-5798/top.kikt.handledeletemedia I/My-Tag: _id : 83
+2020-03-22 10:36:36.537 5798-5798/top.kikt.handledeletemedia I/My-Tag: _data : /storage/emulated/0/Pictures/1584844596247.jpg
+2020-03-22 10:36:36.537 5798-5798/top.kikt.handledeletemedia I/My-Tag: _size : null
+2020-03-22 10:36:36.538 5798-5798/top.kikt.handledeletemedia I/My-Tag: _display_name : 1584844596247.jpg
+2020-03-22 10:36:36.538 5798-5798/top.kikt.handledeletemedia I/My-Tag: mime_type : image/jpeg
+2020-03-22 10:36:36.539 5798-5798/top.kikt.handledeletemedia I/My-Tag: title : image_1584844595.948
+2020-03-22 10:36:36.539 5798-5798/top.kikt.handledeletemedia I/My-Tag: date_added : 1584844596
+2020-03-22 10:36:36.539 5798-5798/top.kikt.handledeletemedia I/My-Tag: date_modified : null
+2020-03-22 10:36:36.539 5798-5798/top.kikt.handledeletemedia I/My-Tag: description : 
+2020-03-22 10:36:36.539 5798-5798/top.kikt.handledeletemedia I/My-Tag: picasa_id : null
+2020-03-22 10:36:36.539 5798-5798/top.kikt.handledeletemedia I/My-Tag: isprivate : null
+2020-03-22 10:36:36.540 5798-5798/top.kikt.handledeletemedia I/My-Tag: latitude : null
+2020-03-22 10:36:36.540 5798-5798/top.kikt.handledeletemedia I/My-Tag: longitude : null
+2020-03-22 10:36:36.543 5798-5798/top.kikt.handledeletemedia I/My-Tag: datetaken : null
+2020-03-22 10:36:36.543 5798-5798/top.kikt.handledeletemedia I/My-Tag: orientation : null
+2020-03-22 10:36:36.543 5798-5798/top.kikt.handledeletemedia I/My-Tag: mini_thumb_magic : null
+2020-03-22 10:36:36.544 5798-5798/top.kikt.handledeletemedia I/My-Tag: bucket_id : -1617409521
+2020-03-22 10:36:36.544 5798-5798/top.kikt.handledeletemedia I/My-Tag: bucket_display_name : Pictures
+2020-03-22 10:36:36.544 5798-5798/top.kikt.handledeletemedia I/My-Tag: width : null
+2020-03-22 10:36:36.545 5798-5798/top.kikt.handledeletemedia I/My-Tag: height : null
+2020-03-22 10:36:36.821 5798-5798/top.kikt.handledeletemedia I/My-Tag: 发生变化 = content://media/external/images/media/83?blocking=1&orig_id=83&group_id=0
+2020-03-22 10:36:36.842 5798-5798/top.kikt.handledeletemedia I/My-Tag: cursor 数量 = 1
+2020-03-22 10:36:36.843 5798-5798/top.kikt.handledeletemedia I/My-Tag: _id : 83
+2020-03-22 10:36:36.844 5798-5798/top.kikt.handledeletemedia I/My-Tag: _data : /storage/emulated/0/Pictures/1584844596247.jpg
+2020-03-22 10:36:36.845 5798-5798/top.kikt.handledeletemedia I/My-Tag: _size : null
+2020-03-22 10:36:36.845 5798-5798/top.kikt.handledeletemedia I/My-Tag: _display_name : 1584844596247.jpg
+2020-03-22 10:36:36.845 5798-5798/top.kikt.handledeletemedia I/My-Tag: mime_type : image/jpeg
+2020-03-22 10:36:36.846 5798-5798/top.kikt.handledeletemedia I/My-Tag: title : image_1584844595.948
+2020-03-22 10:36:36.846 5798-5798/top.kikt.handledeletemedia I/My-Tag: date_added : 1584844596
+2020-03-22 10:36:36.846 5798-5798/top.kikt.handledeletemedia I/My-Tag: date_modified : null
+2020-03-22 10:36:36.846 5798-5798/top.kikt.handledeletemedia I/My-Tag: description : 
+2020-03-22 10:36:36.847 5798-5798/top.kikt.handledeletemedia I/My-Tag: picasa_id : null
+2020-03-22 10:36:36.847 5798-5798/top.kikt.handledeletemedia I/My-Tag: isprivate : null
+2020-03-22 10:36:36.847 5798-5798/top.kikt.handledeletemedia I/My-Tag: latitude : null
+2020-03-22 10:36:36.847 5798-5798/top.kikt.handledeletemedia I/My-Tag: longitude : null
+2020-03-22 10:36:36.848 5798-5798/top.kikt.handledeletemedia I/My-Tag: datetaken : null
+2020-03-22 10:36:36.848 5798-5798/top.kikt.handledeletemedia I/My-Tag: orientation : null
+2020-03-22 10:36:36.848 5798-5798/top.kikt.handledeletemedia I/My-Tag: mini_thumb_magic : 7176894601686278154
+2020-03-22 10:36:36.848 5798-5798/top.kikt.handledeletemedia I/My-Tag: bucket_id : -1617409521
+2020-03-22 10:36:36.849 5798-5798/top.kikt.handledeletemedia I/My-Tag: bucket_display_name : Pictures
+2020-03-22 10:36:36.849 5798-5798/top.kikt.handledeletemedia I/My-Tag: width : null
+2020-03-22 10:36:36.849 5798-5798/top.kikt.handledeletemedia I/My-Tag: height : null
