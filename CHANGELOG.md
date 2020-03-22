@@ -4,6 +4,7 @@
 
 Feature:
 
+- Add `quality` for `AssetEntity.thumbDataWithSize`.
 - Add `orientation` for `AssetEntity`.
 - Add `onlyAll` for `getAssetPathList`.
 - Support audio type(Only android, iOS Photos have no audio)

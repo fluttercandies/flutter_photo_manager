@@ -311,40 +311,24 @@ getAssetEntityListWithGalleryId:(NSString *)id
   [cacheContainer clearCache];
 }
 
-- (void)getThumbWithId:(NSString *)id
-                 width:(NSUInteger)width
-                height:(NSUInteger)height
-                format:(NSUInteger)format
-         resultHandler:(ResultHandler *)handler {
+- (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality resultHandler:(ResultHandler *)handler {
   PMAssetEntity *entity = [self getAssetEntity:id needTitle:NO];
   if (entity && entity.phAsset) {
     PHAsset *asset = entity.phAsset;
-    [self fetchThumb:asset
-               width:width
-              height:height
-              format:format
-       resultHandler:handler];
+    [self fetchThumb:asset width:width height:height format:format quality:quality resultHandler:handler];
   } else {
     [handler replyError:@"asset is not found"];
   }
 }
 
-- (void)fetchThumb:(PHAsset *)asset
-             width:(NSUInteger)width
-            height:(NSUInteger)height
-            format:(NSUInteger)format
-     resultHandler:(ResultHandler *)handler {
+- (void)fetchThumb:(PHAsset *)asset width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality resultHandler:(ResultHandler *)handler {
   PHImageManager *manager = PHImageManager.defaultManager;
   PHImageRequestOptions *options = [PHImageRequestOptions new];
   [options setNetworkAccessAllowed:YES];
   [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
           NSDictionary *info) {
       if (progress == 1.0) {
-        [self fetchThumb:asset
-                   width:width
-                  height:height
-                  format:format
-           resultHandler:handler];
+        [self fetchThumb:asset width:width height:height format:format quality:quality resultHandler:handler];
       }
   }];
   [manager requestImageForAsset:asset
@@ -365,11 +349,11 @@ getAssetEntityListWithGalleryId:(NSString *)id
                       if (format == 1) {
                         imageData = UIImagePNGRepresentation(result);
                       } else {
-                        imageData = UIImageJPEGRepresentation(result, 0.95);
+                        double qualityValue = (double) quality / 100.0;
+                        imageData = UIImageJPEGRepresentation(result, qualityValue);
                       }
 
-                      FlutterStandardTypedData *data =
-                              [FlutterStandardTypedData typedDataWithBytes:imageData];
+                      FlutterStandardTypedData *data = [FlutterStandardTypedData typedDataWithBytes:imageData];
                       [handler reply:data];
                   }];
 }

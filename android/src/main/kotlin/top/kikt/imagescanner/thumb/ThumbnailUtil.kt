@@ -16,131 +16,65 @@ import java.io.File
  * Created by debuggerx on 18-9-27 下午2:08
  */
 object ThumbnailUtil {
-  
-  fun getThumbnailByGlide(ctx: Context, path: String, width: Int, height: Int, format: Int, result: MethodChannel.Result?) {
+
+  fun getThumbnailByGlide(ctx: Context, path: String, width: Int, height: Int, format: Int, quality: Int, result: MethodChannel.Result?) {
     val resultHandler = ResultHandler(result)
-    
+
     Glide.with(ctx)
-      .asBitmap()
-      .load(File(path))
-      .into(object : BitmapTarget(width, height) {
-        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-          super.onResourceReady(resource, transition)
-          val bos = ByteArrayOutputStream()
-          
-          val compressFormat =
-            if (format == 1) {
-              Bitmap.CompressFormat.PNG
-            } else {
-              Bitmap.CompressFormat.JPEG
-            }
-          
-          resource.compress(compressFormat, 100, bos)
-          resultHandler.reply(bos.toByteArray())
-        }
-        
-        override fun onLoadCleared(placeholder: Drawable?) {
-          resultHandler.reply(null)
-        }
-        
-        override fun onLoadFailed(errorDrawable: Drawable?) {
-          resultHandler.reply(null)
-        }
-      })
+            .asBitmap()
+            .load(File(path))
+            .into(object : BitmapTarget(width, height) {
+              override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                super.onResourceReady(resource, transition)
+                val bos = ByteArrayOutputStream()
+
+                val compressFormat =
+                        if (format == 1) {
+                          Bitmap.CompressFormat.PNG
+                        } else {
+                          Bitmap.CompressFormat.JPEG
+                        }
+
+                resource.compress(compressFormat, quality, bos)
+                resultHandler.reply(bos.toByteArray())
+              }
+
+              override fun onLoadCleared(placeholder: Drawable?) {
+                resultHandler.reply(null)
+              }
+
+              override fun onLoadFailed(errorDrawable: Drawable?) {
+                resultHandler.reply(null)
+              }
+            })
   }
-  
-  fun getThumbnailWithVideo(ctx: Context, asset: Asset, width: Int, height: Int, result: MethodChannel.Result?) {
-    val resultHandler = ResultHandler(result)
-    
-    Glide.with(ctx)
-      .asBitmap()
-      .load(File(asset.path))
-      .into(object : BitmapTarget(width, height) {
-        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-          super.onResourceReady(resource, transition)
-          val bos = ByteArrayOutputStream()
-          
-          resource.compress(Bitmap.CompressFormat.JPEG, 100, bos)
-          resultHandler.reply(bos.toByteArray())
-        }
-        
-        override fun onLoadCleared(placeholder: Drawable?) {
-          resultHandler.reply(null)
-        }
-      })
-  }
-  
-  fun getThumb(ctx: Context, path: String, width: Int, height: Int, callback: (ByteArray?) -> Unit) {
-    
-    Glide.with(ctx)
-      .asBitmap()
-      .load(File(path))
-      .into(object : BitmapTarget(width, height) {
-        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-          super.onResourceReady(resource, transition)
-          val bos = ByteArrayOutputStream()
-          resource.compress(Bitmap.CompressFormat.JPEG, 100, bos)
-          callback(bos.toByteArray())
-        }
-        
-        override fun onLoadCleared(placeholder: Drawable?) {
-          callback(null)
-        }
-      })
-  }
-  
-  fun getThumbOfUri(context: Context, uri: Uri, width: Int, height: Int, format: Int, callback: (ByteArray?) -> Unit){
-    val cr = context.contentResolver
+
+
+  fun getThumbOfUri(context: Context, uri: Uri, width: Int, height: Int, format: Int, quality: Int, callback: (ByteArray?) -> Unit) {
     Glide.with(context)
-      .asBitmap()
-      .load(uri)
-      .into(object : BitmapTarget(width, height) {
-        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-          super.onResourceReady(resource, transition)
-          val bos = ByteArrayOutputStream()
-    
-          val compressFormat =
-            if (format == 1) {
-              Bitmap.CompressFormat.PNG
-            } else {
-              Bitmap.CompressFormat.JPEG
-            }
-    
-          resource.compress(compressFormat, 100, bos)
-          callback(bos.toByteArray())
-        }
-  
-        override fun onLoadCleared(placeholder: Drawable?) {
-          callback(null)
-        }
-      })
+            .asBitmap()
+            .load(uri)
+            .into(object : BitmapTarget(width, height) {
+              override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                super.onResourceReady(resource, transition)
+                val bos = ByteArrayOutputStream()
+
+                val compressFormat =
+                        if (format == 1) {
+                          Bitmap.CompressFormat.PNG
+                        } else {
+                          Bitmap.CompressFormat.JPEG
+                        }
+
+                resource.compress(compressFormat, quality, bos)
+                callback(bos.toByteArray())
+              }
+
+              override fun onLoadCleared(placeholder: Drawable?) {
+                callback(null)
+              }
+            })
   }
-  
-  fun getThumb(ctx: Context, bitmap: Bitmap?, width: Int, height: Int, format: Int, callback: (ByteArray?) -> Unit) {
-    Glide.with(ctx)
-      .asBitmap()
-      .load(bitmap)
-      .into(object : BitmapTarget(width, height) {
-        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-          super.onResourceReady(resource, transition)
-          val bos = ByteArrayOutputStream()
-          
-          val compressFormat =
-            if (format == 1) {
-              Bitmap.CompressFormat.PNG
-            } else {
-              Bitmap.CompressFormat.JPEG
-            }
-          
-          resource.compress(compressFormat, 100, bos)
-          callback(bos.toByteArray())
-        }
-        
-        override fun onLoadCleared(placeholder: Drawable?) {
-          callback(null)
-        }
-      })
-  }
-  
-  
+
+
 }

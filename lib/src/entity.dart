@@ -229,14 +229,17 @@ class AssetEntity {
     int width,
     int height, {
     ThumbFormat format = ThumbFormat.jpeg,
+    int quality = 100,
   }) {
     assert(width > 0 && height > 0, "The width and height must better 0.");
     assert(format != null, "The format must not be null.");
+    assert(quality > 0 && quality <= 100, "The qulity must between 0 and 100");
     return PhotoManager._getThumbDataWithId(
       id,
       width: width,
       height: height,
       format: format,
+      quality:quality,
     );
   }
 
