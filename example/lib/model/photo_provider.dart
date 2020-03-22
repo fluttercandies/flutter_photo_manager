@@ -151,6 +151,13 @@ class PhotoProvider extends ChangeNotifier {
       ..setOption(AssetType.image, option)
       ..setOption(AssetType.audio, option);
   }
+
+  Future<void> refreshAllGalleryProperties() async {
+    for (var gallery in list) {
+      await gallery.refreshPathProperties(dt: DateTime.now());
+    }
+    notifyListeners();
+  }
 }
 
 class PathProvider extends ChangeNotifier {
@@ -198,13 +205,14 @@ class PathProvider extends ChangeNotifier {
   void delete(AssetEntity entity) async {
     final result = await PhotoManager.editor.deleteWithIds([entity.id]);
     if (result.isNotEmpty) {
-      await path.refreshPathProperties(dt: path.fetchDatetime);
+      await Future.delayed(Duration(seconds: 3));
+      await provider.refreshAllGalleryProperties();
       final list =
-          await path.getAssetListRange(start: 0, end: provider.list.length);
+          await path.getAssetListRange(start: 0, end: this.list.length);
       printListLength("deleted");
       this.list.clear();
       this.list.addAll(list);
-      notifyListeners();
+      
     }
   }
 

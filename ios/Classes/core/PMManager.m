@@ -47,10 +47,10 @@
 
 
   if (onlyAll) {
-      PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection
-          fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
-                                subtype:PHAssetCollectionSubtypeAlbumRegular
-                                options:fetchCollectionOptions];
+    PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection
+            fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
+                                  subtype:PHAssetCollectionSubtypeAlbumRegular
+                                  options:fetchCollectionOptions];
 
     if (result && result.count) {
       for (PHAssetCollection *collection in result) {
@@ -68,16 +68,16 @@
   }
 
   PHFetchResult<PHAssetCollection *> *smartAlbumResult = [PHAssetCollection
-      fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
-                            subtype:PHAssetCollectionSubtypeAlbumRegular
-                            options:fetchCollectionOptions];
+          fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
+                                subtype:PHAssetCollectionSubtypeAlbumRegular
+                                options:fetchCollectionOptions];
   [self injectAssetPathIntoArray:array
                           result:smartAlbumResult
                          options:assetOptions
                           hasAll:hasAll];
 
   PHFetchResult<PHCollection *> *topLevelResult = [PHAssetCollection
-      fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
+          fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
   [self injectAssetPathIntoArray:array
                           result:topLevelResult
                          options:assetOptions
@@ -109,6 +109,12 @@
     }
 
     PHAssetCollection *assetCollection = (PHAssetCollection *) collection;
+
+    if (assetCollection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumRecentlyAdded
+            || assetCollection.assetCollectionSubtype == 1000000201) {// Recently Deleted
+      continue;
+    }
+
 
     PHFetchResult<PHAsset *> *fetchResult =
             [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
@@ -710,8 +716,8 @@ getAssetEntityListWithGalleryId:(NSString *)id
     [cond appendString:@" AND "];
     [cond appendString:durationCond];
     [args addObjectsFromArray:durationArgs];
-      
-      NSLog(@"duration = %.2f ~ %.2f", [durationArgs[0] floatValue], [durationArgs[1] floatValue]);
+
+    NSLog(@"duration = %.2f ~ %.2f", [durationArgs[0] floatValue], [durationArgs[1] floatValue]);
 
     [cond appendString:@" ) "];
   }

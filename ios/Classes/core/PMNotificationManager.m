@@ -14,16 +14,17 @@
 @implementation PMNotificationManager {
   FlutterMethodChannel *channel;
   BOOL _notifying;
+  PHFetchResult<PHAsset *> *result;
 }
 
 - (instancetype)initWithRegistrar:
-    (NSObject<FlutterPluginRegistrar> *)registrar {
+        (NSObject <FlutterPluginRegistrar> *)registrar {
   self = [super init];
   if (self) {
     self.registrar = registrar;
     channel = [FlutterMethodChannel
-        methodChannelWithName:@"top.kikt/photo_manager/notify"
-              binaryMessenger:[registrar messenger]];
+            methodChannelWithName:@"top.kikt/photo_manager/notify"
+                  binaryMessenger:[registrar messenger]];
     _notifying = NO;
   }
 
@@ -31,7 +32,7 @@
 }
 
 + (instancetype)managerWithRegistrar:
-    (NSObject<FlutterPluginRegistrar> *)registrar {
+        (NSObject <FlutterPluginRegistrar> *)registrar {
   return [[self alloc] initWithRegistrar:registrar];
 }
 
@@ -39,6 +40,7 @@
   PHPhotoLibrary *library = PHPhotoLibrary.sharedPhotoLibrary;
   [library registerChangeObserver:self];
   _notifying = YES;
+  [self refreshFetchResult];
 }
 
 - (void)stopNotify {
@@ -50,46 +52,68 @@
 #pragma "photo library notify"
 
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
-  PHObjectChangeDetails *details =
-      [changeInstance changeDetailsForObject:[PHObject new]];
-  PHObject *object = details.objectAfterChanges;
-
-  if ([object isMemberOfClass:[PHAssetCollection class]]) {
-    PHAssetCollection *collection = (PHAssetCollection *)object;
-    [self onAssetCollectionChanged:collection];
-  } else if ([object isMemberOfClass:[PHAsset class]]) {
-    PHAsset *asset = (PHAsset *)object;
-    [self onAssetChanged:asset];
-  } else if ([object isMemberOfClass:[PHCollectionList class]]) {
-    PHCollectionList *collectionList = (PHCollectionList *)object;
-    [self onCollectionListChanged:collectionList];
+  if (!result) {
+    return;
   }
+
+  PHFetchResultChangeDetails *details = [changeInstance changeDetailsForFetchResult:result];
+
+  NSDictionary *detailResult = [self convertChangeDetailsToNotifyDetail:details];
+
+  NSLog(@"on change result = %@", detailResult);
+  [self refreshFetchResult];
+
+  [channel invokeMethod:@"change" arguments:detailResult];
 }
 
-- (void)onAssetChanged:(PHAsset *)asset {
-  [channel invokeMethod:@"change"
-              arguments:@{
-                @"ios-asset" : [ConvertUtils convertPHAssetToMap:asset
-                                                       needTitle:NO]
-              }];
+- (void)refreshFetchResult {
+  result = [self getLastAssets];
 }
 
-- (void)onAssetCollectionChanged:(PHAssetCollection *)collection {
-  [channel invokeMethod:@"change"
-              arguments:@{
-                @"ios-collection" : @{
-                  @"id" : collection.localIdentifier,
-                }
-              }];
+- (NSDictionary *)convertChangeDetailsToNotifyDetail:(PHFetchResultChangeDetails *)details {
+  NSMutableDictionary *dictionary = [NSMutableDictionary new];
+  NSArray<PHObject *> *changedObjects = details.changedObjects;
+  NSArray<PHObject *> *insertedObjects = details.insertedObjects;
+  NSArray<PHObject *> *removedObjects = details.removedObjects;
+
+  NSLog(@"changed = %@", changedObjects);
+  NSLog(@"inserted = %@", insertedObjects);
+  NSLog(@"removed = %@", removedObjects);
+
+  [self addToResult:dictionary key:@"update" objects:changedObjects];
+  [self addToResult:dictionary key:@"create" objects:insertedObjects];
+  [self addToResult:dictionary key:@"delete" objects:removedObjects];
+
+//  return @{@"platform": @"iOS", result: dictionary};
+  return dictionary;
 }
 
-- (void)onCollectionListChanged:(PHCollectionList *)list {
-  [channel invokeMethod:@"change"
-              arguments:@{
-                @"ios-collectionList" : @{
-                  @"id" : list.localIdentifier,
-                }
-              }];
+- (void)addToResult:(NSMutableDictionary *)dictionary key:(NSString *)key objects:(NSArray<PHObject *> *)changedObjects {
+  NSMutableArray *items = [NSMutableArray new];
+
+  for (PHObject *object in  changedObjects) {
+    if ([object isMemberOfClass:PHAsset.class]) {
+      PHAsset *asset = (PHAsset *) object;
+      NSMutableDictionary *itemDict = [NSMutableDictionary new];
+      PHFetchResult<PHAssetCollection *> *collections = [PHAssetCollection fetchAssetCollectionsContainingAsset:asset withType:PHAssetCollectionTypeAlbum options:nil];
+      itemDict[@"id"] = object.localIdentifier;
+      NSMutableArray *collectionArray = [NSMutableArray new];
+      for (PHAssetCollection *collection in collections) {
+        NSDictionary *collectionDict = @{@"id": collection.localIdentifier, @"title": collection.localizedTitle};
+        [collectionArray addObject:collectionDict];
+      }
+      [items addObject:itemDict];
+    }
+  }
+
+  dictionary[key] = items;
+}
+
+- (PHFetchResult<PHAsset *> *)getLastAssets {
+  if (PHPhotoLibrary.authorizationStatus == PHAuthorizationStatusAuthorized) {
+    return [PHAsset fetchAssetsWithOptions:nil];
+  }
+  return nil;
 }
 
 - (BOOL)isNotifying {
