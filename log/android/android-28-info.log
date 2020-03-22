@@ -1,40 +1,288 @@
-2020-03-22 11:21:06.119 6605-6605/top.kikt.handledeletemedia I/My-Tag: _id : 90 
+2020-03-22 19:12:45.919 13326-13326/top.kikt.handledeletemedia I/My-Tag: _id : 90 
     _data : /storage/emulated/0/Download/Cache_686d564cb2e18183..jpg 
     _size : 16892 
-    _display_name : Cache_686d564cb2e18183..jpg 
-    mime_type : image/jpeg 
-    title : Cache_686d564cb2e18183. 
+    format : 14337 
+    parent : 8 
     date_added : 1584845603 
     date_modified : 1582366646 
+    mime_type : image/jpeg 
+    title : Cache_686d564cb2e18183. 
     description : null 
+    _display_name : Cache_686d564cb2e18183..jpg 
     picasa_id : null 
-    isprivate : null 
+    orientation : 0 
     latitude : null 
     longitude : null 
     datetaken : 1582366646000 
-    orientation : 0 
     mini_thumb_magic : null 
     bucket_id : 540528482 
     bucket_display_name : Download 
+    isprivate : null 
+    title_key : null 
+    artist_id : null 
+    album_id : null 
+    composer : null 
+    track : null 
+    year : null 
+    is_ringtone : null 
+    is_music : null 
+    is_alarm : null 
+    is_notification : null 
+    is_podcast : null 
+    album_artist : null 
+    duration : null 
+    bookmark : null 
+    artist : null 
+    album : null 
+    resolution : null 
+    tags : null 
+    category : null 
+    language : null 
+    mini_thumb_data : null 
+    name : null 
+    media_type : 1 
+    old_id : null 
+    is_drm : 0 
     width : 100 
     height : 100 
-2020-03-22 11:21:06.120 6605-6605/top.kikt.handledeletemedia I/My-Tag: _id : 91 
+    title_resource_uri : null 
+2020-03-22 19:12:45.921 13326-13326/top.kikt.handledeletemedia I/My-Tag: _id : 91 
     _data : /storage/emulated/0/Download/image_picker1.gif 
     _size : 8332182 
-    _display_name : image_picker1.gif 
-    mime_type : image/gif 
-    title : image_picker1 
+    format : 14343 
+    parent : 8 
     date_added : 1584845745 
     date_modified : 1538472913 
+    mime_type : image/gif 
+    title : image_picker1 
     description : null 
+    _display_name : image_picker1.gif 
     picasa_id : null 
-    isprivate : null 
+    orientation : null 
     latitude : null 
     longitude : null 
     datetaken : 1538472913000 
-    orientation : null 
     mini_thumb_magic : null 
     bucket_id : 540528482 
     bucket_display_name : Download 
+    isprivate : null 
+    title_key : null 
+    artist_id : null 
+    album_id : null 
+    composer : null 
+    track : null 
+    year : null 
+    is_ringtone : null 
+    is_music : null 
+    is_alarm : null 
+    is_notification : null 
+    is_podcast : null 
+    album_artist : null 
+    duration : null 
+    bookmark : null 
+    artist : null 
+    album : null 
+    resolution : null 
+    tags : null 
+    category : null 
+    language : null 
+    mini_thumb_data : null 
+    name : null 
+    media_type : 1 
+    old_id : null 
+    is_drm : 0 
     width : 300 
     height : 590 
+    title_resource_uri : null 
+2020-03-22 19:12:45.923 13326-13326/top.kikt.handledeletemedia I/My-Tag: _id : 95 
+    _data : /storage/emulated/0/Download/ali.png 
+    _size : 4502 
+    format : 14347 
+    parent : 8 
+    date_added : 1584869735 
+    date_modified : 1582943299 
+    mime_type : image/png 
+    title : ali 
+    description : null 
+    _display_name : ali.png 
+    picasa_id : null 
+    orientation : null 
+    latitude : null 
+    longitude : null 
+    datetaken : 1582943299000 
+    mini_thumb_magic : null 
+    bucket_id : 540528482 
+    bucket_display_name : Download 
+    isprivate : null 
+    title_key : null 
+    artist_id : null 
+    album_id : null 
+    composer : null 
+    track : null 
+    year : null 
+    is_ringtone : null 
+    is_music : null 
+    is_alarm : null 
+    is_notification : null 
+    is_podcast : null 
+    album_artist : null 
+    duration : null 
+    bookmark : null 
+    artist : null 
+    album : null 
+    resolution : null 
+    tags : null 
+    category : null 
+    language : null 
+    mini_thumb_data : null 
+    name : null 
+    media_type : 1 
+    old_id : null 
+    is_drm : 0 
+    width : 200 
+    height : 200 
+    title_resource_uri : null 
+2020-03-22 19:12:45.930 13326-13326/top.kikt.handledeletemedia I/My-Tag: _id : 96 
+    _data : /storage/emulated/0/Pictures/1584869902982.jpg 
+    _size : null 
+    format : 14337 
+    parent : 6 
+    date_added : 1584869902 
+    date_modified : null 
+    mime_type : image/jpeg 
+    title : image_1584869902.924 
+    description :  
+    _display_name : 1584869902982.jpg 
+    picasa_id : null 
+    orientation : null 
+    latitude : null 
+    longitude : null 
+    datetaken : null 
+    mini_thumb_magic : -7641855944792403501 
+    bucket_id : -1617409521 
+    bucket_display_name : Pictures 
+    isprivate : null 
+    title_key : null 
+    artist_id : null 
+    album_id : null 
+    composer : null 
+    track : null 
+    year : null 
+    is_ringtone : null 
+    is_music : null 
+    is_alarm : null 
+    is_notification : null 
+    is_podcast : null 
+    album_artist : null 
+    duration : null 
+    bookmark : null 
+    artist : null 
+    album : null 
+    resolution : null 
+    tags : null 
+    category : null 
+    language : null 
+    mini_thumb_data : null 
+    name : null 
+    media_type : 1 
+    old_id : null 
+    is_drm : null 
+    width : null 
+    height : null 
+    title_resource_uri : null 
+2020-03-22 19:12:45.933 13326-13326/top.kikt.handledeletemedia I/My-Tag: _id : 81 
+    _data : /storage/emulated/0/Download/ai.mp3 
+    _size : 3907924 
+    format : 12297 
+    parent : 8 
+    date_added : 1584842911 
+    date_modified : 1584842698 
+    mime_type : audio/mpeg 
+    title : ai 
+    description : null 
+    _display_name : ai.mp3 
+    picasa_id : null 
+    orientation : null 
+    latitude : null 
+    longitude : null 
+    datetaken : null 
+    mini_thumb_magic : null 
+    bucket_id : 540528482 
+    bucket_display_name : Download 
+    isprivate : null 
+    title_key : 
+    artist_id : 1 
+    album_id : 1 
+    composer : null 
+    track : 0 
+    year : null 
+    is_ringtone : 0 
+    is_music : 1 
+    is_alarm : 0 
+    is_notification : 0 
+    is_podcast : 0 
+    album_artist : null 
+    duration : 244224 
+    bookmark : null 
+    artist : null 
+    album : null 
+    resolution : null 
+    tags : null 
+    category : null 
+    language : null 
+    mini_thumb_data : null 
+    name : null 
+    media_type : 2 
+    old_id : null 
+    is_drm : 0 
+    width : null 
+    height : null 
+    title_resource_uri : null 
+2020-03-22 19:12:45.935 13326-13326/top.kikt.handledeletemedia I/My-Tag: _id : 72 
+    _data : /storage/emulated/0/Download/ijkplayer-preview-en.mp4 
+    _size : 3984272 
+    format : 12299 
+    parent : 8 
+    date_added : 1581756402 
+    date_modified : 1554904089 
+    mime_type : video/mp4 
+    title : ijkplayer-preview-en 
+    description : null 
+    _display_name : ijkplayer-preview-en.mp4 
+    picasa_id : null 
+    orientation : null 
+    latitude : null 
+    longitude : null 
+    datetaken : 1554904089000 
+    mini_thumb_magic : null 
+    bucket_id : 540528482 
+    bucket_display_name : Download 
+    isprivate : null 
+    title_key : null 
+    artist_id : null 
+    album_id : null 
+    composer : null 
+    track : null 
+    year : null 
+    is_ringtone : null 
+    is_music : null 
+    is_alarm : null 
+    is_notification : null 
+    is_podcast : null 
+    album_artist : null 
+    duration : 61867 
+    bookmark : null 
+    artist : <unknown> 
+    album : Download 
+    resolution : 802x1428 
+    tags : null 
+    category : null 
+    language : null 
+    mini_thumb_data : null 
+    name : null 
+    media_type : 3 
+    old_id : null 
+    is_drm : 0 
+    width : 802 
+    height : 1428 
+    title_resource_uri : null 
