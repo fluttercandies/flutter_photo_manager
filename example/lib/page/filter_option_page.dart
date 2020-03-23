@@ -157,7 +157,9 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
       },
       trailing: RaisedButton(
         child: Text("Today"),
-        onPressed: () {},
+        onPressed: () {
+          onChange(DateTime.now());
+        },
       ),
     );
   }
