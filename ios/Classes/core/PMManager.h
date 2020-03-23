@@ -76,6 +76,6 @@ getAssetEntityListWithGalleryId:(NSString *)id
 
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(ResultHandler *)handler;
 
-- (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type option:(PMFilterOptionGroup *)option;
+- (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(PMFilterOptionGroup *)option;
 
 @end

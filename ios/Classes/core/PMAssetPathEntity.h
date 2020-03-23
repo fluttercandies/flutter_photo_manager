@@ -4,6 +4,8 @@
 
 #import <Foundation/Foundation.h>
 
+#define PM_TYPE_ALBUM 1
+#define PM_TYPE_FOLDER 2
 @class PHAsset;
 
 @interface PMAssetPathEntity : NSObject
@@ -12,6 +14,7 @@
 @property(nonatomic, copy) NSString *name;
 @property(nonatomic, assign) NSUInteger assetCount;
 @property(nonatomic, assign) BOOL isAll;
+@property(nonatomic, assign) int type;
 
 - (instancetype)initWithId:(NSString *)id name:(NSString *)name assetCount:(NSUInteger)assetCount;
 

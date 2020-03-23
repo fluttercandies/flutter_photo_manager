@@ -1,9 +1,10 @@
 # CHANGELOG
 
-## 0.5.0-dev.2
+## 0.5.0-dev.3
 
 Feature:
 
+- Add `getSubPathEntities` for `AssetPathEntity`.
 - Add `quality` for `AssetEntity.thumbDataWithSize`.
 - Add `orientation` for `AssetEntity`.
 - Add `onlyAll` for `getAssetPathList`.

@@ -254,10 +254,11 @@ class Plugin {
     });
   }
 
-  Future<List<AssetPathEntity>> getSubPath(AssetPathEntity pathEntity) async {
+  Future<List<AssetPathEntity>> getSubPathEntities(AssetPathEntity pathEntity) async {
     final result = await _channel.invokeMethod("getSubPath", {
       "id": pathEntity.id,
       "type": pathEntity.type.value,
+      "albumType": pathEntity.albumType,
       "option": pathEntity.filterOption.toMap(),
     });
 

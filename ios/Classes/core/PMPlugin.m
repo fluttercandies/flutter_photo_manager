@@ -228,10 +228,11 @@
       } else if ([@"getSubPath" isEqualToString:call.method]) {
         NSString *galleryId = call.arguments[@"id"];
         int type = [call.arguments[@"type"] intValue];
+        int albumType = [call.arguments[@"albumType"] intValue];
         NSDictionary *optionMap = call.arguments[@"option"];
         PMFilterOptionGroup *option = [ConvertUtils convertMapToOptionContainer:optionMap];
 
-        NSArray<PMAssetPathEntity *> *array = [manager getSubPathWithId:galleryId type:type option:option];
+        NSArray<PMAssetPathEntity *> *array = [manager getSubPathWithId:galleryId type:type albumType:albumType option:option];
         NSDictionary *pathData = [ConvertUtils convertPathToMap:array];
 
         [handler reply:@{@"list": pathData}];

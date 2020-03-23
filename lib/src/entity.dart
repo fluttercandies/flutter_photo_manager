@@ -19,6 +19,11 @@ class AssetPathEntity {
   /// gallery asset count
   int assetCount;
 
+  /// In iOS: 1: album, 2: folder
+  ///
+  /// In android: always 1.
+  int albumType;
+
   /// path asset type.
   RequestType _type;
 
@@ -71,12 +76,14 @@ class AssetPathEntity {
   /// [pageSize] is item count of page.
   ///
   Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) {
+    assert(this.albumType == 1, "Just album type can get asset.");
     assert(pageSize > 0, "The pageSize must better than 0.");
     return PhotoManager._getAssetListPaged(this, page, pageSize);
   }
 
   /// The [start] and [end] like the [String.substring].
   Future<List<AssetEntity>> getAssetListRange({int start, int end}) async {
+    assert(this.albumType == 1, "Just album type can get asset.");
     assert(start >= 0, "The start must better than 0.");
     assert(end > start, "The end must better than start.");
     return PhotoManager._getAssetWithRange(

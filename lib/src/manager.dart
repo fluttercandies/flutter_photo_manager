@@ -247,6 +247,6 @@ class PhotoManager {
   static Future<List<AssetPathEntity>> _getSubPath(
       AssetPathEntity assetPathEntity) {
     assert(Platform.isIOS);
-    return _plugin.getSubPath(assetPathEntity);
+    return _plugin.getSubPathEntities(assetPathEntity);
   }
 }

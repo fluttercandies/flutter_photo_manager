@@ -835,12 +835,16 @@ getAssetEntityListWithGalleryId:(NSString *)id
   }
 }
 
-- (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type option:(PMFilterOptionGroup *)option {
+- (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(PMFilterOptionGroup *)option {
   PHFetchOptions *options = [self getAssetOptions:type date:nil filterOption:option];
 
   if ([PMFolderUtils isRecentCollection:id]) {
     NSArray<PHCollectionList *> *array = [PMFolderUtils getRootFolderWithOptions:nil];
     return [self convertPHCollectionToPMAssetPathArray:array option:options];
+  }
+
+  if (albumType == PM_TYPE_ALBUM) {
+    return @[];
   }
 
   PHCollectionList *list;
@@ -879,8 +883,10 @@ getAssetEntityListWithGalleryId:(NSString *)id
     PHAssetCollection *collection = (PHAssetCollection *) phCollection;
     PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:option];
     pathEntity.assetCount = fetchResult.count;
+    pathEntity.type = PM_TYPE_ALBUM;
   } else {
     pathEntity.assetCount = 0;
+    pathEntity.type = PM_TYPE_FOLDER;
   }
 
   return pathEntity;

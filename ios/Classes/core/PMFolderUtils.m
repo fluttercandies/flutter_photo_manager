@@ -43,12 +43,12 @@
 + (NSArray <PHCollection *> *)getSubCollectionWithCollection:(PHCollectionList *)collection
                                                      options:(PHFetchOptions *)options {
 
-  PHFetchResult<PHCollection *> *result = [PHCollectionList fetchCollectionsInCollectionList:collection options:options];
+  PHFetchResult<PHCollection *> *result = [PHCollection fetchCollectionsInCollectionList:collection options:nil];
 
   NSMutableArray *array = [NSMutableArray new];
 
   for (PHCollection *item in result) {
-    if ([item isMemberOfClass:PHCollectionList.class] || [result isMemberOfClass:PHAssetCollection.class]) {
+    if ([item isMemberOfClass:PHCollectionList.class] || [item isMemberOfClass:PHAssetCollection.class]) {
       [array addObject:item];
     }
   }
