@@ -10,7 +10,7 @@ A flutter api for photo, you can get image/video from ios or android.
 
 If you just need a picture selector, you can choose to use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker. All UI create by flutter.
 
-- [photo_manager](#photo_manager)
+- [photo_manager](#photomanager)
   - [install](#install)
     - [Add to pubspec](#add-to-pubspec)
     - [import in dart code](#import-in-dart-code)
@@ -78,12 +78,11 @@ if (result) {
 List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
 ```
 
-| name          | description                                                                                   |
-| ------------- | --------------------------------------------------------------------------------------------- |
-| hasAll        | Is there an album containing "all"                                                            |
-| type          | image/video/all , default all.                                                                |
-| fetchDateTime | Only include resources older than that time.(Will be included in filterOption in the future.) |
-| fliterOption  | See FilterOption.                                                                             |
+| name         | description                        |
+| ------------ | ---------------------------------- |
+| hasAll       | Is there an album containing "all" |
+| type         | image/video/all , default all.     |
+| fliterOption | See FilterOption.                  |
 
 #### FilterOption
 
@@ -92,6 +91,7 @@ List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
 | needTitle          | The title attribute of the picture must be included in android (even if it is false), it is more performance-consuming in iOS, please consider whether you need it. The default is false. |
 | sizeConstraint     | Constraints on resource size.                                                                                                                                                             |
 | durationConstraint | Constraints of time, pictures will ignore this constraint.                                                                                                                                |
+| dateTimeCond       | Includes date filtering and date sorting                                                                                                                                                  |
 
 Example see [filter_option_page.dart](https://github.com/CaiJingLong/flutter_photo_manager/blob/filter-option/example/lib/page/filter_option_page.dart).
 
