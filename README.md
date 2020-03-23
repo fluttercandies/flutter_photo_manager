@@ -82,7 +82,7 @@ List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
 | ------------ | ---------------------------------- |
 | hasAll       | Is there an album containing "all" |
 | type         | image/video/all , default all.     |
-| fliterOption | See FilterOption.                  |
+| filterOption | See FilterOption.                  |
 
 #### FilterOption
 
@@ -93,7 +93,7 @@ List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
 | durationConstraint | Constraints of time, pictures will ignore this constraint.                                                                                                                                |
 | dateTimeCond       | Includes date filtering and date sorting                                                                                                                                                  |
 
-Example see [filter_option_page.dart](https://github.com/CaiJingLong/flutter_photo_manager/blob/filter-option/example/lib/page/filter_option_page.dart).
+Example see [filter_option_page.dart](https://github.com/CaiJingLong/flutter_photo_manager/example/lib/page/filter_option_page.dart).
 
 ### Get asset list from `AssetPathEntity`
 
