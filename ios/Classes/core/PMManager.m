@@ -635,7 +635,7 @@ getAssetEntityListWithGalleryId:(NSString *)id
                                date:(NSDate *)date
                        filterOption:(PMFilterOptionGroup *)optionGroup {
   PHFetchOptions *options = [PHFetchOptions new];
-  options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
+  options.sortDescriptors = [optionGroup sortCond];
 
   NSMutableString *cond = [NSMutableString new];
   NSMutableArray *args = [NSMutableArray new];
@@ -709,8 +709,12 @@ getAssetEntityListWithGalleryId:(NSString *)id
   [cond insertString:@"(" atIndex:0];
   [cond appendString:@")"];
 
-  [cond appendString:@" AND ( creationDate <= %@ )"];
-  [args addObject:date];
+//  [cond appendString:@" AND ( creationDate <= %@ )"];
+//  [args addObject:date];
+
+  PMDateOption *dateOption = optionGroup.dateOption;
+  [cond appendString:[dateOption dateCond]];
+  [args addObjectsFromArray:[dateOption dateArgs]];
 
   options.predicate = [NSPredicate predicateWithFormat:cond argumentArray:args];
 

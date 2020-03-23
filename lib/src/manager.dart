@@ -28,7 +28,6 @@ class PhotoManager {
     bool hasAll = true,
     bool onlyAll = false,
     RequestType type = RequestType.common,
-    DateTime fetchDateTime,
     FilterOptionGroup filterOption,
   }) async {
     assert(hasAll != null);
@@ -39,7 +38,6 @@ class PhotoManager {
     filterOption ??= FilterOptionGroup();
     return _plugin.getAllGalleryList(
       type: type.index,
-      dt: fetchDateTime,
       hasAll: hasAll,
       onlyAll: onlyAll,
       optionGroup: filterOption,
@@ -79,7 +77,6 @@ class PhotoManager {
       page: page,
       pageCount: pageCount,
       type: entity.typeInt,
-      pagedDt: entity.fetchDatetime,
       optionGroup: entity.filterOption,
     );
   }
@@ -98,7 +95,6 @@ class PhotoManager {
       typeInt: entity.typeInt,
       start: start,
       end: end,
-      fetchDt: entity.fetchDatetime,
       optionGroup: entity.filterOption,
     );
   }
@@ -183,29 +179,24 @@ class PhotoManager {
     return _plugin.assetExistsWithId(id);
   }
 
-  // static Future<AssetEntity> _createAssetEntityWithId(String id) async {
-  //   return AssetEntity(id: id);
-  // }
-
   static Future<AssetPathEntity> fetchPathProperties(
     AssetPathEntity entity,
-    DateTime time,
+    DateTimeCond dateTimeCond,
   ) async {
     assert(entity != null);
-    var result = await _plugin.fetchPathProperties(
+    assert(dateTimeCond != null);
+    final result = await _plugin.fetchPathProperties(
       entity.id,
       entity.typeInt,
-      time,
       entity.filterOption,
     );
     if (result == null) {
       return null;
     }
-    var list = result["data"];
+    final list = result["data"];
     if (list is List && list.isNotEmpty) {
       return ConvertUtils.convertPath(
         result,
-        dt: time,
         type: entity.typeInt,
         optionGroup: entity.filterOption,
       )[0];

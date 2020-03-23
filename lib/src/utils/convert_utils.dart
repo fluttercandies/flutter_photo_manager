@@ -17,7 +17,6 @@ class ConvertUtils {
         ..name = item["name"]
         ..typeInt = type
         ..isAll = item["isAll"]
-        ..fetchDatetime = dt
         ..assetCount = item["length"];
 
       result.add(entity);

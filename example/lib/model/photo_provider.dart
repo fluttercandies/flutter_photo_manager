@@ -8,8 +8,6 @@ class PhotoProvider extends ChangeNotifier {
 
   RequestType type = RequestType.common;
 
-  DateTime dt = DateTime.now();
-
   var hasAll = true;
 
   var onlyAll = false;
@@ -24,6 +22,34 @@ class PhotoProvider extends ChangeNotifier {
 
   set needTitle(bool needTitle) {
     _needTitle = needTitle;
+    notifyListeners();
+  }
+
+  DateTime _startDt = DateTime.now()
+      .subtract(Duration(days: 365 * 8)); // Default Before 8 years
+
+  DateTime get startDt => _startDt;
+
+  set startDt(DateTime startDt) {
+    _startDt = startDt;
+    notifyListeners();
+  }
+
+  DateTime _endDt = DateTime.now();
+
+  DateTime get endDt => _endDt;
+
+  set endDt(DateTime endDt) {
+    _endDt = endDt;
+    notifyListeners();
+  }
+
+  bool _asc = false;
+
+  bool get asc => _asc;
+
+  set asc(bool asc) {
+    _asc = asc;
     notifyListeners();
   }
 
@@ -81,16 +107,6 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeDateToNow() {
-    this.dt = DateTime.now();
-    notifyListeners();
-  }
-
-  void changeDate(DateTime pickDt) {
-    this.dt = pickDt;
-    notifyListeners();
-  }
-
   void reset() {
     this.list.clear();
     pathProviderMap.clear();
@@ -106,7 +122,6 @@ class PhotoProvider extends ChangeNotifier {
 
     reset();
     var galleryList = await PhotoManager.getAssetPathList(
-      fetchDateTime: dt,
       type: type,
       hasAll: hasAll,
       onlyAll: onlyAll,
@@ -155,15 +170,22 @@ class PhotoProvider extends ChangeNotifier {
       needTitle: needTitle,
     );
 
+    final dtCond = DateTimeCond(
+      min: startDt,
+      max: endDt,
+      asc: asc,
+    );
+
     return FilterOptionGroup()
       ..setOption(AssetType.video, option)
       ..setOption(AssetType.image, option)
-      ..setOption(AssetType.audio, option);
+      ..setOption(AssetType.audio, option)
+      ..dateTimeCond = dtCond;
   }
 
   Future<void> refreshAllGalleryProperties() async {
     for (var gallery in list) {
-      await gallery.refreshPathProperties(dt: DateTime.now());
+      await gallery.refreshPathProperties();
     }
     notifyListeners();
   }

@@ -8,6 +8,11 @@ Feature:
 - Add `orientation` for `AssetEntity`.
 - Add `onlyAll` for `getAssetPathList`.
 - Support audio type(Only android, iOS Photos have no audio)
+- **Breaking change**, Add date condition to filter datetime
+  - Add class `DateTimeCond`
+  - Add `dateTimeCond` to `FilterOptionGroup`
+  - Remove `fetchDateTime` from `getAssetPathList`
+  - Remove param `dt` from `AssetPathEntity.refreshPathProperties`, and add `refreshPathProperties` params to the method.
 
 Update
 

@@ -46,6 +46,25 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
               provider.maxDuration = duration;
             },
           ),
+          buildDateTimeWidget(
+            provider,
+            "Start DateTime",
+            provider.startDt,
+            (DateTime dateTime) {
+              provider.startDt = dateTime;
+            },
+          ),
+          buildDateTimeWidget(
+            provider,
+            "End DateTime",
+            provider.endDt,
+            (DateTime dateTime) {
+              if (provider.startDt.difference(dateTime) < Duration.zero) {
+                provider.endDt = dateTime;
+              }
+            },
+          ),
+          buildDateAscCheck(provider),
         ],
       ),
     );
@@ -89,7 +108,8 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
       animation: listenable,
       builder: (context, snapshot) {
         return ListTile(
-          title: Text(
+          title: Text(title),
+          subtitle: Text(
               "${value.inHours.toString().padLeft(2, '0')}h : ${(value.inMinutes % 60).toString().padLeft(2, '0')}m"),
           onTap: () async {
             // final duration = await showDurationPicker(
@@ -110,6 +130,44 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
             }
           },
         );
+      },
+    );
+  }
+
+  Widget buildDateTimeWidget(
+    PhotoProvider provider,
+    String title,
+    DateTime startDt,
+    void Function(DateTime dateTime) onChange,
+  ) {
+    return ListTile(
+      title: Text(title),
+      subtitle: Text("$startDt"),
+      onTap: () async {
+        final result = await showDatePicker(
+          context: context,
+          initialDate: startDt,
+          firstDate: DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+          lastDate: DateTime.now().add(Duration(days: 1)),
+        );
+
+        if (result != null) {
+          onChange(result);
+        }
+      },
+      trailing: RaisedButton(
+        child: Text("Today"),
+        onPressed: () {},
+      ),
+    );
+  }
+
+  Widget buildDateAscCheck(PhotoProvider provider) {
+    return CheckboxListTile(
+      title: Text("Date sort asc"),
+      value: provider.asc,
+      onChanged: (bool value) {
+        provider.asc = value;
       },
     );
   }
