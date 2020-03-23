@@ -11,10 +11,6 @@ class Plugin {
   static const MethodChannel _channel =
       const MethodChannel('top.kikt/photo_manager');
 
-  static DateTime _createDefaultFetchDatetime() {
-    return DateTime.now();
-  }
-
   static Plugin _plugin;
 
   factory Plugin() {
@@ -27,16 +23,12 @@ class Plugin {
   /// [type] 0 : all , 1: image ,2 video
   Future<List<AssetPathEntity>> getAllGalleryList({
     int type = 0,
-    DateTime dt,
     bool hasAll = true,
     FilterOptionGroup optionGroup,
     bool onlyAll,
   }) async {
-    dt ??= _createDefaultFetchDatetime();
-
     final result = await _channel.invokeMethod("getGalleryList", {
       "type": type,
-      "timestamp": dt.millisecondsSinceEpoch,
       "hasAll": hasAll,
       "onlyAll": onlyAll,
       "option": optionGroup.toMap(),
@@ -47,7 +39,6 @@ class Plugin {
     return ConvertUtils.convertPath(
       result,
       type: type,
-      dt: dt,
       optionGroup: optionGroup,
     );
   }
@@ -61,17 +52,13 @@ class Plugin {
     int page = 0,
     int pageCount = 15,
     int type = 0,
-    DateTime pagedDt,
     FilterOptionGroup optionGroup,
   }) async {
-    pagedDt ??= _createDefaultFetchDatetime();
-
     final result = await _channel.invokeMethod("getAssetWithGalleryId", {
       "id": id,
       "page": page,
       "pageCount": pageCount,
       "type": type,
-      "timestamp": pagedDt.millisecondsSinceEpoch,
       "option": optionGroup.toMap(),
     });
 
@@ -83,7 +70,6 @@ class Plugin {
     int typeInt,
     int start,
     int end,
-    DateTime fetchDt,
     FilterOptionGroup optionGroup,
   }) async {
     final Map map = await _channel.invokeMethod("getAssetListWithRange", {
@@ -91,7 +77,6 @@ class Plugin {
       "type": typeInt,
       "start": start,
       "end": end,
-      "timestamp": fetchDt.millisecondsSinceEpoch,
       "option": optionGroup.toMap(),
     });
 
@@ -252,5 +237,23 @@ class Plugin {
       "id": assetEntity.id,
       "type": assetEntity.typeInt,
     });
+  }
+
+  Future<List<AssetPathEntity>> getSubPathEntities(
+      AssetPathEntity pathEntity) async {
+    final result = await _channel.invokeMethod("getSubPath", {
+      "id": pathEntity.id,
+      "type": pathEntity.type.value,
+      "albumType": pathEntity.albumType,
+      "option": pathEntity.filterOption.toMap(),
+    });
+
+    final items = result["list"];
+
+    return ConvertUtils.convertPath(
+      items,
+      type: pathEntity.typeInt,
+      optionGroup: pathEntity.filterOption,
+    );
   }
 }

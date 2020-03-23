@@ -12,6 +12,7 @@
 #import "ResultHandler.h"
 #import "PMRequestTypeUtils.h"
 #import "NSString+PM_COMMON.h"
+#import "PMFolderUtils.h"
 
 @implementation PMManager {
   BOOL __isAuth;
@@ -36,12 +37,9 @@
   __isAuth = auth;
 }
 
-- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type date:(NSDate *)date hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll
-                                          option:(PMFilterOptionGroup *)option {
+- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(PMFilterOptionGroup *)option {
   NSMutableArray<PMAssetPathEntity *> *array = [NSMutableArray new];
-  PHFetchOptions *assetOptions = [self getAssetOptions:type
-                                                  date:date
-                                          filterOption:option];
+  PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:option];
 
   PHFetchOptions *fetchCollectionOptions = [PHFetchOptions new];
 
@@ -139,13 +137,7 @@
 
 #pragma clang diagnostic pop
 
-- (NSArray<PMAssetEntity *> *)
-getAssetEntityListWithGalleryId:(NSString *)id
-                           type:(int)type
-                           page:(NSUInteger)page
-                      pageCount:(NSUInteger)pageCount
-                           date:(NSDate *)date
-                   filterOption:(PMFilterOptionGroup *)filterOption {
+- (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id type:(int)type page:(NSUInteger)page pageCount:(NSUInteger)pageCount filterOption:(PMFilterOptionGroup *)filterOption {
   NSMutableArray<PMAssetEntity *> *result = [NSMutableArray new];
 
   PHFetchOptions *options = [PHFetchOptions new];
@@ -157,9 +149,7 @@ getAssetEntityListWithGalleryId:(NSString *)id
     return result;
   }
 
-  PHFetchOptions *assetOptions = [self getAssetOptions:type
-                                                  date:date
-                                          filterOption:filterOption];
+  PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:filterOption];
 
   PHAssetCollection *collection = fetchResult.firstObject;
 
@@ -197,13 +187,7 @@ getAssetEntityListWithGalleryId:(NSString *)id
   return result;
 }
 
-- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id
-                                                     type:(NSUInteger)type
-                                                    start:(NSUInteger)start
-                                                      end:(NSUInteger)end
-                                                     date:(NSDate *)date
-                                             filterOption:(PMFilterOptionGroup *)
-                                                     filterOption {
+- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id type:(NSUInteger)type start:(NSUInteger)start end:(NSUInteger)end filterOption:(PMFilterOptionGroup *)filterOption {
   NSMutableArray<PMAssetEntity *> *result = [NSMutableArray new];
 
   PHFetchOptions *options = [PHFetchOptions new];
@@ -215,9 +199,7 @@ getAssetEntityListWithGalleryId:(NSString *)id
     return result;
   }
 
-  PHFetchOptions *assetOptions = [self getAssetOptions:(int) type
-                                                  date:date
-                                          filterOption:filterOption];
+  PHFetchOptions *assetOptions = [self getAssetOptions:(int) type filterOption:filterOption];
 
   PHAssetCollection *collection = fetchResult.firstObject;
   PHFetchResult<PHAsset *> *assetArray =
@@ -607,10 +589,7 @@ getAssetEntityListWithGalleryId:(NSString *)id
           ![info[PHImageResultIsDegradedKey] boolValue]; // thumbnail
 }
 
-- (PMAssetPathEntity *)fetchPathProperties:(NSString *)id
-                                      type:(int)type
-                                      date:(NSDate *)date
-                              filterOption:(PMFilterOptionGroup *)filterOption {
+- (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type filterOption:(PMFilterOptionGroup *)filterOption {
   PHFetchOptions *collectionFetchOptions = [PHFetchOptions new];
   PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection
           fetchAssetCollectionsWithLocalIdentifiers:@[id]
@@ -620,9 +599,7 @@ getAssetEntityListWithGalleryId:(NSString *)id
     return nil;
   }
   PHAssetCollection *collection = result[0];
-  PHFetchOptions *assetOptions = [self getAssetOptions:type
-                                                  date:date
-                                          filterOption:filterOption];
+  PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:filterOption];
   PHFetchResult<PHAsset *> *fetchResult =
           [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
 
@@ -631,9 +608,7 @@ getAssetEntityListWithGalleryId:(NSString *)id
                               assetCount:(int) fetchResult.count];
 }
 
-- (PHFetchOptions *)getAssetOptions:(int)type
-                               date:(NSDate *)date
-                       filterOption:(PMFilterOptionGroup *)optionGroup {
+- (PHFetchOptions *)getAssetOptions:(int)type filterOption:(PMFilterOptionGroup *)optionGroup {
   PHFetchOptions *options = [PHFetchOptions new];
   options.sortDescriptors = [optionGroup sortCond];
 
@@ -832,6 +807,63 @@ getAssetEntityListWithGalleryId:(NSString *)id
         }
     }];
   }
+}
+
+- (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(PMFilterOptionGroup *)option {
+  PHFetchOptions *options = [self getAssetOptions:type filterOption:option];
+
+  if ([PMFolderUtils isRecentCollection:id]) {
+    NSArray<PHCollectionList *> *array = [PMFolderUtils getRootFolderWithOptions:nil];
+    return [self convertPHCollectionToPMAssetPathArray:array option:options];
+  }
+
+  if (albumType == PM_TYPE_ALBUM) {
+    return @[];
+  }
+
+  PHCollectionList *list;
+
+  PHFetchResult<PHCollectionList *> *collectionList = [PHCollectionList fetchCollectionListsWithLocalIdentifiers:@[id] options:nil];
+  if (collectionList && collectionList.count > 0) {
+    list = collectionList.firstObject;
+  }
+
+  if (!list) {
+    return @[];
+  }
+
+  NSArray<PHCollection *> *phCollectionArray = [PMFolderUtils getSubCollectionWithCollection:list options:options];
+  return [self convertPHCollectionToPMAssetPathArray:phCollectionArray option:options];
+}
+
+- (NSArray<PMAssetPathEntity *> *)convertPHCollectionToPMAssetPathArray:(NSArray<PHCollection *> *)phArray
+                                                                 option:(PHFetchOptions *)option {
+  NSMutableArray<PMAssetPathEntity *> *result = [NSMutableArray new];
+
+  for (PHCollection *collection in phArray) {
+    [result addObject:[self convertPHCollectionToPMPath:collection option:option]];
+  }
+
+  return result;
+}
+
+- (PMAssetPathEntity *)convertPHCollectionToPMPath:(PHCollection *)phCollection option:(PHFetchOptions *)option {
+  PMAssetPathEntity *pathEntity = [PMAssetPathEntity new];
+
+  pathEntity.id = phCollection.localIdentifier;
+  pathEntity.isAll = NO;
+  pathEntity.name = phCollection.localizedTitle;
+  if ([phCollection isMemberOfClass:PHAssetCollection.class]) {
+    PHAssetCollection *collection = (PHAssetCollection *) phCollection;
+    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:option];
+    pathEntity.assetCount = fetchResult.count;
+    pathEntity.type = PM_TYPE_ALBUM;
+  } else {
+    pathEntity.assetCount = 0;
+    pathEntity.type = PM_TYPE_FOLDER;
+  }
+
+  return pathEntity;
 }
 
 @end

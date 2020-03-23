@@ -20,6 +20,7 @@
             @"name": entity.name,
             @"length": @(entity.assetCount),
             @"isAll": @(entity.isAll),
+            @"albumType": @(entity.type),
     };
 
     [data addObject:item];
@@ -127,9 +128,9 @@
 
   PMDurationConstraint durationConstraint;
   durationConstraint.minDuration =
-      [ConvertUtils convertNSNumberToSecond:durationMap[@"min"]];
+          [ConvertUtils convertNSNumberToSecond:durationMap[@"min"]];
   durationConstraint.maxDuration =
-      [ConvertUtils convertNSNumberToSecond:durationMap[@"max"]];
+          [ConvertUtils convertNSNumberToSecond:durationMap[@"max"]];
   option.durationConstraint = durationConstraint;
 
   return option;

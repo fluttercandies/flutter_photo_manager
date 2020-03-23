@@ -17,7 +17,8 @@ class ConvertUtils {
         ..name = item["name"]
         ..typeInt = type
         ..isAll = item["isAll"]
-        ..assetCount = item["length"];
+        ..assetCount = item["length"]
+        ..albumType = (item["albumType"] ?? 1);
 
       result.add(entity);
     }

@@ -7,6 +7,7 @@
 *.swp
 profile
 
+
 DerivedData/
 build/
 GeneratedPluginRegistrant.h
@@ -44,3 +45,5 @@ Icon?
 Pods/
 .symlinks/
 flutter_export_environment.sh
+
+Podfile.lock

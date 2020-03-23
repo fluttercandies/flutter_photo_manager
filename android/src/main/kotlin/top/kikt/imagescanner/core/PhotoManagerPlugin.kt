@@ -162,7 +162,7 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
         }
         runOnBackground {
           val type = call.argument<Int>("type")!!
-          val timeStamp = call.getTimeStamp()
+          val timeStamp = getTimeStamp()
           val hasAll = call.argument<Boolean>("hasAll")!!
           val option = call.getOption()
           val onlyAll = call.argument<Boolean>("onlyAll")!!
@@ -177,7 +177,7 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
           val page = call.argument<Int>("page")!!
           val pageCount = call.argument<Int>("pageCount")!!
           val type = call.argument<Int>("type")!!
-          val timeStamp = call.getTimeStamp()
+          val timeStamp = getTimeStamp()
           val option = call.getOption()
           val list = photoManager.getAssetList(id, page, pageCount, type, timeStamp, option)
           resultHandler.reply(ConvertUtils.convertToAssetResult(list))
@@ -189,7 +189,7 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
           val type = call.getInt("type")
           val start = call.getInt("start")
           val end = call.getInt("end")
-          val timestamp = call.getTimeStamp()
+          val timestamp = getTimeStamp()
           val option = call.getOption()
           val list: List<AssetEntity> = photoManager.getAssetListWithRange(galleryId, type, start, end, timestamp, option)
           resultHandler.reply(ConvertUtils.convertToAssetResult(list))
@@ -236,7 +236,7 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
         runOnBackground {
           val id = call.argument<String>("id")!!
           val type = call.argument<Int>("type")!!
-          val timestamp = call.getTimeStamp()
+          val timestamp = getTimeStamp()
           val option = call.getOption()
           val pathEntity = photoManager.getPathEntity(id, type, timestamp, option)
           if (pathEntity != null) {
@@ -314,8 +314,8 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
     }
   }
 
-  fun MethodCall.getTimeStamp(): Long {
-    return this.argument<Long>("timestamp")!!
+  private fun getTimeStamp(): Long {
+    return 0
   }
 
   fun MethodCall.getString(key: String): String {

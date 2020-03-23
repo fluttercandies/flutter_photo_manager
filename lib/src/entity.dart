@@ -19,6 +19,11 @@ class AssetPathEntity {
   /// gallery asset count
   int assetCount;
 
+  /// In iOS: 1: album, 2: folder
+  ///
+  /// In android: always 1.
+  int albumType;
+
   /// path asset type.
   RequestType _type;
 
@@ -36,7 +41,14 @@ class AssetPathEntity {
   /// Users should not edit this value.
   ///
   /// This is a field used internally by the library.
-  int typeInt = 0;
+  int get typeInt => type.value;
+
+  /// Users should not edit this value.
+  ///
+  /// This is a field used internally by the library.
+  set typeInt(int typeInt) {
+    _type = RequestType(typeInt);
+  }
 
   /// This path is the path that contains all the assets.
   bool isAll = false;
@@ -64,12 +76,14 @@ class AssetPathEntity {
   /// [pageSize] is item count of page.
   ///
   Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) {
+    assert(this.albumType == 1, "Just album type can get asset.");
     assert(pageSize > 0, "The pageSize must better than 0.");
     return PhotoManager._getAssetListPaged(this, page, pageSize);
   }
 
   /// The [start] and [end] like the [String.substring].
   Future<List<AssetEntity>> getAssetListRange({int start, int end}) async {
+    assert(this.albumType == 1, "Just album type can get asset.");
     assert(start >= 0, "The start must better than 0.");
     assert(end > start, "The end must better than start.");
     return PhotoManager._getAssetWithRange(
@@ -78,6 +92,14 @@ class AssetPathEntity {
 
   /// all of asset, It is recommended to use the latest api (pagination) [getAssetListPaged].
   Future<List<AssetEntity>> get assetList => getAssetListPaged(0, assetCount);
+
+  /// In android, always return empty list.
+  Future<List<AssetPathEntity>> getSubPathList() async {
+    if (!Platform.isIOS) {
+      return [];
+    }
+    return PhotoManager._getSubPath(this);
+  }
 
   @override
   bool operator ==(other) {
@@ -94,7 +116,7 @@ class AssetPathEntity {
 
   @override
   String toString() {
-    return "AssetPathEntity{ name: $name id:$id , length = $assetCount}";
+    return "AssetPathEntity{ name: $name, id:$id, length = $assetCount }";
   }
 }
 

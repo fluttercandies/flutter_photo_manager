@@ -243,4 +243,10 @@ class PhotoManager {
     assert(Platform.isAndroid || Platform.isIOS);
     return _plugin.getMediaUrl(assetEntity);
   }
+
+  static Future<List<AssetPathEntity>> _getSubPath(
+      AssetPathEntity assetPathEntity) {
+    assert(Platform.isIOS);
+    return _plugin.getSubPathEntities(assetPathEntity);
+  }
 }

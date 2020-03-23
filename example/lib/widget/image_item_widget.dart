@@ -26,7 +26,6 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
     return ChangeNotifierBuilder(
       builder: (c, p) {
         final format = provider.thumbFormat;
-        print(format);
         return buildContent(format);
       },
       value: provider,
