@@ -74,13 +74,11 @@
       if ([call.method isEqualToString:@"getGalleryList"]) {
 
         int type = [call.arguments[@"type"] intValue];
-        unsigned long timestamp = [self getTimestamp:call];
         BOOL hasAll = [call.arguments[@"hasAll"] boolValue];
         BOOL onlyAll = [call.arguments[@"onlyAll"] boolValue];
-        NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
         PMFilterOptionGroup *option =
                 [ConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
-        NSArray<PMAssetPathEntity *> *array = [manager getGalleryList:type date:date hasAll:hasAll onlyAll:onlyAll option:option];
+        NSArray<PMAssetPathEntity *> *array = [manager getGalleryList:type hasAll:hasAll onlyAll:onlyAll option:option];
         NSDictionary *dictionary = [ConvertUtils convertPathToMap:array];
         [handler reply:dictionary];
 
@@ -90,17 +88,10 @@
         int type = [call.arguments[@"type"] intValue];
         NSUInteger page = [call.arguments[@"page"] unsignedIntValue];
         NSUInteger pageCount = [call.arguments[@"pageCount"] unsignedIntValue];
-        unsigned long timestamp = [self getTimestamp:call];
-        NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
         PMFilterOptionGroup *option =
                 [ConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
         NSArray<PMAssetEntity *> *array =
-                [manager getAssetEntityListWithGalleryId:id
-                                                    type:type
-                                                    page:page
-                                               pageCount:pageCount
-                                                    date:date
-                                            filterOption:option];
+                [manager getAssetEntityListWithGalleryId:id type:type page:page pageCount:pageCount filterOption:option];
         NSDictionary *dictionary =
                 [ConvertUtils convertAssetToMap:array optionGroup:option];
         [handler reply:dictionary];
@@ -110,18 +101,10 @@
         NSUInteger type = [call.arguments[@"type"] unsignedIntegerValue];
         NSUInteger start = [call.arguments[@"start"] unsignedIntegerValue];
         NSUInteger end = [call.arguments[@"end"] unsignedIntegerValue];
-
-        unsigned long timestamp = [call.arguments[@"timestamp"] unsignedLongValue];
-        NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
         PMFilterOptionGroup *option =
                 [ConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
         NSArray<PMAssetEntity *> *array =
-                [manager getAssetEntityListWithRange:galleryId
-                                                type:type
-                                               start:start
-                                                 end:end
-                                                date:date
-                                        filterOption:option];
+                [manager getAssetEntityListWithRange:galleryId type:type start:start end:end filterOption:option];
         NSDictionary *dictionary =
                 [ConvertUtils convertAssetToMap:array optionGroup:option];
         [handler reply:dictionary];
@@ -150,14 +133,9 @@
       } else if ([call.method isEqualToString:@"fetchPathProperties"]) {
         NSString *id = call.arguments[@"id"];
         int requestType = [call.arguments[@"type"] intValue];
-        unsigned long timestamp = [call.arguments[@"timestamp"] unsignedLongValue];
-        NSDate *date = [NSDate dateWithTimeIntervalSince1970:timestamp / 1000];
         PMFilterOptionGroup *option =
                 [ConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
-        PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id
-                                                                type:requestType
-                                                                date:date
-                                                        filterOption:option];
+        PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id type:requestType filterOption:option];
         if (pathEntity) {
           NSDictionary *dictionary =
                   [ConvertUtils convertPathToMap:@[pathEntity]];

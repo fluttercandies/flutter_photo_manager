@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:oktoast/oktoast.dart';
+import 'package:image_scanner_example/widget/gallery_item_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class SubFolderPage extends StatefulWidget {
   final List<AssetPathEntity> pathList;
+  final String title;
 
-  const SubFolderPage({Key key, this.pathList}) : super(key: key);
+  const SubFolderPage({
+    Key key,
+    @required this.pathList,
+    @required this.title,
+  }) : super(key: key);
 
   @override
   _SubFolderPageState createState() => _SubFolderPageState();
@@ -15,7 +20,9 @@ class _SubFolderPageState extends State<SubFolderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
       body: ListView.builder(
         itemBuilder: _buildItem,
         itemCount: widget.pathList.length,
@@ -25,24 +32,9 @@ class _SubFolderPageState extends State<SubFolderPage> {
 
   Widget _buildItem(BuildContext context, int index) {
     final item = widget.pathList[index];
-    return ListTile(
-      title: Text(item.name),
-      subtitle: Text("asset count: ${item.assetCount.toString()}"),
-      onTap: () async {
-        final subPath = await item.getSubPathList();
-        if (subPath.length == 0) {
-          showToast("no have sub path");
-          return;
-        }
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) {
-            return SubFolderPage(
-              pathList: subPath,
-            );
-          }),
-        );
-      },
+    return GalleryItemWidget(
+      path: item,
+      setState: setState,
     );
   }
 }
