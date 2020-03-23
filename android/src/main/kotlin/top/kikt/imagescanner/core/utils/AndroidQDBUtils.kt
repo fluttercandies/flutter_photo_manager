@@ -41,8 +41,7 @@ object AndroidQDBUtils : IDBUtils {
     val args = ArrayList<String>()
     val typeSelection: String = getCondFromType(requestType, option, args)
     
-    val dateSelection = "AND ${MediaStore.MediaColumns.DATE_ADDED} <= ?"
-    args.add(timeStamp.toString())
+    val dateSelection = getDateCond(args, timeStamp, option)
     
     val sizeWhere = sizeWhere(requestType)
     
@@ -87,8 +86,7 @@ object AndroidQDBUtils : IDBUtils {
     val args = ArrayList<String>()
     val typeSelection: String = getCondFromType(requestType, option, args)
     
-    val dateSelection = "AND ${MediaStore.MediaColumns.DATE_ADDED} <= ?"
-    args.add(timeStamp.toString())
+    val dateSelection = getDateCond(args, timeStamp, option)
     
     val sizeWhere = sizeWhere(requestType)
     
@@ -123,8 +121,7 @@ object AndroidQDBUtils : IDBUtils {
     
     val sizeWhere = sizeWhere(requestType)
     
-    val dateSelection = "AND ${MediaStore.Images.Media.DATE_ADDED} <= ?"
-    args.add(timeStamp.toString())
+    val dateSelection = getDateCond(args, timeStamp, option)
     
     val keys = (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys).distinct().toTypedArray()
     val selection = if (isAll) {
@@ -133,7 +130,7 @@ object AndroidQDBUtils : IDBUtils {
       "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
     }
     
-    val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET ${page * pageSize}"
+    val sortOrder = getSortOrder(page * pageSize, pageSize, option)
     val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
       ?: return emptyList()
     
@@ -165,8 +162,7 @@ object AndroidQDBUtils : IDBUtils {
     
     val sizeWhere = sizeWhere(requestType)
     
-    val dateSelection = "AND ${MediaStore.Images.Media.DATE_ADDED} <= ?"
-    args.add(timestamp.toString())
+    val dateSelection = getDateCond(args, timestamp, option)
     
     val keys = (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys).distinct().toTypedArray()
     val selection = if (isAll) {
@@ -177,7 +173,7 @@ object AndroidQDBUtils : IDBUtils {
     
     val pageSize = end - start
     
-    val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC LIMIT $pageSize OFFSET $start"
+    val sortOrder = getSortOrder(start, pageSize, option)
     val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
       ?: return emptyList()
     
@@ -246,8 +242,7 @@ object AndroidQDBUtils : IDBUtils {
     val args = ArrayList<String>()
     val typeSelection: String = getCondFromType(type, option, args)
     
-    val dateSelection = "AND ${MediaStore.MediaColumns.DATE_ADDED} <= ?"
-    args.add(timeStamp.toString())
+    val dateSelection = getDateCond(args, timeStamp, option)
     
     val idSelection: String
     if (isAll) {

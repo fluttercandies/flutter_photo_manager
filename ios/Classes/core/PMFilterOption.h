@@ -4,6 +4,19 @@
 
 #import <Foundation/Foundation.h>
 
+@interface PMDateOption : NSObject
+
+@property(nonatomic, strong) NSDate *min;
+@property(nonatomic, strong) NSDate *max;
+@property(nonatomic, assign) BOOL asc;
+
+- (NSString *)dateCond;
+
+- (NSArray *)dateArgs;
+
+- (NSSortDescriptor *)sortCond;
+@end
+
 typedef struct PMSizeConstraint {
 
     unsigned int minWidth;
@@ -41,5 +54,7 @@ typedef struct PMDurationConstraint {
 @property(nonatomic, strong) PMFilterOption *imageOption;
 @property(nonatomic, strong) PMFilterOption *videoOption;
 @property(nonatomic, strong) PMFilterOption *audioOption;
+@property(nonatomic, strong) PMDateOption *dateOption;
 
+- (NSArray<NSSortDescriptor *> *)sortCond;
 @end

@@ -106,6 +106,7 @@
   container.imageOption = [self convertMapToPMFilterOption:image];
   container.videoOption = [self convertMapToPMFilterOption:video];
   container.audioOption = [self convertMapToPMFilterOption:audio];
+  container.dateOption = [self convertMapToPMDateOption:map[@"date"]];
 
   return container;
 }
@@ -126,10 +127,24 @@
 
   PMDurationConstraint durationConstraint;
   durationConstraint.minDuration =
-          [ConvertUtils convertNSNumberToSecond:durationMap[@"min"]];
+      [ConvertUtils convertNSNumberToSecond:durationMap[@"min"]];
   durationConstraint.maxDuration =
-          [ConvertUtils convertNSNumberToSecond:durationMap[@"max"]];
+      [ConvertUtils convertNSNumberToSecond:durationMap[@"max"]];
   option.durationConstraint = durationConstraint;
+
+  return option;
+}
+
++ (PMDateOption *)convertMapToPMDateOption:(NSDictionary *)map {
+  PMDateOption *option = [PMDateOption new];
+
+  long min = [map[@"min"] longValue];
+  long max = [map[@"max"] longValue];
+  BOOL asc = [map[@"asc"] boolValue];
+
+  option.min = [NSDate dateWithTimeIntervalSince1970:(min / 1000.0)];
+  option.max = [NSDate dateWithTimeIntervalSince1970:(max / 1000.0)];
+  option.asc = asc;
 
   return option;
 }

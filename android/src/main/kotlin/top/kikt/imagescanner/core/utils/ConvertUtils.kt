@@ -1,10 +1,7 @@
 package top.kikt.imagescanner.core.utils
 
 import top.kikt.imagescanner.AssetType
-import top.kikt.imagescanner.core.entity.AssetEntity
-import top.kikt.imagescanner.core.entity.FilterCond
-import top.kikt.imagescanner.core.entity.FilterOption
-import top.kikt.imagescanner.core.entity.GalleryEntity
+import top.kikt.imagescanner.core.entity.*
 
 /// create 2019-09-05 by cai
 
@@ -118,6 +115,12 @@ object ConvertUtils {
     return filterOptions
   }
   
+  fun convertToDateCond(map: Map<*, *>): DateCond {
+    val min = map["min"].toString().toLong()
+    val max = map["max"].toString().toLong()
+    val asc = map["asc"].toString().toBoolean()
+    return DateCond(min, max, asc)
+  }
   
   fun convertFilterOptionsFromMap(map: Map<*, *>): FilterOption {
     return FilterOption(map)

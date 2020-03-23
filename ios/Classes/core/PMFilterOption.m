@@ -7,6 +7,13 @@
 @implementation PMFilterOptionGroup {
 }
 
+- (NSArray<NSSortDescriptor *> *)sortCond {
+  PMDateOption *dateOption = self.dateOption;
+  return @[
+      [dateOption sortCond]
+  ];
+}
+
 @end
 
 @implementation PMFilterOption {
@@ -23,13 +30,31 @@
 
 
 - (NSString *)durationCond {
-
   return @"duration >= %f AND duration <= %f";
 }
 
 - (NSArray *)durationArgs {
   PMDurationConstraint constraint = self.durationConstraint;
   return @[@(constraint.minDuration), @(constraint.maxDuration)];
+}
+
+@end
+
+
+@implementation PMDateOption {
+
+}
+
+- (NSString *)dateCond {
+  return @"AND ( creationDate >= %@ AND creationDate <= %@ )";
+}
+
+- (NSArray *)dateArgs {
+  return @[self.min, self.max];
+}
+
+- (NSSortDescriptor *)sortCond {
+  return [NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:self.asc];
 }
 
 @end

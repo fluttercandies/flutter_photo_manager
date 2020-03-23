@@ -17,6 +17,8 @@ class FilterOptionGroup {
 
   final Map<AssetType, FilterOption> _map = {};
 
+  DateTimeCond dateTimeCond = DateTimeCond.def();
+
   void setOption(AssetType type, FilterOption option) {
     _map[type] = option;
   }
@@ -32,6 +34,8 @@ class FilterOptionGroup {
     if (_map.containsKey(AssetType.video)) {
       result["audio"] = _map[AssetType.audio].toMap();
     }
+
+    result["date"] = dateTimeCond.toMap();
 
     return result;
   }
@@ -106,6 +110,50 @@ class DurationConstraint {
     return {
       "min": min.inMilliseconds,
       "max": max.inMilliseconds,
+    };
+  }
+}
+
+class DateTimeCond {
+  static final DateTime zero = DateTime.utc(0);
+
+  final DateTime min;
+  final DateTime max;
+  final bool asc;
+
+  const DateTimeCond({
+    this.min,
+    this.max,
+    this.asc = false, // default desc
+  })  : assert(min != null),
+        assert(max != null),
+        assert(asc != null);
+
+  factory DateTimeCond.def() {
+    return DateTimeCond(
+      min: zero,
+      max: DateTime.now(),
+      asc: false,
+    );
+  }
+
+  DateTimeCond copyWith({
+    final DateTime min,
+    final DateTime max,
+    final bool asc,
+  }) {
+    return DateTimeCond(
+      min: min ?? this.min,
+      max: max ?? this.max,
+      asc: asc ?? this.asc,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "min": min.millisecondsSinceEpoch,
+      "max": max.millisecondsSinceEpoch,
+      "asc": asc,
     };
   }
 }

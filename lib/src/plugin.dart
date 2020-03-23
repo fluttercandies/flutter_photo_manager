@@ -137,14 +137,13 @@ class Plugin {
     _channel.invokeMethod("openSetting");
   }
 
-  Future<Map> fetchPathProperties(String id, int type, DateTime datetime,
-      FilterOptionGroup optionGroup) async {
-    datetime ??= _createDefaultFetchDatetime();
+  Future<Map> fetchPathProperties(
+      String id, int type, FilterOptionGroup optionGroup) async {
     return _channel.invokeMethod(
       "fetchPathProperties",
       {
         "id": id,
-        "timestamp": datetime.millisecondsSinceEpoch,
+        "timestamp": 0,
         "type": type,
         "option": optionGroup.toMap(),
       },

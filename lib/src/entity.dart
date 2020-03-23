@@ -41,18 +41,16 @@ class AssetPathEntity {
   /// This path is the path that contains all the assets.
   bool isAll = false;
 
-  /// The timestamp of the path, when the request page number is 0, reset it to the current time. When other page numbers are passed directly.
-  DateTime fetchDatetime;
-
   AssetPathEntity({this.id, this.name, this.filterOption});
 
-  Future<void> refreshPathProperties({DateTime dt}) async {
-    dt ??= DateTime.now();
-    final result = await PhotoManager.fetchPathProperties(this, dt);
+  Future<void> refreshPathProperties({DateTimeCond dateTimeCond}) async {
+    dateTimeCond ??=
+        this.filterOption.dateTimeCond.copyWith(max: DateTime.now());
+    final result = await PhotoManager.fetchPathProperties(this, dateTimeCond);
     if (result != null) {
       this.assetCount = result.assetCount;
-      this.fetchDatetime = result.fetchDatetime;
       this.name = result.name;
+      this.filterOption.dateTimeCond = dateTimeCond;
     }
   }
 
@@ -239,7 +237,7 @@ class AssetEntity {
       width: width,
       height: height,
       format: format,
-      quality:quality,
+      quality: quality,
     );
   }
 

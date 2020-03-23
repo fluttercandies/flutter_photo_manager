@@ -43,13 +43,6 @@ class _NewHomePageState extends State<NewHomePage> {
               ],
             ),
             _buildTypeChecks(provider),
-            Row(
-              children: <Widget>[
-                _buildFecthDtPicker(),
-                _buildDateToNow(),
-              ],
-              mainAxisSize: MainAxisSize.min,
-            ),
             _buildHasAllCheck(),
             _buildOnlyAllCheck(),
             _buildPngCheck(),
@@ -112,23 +105,6 @@ class _NewHomePageState extends State<NewHomePage> {
     ));
   }
 
-  Widget _buildFecthDtPicker() {
-    final dt = provider.dt;
-    return buildButton(
-        "${dt.year}-${dt.month}-${dt.day} ${dt.hour}:${dt.minute}:${dt.second}",
-        () async {
-      final pickDt = await showDatePicker(
-        context: context,
-        firstDate: DateTime(2018, 1, 1),
-        initialDate: dt,
-        lastDate: DateTime.now(),
-      );
-      if (pickDt != null) {
-        provider.changeDate(pickDt);
-      }
-    });
-  }
-
   Widget _buildHasAllCheck() {
     return CheckboxListTile(
       value: provider.hasAll,
@@ -157,12 +133,6 @@ class _NewHomePageState extends State<NewHomePage> {
       },
       title: Text("onlyAll"),
     );
-  }
-
-  Widget _buildDateToNow() {
-    return buildButton("Date to now", () {
-      provider.changeDateToNow();
-    });
   }
 
   Widget _buildNotifyCheck() {
