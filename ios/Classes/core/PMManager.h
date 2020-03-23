@@ -75,4 +75,7 @@ getAssetEntityListWithGalleryId:(NSString *)id
 - (NSString*)getTitleAsyncWithAssetId: (NSString *) assetId;
 
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(ResultHandler *)handler;
+
+- (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type option:(PMFilterOptionGroup *)option;
+
 @end

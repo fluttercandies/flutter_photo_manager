@@ -16,10 +16,27 @@
 
   for (PMAssetPathEntity *entity in array) {
     NSDictionary *item = @{
-            @"id": entity.id,
-            @"name": entity.name,
-            @"length": @(entity.assetCount),
-            @"isAll": @(entity.isAll),
+        @"id": entity.id,
+        @"name": entity.name,
+        @"length": @(entity.assetCount),
+        @"isAll": @(entity.isAll),
+    };
+
+    [data addObject:item];
+  }
+
+  return @{@"data": data};
+}
+
++ (NSDictionary *)convertPHCollectionToMap:(NSArray<PMAssetPathEntity *> *)array {
+  NSMutableArray *data = [NSMutableArray new];
+
+  for (PMAssetPathEntity *entity in array) {
+    NSDictionary *item = @{
+        @"id": entity.id,
+        @"name": entity.name,
+        @"length": @(entity.assetCount),
+        @"isAll": @(entity.isAll),
     };
 
     [data addObject:item];

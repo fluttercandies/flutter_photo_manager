@@ -253,4 +253,20 @@ class Plugin {
       "type": assetEntity.typeInt,
     });
   }
+
+  Future<List<AssetPathEntity>> getSubPath(AssetPathEntity pathEntity) async {
+    final result = await _channel.invokeMethod("getSubPath", {
+      "id": pathEntity.id,
+      "type": pathEntity.type.value,
+      "option": pathEntity.filterOption.toMap(),
+    });
+
+    final items = result["list"];
+
+    return ConvertUtils.convertPath(
+      items,
+      type: pathEntity.typeInt,
+      optionGroup: pathEntity.filterOption,
+    );
+  }
 }

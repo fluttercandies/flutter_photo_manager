@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:image_scanner_example/model/photo_provider.dart';
 import 'package:image_scanner_example/page/image_list_page.dart';
+import 'package:image_scanner_example/widget/dialog/list_dialog.dart';
 import 'package:provider/provider.dart';
+
+import 'sub_gallery_page.dart';
 
 class GalleryListPage extends StatefulWidget {
   const GalleryListPage({Key key}) : super(key: key);
@@ -46,8 +49,36 @@ class _GalleryListPageState extends State<GalleryListPage> {
         ),
       ),
       onLongPress: () async {
-        await item.refreshPathProperties();
-        setState(() {});
+        showDialog(
+          context: context,
+          builder: (_) {
+            return ListDialog(
+              children: [
+                RaisedButton(
+                  child: Text("refrsh properties"),
+                  onPressed: () async {
+                    await item.refreshPathProperties();
+                    setState(() {});
+                  },
+                ),
+                RaisedButton(
+                  child: Text("get sub path"),
+                  onPressed: () async {
+                    final subPath = await item.getSubPathList();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) {
+                        return SubFolderPage(
+                          pathList: subPath,
+                        );
+                      }),
+                    );
+                  },
+                ),
+              ],
+            );
+          },
+        );
       },
       onDoubleTap: () async {
         final list =

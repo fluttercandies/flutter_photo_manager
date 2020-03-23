@@ -225,6 +225,16 @@
         [handler reply:title];
       } else if ([@"getMediaUrl" isEqualToString:call.method]) {
         [manager getMediaUrl:call.arguments[@"id"] resultHandler:handler];
+      } else if ([@"getSubPath" isEqualToString:call.method]) {
+        NSString *galleryId = call.arguments[@"id"];
+        int type = [call.arguments[@"type"] intValue];
+        NSDictionary *optionMap = call.arguments[@"option"];
+        PMFilterOptionGroup *option = [ConvertUtils convertMapToOptionContainer:optionMap];
+
+        NSArray<PMAssetPathEntity *> *array = [manager getSubPathWithId:galleryId type:type option:option];
+        NSDictionary *pathData = [ConvertUtils convertPathToMap:array];
+
+        [handler reply:@{@"list": pathData}];
       } else {
         [handler notImplemented];
       }

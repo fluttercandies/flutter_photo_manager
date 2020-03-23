@@ -12,6 +12,7 @@
 #import "ResultHandler.h"
 #import "PMRequestTypeUtils.h"
 #import "NSString+PM_COMMON.h"
+#import "PMFolderUtils.h"
 
 @implementation PMManager {
   BOOL __isAuth;
@@ -832,6 +833,57 @@ getAssetEntityListWithGalleryId:(NSString *)id
         }
     }];
   }
+}
+
+- (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type option:(PMFilterOptionGroup *)option {
+  PHFetchOptions *options = [self getAssetOptions:type date:nil filterOption:option];
+
+  if ([PMFolderUtils isRecentCollection:id]) {
+    NSArray<PHCollectionList *> *array = [PMFolderUtils getRootFolderWithOptions:nil];
+    return [self convertPHCollectionToPMAssetPathArray:array option:options];
+  }
+
+  PHCollectionList *list;
+
+  PHFetchResult<PHCollectionList *> *collectionList = [PHCollectionList fetchCollectionListsWithLocalIdentifiers:@[id] options:nil];
+  if (collectionList && collectionList.count > 0) {
+    list = collectionList.firstObject;
+  }
+
+  if (!list) {
+    return @[];
+  }
+
+  NSArray<PHCollection *> *phCollectionArray = [PMFolderUtils getSubCollectionWithCollection:list options:options];
+  return [self convertPHCollectionToPMAssetPathArray:phCollectionArray option:options];
+}
+
+- (NSArray<PMAssetPathEntity *> *)convertPHCollectionToPMAssetPathArray:(NSArray<PHCollection *> *)phArray
+                                                                 option:(PHFetchOptions *)option {
+  NSMutableArray<PMAssetPathEntity *> *result = [NSMutableArray new];
+
+  for (PHCollection *collection in phArray) {
+    [result addObject:[self convertPHCollectionToPMPath:collection option:option]];
+  }
+
+  return result;
+}
+
+- (PMAssetPathEntity *)convertPHCollectionToPMPath:(PHCollection *)phCollection option:(PHFetchOptions *)option {
+  PMAssetPathEntity *pathEntity = [PMAssetPathEntity new];
+
+  pathEntity.id = phCollection.localIdentifier;
+  pathEntity.isAll = NO;
+  pathEntity.name = phCollection.localizedTitle;
+  if ([phCollection isMemberOfClass:PHAssetCollection.class]) {
+    PHAssetCollection *collection = (PHAssetCollection *) phCollection;
+    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:option];
+    pathEntity.assetCount = fetchResult.count;
+  } else {
+    pathEntity.assetCount = 0;
+  }
+
+  return pathEntity;
 }
 
 @end
