@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_scanner_example/model/photo_provider.dart';
+import 'package:image_scanner_example/widget/dialog/duration_picker.dart';
 import 'package:provider/provider.dart';
 
 class FilterOptionPage extends StatefulWidget {
@@ -110,24 +111,25 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
         return ListTile(
           title: Text(title),
           subtitle: Text(
-              "${value.inHours.toString().padLeft(2, '0')}h : ${(value.inMinutes % 60).toString().padLeft(2, '0')}m"),
+              "${value.inHours.toString().padLeft(2, '0')}h : ${(value.inMinutes % 60).toString().padLeft(2, '0')}m : ${(value.inSeconds % 60).toString().padLeft(2, '0')}s"),
           onTap: () async {
-            // final duration = await showDurationPicker(
-            //   context: context,
-            //   initialTime: value,
-            //   snapToMins: 0.5,
-            // );
-            final timeOfDay =
-                TimeOfDay(hour: value.inHours, minute: value.inMinutes);
-            final result =
-                await showTimePicker(context: context, initialTime: timeOfDay);
-            if (result != null) {
-              final duration =
-                  Duration(hours: result.hour, minutes: result.minute);
-              if (duration != null) {
-                onChanged(duration);
-              }
+            final duration = await showCupertinoDurationPicker(
+                context: context, initDuration: value);
+
+            if (duration != null) {
+              onChanged(duration);
             }
+            // final timeOfDay =
+            //     TimeOfDay(hour: value.inHours, minute: value.inMinutes);
+            // final result =
+            //     await showTimePicker(context: context, initialTime: timeOfDay);
+            // if (result != null) {
+            //   final duration =
+            //       Duration(hours: result.hour, minutes: result.minute);
+            //   if (duration != null) {
+            //     onChanged(duration);
+            //   }
+            // }
           },
         );
       },
