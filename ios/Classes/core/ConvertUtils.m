@@ -124,6 +124,7 @@
   sizeConstraint.maxWidth = [sizeMap[@"maxWidth"] unsignedIntValue];
   sizeConstraint.minHeight = [sizeMap[@"minHeight"] unsignedIntValue];
   sizeConstraint.maxHeight = [sizeMap[@"maxHeight"] unsignedIntValue];
+  sizeConstraint.ignoreSize = [sizeMap[@"ignoreSize"] boolValue];
   option.sizeConstraint = sizeConstraint;
 
   PMDurationConstraint durationConstraint;

@@ -23,6 +23,7 @@ typedef struct PMSizeConstraint {
     unsigned int maxWidth;
     unsigned int minHeight;
     unsigned int maxHeight;
+    BOOL ignoreSize;
 
 } PMSizeConstraint;
 

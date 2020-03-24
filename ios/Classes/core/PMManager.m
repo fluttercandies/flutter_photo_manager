@@ -630,9 +630,11 @@
     [cond appendString:@"mediaType == %d"];
     [args addObject:@(PHAssetMediaTypeImage)];
 
-    [cond appendString:@" AND "];
-    [cond appendString:sizeCond];
-    [args addObjectsFromArray:sizeArgs];
+    if (!imageOption.sizeConstraint.ignoreSize) {
+      [cond appendString:@" AND "];
+      [cond appendString:sizeCond];
+      [args addObjectsFromArray:sizeArgs];
+    }
 
     [cond appendString:@")"];
   }
@@ -683,9 +685,6 @@
 
   [cond insertString:@"(" atIndex:0];
   [cond appendString:@")"];
-
-//  [cond appendString:@" AND ( creationDate <= %@ )"];
-//  [args addObject:date];
 
   PMDateOption *dateOption = optionGroup.dateOption;
   [cond appendString:[dateOption dateCond]];
