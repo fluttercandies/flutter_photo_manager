@@ -105,6 +105,7 @@ object ConvertUtils {
     sizeConstraint.maxWidth = sizeMap["maxWidth"] as Int
     sizeConstraint.minHeight = sizeMap["minHeight"] as Int
     sizeConstraint.maxHeight = sizeMap["maxHeight"] as Int
+    sizeConstraint.ignoreSize = sizeMap["ignoreSize"] as Boolean
     
     val durationConstraint = FilterCond.DurationConstraint()
     filterOptions.durationConstraint = durationConstraint

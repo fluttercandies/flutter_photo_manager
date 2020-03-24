@@ -51,7 +51,7 @@ class FilterCond {
     var maxWidth = 0
     var minHeight = 0
     var maxHeight = 0
-    
+    var ignoreSize = false
   }
   
   class DurationConstraint {

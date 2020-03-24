@@ -29,6 +29,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
           buildInput(provider.maxHeight, "maxHeight", (value) {
             provider.maxHeight = value;
           }),
+          buildIgnoreSize(provider),
           buildNeedTitleCheck(provider),
           buildDurationWidget(
             provider,
@@ -97,6 +98,21 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
             provider.needTitle = value;
           },
           value: provider.needTitle,
+        );
+      },
+    );
+  }
+
+  Widget buildIgnoreSize(PhotoProvider provider) {
+    return AnimatedBuilder(
+      animation: provider,
+      builder: (context, snapshot) {
+        return CheckboxListTile(
+          title: Text('Ignore size with image'),
+          onChanged: (bool value) {
+            provider.ignoreSize = value;
+          },
+          value: provider.ignoreSize,
         );
       },
     );
