@@ -129,14 +129,14 @@ class AssetEntity {
 
   /// It is title `MediaStore.MediaColumns.DISPLAY_NAME` in MediaStore on android.
   ///
-  /// It is `PHAssetResource.originalFilename` on iOS.
+  /// It is `PHAssetResource.filename` on iOS.
   ///
   /// Nullable in iOS. If you must need it, See [FilterOption.needTitle] or use [titleAsync].
   String title;
 
   /// It is [title] in Android.
   ///
-  /// It is [PHAsset valueForKey:@"originalFilename"] in iOS.
+  /// It is [PHAsset valueForKey:@"filename"] in iOS.
   Future<String> get titleAsync => _plugin.getTitleAsync(this);
 
   /// see [id]

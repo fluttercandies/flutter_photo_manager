@@ -157,6 +157,25 @@ double longitude = entiry.longitude;
 Latlng latlng = await entity.latlngAsync(); // In androidQ or higher, need use the method to get location info.
 
 String mediaUrl = await entity.getMediaUrl(); /// It can be used in some video player plugin to preview, such as [flutter_ijkplayer](https://pub.dev/packages/flutter_ijkplayer)
+
+String title = entity.title;
+```
+
+About title: if the title is null or empty string, need use the titleAsync to get it. See below for the definition of attributes.
+
+```dart
+
+  /// It is title `MediaStore.MediaColumns.DISPLAY_NAME` in MediaStore on android.
+  ///
+  /// It is `PHAssetResource.filename` on iOS.
+  ///
+  /// Nullable in iOS. If you must need it, See [FilterOption.needTitle] or use [titleAsync].
+  String title;
+
+  /// It is [title] in Android.
+  ///
+  /// It is [PHAsset valueForKey:@"filename"] in iOS.
+  Future<String> get titleAsync => _plugin.getTitleAsync(this);
 ```
 
 #### location info of android Q
