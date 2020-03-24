@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.5.0-dev.3
+## 0.5.0
 
 Feature:
 
