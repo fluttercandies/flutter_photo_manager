@@ -68,8 +68,16 @@ class PhotoProvider extends ChangeNotifier {
   String maxWidth = "10000";
   String minHeight = "0";
   String maxHeight = "10000";
+  bool _ignoreSize = false;
 
-  Duration _minDuration = Duration(seconds: 10);
+  bool get ignoreSize => _ignoreSize;
+
+  set ignoreSize(bool ignoreSize) {
+    _ignoreSize = ignoreSize;
+    notifyListeners();
+  }
+
+  Duration _minDuration = Duration.zero;
 
   Duration get minDuration => _minDuration;
 
@@ -153,6 +161,7 @@ class PhotoProvider extends ChangeNotifier {
         maxWidth: maxW,
         minHeight: minH,
         maxHeight: maxH,
+        ignoreSize: ignoreSize,
       );
     } catch (e) {
       showToast("Cannot convert your size.");

@@ -59,7 +59,7 @@ object DBUtils : IDBUtils {
     
     val dateSelection = getDateCond(args, timeStamp, option)
     
-    val sizeWhere = AndroidQDBUtils.sizeWhere(requestType)
+    val sizeWhere = sizeWhere(requestType, option)
     
     val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
     val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
@@ -84,7 +84,7 @@ object DBUtils : IDBUtils {
     
     val dateSelection = getDateCond(args, timeStamp, option)
     
-    val sizeWhere = AndroidQDBUtils.sizeWhere(requestType)
+    val sizeWhere = sizeWhere(requestType, option)
     
     val selections = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
     
@@ -117,7 +117,7 @@ object DBUtils : IDBUtils {
       args.add(galleryId)
     }
     
-    val sizeWhere = AndroidQDBUtils.sizeWhere(null)
+    val sizeWhere = sizeWhere(null, option)
     
     val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
     val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
@@ -164,7 +164,7 @@ object DBUtils : IDBUtils {
     
     val dateSelection = getDateCond(args, timeStamp, option)
     
-    val sizeWhere = AndroidQDBUtils.sizeWhere(requestType)
+    val sizeWhere = sizeWhere(requestType, option)
     
     val keys = (storeImageKeys + storeVideoKeys + typeKeys + locationKeys).distinct().toTypedArray()
     val selection = if (isAll) {
@@ -204,7 +204,7 @@ object DBUtils : IDBUtils {
     
     val dateSelection = getDateCond(args, timestamp, option)
     
-    val sizeWhere = AndroidQDBUtils.sizeWhere(requestType)
+    val sizeWhere = sizeWhere(requestType, option)
     
     val keys = (storeImageKeys + storeVideoKeys + typeKeys + locationKeys).distinct().toTypedArray()
     val selection = if (isAll) {

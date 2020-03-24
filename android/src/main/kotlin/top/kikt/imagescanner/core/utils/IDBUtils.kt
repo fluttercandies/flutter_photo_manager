@@ -82,35 +82,6 @@ interface IDBUtils {
   val allUri: Uri
     get() = IDBUtils.allUri
   
-  /**
-   * Just filter [MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE]
-   */
-  fun sizeWhere(requestType: Int?): String {
-    if (requestType == null || !typeUtils.containsImage(requestType)) {
-      return ""
-    }
-    val mediaType = MediaStore.Files.FileColumns.MEDIA_TYPE
-    
-    
-    var result = ""
-    
-    if (typeUtils.containsVideo(requestType)) {
-      result = "OR ( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO} )"
-    }
-    
-    if (typeUtils.containsAudio(requestType)) {
-      result = "$result OR ( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO} )"
-    }
-    
-    val size = "${MediaStore.MediaColumns.WIDTH} > 0 AND ${MediaStore.MediaColumns.HEIGHT} > 0"
-    
-    val imageCondString = "( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE} AND $size )"
-    
-    result = "AND ($imageCondString $result)"
-    
-    return result
-  }
-  
   private val typeUtils: RequestTypeUtils
     get() = RequestTypeUtils
   
@@ -190,8 +161,41 @@ interface IDBUtils {
   
   fun cacheOriginFile(context: Context, asset: AssetEntity, byteArray: ByteArray)
   
+  /**
+   * Just filter [MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE]
+   */
+  fun sizeWhere(requestType: Int?, option: FilterOption): String {
+    if (option.imageOption.sizeConstraint.ignoreSize) {
+      return ""
+    }
+    
+    if (requestType == null || !typeUtils.containsImage(requestType)) {
+      return ""
+    }
+    val mediaType = MediaStore.Files.FileColumns.MEDIA_TYPE
+    
+    
+    var result = ""
+    
+    if (typeUtils.containsVideo(requestType)) {
+      result = "OR ( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO} )"
+    }
+    
+    if (typeUtils.containsAudio(requestType)) {
+      result = "$result OR ( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO} )"
+    }
+    
+    val size = "${MediaStore.MediaColumns.WIDTH} > 0 AND ${MediaStore.MediaColumns.HEIGHT} > 0"
+    
+    val imageCondString = "( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE} AND $size )"
+    
+    result = "AND ($imageCondString $result)"
+    
+    return result
+  }
+  
   fun getCondFromType(type: Int, filterOption: FilterOption, args: ArrayList<String>): String {
-    val cond = StringBuilder();
+    val cond = StringBuilder()
     val typeKey = MediaStore.Files.FileColumns.MEDIA_TYPE
     
     val haveImage = RequestTypeUtils.containsImage(type)
@@ -204,11 +208,15 @@ interface IDBUtils {
     
     if (haveImage) {
       val imageCond = filterOption.imageOption
-      val sizeCond = imageCond.sizeCond()
-      val sizeArgs = imageCond.sizeArgs()
-      imageCondString = "$typeKey = ? AND $sizeCond"
+      imageCondString = "$typeKey = ? "
       args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString())
-      args.addAll(sizeArgs)
+      
+      if (!imageCond.sizeConstraint.ignoreSize) {
+        val sizeCond = imageCond.sizeCond()
+        val sizeArgs = imageCond.sizeArgs()
+        imageCondString = "$imageCondString AND $sizeCond"
+        args.addAll(sizeArgs)
+      }
     }
     
     if (haveVideo) {
@@ -250,9 +258,7 @@ interface IDBUtils {
       cond.append("( $audioCondString )")
     }
     
-    val condString = "AND ( $cond )"
-    
-    return condString
+    return "AND ( $cond )"
   }
   
   private fun getCond(cond: Boolean, condString: String): String {

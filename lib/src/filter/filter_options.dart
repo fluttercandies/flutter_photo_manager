@@ -77,11 +77,15 @@ class SizeConstraint {
   final int minHeight;
   final int maxHeight;
 
+  /// When set to true, all constraints are ignored and all sizes of images are displayed.
+  final bool ignoreSize;
+
   const SizeConstraint({
     this.minWidth = 0,
     this.maxWidth = 100000,
     this.minHeight = 0,
     this.maxHeight = 100000,
+    this.ignoreSize = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -90,6 +94,7 @@ class SizeConstraint {
       "maxWidth": maxWidth,
       "minHeight": minHeight,
       "maxHeight": maxHeight,
+      "ignoreSize": ignoreSize,
     };
   }
 }

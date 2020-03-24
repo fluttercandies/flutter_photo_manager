@@ -43,7 +43,7 @@ object AndroidQDBUtils : IDBUtils {
     
     val dateSelection = getDateCond(args, timeStamp, option)
     
-    val sizeWhere = sizeWhere(requestType)
+    val sizeWhere = sizeWhere(requestType, option)
     
     val selections = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
     
@@ -88,7 +88,7 @@ object AndroidQDBUtils : IDBUtils {
     
     val dateSelection = getDateCond(args, timeStamp, option)
     
-    val sizeWhere = sizeWhere(requestType)
+    val sizeWhere = sizeWhere(requestType, option)
     
     val selections = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
     
@@ -119,7 +119,7 @@ object AndroidQDBUtils : IDBUtils {
     }
     val typeSelection: String = getCondFromType(requestType, option, args)
     
-    val sizeWhere = sizeWhere(requestType)
+    val sizeWhere = sizeWhere(requestType, option)
     
     val dateSelection = getDateCond(args, timeStamp, option)
     
@@ -160,7 +160,7 @@ object AndroidQDBUtils : IDBUtils {
     }
     val typeSelection: String = getCondFromType(requestType, option, args)
     
-    val sizeWhere = sizeWhere(requestType)
+    val sizeWhere = sizeWhere(requestType, option)
     
     val dateSelection = getDateCond(args, timestamp, option)
     
@@ -252,7 +252,7 @@ object AndroidQDBUtils : IDBUtils {
       args.add(galleryId)
     }
     
-    val sizeWhere = sizeWhere(null)
+    val sizeWhere = sizeWhere(null, option)
     
     val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere"
     val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
