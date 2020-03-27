@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.5.0+1
+
+Fix:
+
+- Problem of AssetPathEntity.refreshPathProperties.
+
 ## 0.5.0
 
 Feature:
