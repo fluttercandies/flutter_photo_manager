@@ -297,7 +297,8 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
             val videoPath = call.argument<String>("path")!!
             val title = call.argument<String>("title")!!
             val desc = call.argument<String>("desc") ?: ""
-            val entity = photoManager.saveVideo(videoPath, title, desc)
+            val duration = call.argument<Long>("duration")
+            val entity = photoManager.saveVideo(videoPath, title, desc, duration)
             if (entity == null) {
               resultHandler.reply(null)
               return@runOnBackground

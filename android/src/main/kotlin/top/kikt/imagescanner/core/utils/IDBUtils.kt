@@ -13,7 +13,6 @@ import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
 import top.kikt.imagescanner.util.LogUtils
-import java.io.InputStream
 
 
 /// create 2019-09-11 by cai
@@ -143,7 +142,7 @@ interface IDBUtils {
   
   fun saveImage(context: Context, image: ByteArray, title: String, desc: String): AssetEntity?
   
-  fun saveVideo(context: Context, inputStream: InputStream, title: String, desc: String): AssetEntity?
+  fun saveVideo(context: Context, path: String, title: String, desc: String, duration: Long?): AssetEntity?
   
   fun exists(context: Context, id: String): Boolean {
     val columns = arrayOf(MediaStore.Files.FileColumns._ID)

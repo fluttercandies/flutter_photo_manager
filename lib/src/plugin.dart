@@ -172,8 +172,11 @@ class Plugin {
     return ConvertUtils.convertToAsset(result);
   }
 
-  Future<AssetEntity> saveVideo(File file,
-      {String title, String desc = ""}) async {
+  Future<AssetEntity> saveVideo(
+    File file, {
+    String title,
+    String desc = "",
+  }) async {
     if (!file.existsSync()) {
       return null;
     }

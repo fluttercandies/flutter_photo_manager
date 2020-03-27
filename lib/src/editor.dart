@@ -17,7 +17,12 @@ class Editor {
     File file, {
     String title,
     String desc,
+    Duration duration,
   }) async {
-    return _plugin.saveVideo(file, title: title, desc: desc);
+    return _plugin.saveVideo(
+      file,
+      title: title,
+      desc: desc,
+    );
   }
 }
