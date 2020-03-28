@@ -790,14 +790,18 @@
   __block NSString *assetId = nil;
   [[PHPhotoLibrary sharedPhotoLibrary]
           performChanges:^{
-              PHAssetCreationRequest *request = [PHAssetCreationRequest
-                      creationRequestForAssetFromVideoAtFileURL:fileURL];
-              PHAssetResourceCreationOptions *options =
-                      [PHAssetResourceCreationOptions new];
-              [options setOriginalFilename:title];
-              [request addResourceWithType:PHAssetResourceTypeVideo
-                                   fileURL:fileURL
-                                   options:options];
+              PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromVideoAtFileURL:fileURL];
+//              PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
+//              [options setOriginalFilename:title];
+
+//              PHAssetCreationRequest *request = [PHAssetCreationRequest
+//                      creationRequestForAssetFromVideoAtFileURL:fileURL];
+//              PHAssetResourceCreationOptions *options =
+//                      [PHAssetResourceCreationOptions new];
+//              [options setOriginalFilename:title];
+//              [request addResourceWithType:PHAssetResourceTypeVideo
+//                                   fileURL:fileURL
+//                                   options:options];
               assetId = request.placeholderForCreatedAsset.localIdentifier;
           }
        completionHandler:^(BOOL success, NSError *error) {
