@@ -14,6 +14,8 @@ import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
+import 'copy_to_another_gallery_example.dart';
+
 class GalleryContentListPage extends StatefulWidget {
   final AssetPathEntity path;
 
@@ -144,6 +146,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                 child: Text("Upload to my test server."),
                 onPressed: () => UploadToDevServer().upload(entity),
               ),
+              RaisedButton(
+                child: Text("Copy to another path"),
+                onPressed: () => copyToAnotherPath(entity),
+              ),
             ],
           ),
         );
@@ -259,5 +265,16 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             },
           );
         });
+  }
+
+  void copyToAnotherPath(AssetEntity entity) async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CopyToAnotherGalleryPage(
+          assetEntity: entity,
+        ),
+      ),
+    );
   }
 }

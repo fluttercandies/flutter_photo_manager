@@ -13,7 +13,7 @@ import java.util.*
 @SuppressLint("StaticFieldLeak")
 object CrashHandler : Thread.UncaughtExceptionHandler {
 
-    private lateinit var defaultHandler: Thread.UncaughtExceptionHandler
+    private var defaultHandler: Thread.UncaughtExceptionHandler? = null
     private lateinit var context: Context
 
     private var df = SimpleDateFormat("yyyy-MM-dd", Locale.CHINA)
@@ -46,7 +46,7 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
             writer?.close()
         }
 
-        defaultHandler.uncaughtException(t, e)
+        defaultHandler?.uncaughtException(t, e)
     }
 
     private fun getTimeString(): String {

@@ -895,5 +895,54 @@
   return pathEntity;
 }
 
+- (PHAssetCollection *)getCollectionWithId:(NSString *)galleryId {
+  PHFetchResult<PHAssetCollection *> *fetchResult = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[galleryId] options:nil];
 
+  if (fetchResult && fetchResult.count > 0) {
+    return fetchResult.firstObject;
+  }
+  return nil;
+}
+
+- (void)copyAssetWithId:(NSString *)id toGallery:(NSString *)gallery block:(void (^)(PMAssetEntity *entity, NSString *msg))block {
+  PMAssetEntity *assetEntity = [self getAssetEntity:id needTitle:NO];
+
+  if (!assetEntity) {
+    NSString *msg = [NSString stringWithFormat:@"not found asset : %@", id];
+    block(nil, msg);
+    return;
+  }
+
+  __block PHAssetCollection *collection = [self getCollectionWithId:gallery];
+
+  if (!collection) {
+    NSString *msg = [NSString stringWithFormat:@"not found collection with gallery id : %@", gallery];
+    block(nil, msg);
+    return;
+  }
+
+  if (![collection canPerformEditOperation:PHCollectionEditOperationAddContent]) {
+    block(nil, @"The collection can't add from user. The [collection canPerformEditOperation:PHCollectionEditOperationAddContent] return NO!");
+    return;
+  }
+
+  __block PHFetchResult<PHAsset *> *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:nil];
+  NSError *error;
+
+  [PHPhotoLibrary.sharedPhotoLibrary
+          performChangesAndWait:^{
+              PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
+              [request addAssets:asset];
+//              [request insertAssets:asset atIndexes:[NSIndexSet indexSetWithIndex:0]];
+
+          } error:&error];
+
+  if (error) {
+    NSString *msg = [NSString stringWithFormat:@"Can't copy, error : %@ ", error];
+    block(nil, msg);
+    return;
+  }
+
+  block(assetEntity, nil);
+}
 @end

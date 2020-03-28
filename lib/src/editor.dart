@@ -33,4 +33,13 @@ class Editor {
       desc: desc,
     );
   }
+
+  Future<AssetEntity> copyAssetToPath({
+   @required AssetEntity asset,
+   @required AssetPathEntity pathEntity,
+  }) {
+    assert(asset != null);
+    assert(pathEntity != null);
+    return _plugin.copyAssetToGallery(asset,pathEntity);
+  }
 }

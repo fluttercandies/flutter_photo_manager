@@ -5,6 +5,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.provider.MediaStore.Files.FileColumns.*
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import androidx.annotation.IntDef
 import androidx.exifinterface.media.ExifInterface
@@ -78,6 +79,9 @@ interface IDBUtils {
 
   }
 
+  val idSelection: String
+    get() = "${MediaStore.Images.Media._ID} = ?"
+
   val allUri: Uri
     get() = IDBUtils.allUri
 
@@ -98,6 +102,17 @@ interface IDBUtils {
       else -> 0
     }
   }
+
+
+  fun convertTypeToMediaType(type: Int): Int {
+    return when (type) {
+      1 -> MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
+      2 -> MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO
+      3 -> MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO
+      else -> 0
+    }
+  }
+
 
   fun Cursor.getInt(columnName: String): Int {
     return getInt(getColumnIndex(columnName))
@@ -312,5 +327,34 @@ interface IDBUtils {
     return "${MediaStore.Files.FileColumns.DATE_ADDED} $asc LIMIT $pageSize OFFSET $start"
   }
 
+  fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity?
 
+  fun getGalleryId(context: Context, assetId: String): String? {
+    val cr = context.contentResolver
+    val cursor = cr.query(allUri, arrayOf(MediaStore.Files.FileColumns.BUCKET_ID, MediaStore.Files.FileColumns.DATA), "${MediaStore.Files.FileColumns._ID} = ?", arrayOf(assetId), null)
+            ?: return null
+
+    cursor.use {
+      if (!cursor.moveToNext()) {
+        return null
+      }
+
+      return cursor.getString(0)
+    }
+  }
+
+  fun getSomeInfo(context: Context, assetId: String): Pair<String, String>?
+
+  fun getInsertUri(mediaType: Int): Uri {
+    return when (mediaType) {
+      MEDIA_TYPE_AUDIO -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+      MEDIA_TYPE_VIDEO -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+      MEDIA_TYPE_IMAGE -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+      else -> allUri
+    }
+  }
+
+  fun throwMsg(msg: String): Nothing {
+    throw RuntimeException(msg)
+  }
 }
