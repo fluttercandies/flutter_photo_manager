@@ -252,6 +252,19 @@
             }
         }];
 
+      } else if ([@"createFolder" isEqualToString:call.method]) {
+        NSString *name = call.arguments[@"name"];
+        BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
+        NSString *parentId = call.arguments[@"folderId"];
+
+        if(isRoot){
+          parentId = nil;
+        }
+
+        [manager createFolderWithName:name parentId:parentId block:^(NSString*id,NSString *errorMsg){
+
+        }];
+
       } else {
         [handler notImplemented];
       }
