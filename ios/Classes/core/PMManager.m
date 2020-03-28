@@ -756,6 +756,32 @@
        }];
 }
 
+- (void)saveImageWithPath:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(void (^)(PMAssetEntity *))block {
+  __block NSString *assetId = nil;
+  [[PHPhotoLibrary sharedPhotoLibrary]
+          performChanges:^{
+              PHAssetCreationRequest *request =
+                      [PHAssetCreationRequest creationRequestForAsset];
+              PHAssetResourceCreationOptions *options =
+                      [PHAssetResourceCreationOptions new];
+              [options setOriginalFilename:title];
+              NSData *data = [NSData dataWithContentsOfFile:path];
+              [request addResourceWithType:PHAssetResourceTypePhoto
+                                      data:data
+                                   options:options];
+              assetId = request.placeholderForCreatedAsset.localIdentifier;
+          }
+       completionHandler:^(BOOL success, NSError *error) {
+           if (success) {
+             NSLog(@"create asset : id = %@", assetId);
+             block([self getAssetEntity:assetId needTitle:YES]);
+           } else {
+             NSLog(@"create fail");
+             block(nil);
+           }
+       }];
+}
+
 - (void)saveVideo:(NSString *)path
             title:(NSString *)title
              desc:(NSString *)desc
@@ -779,7 +805,7 @@
              NSLog(@"create asset : id = %@", assetId);
              block([self getAssetEntity:assetId needTitle:YES]);
            } else {
-             NSLog(@"create fail");
+             NSLog(@"create fail, error: %@", error);
              block(nil);
            }
        }];
@@ -864,5 +890,6 @@
 
   return pathEntity;
 }
+
 
 @end
