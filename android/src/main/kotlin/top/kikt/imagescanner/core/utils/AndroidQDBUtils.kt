@@ -5,10 +5,11 @@ import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.PhotoManager
@@ -352,6 +353,14 @@ object AndroidQDBUtils : IDBUtils {
   }
 
   override fun saveImage(context: Context, image: ByteArray, title: String, desc: String): AssetEntity? {
+    val (width, height) =
+            try {
+              val bmp = BitmapFactory.decodeByteArray(image, 0, image.count())
+              Pair(bmp.width, bmp.height)
+            } catch (e: Exception) {
+              Pair(0, 0)
+            }
+
     val inputStream = ByteArrayInputStream(image)
 
     val cr = context.contentResolver
@@ -362,6 +371,8 @@ object AndroidQDBUtils : IDBUtils {
     val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 
     val values = ContentValues().apply {
+      put(MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
+
       put(MediaStore.MediaColumns.DISPLAY_NAME, title)
       put(MediaStore.Images.ImageColumns.MIME_TYPE, typeFromStream)
       put(MediaStore.Images.ImageColumns.TITLE, title)
@@ -369,6 +380,8 @@ object AndroidQDBUtils : IDBUtils {
       put(MediaStore.Images.ImageColumns.DATE_ADDED, timestamp)
       put(MediaStore.Images.Media.DISPLAY_NAME, title)
       put(MediaStore.Images.ImageColumns.DATE_MODIFIED, timestamp)
+      put(MediaStore.Images.ImageColumns.WIDTH, width)
+      put(MediaStore.Images.ImageColumns.HEIGHT, height)
     }
 
     val contentUri = cr.insert(uri, values) ?: return null
@@ -386,7 +399,55 @@ object AndroidQDBUtils : IDBUtils {
     return getAssetEntity(context, id.toString())
   }
 
-  override fun saveVideo(context: Context, path: String, title: String, desc: String, duration: Long?): AssetEntity? {
+  override fun saveImage(context: Context, path: String, title: String, desc: String): AssetEntity? {
+    val cr = context.contentResolver
+    val timestamp = System.currentTimeMillis() / 1000
+    val inputStream = FileInputStream(path)
+    val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
+            ?: "image/${File(path).extension}"
+
+    val (width, height) =
+            try {
+              val bmp = BitmapFactory.decodeFile(path)
+              Pair(bmp.width, bmp.height)
+            } catch (e: Exception) {
+              Pair(0, 0)
+            }
+
+    val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+
+    val values = ContentValues().apply {
+      put(MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
+
+      put(MediaStore.MediaColumns.DISPLAY_NAME, title)
+      put(MediaStore.Images.ImageColumns.MIME_TYPE, typeFromStream)
+      put(MediaStore.Images.ImageColumns.TITLE, title)
+      put(MediaStore.Images.ImageColumns.DESCRIPTION, desc)
+      put(MediaStore.Images.ImageColumns.DATE_ADDED, timestamp)
+      put(MediaStore.Images.ImageColumns.DATE_MODIFIED, timestamp)
+      put(MediaStore.Images.ImageColumns.DATE_TAKEN, timestamp * 1000)
+      put(MediaStore.Images.ImageColumns.DISPLAY_NAME, title)
+      put(MediaStore.Images.ImageColumns.DURATION, 0)
+      put(MediaStore.Images.ImageColumns.WIDTH, width)
+      put(MediaStore.Images.ImageColumns.HEIGHT, height)
+    }
+
+    val contentUri = cr.insert(uri, values) ?: return null
+    val outputStream = cr.openOutputStream(contentUri)
+
+    outputStream?.use {
+      inputStream.use {
+        inputStream.copyTo(outputStream)
+      }
+    }
+
+    val id = ContentUris.parseId(contentUri)
+
+    cr.notifyChange(contentUri, null)
+    return getAssetEntity(context, id.toString())
+  }
+
+  override fun saveVideo(context: Context, path: String, title: String, desc: String): AssetEntity? {
     val cr = context.contentResolver
     val timestamp = System.currentTimeMillis() / 1000
     val inputStream = FileInputStream(path)
@@ -398,6 +459,8 @@ object AndroidQDBUtils : IDBUtils {
     val info = VideoUtils.getPropertiesUseMediaPlayer(path)
 
     val values = ContentValues().apply {
+      put(MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
+
       put(MediaStore.MediaColumns.DISPLAY_NAME, title)
       put(MediaStore.Video.VideoColumns.MIME_TYPE, typeFromStream)
       put(MediaStore.Video.VideoColumns.TITLE, title)

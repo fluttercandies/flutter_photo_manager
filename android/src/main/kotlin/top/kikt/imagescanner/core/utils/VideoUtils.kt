@@ -1,6 +1,11 @@
 package top.kikt.imagescanner.core.utils
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
+import android.util.Size
+import android.util.SizeF
 import java.util.concurrent.Callable
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
@@ -31,4 +36,8 @@ object VideoUtils {
     return info
   }
 
+  fun getSize(path: String): SizeF {
+    val bitmap = BitmapFactory.decodeFile(path)
+    return SizeF(bitmap.width.toFloat(), bitmap.height.toFloat())
+  }
 }

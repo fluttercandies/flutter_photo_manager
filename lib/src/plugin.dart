@@ -172,12 +172,35 @@ class Plugin {
     return ConvertUtils.convertToAsset(result);
   }
 
+  Future<AssetEntity> saveImageWithPath(String path,
+      {String title, String desc = ""}) async {
+    final file = File(path);
+    if (!file.existsSync()) {
+      assert(file.existsSync(), "file must exists");
+      return null;
+    }
+
+    title ??= "image_${DateTime.now().millisecondsSinceEpoch / 1000}.jpg";
+
+    final result = await _channel.invokeMethod(
+      "saveImageWithPath",
+      {
+        "path": path,
+        "title": title,
+        "desc": desc,
+      },
+    );
+
+    return ConvertUtils.convertToAsset(result);
+  }
+
   Future<AssetEntity> saveVideo(
     File file, {
     String title,
     String desc = "",
   }) async {
     if (!file.existsSync()) {
+      assert(file.existsSync(), "file must exists");
       return null;
     }
     final result = await _channel.invokeMethod(

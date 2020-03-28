@@ -9,7 +9,6 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.PhotoManager
 import top.kikt.imagescanner.core.cache.CacheContainer
@@ -20,10 +19,7 @@ import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeBucketKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeImageKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeVideoKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.typeKeys
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
+import java.io.*
 import java.net.URLConnection
 
 
@@ -306,13 +302,170 @@ object DBUtils : IDBUtils {
   }
 
   override fun saveImage(context: Context, image: ByteArray, title: String, desc: String): AssetEntity? {
-    val bmp = BitmapFactory.decodeByteArray(image, 0, image.count())
-    val insertImage = MediaStore.Images.Media.insertImage(context.contentResolver, bmp, title, desc)
-    val id = ContentUris.parseId(Uri.parse(insertImage))
+    val cr = context.contentResolver
+    var inputStream = ByteArrayInputStream(image)
+
+    fun refreshInputStream() {
+      inputStream = ByteArrayInputStream(image)
+    }
+
+
+    val latLong = kotlin.run {
+      val exifInterface = try {
+        ExifInterface(ByteArrayInputStream(image))
+      } catch (e: Exception) {
+        return@run doubleArrayOf(0.0, 0.0)
+      }
+      exifInterface.latLong ?: doubleArrayOf(0.0, 0.0)
+    }
+
+
+    val degress =
+            try {
+              val exifInterface = ExifInterface(inputStream)
+              exifInterface.rotationDegrees
+            } catch (e: Exception) {
+              0
+            }
+    refreshInputStream()
+    val bmp = BitmapFactory.decodeStream(inputStream)
+    val width = bmp.width
+    val height = bmp.height
+
+    val timestamp = System.currentTimeMillis() / 1000
+    refreshInputStream()
+
+    val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
+            ?: "image/${File(title).extension}"
+
+    val values = ContentValues().apply {
+      put(MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
+
+      put(MediaStore.MediaColumns.DISPLAY_NAME, title)
+      put(MediaStore.Images.ImageColumns.MIME_TYPE, typeFromStream)
+      put(MediaStore.Images.ImageColumns.TITLE, title)
+      put(MediaStore.Images.ImageColumns.DESCRIPTION, desc)
+      put(MediaStore.Images.ImageColumns.DATE_ADDED, timestamp)
+      put(MediaStore.Images.ImageColumns.DATE_MODIFIED, timestamp)
+      put(MediaStore.Images.ImageColumns.DATE_TAKEN, timestamp * 1000)
+      put(MediaStore.Images.ImageColumns.DISPLAY_NAME, title)
+      put(MediaStore.Images.ImageColumns.WIDTH, width)
+      put(MediaStore.Images.ImageColumns.HEIGHT, height)
+      put(MediaStore.Images.ImageColumns.LATITUDE, latLong[0])
+      put(MediaStore.Images.ImageColumns.LONGITUDE, latLong[1])
+      put(MediaStore.Images.ImageColumns.ORIENTATION, degress)
+    }
+
+    val insertUri = cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values) ?: return null
+    val id = ContentUris.parseId(insertUri)
+
+    // write bytes
+    val cursor = cr.query(insertUri, arrayOf(MediaStore.Images.ImageColumns.DATA), null, null, null)
+            ?: return null
+
+    cursor.use {
+      if (cursor.moveToNext()) {
+        val targetPath = cursor.getString(0)
+        val outputStream = FileOutputStream(targetPath)
+        refreshInputStream()
+        outputStream.use {
+          inputStream.use {
+            inputStream.copyTo(outputStream)
+          }
+        }
+      }
+    }
+
     return getAssetEntity(context, id.toString())
   }
 
-  override fun saveVideo(context: Context, path: String, title: String, desc: String, duration: Long?): AssetEntity? {
+  override fun saveImage(context: Context, path: String, title: String, desc: String): AssetEntity? {
+    val inputStream = FileInputStream(path)
+    val cr = context.contentResolver
+    val timestamp = System.currentTimeMillis() / 1000
+
+    val latLong = kotlin.run {
+      val exifInterface = try {
+        ExifInterface(path)
+      } catch (e: Exception) {
+        return@run doubleArrayOf(0.0, 0.0)
+      }
+      exifInterface.latLong ?: doubleArrayOf(0.0, 0.0)
+    }
+
+
+    val (width, height) =
+            try {
+              val bmp = BitmapFactory.decodeFile(path)
+              Pair(bmp.width, bmp.height)
+            } catch (e: Exception) {
+              Pair(0, 0)
+            }
+
+
+    val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
+            ?: "image/${File(path).extension}"
+
+    val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+
+    val dir = Environment.getExternalStorageDirectory()
+    val savePath = File(path).absolutePath.startsWith(dir.path);
+
+    val values = ContentValues().apply {
+      put(MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
+
+      put(MediaStore.MediaColumns.DISPLAY_NAME, title)
+      put(MediaStore.Images.ImageColumns.MIME_TYPE, typeFromStream)
+      put(MediaStore.Images.ImageColumns.TITLE, title)
+      put(MediaStore.Images.ImageColumns.DESCRIPTION, desc)
+      put(MediaStore.Images.ImageColumns.DATE_ADDED, timestamp)
+      put(MediaStore.Images.ImageColumns.DATE_MODIFIED, timestamp)
+      put(MediaStore.Images.ImageColumns.DATE_TAKEN, timestamp * 1000)
+      put(MediaStore.Images.ImageColumns.DISPLAY_NAME, title)
+      put(MediaStore.Images.ImageColumns.LATITUDE, latLong[0])
+      put(MediaStore.Images.ImageColumns.LONGITUDE, latLong[1])
+      put(MediaStore.Images.ImageColumns.WIDTH, width)
+      put(MediaStore.Images.ImageColumns.HEIGHT, height)
+
+      if (savePath) {
+        put(MediaStore.Video.VideoColumns.DATA, path)
+      }
+    }
+
+    val contentUri = cr.insert(uri, values) ?: return null
+    val id = ContentUris.parseId(contentUri)
+
+    if (savePath) {
+      inputStream.close()
+    } else {
+      val tmpPath = getAssetEntity(context, id.toString())?.path!!
+      val tmpFile = File(tmpPath)
+      val targetPath = "${tmpFile.parent}/$title"
+      val targetFile = File(targetPath)
+
+      if (targetFile.exists()) {
+        throw IOException("save target path is ")
+      }
+
+      tmpFile.renameTo(targetFile)
+      val updateDataValues = ContentValues().apply {
+        put(MediaStore.Video.VideoColumns.DATA, targetPath)
+      }
+      cr.update(contentUri, updateDataValues, null, null)
+
+      val outputStream = FileOutputStream(targetFile)
+      outputStream.use {
+        inputStream.use {
+          inputStream.copyTo(outputStream)
+        }
+      }
+    }
+
+    cr.notifyChange(contentUri, null)
+    return getAssetEntity(context, id.toString())
+  }
+
+  override fun saveVideo(context: Context, path: String, title: String, desc: String): AssetEntity? {
     val inputStream = FileInputStream(path)
     val cr = context.contentResolver
     val timestamp = System.currentTimeMillis() / 1000

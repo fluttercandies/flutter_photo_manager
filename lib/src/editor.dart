@@ -13,6 +13,14 @@ class Editor {
     return _plugin.saveImage(uint8List, title: title, desc: desc);
   }
 
+  Future<AssetEntity> saveImageWithPath(
+    String path, {
+    String title,
+    String desc,
+  }) async {
+    return _plugin.saveImageWithPath(path, title: title, desc: desc);
+  }
+
   Future<AssetEntity> saveVideo(
     File file, {
     String title,
