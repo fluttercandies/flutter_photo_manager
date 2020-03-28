@@ -325,7 +325,7 @@ class AssetEntity {
 
   @override
   String toString() {
-    return "AssetEntity{id:$id}";
+    return "AssetEntity{ id:$id , type: $type}";
   }
 }
 

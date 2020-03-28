@@ -291,6 +291,25 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
           }
         }
       }
+      "saveImageWithPath" -> {
+        runOnBackground {
+          try {
+            val imagePath = call.argument<String>("path")!!
+            val title = call.argument<String>("title") ?: ""
+            val desc = call.argument<String>("desc") ?: ""
+            val entity = photoManager.saveImage(imagePath, title, desc)
+            if (entity == null) {
+              resultHandler.reply(null)
+              return@runOnBackground
+            }
+            val map = ConvertUtils.convertToAssetResult(entity)
+            resultHandler.reply(map)
+          } catch (e: Exception) {
+            LogUtils.error("save image error", e)
+            resultHandler.reply(null)
+          }
+        }
+      }
       "saveVideo" -> {
         runOnBackground {
           try {

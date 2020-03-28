@@ -14,7 +14,6 @@ import top.kikt.imagescanner.thumb.ThumbnailUtil
 import top.kikt.imagescanner.util.LogUtils
 import top.kikt.imagescanner.util.ResultHandler
 import java.io.File
-import java.io.FileInputStream
 
 /// create 2019-09-05 by cai
 /// Do some business logic assembly
@@ -154,11 +153,15 @@ class PhotoManager(private val context: Context) {
     return dbUtils.saveImage(context, image, title, description)
   }
 
+  fun saveImage(path: String, title: String, description: String): AssetEntity? {
+    return dbUtils.saveImage(context, path, title, description)
+  }
+
   fun saveVideo(path: String, title: String, desc: String): AssetEntity? {
     if (!File(path).exists()) {
       return null
     }
-    return dbUtils.saveVideo(context, FileInputStream(path), title, desc)
+    return dbUtils.saveVideo(context, path, title, desc)
   }
 
   fun assetExists(id: String, resultHandler: ResultHandler) {

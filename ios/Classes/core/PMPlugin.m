@@ -174,10 +174,32 @@
                      title:title
                       desc:desc
                      block:^(PMAssetEntity *asset) {
+                         if (!asset) {
+                           [handler reply:nil];
+                           return;
+                         }
                          NSDictionary *resultData =
                                  [ConvertUtils convertPMAssetToMap:asset needTitle:NO];
                          [handler reply:@{@"data": resultData}];
                      }];
+
+      } else if ([call.method isEqualToString:@"saveImageWithPath"]) {
+        NSString *path = call.arguments[@"path"];
+        NSString *title = call.arguments[@"title"];
+        NSString *desc = call.arguments[@"desc"];
+
+        [manager saveImageWithPath:path
+                             title:title
+                              desc:desc
+                             block:^(PMAssetEntity *asset) {
+                                 if (!asset) {
+                                   [handler reply:nil];
+                                   return;
+                                 }
+                                 NSDictionary *resultData =
+                                         [ConvertUtils convertPMAssetToMap:asset needTitle:NO];
+                                 [handler reply:@{@"data": resultData}];
+                             }];
 
       } else if ([call.method isEqualToString:@"saveVideo"]) {
         NSString *videoPath = call.arguments[@"path"];
@@ -188,6 +210,10 @@
                      title:title
                       desc:desc
                      block:^(PMAssetEntity *asset) {
+                         if (!asset) {
+                           [handler reply:nil];
+                           return;
+                         }
                          NSDictionary *resultData =
                                  [ConvertUtils convertPMAssetToMap:asset needTitle:NO];
                          [handler reply:@{@"data": resultData}];

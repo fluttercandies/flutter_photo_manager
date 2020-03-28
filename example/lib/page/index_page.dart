@@ -19,7 +19,7 @@ class _IndexPageState extends State<IndexPage> {
       body: ListView(
         children: <Widget>[
           routePage("gallery list", NewHomePage()),
-          routePage("insert image", SaveImageExample()),
+          routePage("save media example", SaveMediaExample()),
           routePage("For Developer page", DeveloperIndexPage()),
         ],
       ),
