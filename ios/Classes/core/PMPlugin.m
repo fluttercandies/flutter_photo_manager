@@ -240,6 +240,18 @@
         NSDictionary *pathData = [ConvertUtils convertPathToMap:array];
 
         [handler reply:@{@"list": pathData}];
+      } else if ([@"copyAsset" isEqualToString:call.method]) {
+        NSString *assetId = call.arguments[@"assetId"];
+        NSString *galleryId = call.arguments[@"galleryId"];
+        [manager copyAssetWithId:assetId toGallery:galleryId block:^(PMAssetEntity *entity, NSString *msg) {
+            if (msg) {
+              NSLog(@"copy asset error, cause by : %@", msg);
+              [handler reply:nil];
+            } else {
+              [handler reply:[ConvertUtils convertPMAssetToMap:entity needTitle:NO]];
+            }
+        }];
+
       } else {
         [handler notImplemented];
       }

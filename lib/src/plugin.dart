@@ -282,4 +282,24 @@ class Plugin {
       optionGroup: pathEntity.filterOption,
     );
   }
+
+  Future<AssetEntity> copyAssetToGallery(
+      AssetEntity asset, AssetPathEntity pathEntity) async {
+    if (pathEntity.isAll) {
+      assert(pathEntity.isAll,
+          "You don't need to copy the asset into the album containing all the pictures.");
+      return null;
+    }
+
+    final result = await _channel.invokeMethod("copyAsset", {
+      "assetId": asset.id,
+      "galleryId": pathEntity.id,
+    });
+
+    if (result == null) {
+      return null;
+    }
+
+    return ConvertUtils.convertToAsset(result);
+  }
 }
