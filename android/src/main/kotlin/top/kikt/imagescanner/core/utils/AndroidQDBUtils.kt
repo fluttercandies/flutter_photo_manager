@@ -5,7 +5,6 @@ import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
@@ -18,6 +17,7 @@ import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
+import top.kikt.imagescanner.core.utils.DBUtils.getString
 import top.kikt.imagescanner.util.LogUtils
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -445,6 +445,106 @@ object AndroidQDBUtils : IDBUtils {
 
     cr.notifyChange(contentUri, null)
     return getAssetEntity(context, id.toString())
+  }
+
+  override fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity? {
+
+    val (currentGalleryId, _) = getSomeInfo(context, assetId)
+            ?: throwMsg("Cannot get gallery id of $assetId")
+
+    if (galleryId == currentGalleryId) {
+      throwMsg("No copy required, because the target gallery is the same as the current one.")
+    }
+
+    val cr = context.contentResolver
+
+    val asset = getAssetEntity(context, assetId)
+            ?: throwMsg("No copy required, because the target gallery is the same as the current one.")
+
+    val copyKeys = arrayListOf(
+            MediaStore.MediaColumns.DISPLAY_NAME,
+            MediaStore.Video.VideoColumns.TITLE,
+            MediaStore.Video.VideoColumns.DATE_ADDED,
+            MediaStore.Video.VideoColumns.DATE_MODIFIED,
+            MediaStore.Video.VideoColumns.DATE_TAKEN,
+            MediaStore.Video.VideoColumns.DURATION,
+            MediaStore.Video.VideoColumns.WIDTH,
+            MediaStore.Video.VideoColumns.HEIGHT
+    )
+
+    val mediaType = convertTypeToMediaType(asset.type)
+
+    if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
+      copyKeys.add(MediaStore.Video.VideoColumns.DESCRIPTION)
+    }
+
+    val cursor = cr.query(allUri, copyKeys.toTypedArray() + arrayOf(MediaStore.Video.VideoColumns.RELATIVE_PATH), idSelection, arrayOf(assetId), null)
+            ?: throwMsg("Cannot find asset.")
+
+    if (!cursor.moveToNext()) {
+      throwMsg("Cannot find asset.")
+    }
+
+    val insertUri = getInsertUri(mediaType)
+
+    val relativePath = getRelativePath(context, galleryId)
+
+    val cv = ContentValues().apply {
+      for (key in copyKeys) {
+        put(key, cursor.getString(key))
+      }
+      put(MediaStore.Files.FileColumns.MEDIA_TYPE, mediaType)
+      put(MediaStore.Files.FileColumns.RELATIVE_PATH, relativePath)
+    }
+
+    val insertedUri = cr.insert(insertUri, cv) ?: throwMsg("Cannot insert new asset.")
+    val outputStream = cr.openOutputStream(insertedUri)
+            ?: throwMsg("Cannot open output stream for $insertedUri.")
+    val inputUri = getUri(asset, true)
+    val inputStream = cr.openInputStream(inputUri)
+            ?: throwMsg("Cannot open input stream for $inputUri")
+    inputStream.use {
+      outputStream.use {
+        inputStream.copyTo(outputStream)
+      }
+    }
+
+    val insertedId = insertedUri.lastPathSegment
+            ?: throwMsg("Cannot open output stream for $insertedUri.")
+
+    return getAssetEntity(context, insertedId)
+  }
+
+  private fun getRelativePath(context: Context, galleryId: String): String? {
+    val cr = context.contentResolver
+
+    val cursor = cr.query(allUri, arrayOf(MediaStore.Files.FileColumns.BUCKET_ID, MediaStore.Files.FileColumns.RELATIVE_PATH), "${MediaStore.Files.FileColumns.BUCKET_ID} = ?", arrayOf(galleryId), null)
+            ?: return null
+
+    cursor.use {
+      if (!cursor.moveToNext()) {
+        return null
+      }
+      return cursor.getString(1)
+    }
+  }
+
+  override fun getSomeInfo(context: Context, assetId: String): Pair<String, String>? {
+    val cr = context.contentResolver
+
+    val cursor = cr.query(allUri, arrayOf(MediaStore.Files.FileColumns.BUCKET_ID, MediaStore.Files.FileColumns.RELATIVE_PATH), "${MediaStore.Files.FileColumns._ID} = ?", arrayOf(assetId), null)
+            ?: return null
+
+    cursor.use {
+      if (!cursor.moveToNext()) {
+        return null
+      }
+
+      val galleryID = cursor.getString(0)
+      val path = cursor.getString(1)
+
+      return Pair(galleryID, File(path).parent)
+    }
   }
 
   override fun saveVideo(context: Context, path: String, title: String, desc: String): AssetEntity? {

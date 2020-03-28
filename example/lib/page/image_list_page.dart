@@ -14,7 +14,7 @@ import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
-import 'copy_to_another_gallery_dialog.dart';
+import 'copy_to_another_gallery_example.dart';
 
 class GalleryContentListPage extends StatefulWidget {
   final AssetPathEntity path;

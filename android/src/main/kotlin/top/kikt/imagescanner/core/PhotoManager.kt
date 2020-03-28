@@ -7,6 +7,7 @@ import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
 import top.kikt.imagescanner.core.utils.AndroidQDBUtils
+import top.kikt.imagescanner.core.utils.ConvertUtils
 import top.kikt.imagescanner.core.utils.DBUtils
 import top.kikt.imagescanner.core.utils.IDBUtils
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.isAndroidQ
@@ -187,6 +188,20 @@ class PhotoManager(private val context: Context) {
 
   fun getMediaUri(id: String, type: Int): String {
     return dbUtils.getMediaUri(context, id, type)
+  }
+
+  fun copyToGallery(assetId: String, galleryId: String, resultHandler: ResultHandler) {
+    try {
+      val assetEntity = dbUtils.copyToGallery(context, assetId, galleryId)
+      if (assetEntity == null) {
+        resultHandler.reply(null)
+        return
+      }
+      resultHandler.reply(ConvertUtils.convertToAssetResult(assetEntity))
+    } catch (e: Exception) {
+      LogUtils.error(e)
+      resultHandler.reply(null)
+    }
   }
 
 }

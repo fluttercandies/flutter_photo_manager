@@ -1,6 +1,11 @@
 # CHANGELOG
 
-## 0.5.0+1
+## 0.5.1
+
+Feature:
+
+- Save image asset with file path.
+- Copy asset to another album.
 
 Fix:
 

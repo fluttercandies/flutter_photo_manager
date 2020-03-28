@@ -10,7 +10,7 @@ A flutter api for photo, you can get image/video from ios or android.
 
 If you just need a picture selector, you can choose to use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker. All UI create by flutter.
 
-- [photo_manager](#photomanager)
+- [photo_manager](#photo_manager)
   - [install](#install)
     - [Add to pubspec](#add-to-pubspec)
     - [import in dart code](#import-in-dart-code)
@@ -29,6 +29,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
     - [Experimental](#experimental)
       - [Delete item](#delete-item)
       - [Insert new item](#insert-new-item)
+      - [Copy asset](#copy-asset)
   - [iOS config](#ios-config)
     - [iOS plist config](#ios-plist-config)
     - [enabling localized system albums names](#enabling-localized-system-albums-names)
@@ -206,7 +207,11 @@ PhotoManager.stopChangeNotify();
 
 ### Experimental
 
+**Important**: The functions are not guaranteed to be fully usable, because it involves data modification, some APIs will cause irreversible deletion / movement of the data, so please use test equipment to make sure that there is no problem before using it.
+
 #### Delete item
+
+Hint: this will delete the asset from your device. For iOS, it's not just about removing from the album.
 
 ```dart
 final List<String> result = await PhotoManager.editor.deleteWithIds([entity.id]); // The deleted id will be returned, if it fails, an empty array will be returned.
@@ -221,9 +226,23 @@ And [range](#range) way to get the latest data to ensure the accuracy of the cur
 ```dart
 final AssetEntity imageEntity = await PhotoManager.editor.saveImage(uint8list); // nullable
 
+final AssetEntity imageEntity = await PhotoManager.editor.saveImageWithPath(path); // nullable
 
 File videoFile = File("video path");
 final AssetEntity videoEntity = await await PhotoManager.editor.saveVideo(videoFile); // nullable
+```
+
+#### Copy asset
+
+Availability:
+
+- iOS: some albums are smart albums, their content is automatically managed by the system and cannot be inserted manually.
+- android:
+  - Before api 28, the method will copy some column from origin row.
+  - In api 29 or higher, There are some restrictions that cannot be guaranteed, See [document of relative_path](https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#RELATIVE_PATH).
+
+```dart
+
 ```
 
 ## iOS config

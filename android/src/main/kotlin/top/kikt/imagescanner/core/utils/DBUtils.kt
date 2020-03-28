@@ -465,6 +465,113 @@ object DBUtils : IDBUtils {
     return getAssetEntity(context, id.toString())
   }
 
+  override fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity? {
+
+    val (currentGalleryId, currentFilePath) = getSomeInfo(context, assetId)
+            ?: throw RuntimeException("Cannot get gallery id of $assetId")
+
+    if (galleryId == currentGalleryId) {
+      throw RuntimeException("No copy required, because the target gallery is the same as the current one.")
+    }
+
+    val cr = context.contentResolver
+
+    val asset = getAssetEntity(context, assetId)
+            ?: throw RuntimeException("No copy required, because the target gallery is the same as the current one.")
+
+    val copyKeys = arrayListOf(
+            MediaStore.MediaColumns.DISPLAY_NAME,
+            MediaStore.Video.VideoColumns.TITLE,
+            MediaStore.Video.VideoColumns.DATE_ADDED,
+            MediaStore.Video.VideoColumns.DATE_MODIFIED,
+            MediaStore.Video.VideoColumns.DATE_TAKEN,
+            MediaStore.Video.VideoColumns.DURATION,
+            MediaStore.Video.VideoColumns.LONGITUDE,
+            MediaStore.Video.VideoColumns.LATITUDE,
+            MediaStore.Video.VideoColumns.WIDTH,
+            MediaStore.Video.VideoColumns.HEIGHT
+    )
+    val mediaType = convertTypeToMediaType(asset.type)
+
+    if (mediaType != MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO) {
+      copyKeys.add(MediaStore.Video.VideoColumns.DESCRIPTION)
+    }
+
+    val cursor = cr.query(allUri, copyKeys.toTypedArray() + arrayOf(MediaStore.Video.VideoColumns.DATA), idSelection, arrayOf(assetId), null)
+            ?: throw RuntimeException("Cannot find asset .")
+
+    if (!cursor.moveToNext()) {
+      throw RuntimeException("Cannot find asset .")
+    }
+
+
+    val insertUri = getInsertUri(mediaType)
+    val outputPath = "${getGalleyPath(context, galleryId)}/${asset.displayName}"
+
+    val cv = ContentValues().apply {
+      for (key in copyKeys) {
+        put(key, cursor.getString(key))
+      }
+      put(MediaStore.Files.FileColumns.MEDIA_TYPE, mediaType)
+      put(MediaStore.Files.FileColumns.DATA, outputPath)
+    }
+
+    val insertedUri = cr.insert(insertUri, cv) ?: throw RuntimeException("Cannot insert new asset.")
+    val outputStream = cr.openOutputStream(insertedUri)
+            ?: throw RuntimeException("Cannot open output stream for $insertedUri.")
+    val inputStream = File(asset.path).inputStream()
+    inputStream.use {
+      outputStream.use {
+        inputStream.copyTo(outputStream)
+      }
+    }
+
+    val insertedId = insertedUri.lastPathSegment
+            ?: throw RuntimeException("Cannot open output stream for $insertedUri.")
+
+    return getAssetEntity(context, insertedId)
+  }
+
+  /**
+   * 0 : gallery id
+   * 1 : current asset parent path
+   */
+  override fun getSomeInfo(context: Context, assetId: String): Pair<String, String>? {
+    val cr = context.contentResolver
+
+    val cursor = cr.query(allUri, arrayOf(MediaStore.Files.FileColumns.BUCKET_ID, MediaStore.Files.FileColumns.DATA), "${MediaStore.Files.FileColumns._ID} = ?", arrayOf(assetId), null)
+            ?: return null
+
+    cursor.use {
+      if (!cursor.moveToNext()) {
+        return null
+      }
+
+      val galleryID = cursor.getString(0)
+      val path = cursor.getString(1)
+
+      return Pair(galleryID, File(path).parent)
+    }
+  }
+
+  private fun getGalleyPath(context: Context, galleryId: String): String? {
+    val cr = context.contentResolver
+
+    val cursor = cr.query(allUri, arrayOf(MediaStore.Files.FileColumns.BUCKET_ID, MediaStore.Files.FileColumns.DATA), "${MediaStore.Files.FileColumns.BUCKET_ID} = ?", arrayOf(galleryId), null)
+            ?: return null
+
+
+    cursor.use {
+      if (!cursor.moveToNext()) {
+        return null
+      }
+
+      val path = cursor.getString(1)
+
+      return File(path).parentFile?.absolutePath
+    }
+  }
+
   override fun saveVideo(context: Context, path: String, title: String, desc: String): AssetEntity? {
     val inputStream = FileInputStream(path)
     val cr = context.contentResolver

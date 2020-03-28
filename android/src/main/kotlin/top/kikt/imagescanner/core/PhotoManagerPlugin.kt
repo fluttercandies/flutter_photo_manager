@@ -96,6 +96,10 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
         needLocationPermissions = true
         false
       }
+      "copyAsset" -> {
+        needLocationPermissions = true
+        false
+      }
       "getFullFile" -> {
         val isOrigin = call.argument<Boolean>("isOrigin")!!
         if (isOrigin && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -327,6 +331,13 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
             LogUtils.error("save video error", e)
             resultHandler.reply(null)
           }
+        }
+      }
+      "copyAsset" -> {
+        runOnBackground {
+          val assetId = call.argument<String>("assetId")!!
+          val galleryId = call.argument<String>("galleryId")!!
+          photoManager.copyToGallery(assetId, galleryId, resultHandler)
         }
       }
       else -> resultHandler.notImplemented()
