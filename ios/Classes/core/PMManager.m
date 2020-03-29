@@ -1046,4 +1046,34 @@
     block(targetId, error.localizedDescription);
   }
 }
+
+- (void)removeInAlbumWithAssetId:(NSArray *)id albumId:(NSString *)albumId block:(void (^)(NSString *))block {
+  PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[albumId] options:nil];
+  PHAssetCollection *collection;
+  if (result && result.count > 0) {
+    collection = result.firstObject;
+  } else {
+    block(@"Can't found the collection.");
+    return;
+  }
+
+  if (![collection canPerformEditOperation:PHCollectionEditOperationRemoveContent]) {
+    block(@"The collection cannot remove asset by user.");
+    return;
+  }
+
+  PHFetchResult<PHAsset *> *assetResult = [PHAsset fetchAssetsWithLocalIdentifiers:id options:nil];
+  NSError *error;
+  [PHPhotoLibrary.sharedPhotoLibrary
+          performChangesAndWait:^{
+              PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
+              [request removeAssets:assetResult];
+          } error:&error];
+  if (error) {
+    block([NSString stringWithFormat:@"Remove error: %@", error]);
+    return;
+  }
+
+  block(nil);
+}
 @end

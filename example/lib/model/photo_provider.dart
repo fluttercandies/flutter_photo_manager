@@ -12,7 +12,7 @@ class PhotoProvider extends ChangeNotifier {
 
   var onlyAll = false;
 
-  Map<AssetPathEntity, PathProvider> pathProviderMap = {};
+  Map<AssetPathEntity, AssetPathProvider> pathProviderMap = {};
 
   bool _notifying = false;
 
@@ -144,8 +144,8 @@ class PhotoProvider extends ChangeNotifier {
     this.list.addAll(galleryList);
   }
 
-  PathProvider getOrCreatePathProvider(AssetPathEntity pathEntity) {
-    pathProviderMap[pathEntity] ??= PathProvider(pathEntity);
+  AssetPathProvider getOrCreatePathProvider(AssetPathEntity pathEntity) {
+    pathProviderMap[pathEntity] ??= AssetPathProvider(pathEntity);
     return pathProviderMap[pathEntity];
   }
 
@@ -208,13 +208,13 @@ class PhotoProvider extends ChangeNotifier {
   }
 }
 
-class PathProvider extends ChangeNotifier {
+class AssetPathProvider extends ChangeNotifier {
   static const loadCount = 50;
 
   bool isInit = false;
 
   final AssetPathEntity path;
-  PathProvider(this.path);
+  AssetPathProvider(this.path);
 
   List<AssetEntity> list = [];
 
@@ -229,6 +229,7 @@ class PathProvider extends ChangeNotifier {
   }
 
   Future onRefresh() async {
+    await path.refreshPathProperties();
     final list = await path.getAssetListPaged(0, loadCount);
     page = 0;
     this.list.clear();
@@ -253,13 +254,23 @@ class PathProvider extends ChangeNotifier {
   void delete(AssetEntity entity) async {
     final result = await PhotoManager.editor.deleteWithIds([entity.id]);
     if (result.isNotEmpty) {
-      await Future.delayed(Duration(seconds: 3));
+      final rangeEnd = this.list.length;
       await provider.refreshAllGalleryProperties();
-      final list =
-          await path.getAssetListRange(start: 0, end: this.list.length);
-      printListLength("deleted");
+      final list = await path.getAssetListRange(start: 0, end: rangeEnd);
       this.list.clear();
       this.list.addAll(list);
+      printListLength("deleted");
+    }
+  }
+
+  void removeInAlbum(AssetEntity entity) async {
+    if (await PhotoManager.editor.iOS.removeInAlbum(entity, path)) {
+      final rangeEnd = this.list.length;
+      await provider.refreshAllGalleryProperties();
+      final list = await path.getAssetListRange(start: 0, end: rangeEnd);
+      this.list.clear();
+      this.list.addAll(list);
+      printListLength("removeInAlbum");
     }
   }
 

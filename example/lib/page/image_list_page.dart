@@ -30,7 +30,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
 
   PhotoProvider get photoProvider => Provider.of<PhotoProvider>(context);
 
-  PathProvider get provider =>
+  AssetPathProvider get provider =>
       Provider.of<PhotoProvider>(context).getOrCreatePathProvider(path);
 
   @override
@@ -150,6 +150,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                 child: Text("Copy to another path"),
                 onPressed: () => copyToAnotherPath(entity),
               ),
+              _buildRemoveInAlbumWidget(entity),
             ],
           ),
         );
@@ -276,5 +277,20 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
         ),
       ),
     );
+  }
+
+  Widget _buildRemoveInAlbumWidget(AssetEntity entity) {
+    if (!Platform.isIOS) {
+      return Container();
+    }
+
+    return RaisedButton(
+      child: Text("Remove in album"),
+      onPressed: () => deleteAssetInAlbum(entity),
+    );
+  }
+
+  void deleteAssetInAlbum(entity) {
+    provider.removeInAlbum(entity);
   }
 }
