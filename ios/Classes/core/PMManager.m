@@ -998,4 +998,52 @@
 
 }
 
+- (void)createAlbumWithName:(NSString *)name parentId:(NSString *)id block:(void (^)(NSString *, NSString *))block {
+  __block NSString *targetId;
+  NSError *error;
+  if (id) { // create in folder
+    PHFetchResult<PHCollectionList *> *result = [PHCollectionList fetchCollectionListsWithLocalIdentifiers:@[id] options:nil];
+    if (result && result.count > 0) {
+      PHCollectionList *parent = result.firstObject;
+
+      [PHPhotoLibrary.sharedPhotoLibrary
+              performChangesAndWait:^{
+                  PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:name];
+                  targetId = request.placeholderForCreatedAssetCollection.localIdentifier;
+              } error:&error];
+
+      if (error) {
+        NSLog(@"createAlbumWithName 1: error : %@", error);
+      }
+
+      [PHPhotoLibrary.sharedPhotoLibrary
+              performChangesAndWait:^{
+                  PHCollectionListChangeRequest *request = [PHCollectionListChangeRequest changeRequestForCollectionList:parent];
+                  PHFetchResult<PHAssetCollection *> *fetchResult = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[targetId] options:nil];
+                  [request addChildCollections:fetchResult];
+              } error:&error];
+
+      if (error) {
+        NSLog(@"createAlbumWithName 2: error : %@", error);
+      }
+
+      block(targetId, error.localizedDescription);
+
+    } else {
+      block(nil, [NSString stringWithFormat:@"Cannot find folder : %@", id]);
+      return;
+    }
+  } else { // create in top
+    [PHPhotoLibrary.sharedPhotoLibrary
+            performChangesAndWait:^{
+                PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:name];
+                targetId = request.placeholderForCreatedAssetCollection.localIdentifier;
+            } error:&error];
+
+    if (error) {
+      NSLog(@"createAlbumWithName 3: error : %@", error);
+    }
+    block(targetId, error.localizedDescription);
+  }
+}
 @end

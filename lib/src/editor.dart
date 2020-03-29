@@ -94,6 +94,21 @@ class IosEditor {
       return _plugin.iosCreateFolder(name, false, parent);
     }
   }
+
+  Future<AssetPathEntity> createAlbum(
+    String name, {
+    AssetPathEntity parent,
+  }) {
+    if (parent == null || parent.isAll) {
+      return _plugin.iosCreateAlbum(name, true, null);
+    } else {
+      if (parent.albumType == 1) {
+        assert(parent.albumType == 1, "The folder can't add");
+        return null;
+      }
+      return _plugin.iosCreateAlbum(name, false, parent);
+    }
+  }
 }
 
 class AndroidEditor {}

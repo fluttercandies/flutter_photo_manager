@@ -30,12 +30,23 @@ class _CreateFolderExampleState extends State<CreateFolderExample> {
           TextField(
             controller: nameController,
           ),
-          RaisedButton.icon(
-            onPressed: createFolder,
-            icon: Icon(Icons.create_new_folder),
-            label: Text(
-              "Create folder",
-            ),
+          Row(
+            children: <Widget>[
+              RaisedButton.icon(
+                onPressed: createFolder,
+                icon: Icon(Icons.create_new_folder),
+                label: Text(
+                  "Create folder",
+                ),
+              ),
+              RaisedButton.icon(
+                onPressed: createAlbum,
+                icon: Icon(Icons.create_new_folder),
+                label: Text(
+                  "Create album",
+                ),
+              ),
+            ],
           ),
           _buildParentTarget(),
           RaisedButton.icon(
@@ -65,9 +76,19 @@ class _CreateFolderExampleState extends State<CreateFolderExample> {
     );
   }
 
+  void createAlbum() {
+    final name = nameController.text;
+    PhotoManager.editor.iOS.createAlbum(
+      name,
+      parent: parent,
+    );
+  }
+
   Widget _buildParentTarget() {
     return DropdownButton<AssetPathEntity>(
-      items: subDir.map<DropdownMenuItem<AssetPathEntity>>((v) => _buildItem(v)).toList(),
+      items: subDir
+          .map<DropdownMenuItem<AssetPathEntity>>((v) => _buildItem(v))
+          .toList(),
       onChanged: (path) {
         this.parent = path;
         setState(() {});
