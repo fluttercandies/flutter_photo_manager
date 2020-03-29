@@ -257,12 +257,12 @@
         BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
         NSString *parentId = call.arguments[@"folderId"];
 
-        if(isRoot){
+        if (isRoot) {
           parentId = nil;
         }
 
-        [manager createFolderWithName:name parentId:parentId block:^(NSString*id,NSString *errorMsg){
-
+        [manager createFolderWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
+            [handler reply:[self convertToResult:@{@"id": id, @"errorMsg": errorMsg}]];
         }];
 
       } else if ([@"createAlbum" isEqualToString:call.method]) {
@@ -270,12 +270,25 @@
         BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
         NSString *parentId = call.arguments[@"folderId"];
 
-        if(isRoot){
+        if (isRoot) {
           parentId = nil;
         }
 
-        [manager createAlbumWithName:name parentId:parentId block:^(NSString*id,NSString *errorMsg){
+        [manager createAlbumWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
+            NSDictionary *dictionary = @{@"id": id, @"errorMsg": errorMsg};
+            [handler reply:[self convertToResult:dictionary]];
+        }];
 
+      } else if ([@"removeInAlbum" isEqualToString:call.method]) {
+        NSArray *assetId = call.arguments[@"assetId"];
+        NSString *pathId = call.arguments[@"pathId"];
+
+        [manager removeInAlbumWithAssetId:assetId albumId:pathId block:^(NSString *msg) {
+            if (msg) {
+              [handler reply:@{@"msg": msg}];
+            } else {
+              [handler reply:@{@"success": @YES}];
+            }
         }];
 
       } else {
@@ -283,6 +296,19 @@
       }
   }];
 
+}
+
+- (NSDictionary *)convertToResult:(NSDictionary *)dict {
+  NSMutableDictionary *result = [NSMutableDictionary new];
+
+  for (id key in dict.allKeys) {
+    id value = dict[key];
+    if (value) {
+      result[key] = value;
+    }
+  }
+
+  return result;
 }
 
 - (unsigned long)getTimestamp:(FlutterMethodCall *)call {

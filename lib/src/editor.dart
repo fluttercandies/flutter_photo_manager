@@ -109,6 +109,44 @@ class IosEditor {
       return _plugin.iosCreateAlbum(name, false, parent);
     }
   }
+
+  Future<bool> removeInAlbum(AssetEntity entity, AssetPathEntity path) async {
+    if (entity == null || path == null) {
+      assert(entity != null, "");
+      assert(path != null, "");
+      return false;
+    }
+    if (path.albumType == 2 || path.isAll) {
+      assert(path.albumType == 1, "The path must is album");
+      assert(
+        !path.isAll,
+        "The ${path.name}'s asset can't be remove. Use PhotoManager.editor.deleteAsset",
+      );
+      return false;
+    }
+    return _plugin.iosRemoveInAlbum([entity], path);
+  }
+
+  Future<bool> removeAssetsInAlbum(
+      List<AssetEntity> list, AssetPathEntity path) async {
+    if (list == null || path == null) {
+      assert(list != null, "");
+      assert(path != null, "");
+      return false;
+    }
+    if (list.isEmpty) {
+      return null;
+    }
+    if (path.albumType == 2 || path.isAll) {
+      assert(path.albumType == 1, "The path must is album");
+      assert(
+        !path.isAll,
+        "The ${path.name} can't be remove. Use PhotoManager.editor.deleteAsset",
+      );
+      return false;
+    }
+    return _plugin.iosRemoveInAlbum(list, path);
+  }
 }
 
 class AndroidEditor {}

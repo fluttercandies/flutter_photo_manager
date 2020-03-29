@@ -323,6 +323,11 @@ mixin IosPlugin on BasePlugin {
       return null;
     }
 
+    if (result["errorMsg"] != null) {
+      print("errorMsg");
+      return null;
+    }
+
     return AssetPathEntity()
       ..id = result["id"]
       ..name = name
@@ -348,12 +353,35 @@ mixin IosPlugin on BasePlugin {
       return null;
     }
 
+    if (result["errorMsg"] != null) {
+      print("errorMsg");
+      return null;
+    }
+
     return AssetPathEntity()
       ..id = result["id"]
       ..name = name
       ..isAll = false
       ..assetCount = 0
       ..albumType = 1;
+  }
+
+  Future<bool> iosRemoveInAlbum(
+      List<AssetEntity> entities, AssetPathEntity path) async {
+    final result = await _channel.invokeMethod(
+      "removeInAlbum",
+      {
+        "assetId": entities.map((e) => e.id).toList(),
+        "pathId": path.id,
+      },
+    );
+
+    if (result["msg"] != null) {
+      print("cannot remove, cause by: ${result["msg"]}");
+      return false;
+    }
+
+    return true;
   }
 }
 
