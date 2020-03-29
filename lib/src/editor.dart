@@ -78,20 +78,20 @@ class Editor {
 class IosEditor {
   /// [name] The folder name.
   ///
-  /// [entity] is nullable, if it's null, the folder will be create in root. If isn't null, the [AssetPathEntity.albumType] must be 2.
+  /// [parent] is nullable, if it's null, the folder will be create in root. If isn't null, the [AssetPathEntity.albumType] must be 2.
   /// The only exception, Recent can be specified, but the same as null.
   Future<AssetPathEntity> createFolder(
     String name, {
-    AssetPathEntity entity,
+    AssetPathEntity parent,
   }) {
-    if (entity == null || entity.isAll) {
+    if (parent == null || parent.isAll) {
       return _plugin.iosCreateFolder(name, true, null);
     } else {
-      if (entity.albumType == 1) {
-        assert(entity.albumType == 1, "The folder can't add");
+      if (parent.albumType == 1) {
+        assert(parent.albumType == 1, "The folder can't add");
         return null;
       }
-      return _plugin.iosCreateFolder(name, false, entity);
+      return _plugin.iosCreateFolder(name, false, parent);
     }
   }
 }
