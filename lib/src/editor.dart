@@ -147,6 +147,15 @@ class IosEditor {
     }
     return _plugin.iosRemoveInAlbum(list, path);
   }
+
+  Future<bool> deletePath(AssetPathEntity path) async {
+    assert(path != null, "The path is not null.");
+    if (path == null) {
+      return false;
+    }
+
+    return _plugin.iosDeleteCollection(path);
+  }
 }
 
 class AndroidEditor {}

@@ -291,6 +291,16 @@
             }
         }];
 
+      } else if ([@"deleteAlbum" isEqualToString:call.method]) {
+        NSString *id = call.arguments[@"id"];
+        int type = [call.arguments[@"type"] intValue];
+        [manager removeCollectionWithId:id type:type block:^(NSString *msg) {
+            if (msg) {
+              [handler reply:@{@"errorMsg": msg}];
+            } else {
+              [handler reply:@{@"result": @YES}];
+            }
+        }];
       } else {
         [handler notImplemented];
       }

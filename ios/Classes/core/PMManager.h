@@ -71,4 +71,6 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (void)createAlbumWithName:(NSString *)name parentId:(NSString *)id block:(void (^)(NSString *, NSString *))block;
 
 - (void)removeInAlbumWithAssetId:(NSArray *)id albumId:(NSString *)albumId block:(void (^)(NSString *))block;
+
+- (void)removeCollectionWithId:(NSString *)id type:(int)type block:(void (^)(NSString *))block;
 @end

@@ -1076,4 +1076,63 @@
 
   block(nil);
 }
+
+- (id)getFirstCollectionFromFetchResult:(PHFetchResult<id> *)fetchResult {
+  if (fetchResult && fetchResult.count > 0) {
+    return fetchResult.firstObject;
+  }
+  return nil;
+}
+
+- (void)removeCollectionWithId:(NSString *)id type:(int)type block:(void (^)(NSString *))block {
+  if (type == 1) {
+    PHFetchResult<PHAssetCollection *> *fetchResult = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[id] options:nil];
+    PHAssetCollection *collection = [self getFirstCollectionFromFetchResult:fetchResult];
+    if (!collection) {
+      block(@"Cannot found asset collection.");
+      return;
+    }
+    if (![collection canPerformEditOperation:PHCollectionEditOperationDelete]) {
+      block(@"The asset collection can be delete.");
+      return;
+    }
+    NSError *error;
+    [PHPhotoLibrary.sharedPhotoLibrary performChangesAndWait:^{
+        [PHAssetCollectionChangeRequest deleteAssetCollections:@[collection]];
+    }                                                  error:&error];
+
+    if (error) {
+      block([NSString stringWithFormat:@"Remove error: %@", error]);
+      return;
+    }
+
+    block(nil);
+
+  } else if (type == 2) {
+    PHFetchResult<PHCollectionList *> *fetchResult = [PHCollectionList fetchCollectionListsWithLocalIdentifiers:@[id] options:nil];
+    PHCollectionList *collection = [self getFirstCollectionFromFetchResult:fetchResult];
+    if (!collection) {
+      block(@"Cannot found collection list.");
+      return;
+    }
+    if (![collection canPerformEditOperation:PHCollectionEditOperationDelete]) {
+      block(@"The collection list can be delete.");
+      return;
+    }
+    NSError *error;
+    [PHPhotoLibrary.sharedPhotoLibrary performChangesAndWait:^{
+        [PHCollectionListChangeRequest deleteCollectionLists:@[collection]];
+    }                                                  error:&error];
+
+    if (error) {
+      block([NSString stringWithFormat:@"Remove error: %@", error]);
+      return;
+    }
+
+    block(nil);
+  } else {
+    block(@"Not support the type");
+  }
+}
+
 @end
