@@ -95,6 +95,7 @@ class IosEditor {
     }
   }
 
+  /// if [parent] is null, the album will be added in root.
   Future<AssetPathEntity> createAlbum(
     String name, {
     AssetPathEntity parent,
@@ -110,6 +111,7 @@ class IosEditor {
     }
   }
 
+  /// The [entity] and [path] isn't null.
   Future<bool> removeInAlbum(AssetEntity entity, AssetPathEntity path) async {
     if (entity == null || path == null) {
       assert(entity != null, "");
@@ -127,6 +129,7 @@ class IosEditor {
     return _plugin.iosRemoveInAlbum([entity], path);
   }
 
+  /// Remove [list]'s items from [path] in batches.
   Future<bool> removeAssetsInAlbum(
       List<AssetEntity> list, AssetPathEntity path) async {
     if (list == null || path == null) {
@@ -135,7 +138,7 @@ class IosEditor {
       return false;
     }
     if (list.isEmpty) {
-      return null;
+      return false;
     }
     if (path.albumType == 2 || path.isAll) {
       assert(path.albumType == 1, "The path must is album");
@@ -146,6 +149,16 @@ class IosEditor {
       return false;
     }
     return _plugin.iosRemoveInAlbum(list, path);
+  }
+
+  /// Delete the [path].
+  Future<bool> deletePath(AssetPathEntity path) async {
+    assert(path != null, "The path is not null.");
+    if (path == null) {
+      return false;
+    }
+
+    return _plugin.iosDeleteCollection(path);
   }
 }
 

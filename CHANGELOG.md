@@ -8,6 +8,8 @@ Feature:
 - Copy asset to another album.
 - Only iOS
   - Create folder or album.
+  - Remove assets in album.
+  - Delete folder or album.
 
 Fix:
 

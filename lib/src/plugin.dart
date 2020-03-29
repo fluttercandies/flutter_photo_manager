@@ -299,6 +299,18 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
 
     return ConvertUtils.convertToAsset(result);
   }
+
+  Future<bool> iosDeleteCollection(AssetPathEntity path) async {
+    final result = await _channel.invokeMethod("deleteAlbum", {
+      "id": path.id,
+      "type": path.albumType,
+    });
+    if (result["errorMsg"] != null) {
+      print(result["errorMsg"]);
+      return false;
+    }
+    return true;
+  }
 }
 
 mixin BasePlugin {

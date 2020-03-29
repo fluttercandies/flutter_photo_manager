@@ -266,6 +266,19 @@ PhotoManager.editor.iOS.createAlbum(
 );
 ```
 
+Remove asset in album, the asset can't be delete in device, just remove of album.
+
+```dart
+PhotoManager.editor.iOS.removeInAlbum();  // remove single asset.
+PhotoManager.editor.iOS.removeAssetsInAlbum(); // Batch remove asset in album.
+```
+
+Delete the path in device. Both folders and albums can be deleted, except for smart albums.
+
+```dart
+PhotoManager.editor.iOS.deletePath();
+```
+
 ## iOS config
 
 ### iOS plist config

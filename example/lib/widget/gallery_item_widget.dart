@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_scanner_example/page/image_list_page.dart';
 import 'package:image_scanner_example/page/sub_gallery_page.dart';
@@ -53,10 +55,20 @@ class GalleryItemWidget extends StatelessWidget {
             return ListDialog(
               children: [
                 RaisedButton(
-                  child: Text("refrsh properties"),
+                  child: Text("refresh properties"),
                   onPressed: () async {
                     await item.refreshPathProperties();
                     setState(() {});
+                  },
+                ),
+                RaisedButton(
+                  child: Text("Delete self (${item.name})"),
+                  onPressed: () async {
+                    if (!Platform.isIOS) {
+                      showToast("The function only support iOS.");
+                      return;
+                    }
+                    PhotoManager.editor.iOS.deletePath(path);
                   },
                 ),
               ],
@@ -64,14 +76,14 @@ class GalleryItemWidget extends StatelessWidget {
           },
         );
       },
-      onDoubleTap: () async {
-        final list =
-            await item.getAssetListRange(start: 0, end: item.assetCount);
-        for (var i = 0; i < list.length; i++) {
-          final asset = list[i];
-          debugPrint("$i : ${asset.id}");
-        }
-      },
+      // onDoubleTap: () async {
+      //   final list =
+      //       await item.getAssetListRange(start: 0, end: item.assetCount);
+      //   for (var i = 0; i < list.length; i++) {
+      //     final asset = list[i];
+      //     debugPrint("$i : ${asset.id}");
+      //   }
+      // },
     );
   }
 
