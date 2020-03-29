@@ -6,6 +6,8 @@ Feature:
 
 - Save image asset with file path.
 - Copy asset to another album.
+- Only iOS
+  - Create folder or album.
 
 Fix:
 

@@ -30,6 +30,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
       - [Delete item](#delete-item)
       - [Insert new item](#insert-new-item)
       - [Copy asset](#copy-asset)
+        - [Only for iOS](#only-for-ios)
   - [iOS config](#ios-config)
     - [iOS plist config](#ios-plist-config)
     - [enabling localized system albums names](#enabling-localized-system-albums-names)
@@ -243,6 +244,26 @@ Availability:
 
 ```dart
 
+```
+
+##### Only for iOS
+
+Create folder:
+
+```dart
+PhotoManager.editor.iOS.createFolder(
+  name,
+  parent: parent, // It is a folder or Recent album.
+);
+```
+
+Create album:
+
+```dart
+PhotoManager.editor.iOS.createAlbum(
+  name,
+  parent: parent, // It is a folder or Recent album.
+);
 ```
 
 ## iOS config
