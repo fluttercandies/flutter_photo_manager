@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:photo_manager/photo_manager.dart';
 
 import 'dev_title_page.dart';
+import 'ios/create_folder_example.dart';
 
 class DeveloperIndexPage extends StatefulWidget {
   @override
@@ -21,6 +22,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
       ),
       body: ListView(
         children: <Widget>[
+          RaisedButton(
+            child: Text("Show iOS create folder example."),
+            onPressed: () => navToWidget(CreateFolderExample()),
+          ),
           RaisedButton(
             child: Text("upload file to local to test EXIF."),
             onPressed: _upload,
@@ -101,6 +106,12 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
       final widget = DevelopingExample();
       return widget;
+    }));
+  }
+
+  void navToWidget(CreateFolderExample createFolderExample) {
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+      return CreateFolderExample();
     }));
   }
 }

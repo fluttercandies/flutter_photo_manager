@@ -7,10 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager/src/utils/convert_utils.dart';
 
-class Plugin {
-  static const MethodChannel _channel =
-      const MethodChannel('top.kikt/photo_manager');
-
+class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   static Plugin _plugin;
 
   factory Plugin() {
@@ -303,3 +300,61 @@ class Plugin {
     return ConvertUtils.convertToAsset(result);
   }
 }
+
+mixin BasePlugin {
+  final MethodChannel _channel = MethodChannel('top.kikt/photo_manager');
+}
+
+mixin IosPlugin on BasePlugin {
+  Future<AssetPathEntity> iosCreateFolder(
+      String name, bool isRoot, AssetPathEntity parent) async {
+    final map = {
+      "name": name,
+      "isRoot": isRoot,
+    };
+    if (!isRoot && parent != null) {
+      map["folderId"] = parent.id;
+    }
+    final result = await _channel.invokeMethod(
+      "createFolder",
+      map,
+    );
+    if (result == null) {
+      return null;
+    }
+
+    return AssetPathEntity()
+      ..id = result["id"]
+      ..name = name
+      ..isAll = false
+      ..assetCount = 0
+      ..albumType = 2;
+  }
+
+  Future<AssetPathEntity> iosCreateAlbum(
+      String name, bool isRoot, AssetPathEntity parent) async {
+    final map = {
+      "name": name,
+      "isRoot": isRoot,
+    };
+    if (!isRoot && parent != null) {
+      map["folderId"] = parent.id;
+    }
+    final result = await _channel.invokeMethod(
+      "createAlbum",
+      map,
+    );
+    if (result == null) {
+      return null;
+    }
+
+    return AssetPathEntity()
+      ..id = result["id"]
+      ..name = name
+      ..isAll = false
+      ..assetCount = 0
+      ..albumType = 1;
+  }
+}
+
+mixin AndroidPlugin on BasePlugin {}
