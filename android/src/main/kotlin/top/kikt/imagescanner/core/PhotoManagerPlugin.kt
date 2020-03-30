@@ -340,6 +340,13 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
           photoManager.copyToGallery(assetId, galleryId, resultHandler)
         }
       }
+      "moveAssetToPath"->{
+        runOnBackground {
+          val assetId = call.argument<String>("assetId")!!
+          val albumId = call.argument<String>("albumId")!!
+          photoManager.moveToGallery(assetId, albumId, resultHandler)
+        }
+      }
       else -> resultHandler.notImplemented()
     }
   }

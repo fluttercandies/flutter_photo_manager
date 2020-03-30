@@ -122,6 +122,10 @@ interface IDBUtils {
     return getString(getColumnIndex(columnName)) ?: ""
   }
 
+  fun Cursor.getStringOrNull(columnName: String): String? {
+    return getString(getColumnIndex(columnName))
+  }
+
   fun Cursor.getLong(columnName: String): Long {
     return getLong(getColumnIndex(columnName))
   }
@@ -328,6 +332,8 @@ interface IDBUtils {
   }
 
   fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity?
+  
+  fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity?
 
   fun getGalleryId(context: Context, assetId: String): String? {
     val cr = context.contentResolver

@@ -404,4 +404,16 @@ mixin IosPlugin on BasePlugin {
   }
 }
 
-mixin AndroidPlugin on BasePlugin {}
+mixin AndroidPlugin on BasePlugin {
+  Future<bool> androidMoveAssetToPath(
+      AssetEntity entity, AssetPathEntity target) async {
+    final result = await _channel.invokeMethod("moveAssetToPath", {
+      "assetId": entity.id,
+      "albumId": target.id,
+    });
+
+    print(result);
+
+    return true;
+  }
+}

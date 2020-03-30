@@ -506,7 +506,8 @@ object DBUtils : IDBUtils {
 
 
     val insertUri = getInsertUri(mediaType)
-    val outputPath = "${getGalleyPath(context, galleryId)}/${asset.displayName}"
+    val galleryInfo = getGalleryInfo(context, galleryId) ?: throwMsg("Cannot find gallery info")
+    val outputPath = "${galleryInfo.path}/${asset.displayName}"
 
     val cv = ContentValues().apply {
       for (key in copyKeys) {
@@ -532,6 +533,46 @@ object DBUtils : IDBUtils {
     return getAssetEntity(context, insertedId)
   }
 
+  override fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity? {
+
+    val (currentGalleryId, _) = getSomeInfo(context, assetId)
+            ?: throwMsg("Cannot get gallery id of $assetId")
+
+    val targetGalleryInfo = getGalleryInfo(context, galleryId)
+            ?: throwMsg("Cannot get target gallery info")
+
+    if (galleryId == currentGalleryId) {
+      throwMsg("No move required, because the target gallery is the same as the current one.")
+    }
+
+    val cr = context.contentResolver
+
+    val cursor = cr.query(allUri, arrayOf(MediaStore.MediaColumns.DATA), idSelection, arrayOf(assetId), null)
+            ?: throwMsg("Cannot find $assetId path")
+
+    val targetPath = if (cursor.moveToNext()) {
+      val srcPath = cursor.getString(0)
+      cursor.close()
+      val target = "${targetGalleryInfo.path}/${File(srcPath).name}"
+      File(srcPath).renameTo(File(target))
+      target
+    } else {
+      throwMsg("Cannot find $assetId path")
+    }
+
+    val contentValues = ContentValues().apply {
+      put(MediaStore.MediaColumns.DATA, targetPath)
+      put(MediaStore.MediaColumns.BUCKET_ID, galleryId)
+      put(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, targetGalleryInfo.galleryName)
+    }
+
+    val count = cr.update(allUri, contentValues, idSelection, arrayOf(assetId))
+    if (count > 0) {
+      return getAssetEntity(context, assetId)
+    }
+    throwMsg("Cannot update $assetId relativePath")
+  }
+
   /**
    * 0 : gallery id
    * 1 : current asset parent path
@@ -554,10 +595,15 @@ object DBUtils : IDBUtils {
     }
   }
 
-  private fun getGalleyPath(context: Context, galleryId: String): String? {
+  private fun getGalleryInfo(context: Context, galleryId: String): GalleryInfo? {
     val cr = context.contentResolver
 
-    val cursor = cr.query(allUri, arrayOf(MediaStore.Files.FileColumns.BUCKET_ID, MediaStore.Files.FileColumns.DATA), "${MediaStore.Files.FileColumns.BUCKET_ID} = ?", arrayOf(galleryId), null)
+    val keys = arrayOf(
+            MediaStore.Files.FileColumns.BUCKET_ID,
+            MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME,
+            MediaStore.Files.FileColumns.DATA
+    )
+    val cursor = cr.query(allUri, keys, "${MediaStore.Files.FileColumns.BUCKET_ID} = ?", arrayOf(galleryId), null)
             ?: return null
 
 
@@ -566,9 +612,12 @@ object DBUtils : IDBUtils {
         return null
       }
 
-      val path = cursor.getString(1)
+      val path = cursor.getStringOrNull(MediaStore.Files.FileColumns.DATA) ?: return null
+      val name = cursor.getStringOrNull(MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME)
+              ?: return null
 
-      return File(path).parentFile?.absolutePath
+      val galleryPath = File(path).parentFile?.absolutePath ?: return null
+      return GalleryInfo(galleryPath, galleryId, name)
     }
   }
 
@@ -644,4 +693,5 @@ object DBUtils : IDBUtils {
     return File(asset.path).toURI().toString()
   }
 
+  private data class GalleryInfo(val path: String, val galleryId: String, val galleryName: String)
 }

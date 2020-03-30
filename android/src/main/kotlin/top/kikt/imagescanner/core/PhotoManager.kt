@@ -203,5 +203,19 @@ class PhotoManager(private val context: Context) {
       resultHandler.reply(null)
     }
   }
-
+  
+  fun moveToGallery(assetId: String, albumId: String, resultHandler: ResultHandler) {
+    try {
+      val assetEntity = dbUtils.moveToGallery(context, assetId, albumId)
+      if (assetEntity == null) {
+        resultHandler.reply(null)
+        return
+      }
+      resultHandler.reply(ConvertUtils.convertToAssetResult(assetEntity))
+    } catch (e: Exception) {
+      LogUtils.error(e)
+      resultHandler.reply(null)
+    }
+  }
+  
 }
