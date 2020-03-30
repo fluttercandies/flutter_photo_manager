@@ -173,4 +173,19 @@ class IosEditor {
   }
 }
 
-class AndroidEditor {}
+class AndroidEditor {
+  Future<bool> moveAssetToAnother({
+    AssetEntity entity,
+    AssetPathEntity target,
+  }) async {
+    if (!Platform.isAndroid) {
+      assert(Platform.isAndroid);
+      return false;
+    }
+
+    assert(entity != null);
+    assert(target != null);
+
+    return _plugin.androidMoveAssetToPath(entity, target);
+  }
+}

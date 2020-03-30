@@ -15,6 +15,7 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
 import 'copy_to_another_gallery_example.dart';
+import 'move_to_another_gallery_example.dart';
 
 class GalleryContentListPage extends StatefulWidget {
   final AssetPathEntity path;
@@ -150,6 +151,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                 child: Text("Copy to another path"),
                 onPressed: () => copyToAnotherPath(entity),
               ),
+              _buildMoveAnotherPath(entity),
               _buildRemoveInAlbumWidget(entity),
             ],
           ),
@@ -292,5 +294,20 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
 
   void deleteAssetInAlbum(entity) {
     provider.removeInAlbum(entity);
+  }
+
+  Widget _buildMoveAnotherPath(AssetEntity entity) {
+    if (!Platform.isAndroid) {
+      return Container();
+    }
+    return RaisedButton(
+      onPressed: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (BuildContext context) {
+          return MoveToAnotherExample(entity: entity);
+        }));
+      },
+      child: Text("Move to another gallery."),
+    );
   }
 }

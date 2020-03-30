@@ -328,6 +328,8 @@ interface IDBUtils {
   }
 
   fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity?
+  
+  fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity?
 
   fun getGalleryId(context: Context, assetId: String): String? {
     val cr = context.contentResolver
