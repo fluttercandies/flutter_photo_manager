@@ -301,6 +301,12 @@
               [handler reply:@{@"result": @YES}];
             }
         }];
+      } else if ([@"favoriteAsset" isEqualToString:call.method]) {
+        NSString *id = call.arguments[@"id"];
+        BOOL favorite = [call.arguments[@"type"] boolValue];
+        BOOL result = [manager favoriteWithId:id favorite:favorite];
+
+        [handler reply:@(result)];
       } else {
         [handler notImplemented];
       }

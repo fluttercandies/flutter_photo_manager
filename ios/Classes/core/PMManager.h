@@ -73,4 +73,6 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (void)removeInAlbumWithAssetId:(NSArray *)id albumId:(NSString *)albumId block:(void (^)(NSString *))block;
 
 - (void)removeCollectionWithId:(NSString *)id type:(int)type block:(void (^)(NSString *))block;
+
+- (BOOL)favoriteWithId:(NSString *)id favorite:(BOOL)favorite;
 @end

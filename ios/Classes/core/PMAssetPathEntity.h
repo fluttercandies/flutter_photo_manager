@@ -35,6 +35,7 @@
 @property(nonatomic, assign) double lat;
 @property(nonatomic, assign) double lng;
 @property(nonatomic, copy) NSString *title;
+@property(nonatomic, assign) BOOL favorite;
 
 - (instancetype)initWithId:(NSString *)id
                   createDt:(long)createDt

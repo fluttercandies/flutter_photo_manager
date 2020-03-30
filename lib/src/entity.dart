@@ -310,6 +310,11 @@ class AssetEntity {
   /// The value always 0 in iOS.
   int orientation;
 
+  /// Android does not have this field, so it is always false.
+  ///
+  /// In iOS, it is consistent with PHAsset.isFavorite. to change it, Use `PhotoManager.editor.iOS.favoriteAsset`, See [IosEditor.favoriteAsset]
+  bool isFavorite;
+
   @override
   int get hashCode {
     return id.hashCode;
