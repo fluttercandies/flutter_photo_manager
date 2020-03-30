@@ -10,6 +10,9 @@ Feature:
   - Create folder or album.
   - Remove assets in album.
   - Delete folder or album.
+  - Favorite asset.
+- Only android
+  - move asset to another path.
 
 Fix:
 

@@ -31,6 +31,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
       - [Insert new item](#insert-new-item)
       - [Copy asset](#copy-asset)
         - [Only for iOS](#only-for-ios)
+        - [Only for Android](#only-for-android)
   - [iOS config](#ios-config)
     - [iOS plist config](#ios-plist-config)
     - [enabling localized system albums names](#enabling-localized-system-albums-names)
@@ -277,6 +278,14 @@ Delete the path in device. Both folders and albums can be deleted, except for sm
 
 ```dart
 PhotoManager.editor.iOS.deletePath();
+```
+
+##### Only for Android
+
+Move asset to another album
+
+```dart
+PhotoManager.editor.android.moveAssetToAnother(entity: assetEntity, target: pathEntity);
 ```
 
 ## iOS config
