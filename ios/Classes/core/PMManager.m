@@ -267,6 +267,7 @@
   entity.lat = asset.location.coordinate.latitude;
   entity.lng = asset.location.coordinate.longitude;
   entity.title = needTitle ? [asset title] : @"";
+  entity.favorite = asset.isFavorite;
 
   return entity;
 }
@@ -1077,7 +1078,7 @@
   block(nil);
 }
 
-- (id)getFirstCollectionFromFetchResult:(PHFetchResult<id> *)fetchResult {
+- (id)getFirstObjFromFetchResult:(PHFetchResult<id> *)fetchResult {
   if (fetchResult && fetchResult.count > 0) {
     return fetchResult.firstObject;
   }
@@ -1087,7 +1088,7 @@
 - (void)removeCollectionWithId:(NSString *)id type:(int)type block:(void (^)(NSString *))block {
   if (type == 1) {
     PHFetchResult<PHAssetCollection *> *fetchResult = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[id] options:nil];
-    PHAssetCollection *collection = [self getFirstCollectionFromFetchResult:fetchResult];
+    PHAssetCollection *collection = [self getFirstObjFromFetchResult:fetchResult];
     if (!collection) {
       block(@"Cannot found asset collection.");
       return;
@@ -1110,7 +1111,7 @@
 
   } else if (type == 2) {
     PHFetchResult<PHCollectionList *> *fetchResult = [PHCollectionList fetchCollectionListsWithLocalIdentifiers:@[id] options:nil];
-    PHCollectionList *collection = [self getFirstCollectionFromFetchResult:fetchResult];
+    PHCollectionList *collection = [self getFirstObjFromFetchResult:fetchResult];
     if (!collection) {
       block(@"Cannot found collection list.");
       return;
@@ -1135,4 +1136,28 @@
   }
 }
 
+- (BOOL)favoriteWithId:(NSString *)id favorite:(BOOL)favorite {
+  PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:nil];
+  PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
+
+  if (!asset) {
+    NSLog(@"Cannot find found: %@", id);
+    return NO;
+  }
+
+  NSError *error;
+
+  [PHPhotoLibrary.sharedPhotoLibrary
+      performChangesAndWait:^{
+          PHAssetChangeRequest *request = [PHAssetChangeRequest changeRequestForAsset:asset];
+          request.favorite = favorite;
+      } error:&error];
+
+  if (error) {
+    NSLog(@"favorite error: %@", error);
+    return NO;
+  }
+
+  return YES;
+}
 @end

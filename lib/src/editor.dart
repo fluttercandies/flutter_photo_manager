@@ -160,6 +160,17 @@ class IosEditor {
 
     return _plugin.iosDeleteCollection(path);
   }
+
+  Future<bool> favoriteAsset(
+      {@required AssetEntity entity, @required bool favorite}) async {
+    assert(entity != null);
+    assert(favorite != null);
+    final result = await _plugin.favoriteAsset(entity.id, favorite);
+    if (result) {
+      entity.isFavorite = favorite;
+    }
+    return result;
+  }
 }
 
 class AndroidEditor {}

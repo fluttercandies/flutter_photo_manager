@@ -311,6 +311,13 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     }
     return true;
   }
+
+  Future<bool> favoriteAsset(String id, bool favorite) {
+    return _channel.invokeMethod("favoriteAsset", {
+      "id": id,
+      "favorite": favorite,
+    });
+  }
 }
 
 mixin BasePlugin {
