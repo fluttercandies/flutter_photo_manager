@@ -347,6 +347,11 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
           photoManager.moveToGallery(assetId, albumId, resultHandler)
         }
       }
+      "removeNoExistsAssets"->{
+        runOnBackground {
+          photoManager.removeAllExistsAssets(resultHandler)
+        }
+      }
       else -> resultHandler.notImplemented()
     }
   }

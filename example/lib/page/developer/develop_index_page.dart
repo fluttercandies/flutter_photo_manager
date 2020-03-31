@@ -7,6 +7,7 @@ import 'package:photo_manager/photo_manager.dart';
 
 import 'dev_title_page.dart';
 import 'ios/create_folder_example.dart';
+import 'remove_all_android_not_exists_example.dart';
 
 class DeveloperIndexPage extends StatefulWidget {
   @override
@@ -25,6 +26,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
           RaisedButton(
             child: Text("Show iOS create folder example."),
             onPressed: () => navToWidget(CreateFolderExample()),
+          ),
+          RaisedButton(
+            child: Text("Show Android remove not exists asset example."),
+            onPressed: () => navToWidget(RemoveAndroidNotExistsExample()),
           ),
           RaisedButton(
             child: Text("upload file to local to test EXIF."),
@@ -109,9 +114,9 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
     }));
   }
 
-  void navToWidget(CreateFolderExample createFolderExample) {
+  void navToWidget(Widget widget) {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
-      return CreateFolderExample();
+      return widget;
     }));
   }
 }

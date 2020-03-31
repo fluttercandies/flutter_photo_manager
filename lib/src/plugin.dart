@@ -318,6 +318,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
       "favorite": favorite,
     });
   }
+
+  Future<bool> androidRemoveNoExistsAssets() {
+    return _channel.invokeMethod("removeNoExistsAssets");
+  }
 }
 
 mixin BasePlugin {

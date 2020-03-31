@@ -10,7 +10,7 @@ A flutter api for photo, you can get image/video from ios or android.
 
 If you just need a picture selector, you can choose to use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker. All UI create by flutter.
 
-- [photo_manager](#photo_manager)
+- [photo_manager](#photomanager)
   - [install](#install)
     - [Add to pubspec](#add-to-pubspec)
     - [import in dart code](#import-in-dart-code)
@@ -286,6 +286,14 @@ Move asset to another album
 
 ```dart
 PhotoManager.editor.android.moveAssetToAnother(entity: assetEntity, target: pathEntity);
+```
+
+Remove all non-existing rows. For normal Android users, this problem doesn't happened.  
+A row record exists in the Android MediaStore, but the corresponding file has been deleted. This kind of abnormal deletion usually comes from file manager, helper to clear cache or adb.  
+This is a very resource-consuming operation. If the first one is not completed, the second one cannot be opened.
+
+```dart
+await PhotoManager.editor.android.removeAllNoExistsAsset();
 ```
 
 ## iOS config

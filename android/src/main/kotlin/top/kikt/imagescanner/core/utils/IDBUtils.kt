@@ -25,10 +25,12 @@ interface IDBUtils {
   annotation class MediaTypeDef {
 
   }
+  
+  
 
   companion object {
     val isAndroidQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-
+    
     val storeImageKeys = arrayOf(
             MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
             MediaStore.MediaColumns.DATA, // 数据
@@ -113,6 +115,14 @@ interface IDBUtils {
     }
   }
 
+  fun getTypeFromMediaType(mediaType: Int):Int{
+    return when (mediaType) {
+      MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE  -> 1
+      MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO  -> 2
+      MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO  -> 3
+      else -> 0
+    }
+  }
 
   fun Cursor.getInt(columnName: String): Int {
     return getInt(getColumnIndex(columnName))
@@ -363,4 +373,6 @@ interface IDBUtils {
   fun throwMsg(msg: String): Nothing {
     throw RuntimeException(msg)
   }
+  
+  fun removeAllExistsAssets(context: Context): Boolean
 }

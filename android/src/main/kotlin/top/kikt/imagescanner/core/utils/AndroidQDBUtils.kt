@@ -8,7 +8,10 @@ import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.provider.BaseColumns
 import android.provider.MediaStore
+import android.provider.MediaStore.Files.FileColumns.*
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.PhotoManager
@@ -23,10 +26,14 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.net.URLConnection
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 /// create 2019-09-11 by cai
 @RequiresApi(Build.VERSION_CODES.Q)
 object AndroidQDBUtils : IDBUtils {
+  private const val TAG = "PhotoManagerPlugin"
+  
   private val cacheContainer = CacheContainer()
   
   private var androidQCache = AndroidQCache()
@@ -195,7 +202,7 @@ object AndroidQDBUtils : IDBUtils {
     val id = cursor.getString(MediaStore.MediaColumns._ID)
     val path = cursor.getString(MediaStore.MediaColumns.DATA)
     val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
-    val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
+    val type = cursor.getInt(MEDIA_TYPE)
     
     val duration = if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
     val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
@@ -221,7 +228,7 @@ object AndroidQDBUtils : IDBUtils {
     val cursor = context.contentResolver.query(allUri, keys, selection, args, null)
     cursor?.use {
       if (cursor.moveToNext()) {
-        val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
+        val type = cursor.getInt(MEDIA_TYPE)
         val dbAsset = convertCursorToAssetEntity(cursor, type)
         cacheContainer.putAsset(dbAsset)
         cursor.close()
@@ -370,7 +377,7 @@ object AndroidQDBUtils : IDBUtils {
     val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     
     val values = ContentValues().apply {
-      put(MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
+      put(MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
       
       put(MediaStore.MediaColumns.DISPLAY_NAME, title)
       put(MediaStore.Images.ImageColumns.MIME_TYPE, typeFromStream)
@@ -416,7 +423,7 @@ object AndroidQDBUtils : IDBUtils {
     val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     
     val values = ContentValues().apply {
-      put(MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
+      put(MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
       
       put(MediaStore.MediaColumns.DISPLAY_NAME, title)
       put(MediaStore.Images.ImageColumns.MIME_TYPE, typeFromStream)
@@ -492,7 +499,7 @@ object AndroidQDBUtils : IDBUtils {
       for (key in copyKeys) {
         put(key, cursor.getString(key))
       }
-      put(MediaStore.Files.FileColumns.MEDIA_TYPE, mediaType)
+      put(MEDIA_TYPE, mediaType)
       put(MediaStore.Files.FileColumns.RELATIVE_PATH, relativePath)
     }
     
@@ -536,6 +543,63 @@ object AndroidQDBUtils : IDBUtils {
       return getAssetEntity(context, assetId)
     }
     throwMsg("Cannot update $assetId relativePath")
+  }
+  
+  private val deleteLock = ReentrantLock()
+  
+  override fun removeAllExistsAssets(context: Context): Boolean {
+    if (deleteLock.isLocked) {
+      Log.i(TAG, "The removeAllExistsAssets is running.")
+      return false
+    }
+    deleteLock.withLock {
+      Log.i(TAG, "The removeAllExistsAssets is starting.")
+      val removedList = ArrayList<String>()
+      val cr = context.contentResolver
+      
+      val queryCursor = cr.query(
+        allUri,
+        arrayOf(BaseColumns._ID, MEDIA_TYPE, DATA),
+        "$MEDIA_TYPE in ( ?,?,? )",
+        arrayOf(MEDIA_TYPE_AUDIO, MEDIA_TYPE_VIDEO, MEDIA_TYPE_IMAGE).map { it.toString() }.toTypedArray(),
+        null
+      ) ?: return false
+      queryCursor.use {
+        var count = 0
+        while (queryCursor.moveToNext()) {
+          val id = queryCursor.getString(BaseColumns._ID)
+          val mediaType = queryCursor.getInt(MEDIA_TYPE)
+          val path = queryCursor.getStringOrNull(DATA)
+          val type = getTypeFromMediaType(mediaType)
+          val uri = getUri(id, type)
+          val exists = try {
+            cr.openInputStream(uri)?.close()
+            true
+          } catch (e: Exception) {
+            false
+          }
+          if (!exists) {
+            removedList.add(id)
+            Log.i(TAG, "The $id, $path media was not exists. ")
+          }
+          count++
+          
+          if (count % 300 == 0) {
+            Log.i(TAG, "Current checked count == $count")
+          }
+        }
+        
+        Log.i(TAG, "The removeAllExistsAssets was stopped, will be delete ids = $removedList")
+      }
+      
+      val idWhere = removedList.map { "?" }.joinToString(",")
+      
+      // Remove exists rows.
+      val deleteRowCount = cr.delete(allUri, "${BaseColumns._ID} in ( $idWhere )", removedList.toTypedArray())
+      Log.i("PhotoManagerPlugin", "Delete rows: $deleteRowCount")
+    }
+    
+    return true
   }
   
   private fun getRelativePath(context: Context, galleryId: String): String? {
@@ -582,7 +646,7 @@ object AndroidQDBUtils : IDBUtils {
     val info = VideoUtils.getPropertiesUseMediaPlayer(path)
     
     val values = ContentValues().apply {
-      put(MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
+      put(MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
       
       put(MediaStore.MediaColumns.DISPLAY_NAME, title)
       put(MediaStore.Video.VideoColumns.MIME_TYPE, typeFromStream)
