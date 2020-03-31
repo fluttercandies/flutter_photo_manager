@@ -218,4 +218,9 @@ class PhotoManager(private val context: Context) {
     }
   }
   
+  fun removeAllExistsAssets(resultHandler: ResultHandler) {
+    val result = dbUtils.removeAllExistsAssets(context)
+    resultHandler.reply(result)
+  }
+  
 }

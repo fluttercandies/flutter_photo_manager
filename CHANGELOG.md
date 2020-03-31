@@ -13,6 +13,7 @@ Feature:
   - Favorite asset.
 - Only android
   - move asset to another path.
+  - Remove all non-existing rows.
 
 Fix:
 

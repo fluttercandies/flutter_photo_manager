@@ -188,4 +188,12 @@ class AndroidEditor {
 
     return _plugin.androidMoveAssetToPath(entity, target);
   }
+
+  Future<bool> removeAllNoExistsAsset() async {
+    assert(Platform.isAndroid);
+    if (!Platform.isAndroid) {
+      return false;
+    }
+    return _plugin.androidRemoveNoExistsAssets();
+  }
 }
