@@ -43,6 +43,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
             child: Text("Open test title page"),
             onPressed: _navigatorSpeedOfTitle,
           ),
+          RaisedButton(
+            child: Text("Open setting."),
+            onPressed: _openSetting,
+          ),
         ],
       ),
     );
@@ -118,5 +122,9 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
       return widget;
     }));
+  }
+
+  void _openSetting() {
+    PhotoManager.openSetting();
   }
 }
