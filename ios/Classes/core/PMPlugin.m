@@ -46,6 +46,8 @@
           [handler reply:@0];
         }
     }];
+  } else if ([call.method isEqualToString:@"openSetting"]) {
+    [PMManager openSetting];
   } else if (manager.isAuth) {
     [self onAuth:call result:result];
   } else {
