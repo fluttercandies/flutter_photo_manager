@@ -18,6 +18,7 @@ Feature:
 Fix:
 
 - Problem of AssetPathEntity.refreshPathProperties.
+- Open setting in iOS.
 
 Change:
 
