@@ -166,19 +166,9 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
 
   void routeToDetailPage(AssetEntity entity) async {
     final mediaUrl = await entity.getMediaUrl();
-    File imageFile;
-    if (entity.type == AssetType.image) {
-      imageFile = await entity.originFile;
-      print(
-          "origin file is ${imageFile.absolute.path}, length = ${imageFile.lengthSync()}");
-    } else {
-      print("play media url: $mediaUrl");
-    }
-
     final page = DetailPage(
       entity: entity,
       mediaUrl: mediaUrl,
-      imageOriginFile: imageFile,
     );
     Navigator.of(context).push(
       MaterialPageRoute(

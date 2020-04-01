@@ -13,6 +13,7 @@
 #import "PMRequestTypeUtils.h"
 #import "NSString+PM_COMMON.h"
 #import "PMFolderUtils.h"
+#import "MD5Utils.h"
 
 @implementation PMManager {
   BOOL __isAuth;
@@ -358,7 +359,7 @@
       if (isOrigin) {
         [self fetchOriginImageFile:asset resultHandler:handler];
       } else {
-        [self fetchOriginImageFile:asset resultHandler:handler];
+        [self fetchFullSizeImageFile:asset resultHandler:handler];
       }
     }
   } else {
@@ -508,29 +509,51 @@
       }
   }];
 
-  [manager requestImageForAsset:asset
-                     targetSize:PHImageManagerMaximumSize
-                    contentMode:PHImageContentModeDefault
-                        options:options
-                  resultHandler:^(UIImage *_Nullable image,
-                          NSDictionary *_Nullable info) {
-                      BOOL downloadFinished = [PMManager isDownloadFinish:info];
-                      if (!downloadFinished) {
-                        return;
-                      }
+    [manager requestImageForAsset:asset
+                       targetSize:PHImageManagerMaximumSize
+                      contentMode:PHImageContentModeDefault
+                          options:options
+                    resultHandler:^(UIImage *_Nullable image,
+                            NSDictionary *_Nullable info) {
+        
+        BOOL downloadFinished = [PMManager isDownloadFinish:info];
+        if (!downloadFinished) {
+            return;
+        }
 
-                      if ([handler isReplied]) {
-                        return;
-                      }
+        if ([handler isReplied]) {
+            return;
+        }
+        
+        NSString * path = [self writeFullFileWithAssetId:asset imageData:UIImageJPEGRepresentation(image, 1.0)];
 
-                      NSString *path = [self makeAssetOutputPath:asset
-                                                        isOrigin:NO];
+        [handler reply:path];
+    }];
+}
 
-                      [UIImageJPEGRepresentation(image, 1.0) writeToFile:path
-                                                              atomically:YES];
+- (NSString *)writeFullFileWithAssetId:(PHAsset *)asset imageData:(NSData *)imageData {
+    
+    NSString *homePath = NSTemporaryDirectory();
+    NSFileManager *manager = NSFileManager.defaultManager;
 
-                      [handler reply:path];
-                  }];
+    NSMutableString *path = [NSMutableString stringWithString:homePath];
+    [path appendString:@"flutter-images"];
+
+    [manager createDirectoryAtPath:path attributes:@{}];
+
+    [path appendString:@"/"];
+    [path appendString:[MD5Utils getmd5WithString:asset.localIdentifier]];
+    
+    [path appendString:@"_exif"];
+    
+    [path appendString:@".jpg"];
+
+    if ([manager fileExistsAtPath:path]) {
+        return path;
+    }
+
+    [manager createFileAtPath:path contents:imageData attributes:@{}];
+    return path;
 }
 
 - (BOOL)isImage:(PHAssetResource *)resource {

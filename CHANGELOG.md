@@ -19,6 +19,10 @@ Fix:
 
 - Problem of AssetPathEntity.refreshPathProperties.
 
+Change:
+
+- Modified `AssetEntity.file`'s behavior on iOS, currently it will return a picture in jpg format instead of heic/gif/png. Now more in line with the description in the doc, this is suitable for uploading images (theoretically, no Exif information will be included).
+
 ## 0.5.0
 
 Feature:

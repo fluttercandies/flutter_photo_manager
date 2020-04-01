@@ -7,11 +7,9 @@ import 'package:photo_manager/photo_manager.dart';
 class DetailPage extends StatefulWidget {
   final AssetEntity entity;
   final String mediaUrl;
-  final File imageOriginFile;
   const DetailPage({
     Key key,
     this.entity,
-    this.imageOriginFile,
     this.mediaUrl,
   }) : super(key: key);
 
@@ -20,6 +18,8 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  bool useOrigin = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,11 +32,21 @@ class _DetailPageState extends State<DetailPage> {
           ),
         ],
       ),
-      body: Center(
-        child: Container(
-          color: Colors.black,
-          child: _buildContent(),
-        ),
+      body: ListView(
+        children: <Widget>[
+          CheckboxListTile(
+            title: Text("Use origin file."),
+            onChanged: (value) {
+              this.useOrigin = value;
+              setState(() {});
+            },
+            value: useOrigin,
+          ),
+          Container(
+            color: Colors.black,
+            child: _buildContent(),
+          ),
+        ],
       ),
     );
   }
@@ -52,9 +62,20 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget buildImage() {
-    return Image.file(
-      widget.imageOriginFile,
-      filterQuality: FilterQuality.low,
+    return FutureBuilder<File>(
+      future: useOrigin ? widget.entity.originFile : widget.entity.file,
+      builder: (_, snapshot) {
+        if (snapshot.data == null) {
+          return Center(
+            child: SizedBox(
+              width: 30,
+              height: 30,
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+        return Image.file(snapshot.data);
+      },
     );
   }
 
