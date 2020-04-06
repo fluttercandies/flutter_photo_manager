@@ -22,6 +22,25 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final originCheckbox = CheckboxListTile(
+      title: Text("Use origin file."),
+      onChanged: (value) {
+        this.useOrigin = value;
+        setState(() {});
+      },
+      value: useOrigin,
+    );
+    final children = <Widget>[
+      Container(
+        color: Colors.black,
+        child: _buildContent(),
+      ),
+    ];
+
+    if (widget.entity.type == AssetType.image) {
+      children.insert(0, originCheckbox);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Asset detail"),
@@ -33,20 +52,7 @@ class _DetailPageState extends State<DetailPage> {
         ],
       ),
       body: ListView(
-        children: <Widget>[
-          CheckboxListTile(
-            title: Text("Use origin file."),
-            onChanged: (value) {
-              this.useOrigin = value;
-              setState(() {});
-            },
-            value: useOrigin,
-          ),
-          Container(
-            color: Colors.black,
-            child: _buildContent(),
-          ),
-        ],
+        children: children,
       ),
     );
   }
