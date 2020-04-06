@@ -293,9 +293,7 @@ class AssetEntity {
   ///
   /// It is such as `file:///var/mobile/Media/DCIM/118APPLE/IMG_8371.MOV` in iOS.
   ///
-  /// Android28 or lower: `file:///storage/emulated/0/DCIM/Camera/20201020_202020.MP4`
-  ///
-  /// AndroidQ or higher: `content://media/external/video/media/894857`
+  /// Android: `content://media/external/video/media/894857`
   Future<String> getMediaUrl() {
     if (type == AssetType.video || type == AssetType.audio) {
       return PhotoManager._getMediaUrl(this);
