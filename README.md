@@ -1,6 +1,6 @@
 # photo_manager
 
-[![pub package](https://img.shields.io/pub/v/photo_manager.svg)](https://pub.dartlang.org/packages/photo_manager)
+[![pub package](https://img.shields.io/pub/v/photo_manager.svg) ![dev](https://img.shields.io/pub/v/photo_manager?include_prereleases)](https://pub.dartlang.org/packages/photo_manager)
 [![GitHub](https://img.shields.io/github/license/Caijinglong/flutter_photo_manager.svg)](https://github.com/Caijinglong/flutter_photo_manager)
 [![GitHub stars](https://img.shields.io/github/stars/Caijinglong/flutter_photo_manager.svg?style=social&label=Stars)](https://github.com/Caijinglong/flutter_photo_manager)
 
