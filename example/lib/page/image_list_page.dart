@@ -140,6 +140,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                 onPressed: () => routeToDetailPage(entity),
               ),
               RaisedButton(
+                child: Text("show 500 size thumb "),
+                onPressed: () => showThumb(entity, 500),
+              ),
+              RaisedButton(
                 child: Text("Delete item"),
                 onPressed: () => _deleteCurrent(entity),
               ),
@@ -299,5 +303,45 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       },
       child: Text("Move to another gallery."),
     );
+  }
+
+  showThumb(AssetEntity entity, int size) async {
+    var title = entity.title;
+    if (entity.title == null || entity.title.isEmpty) {
+      title = await entity.titleAsync;
+    }
+    print("entity.title = $title");
+    if (title.toLowerCase().endsWith(".heic")) {
+      showToast(
+          "Heic no support by Flutter. Try to use entity.thumbDataWithSize to get thumb.");
+      return;
+    }
+    showDialog(
+        context: context,
+        builder: (_) {
+          return FutureBuilder<Uint8List>(
+            future: entity.thumbDataWithSize(size, size),
+            builder: (BuildContext context, snapshot) {
+              Widget w;
+              if (snapshot.hasError) {
+                return ErrorWidget(snapshot.error);
+              } else if (snapshot.hasData) {
+                w = Image.memory(snapshot.data);
+              } else {
+                w = Center(
+                  child: Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.all(20),
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+              return GestureDetector(
+                child: w,
+                onTap: () => Navigator.pop(context),
+              );
+            },
+          );
+        });
   }
 }
