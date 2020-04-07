@@ -8,9 +8,21 @@ A flutter api for photo, you can get image/video from ios or android.
 
 一个提供相册 api 的插件, android ios 可用,没有 ui,以便于自定义自己的界面, 你可以通过提供的 api 来制作图片相关的 ui 或插件
 
+## Other projects using this library
+
 If you just need a picture selector, you can choose to use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker. All UI create by flutter.
 
+| name                 | owner          | description                                                                                                                                       | pub                                                                                                                    | github                                                                                                                                                                             |
+| -------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| photo                | Caijinglong    | A selector for multiple pictures / videos, The style is like the 6.0 version of wechat.                                                           | [![pub package](https://img.shields.io/pub/v/photo.svg)](https://pub.dev/packages/photo)                               | [![star](https://img.shields.io/github/stars/Caijinglong/flutter_photo?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker/stargazers)                   |
+| wechat_assets_picker | fluttercandies | An assets picker in WeChat 7.x style, support multi assets picking.                                                                               | [![pub package](https://img.shields.io/pub/v/wechat_assets_picker.svg)](https://pub.dev/packages/wechat_assets_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker/stargazers) |
+| photo_widget         | fluttercandies | Not just selectors, but to provide each widget as a separate component, which is convenient for quickly combining and customizing your own style. | Wait                                                                                                                   | Wait                                                                                                                                                                               |
+
+## Table of contents
+
 - [photo_manager](#photomanager)
+  - [Other projects using this library](#other-projects-using-this-library)
+  - [Table of contents](#table-of-contents)
   - [install](#install)
     - [Add to pubspec](#add-to-pubspec)
     - [import in dart code](#import-in-dart-code)
@@ -41,6 +53,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
     - [glide](#glide)
   - [common issues](#common-issues)
     - [ios build error](#ios-build-error)
+  - [Some articles about to use this library](#some-articles-about-to-use-this-library)
 
 ## install
 
@@ -395,3 +408,9 @@ Xcode's output:
      ~~~~~~~^
     2 errors generated.
 ```
+
+## Some articles about to use this library
+
+[How To: Create a custom media picker in Flutter to select photos and videos from the gallery](https://medium.com/@mhstoller.it/how-to-create-a-custom-media-picker-in-flutter-to-select-photos-and-videos-from-the-gallery-988eea477643?sk=cb395a7c20f6002f92f83374b3cc3875)
+
+[Flutter 开发日记-如何实现一个照片选择器 plugin](https://juejin.im/post/5df797706fb9a016107974fc)
