@@ -10,7 +10,7 @@ A flutter api for photo, you can get image/video from ios or android.
 
 If you just need a picture selector, you can choose to use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker. All UI create by flutter.
 
-- [photo_manager](#photomanager)
+- [photo_manager](#photo_manager)
   - [install](#install)
     - [Add to pubspec](#add-to-pubspec)
     - [import in dart code](#import-in-dart-code)
@@ -351,7 +351,7 @@ If your compileSdkVersion and targetSdkVersion are both below 28, you can use `P
 
 ### glide
 
-Android native use glide to create image thumb bytes, version is 4.9.0.
+Android native use glide to create image thumb bytes, version is 4.11.0.
 
 If your other android library use the library, and version is not same, then you need edit your android project's build.gradle.
 
@@ -363,7 +363,7 @@ rootProject.allprojects {
             resolutionStrategy.eachDependency { details ->
                 if (details.requested.group == 'com.github.bumptech.glide'
                         && details.requested.name.contains('glide')) {
-                    details.useVersion "4.9.0"
+                    details.useVersion "4.11.0"
                 }
             }
         }
