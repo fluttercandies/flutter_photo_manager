@@ -36,4 +36,5 @@ jobs:
           flutter-version: "1.12.13+hotfix.7"
       - run: flutter pub get
       - run: flutter analyze lib example/lib
+      - run: echo "y"|$ANDROID_HOME/tools/bin/sdkmanager "20.0.5594570"
       - run: cd example ; flutter build apk --debug
