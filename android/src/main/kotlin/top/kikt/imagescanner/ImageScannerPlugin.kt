@@ -3,12 +3,9 @@ package top.kikt.imagescanner
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry.Registrar
 import top.kikt.imagescanner.core.PhotoManagerPlugin
-import top.kikt.imagescanner.old.refresh.RefreshObserver
 
 class ImageScannerPlugin(val registrar: Registrar) {
     companion object {
-        private val notifyChangeObserver = RefreshObserver()
-
         @JvmStatic
         fun registerWith(registrar: Registrar): Unit {
             val newChannel = MethodChannel(registrar.messenger(), "top.kikt/photo_manager")

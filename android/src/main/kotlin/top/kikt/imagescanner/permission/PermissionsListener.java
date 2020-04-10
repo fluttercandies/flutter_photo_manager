@@ -1,4 +1,4 @@
-package top.kikt.imagescanner.old.permission;
+package top.kikt.imagescanner.permission;
 
 import java.util.List;
 

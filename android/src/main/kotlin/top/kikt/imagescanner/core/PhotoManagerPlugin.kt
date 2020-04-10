@@ -9,8 +9,8 @@ import io.flutter.plugin.common.PluginRegistry
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.utils.ConvertUtils
-import top.kikt.imagescanner.old.permission.PermissionsListener
-import top.kikt.imagescanner.old.permission.PermissionsUtils
+import top.kikt.imagescanner.permission.PermissionsListener
+import top.kikt.imagescanner.permission.PermissionsUtils
 import top.kikt.imagescanner.util.LogUtils
 import top.kikt.imagescanner.util.ResultHandler
 import java.util.concurrent.ArrayBlockingQueue

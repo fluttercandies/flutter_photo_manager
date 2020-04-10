@@ -1,4 +1,4 @@
-package top.kikt.imagescanner.old.permission;
+package top.kikt.imagescanner.permission;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -14,7 +14,6 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import androidx.annotation.NonNull;
