@@ -243,10 +243,6 @@ Availability:
   - Before api 28, the method will copy some column from origin row.
   - In api 29 or higher, There are some restrictions that cannot be guaranteed, See [document of relative_path](https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#RELATIVE_PATH).
 
-```dart
-
-```
-
 ##### Only for iOS
 
 Create folder:
