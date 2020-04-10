@@ -167,7 +167,6 @@ String title = entity.title;
 About title: if the title is null or empty string, need use the titleAsync to get it. See below for the definition of attributes.
 
 ```dart
-
   /// It is title `MediaStore.MediaColumns.DISPLAY_NAME` in MediaStore on android.
   ///
   /// It is `PHAssetResource.filename` on iOS.
