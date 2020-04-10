@@ -167,7 +167,6 @@ String title = entity.title;
 About title: if the title is null or empty string, need use the titleAsync to get it. See below for the definition of attributes.
 
 ```dart
-
   /// It is title `MediaStore.MediaColumns.DISPLAY_NAME` in MediaStore on android.
   ///
   /// It is `PHAssetResource.filename` on iOS.
@@ -242,10 +241,6 @@ Availability:
 - android:
   - Before api 28, the method will copy some column from origin row.
   - In api 29 or higher, There are some restrictions that cannot be guaranteed, See [document of relative_path](https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#RELATIVE_PATH).
-
-```dart
-
-```
 
 ##### Only for iOS
 
