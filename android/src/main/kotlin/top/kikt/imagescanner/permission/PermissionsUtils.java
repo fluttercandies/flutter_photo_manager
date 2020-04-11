@@ -20,6 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
+import org.jetbrains.annotations.NotNull;
+
 import top.kikt.imagescanner.util.LogUtils;
 
 /**
@@ -270,7 +272,24 @@ public final class PermissionsUtils {
     context.startActivity(localIntent);
   }
 
-  public void setmPermissionsListener(PermissionsListener mPermissionsListener) {
-    this.mPermissionsListener = mPermissionsListener;
+  /**
+   * 获取申请权限的回调监听器
+   *
+   * @return 监听器
+   */
+  public PermissionsListener getPermissionsListener() {
+    return mPermissionsListener;
   }
+
+  /**
+   * 设置申请权限的回调监听器
+   *
+   * @param permissionsListener 监听器
+   * @return 返回 {@link PermissionsUtils} 自身，进行链式调用
+   */
+  public PermissionsUtils setPermissionsListener(PermissionsListener permissionsListener) {
+    this.mPermissionsListener = permissionsListener;
+    return this;
+  }
+
 }
