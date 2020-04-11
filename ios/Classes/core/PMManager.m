@@ -483,10 +483,9 @@
 
 //  NSString *title = [asset title];
   NSMutableString *path = [NSMutableString stringWithString:dirPath];
-  NSString *filename =
-          [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/"
-                                                           withString:@"_"];
-  [path appendFormat:@"%@/%@%@.jpg", cachePath, filename, isOrigin ? @"_origin" : @""];
+  NSString *filename = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+  NSString *extName = [asset title];
+  [path appendFormat:@"/%@%@.%@", filename, isOrigin ? @"_origin" : @"", extName];
   return path;
 }
 
