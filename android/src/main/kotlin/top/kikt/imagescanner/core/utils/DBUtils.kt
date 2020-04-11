@@ -30,12 +30,8 @@ import kotlin.concurrent.withLock
 /// create 2019-09-05 by cai
 /// Call the MediaStore API and get entity for the data.
 @Suppress("DEPRECATION")
+@SuppressLint("Recycle", "InlinedApi")
 object DBUtils : IDBUtils {
-
-  private const val TAG = "PhotoManagerPlugin"
-
-  private val imageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-  private val videoUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
 
   private val cacheContainer = CacheContainer()
 
@@ -44,15 +40,6 @@ object DBUtils : IDBUtils {
           MediaStore.Images.ImageColumns.LATITUDE
   )
 
-  private fun convertTypeToUri(type: Int): Uri {
-    return when (type) {
-      1 -> imageUri
-      2 -> videoUri
-      else -> allUri
-    }
-  }
-
-  @SuppressLint("Recycle")
   override fun getGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity> {
     val list = ArrayList<GalleryEntity>()
     val uri = allUri
@@ -269,17 +256,17 @@ object DBUtils : IDBUtils {
     val cursor = context.contentResolver.query(allUri, keys, selection, args, null)
             ?: return null
 
-    if (cursor.moveToNext()) {
+    return if (cursor.moveToNext()) {
       val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
       val dbAsset = convertCursorToAsset(cursor, type)
 
       cacheContainer.putAsset(dbAsset)
 
       cursor.close()
-      return dbAsset
+      dbAsset
     } else {
       cursor.close()
-      return null
+      null
     }
   }
 
@@ -323,8 +310,7 @@ object DBUtils : IDBUtils {
       exifInterface.latLong ?: doubleArrayOf(0.0, 0.0)
     }
 
-
-    val degress =
+    val degrees =
             try {
               val exifInterface = ExifInterface(inputStream)
               exifInterface.rotationDegrees
@@ -357,7 +343,7 @@ object DBUtils : IDBUtils {
       put(MediaStore.Images.ImageColumns.HEIGHT, height)
       put(MediaStore.Images.ImageColumns.LATITUDE, latLong[0])
       put(MediaStore.Images.ImageColumns.LONGITUDE, latLong[1])
-      put(MediaStore.Images.ImageColumns.ORIENTATION, degress)
+      put(MediaStore.Images.ImageColumns.ORIENTATION, degrees)
     }
 
     val insertUri = cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values) ?: return null
@@ -413,7 +399,7 @@ object DBUtils : IDBUtils {
     val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 
     val dir = Environment.getExternalStorageDirectory()
-    val savePath = File(path).absolutePath.startsWith(dir.path);
+    val savePath = File(path).absolutePath.startsWith(dir.path)
 
     val values = ContentValues().apply {
       put(MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
@@ -471,7 +457,7 @@ object DBUtils : IDBUtils {
 
   override fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity? {
 
-    val (currentGalleryId, currentFilePath) = getSomeInfo(context, assetId)
+    val (currentGalleryId, _) = getSomeInfo(context, assetId)
             ?: throw RuntimeException("Cannot get gallery id of $assetId")
 
     if (galleryId == currentGalleryId) {
@@ -603,7 +589,7 @@ object DBUtils : IDBUtils {
         Log.i("PhotoManagerPlugin", "will be delete ids = $removedList")
       }
 
-      val idWhere = removedList.map { "?" }.joinToString(",")
+      val idWhere = removedList.joinToString(",") { "?" }
 
       // Remove exists rows.
       val deleteRowCount = cr.delete(allUri, "$_ID in ( $idWhere )", removedList.toTypedArray())
@@ -672,7 +658,7 @@ object DBUtils : IDBUtils {
     val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
 
     val dir = Environment.getExternalStorageDirectory()
-    val savePath = File(path).absolutePath.startsWith(dir.path);
+    val savePath = File(path).absolutePath.startsWith(dir.path)
 
 
     val info = VideoUtils.getPropertiesUseMediaPlayer(path)
