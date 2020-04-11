@@ -273,8 +273,7 @@
   return entity;
 }
 
-- (PMAssetEntity *)getAssetEntity:(NSString *)assetId
-                        needTitle:(BOOL)needTitle {
+- (PMAssetEntity *)getAssetEntity:(NSString *)assetId {
   PMAssetEntity *entity = [cacheContainer getAssetEntity:assetId];
   if (entity) {
     return entity;
@@ -296,7 +295,7 @@
 }
 
 - (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality resultHandler:(ResultHandler *)handler {
-  PMAssetEntity *entity = [self getAssetEntity:id needTitle:NO];
+  PMAssetEntity *entity = [self getAssetEntity:id];
   if (entity && entity.phAsset) {
     PHAsset *asset = entity.phAsset;
     [self fetchThumb:asset width:width height:height format:format quality:quality resultHandler:handler];
@@ -345,7 +344,7 @@
 - (void)getFullSizeFileWithId:(NSString *)id
                      isOrigin:(BOOL)isOrigin
                 resultHandler:(ResultHandler *)handler {
-  PMAssetEntity *entity = [self getAssetEntity:id needTitle:NO];
+  PMAssetEntity *entity = [self getAssetEntity:id];
   if (entity && entity.phAsset) {
     PHAsset *asset = entity.phAsset;
     if (asset.isVideo) {
@@ -417,7 +416,7 @@
 
   NSMutableString *path = [NSMutableString stringWithString:homePath];
 
-  NSString *filename = [asset valueForKey:@"filename"];
+  NSString *filename = [asset valueForKey:[NSString stringWithFormat:@"filename"]];
 
   NSString *dirPath = [NSString stringWithFormat:@"%@/%@", homePath, @".video"];
   [manager createDirectoryAtPath:dirPath
@@ -482,17 +481,12 @@
 
   NSLog(@"cache path = %@", dirPath);
 
-  NSString *title = [asset title];
+//  NSString *title = [asset title];
   NSMutableString *path = [NSMutableString stringWithString:dirPath];
   NSString *filename =
           [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/"
                                                            withString:@"_"];
-  if (isOrigin) {
-    return [NSString stringWithFormat:@"%@/%@", dirPath, title];
-  } else {
-    [path appendFormat:@"%@/%@%@.jpg", cachePath, filename,
-                       isOrigin ? @"_origin" : @""];
-  }
+  [path appendFormat:@"%@/%@%@.jpg", cachePath, filename, isOrigin ? @"_origin" : @""];
   return path;
 }
 
@@ -509,51 +503,52 @@
       }
   }];
 
-    [manager requestImageForAsset:asset
-                       targetSize:PHImageManagerMaximumSize
-                      contentMode:PHImageContentModeDefault
-                          options:options
-                    resultHandler:^(UIImage *_Nullable image,
-                            NSDictionary *_Nullable info) {
-        
-        BOOL downloadFinished = [PMManager isDownloadFinish:info];
-        if (!downloadFinished) {
-            return;
-        }
+  [manager requestImageForAsset:asset
+                     targetSize:PHImageManagerMaximumSize
+                    contentMode:PHImageContentModeDefault
+                        options:options
+                  resultHandler:^(UIImage *_Nullable image,
+                          NSDictionary *_Nullable info) {
 
-        if ([handler isReplied]) {
-            return;
-        }
-        
-        NSString * path = [self writeFullFileWithAssetId:asset imageData:UIImageJPEGRepresentation(image, 1.0)];
+                      BOOL downloadFinished = [PMManager isDownloadFinish:info];
+                      if (!downloadFinished) {
+                        return;
+                      }
 
-        [handler reply:path];
-    }];
+                      if ([handler isReplied]) {
+                        return;
+                      }
+
+                      NSString *path = [self writeFullFileWithAssetId:asset imageData:UIImageJPEGRepresentation(image, 1.0)];
+
+                      [handler reply:path];
+                  }];
 }
 
 - (NSString *)writeFullFileWithAssetId:(PHAsset *)asset imageData:(NSData *)imageData {
-    
-    NSString *homePath = NSTemporaryDirectory();
-    NSFileManager *manager = NSFileManager.defaultManager;
 
-    NSMutableString *path = [NSMutableString stringWithString:homePath];
-    [path appendString:@"flutter-images"];
+  NSString *homePath = NSTemporaryDirectory();
+  NSFileManager *manager = NSFileManager.defaultManager;
 
-    [manager createDirectoryAtPath:path attributes:@{}];
+  NSMutableString *path = [NSMutableString stringWithString:homePath];
+  [path appendString:@"flutter-images"];
 
-    [path appendString:@"/"];
-    [path appendString:[MD5Utils getmd5WithString:asset.localIdentifier]];
-    
-    [path appendString:@"_exif"];
-    
-    [path appendString:@".jpg"];
+  NSError *error;
+  [manager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:@{} error:&error];
 
-    if ([manager fileExistsAtPath:path]) {
-        return path;
-    }
+  [path appendString:@"/"];
+  [path appendString:[MD5Utils getmd5WithString:asset.localIdentifier]];
 
-    [manager createFileAtPath:path contents:imageData attributes:@{}];
+  [path appendString:@"_exif"];
+
+  [path appendString:@".jpg"];
+
+  if ([manager fileExistsAtPath:path]) {
     return path;
+  }
+
+  [manager createFileAtPath:path contents:imageData attributes:@{}];
+  return path;
 }
 
 - (BOOL)isImage:(PHAssetResource *)resource {
@@ -725,11 +720,18 @@
 + (void)openSetting {
   NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
   if ([[UIApplication sharedApplication] canOpenURL:url]) {
-    [[UIApplication sharedApplication] openURL:url
-                                       options:@{}
-                             completionHandler:^(BOOL success) {
+    if ([UIDevice currentDevice].systemVersion.floatValue >= 10.0) {
+      [[UIApplication sharedApplication] openURL:url
+                                         options:@{}
+                               completionHandler:^(BOOL success) {
+                               }];
+    } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+      [[UIApplication sharedApplication] openURL:url];
+#pragma clang diagnostic pop
+    }
 
-                             }];
   }
 }
 
@@ -757,6 +759,9 @@
              desc:(NSString *)desc
             block:(AssetResult)block {
   __block NSString *assetId = nil;
+
+  [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save image with data, length: %ld, title:%@, desc: %@", data.length, title, desc]];
+
   [[PHPhotoLibrary sharedPhotoLibrary]
           performChanges:^{
               PHAssetCreationRequest *request =
@@ -772,7 +777,7 @@
        completionHandler:^(BOOL success, NSError *error) {
            if (success) {
              NSLog(@"create asset : id = %@", assetId);
-             block([self getAssetEntity:assetId needTitle:YES]);
+             block([self getAssetEntity:assetId]);
            } else {
              NSLog(@"create fail");
              block(nil);
@@ -781,6 +786,9 @@
 }
 
 - (void)saveImageWithPath:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(void (^)(PMAssetEntity *))block {
+
+  [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save image with path: %@ title:%@, desc: %@", path, title, desc]];
+
   __block NSString *assetId = nil;
   [[PHPhotoLibrary sharedPhotoLibrary]
           performChanges:^{
@@ -798,7 +806,7 @@
        completionHandler:^(BOOL success, NSError *error) {
            if (success) {
              NSLog(@"create asset : id = %@", assetId);
-             block([self getAssetEntity:assetId needTitle:YES]);
+             block([self getAssetEntity:assetId]);
            } else {
              NSLog(@"create fail");
              block(nil);
@@ -810,6 +818,7 @@
             title:(NSString *)title
              desc:(NSString *)desc
             block:(AssetResult)block {
+  [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save video with path: %@, title: %@, desc %@", path, title, desc]];
   NSURL *fileURL = [NSURL fileURLWithPath:path];
   __block NSString *assetId = nil;
   [[PHPhotoLibrary sharedPhotoLibrary]
@@ -831,7 +840,7 @@
        completionHandler:^(BOOL success, NSError *error) {
            if (success) {
              NSLog(@"create asset : id = %@", assetId);
-             block([self getAssetEntity:assetId needTitle:YES]);
+             block([self getAssetEntity:assetId]);
            } else {
              NSLog(@"create fail, error: %@", error);
              block(nil);
@@ -929,7 +938,7 @@
 }
 
 - (void)copyAssetWithId:(NSString *)id toGallery:(NSString *)gallery block:(void (^)(PMAssetEntity *entity, NSString *msg))block {
-  PMAssetEntity *assetEntity = [self getAssetEntity:id needTitle:NO];
+  PMAssetEntity *assetEntity = [self getAssetEntity:id];
 
   if (!assetEntity) {
     NSString *msg = [NSString stringWithFormat:@"not found asset : %@", id];
@@ -1171,10 +1180,10 @@
   NSError *error;
 
   [PHPhotoLibrary.sharedPhotoLibrary
-      performChangesAndWait:^{
-          PHAssetChangeRequest *request = [PHAssetChangeRequest changeRequestForAsset:asset];
-          request.favorite = favorite;
-      } error:&error];
+          performChangesAndWait:^{
+              PHAssetChangeRequest *request = [PHAssetChangeRequest changeRequestForAsset:asset];
+              request.favorite = favorite;
+          } error:&error];
 
   if (error) {
     NSLog(@"favorite error: %@", error);

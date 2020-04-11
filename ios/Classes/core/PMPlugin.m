@@ -10,7 +10,6 @@
 #import "PMManager.h"
 #import "PMNotificationManager.h"
 #import "ResultHandler.h"
-#import <Photos/Photos.h>
 
 @implementation PMPlugin {
 }
@@ -306,9 +305,9 @@
       } else if ([@"favoriteAsset" isEqualToString:call.method]) {
         NSString *id = call.arguments[@"id"];
         BOOL favorite = [call.arguments[@"type"] boolValue];
-        BOOL result = [manager favoriteWithId:id favorite:favorite];
+        BOOL favoriteResult = [manager favoriteWithId:id favorite:favorite];
 
-        [handler reply:@(result)];
+        [handler reply:@(favoriteResult)];
       } else {
         [handler notImplemented];
       }
@@ -327,11 +326,6 @@
   }
 
   return result;
-}
-
-- (unsigned long)getTimestamp:(FlutterMethodCall *)call {
-  unsigned long timestamp = [call.arguments[@"timestamp"] unsignedLongValue];
-  return timestamp;
 }
 
 @end
