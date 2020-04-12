@@ -22,9 +22,6 @@ class PhotoManagerNotifyChannel(val registry: PluginRegistry.Registrar, handler:
 
   private var notifying = false
 
-  val isNotifying: Boolean
-    get() = notifying
-
   private val videoObserver = MediaObserver(MEDIA_TYPE_VIDEO, handler)
   private val imageObserver = MediaObserver(MEDIA_TYPE_IMAGE, handler)
   private val audioObserver = MediaObserver(MEDIA_TYPE_AUDIO, handler)
@@ -152,52 +149,56 @@ class PhotoManagerNotifyChannel(val registry: PluginRegistry.Registrar, handler:
     }
 
     private fun getGalleryIdAndName(id: Long, type: Int): Pair<Long?, String?> {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        val cursor = cr.query(
-                allUri,
-                arrayOf(MediaStore.MediaColumns.BUCKET_ID, MediaStore.MediaColumns.BUCKET_DISPLAY_NAME),
-                "${BaseColumns._ID} = ?",
-                arrayOf(id.toString()),
-                null
-        )
-        cursor?.use {
-          if (cursor.moveToNext()) {
-            val galleryId = cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.BUCKET_ID))
-            val galleryName = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME))
-            return Pair(galleryId, galleryName)
+      when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+          val cursor = cr.query(
+                  allUri,
+                  arrayOf(MediaStore.MediaColumns.BUCKET_ID, MediaStore.MediaColumns.BUCKET_DISPLAY_NAME),
+                  "${BaseColumns._ID} = ?",
+                  arrayOf(id.toString()),
+                  null
+          )
+          cursor?.use {
+            if (cursor.moveToNext()) {
+              val galleryId = cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.BUCKET_ID))
+              val galleryName = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME))
+              return Pair(galleryId, galleryName)
+            }
+          }
+
+        }
+        type == MEDIA_TYPE_AUDIO -> {
+          val cursor = cr.query(
+                  allUri,
+                  arrayOf(MediaStore.Audio.AudioColumns.ALBUM_ID, MediaStore.Audio.AudioColumns.ALBUM),
+                  "${BaseColumns._ID} = ?",
+                  arrayOf(id.toString()),
+                  null
+          )
+
+          cursor?.use {
+            if (cursor.moveToNext()) {
+              val galleryId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ID))
+              val galleryName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM))
+              return Pair(galleryId, galleryName)
+            }
           }
         }
+        else -> {
+          val cursor = cr.query(
+                  allUri,
+                  arrayOf("bucket_id", "bucket_display_name"),
+                  "${BaseColumns._ID} = ?",
+                  arrayOf(id.toString()),
+                  null
+          )
 
-      } else if (type == MEDIA_TYPE_AUDIO) {
-        val cursor = cr.query(
-                allUri,
-                arrayOf(MediaStore.Audio.AudioColumns.ALBUM_ID, MediaStore.Audio.AudioColumns.ALBUM),
-                "${BaseColumns._ID} = ?",
-                arrayOf(id.toString()),
-                null
-        )
-
-        cursor?.use {
-          if (cursor.moveToNext()) {
-            val galleryId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ID))
-            val galleryName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM))
-            return Pair(galleryId, galleryName)
-          }
-        }
-      } else {
-        val cursor = cr.query(
-                allUri,
-                arrayOf("bucket_id", "bucket_display_name"),
-                "${BaseColumns._ID} = ?",
-                arrayOf(id.toString()),
-                null
-        )
-
-        cursor?.use {
-          if (cursor.moveToNext()) {
-            val galleryId = cursor.getLong(cursor.getColumnIndex("bucket_id"))
-            val galleryName = cursor.getString(cursor.getColumnIndex("bucket_display_name"))
-            return Pair(galleryId, galleryName)
+          cursor?.use {
+            if (cursor.moveToNext()) {
+              val galleryId = cursor.getLong(cursor.getColumnIndex("bucket_id"))
+              val galleryName = cursor.getString(cursor.getColumnIndex("bucket_display_name"))
+              return Pair(galleryId, galleryName)
+            }
           }
         }
       }

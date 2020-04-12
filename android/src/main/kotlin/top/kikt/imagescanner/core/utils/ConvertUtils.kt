@@ -84,14 +84,17 @@ object ConvertUtils {
   }
   
   fun getOptionFromType(map: Map<*, *>, type: AssetType): FilterCond {
-    if (type == AssetType.Video) {
-      return getOptionWithKey(map, "video")
-    } else if (type == AssetType.Image) {
-      return getOptionWithKey(map, "image")
-    } else if (type == AssetType.Audio) {
-      return getOptionWithKey(map, "audio")
+    return when (type) {
+      AssetType.Video -> {
+        getOptionWithKey(map, "video")
+      }
+      AssetType.Image -> {
+        getOptionWithKey(map, "image")
+      }
+      AssetType.Audio -> {
+        getOptionWithKey(map, "audio")
+      }
     }
-    return FilterCond()
   }
   
   private fun convertToOption(map: Map<*, *>): FilterCond {

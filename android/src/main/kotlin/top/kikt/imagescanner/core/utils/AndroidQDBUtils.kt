@@ -30,7 +30,9 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /// create 2019-09-11 by cai
+@Suppress("DEPRECATION")
 @RequiresApi(Build.VERSION_CODES.Q)
+@SuppressLint("Recycle")
 object AndroidQDBUtils : IDBUtils {
   private const val TAG = "PhotoManagerPlugin"
   
@@ -144,7 +146,7 @@ object AndroidQDBUtils : IDBUtils {
       ?: return emptyList()
     
     while (cursor.moveToNext()) {
-      val asset = convertCursorToAssetEntity(cursor, requestType)
+      val asset = convertCursorToAssetEntity(cursor)
       list.add(asset)
       cache.putAsset(asset)
     }
@@ -187,7 +189,7 @@ object AndroidQDBUtils : IDBUtils {
       ?: return emptyList()
     
     while (cursor.moveToNext()) {
-      val asset = convertCursorToAssetEntity(cursor, requestType)
+      val asset = convertCursorToAssetEntity(cursor)
       list.add(asset)
       cache.putAsset(asset)
     }
@@ -198,13 +200,13 @@ object AndroidQDBUtils : IDBUtils {
     
   }
   
-  private fun convertCursorToAssetEntity(cursor: Cursor, requestType: Int): AssetEntity {
+  private fun convertCursorToAssetEntity(cursor: Cursor): AssetEntity {
     val id = cursor.getString(MediaStore.MediaColumns._ID)
     val path = cursor.getString(MediaStore.MediaColumns.DATA)
     val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
     val type = cursor.getInt(MEDIA_TYPE)
     
-    val duration = if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
+    val duration = if (type == MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
     val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
     val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
     val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
@@ -221,21 +223,20 @@ object AndroidQDBUtils : IDBUtils {
     
     val keys = (IDBUtils.storeImageKeys + IDBUtils.typeKeys + IDBUtils.storeVideoKeys).distinct().toTypedArray()
     
-    val selection = "${MediaStore.Files.FileColumns._ID} = ?"
+    val selection = "$_ID = ?"
     
     val args = arrayOf(id)
     
     val cursor = context.contentResolver.query(allUri, keys, selection, args, null)
     cursor?.use {
-      if (cursor.moveToNext()) {
-        val type = cursor.getInt(MEDIA_TYPE)
-        val dbAsset = convertCursorToAssetEntity(cursor, type)
+      return if (cursor.moveToNext()) {
+        val dbAsset = convertCursorToAssetEntity(cursor)
         cacheContainer.putAsset(dbAsset)
         cursor.close()
-        return dbAsset
+        dbAsset
       } else {
         cursor.close()
-        return null
+        null
       }
     }
     return null
@@ -377,7 +378,7 @@ object AndroidQDBUtils : IDBUtils {
     val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     
     val values = ContentValues().apply {
-      put(MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
+      put(MEDIA_TYPE, MEDIA_TYPE_IMAGE)
       
       put(MediaStore.MediaColumns.DISPLAY_NAME, title)
       put(MediaStore.Images.ImageColumns.MIME_TYPE, typeFromStream)
@@ -423,7 +424,7 @@ object AndroidQDBUtils : IDBUtils {
     val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     
     val values = ContentValues().apply {
-      put(MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
+      put(MEDIA_TYPE, MEDIA_TYPE_IMAGE)
       
       put(MediaStore.MediaColumns.DISPLAY_NAME, title)
       put(MediaStore.Images.ImageColumns.MIME_TYPE, typeFromStream)
@@ -480,7 +481,7 @@ object AndroidQDBUtils : IDBUtils {
     
     val mediaType = convertTypeToMediaType(asset.type)
     
-    if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
+    if (mediaType == MEDIA_TYPE_VIDEO) {
       copyKeys.add(MediaStore.Video.VideoColumns.DESCRIPTION)
     }
     
@@ -500,7 +501,7 @@ object AndroidQDBUtils : IDBUtils {
         put(key, cursor.getString(key))
       }
       put(MEDIA_TYPE, mediaType)
-      put(MediaStore.Files.FileColumns.RELATIVE_PATH, relativePath)
+      put(RELATIVE_PATH, relativePath)
     }
     
     val insertedUri = cr.insert(insertUri, cv) ?: throwMsg("Cannot insert new asset.")
@@ -592,8 +593,8 @@ object AndroidQDBUtils : IDBUtils {
         Log.i(TAG, "The removeAllExistsAssets was stopped, will be delete ids = $removedList")
       }
       
-      val idWhere = removedList.map { "?" }.joinToString(",")
-      
+      val idWhere = removedList.joinToString(",") { "?" }
+
       // Remove exists rows.
       val deleteRowCount = cr.delete(allUri, "${BaseColumns._ID} in ( $idWhere )", removedList.toTypedArray())
       Log.i("PhotoManagerPlugin", "Delete rows: $deleteRowCount")
@@ -605,7 +606,7 @@ object AndroidQDBUtils : IDBUtils {
   private fun getRelativePath(context: Context, galleryId: String): String? {
     val cr = context.contentResolver
     
-    val cursor = cr.query(allUri, arrayOf(MediaStore.Files.FileColumns.BUCKET_ID, MediaStore.Files.FileColumns.RELATIVE_PATH), "${MediaStore.Files.FileColumns.BUCKET_ID} = ?", arrayOf(galleryId), null)
+    val cursor = cr.query(allUri, arrayOf(BUCKET_ID, RELATIVE_PATH), "$BUCKET_ID = ?", arrayOf(galleryId), null)
       ?: return null
     
     cursor.use {
@@ -619,7 +620,7 @@ object AndroidQDBUtils : IDBUtils {
   override fun getSomeInfo(context: Context, assetId: String): Pair<String, String>? {
     val cr = context.contentResolver
     
-    val cursor = cr.query(allUri, arrayOf(MediaStore.Files.FileColumns.BUCKET_ID, MediaStore.Files.FileColumns.RELATIVE_PATH), "${MediaStore.Files.FileColumns._ID} = ?", arrayOf(assetId), null)
+    val cursor = cr.query(allUri, arrayOf(BUCKET_ID, RELATIVE_PATH), "$_ID = ?", arrayOf(assetId), null)
       ?: return null
     
     cursor.use {
@@ -646,7 +647,7 @@ object AndroidQDBUtils : IDBUtils {
     val info = VideoUtils.getPropertiesUseMediaPlayer(path)
     
     val values = ContentValues().apply {
-      put(MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
+      put(MEDIA_TYPE, MEDIA_TYPE_VIDEO)
       
       put(MediaStore.MediaColumns.DISPLAY_NAME, title)
       put(MediaStore.Video.VideoColumns.MIME_TYPE, typeFromStream)

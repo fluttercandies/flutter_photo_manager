@@ -20,6 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
+import org.jetbrains.annotations.NotNull;
+
 import top.kikt.imagescanner.util.LogUtils;
 
 /**
@@ -68,6 +70,9 @@ public final class PermissionsUtils {
    */
   private List<String> deniedTipsList;
 
+  public PermissionsUtils() {
+  }
+
   /**
    * 设置是哪一个Activity进行权限操作
    *
@@ -76,18 +81,6 @@ public final class PermissionsUtils {
    */
   public PermissionsUtils withActivity(Activity activity) {
     this.mActivity = activity;
-    return this;
-  }
-
-  /**
-   * 进行权限申请，不带拒绝弹框提示
-   *
-   * @param requestCode 指定该次申请的requestCode
-   * @param permissions 要申请的权限数组
-   * @return 返回 {@link PermissionsUtils} 自身，进行链式调用
-   */
-  public PermissionsUtils getPermissions(Activity activity, int requestCode, String... permissions) {
-    getPermissionsWithTips(activity, requestCode, null, permissions);
     return this;
   }
 
@@ -247,22 +240,6 @@ public final class PermissionsUtils {
   }
 
   /**
-   * 列表无颜色
-   */
-  private String dealString() {
-    StringBuffer buffer = new StringBuffer();
-//            buffer.append(mActivity.getString(R.string.md_dialog_content_head));
-    for (int i = 0; i < deniedPermissionsList.size(); i++) {
-      buffer.append(deniedPermissionsList.get(i).split("\\.")[2]);
-      buffer.append("：");
-      buffer.append(deniedTipsList.get(i));
-      if (i != deniedPermissionsList.size() - 1)
-        buffer.append("\n");
-    }
-    return buffer.toString();
-  }
-
-  /**
    * 列表有颜色
    */
   private CharSequence dealStringWithColor() {
@@ -283,6 +260,19 @@ public final class PermissionsUtils {
   }
 
   /**
+   * 跳转到应用的设置界面
+   *
+   * @param context 上下文
+   */
+  public void getAppDetailSettingIntent(Context context) {
+    Intent localIntent = new Intent();
+    localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    localIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
+    localIntent.setData(Uri.fromParts("package", context.getPackageName(), null));
+    context.startActivity(localIntent);
+  }
+
+  /**
    * 获取申请权限的回调监听器
    *
    * @return 监听器
@@ -300,19 +290,6 @@ public final class PermissionsUtils {
   public PermissionsUtils setPermissionsListener(PermissionsListener permissionsListener) {
     this.mPermissionsListener = permissionsListener;
     return this;
-  }
-
-  /**
-   * 跳转到应用的设置界面
-   *
-   * @param context 上下文
-   */
-  public void getAppDetailSettingIntent(Context context) {
-    Intent localIntent = new Intent();
-    localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    localIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
-    localIntent.setData(Uri.fromParts("package", context.getPackageName(), null));
-    context.startActivity(localIntent);
   }
 
 }

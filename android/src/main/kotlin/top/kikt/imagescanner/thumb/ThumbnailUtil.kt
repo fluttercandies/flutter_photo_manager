@@ -7,7 +7,6 @@ import android.net.Uri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.transition.Transition
 import io.flutter.plugin.common.MethodChannel
-import top.kikt.imagescanner.Asset
 import top.kikt.imagescanner.util.ResultHandler
 import java.io.ByteArrayOutputStream
 import java.io.File

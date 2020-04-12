@@ -360,15 +360,15 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
     return 0
   }
 
-  fun MethodCall.getString(key: String): String {
+  private fun MethodCall.getString(key: String): String {
     return this.argument<String>(key)!!
   }
 
-  fun MethodCall.getInt(key: String): Int {
+  private fun MethodCall.getInt(key: String): Int {
     return this.argument<Int>(key)!!
   }
 
-  fun MethodCall.getOption(): FilterOption {
+  private fun MethodCall.getOption(): FilterOption {
     val arguments = argument<Map<*, *>>("option")!!
     return ConvertUtils.convertFilterOptionsFromMap(arguments)
   }
