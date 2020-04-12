@@ -34,7 +34,7 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           flutter-version: "1.12.13+hotfix.7"
-      - run: sudo flutter pub get
-      - run: sudo flutter analyze lib example/lib
+      - run: flutter pub get
+      - run: flutter analyze lib example/lib
       - run: sudo echo "y"|sudo $ANDROID_HOME/tools/bin/sdkmanager "ndk;20.0.5594570"
       - run: sudo cd example ;sudo flutter build apk --debug
