@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.5.1-dev.3
+## 0.5.1-dev.4
 
 Feature:
 
@@ -24,6 +24,7 @@ Change:
 
 - Modified `AssetEntity.file`'s behavior on iOS, currently it will return a picture in jpg format instead of heic/gif/png. Now more in line with the description in the doc, this is suitable for uploading images (theoretically, no Exif information will be included).
 - Update android change media url from file scheme to content scheme.
+- Clean up some unused code.
 
 ## 0.5.0
 

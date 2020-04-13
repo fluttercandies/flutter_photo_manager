@@ -28,7 +28,7 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id type:(int)type page:(NSUInteger)page pageCount:(NSUInteger)pageCount filterOption:(PMFilterOptionGroup *)filterOption;
 
-- (PMAssetEntity *)getAssetEntity:(NSString *)assetId needTitle:(BOOL)needTitle;
+- (PMAssetEntity *)getAssetEntity:(NSString *)assetId;
 
 - (void)clearCache;
 

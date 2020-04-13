@@ -1,5 +1,6 @@
 package top.kikt.imagescanner.core.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
@@ -7,7 +8,6 @@ import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.*
 import android.provider.MediaStore.VOLUME_EXTERNAL
-import androidx.annotation.IntDef
 import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
@@ -17,20 +17,13 @@ import top.kikt.imagescanner.util.LogUtils
 
 
 /// create 2019-09-11 by cai
-
-
+@Suppress("DEPRECATION")
+@SuppressLint("InlinedApi")
 interface IDBUtils {
-
-  @IntDef(value = [MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO, MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE])
-  annotation class MediaTypeDef {
-
-  }
-  
-  
 
   companion object {
     val isAndroidQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-    
+
     val storeImageKeys = arrayOf(
             MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
             MediaStore.MediaColumns.DATA, // 数据
@@ -63,7 +56,7 @@ interface IDBUtils {
     )
 
     val typeKeys = arrayOf(
-            MediaStore.Files.FileColumns.MEDIA_TYPE,
+            MEDIA_TYPE,
             MediaStore.Images.Media.DISPLAY_NAME
     )
 
@@ -98,9 +91,9 @@ interface IDBUtils {
 
   fun getMediaType(type: Int): Int {
     return when (type) {
-      MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE -> 1
-      MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> 2
-      MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO -> 3
+      MEDIA_TYPE_IMAGE -> 1
+      MEDIA_TYPE_VIDEO -> 2
+      MEDIA_TYPE_AUDIO -> 3
       else -> 0
     }
   }
@@ -108,18 +101,18 @@ interface IDBUtils {
 
   fun convertTypeToMediaType(type: Int): Int {
     return when (type) {
-      1 -> MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
-      2 -> MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO
-      3 -> MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO
+      1 -> MEDIA_TYPE_IMAGE
+      2 -> MEDIA_TYPE_VIDEO
+      3 -> MEDIA_TYPE_AUDIO
       else -> 0
     }
   }
 
-  fun getTypeFromMediaType(mediaType: Int):Int{
+  fun getTypeFromMediaType(mediaType: Int): Int {
     return when (mediaType) {
-      MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE  -> 1
-      MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO  -> 2
-      MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO  -> 3
+      MEDIA_TYPE_IMAGE -> 1
+      MEDIA_TYPE_VIDEO -> 2
+      MEDIA_TYPE_AUDIO -> 3
       else -> 0
     }
   }
@@ -176,8 +169,8 @@ interface IDBUtils {
   fun saveVideo(context: Context, path: String, title: String, desc: String): AssetEntity?
 
   fun exists(context: Context, id: String): Boolean {
-    val columns = arrayOf(MediaStore.Files.FileColumns._ID)
-    context.contentResolver.query(allUri, columns, "${MediaStore.Files.FileColumns._ID} = ?", arrayOf(id), null).use {
+    val columns = arrayOf(_ID)
+    context.contentResolver.query(allUri, columns, "$_ID = ?", arrayOf(id), null).use {
       if (it == null) {
         return false
       }
@@ -202,22 +195,22 @@ interface IDBUtils {
     if (requestType == null || !typeUtils.containsImage(requestType)) {
       return ""
     }
-    val mediaType = MediaStore.Files.FileColumns.MEDIA_TYPE
+    val mediaType = MEDIA_TYPE
 
 
     var result = ""
 
     if (typeUtils.containsVideo(requestType)) {
-      result = "OR ( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO} )"
+      result = "OR ( $mediaType = $MEDIA_TYPE_VIDEO )"
     }
 
     if (typeUtils.containsAudio(requestType)) {
-      result = "$result OR ( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO} )"
+      result = "$result OR ( $mediaType = $MEDIA_TYPE_VIDEO )"
     }
 
     val size = "${MediaStore.MediaColumns.WIDTH} > 0 AND ${MediaStore.MediaColumns.HEIGHT} > 0"
 
-    val imageCondString = "( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE} AND $size )"
+    val imageCondString = "( $mediaType = $MEDIA_TYPE_IMAGE AND $size )"
 
     result = "AND ($imageCondString $result)"
 
@@ -226,7 +219,7 @@ interface IDBUtils {
 
   fun getCondFromType(type: Int, filterOption: FilterOption, args: ArrayList<String>): String {
     val cond = StringBuilder()
-    val typeKey = MediaStore.Files.FileColumns.MEDIA_TYPE
+    val typeKey = MEDIA_TYPE
 
     val haveImage = RequestTypeUtils.containsImage(type)
     val haveVideo = RequestTypeUtils.containsVideo(type)
@@ -239,7 +232,7 @@ interface IDBUtils {
     if (haveImage) {
       val imageCond = filterOption.imageOption
       imageCondString = "$typeKey = ? "
-      args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString())
+      args.add(MEDIA_TYPE_IMAGE.toString())
 
       if (!imageCond.sizeConstraint.ignoreSize) {
         val sizeCond = imageCond.sizeCond()
@@ -254,7 +247,7 @@ interface IDBUtils {
       val durationCond = videoCond.durationCond()
       val durationArgs = videoCond.durationArgs()
       videoCondString = "$typeKey = ? AND $durationCond"
-      args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString())
+      args.add(MEDIA_TYPE_VIDEO.toString())
       args.addAll(durationArgs)
     }
 
@@ -263,7 +256,7 @@ interface IDBUtils {
       val durationCond = audioCond.durationCond()
       val durationArgs = audioCond.durationArgs()
       audioCondString = "$typeKey = ? AND $durationCond"
-      args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO.toString())
+      args.add(MEDIA_TYPE_AUDIO.toString())
       args.addAll(durationArgs)
     }
 
@@ -291,19 +284,11 @@ interface IDBUtils {
     return "AND ( $cond )"
   }
 
-  private fun getCond(cond: Boolean, condString: String): String {
-    if (cond) {
-      return condString
-    } else {
-      return "1 == 0"
-    }
-  }
-
   fun logRowWithId(context: Context, id: String) {
     if (LogUtils.isLog) {
       val splitter = "".padStart(40, '-')
       LogUtils.info("log error row $id start $splitter")
-      val cursor = context.contentResolver.query(allUri, null, "${MediaStore.Files.FileColumns._ID} = ?", arrayOf(id), null)
+      val cursor = context.contentResolver.query(allUri, null, "$_ID = ?", arrayOf(id), null)
       cursor?.use {
         val names = it.columnNames
         if (cursor.moveToNext()) {
@@ -338,26 +323,12 @@ interface IDBUtils {
             } else {
               "DESC"
             }
-    return "${MediaStore.Files.FileColumns.DATE_ADDED} $asc LIMIT $pageSize OFFSET $start"
+    return "$DATE_ADDED $asc LIMIT $pageSize OFFSET $start"
   }
 
   fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity?
-  
+
   fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity?
-
-  fun getGalleryId(context: Context, assetId: String): String? {
-    val cr = context.contentResolver
-    val cursor = cr.query(allUri, arrayOf(MediaStore.Files.FileColumns.BUCKET_ID, MediaStore.Files.FileColumns.DATA), "${MediaStore.Files.FileColumns._ID} = ?", arrayOf(assetId), null)
-            ?: return null
-
-    cursor.use {
-      if (!cursor.moveToNext()) {
-        return null
-      }
-
-      return cursor.getString(0)
-    }
-  }
 
   fun getSomeInfo(context: Context, assetId: String): Pair<String, String>?
 
@@ -373,6 +344,6 @@ interface IDBUtils {
   fun throwMsg(msg: String): Nothing {
     throw RuntimeException(msg)
   }
-  
+
   fun removeAllExistsAssets(context: Context): Boolean
 }

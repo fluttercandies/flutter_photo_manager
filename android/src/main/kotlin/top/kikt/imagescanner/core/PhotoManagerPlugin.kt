@@ -9,8 +9,8 @@ import io.flutter.plugin.common.PluginRegistry
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.utils.ConvertUtils
-import top.kikt.imagescanner.old.permission.PermissionsListener
-import top.kikt.imagescanner.old.permission.PermissionsUtils
+import top.kikt.imagescanner.permission.PermissionsListener
+import top.kikt.imagescanner.permission.PermissionsUtils
 import top.kikt.imagescanner.util.LogUtils
 import top.kikt.imagescanner.util.ResultHandler
 import java.util.concurrent.ArrayBlockingQueue
@@ -360,15 +360,15 @@ class PhotoManagerPlugin(private val registrar: PluginRegistry.Registrar) : Meth
     return 0
   }
 
-  fun MethodCall.getString(key: String): String {
+  private fun MethodCall.getString(key: String): String {
     return this.argument<String>(key)!!
   }
 
-  fun MethodCall.getInt(key: String): Int {
+  private fun MethodCall.getInt(key: String): Int {
     return this.argument<Int>(key)!!
   }
 
-  fun MethodCall.getOption(): FilterOption {
+  private fun MethodCall.getOption(): FilterOption {
     val arguments = argument<Map<*, *>>("option")!!
     return ConvertUtils.convertFilterOptionsFromMap(arguments)
   }

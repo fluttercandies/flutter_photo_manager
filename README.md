@@ -23,6 +23,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
 - [photo_manager](#photomanager)
   - [Other projects using this library](#other-projects-using-this-library)
   - [Table of contents](#table-of-contents)
+- [photo_manager](#photo_manager)
   - [install](#install)
     - [Add to pubspec](#add-to-pubspec)
     - [import in dart code](#import-in-dart-code)
@@ -180,7 +181,6 @@ String title = entity.title;
 About title: if the title is null or empty string, need use the titleAsync to get it. See below for the definition of attributes.
 
 ```dart
-
   /// It is title `MediaStore.MediaColumns.DISPLAY_NAME` in MediaStore on android.
   ///
   /// It is `PHAssetResource.filename` on iOS.
@@ -255,10 +255,6 @@ Availability:
 - android:
   - Before api 28, the method will copy some column from origin row.
   - In api 29 or higher, There are some restrictions that cannot be guaranteed, See [document of relative_path](https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#RELATIVE_PATH).
-
-```dart
-
-```
 
 ##### Only for iOS
 
@@ -364,7 +360,7 @@ If your compileSdkVersion and targetSdkVersion are both below 28, you can use `P
 
 ### glide
 
-Android native use glide to create image thumb bytes, version is 4.9.0.
+Android native use glide to create image thumb bytes, version is 4.11.0.
 
 If your other android library use the library, and version is not same, then you need edit your android project's build.gradle.
 
@@ -376,7 +372,7 @@ rootProject.allprojects {
             resolutionStrategy.eachDependency { details ->
                 if (details.requested.group == 'com.github.bumptech.glide'
                         && details.requested.name.contains('glide')) {
-                    details.useVersion "4.9.0"
+                    details.useVersion "4.11.0"
                 }
             }
         }
