@@ -122,7 +122,7 @@ class AssetPathEntity {
 
 /// Used to describe a picture or video
 class AssetEntity {
-  /// in android is full path
+  /// in android is database _id column
   ///
   /// in ios is local id
   String id;
