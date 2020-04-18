@@ -20,10 +20,9 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
 
 ## Table of contents
 
-- [photo_manager](#photomanager)
+- [photo_manager](#photo_manager)
   - [Other projects using this library](#other-projects-using-this-library)
   - [Table of contents](#table-of-contents)
-- [photo_manager](#photo_manager)
   - [install](#install)
     - [Add to pubspec](#add-to-pubspec)
     - [import in dart code](#import-in-dart-code)
@@ -175,7 +174,9 @@ Latlng latlng = await entity.latlngAsync(); // In androidQ or higher, need use t
 
 String mediaUrl = await entity.getMediaUrl(); /// It can be used in some video player plugin to preview, such as [flutter_ijkplayer](https://pub.dev/packages/flutter_ijkplayer)
 
-String title = entity.title;
+String title = entity.title; // Since this property is fetched using KVO in iOS, the default is null, please use titleAsync to get it.
+
+String relativePath = entity.relativePath; // It is always null in iOS.
 ```
 
 About title: if the title is null or empty string, need use the titleAsync to get it. See below for the definition of attributes.

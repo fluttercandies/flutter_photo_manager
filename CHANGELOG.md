@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.5.1-dev.4
+## 0.5.1-dev.5
 
 Feature:
 
@@ -14,6 +14,7 @@ Feature:
 - Only android
   - move asset to another path.
   - Remove all non-existing rows.
+  - add `relativePath` for android.
 
 Fix:
 
