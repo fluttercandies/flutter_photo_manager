@@ -313,6 +313,13 @@ class AssetEntity {
   /// In iOS, it is consistent with PHAsset.isFavorite. to change it, Use `PhotoManager.editor.iOS.favoriteAsset`, See [IosEditor.favoriteAsset]
   bool isFavorite;
 
+  /// In iOS, always null.
+  ///
+  /// In androidQ or higher: it is `MediaStore.MediaColumns.RELATIVE_PATH`.
+  ///
+  /// API 28 or lower: it is `MediaStore.MediaColumns.DATA` parent path.
+  String relativePath;
+
   @override
   int get hashCode {
     return id.hashCode;
