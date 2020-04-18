@@ -13,3 +13,5 @@ fvm
 
 android/.settings/org.eclipse.buildship.core.prefs
 doc/
+
+.env
