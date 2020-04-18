@@ -42,7 +42,8 @@ class ConvertUtils {
         ..typeInt = item["type"]
         ..longitude = item["lng"]
         ..latitude = item["lat"]
-        ..title = item["title"];
+        ..title = item["title"]
+        ..relativePath = item['relativePath'];
 
       result.add(entity);
     }

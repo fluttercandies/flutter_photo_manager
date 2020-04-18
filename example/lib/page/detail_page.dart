@@ -117,6 +117,7 @@ class _DetailPageState extends State<DetailPage> {
               buildInfoItemAsync("title", entity.titleAsync),
               buildInfoItem("lat", lat?.toString() ?? "null"),
               buildInfoItem("lng", lng?.toString() ?? "null"),
+              buildInfoItem("relative path", entity.relativePath ?? 'null'),
             ],
           ),
         ),
