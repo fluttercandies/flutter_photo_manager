@@ -1,11 +1,12 @@
 # CHANGELOG
 
-## 0.5.1-dev.5
+## 0.5.1-dev.6
 
 Feature:
 
 - Save image asset with file path.
 - Copy asset to another album.
+- Create AssetEntity with id.
 - Only iOS
   - Create folder or album.
   - Remove assets in album.
