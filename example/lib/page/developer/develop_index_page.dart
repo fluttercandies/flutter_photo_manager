@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_scanner_example/page/developer/create_entity_by_id.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 import 'dev_title_page.dart';
@@ -46,6 +47,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
           RaisedButton(
             child: Text("Open setting."),
             onPressed: _openSetting,
+          ),
+          RaisedButton(
+            child: Text("Create Entity ById"),
+            onPressed: () => navToWidget(CreateEntityById()),
           ),
         ],
       ),

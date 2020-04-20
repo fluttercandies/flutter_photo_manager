@@ -223,4 +223,8 @@ class PhotoManager(private val context: Context) {
     resultHandler.reply(result)
   }
   
+  fun getAssetProperties(id: String): AssetEntity? {
+    return dbUtils.getAssetEntity(context, id)
+  }
+  
 }

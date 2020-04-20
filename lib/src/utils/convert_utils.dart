@@ -58,6 +58,10 @@ class ConvertUtils {
 
     Map data = map["data"];
 
+    if (data == null) {
+      return null;
+    }
+
     final entity = AssetEntity()
       ..id = data["id"]
       ..createDtSecond = data["createDt"]

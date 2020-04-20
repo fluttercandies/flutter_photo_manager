@@ -322,6 +322,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   Future<bool> androidRemoveNoExistsAssets() {
     return _channel.invokeMethod("removeNoExistsAssets");
   }
+
+  Future getPropertiesFromAssetEntity(String id) async {
+    return _channel.invokeMethod('getPropertiesFromAssetEntity', {"id": id});
+  }
 }
 
 mixin BasePlugin {
