@@ -258,6 +258,8 @@ class PhotoManager {
 
     final asset = ConvertUtils.convertToAsset(map);
 
+    print(asset);
+
     if (asset == null) {
       return null;
     }

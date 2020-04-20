@@ -230,6 +230,15 @@
         [handler reply:title];
       } else if ([@"getMediaUrl" isEqualToString:call.method]) {
         [manager getMediaUrl:call.arguments[@"id"] resultHandler:handler];
+      } else if ([@"getPropertiesFromAssetEntity" isEqualToString:call.method]) {
+        NSString *assetId = call.arguments[@"id"];
+        PMAssetEntity *entity = [manager getAssetEntity:assetId];
+        if (entity == nil) {
+          [handler reply:nil];
+          return;
+        }
+        NSDictionary *resultMap = [ConvertUtils convertPMAssetToMap:entity needTitle:YES];
+        [handler reply:@{@"data": resultMap}];
       } else if ([@"getSubPath" isEqualToString:call.method]) {
         NSString *galleryId = call.arguments[@"id"];
         int type = [call.arguments[@"type"] intValue];
