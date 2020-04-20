@@ -250,4 +250,30 @@ class PhotoManager {
     assert(Platform.isIOS);
     return _plugin.getSubPathEntities(assetPathEntity);
   }
+
+  static Future<AssetEntity> refreshAssetProperties(AssetEntity src) async {
+    assert(src.id != null);
+    final Map<dynamic, dynamic> map =
+        await _plugin.getPropertiesFromAssetEntity(src.id);
+
+    final asset = ConvertUtils.convertToAsset(map);
+
+    if (asset == null) {
+      return null;
+    }
+
+    src
+      ..id = asset.id
+      ..createDtSecond = asset.createDtSecond
+      ..width = asset.width
+      ..height = asset.height
+      ..duration = asset.duration
+      ..modifiedDateSecond = asset.modifiedDateSecond
+      ..typeInt = asset.typeInt
+      ..longitude = asset.longitude
+      ..latitude = asset.latitude
+      ..title = asset.title;
+
+    return src;
+  }
 }

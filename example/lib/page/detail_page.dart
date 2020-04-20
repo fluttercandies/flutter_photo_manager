@@ -109,6 +109,7 @@ class _DetailPageState extends State<DetailPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
+              buildInfoItem("id", entity.id),
               buildInfoItem("create", entity.createDateTime.toString()),
               buildInfoItem("modified", entity.modifiedDateTime.toString()),
               buildInfoItem("size", entity.size.toString()),

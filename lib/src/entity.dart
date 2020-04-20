@@ -122,6 +122,21 @@ class AssetPathEntity {
 
 /// Used to describe a picture or video
 class AssetEntity {
+  /// Create from [AssetEntity.id].
+  static Future<AssetEntity> fromId(String id) async {
+    final entity = AssetEntity();
+    entity.id = id;
+    try {
+      final result = await entity.refreshProperties();
+      if (result == null) {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+    return entity;
+  }
+
   /// in android is database _id column
   ///
   /// in ios is local id
@@ -319,6 +334,11 @@ class AssetEntity {
   ///
   /// API 28 or lower: it is `MediaStore.MediaColumns.DATA` parent path.
   String relativePath;
+
+  /// refreshProperties
+  Future<AssetEntity> refreshProperties() async {
+    return PhotoManager.refreshAssetProperties(this);
+  }
 
   @override
   int get hashCode {
