@@ -21,6 +21,7 @@ Fix:
 
 - Problem of AssetPathEntity.refreshPathProperties.
 - Open setting in iOS.
+- Edited asset in iOS.
 
 Change:
 
