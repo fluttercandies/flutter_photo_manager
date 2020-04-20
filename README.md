@@ -13,14 +13,14 @@ A flutter api for photo, you can get image/video from ios or android.
 If you just need a picture selector, you can choose to use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker. All UI create by flutter.
 
 | name                 | owner          | description                                                                                                                                       | pub                                                                                                                    | github                                                                                                                                                                  |
-|:---------------------|:---------------|:--------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| :------------------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | photo                | Caijinglong    | A selector for multiple pictures / videos, The style is like the 6.0 version of wechat.                                                           | [![pub package](https://img.shields.io/pub/v/photo.svg)](https://pub.dev/packages/photo)                               | [![star](https://img.shields.io/github/stars/Caijinglong/flutter_photo?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker)                   |
 | wechat_assets_picker | fluttercandies | An assets picker in WeChat 7.x style, support multi assets picking.                                                                               | [![pub package](https://img.shields.io/pub/v/wechat_assets_picker.svg)](https://pub.dev/packages/wechat_assets_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker) |
 | photo_widget         | fluttercandies | Not just selectors, but to provide each widget as a separate component, which is convenient for quickly combining and customizing your own style. | [![pub package](https://img.shields.io/pub/v/photo_widget.svg)](https://pub.dev/packages/photo_widget)                 | [![star](https://img.shields.io/github/stars/fluttercandies/photo_widget?style=social)](https://github.com/fluttercandies/photo_widget)                                 |
 
 ## Table of contents
 
-- [photo_manager](#photo_manager)
+- [photo_manager](#photomanager)
   - [Other projects using this library](#other-projects-using-this-library)
   - [Table of contents](#table-of-contents)
   - [install](#install)
@@ -37,6 +37,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
     - [AssetEntity](#assetentity)
       - [location info of android Q](#location-info-of-android-q)
       - [Origin description](#origin-description)
+      - [Create with id](#create-with-id)
     - [observer](#observer)
     - [Experimental](#experimental)
       - [Delete item](#delete-item)
@@ -206,6 +207,16 @@ The `originFile` and `originBytes` will return the original content.
 Not guaranteed to be available in flutter.  
 Because flutter's Image does not support heic.  
 The video is also the original format, non-exported format, compatibility does not guarantee usability.
+
+#### Create with id
+
+The id of the Asset corresponds to the id field of the MediaStore on android, and the localIdentity of PHAsset on iOS.
+
+The user can store the id to any place if necessary, and next time use the [`AssetEntity.fromId(id)`](https://github.com/CaiJingLong/flutter_photo_manager/blob/add49c1e4125540a9fc612521a8441398f9d72ad/lib/src/entity.dart#L126-L138) method to create the AssetEntity instace.
+
+```dart
+final asset = await AssetEntity.fromId(id);
+```
 
 ### observer
 
