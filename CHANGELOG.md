@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.5.1-dev.6
+## 0.5.1-dev.8
 
 Feature:
 
@@ -22,6 +22,7 @@ Fix:
 - Problem of AssetPathEntity.refreshPathProperties.
 - Open setting in iOS.
 - Edited asset in iOS.
+- Audio properties of FilterOption.
 
 Change:
 
