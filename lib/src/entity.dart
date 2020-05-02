@@ -2,6 +2,14 @@ part of '../photo_manager.dart';
 
 /// asset entity, for entity info.
 class AssetPathEntity {
+  static Future<AssetPathEntity> fromId(String id,
+      {FilterOptionGroup filterOption}) async {
+    filterOption ??= FilterOptionGroup();
+    final entity = AssetPathEntity()..id = id;
+    await entity.refreshPathProperties();
+    return entity;
+  }
+
   /// id
   ///
   /// in ios is localIdentifier
@@ -63,6 +71,7 @@ class AssetPathEntity {
       this.assetCount = result.assetCount;
       this.name = result.name;
       this.filterOption.dateTimeCond = dateTimeCond;
+      this.isAll = result.isAll;
     }
   }
 
