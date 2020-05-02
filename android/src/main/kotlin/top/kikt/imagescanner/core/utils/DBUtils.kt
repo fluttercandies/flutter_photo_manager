@@ -83,9 +83,12 @@ object DBUtils : IDBUtils {
             ?: return list
 
     cursor.use {
-      val count = cursor.count
-      val galleryEntity = GalleryEntity(PhotoManager.ALL_ID, "Recent", count, requestType, true)
-      list.add(galleryEntity)
+      if (it.moveToNext()) {
+        val countIndex = projection.indexOf("count(1)")
+        val count = cursor.getInt(countIndex)
+        val galleryEntity = GalleryEntity(PhotoManager.ALL_ID, "Recent", count, requestType, true)
+        list.add(galleryEntity)
+      }
     }
 
     return list
