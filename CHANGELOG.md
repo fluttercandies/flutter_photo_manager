@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.5.1-dev.9
+## 0.5.1
 
 Feature:
 
