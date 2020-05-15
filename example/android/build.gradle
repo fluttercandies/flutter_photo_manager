@@ -1,19 +1,21 @@
 import groovy.json.JsonSlurper
 
-
 buildscript {
     ext.kotlin_version = '1.3.61'
+    def isChina = false
+    try {
+        def connection = new URL('https://api.ip.sb/geoip').openConnection()
+        connection.setRequestMethod('GET')
+        def reader = new BufferedReader(new InputStreamReader(connection.inputStream))
+        def text = reader.readLine()
 
-    def connection = new URL('https://api.ip.sb/geoip').openConnection()
-    connection.setRequestMethod('GET')
-    def reader = new BufferedReader(new InputStreamReader(connection.inputStream))
-    def text = reader.readLine()
-
-    def slurper = new JsonSlurper()
-    def states = slurper.parseText(text)
-    def country = states['country']
-
-    def isChina = country == 'China'
+        def slurper = new JsonSlurper()
+        def states = slurper.parseText(text)
+        def country = states['country']
+        isChina = country == 'China'
+    } catch (e) {
+        println(e)
+    }
 
     ext.isChina = isChina
 
