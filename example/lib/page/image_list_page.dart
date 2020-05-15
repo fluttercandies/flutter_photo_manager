@@ -276,7 +276,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   }
 
   Widget _buildRemoveInAlbumWidget(AssetEntity entity) {
-    if (!Platform.isIOS) {
+    if (!(Platform.isIOS || Platform.isMacOS)) {
       return Container();
     }
 

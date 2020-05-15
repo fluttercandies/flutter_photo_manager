@@ -13,11 +13,11 @@ dependencies:
 
 flutter:
   plugin:
-    # platforms:
-    #   android:
-    #     package: top.kikt.imagescanner
-    #     pluginClass: ImageScannerPlugin
-    #   ios:
-    #     pluginClass: ImageScannerPlugin
-    androidPackage: top.kikt.imagescanner
-    pluginClass: ImageScannerPlugin
+    platforms:
+      android:
+        package: top.kikt.imagescanner
+        pluginClass: ImageScannerPlugin
+      ios:
+        pluginClass: ImageScannerPlugin
+      macos:
+        pluginClass: ImageScannerPlugin

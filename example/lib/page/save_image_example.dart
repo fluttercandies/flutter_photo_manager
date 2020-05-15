@@ -35,7 +35,7 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
 
     String dir;
 
-    if (Platform.isIOS) {
+    if (Platform.isIOS || Platform.isMacOS) {
       dir = (await getApplicationSupportDirectory()).absolute.path;
     } else if (Platform.isAndroid) {
       dir = (await getExternalStorageDirectories(

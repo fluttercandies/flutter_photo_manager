@@ -243,12 +243,12 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<String> getTitleAsync(AssetEntity assetEntity) async {
-    assert(Platform.isAndroid || Platform.isIOS);
+    assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
     if (Platform.isAndroid) {
       return assetEntity.title;
     }
 
-    if (Platform.isIOS) {
+    if (Platform.isIOS || Platform.isMacOS) {
       return _channel.invokeMethod("getTitleAsync", {"id": assetEntity.id});
     }
 

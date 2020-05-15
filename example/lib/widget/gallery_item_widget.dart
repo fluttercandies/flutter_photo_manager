@@ -64,7 +64,7 @@ class GalleryItemWidget extends StatelessWidget {
                 RaisedButton(
                   child: Text("Delete self (${item.name})"),
                   onPressed: () async {
-                    if (!Platform.isIOS) {
+                    if (!(Platform.isIOS || Platform.isMacOS)) {
                       showToast("The function only support iOS.");
                       return;
                     }
