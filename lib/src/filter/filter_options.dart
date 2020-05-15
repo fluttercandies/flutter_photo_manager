@@ -31,7 +31,7 @@ class FilterOptionGroup {
     if (_map.containsKey(AssetType.video)) {
       result["video"] = _map[AssetType.video].toMap();
     }
-    if (_map.containsKey(AssetType.video)) {
+    if (_map.containsKey(AssetType.audio)) {
       result["audio"] = _map[AssetType.audio].toMap();
     }
 

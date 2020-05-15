@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_scanner_example/widget/video_widget.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class DetailPage extends StatefulWidget {
@@ -109,6 +111,13 @@ class _DetailPageState extends State<DetailPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
+              GestureDetector(
+                child: buildInfoItem("id", entity.id),
+                onLongPress: () {
+                  Clipboard.setData(ClipboardData(text: entity.id));
+                  showToast('The id already copied.');
+                },
+              ),
               buildInfoItem("create", entity.createDateTime.toString()),
               buildInfoItem("modified", entity.modifiedDateTime.toString()),
               buildInfoItem("size", entity.size.toString()),
@@ -117,6 +126,7 @@ class _DetailPageState extends State<DetailPage> {
               buildInfoItemAsync("title", entity.titleAsync),
               buildInfoItem("lat", lat?.toString() ?? "null"),
               buildInfoItem("lng", lng?.toString() ?? "null"),
+              buildInfoItem("relative path", entity.relativePath ?? 'null'),
             ],
           ),
         ),

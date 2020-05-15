@@ -42,7 +42,8 @@ class ConvertUtils {
         ..typeInt = item["type"]
         ..longitude = item["lng"]
         ..latitude = item["lat"]
-        ..title = item["title"];
+        ..title = item["title"]
+        ..relativePath = item['relativePath'];
 
       result.add(entity);
     }
@@ -56,6 +57,10 @@ class ConvertUtils {
     }
 
     Map data = map["data"];
+
+    if (data == null) {
+      return null;
+    }
 
     final entity = AssetEntity()
       ..id = data["id"]

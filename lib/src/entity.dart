@@ -2,6 +2,14 @@ part of '../photo_manager.dart';
 
 /// asset entity, for entity info.
 class AssetPathEntity {
+  static Future<AssetPathEntity> fromId(String id,
+      {FilterOptionGroup filterOption}) async {
+    filterOption ??= FilterOptionGroup();
+    final entity = AssetPathEntity()..id = id;
+    await entity.refreshPathProperties();
+    return entity;
+  }
+
   /// id
   ///
   /// in ios is localIdentifier
@@ -63,6 +71,7 @@ class AssetPathEntity {
       this.assetCount = result.assetCount;
       this.name = result.name;
       this.filterOption.dateTimeCond = dateTimeCond;
+      this.isAll = result.isAll;
     }
   }
 
@@ -122,7 +131,22 @@ class AssetPathEntity {
 
 /// Used to describe a picture or video
 class AssetEntity {
-  /// in android is full path
+  /// Create from [AssetEntity.id].
+  static Future<AssetEntity> fromId(String id) async {
+    final entity = AssetEntity();
+    entity.id = id;
+    try {
+      final result = await entity.refreshProperties();
+      if (result == null) {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+    return entity;
+  }
+
+  /// in android is database _id column
   ///
   /// in ios is local id
   String id;
@@ -312,6 +336,18 @@ class AssetEntity {
   ///
   /// In iOS, it is consistent with PHAsset.isFavorite. to change it, Use `PhotoManager.editor.iOS.favoriteAsset`, See [IosEditor.favoriteAsset]
   bool isFavorite;
+
+  /// In iOS, always null.
+  ///
+  /// In androidQ or higher: it is `MediaStore.MediaColumns.RELATIVE_PATH`.
+  ///
+  /// API 28 or lower: it is `MediaStore.MediaColumns.DATA` parent path.
+  String relativePath;
+
+  /// refreshProperties
+  Future<AssetEntity> refreshProperties() async {
+    return PhotoManager.refreshAssetProperties(this);
+  }
 
   @override
   int get hashCode {

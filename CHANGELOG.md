@@ -1,11 +1,13 @@
 # CHANGELOG
 
-## 0.5.1-dev.4
+## 0.5.1
 
 Feature:
 
 - Save image asset with file path.
 - Copy asset to another album.
+- Create AssetEntity with id.
+- Create AssetPathEntity from id.
 - Only iOS
   - Create folder or album.
   - Remove assets in album.
@@ -14,11 +16,15 @@ Feature:
 - Only android
   - move asset to another path.
   - Remove all non-existing rows.
+  - add `relativePath` for android.
 
 Fix:
 
 - Problem of AssetPathEntity.refreshPathProperties.
 - Open setting in iOS.
+- Edited asset in iOS.
+- Audio properties of FilterOption.
+- Android onlyAll assetCount bug.
 
 Change:
 

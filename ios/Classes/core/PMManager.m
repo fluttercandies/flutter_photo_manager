@@ -493,6 +493,8 @@
                  resultHandler:(ResultHandler *)handler {
   PHImageManager *manager = PHImageManager.defaultManager;
   PHImageRequestOptions *options = [PHImageRequestOptions new];
+  options.synchronous = YES;
+  options.version = PHImageRequestOptionsVersionCurrent;
 
   [options setNetworkAccessAllowed:YES];
   [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
@@ -542,9 +544,9 @@
 
   [path appendString:@".jpg"];
 
-  if ([manager fileExistsAtPath:path]) {
-    return path;
-  }
+//  if ([manager fileExistsAtPath:path]) {
+//    return path;
+//  }
 
   [manager createFileAtPath:path contents:imageData attributes:@{}];
   return path;
@@ -562,10 +564,10 @@
   NSLog(@"The asset has %lu resources.", (unsigned long) resources.count);
   PHAssetResource *imageResource;
 
-  if (resources.lastObject && [self isImage:resources.lastObject]) {
-    imageResource = resources.lastObject;
+  if (resources.firstObject && [self isImage:resources.firstObject]) {
+    imageResource = resources.firstObject;
   } else {
-    for (PHAssetResource *resource in [resources reverseObjectEnumerator]) {
+    for (PHAssetResource *resource in resources) {
       if ([self isImage:resource]) {
         imageResource = resource;
         break;

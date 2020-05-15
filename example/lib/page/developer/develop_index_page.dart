@@ -3,10 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_scanner_example/page/developer/create_entity_by_id.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 import 'dev_title_page.dart';
 import 'ios/create_folder_example.dart';
+import 'ios/edit_asset.dart';
 import 'remove_all_android_not_exists_example.dart';
 
 class DeveloperIndexPage extends StatefulWidget {
@@ -28,6 +30,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
             onPressed: () => navToWidget(CreateFolderExample()),
           ),
           RaisedButton(
+            child: Text("Test edit image"),
+            onPressed: () => navToWidget(EditAssetPage()),
+          ),
+          RaisedButton(
             child: Text("Show Android remove not exists asset example."),
             onPressed: () => navToWidget(RemoveAndroidNotExistsExample()),
           ),
@@ -46,6 +52,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
           RaisedButton(
             child: Text("Open setting."),
             onPressed: _openSetting,
+          ),
+          RaisedButton(
+            child: Text("Create Entity ById"),
+            onPressed: () => navToWidget(CreateEntityById()),
           ),
         ],
       ),
