@@ -104,7 +104,7 @@ class AssetPathEntity {
 
   /// In android, always return empty list.
   Future<List<AssetPathEntity>> getSubPathList() async {
-    if (!Platform.isIOS) {
+    if (!(Platform.isIOS || Platform.isMacOS)) {
       return [];
     }
     return PhotoManager._getSubPath(this);

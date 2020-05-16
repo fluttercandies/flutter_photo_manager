@@ -1,0 +1,33 @@
+PODS:
+  - FlutterMacOS (1.0.0)
+  - path_provider (0.0.1)
+  - path_provider_macos (0.0.1):
+    - FlutterMacOS
+  - photo_manager (0.0.1):
+    - FlutterMacOS
+
+DEPENDENCIES:
+  - FlutterMacOS (from `Flutter/ephemeral/.symlinks/flutter/darwin-x64`)
+  - path_provider (from `/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/path_provider-1.6.5/macos/path_provider.podspec`)
+  - path_provider_macos (from `/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/path_provider_macos-0.0.4/macos/path_provider_macos.podspec`)
+  - photo_manager (from `/Users/caijinglong/code/flutter/plugin/flutter_photo_manager/macos/photo_manager.podspec`)
+
+EXTERNAL SOURCES:
+  FlutterMacOS:
+    :path: Flutter/ephemeral/.symlinks/flutter/darwin-x64
+  path_provider:
+    :path: "/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/path_provider-1.6.5/macos/path_provider.podspec"
+  path_provider_macos:
+    :path: "/Users/caijinglong/.pub-cache/hosted/pub.flutter-io.cn/path_provider_macos-0.0.4/macos/path_provider_macos.podspec"
+  photo_manager:
+    :path: "/Users/caijinglong/code/flutter/plugin/flutter_photo_manager/macos/photo_manager.podspec"
+
+SPEC CHECKSUMS:
+  FlutterMacOS: 15bea8a44d2fa024068daa0140371c020b4b6ff9
+  path_provider: e0848572d1d38b9a7dd099e79cf83f5b7e2cde9f
+  path_provider_macos: adb94ae6c253c45ef2aac146fbf1f4504d74b0f8
+  photo_manager: 4f4f808cb9801f1e961a913af4d41c641f79ba26
+
+PODFILE CHECKSUM: a9286f72134f50b554ed62d8799bbfdd5695b36b
+
+COCOAPODS: 1.9.1
