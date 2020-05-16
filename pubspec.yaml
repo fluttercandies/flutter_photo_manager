@@ -5,8 +5,8 @@ version: 0.5.2
 homepage: https://github.com/CaiJingLong/flutter_photo_manager
 
 environment:
-  sdk: ">=2.0.0-dev.28.0 <3.0.0"
-  # flutter: ">=1.10.0 <2.0.0"
+  sdk: ">=2.0.0 <3.0.0"
+  flutter: ">=1.10.0 <2.0.0"
 dependencies:
   flutter:
     sdk: flutter

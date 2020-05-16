@@ -4,6 +4,8 @@
 
 Support MacOS
 
+From the version, Starting from this version, 1.9 or earlier versions are not supported.
+
 ## 0.5.1
 
 Feature:
