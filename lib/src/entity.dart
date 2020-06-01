@@ -277,7 +277,13 @@ class AssetEntity {
   }) {
     assert(width > 0 && height > 0, "The width and height must better 0.");
     assert(format != null, "The format must not be null.");
-    assert(quality > 0 && quality <= 100, "The qulity must between 0 and 100");
+    assert(quality > 0 && quality <= 100, "The quality must between 0 and 100");
+
+    /// Return null if asset is audio or other type, because they don't have such a thing.
+    if (type == AssetType.audio || type == AssetType.other) {
+      return null;
+    }
+
     return PhotoManager._getThumbDataWithId(
       id,
       width: width,
