@@ -36,6 +36,14 @@ class PhotoManager {
       assert(hasAll, "If only is true, then the hasAll must be not null.");
     }
     filterOption ??= FilterOptionGroup();
+
+    assert(
+        type.index != 0, 'The request type must have video, image or audio.');
+
+    if (type.index == 0) {
+      return [];
+    }
+
     return _plugin.getAllGalleryList(
       type: type.index,
       hasAll: hasAll,

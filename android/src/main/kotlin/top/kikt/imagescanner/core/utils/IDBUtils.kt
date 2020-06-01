@@ -205,7 +205,7 @@ interface IDBUtils {
     }
 
     if (typeUtils.containsAudio(requestType)) {
-      result = "$result OR ( $mediaType = $MEDIA_TYPE_VIDEO )"
+      result = "$result OR ( $mediaType = $MEDIA_TYPE_AUDIO )"
     }
 
     val size = "${MediaStore.MediaColumns.WIDTH} > 0 AND ${MediaStore.MediaColumns.HEIGHT} > 0"
