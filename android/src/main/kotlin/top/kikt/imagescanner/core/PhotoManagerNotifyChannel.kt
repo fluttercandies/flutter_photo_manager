@@ -10,6 +10,7 @@ import android.os.Looper
 import android.provider.BaseColumns
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.*
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import top.kikt.imagescanner.core.utils.IDBUtils
@@ -18,7 +19,7 @@ import top.kikt.imagescanner.util.LogUtils
 /// create 2019-09-09 by cai
 
 
-class PhotoManagerNotifyChannel(val registry: PluginRegistry.Registrar, handler: Handler) {
+class PhotoManagerNotifyChannel(val applicationContext: Context, private val messenger: BinaryMessenger, handler: Handler) {
 
   private var notifying = false
 
@@ -30,10 +31,10 @@ class PhotoManagerNotifyChannel(val registry: PluginRegistry.Registrar, handler:
   private val videoUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
   private val audioUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
-  private val methodChannel = MethodChannel(registry.messenger(), "top.kikt/photo_manager/notify")
+  private val methodChannel = MethodChannel(messenger, "top.kikt/photo_manager/notify")
 
   private val context
-    get() = registry.context().applicationContext
+    get() = applicationContext
 
   fun startNotify() {
     if (notifying) {
@@ -88,7 +89,7 @@ class PhotoManagerNotifyChannel(val registry: PluginRegistry.Registrar, handler:
     var uri: Uri = Uri.parse("content://${MediaStore.AUTHORITY}")
 
     val context: Context
-      get() = registry.context()
+      get() = applicationContext
 
     val cr: ContentResolver
       get() = context.contentResolver
