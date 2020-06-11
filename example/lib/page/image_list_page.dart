@@ -34,6 +34,8 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   AssetPathProvider get provider =>
       Provider.of<PhotoProvider>(context).getOrCreatePathProvider(path);
 
+  List<AssetEntity> checked = [];
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +51,15 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
           appBar: AppBar(
             title: Text("${path.name}"),
             actions: <Widget>[
+              IconButton(
+                icon: Icon(
+                  Icons.delete,
+                ),
+                tooltip: 'Delete selected ',
+                onPressed: () {
+                  provider.deleteSelectedAssets(checked);
+                },
+              ),
               ChangeNotifierBuilder(
                 builder: (context, provider) {
                   final formatType = provider.thumbFormat == ThumbFormat.jpeg
@@ -161,9 +172,35 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
           ),
         );
       },
-      child: ImageItemWidget(
-        key: ValueKey(entity),
-        entity: entity,
+      onLongPress: () {
+        if (checked.contains(entity)) {
+          checked.remove(entity);
+        } else {
+          checked.add(entity);
+        }
+        setState(() {});
+      },
+      child: Stack(
+        children: [
+          ImageItemWidget(
+            key: ValueKey(entity),
+            entity: entity,
+          ),
+          Align(
+            alignment: Alignment.topRight,
+            child: Checkbox(
+              value: checked.contains(entity),
+              onChanged: (value) {
+                if (checked.contains(entity)) {
+                  checked.remove(entity);
+                } else {
+                  checked.add(entity);
+                }
+                setState(() {});
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

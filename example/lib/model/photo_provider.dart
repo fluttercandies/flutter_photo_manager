@@ -263,6 +263,11 @@ class AssetPathProvider extends ChangeNotifier {
     }
   }
 
+  void deleteSelectedAssets(List<AssetEntity> entity) async {
+    final ids = entity.map((e) => e.id).toList();
+    await PhotoManager.editor.deleteWithIds(ids);
+  }
+
   void removeInAlbum(AssetEntity entity) async {
     if (await PhotoManager.editor.iOS.removeInAlbum(entity, path)) {
       final rangeEnd = this.list.length;
