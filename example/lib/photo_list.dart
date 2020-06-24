@@ -31,7 +31,7 @@ class _PhotoListState extends State<PhotoList> {
     //     "request index = $index , image id = ${entity.id} type = ${entity.type}");
 
     // Future<Uint8List> thumbDataWithSize =
-    //     entity.thumbDataWithSize(500, 500); // get thumb with width and height.
+    //     entity.thumbDataWithSize(DefaultLoadOption(150, 150)); // get thumb with width and height.
     // Future<Uint8List> thumbData =
     //     entity.thumbData; // the method will get thumbData is size 64*64.
     // Future<Uint8List> imageFullData = entity.fullData; // get the origin data.
