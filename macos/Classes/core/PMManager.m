@@ -307,16 +307,20 @@
 - (void)fetchThumb:(PHAsset *)asset width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality deliveryMode:(NSUInteger)deliveryMode resizeMode:(NSUInteger)resizeMode contentMode:(NSUInteger)contentMode resultHandler:(ResultHandler *)handler {
     PHImageManager *manager = PHImageManager.defaultManager;
     PHImageRequestOptions *options = [PHImageRequestOptions new];
+
     [options setNetworkAccessAllowed:YES];
+    [options setDeliveryMode: (PHImageRequestOptionsDeliveryMode)deliveryMode];
+    [options setResizeMode: (PHImageRequestOptionsResizeModeFast)resizeMode];
+
     [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
                                   NSDictionary *info) {
         if (progress == 1.0) {
-            [self fetchThumb:asset width:width height:height format:format quality:quality resultHandler:handler];
+        [self fetchThumb:asset width:width height:height format:format quality:quality, deliveryMode: deliveryMode, resizeMode: resizeMode, contentMode: contentMode resultHandler:handler];
         }
     }];
     [manager requestImageForAsset:asset
                        targetSize:CGSizeMake(width, height)
-                      contentMode:PHImageContentModeAspectFill
+                      contentMode:(PHImageContentMode)contentMode
                           options:options
                     resultHandler:^(NSImage *result, NSDictionary *info) {
         BOOL downloadFinished = [PMManager isDownloadFinish:info];
