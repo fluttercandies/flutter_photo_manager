@@ -294,7 +294,7 @@
   [cacheContainer clearCache];
 }
 
-- (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality resultHandler:(ResultHandler *)handler {
+- (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality deliveryMode:(NSUInteger)deliveryMode resizeMode:(NSUInteger)resizeMode contentMode:(NSUInteger)contentMode resultHandler:(ResultHandler *)handler {
   PMAssetEntity *entity = [self getAssetEntity:id];
   if (entity && entity.phAsset) {
     PHAsset *asset = entity.phAsset;

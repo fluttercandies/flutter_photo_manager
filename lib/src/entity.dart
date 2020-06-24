@@ -269,15 +269,12 @@ class AssetEntity {
   Future<Uint8List> get thumbData => PhotoManager._getThumbDataWithId(id);
 
   /// get thumb with size
-  Future<Uint8List> thumbDataWithSize(
-    int width,
-    int height, {
-    ThumbFormat format = ThumbFormat.jpeg,
-    int quality = 100,
-  }) {
-    assert(width > 0 && height > 0, "The width and height must better 0.");
-    assert(format != null, "The format must not be null.");
-    assert(quality > 0 && quality <= 100, "The quality must between 0 and 100");
+  Future<Uint8List> thumbDataWithSize(LoadOption option) {
+    assert(option.width > 0 && option.height > 0,
+        "The width and height must better 0.");
+    assert(option.format != null, "The format must not be null.");
+    assert(option.quality > 0 && option.quality <= 100,
+        "The quality must between 0 and 100");
 
     /// Return null if asset is audio or other type, because they don't have such a thing.
     if (type == AssetType.audio || type == AssetType.other) {
@@ -286,10 +283,7 @@ class AssetEntity {
 
     return PhotoManager._getThumbDataWithId(
       id,
-      width: width,
-      height: height,
-      format: format,
-      quality: quality,
+      option: option,
     );
   }
 

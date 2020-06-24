@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:photo_manager/src/filter/load_option.dart';
 import 'package:photo_manager/src/utils/convert_utils.dart';
 import 'src/filter/filter_options.dart';
 
