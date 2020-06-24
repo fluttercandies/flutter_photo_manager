@@ -34,7 +34,8 @@ class _CopyToAnotherGalleryPageState extends State<CopyToAnotherGalleryPage> {
           AspectRatio(
             aspectRatio: 1,
             child: FutureBuilder<Uint8List>(
-              future: widget.assetEntity.thumbDataWithSize(500, 500),
+              future: widget.assetEntity
+                  .thumbDataWithSize(DefaultLoadOption(500, 500)),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Image.memory(snapshot.data);

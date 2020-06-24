@@ -42,7 +42,7 @@ class _PhotoListState extends State<PhotoList> {
     // });
 
     return FutureBuilder<Uint8List>(
-      future: entity.thumbDataWithSize(150, 150),
+      future: entity.thumbDataWithSize(DefaultLoadOption(150, 150)),
       builder: (BuildContext context, AsyncSnapshot<Uint8List> snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.data != null) {

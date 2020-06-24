@@ -9,12 +9,14 @@ import 'package:flutter/services.dart';
 import 'package:photo_manager/src/filter/load_option.dart';
 import 'package:photo_manager/src/utils/convert_utils.dart';
 import 'src/filter/filter_options.dart';
+import 'src/filter/load_option.dart';
 
 import 'src/plugin.dart';
 import 'src/type.dart';
 
 export 'src/plugin.dart';
 export 'src/filter/filter_options.dart';
+export 'src/filter/load_option.dart';
 export 'src/type.dart';
 
 part './src/manager.dart';
