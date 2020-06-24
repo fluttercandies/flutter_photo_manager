@@ -298,7 +298,7 @@
     PMAssetEntity *entity = [self getAssetEntity:id];
     if (entity && entity.phAsset) {
         PHAsset *asset = entity.phAsset;
-        [self fetchThumb:asset width:width height:height format:format quality:quality, deliveryMode: deliveryMode, resizeMode: resizeMode, contentMode: contentMode resultHandler:handler];
+        [self fetchThumb:asset width:width height:height format:format quality:quality deliveryMode: deliveryMode resizeMode: resizeMode contentMode: contentMode resultHandler:handler];
     } else {
         [handler replyError:@"asset is not found"];
     }
@@ -310,12 +310,12 @@
 
     [options setNetworkAccessAllowed:YES];
     [options setDeliveryMode: (PHImageRequestOptionsDeliveryMode)deliveryMode];
-    [options setResizeMode: (PHImageRequestOptionsResizeModeFast)resizeMode];
+    [options setResizeMode: (PHImageRequestOptionsResizeMode)resizeMode];
 
     [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
                                   NSDictionary *info) {
         if (progress == 1.0) {
-        [self fetchThumb:asset width:width height:height format:format quality:quality, deliveryMode: deliveryMode, resizeMode: resizeMode, contentMode: contentMode resultHandler:handler];
+        [self fetchThumb:asset width:width height:height format:format quality:quality deliveryMode: deliveryMode resizeMode: resizeMode contentMode: contentMode resultHandler:handler];
         }
     }];
     [manager requestImageForAsset:asset

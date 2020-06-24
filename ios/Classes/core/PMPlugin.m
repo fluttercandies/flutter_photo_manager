@@ -120,7 +120,7 @@
         NSUInteger resizeMode = [call.arguments[@"resizeMode"] unsignedIntegerValue];
         NSUInteger contentMode = [call.arguments[@"contentMode"] unsignedIntegerValue];
 
-        [manager getThumbWithId:id width:width height:height format:format quality:quality, deliveryMode: deliveryMode, resizeMode: resizeMode, contentMode, contentMode, resultHandler:handler];
+          [manager getThumbWithId:id width:width height:height format:format quality:quality deliveryMode: deliveryMode resizeMode: resizeMode contentMode: contentMode resultHandler:handler];
 
       } else if ([call.method isEqualToString:@"getFullFile"]) {
         NSString *id = call.arguments[@"id"];
