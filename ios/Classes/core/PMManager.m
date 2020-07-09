@@ -294,7 +294,7 @@
   [cacheContainer clearCache];
 }
 
-- (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality deliveryMode:(NSUInteger)deliveryMode resizeMode:(NSUInteger)resizeMode contentMode:(NSUInteger)contentMode resultHandler:(ResultHandler *)handler {
+- (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality deliveryMode:(NSNumber *)deliveryMode resizeMode:(NSNumber *)resizeMode contentMode:(NSNumber *)contentMode resultHandler:(ResultHandler *)handler {
   PMAssetEntity *entity = [self getAssetEntity:id];
   if (entity && entity.phAsset) {
     PHAsset *asset = entity.phAsset;
@@ -305,14 +305,26 @@
   }
 }
 
-- (void)fetchThumb:(PHAsset *)asset width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality deliveryMode:(NSUInteger)deliveryMode resizeMode:(NSUInteger)resizeMode contentMode:(NSUInteger)contentMode resultHandler:(ResultHandler *)handler {
+- (void)fetchThumb:(PHAsset *)asset width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality deliveryMode:(NSNumber *)deliveryMode resizeMode:(NSNumber *)resizeMode contentMode:(NSNumber *)contentMode resultHandler:(ResultHandler *)handler {
   PHImageManager *manager = PHImageManager.defaultManager;
   PHImageRequestOptions *options = [PHImageRequestOptions new];
 
   [options setNetworkAccessAllowed:YES];
-  [options setDeliveryMode: (PHImageRequestOptionsDeliveryMode)deliveryMode];
-  [options setResizeMode: (PHImageRequestOptionsResizeMode)resizeMode];
+    
+  if(deliveryMode != NULL){
+      [options setDeliveryMode: (PHImageRequestOptionsDeliveryMode)([deliveryMode unsignedIntValue])];
+  }
+    
+  if(resizeMode != NULL){
+      [options setResizeMode: (PHImageRequestOptionsResizeMode)([resizeMode unsignedIntValue])];
+  }
 
+  PHImageContentMode mode = PHImageContentModeAspectFill;
+  if(contentMode != NULL){
+      mode = (PHImageContentMode)[contentMode unsignedIntValue];
+  }
+  
+    
   [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
           NSDictionary *info) {
       if (progress == 1.0) {
@@ -321,7 +333,7 @@
   }];
   [manager requestImageForAsset:asset
                      targetSize:CGSizeMake(width, height)
-                    contentMode:(PHImageContentMode)contentMode
+                    contentMode:mode
                         options:options
                   resultHandler:^(UIImage *result, NSDictionary *info) {
                       BOOL downloadFinished = [PMManager isDownloadFinish:info];
