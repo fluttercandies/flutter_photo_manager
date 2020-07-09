@@ -116,9 +116,9 @@
         NSUInteger height = [call.arguments[@"height"] unsignedIntegerValue];
         NSUInteger format = [call.arguments[@"format"] unsignedIntegerValue];
         NSUInteger quality = [call.arguments[@"quality"] unsignedIntegerValue];
-        NSUInteger deliveryMode = [call.arguments[@"deliveryMode"] unsignedIntegerValue];
-        NSUInteger resizeMode = [call.arguments[@"resizeMode"] unsignedIntegerValue];
-        NSUInteger contentMode = [call.arguments[@"contentMode"] unsignedIntegerValue];
+        NSNumber * deliveryMode = call.arguments[@"deliveryMode"];
+        NSNumber * resizeMode = call.arguments[@"resizeMode"];
+        NSNumber * contentMode = call.arguments[@"contentMode"];
 
         [manager getThumbWithId:id width:width height:height format:format quality:quality deliveryMode: deliveryMode resizeMode: resizeMode contentMode: contentMode resultHandler:handler];
 

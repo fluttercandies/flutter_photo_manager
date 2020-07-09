@@ -120,7 +120,7 @@
         NSNumber * resizeMode = call.arguments[@"resizeMode"];
         NSNumber * contentMode = call.arguments[@"contentMode"];
 
-          [manager getThumbWithId:id width:width height:height format:format quality:quality deliveryMode: deliveryMode resizeMode: resizeMode contentMode: contentMode resultHandler:handler];
+        [manager getThumbWithId:id width:width height:height format:format quality:quality deliveryMode: deliveryMode resizeMode: resizeMode contentMode: contentMode resultHandler:handler];
 
       } else if ([call.method isEqualToString:@"getFullFile"]) {
         NSString *id = call.arguments[@"id"];
