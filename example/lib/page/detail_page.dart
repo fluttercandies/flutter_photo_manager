@@ -127,6 +127,7 @@ class _DetailPageState extends State<DetailPage> {
               buildInfoItem("lat", lat?.toString() ?? "null"),
               buildInfoItem("lng", lng?.toString() ?? "null"),
               buildInfoItem("relative path", entity.relativePath ?? 'null'),
+              buildInfoItemNumberAsync('file size', entity.fileSize()),
             ],
           ),
         ),
@@ -165,6 +166,18 @@ class _DetailPageState extends State<DetailPage> {
           return buildInfoItem(title, "");
         }
         return buildInfoItem(title, snapshot.data);
+      },
+    );
+  }
+
+  Widget buildInfoItemNumberAsync(String title, Future<num> info) {
+    return FutureBuilder(
+      future: info,
+      builder: (BuildContext context, snapshot) {
+        if (!snapshot.hasData) {
+          return buildInfoItem(title, "");
+        }
+        return buildInfoItem(title, snapshot.data.toString());
       },
     );
   }

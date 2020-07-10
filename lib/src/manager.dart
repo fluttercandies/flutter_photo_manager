@@ -280,7 +280,7 @@ class PhotoManager {
     return src;
   }
 
-  static Future<int> _assetFileSize(AssetPathEntity assetPathEntity) {
+  static Future<int> _assetFileSize(AssetEntity assetPathEntity) {
     return _plugin.getFileSize(assetPathEntity);
   }
 }

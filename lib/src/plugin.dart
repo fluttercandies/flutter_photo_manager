@@ -320,7 +320,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     return _channel.invokeMethod('getPropertiesFromAssetEntity', {"id": id});
   }
 
-  Future<int> getFileSize(AssetPathEntity assetPathEntity) {
+  Future<int> getFileSize(AssetEntity assetPathEntity) {
     return _channel.invokeMethod('getFileSize', {'id': assetPathEntity.id});
   }
 }
