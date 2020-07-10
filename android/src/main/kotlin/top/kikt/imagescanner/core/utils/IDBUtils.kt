@@ -346,4 +346,9 @@ interface IDBUtils {
   }
 
   fun removeAllExistsAssets(context: Context): Boolean
+
+  fun fileSize(context: Context, assetId: String) :Long?{
+    val asset = getAssetEntity(context,assetId)
+    return asset?.size
+  }
 }

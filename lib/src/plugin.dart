@@ -319,6 +319,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   Future getPropertiesFromAssetEntity(String id) async {
     return _channel.invokeMethod('getPropertiesFromAssetEntity', {"id": id});
   }
+
+  Future<int> getFileSize(AssetPathEntity assetPathEntity) {
+    return _channel.invokeMethod('getFileSize', {'id': assetPathEntity.id});
+  }
 }
 
 mixin BasePlugin {

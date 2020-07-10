@@ -10,6 +10,7 @@
 #import "PMManager.h"
 #import "PMNotificationManager.h"
 #import "ResultHandler.h"
+#import "PMResourceUtils.h"
 
 @implementation PMPlugin {
 }
@@ -320,6 +321,14 @@
         BOOL favoriteResult = [manager favoriteWithId:id favorite:favorite];
 
         [handler reply:@(favoriteResult)];
+      } else if ([@"getFileSize" isEqualToString:call.method]) {
+        NSString *id = call.arguments[@"id"];
+        
+        PMAssetEntity *assetEntity = [manager getAssetEntity:id];
+          
+        PMResourceUtils *utils = [PMResourceUtils new];
+        NSNumber *fileSize = [utils getPHAssetSize:assetEntity.phAsset];
+        [handler reply:fileSize];
       } else {
         [handler notImplemented];
       }

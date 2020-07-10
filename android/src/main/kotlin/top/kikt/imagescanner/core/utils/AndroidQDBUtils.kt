@@ -13,6 +13,7 @@ import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.*
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.database.getLongOrNull
 import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.PhotoManager
 import top.kikt.imagescanner.core.cache.AndroidQCache
@@ -200,7 +201,7 @@ object AndroidQDBUtils : IDBUtils {
 
   }
 
-  private fun assetKeys() = IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + arrayOf(MediaStore.MediaColumns.RELATIVE_PATH)
+  private fun assetKeys() = IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + arrayOf(MediaStore.MediaColumns.RELATIVE_PATH) + arrayOf(SIZE)
 
   private fun convertCursorToAssetEntity(cursor: Cursor): AssetEntity {
     val id = cursor.getString(MediaStore.MediaColumns._ID)
@@ -215,7 +216,8 @@ object AndroidQDBUtils : IDBUtils {
     val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
     val orientation: Int = cursor.getInt(MediaStore.MediaColumns.ORIENTATION)
     val relativePath: String = cursor.getString(MediaStore.MediaColumns.RELATIVE_PATH)
-    return AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate, orientation, androidQRelativePath = relativePath)
+    val size: Long? = cursor.getLong(MediaStore.MediaColumns.SIZE)
+    return AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate, orientation, androidQRelativePath = relativePath,size =size )
   }
 
   override fun getAssetEntity(context: Context, id: String): AssetEntity? {

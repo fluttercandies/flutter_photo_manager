@@ -203,7 +203,7 @@ class PhotoManager(private val context: Context) {
       resultHandler.reply(null)
     }
   }
-  
+
   fun moveToGallery(assetId: String, albumId: String, resultHandler: ResultHandler) {
     try {
       val assetEntity = dbUtils.moveToGallery(context, assetId, albumId)
@@ -217,14 +217,18 @@ class PhotoManager(private val context: Context) {
       resultHandler.reply(null)
     }
   }
-  
+
   fun removeAllExistsAssets(resultHandler: ResultHandler) {
     val result = dbUtils.removeAllExistsAssets(context)
     resultHandler.reply(result)
   }
-  
+
   fun getAssetProperties(id: String): AssetEntity? {
     return dbUtils.getAssetEntity(context, id)
   }
-  
+
+  fun getFileSize(assetId: String, resultHandler: ResultHandler) {
+    resultHandler.reply(dbUtils.fileSize(context, assetId))
+  }
+
 }

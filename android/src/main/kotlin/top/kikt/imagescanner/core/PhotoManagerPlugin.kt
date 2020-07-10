@@ -117,6 +117,9 @@ class PhotoManagerPlugin(
       "getMediaUrl" -> {
         false
       }
+      "getFileSize" -> {
+        false
+      }
       else -> false
     }
 
@@ -365,6 +368,12 @@ class PhotoManagerPlugin(
       "removeNoExistsAssets" -> {
         runOnBackground {
           photoManager.removeAllExistsAssets(resultHandler)
+        }
+      }
+      "getFileSize" -> {
+        runOnBackground {
+          val assetId = call.argument<String>("id")!!
+          photoManager.getFileSize(assetId, resultHandler)
         }
       }
       else -> resultHandler.notImplemented()

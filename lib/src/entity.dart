@@ -61,6 +61,10 @@ class AssetPathEntity {
   /// This path is the path that contains all the assets.
   bool isAll = false;
 
+  Future<int> fileSize() async {
+    return PhotoManager._assetFileSize(this);
+  }
+
   AssetPathEntity({this.id, this.name, this.filterOption});
 
   Future<void> refreshPathProperties({DateTimeCond dateTimeCond}) async {

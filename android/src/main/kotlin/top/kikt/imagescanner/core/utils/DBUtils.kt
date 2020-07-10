@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.BaseColumns._ID
 import android.provider.MediaStore
+import android.provider.MediaStore.MediaColumns.SIZE
 import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.PhotoManager
@@ -17,6 +18,7 @@ import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
+import top.kikt.imagescanner.core.utils.AndroidQDBUtils.getLong
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeBucketKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeImageKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeVideoKeys
@@ -160,7 +162,7 @@ object DBUtils : IDBUtils {
 
     val sizeWhere = sizeWhere(requestType, option)
 
-    val keys = (storeImageKeys + storeVideoKeys + typeKeys + locationKeys).distinct().toTypedArray()
+    val keys = (storeImageKeys + storeVideoKeys + typeKeys + locationKeys + arrayOf(SIZE)).distinct().toTypedArray()
     val selection = if (isAll) {
       "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
     } else {
@@ -240,7 +242,9 @@ object DBUtils : IDBUtils {
     val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
     val orientation: Int = cursor.getInt(MediaStore.MediaColumns.ORIENTATION)
 
-    return AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate, orientation, lat, lng)
+    val size: Long? = cursor.getLong(SIZE)
+
+    return AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate, orientation, lat, lng, size = size)
   }
 
   @SuppressLint("Recycle")
