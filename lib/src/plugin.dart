@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photo_manager/src/filter/load_option.dart';
 import 'package:photo_manager/src/utils/convert_utils.dart';
 
 class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
@@ -80,20 +81,12 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     return ConvertUtils.convertToAssetList(map);
   }
 
-  Future<Uint8List> getThumb({
-    @required String id,
-    int width = 100,
-    int height = 100,
-    ThumbFormat format,
-    int quality,
-  }) {
-    return _channel.invokeMethod("getThumb", {
-      "width": width,
-      "height": height,
-      "id": id,
-      "format": format.index,
-      "quality": quality,
-    });
+  Future<Uint8List> getThumb(
+      {@required String id,
+      LoadOption option = const DefaultLoadOption(100, 100)}) {
+    final map = option.toMap();
+    map["id"] = id;
+    return _channel.invokeMethod("getThumb", map);
   }
 
   Future<Uint8List> getOriginBytes(String id) async {

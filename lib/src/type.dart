@@ -82,3 +82,14 @@ class RequestType {
 
 /// For generality, only support jpg and png.
 enum ThumbFormat { jpeg, png }
+
+/// Different load image strategy. It's must be used only for iOS
+/// [Apple delivery mode documentation](https://developer.apple.com/documentation/photokit/phimagerequestoptions/1616947-deliverymode)
+enum DeliveryMode { opportunistic, highQualityFormat, fastFormat }
+
+/// Resize strategy, useful when need exact image size. It's must be used only for iOS
+/// [Apple resize mode documentation](https://developer.apple.com/documentation/photokit/phimagerequestoptions/1616988-resizemode?language=swift)
+enum ResizeMode { none, fast, exact }
+
+/// Resize content mode
+enum ResizeContentMode { fit, fill, def }

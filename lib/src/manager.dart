@@ -167,19 +167,12 @@ class PhotoManager {
     return _plugin.getOriginBytes(id);
   }
 
-  static _getThumbDataWithId(
-    String id, {
-    int width = 150,
-    int height = 150,
-    ThumbFormat format = ThumbFormat.jpeg,
-    int quality = 100,
-  }) {
+  static _getThumbDataWithId(String id,
+      {LoadOption option = const DefaultLoadOption(150, 150,
+          format: ThumbFormat.jpeg, quality: 100)}) {
     return _plugin.getThumb(
       id: id,
-      width: width,
-      height: height,
-      format: format,
-      quality: quality,
+      option: option,
     );
   }
 

@@ -357,7 +357,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
         context: context,
         builder: (_) {
           return FutureBuilder<Uint8List>(
-            future: entity.thumbDataWithSize(size, size),
+            future: entity.thumbDataWithSize(DefaultLoadOption(size, size)),
             builder: (BuildContext context, snapshot) {
               Widget w;
               if (snapshot.hasError) {

@@ -50,7 +50,7 @@ class _MoveToAnotherExampleState extends State<MoveToAnotherExample> {
 
   Widget _buildPreview() {
     return FutureBuilder<Uint8List>(
-      future: widget.entity.thumbDataWithSize(500, 500),
+      future: widget.entity.thumbDataWithSize(DefaultLoadOption(500, 500)),
       builder: (_, snapshot) {
         if (snapshot.data != null) {
           return Image.memory(snapshot.data);
