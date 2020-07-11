@@ -384,7 +384,7 @@ rootProject.allprojects {
             resolutionStrategy.eachDependency { details ->
                 if (details.requested.group == 'com.github.bumptech.glide'
                         && details.requested.name.contains('glide')) {
-                    details.useVersion "4.11.0"
+                    details.useVersion '4.11.0'
                 }
             }
         }
