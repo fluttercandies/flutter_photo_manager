@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [0.5.4](#054)
   - [0.5.3+1](#0531)
   - [0.5.3](#053)
   - [0.5.2](#052)
@@ -37,6 +38,10 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 0.5.4
+
+Add `copyWith` for `FilterOptionGroup`
 
 ## 0.5.3+1
 
