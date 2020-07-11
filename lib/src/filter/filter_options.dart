@@ -29,6 +29,13 @@ class FilterOptionGroup {
     _map[type] = option;
   }
 
+  void merge(FilterOptionGroup other) {
+    assert(other != null, 'Cannot merge null.');
+    for (final AssetType type in _map.keys) {
+      _map[type] = _map[type]?.merge(other.getOption(type));
+    }
+  }
+
   Map<String, dynamic> toMap() {
     Map<String, dynamic> result = {};
     if (_map.containsKey(AssetType.image)) {
@@ -44,6 +51,11 @@ class FilterOptionGroup {
     result["date"] = dateTimeCond.toMap();
 
     return result;
+  }
+
+  @override
+  String toString() {
+    return const JsonEncoder.withIndent('  ').convert(toMap());
   }
 }
 
@@ -77,6 +89,16 @@ class FilterOption {
       needTitle: needTitle ?? this.needTitle,
       sizeConstraint: sizeConstraint ?? this.sizeConstraint,
       durationConstraint: durationConstraint ?? this.durationConstraint,
+    );
+  }
+
+  /// Merge a [FilterOption] into another.
+  FilterOption merge(FilterOption other) {
+    assert(other != null, 'Cannot merge null.');
+    return FilterOption(
+      needTitle: other.needTitle ?? this.needTitle,
+      sizeConstraint: other.sizeConstraint ?? this.sizeConstraint,
+      durationConstraint: other.durationConstraint ?? this.durationConstraint,
     );
   }
 
