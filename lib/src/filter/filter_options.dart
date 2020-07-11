@@ -21,6 +21,10 @@ class FilterOptionGroup {
 
   DateTimeCond dateTimeCond = DateTimeCond.def();
 
+  FilterOption getOption(AssetType type) {
+    return _map[type];
+  }
+
   void setOption(AssetType type, FilterOption option) {
     _map[type] = option;
   }
