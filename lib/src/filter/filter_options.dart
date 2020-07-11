@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../type.dart';
 
 /// Filter option for get asset.
@@ -6,7 +8,7 @@ import '../type.dart';
 ///
 /// See [FilterOption]
 class FilterOptionGroup {
-  /// A empty option
+  /// An empty option
   FilterOptionGroup.empty();
 
   FilterOptionGroup() {
@@ -45,6 +47,13 @@ class FilterOptionGroup {
 ///
 /// 筛选选项的详细情况
 class FilterOption {
+  /// See [needTitle], [sizeConstraint] and [durationConstraint]
+  const FilterOption({
+    this.needTitle = false,
+    this.sizeConstraint = const SizeConstraint(),
+    this.durationConstraint = const DurationConstraint(),
+  });
+
   /// This property affects performance on iOS. If not needed, please pass false, default is false.
   final bool needTitle;
 
@@ -54,12 +63,18 @@ class FilterOption {
   /// See [DurationConstraint], ignore in [AssetType.image].
   final DurationConstraint durationConstraint;
 
-  /// See [needTitle], [sizeConstraint] and [durationConstraint]
-  const FilterOption({
-    this.needTitle = false,
-    this.sizeConstraint = const SizeConstraint(),
-    this.durationConstraint = const DurationConstraint(),
-  });
+  /// Create a new [FilterOption] with specific properties merging.
+  FilterOption copyWith({
+    bool needTitle,
+    SizeConstraint sizeConstraint,
+    DurationConstraint durationConstraint,
+  }) {
+    return FilterOption(
+      needTitle: needTitle ?? this.needTitle,
+      sizeConstraint: sizeConstraint ?? this.sizeConstraint,
+      durationConstraint: durationConstraint ?? this.durationConstraint,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -67,6 +82,11 @@ class FilterOption {
       "size": sizeConstraint.toMap(),
       "duration": durationConstraint.toMap(),
     };
+  }
+
+  @override
+  String toString() {
+    return const JsonEncoder.withIndent('  ').convert(toMap());
   }
 }
 
