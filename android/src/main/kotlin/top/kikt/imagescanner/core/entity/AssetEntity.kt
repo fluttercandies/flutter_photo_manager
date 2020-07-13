@@ -8,7 +8,7 @@ import java.io.File
 
 data class AssetEntity(
         val id: String,
-        val path: String,
+        var path: String,
         val duration: Long,
         val createDt: Long,
         val width: Int,
