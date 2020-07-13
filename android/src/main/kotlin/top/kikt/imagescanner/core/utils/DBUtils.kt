@@ -428,10 +428,11 @@ object DBUtils : IDBUtils {
     val contentUri = cr.insert(uri, values) ?: return null
     val id = ContentUris.parseId(contentUri)
 
+    val assetEntity = getAssetEntity(context, id.toString())
     if (savePath) {
       inputStream.close()
     } else {
-      val tmpPath = getAssetEntity(context, id.toString())?.path!!
+      val tmpPath = assetEntity?.path!!
       val tmpFile = File(tmpPath)
       val targetPath = "${tmpFile.parent}/$title"
       val targetFile = File(targetPath)
@@ -452,10 +453,11 @@ object DBUtils : IDBUtils {
           inputStream.copyTo(outputStream)
         }
       }
+      assetEntity.path = targetPath
     }
 
     cr.notifyChange(contentUri, null)
-    return getAssetEntity(context, id.toString())
+    return assetEntity
   }
 
   override fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity? {
@@ -687,10 +689,11 @@ object DBUtils : IDBUtils {
     val contentUri = cr.insert(uri, values) ?: return null
     val id = ContentUris.parseId(contentUri)
 
+    val assetEntity = getAssetEntity(context, id.toString())
     if (savePath) {
       inputStream.close()
     } else {
-      val tmpPath = getAssetEntity(context, id.toString())?.path!!
+      val tmpPath = assetEntity?.path!!
       val tmpFile = File(tmpPath)
       val targetPath = "${tmpFile.parent}/$title"
       val targetFile = File(targetPath)
@@ -711,10 +714,11 @@ object DBUtils : IDBUtils {
           inputStream.copyTo(outputStream)
         }
       }
+      assetEntity.path = targetPath
     }
 
     cr.notifyChange(contentUri, null)
-    return getAssetEntity(context, id.toString())
+    return assetEntity
   }
 
   override fun getMediaUri(context: Context, id: String, type: Int): String {
