@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [0.5.6](#056)
   - [0.5.5+1](#0551)
   - [0.5.5](#055)
   - [0.5.4](#054)
@@ -40,6 +41,10 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 0.5.6
+
+Fix save image with path for android.
 
 ## 0.5.5+1
 
