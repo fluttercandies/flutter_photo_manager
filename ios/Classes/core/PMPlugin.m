@@ -285,7 +285,16 @@
         }
 
         [manager createAlbumWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
-            NSDictionary *dictionary = @{@"id": id, @"errorMsg": errorMsg};
+            NSMutableDictionary *mutableDictionary = [NSMutableDictionary new];
+            if (errorMsg) {
+                mutableDictionary[@"errorMsg"] = errorMsg;
+            }
+            
+            if (id) {
+                mutableDictionary[@"id"] = id;
+            }
+
+            NSDictionary *dictionary = [NSDictionary dictionaryWithDictionary:mutableDictionary];
             [handler reply:[self convertToResult:dictionary]];
         }];
 
