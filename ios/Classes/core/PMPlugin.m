@@ -272,7 +272,7 @@
         }
 
         [manager createFolderWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
-            [handler reply:[self convertToResult:@{@"id": id, @"errorMsg": errorMsg}]];
+            [handler reply:[self convertToResult:id errorMsg:errorMsg]];
         }];
 
       } else if ([@"createAlbum" isEqualToString:call.method]) {
@@ -285,17 +285,7 @@
         }
 
         [manager createAlbumWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
-            NSMutableDictionary *mutableDictionary = [NSMutableDictionary new];
-            if (errorMsg) {
-                mutableDictionary[@"errorMsg"] = errorMsg;
-            }
-            
-            if (id) {
-                mutableDictionary[@"id"] = id;
-            }
-
-            NSDictionary *dictionary = [NSDictionary dictionaryWithDictionary:mutableDictionary];
-            [handler reply:[self convertToResult:dictionary]];
+            [handler reply:[self convertToResult:id errorMsg:errorMsg]];
         }];
 
       } else if ([@"removeInAlbum" isEqualToString:call.method]) {
@@ -333,17 +323,17 @@
 
 }
 
-- (NSDictionary *)convertToResult:(NSDictionary *)dict {
-  NSMutableDictionary *result = [NSMutableDictionary new];
-
-  for (id key in dict.allKeys) {
-    id value = dict[key];
-    if (value) {
-      result[key] = value;
+- (NSDictionary *)convertToResult:(NSString *)id errorMsg:(NSString *)errorMsg {
+    NSMutableDictionary *mutableDictionary = [NSMutableDictionary new];
+    if (errorMsg) {
+        mutableDictionary[@"errorMsg"] = errorMsg;
     }
-  }
 
-  return result;
+    if (id) {
+        mutableDictionary[@"id"] = id;
+    }
+
+    return mutableDictionary;
 }
 
 @end
