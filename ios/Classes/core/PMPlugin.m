@@ -49,6 +49,8 @@
     [PMManager openSetting];
   } else if (manager.isAuth) {
     [self onAuth:call result:result];
+  } else if ([call.method isEqualToString:@"log"]){
+    PMLogUtils.sharedInstance.isLog = (BOOL) call.arguments;
   } else {
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
         BOOL auth = PHAuthorizationStatusAuthorized == status;
@@ -127,10 +129,6 @@
 
       } else if ([call.method isEqualToString:@"releaseMemCache"]) {
         [manager clearCache];
-
-      } else if ([call.method isEqualToString:@"log"]) {
-        PMLogUtils.sharedInstance.isLog = (BOOL) call.arguments;
-
       } else if ([call.method isEqualToString:@"fetchPathProperties"]) {
         NSString *id = call.arguments[@"id"];
         int requestType = [call.arguments[@"type"] intValue];
