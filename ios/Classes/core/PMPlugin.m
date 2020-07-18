@@ -10,21 +10,25 @@
 #import "PMManager.h"
 #import "PMNotificationManager.h"
 #import "ResultHandler.h"
+#import "PMResourceManager.h"
 
 @implementation PMPlugin {
 }
 
 - (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar {
-  [self initNotificationManager:registrar];
+    [self initNotificationManager:registrar];
 
-  FlutterMethodChannel *channel =
-          [FlutterMethodChannel methodChannelWithName:@"top.kikt/photo_manager"
-                                      binaryMessenger:[registrar messenger]];
-  [self setManager:[PMManager new]];
-  [channel
-          setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
-              [self onMethodCall:call result:result];
-          }];
+    FlutterMethodChannel *channel =
+            [FlutterMethodChannel methodChannelWithName:@"top.kikt/photo_manager"
+                                        binaryMessenger:[registrar messenger]];
+
+    PMManager *manager = [PMManager new];
+    manager.registrar = registrar;
+    [self setManager:manager];
+    [channel
+            setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
+                [self onMethodCall:call result:result];
+            }];
 }
 
 - (void)initNotificationManager:(NSObject <FlutterPluginRegistrar> *)registrar {
@@ -309,13 +313,17 @@
             }
         }];
       } else if ([@"favoriteAsset" isEqualToString:call.method]) {
-        NSString *id = call.arguments[@"id"];
-        BOOL favorite = [call.arguments[@"type"] boolValue];
-        BOOL favoriteResult = [manager favoriteWithId:id favorite:favorite];
+          NSString *id = call.arguments[@"id"];
+          BOOL favorite = [call.arguments[@"type"] boolValue];
+          BOOL favoriteResult = [manager favoriteWithId:id favorite:favorite];
 
-        [handler reply:@(favoriteResult)];
+          [handler reply:@(favoriteResult)];
+      } else if ([@"getStream" isEqualToString:call.method]) {
+          NSString *id = call.arguments[@"id"];
+          PMResourceManager *resourceManager = [manager getResourceManager:id];
+          [handler reply:[resourceManager toDict]];
       } else {
-        [handler notImplemented];
+          [handler notImplemented];
       }
   }];
 

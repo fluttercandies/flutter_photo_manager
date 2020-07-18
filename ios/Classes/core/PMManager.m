@@ -14,10 +14,13 @@
 #import "NSString+PM_COMMON.h"
 #import "PMFolderUtils.h"
 #import "MD5Utils.h"
+#import "PMResourceManager.h"
 
 @implementation PMManager {
   BOOL __isAuth;
   PMCacheContainer *cacheContainer;
+
+  NSMutableDictionary<NSString *, PMResourceManager *> *resourceDict;
 }
 
 - (instancetype)init {
@@ -25,6 +28,7 @@
   if (self) {
     __isAuth = NO;
     cacheContainer = [PMCacheContainer new];
+    resourceDict = [NSMutableDictionary new];
   }
 
   return self;
@@ -1169,6 +1173,7 @@
   }
 }
 
+
 - (BOOL)favoriteWithId:(NSString *)id favorite:(BOOL)favorite {
   PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:nil];
   PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
@@ -1193,4 +1198,16 @@
 
   return YES;
 }
+
+#pragma mark "The stream of read data"
+
+- (PMResourceManager *)getResourceManager:(NSString *)id {
+  PMAssetEntity *entity = [self getAssetEntity:id];
+  if (entity == nil) {
+    return nil;
+  }
+
+  return [PMResourceManager managerWithRegistrar:self.registrar asset:entity.phAsset];
+}
+
 @end

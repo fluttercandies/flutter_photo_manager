@@ -5,6 +5,7 @@
 #import "PMFileHelper.h"
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
+#import <Flutter/Flutter.h>
 
 typedef void (^ChangeIds)(NSArray<NSString *> *);
 
@@ -13,10 +14,13 @@ typedef void (^ChangeIds)(NSArray<NSString *> *);
 @class ResultHandler;
 @class PMFilterOption;
 @class PMFilterOptionGroup;
+@class PMResourceManager;
 
 typedef void (^AssetResult)(PMAssetEntity *);
 
 @interface PMManager : NSObject
+
+@property(nonatomic, strong) NSObject <FlutterPluginRegistrar> *registrar;
 
 - (BOOL)isAuth;
 
@@ -75,4 +79,6 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (void)removeCollectionWithId:(NSString *)id type:(int)type block:(void (^)(NSString *))block;
 
 - (BOOL)favoriteWithId:(NSString *)id favorite:(BOOL)favorite;
+
+- (PMResourceManager *)getResourceManager:(NSString *)id1;
 @end
