@@ -35,9 +35,10 @@ class _UserStreamPageState extends State<UserStreamPage> {
             onPressed: openStream,
           ),
           RaisedButton(
-            child: Text('start'),
+            child: Text('start with write file'),
             onPressed: start,
           ),
+          // TODO Add big file and upload, test case
         ],
       ),
     );
