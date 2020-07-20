@@ -17,6 +17,11 @@ export 'src/filter/filter_options.dart';
 export 'src/type.dart';
 
 part './src/manager.dart';
+
 part './src/entity.dart';
+
 part './src/notify.dart';
+
 part './src/editor.dart';
+
+part './src/asset_origin_stream.dart';

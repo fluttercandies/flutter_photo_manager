@@ -284,4 +284,23 @@ class PhotoManager {
 
     return src;
   }
+
+  static Future<AssetOriginStream> _createOriginStream(
+      AssetEntity assetEntity) async {
+    assert(assetEntity != null && assetEntity.id != null);
+    final originStreamMap = await _plugin.getOriginStream(assetEntity.id);
+    if (originStreamMap == null || originStreamMap is! Map) {
+      return null;
+    }
+
+    return AssetOriginStream.fromMap(originStreamMap)
+      ..assetEntity = assetEntity;
+  }
+
+  static Future<void> _releaseAssetStream(AssetOriginStream stream) async {
+    assert(stream != null &&
+        stream.assetEntity != null &&
+        stream.assetEntity.id != null);
+    await _plugin.releaseStream(stream.assetEntity.id);
+  }
 }

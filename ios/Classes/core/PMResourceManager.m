@@ -83,7 +83,7 @@
     }                                                              completionHandler:^(NSError *error) {
         running = NO;
         if (error) {
-            [channel invokeMethod:@"happen error" arguments:@{@"error": error.localizedDescription}];
+            [channel invokeMethod:@"happenError" arguments:@{@"error": error.localizedDescription}];
         } else {
             [channel invokeMethod:@"completion" arguments:@{}];
         }

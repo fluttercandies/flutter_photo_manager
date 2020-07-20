@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_scanner_example/develop/upload_to_dev_serve.dart';
 import 'package:image_scanner_example/model/photo_provider.dart';
 import 'package:image_scanner_example/page/detail_page.dart';
+import 'package:image_scanner_example/page/use_stream.dart';
 import 'package:image_scanner_example/widget/change_notifier_builder.dart';
 import 'package:image_scanner_example/widget/dialog/list_dialog.dart';
 import 'package:image_scanner_example/widget/image_item_widget.dart';
@@ -165,6 +166,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               RaisedButton(
                 child: Text("Copy to another path"),
                 onPressed: () => copyToAnotherPath(entity),
+              ),
+              RaisedButton(
+                child: Text("Use AssetStream"),
+                onPressed: () => navigatorToStream(entity),
               ),
               _buildMoveAnotherPath(entity),
               _buildRemoveInAlbumWidget(entity),
@@ -380,5 +385,18 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             },
           );
         });
+  }
+
+  navigatorToStream(AssetEntity entity) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return UserStreamPage(
+            asset: entity,
+          );
+        },
+      ),
+    );
   }
 }

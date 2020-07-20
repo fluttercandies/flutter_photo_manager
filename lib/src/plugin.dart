@@ -326,6 +326,14 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   Future getPropertiesFromAssetEntity(String id) async {
     return _channel.invokeMethod('getPropertiesFromAssetEntity', {"id": id});
   }
+
+  Future getOriginStream(String id) {
+    return _channel.invokeMethod("getStream", {"id": id});
+  }
+
+  Future releaseStream(String id) async {
+    return _channel.invokeMethod("releaseStream", {"id": id});
+  }
 }
 
 mixin BasePlugin {

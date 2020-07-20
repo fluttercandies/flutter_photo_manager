@@ -355,6 +355,10 @@ class AssetEntity {
     return PhotoManager.refreshAssetProperties(this);
   }
 
+  Future<AssetOriginStream> originStream() async{
+    return PhotoManager._createOriginStream(this);
+  }
+
   @override
   int get hashCode {
     return id.hashCode;
