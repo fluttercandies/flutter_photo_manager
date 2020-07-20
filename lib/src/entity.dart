@@ -355,7 +355,21 @@ class AssetEntity {
     return PhotoManager.refreshAssetProperties(this);
   }
 
-  Future<AssetOriginStream> originStream() async{
+  /// Create a [AssetOriginStream] to handle data.
+  ///
+  /// Create a stream to read the raw bytes of the file. This method is for uploading or copying scenes.
+  //  It is suitable for large files and other situations where you don't want to load all the data into the memory at once.
+  ///
+  /// The advantage of comparing [originFile] is that this method does not increase storage space and saves an additional IO process.
+  /// The advantage of comparing [originBytes] is that this method will not increase too much memory usage.
+  ///
+  /// 创建一个流来读取文件的原始字节,  这个方法是为了上传或复制场景准备的.
+  /// 适用于大文件等不希望一次性加载所有数据到内存中的情况.
+  ///
+  /// 对比[originFile]的好处是, 这个方法不会增加额外储存空间, 且省去了一次额外的IO过程.
+  /// 对比[originBytes]的好处是, 这个方法不会增加太多的内存占用.
+  ///
+  Future<AssetOriginStream> createOriginByteStream() async {
     return PhotoManager._createOriginStream(this);
   }
 

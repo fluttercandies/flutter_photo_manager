@@ -288,7 +288,8 @@ class PhotoManager {
   static Future<AssetOriginStream> _createOriginStream(
       AssetEntity assetEntity) async {
     assert(assetEntity != null && assetEntity.id != null);
-    final originStreamMap = await _plugin.getOriginStream(assetEntity.id);
+    final originStreamMap =
+        await _plugin.createOriginStream(assetEntity.id, assetEntity.typeInt);
     if (originStreamMap == null || originStreamMap is! Map) {
       return null;
     }

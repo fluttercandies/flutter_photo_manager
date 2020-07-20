@@ -8,7 +8,6 @@ import android.os.Handler
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.PluginRegistry
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.utils.ConvertUtils
@@ -59,7 +58,7 @@ class PhotoManagerPlugin(
     }
   }
 
-  private val photoManager = PhotoManager(applicationContext)
+  private val photoManager = PhotoManager(applicationContext, messenger)
 
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     val resultHandler = ResultHandler(result)
@@ -69,14 +68,17 @@ class PhotoManagerPlugin(
     val handleResult = when (call.method) {
       "releaseMemCache" -> {
         photoManager.clearCache()
+        resultHandler.reply(true)
         true
       }
       "log" -> {
         LogUtils.isLog = call.arguments()
+        resultHandler.reply(true)
         true
       }
       "openSetting" -> {
         permissionsUtils.getAppDetailSettingIntent(activity)
+        resultHandler.reply(true)
         true
       }
       "forceOldApi" -> {
@@ -116,6 +118,19 @@ class PhotoManagerPlugin(
       }
       "getMediaUrl" -> {
         false
+      }
+      "getStream" -> {
+        val isOrigin = call.argument<Boolean>("isOrigin")!!
+        if (isOrigin && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+          needLocationPermissions = true
+        }
+        false
+      }
+      "releaseStream" -> {
+        val id = call.argument<String>("id")!!
+        photoManager.releaseStream(id)
+        resultHandler.reply(true)
+        true
       }
       else -> false
     }
@@ -237,6 +252,13 @@ class PhotoManagerPlugin(
           val type = call.argument<Int>("type")!!
           val mediaUri = photoManager.getMediaUri(id, type)
           resultHandler.reply(mediaUri)
+        }
+      }
+      "getStream" -> {
+        runOnBackground {
+          val id = call.argument<String>("id")!!
+          val typeInt = call.argument<Int>("type")!!
+          photoManager.createStream(id, haveLocationPermission, typeInt, resultHandler)
         }
       }
       "getPropertiesFromAssetEntity" -> {
@@ -367,6 +389,7 @@ class PhotoManagerPlugin(
           photoManager.removeAllExistsAssets(resultHandler)
         }
       }
+
       else -> resultHandler.notImplemented()
     }
   }

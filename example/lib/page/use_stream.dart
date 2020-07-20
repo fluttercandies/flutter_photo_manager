@@ -48,7 +48,7 @@ class _UserStreamPageState extends State<UserStreamPage> {
       showToast('The stream already create');
       return;
     }
-    originStream = await asset.originStream();
+    originStream = await asset.createOriginByteStream();
   }
 
   void start() async {
@@ -61,7 +61,16 @@ class _UserStreamPageState extends State<UserStreamPage> {
       return;
     }
 
-    final tmpDir = await getTemporaryDirectory();
+    Directory tmpDir;
+
+    if (Platform.isIOS) {
+      tmpDir = await getTemporaryDirectory();
+    } else if (Platform.isAndroid) {
+      tmpDir = (await getExternalCacheDirectories())[0];
+    } else {
+      showToast('Not support the platform');
+      return;
+    }
 
     final title = await asset.titleAsync;
     file = File('${tmpDir.absolute.path}/$title');

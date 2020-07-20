@@ -327,8 +327,9 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     return _channel.invokeMethod('getPropertiesFromAssetEntity', {"id": id});
   }
 
-  Future getOriginStream(String id) {
-    return _channel.invokeMethod("getStream", {"id": id});
+  Future createOriginStream(String id, int type) {
+    return _channel
+        .invokeMethod("getStream", {"id": id, "type": type, "isOrigin": true});
   }
 
   Future releaseStream(String id) async {

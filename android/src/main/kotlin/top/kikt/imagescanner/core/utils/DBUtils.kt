@@ -730,4 +730,5 @@ object DBUtils : IDBUtils {
   }
 
   private data class GalleryInfo(val path: String, val galleryId: String, val galleryName: String)
+
 }

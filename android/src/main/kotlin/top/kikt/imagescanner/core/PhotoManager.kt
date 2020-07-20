@@ -3,6 +3,7 @@ package top.kikt.imagescanner.core
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import io.flutter.plugin.common.BinaryMessenger
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
@@ -18,13 +19,15 @@ import java.io.File
 
 /// create 2019-09-05 by cai
 /// Do some business logic assembly
-class PhotoManager(private val context: Context) {
+class PhotoManager(private val context: Context, val messenger: BinaryMessenger) {
 
   companion object {
     const val ALL_ID = "isAll"
   }
 
   var useOldApi: Boolean = false
+
+  val streamMap: MutableMap<String, StreamManager> = HashMap()
 
   private val dbUtils: IDBUtils
     get() = if (useOldApi || Build.VERSION.SDK_INT < 29) {
@@ -203,7 +206,7 @@ class PhotoManager(private val context: Context) {
       resultHandler.reply(null)
     }
   }
-  
+
   fun moveToGallery(assetId: String, albumId: String, resultHandler: ResultHandler) {
     try {
       val assetEntity = dbUtils.moveToGallery(context, assetId, albumId)
@@ -217,14 +220,35 @@ class PhotoManager(private val context: Context) {
       resultHandler.reply(null)
     }
   }
-  
+
   fun removeAllExistsAssets(resultHandler: ResultHandler) {
     val result = dbUtils.removeAllExistsAssets(context)
     resultHandler.reply(result)
   }
-  
+
   fun getAssetProperties(id: String): AssetEntity? {
     return dbUtils.getAssetEntity(context, id)
   }
-  
+
+  fun createStream(id: String, haveLocationPermission: Boolean, type: Int, resultHandler: ResultHandler) {
+    if (streamMap[id] != null) {
+      resultHandler.reply(streamMap[id]?.toMap())
+      return
+    }
+
+    val uri = dbUtils.getUri(context, id, type, haveLocationPermission)
+    val streamManager = StreamManager(context, messenger, id, uri)
+    streamMap[id] = streamManager
+    streamManager.handleChannel()
+    resultHandler.reply(streamManager.toMap())
+  }
+
+  fun releaseStream(id: String) {
+    val streamManager = streamMap[id]
+    if (streamManager != null) {
+      streamManager.onRelease()
+      streamMap.remove(id)
+    }
+  }
+
 }

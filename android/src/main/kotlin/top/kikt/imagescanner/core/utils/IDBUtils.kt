@@ -346,4 +346,18 @@ interface IDBUtils {
   }
 
   fun removeAllExistsAssets(context: Context): Boolean
+
+  fun getUri(context: Context, id: String, type: Int, isOrigin: Boolean): Uri {
+    var uri =
+            when (type) {
+              1 -> Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+              2 -> Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+              else -> Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+            }
+
+    if (isOrigin) {
+      uri = MediaStore.setRequireOriginal(uri)
+    }
+    return uri
+  }
 }

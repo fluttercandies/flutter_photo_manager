@@ -62,10 +62,11 @@
 
 - (NSDictionary *)toDict {
     NSString *channelName = [self getChannelName];
+    __weak PMResourceManager *manager;
     if (!channel) {
         channel = [FlutterMethodChannel methodChannelWithName:channelName binaryMessenger:self.registrar.messenger];
         [channel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
-            [self handleMethodResult:call result:result];
+            [manager handleMethodResult:call result:result];
         }];
     }
     return @{@"channelName": channelName, @"running": @(running)};
