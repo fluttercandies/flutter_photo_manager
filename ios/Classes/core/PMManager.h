@@ -80,5 +80,7 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (BOOL)favoriteWithId:(NSString *)id favorite:(BOOL)favorite;
 
-- (PMResourceManager *)getResourceManager:(NSString *)id1;
+- (PMResourceManager *)getResourceManager:(NSString *)assetId;
+
+- (BOOL)releaseResourceManager:(NSString *)assetId;
 @end

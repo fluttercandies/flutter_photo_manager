@@ -322,6 +322,10 @@
           NSString *id = call.arguments[@"id"];
           PMResourceManager *resourceManager = [manager getResourceManager:id];
           [handler reply:[resourceManager toDict]];
+      } else if ([@"releaseStream" isEqualToString:call.method]) {
+          NSString *id = call.arguments[@"id"];
+          BOOL releaseResult = [manager releaseResourceManager:id];
+          [handler reply:@(releaseResult)];
       } else {
           [handler notImplemented];
       }

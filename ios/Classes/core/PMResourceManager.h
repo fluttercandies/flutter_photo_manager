@@ -17,5 +17,5 @@
 
 - (NSDictionary *)toDict;
 
-
+- (void)onRelease;
 @end

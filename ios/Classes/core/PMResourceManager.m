@@ -8,6 +8,7 @@
 @implementation PMResourceManager {
     FlutterMethodChannel *channel;
     BOOL running;
+    PHAssetResourceDataRequestID requestId;
 }
 - (instancetype)initWithRegistrar:(NSObject <FlutterPluginRegistrar> *)registrar asset:(PHAsset *)asset {
     self = [super init];
@@ -47,25 +48,59 @@
     return [NSString stringWithFormat:@"top.kikt/photo_manager/stream/%@", self.asset.localIdentifier];
 }
 
+- (void)handleMethodResult:(FlutterMethodCall *)call result:(FlutterResult)result {
+    if ([call.method isEqualToString:@"start"]) {
+        [self start];
+        result(@YES);
+    } else if ([call.method isEqualToString:@"stop"]) {
+        [self stop];
+        result(@YES);
+    } else {
+        result(FlutterMethodNotImplemented);
+    }
+}
+
 - (NSDictionary *)toDict {
     NSString *channelName = [self getChannelName];
-    channel = [FlutterMethodChannel methodChannelWithName:channelName binaryMessenger:self.registrar.messenger];
+    if (!channel) {
+        channel = [FlutterMethodChannel methodChannelWithName:channelName binaryMessenger:self.registrar.messenger];
+        [channel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
+            [self handleMethodResult:call result:result];
+        }];
+    }
     return @{@"channelName": channelName, @"running": @(running)};
 }
 
 - (void)start {
+    if (running) {
+        return;
+    }
     running = YES;
     PHAssetResource *resource = [self findLastResource];
-    [[PHAssetResourceManager defaultManager] requestDataForAssetResource:resource options:nil dataReceivedHandler:^(NSData *data) {
+    requestId = [[PHAssetResourceManager defaultManager] requestDataForAssetResource:resource options:nil dataReceivedHandler:^(NSData *data) {
         FlutterStandardTypedData *d = [FlutterStandardTypedData typedDataWithBytes:data];
         [channel invokeMethod:@"onReceived" arguments:@{@"data": d}];
-    }                                                  completionHandler:^(NSError *error) {
+    }                                                              completionHandler:^(NSError *error) {
+        running = NO;
         if (error) {
             [channel invokeMethod:@"happen error" arguments:@{@"error": error.localizedDescription}];
         } else {
             [channel invokeMethod:@"completion" arguments:@{}];
         }
     }];
+}
+
+- (void)stop {
+    if (running && requestId) {
+        running = NO;
+        [[PHAssetResourceManager defaultManager] cancelDataRequest:requestId];
+    }
+
+}
+
+- (void)onRelease {
+    [self stop];
+    [channel setMethodCallHandler:nil];
 }
 
 @end

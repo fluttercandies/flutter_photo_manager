@@ -1201,13 +1201,31 @@
 
 #pragma mark "The stream of read data"
 
-- (PMResourceManager *)getResourceManager:(NSString *)id {
-  PMAssetEntity *entity = [self getAssetEntity:id];
+- (PMResourceManager *)getResourceManager:(NSString *)assetId {
+  if (resourceDict[assetId]) {
+    return resourceDict[assetId];
+  }
+
+  PMAssetEntity *entity = [self getAssetEntity:assetId];
   if (entity == nil) {
     return nil;
   }
 
-  return [PMResourceManager managerWithRegistrar:self.registrar asset:entity.phAsset];
+  PMResourceManager *manager = [PMResourceManager managerWithRegistrar:self.registrar asset:entity.phAsset];
+  resourceDict[assetId] = manager;
+  return manager;
+}
+
+- (BOOL)releaseResourceManager:(NSString *)assetId {
+  PMResourceManager *manager = [self getResourceManager:assetId];
+  if (!manager) {
+    return NO;
+  }
+  [manager onRelease];
+
+  [resourceDict removeObjectForKey:assetId];
+
+  return YES;
 }
 
 @end
