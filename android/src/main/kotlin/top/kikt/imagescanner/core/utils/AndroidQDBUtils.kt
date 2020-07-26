@@ -285,11 +285,7 @@ object AndroidQDBUtils : IDBUtils {
     try {
       val asset = getAssetEntity(context, id) ?: return null
 
-      val uri =
-              if (asset.type == 1)
-                Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, asset.id)
-              else
-                Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, asset.id)
+      val uri = getUri(asset)
 
       val originalUri = MediaStore.setRequireOriginal(uri)
 
@@ -317,9 +313,9 @@ object AndroidQDBUtils : IDBUtils {
     return getUri(id, type)
   }
 
-  private fun getUri(asset: AssetEntity, isOrigin: Boolean = false): Uri = getUri(asset.id, asset.type, isOrigin)
+  fun getUri(asset: AssetEntity, isOrigin: Boolean = false): Uri = getUri(asset.id, asset.type, isOrigin)
 
-  private fun getUri(id: String, type: Int, isOrigin: Boolean = false): Uri {
+  fun getUri(id: String, type: Int, isOrigin: Boolean = false): Uri {
     var uri =
             when (type) {
               1 -> Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
