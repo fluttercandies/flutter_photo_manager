@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [0.5.7](#057)
   - [0.5.6](#056)
   - [0.5.5+1](#0551)
   - [0.5.5](#055)
@@ -41,6 +42,12 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 0.5.7
+
+Fix:
+
+- Audio asset error for androidQ. See [#340](https://github.com/CaiJingLong/flutter_photo_manager/issues/340) [#341](https://github.com/CaiJingLong/flutter_photo_manager/pull/341).
 
 ## 0.5.6
 
