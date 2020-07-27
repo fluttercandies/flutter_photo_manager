@@ -37,7 +37,7 @@ class AndroidQCache {
     val contentResolver = context.contentResolver
 
     var uri = AndroidQDBUtils.getUri(assetId,type, isOrigin)
-    if (uri== Uri.EMPTY){
+    if (uri == Uri.EMPTY){
       return null
     }
     if (isOrigin) {
