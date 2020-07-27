@@ -15,48 +15,54 @@ import java.io.FileOutputStream
 
 @RequiresApi(Build.VERSION_CODES.Q)
 class AndroidQCache {
-  
-  fun getCacheFile(context: Context, id: String, displayName: String, isOrigin: Boolean): File {
-    val originString =
-      if (isOrigin) {
-        "_origin"
-      } else {
-        ""
-      }
-    val name = "$id${originString}_${displayName}"
-    return File(context.cacheDir, name)
-  }
-  
-  fun getCacheFile(context: Context, assetId: String, extName: String, type: Int, isOrigin: Boolean): File {
-    val targetFile = getCacheFile(context, assetId, extName, isOrigin)
-    
-    if (targetFile.exists()) {
-      return targetFile
-    }
-    
-    val contentResolver = context.contentResolver
 
-    val uri = AndroidQDBUtils.getUri(assetId,type, isOrigin)
-    val inputStream = contentResolver.openInputStream(uri)
-    val outputStream = FileOutputStream(targetFile)
-    outputStream.use {
-      inputStream?.copyTo(it)
+    fun getCacheFile(context: Context, id: String, displayName: String, isOrigin: Boolean): File {
+        val originString =
+                if (isOrigin) {
+                    "_origin"
+                } else {
+                    ""
+                }
+        val name = "$id${originString}_${displayName}"
+        return File(context.cacheDir, name)
     }
-    return targetFile
-  }
-  
-  fun saveAssetCache(context: Context, asset: AssetEntity, byteArray: ByteArray, isOrigin: Boolean = false) {
-    val file = getCacheFile(context, asset.id, asset.displayName, isOrigin)
-    if (file.exists()) {
-      LogUtils.info("${asset.id} , isOrigin: $isOrigin, cache file exists, ignore save")
-      return
+
+    fun getCacheFile(context: Context, assetId: String, extName: String, type: Int, isOrigin: Boolean): File? {
+        val targetFile = getCacheFile(context, assetId, extName, isOrigin)
+
+        if (targetFile.exists()) {
+            return targetFile
+        }
+
+        val contentResolver = context.contentResolver
+
+        var uri = AndroidQDBUtils.getUri(assetId, type, isOrigin)
+        if (uri == Uri.EMPTY) {
+            return null
+        }
+        if (isOrigin) {
+            uri = MediaStore.setRequireOriginal(uri)
+        }
+        val inputStream = contentResolver.openInputStream(uri)
+        val outputStream = FileOutputStream(targetFile)
+        outputStream.use {
+            inputStream?.copyTo(it)
+        }
+        return targetFile
     }
-    
-    if (file.parentFile?.exists() != true) {
-      file.mkdirs()
+
+    fun saveAssetCache(context: Context, asset: AssetEntity, byteArray: ByteArray, isOrigin: Boolean = false) {
+        val file = getCacheFile(context, asset.id, asset.displayName, isOrigin)
+        if (file.exists()) {
+            LogUtils.info("${asset.id} , isOrigin: $isOrigin, cache file exists, ignore save")
+            return
+        }
+
+        if (file.parentFile?.exists() != true) {
+            file.mkdirs()
+        }
+        file.writeBytes(byteArray)
+
+        LogUtils.info("${asset.id} , isOrigin: $isOrigin, cached")
     }
-    file.writeBytes(byteArray)
-  
-    LogUtils.info("${asset.id} , isOrigin: $isOrigin, cached")
-  }
 }
