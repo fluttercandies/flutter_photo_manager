@@ -306,7 +306,7 @@ object AndroidQDBUtils : IDBUtils {
 
   override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
     val assetEntity = getAssetEntity(context, id) ?: return null
-    val cacheFile = androidQCache.getCacheFile(context, id, assetEntity.displayName, assetEntity.type, origin)
+    val cacheFile = androidQCache.getCacheFile(context, id, assetEntity.displayName, assetEntity.type, origin) ?: return null
     return cacheFile.path
   }
 
