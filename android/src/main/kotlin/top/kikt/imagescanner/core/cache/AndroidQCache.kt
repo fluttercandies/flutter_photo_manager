@@ -6,6 +6,7 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import top.kikt.imagescanner.core.entity.AssetEntity
+import top.kikt.imagescanner.core.utils.AndroidQDBUtils
 import top.kikt.imagescanner.util.LogUtils
 import java.io.File
 import java.io.FileOutputStream
@@ -34,17 +35,14 @@ class AndroidQCache {
     }
 
     val contentResolver = context.contentResolver
-    var uri =
-        when (type) {
-          1 -> Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, assetId)
-          2 -> Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, assetId)
-          3 -> Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, assetId)
-          else -> return null
-        }
+
+    var uri = AndroidQDBUtils.getUri(assetId,type, isOrigin)
+    if (uri == Uri.EMPTY){
+      return null
+    }
     if (isOrigin) {
       uri = MediaStore.setRequireOriginal(uri)
     }
-
     val inputStream = contentResolver.openInputStream(uri)
     val outputStream = FileOutputStream(targetFile)
     outputStream.use {

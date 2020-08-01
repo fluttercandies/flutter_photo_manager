@@ -722,11 +722,7 @@ object DBUtils : IDBUtils {
   }
 
   override fun getMediaUri(context: Context, id: String, type: Int): String {
-    return when (type) {
-      1 -> Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-      2 -> Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
-      else -> Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-    }.toString()
+    return AndroidQDBUtils.getMediaUri(context, id, type)
   }
 
   private data class GalleryInfo(val path: String, val galleryId: String, val galleryName: String)
