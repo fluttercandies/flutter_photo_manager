@@ -1,11 +1,12 @@
 package top.kikt.imagescanner.core.entity
 
+import android.net.Uri
+import top.kikt.imagescanner.core.utils.IDBUtils
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.isAndroidQ
+import top.kikt.imagescanner.core.utils.MediaStoreUtils
 import java.io.File
 
 /// create 2019-09-05 by cai
-
-
 data class AssetEntity(
         val id: String,
         var path: String,
@@ -21,6 +22,10 @@ data class AssetEntity(
         var lng: Double? = null,
         val androidQRelativePath: String? = null
 ) {
+
+  fun getUri(): Uri {
+    return MediaStoreUtils.getDeleteUri(id, MediaStoreUtils.convertTypeToMediaType(type))
+  }
 
   val relativePath: String?
     get() {

@@ -500,7 +500,7 @@ object DBUtils : IDBUtils {
     }
 
 
-    val insertUri = getInsertUri(mediaType)
+    val insertUri = MediaStoreUtils.getInsertUri(mediaType)
     val galleryInfo = getGalleryInfo(context, galleryId) ?: throwMsg("Cannot find gallery info")
     val outputPath = "${galleryInfo.path}/${asset.displayName}"
 
@@ -719,10 +719,6 @@ object DBUtils : IDBUtils {
 
     cr.notifyChange(contentUri, null)
     return assetEntity
-  }
-
-  override fun getMediaUri(context: Context, id: String, type: Int): String {
-    return AndroidQDBUtils.getMediaUri(context, id, type)
   }
 
   private data class GalleryInfo(val path: String, val galleryId: String, val galleryName: String)

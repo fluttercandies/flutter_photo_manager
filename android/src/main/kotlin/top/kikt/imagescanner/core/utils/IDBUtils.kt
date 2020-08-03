@@ -1,6 +1,7 @@
 package top.kikt.imagescanner.core.utils
 
 import android.annotation.SuppressLint
+import android.content.ContentProviderOperation
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
@@ -100,12 +101,7 @@ interface IDBUtils {
 
 
   fun convertTypeToMediaType(type: Int): Int {
-    return when (type) {
-      1 -> MEDIA_TYPE_IMAGE
-      2 -> MEDIA_TYPE_VIDEO
-      3 -> MEDIA_TYPE_AUDIO
-      else -> 0
-    }
+    return MediaStoreUtils.convertTypeToMediaType(type)
   }
 
   fun getTypeFromMediaType(mediaType: Int): Int {
@@ -148,18 +144,24 @@ interface IDBUtils {
   fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOption): List<AssetEntity>
 
   fun deleteWithIds(context: Context, ids: List<String>): List<String> {
-    val where = "${MediaStore.MediaColumns._ID} in (?)"
-    val idsArgs = ids.joinToString()
-    return try {
-      val lines = context.contentResolver.delete(allUri, where, arrayOf(idsArgs))
-      if (lines > 0) {
-        ids
-      } else {
-        emptyList()
-      }
-    } catch (e: Exception) {
-      emptyList()
+    if (ids.isEmpty()) {
+      return emptyList()
     }
+
+    context.contentResolver.applyBatch(MediaStore.AUTHORITY, ArrayList(
+            ids.map {
+              val uri = findDeleteUri(context, it)
+              ContentProviderOperation.newDelete(uri).build()
+            })
+    )
+
+    return ids
+
+  }
+
+  fun findDeleteUri(context: Context, id: String): Uri? {
+    val assetEntity = getAssetEntity(context, id) ?: return null
+    return assetEntity.getUri()
   }
 
   fun saveImage(context: Context, image: ByteArray, title: String, desc: String): AssetEntity?
@@ -301,7 +303,10 @@ interface IDBUtils {
     }
   }
 
-  fun getMediaUri(context: Context, id: String, type: Int): String
+  fun getMediaUri(context: Context, id: String, type: Int): String {
+    val uri = AndroidQDBUtils.getUri(id, type, false)
+    return uri.toString()
+  }
 
   fun getOnlyGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity>
 
@@ -332,13 +337,19 @@ interface IDBUtils {
 
   fun getSomeInfo(context: Context, assetId: String): Pair<String, String>?
 
-  fun getInsertUri(mediaType: Int): Uri {
-    return when (mediaType) {
-      MEDIA_TYPE_AUDIO -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-      MEDIA_TYPE_VIDEO -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-      MEDIA_TYPE_IMAGE -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-      else -> allUri
+  fun getUri(id: String, type: Int, isOrigin: Boolean = false): Uri {
+    var uri =
+            when (type) {
+              1 -> Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+              2 -> Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+              3 -> Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+              else -> return Uri.EMPTY
+            }
+
+    if (isOrigin) {
+      uri = MediaStore.setRequireOriginal(uri)
     }
+    return uri
   }
 
   fun throwMsg(msg: String): Nothing {

@@ -313,22 +313,7 @@ object AndroidQDBUtils : IDBUtils {
     return getUri(id, type)
   }
 
-  fun getUri(asset: AssetEntity, isOrigin: Boolean = false): Uri = getUri(asset.id, asset.type, isOrigin)
-
-  fun getUri(id: String, type: Int, isOrigin: Boolean = false): Uri {
-    var uri =
-            when (type) {
-                1 -> Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-                2 -> Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
-                3 -> Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-                else -> return Uri.EMPTY
-            }
-
-    if (isOrigin) {
-      uri = MediaStore.setRequireOriginal(uri)
-    }
-    return uri
-  }
+  private fun getUri(asset: AssetEntity, isOrigin: Boolean = false): Uri = getUri(asset.id, asset.type, isOrigin)
 
   override fun getOriginBytes(context: Context, asset: AssetEntity, haveLocationPermission: Boolean): ByteArray {
     val file = androidQCache.getCacheFile(context, asset.id, asset.displayName, true)
@@ -492,7 +477,7 @@ object AndroidQDBUtils : IDBUtils {
       throwMsg("Cannot find asset.")
     }
 
-    val insertUri = getInsertUri(mediaType)
+    val insertUri = MediaStoreUtils.getInsertUri(mediaType)
 
     val relativePath = getRelativePath(context, galleryId)
 
@@ -677,8 +662,4 @@ object AndroidQDBUtils : IDBUtils {
     return getAssetEntity(context, id.toString())
   }
 
-  override fun getMediaUri(context: Context, id: String, type: Int): String {
-    val uri = getUri(id, type, false)
-    return uri.toString()
-  }
 }
