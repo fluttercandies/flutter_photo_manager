@@ -2,16 +2,12 @@ package top.kikt.imagescanner.core
 
 import android.Manifest
 import android.app.Activity
-import android.app.RecoverableSecurityException
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Handler
-import androidx.core.app.ActivityCompat
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.PluginRegistry
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.utils.ConvertUtils
@@ -27,20 +23,22 @@ import java.util.concurrent.TimeUnit
 
 
 class PhotoManagerPlugin(
-        private val applicationContext: Context,
-        private val messenger: BinaryMessenger,
-        var activity: Activity?,
-        private val permissionsUtils: PermissionsUtils
-) : MethodChannel.MethodCallHandler, PluginRegistry.ActivityResultListener {
+    private val applicationContext: Context,
+    private val messenger: BinaryMessenger,
+    var activity: Activity?,
+    private val permissionsUtils: PermissionsUtils
+) : MethodChannel.MethodCallHandler {
+
+  val deleteManager = PhotoManagerDeleteManager(applicationContext, activity)
 
   companion object {
     private const val poolSize = 8
     private val threadPool: ThreadPoolExecutor = ThreadPoolExecutor(
-            poolSize + 3,
-            1000,
-            200,
-            TimeUnit.MINUTES,
-            ArrayBlockingQueue<Runnable>(poolSize + 3)
+        poolSize + 3,
+        1000,
+        200,
+        TimeUnit.MINUTES,
+        ArrayBlockingQueue<Runnable>(poolSize + 3)
     )
 
     fun runOnBackground(runnable: () -> Unit) {
@@ -49,10 +47,7 @@ class PhotoManagerPlugin(
 
     var cacheOriginBytes = true
 
-    private const val REQ_DELETE_CODE = 10303
   }
-
-  private var deleteTask: SimpleDeleteTask? = null
 
   private val notifyChannel = PhotoManagerNotifyChannel(applicationContext, messenger, Handler())
 
@@ -294,13 +289,11 @@ class PhotoManagerPlugin(
       "deleteWithIds" -> {
         runOnBackground {
           val ids = call.argument<List<String>>("ids")!!
-          try {
-            val list: List<String> = photoManager.deleteAssetWithIds(ids)
-            resultHandler.reply(list)
-          } catch (e: RecoverableSecurityException) {
-            removeWithIds(photoManager, ids, resultHandler, e)
-          } catch (e: Exception) {
-            resultHandler.replyError("Unknown error", null, e)
+          for (id in ids) {
+            val uri = photoManager.getUri(id)
+            if (uri != null) {
+              deleteManager.deleteWithUri(uri, false)
+            }
           }
         }
       }
@@ -400,45 +393,6 @@ class PhotoManagerPlugin(
   private fun MethodCall.getOption(): FilterOption {
     val arguments = argument<Map<*, *>>("option")!!
     return ConvertUtils.convertFilterOptionsFromMap(arguments)
-  }
-
-
-  private fun removeWithIds(photoManager: PhotoManager, ids: List<String>, resultHandler: ResultHandler, recoverableSecurityException: RecoverableSecurityException) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      if (activity != null) {
-        this.deleteTask = SimpleDeleteTask(photoManager, ids, resultHandler)
-        val intentSender = recoverableSecurityException.userAction.actionIntent.intentSender
-        ActivityCompat.startIntentSenderForResult(activity!!, intentSender, REQ_DELETE_CODE, null, 0, 0, 0, null)
-      } else {
-        resultHandler.replyError("Cannot delete", "the Activity is null")
-      }
-    } else {
-      resultHandler.replyError("Cannot delete", "The min sdk must below ${Build.VERSION_CODES.O}")
-    }
-  }
-
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-    if (requestCode == REQ_DELETE_CODE) {
-      if (resultCode == Activity.RESULT_OK) {
-        deleteTask?.delete()
-      }
-      deleteTask = null
-      return true
-    }
-    return false
-  }
-
-
-  class SimpleDeleteTask(private val photoManager: PhotoManager, private val ids: List<String>, private val resultHandler: ResultHandler) {
-    fun delete() {
-      try {
-        val resultIds = photoManager.deleteAssetWithIds(ids)
-        resultHandler.reply(resultIds)
-      } catch (e: Exception) {
-        resultHandler.replyError("Cannot delete", null, e)
-      }
-    }
-
   }
 
 }

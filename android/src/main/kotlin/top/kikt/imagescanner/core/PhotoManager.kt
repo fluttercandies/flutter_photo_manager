@@ -1,6 +1,7 @@
 package top.kikt.imagescanner.core
 
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import top.kikt.imagescanner.core.entity.AssetEntity
@@ -82,7 +83,7 @@ class PhotoManager(private val context: Context) {
         val asset = dbUtils.getAssetEntity(context, id)
         val type = asset?.type
         val uri = dbUtils.getThumbUri(context, id, width, height, type)
-                ?: throw RuntimeException("Cannot load uri of $id.")
+            ?: throw RuntimeException("Cannot load uri of $id.")
         ThumbnailUtil.getThumbOfUri(context, uri, width, height, format, quality) {
           resultHandler.reply(it)
         }
@@ -175,13 +176,13 @@ class PhotoManager(private val context: Context) {
     val latLong = exifInfo?.latLong
     return if (latLong == null) {
       mapOf(
-              "lat" to 0.0,
-              "lng" to 0.0
+          "lat" to 0.0,
+          "lng" to 0.0
       )
     } else {
       mapOf(
-              "lat" to latLong[0],
-              "lng" to latLong[1]
+          "lat" to latLong[0],
+          "lng" to latLong[1]
       )
     }
   }
@@ -203,7 +204,7 @@ class PhotoManager(private val context: Context) {
       resultHandler.reply(null)
     }
   }
-  
+
   fun moveToGallery(assetId: String, albumId: String, resultHandler: ResultHandler) {
     try {
       val assetEntity = dbUtils.moveToGallery(context, assetId, albumId)
@@ -217,14 +218,19 @@ class PhotoManager(private val context: Context) {
       resultHandler.reply(null)
     }
   }
-  
+
   fun removeAllExistsAssets(resultHandler: ResultHandler) {
     val result = dbUtils.removeAllExistsAssets(context)
     resultHandler.reply(result)
   }
-  
+
   fun getAssetProperties(id: String): AssetEntity? {
     return dbUtils.getAssetEntity(context, id)
   }
-  
+
+  fun getUri(id: String): Uri? {
+    val asset = dbUtils.getAssetEntity(context, id)
+    return asset?.getUri()
+  }
+
 }

@@ -28,8 +28,7 @@ class ImageScannerPlugin : FlutterPlugin, ActivityAware {
       registrar.addRequestPermissionsResultListener(createAddRequestPermissionsResultListener(permissionsUtils))
       val plugin = PhotoManagerPlugin(registrar.context(), registrar.messenger(), registrar.activity(), permissionsUtils)
       register(plugin, registrar.messenger())
-
-      registrar.addActivityResultListener(plugin)
+      registrar.addActivityResultListener(plugin.deleteManager)
     }
 
     fun createAddRequestPermissionsResultListener(permissionsUtils: PermissionsUtils): RequestPermissionsResultListener {
@@ -50,7 +49,7 @@ class ImageScannerPlugin : FlutterPlugin, ActivityAware {
 
   override fun onDetachedFromActivity() {
     plugin?.let {
-      binding?.removeActivityResultListener(it)
+      binding?.removeActivityResultListener(it.deleteManager)
     }
   }
 
@@ -64,7 +63,7 @@ class ImageScannerPlugin : FlutterPlugin, ActivityAware {
     binding.addRequestPermissionsResultListener(createAddRequestPermissionsResultListener(permissionsUtils))
     if (plugin != null) {
       plugin?.let {
-        binding.addActivityResultListener(it)
+        binding.addActivityResultListener(it.deleteManager)
       }
     }
   }
