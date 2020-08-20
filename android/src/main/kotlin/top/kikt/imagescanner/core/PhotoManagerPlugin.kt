@@ -8,7 +8,6 @@ import android.os.Handler
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.PluginRegistry
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.utils.ConvertUtils
@@ -24,20 +23,22 @@ import java.util.concurrent.TimeUnit
 
 
 class PhotoManagerPlugin(
-        private val applicationContext: Context,
-        private val messenger: BinaryMessenger,
-        var activity: Activity?,
-        private val permissionsUtils: PermissionsUtils
+    private val applicationContext: Context,
+    private val messenger: BinaryMessenger,
+    var activity: Activity?,
+    private val permissionsUtils: PermissionsUtils
 ) : MethodChannel.MethodCallHandler {
+
+  val deleteManager = PhotoManagerDeleteManager(applicationContext, activity)
 
   companion object {
     private const val poolSize = 8
     private val threadPool: ThreadPoolExecutor = ThreadPoolExecutor(
-            poolSize + 3,
-            1000,
-            200,
-            TimeUnit.MINUTES,
-            ArrayBlockingQueue<Runnable>(poolSize + 3)
+        poolSize + 3,
+        1000,
+        200,
+        TimeUnit.MINUTES,
+        ArrayBlockingQueue<Runnable>(poolSize + 3)
     )
 
     fun runOnBackground(runnable: () -> Unit) {
@@ -45,6 +46,7 @@ class PhotoManagerPlugin(
     }
 
     var cacheOriginBytes = true
+
   }
 
   private val notifyChannel = PhotoManagerNotifyChannel(applicationContext, messenger, Handler())
@@ -287,8 +289,12 @@ class PhotoManagerPlugin(
       "deleteWithIds" -> {
         runOnBackground {
           val ids = call.argument<List<String>>("ids")!!
-          val list: List<String> = photoManager.deleteAssetWithIds(ids)
-          resultHandler.reply(list)
+          for (id in ids) {
+            val uri = photoManager.getUri(id)
+            if (uri != null) {
+              deleteManager.deleteWithUri(uri, false)
+            }
+          }
         }
       }
       "saveImage" -> {
@@ -371,6 +377,7 @@ class PhotoManagerPlugin(
     }
   }
 
+
   private fun getTimeStamp(): Long {
     return 0
   }
@@ -387,4 +394,5 @@ class PhotoManagerPlugin(
     val arguments = argument<Map<*, *>>("option")!!
     return ConvertUtils.convertFilterOptionsFromMap(arguments)
   }
+
 }
