@@ -3,9 +3,12 @@ part of '../photo_manager.dart';
 /// asset entity, for entity info.
 class AssetPathEntity {
   static Future<AssetPathEntity> fromId(String id,
-      {FilterOptionGroup filterOption}) async {
+      {FilterOptionGroup filterOption,
+        RequestType type = RequestType.common}) async {
     filterOption ??= FilterOptionGroup();
-    final entity = AssetPathEntity()..id = id;
+    final entity = AssetPathEntity(id: id, filterOption: filterOption)
+      ..type = type
+      ..albumType = 1;
     await entity.refreshPathProperties();
     return entity;
   }
