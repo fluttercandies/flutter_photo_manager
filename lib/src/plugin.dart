@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager/src/utils/convert_utils.dart';
 
@@ -41,7 +42,15 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<bool> requestPermission() async {
-    return (await _channel.invokeMethod("requestPermission")) == 1;
+    if (Platform.isAndroid) {
+      return (await Permission.storage.request()) == PermissionStatus.granted;
+    } else if (Platform.isIOS) {
+      // WARNING - THIS IS NOT TESTED!
+      return (await Permission.photos.request()) == PermissionStatus.granted;
+    } else
+      return false;
+    // TODO: Delete old permission handling
+    //  in Android and iOS parts of the plugin
   }
 
   Future<List<AssetEntity>> getAssetWithGalleryIdPaged(

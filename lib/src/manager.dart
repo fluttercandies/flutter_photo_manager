@@ -10,7 +10,14 @@ class PhotoManager {
   ///
   /// in ios request the photo permission
   static Future<bool> requestPermission() async {
-    return _plugin.requestPermission();
+    if(Platform.isAndroid){
+      return (await Permission.storage.request()) == PermissionStatus.granted;
+    } else if(Platform.isIOS) {
+      // WARNING - THIS IS NOT TESTED!
+      return (await Permission.photos.request()) == PermissionStatus.granted;
+    } else return false;
+    // TODO: Delete old permission handling
+    //  in Android and iOS parts of the plugin
   }
 
   static Editor editor = Editor();
