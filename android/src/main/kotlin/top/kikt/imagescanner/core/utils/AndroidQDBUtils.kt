@@ -61,6 +61,8 @@ object AndroidQDBUtils : IDBUtils {
     val cursor = context.contentResolver.query(allUri, galleryKeys, selections, args.toTypedArray(), null)
             ?: return list
 
+    LogUtils.logCursor(cursor)
+
     val nameMap = HashMap<String, String>()
     val countMap = HashMap<String, Int>()
 
