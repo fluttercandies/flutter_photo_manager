@@ -125,6 +125,17 @@ object Android30DbUtils : IDBUtils {
     return "$DATE_ADDED $asc"
   }
 
+
+  private fun cursorWithRange(cursor: Cursor, start: Int, pageSize: Int, block: (cursor: Cursor) -> Unit) {
+    cursor.moveToPosition(start - 1)
+
+    for (i in 0 until pageSize) {
+      if (cursor.moveToNext()) {
+        block(cursor)
+      }
+    }
+  }
+
   @SuppressLint("Recycle")
   override fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int, timeStamp: Long, option: FilterOption, cacheContainer: CacheContainer?): List<AssetEntity> {
 
@@ -156,16 +167,22 @@ object Android30DbUtils : IDBUtils {
     val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
         ?: return emptyList()
 
-    while (cursor.moveToNext()) {
+    cursorWithRange(cursor, page * pageSize, pageSize) {
       val asset = convertCursorToAssetEntity(cursor)
       list.add(asset)
     }
+
+//    while (cursor.moveToNext()) {
+//      val asset = convertCursorToAssetEntity(cursor)
+//      list.add(asset)
+//    }
 
     cursor.close()
 
     return list
 
   }
+
 
   override fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOption): List<AssetEntity> {
     val isAll = gId.isEmpty()
@@ -196,10 +213,15 @@ object Android30DbUtils : IDBUtils {
     val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
         ?: return emptyList()
 
-    while (cursor.moveToNext()) {
+    cursorWithRange(cursor, start, pageSize) {
       val asset = convertCursorToAssetEntity(cursor)
       list.add(asset)
     }
+
+//    while (cursor.moveToNext()) {
+//      val asset = convertCursorToAssetEntity(cursor)
+//      list.add(asset)
+//    }
 
     cursor.close()
 

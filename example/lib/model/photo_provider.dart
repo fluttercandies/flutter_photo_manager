@@ -68,7 +68,7 @@ class PhotoProvider extends ChangeNotifier {
   String maxWidth = "10000";
   String minHeight = "0";
   String maxHeight = "10000";
-  bool _ignoreSize = false;
+  bool _ignoreSize = true;
 
   bool get ignoreSize => _ignoreSize;
 
@@ -240,7 +240,7 @@ class AssetPathProvider extends ChangeNotifier {
   }
 
   Future<void> onLoadMore() async {
-    if (showItemCount > path.assetCount) {
+    if (showItemCount >= path.assetCount) {
       print("already max");
       return;
     }
