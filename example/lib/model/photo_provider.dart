@@ -240,7 +240,7 @@ class AssetPathProvider extends ChangeNotifier {
   }
 
   Future<void> onLoadMore() async {
-    if (showItemCount >= path.assetCount) {
+    if (showItemCount > path.assetCount) {
       print("already max");
       return;
     }
