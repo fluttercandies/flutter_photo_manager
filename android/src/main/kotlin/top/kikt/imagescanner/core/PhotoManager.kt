@@ -7,10 +7,7 @@ import android.util.Log
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
-import top.kikt.imagescanner.core.utils.AndroidQDBUtils
-import top.kikt.imagescanner.core.utils.ConvertUtils
-import top.kikt.imagescanner.core.utils.DBUtils
-import top.kikt.imagescanner.core.utils.IDBUtils
+import top.kikt.imagescanner.core.utils.*
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.isAndroidQ
 import top.kikt.imagescanner.thumb.ThumbnailUtil
 import top.kikt.imagescanner.util.LogUtils
@@ -28,10 +25,14 @@ class PhotoManager(private val context: Context) {
   var useOldApi: Boolean = false
 
   private val dbUtils: IDBUtils
-    get() = if (useOldApi || Build.VERSION.SDK_INT < 29) {
-      DBUtils
-    } else {
-      AndroidQDBUtils
+    get() {
+      return if (IDBUtils.isAndroidR) {
+        Android30DbUtils
+      } else if (useOldApi || Build.VERSION.SDK_INT < 29) {
+        DBUtils
+      } else {
+        AndroidQDBUtils
+      }
     }
 
   fun getGalleryList(type: Int, timeStamp: Long, hasAll: Boolean, onlyAll: Boolean, option: FilterOption): List<GalleryEntity> {
@@ -70,7 +71,7 @@ class PhotoManager(private val context: Context) {
 
   fun getThumb(id: String, width: Int, height: Int, format: Int, quality: Int, resultHandler: ResultHandler) {
     try {
-      if (!isAndroidQ) {
+      if (!isAndroidQ || IDBUtils.isAndroidR) {
         val asset = dbUtils.getAssetEntity(context, id)
         if (asset == null) {
           resultHandler.replyError("The asset not found!")
@@ -103,7 +104,7 @@ class PhotoManager(private val context: Context) {
       return
     }
     try {
-      if (!isAndroidQ) {
+      if (!isAndroidQ || IDBUtils.isAndroidR) {
         val byteArray = File(asset.path).readBytes()
         resultHandler.reply(byteArray)
       } else {
@@ -145,10 +146,6 @@ class PhotoManager(private val context: Context) {
   fun getFile(id: String, isOrigin: Boolean, resultHandler: ResultHandler) {
     val path = dbUtils.getFilePath(context, id, isOrigin)
     resultHandler.reply(path)
-  }
-
-  fun deleteAssetWithIds(ids: List<String>): List<String> {
-    return dbUtils.deleteWithIds(context, ids)
   }
 
   fun saveImage(image: ByteArray, title: String, description: String): AssetEntity? {
