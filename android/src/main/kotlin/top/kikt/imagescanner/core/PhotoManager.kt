@@ -3,6 +3,7 @@ package top.kikt.imagescanner.core
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.util.Log
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
@@ -71,7 +72,7 @@ class PhotoManager(private val context: Context) {
 
   fun getThumb(id: String, width: Int, height: Int, format: Int, quality: Int, resultHandler: ResultHandler) {
     try {
-      if (!isAndroidQ || IDBUtils.isAndroidR) {
+      if (isExternalStorageLegacy()) {
         val asset = dbUtils.getAssetEntity(context, id)
         if (asset == null) {
           resultHandler.replyError("The asset not found!")
@@ -80,7 +81,6 @@ class PhotoManager(private val context: Context) {
         ThumbnailUtil.getThumbnailByGlide(context, asset.path, width, height, format, quality, resultHandler.result)
       } else {
         // need use android Q  MediaStore thumbnail api
-
         val asset = dbUtils.getAssetEntity(context, id)
         val type = asset?.type
         val uri = dbUtils.getThumbUri(context, id, width, height, type)
@@ -104,7 +104,7 @@ class PhotoManager(private val context: Context) {
       return
     }
     try {
-      if (!isAndroidQ || IDBUtils.isAndroidR) {
+      if (isExternalStorageLegacy()) {
         val byteArray = File(asset.path).readBytes()
         resultHandler.reply(byteArray)
       } else {

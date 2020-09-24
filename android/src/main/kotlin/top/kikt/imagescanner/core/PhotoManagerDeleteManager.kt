@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import io.flutter.plugin.common.PluginRegistry
@@ -119,6 +120,12 @@ class PhotoManagerDeleteManager(val context: Context, val activity: Activity?) :
 
   @RequiresApi(Build.VERSION_CODES.Q)
   fun deleteWithUriInApi29(ids: List<String>, uris: List<Uri>, resultHandler: ResultHandler, havePermission: Boolean) {
+    if (Environment.isExternalStorageLegacy()) {
+      deleteInApi28(ids)
+      resultHandler.reply(ids)
+      return
+    }
+
     androidQHandler = resultHandler
     androidQResult.clear()
     for (uri in uris) {
