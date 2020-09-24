@@ -73,14 +73,18 @@
   [self injectAssetPathIntoArray:array
                           result:smartAlbumResult
                          options:assetOptions
-                          hasAll:hasAll];
+                          hasAll:hasAll
+              containsEmptyAlbum:option.containsEmptyAlbum
+   ];
 
   PHFetchResult<PHCollection *> *topLevelResult = [PHAssetCollection
           fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
   [self injectAssetPathIntoArray:array
                           result:topLevelResult
                          options:assetOptions
-                          hasAll:hasAll];
+                          hasAll:hasAll
+                    containsEmptyAlbum:option.containsEmptyAlbum
+   ];
 
   return array;
 }
@@ -101,7 +105,9 @@
 - (void)injectAssetPathIntoArray:(NSMutableArray<PMAssetPathEntity *> *)array
                           result:(PHFetchResult *)result
                          options:(PHFetchOptions *)options
-                          hasAll:(BOOL)hasAll {
+                          hasAll:(BOOL)hasAll
+              containsEmptyAlbum:(BOOL)containsEmptyAlbum
+{
   for (id collection in result) {
     if (![collection isMemberOfClass:[PHAssetCollection class]]) {
       continue;
@@ -131,6 +137,8 @@
     }
 
     if (entity.assetCount && entity.assetCount > 0) {
+      [array addObject:entity];
+    } else if(containsEmptyAlbum && assetCollection.assetCollectionType == PHAssetCollectionTypeAlbum){
       [array addObject:entity];
     }
   }

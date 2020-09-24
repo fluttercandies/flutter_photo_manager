@@ -56,6 +56,7 @@ typedef struct PMDurationConstraint {
 @property(nonatomic, strong) PMFilterOption *videoOption;
 @property(nonatomic, strong) PMFilterOption *audioOption;
 @property(nonatomic, strong) PMDateOption *dateOption;
+@property(nonatomic, assign) BOOL containsEmptyAlbum;
 
 - (NSArray<NSSortDescriptor *> *)sortCond;
 @end
