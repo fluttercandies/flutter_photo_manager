@@ -24,6 +24,7 @@ interface IDBUtils {
 
   companion object {
     val isAndroidQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+    val isAndroidR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
     val storeImageKeys = arrayOf(
             MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
@@ -142,22 +143,6 @@ interface IDBUtils {
   fun getThumbUri(context: Context, id: String, width: Int, height: Int, type: Int?): Uri?
 
   fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOption): List<AssetEntity>
-
-  fun deleteWithIds(context: Context, ids: List<String>): List<String> {
-    if (ids.isEmpty()) {
-      return emptyList()
-    }
-
-    context.contentResolver.applyBatch(MediaStore.AUTHORITY, ArrayList(
-            ids.map {
-              val uri = findDeleteUri(context, it)
-              ContentProviderOperation.newDelete(uri).build()
-            })
-    )
-
-    return ids
-
-  }
 
   fun findDeleteUri(context: Context, id: String): Uri? {
     val assetEntity = getAssetEntity(context, id) ?: return null
