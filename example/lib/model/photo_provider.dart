@@ -266,6 +266,9 @@ class AssetPathProvider extends ChangeNotifier {
   void deleteSelectedAssets(List<AssetEntity> entity) async {
     final ids = entity.map((e) => e.id).toList();
     await PhotoManager.editor.deleteWithIds(ids);
+    await path.refreshPathProperties();
+    showToast('The path ${path.name} asset count have :${path.assetCount}');
+    notifyListeners();
   }
 
   void removeInAlbum(AssetEntity entity) async {

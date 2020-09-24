@@ -5,13 +5,14 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.os.Handler
-import android.provider.MediaStore
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.utils.ConvertUtils
+import top.kikt.imagescanner.core.utils.IDBUtils
+import top.kikt.imagescanner.core.utils.belowSdk
 import top.kikt.imagescanner.permission.PermissionsListener
 import top.kikt.imagescanner.permission.PermissionsUtils
 import top.kikt.imagescanner.util.LogUtils
@@ -65,7 +66,7 @@ class PhotoManagerPlugin(
   private val photoManager = PhotoManager(applicationContext)
 
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-    val resultHandler = ResultHandler(result)
+    val resultHandler = ResultHandler(result, call)
 
     var needLocationPermissions = false
 
@@ -290,10 +291,22 @@ class PhotoManagerPlugin(
       "deleteWithIds" -> {
         runOnBackground {
           val ids = call.argument<List<String>>("ids")!!
-          for (id in ids) {
-            val uri = photoManager.getUri(id)
-            if (uri != null) {
-              deleteManager.deleteWithUri(uri, false)
+          if (belowSdk(29)) {
+            deleteManager.deleteInApi28(ids)
+            resultHandler.reply(true)
+          } else if (IDBUtils.isAndroidR) {
+            val uris = ids.map {
+              photoManager.getUri(it)
+            }.toList()
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+              deleteManager.deleteInApi30(uris, resultHandler)
+            }
+          } else {
+            for (id in ids) {
+              val uri = photoManager.getUri(id)
+              if (uri != null) {
+                deleteManager.deleteWithUriInApi29(uri, false)
+              }
             }
           }
         }
