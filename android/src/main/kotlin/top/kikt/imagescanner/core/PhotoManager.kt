@@ -3,13 +3,11 @@ package top.kikt.imagescanner.core
 import android.content.Context
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.util.Log
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
 import top.kikt.imagescanner.core.utils.*
-import top.kikt.imagescanner.core.utils.IDBUtils.Companion.isAndroidQ
 import top.kikt.imagescanner.thumb.ThumbnailUtil
 import top.kikt.imagescanner.util.LogUtils
 import top.kikt.imagescanner.util.ResultHandler
@@ -72,7 +70,7 @@ class PhotoManager(private val context: Context) {
 
   fun getThumb(id: String, width: Int, height: Int, format: Int, quality: Int, resultHandler: ResultHandler) {
     try {
-      if (isExternalStorageLegacy()) {
+      if (useFilePath()) {
         val asset = dbUtils.getAssetEntity(context, id)
         if (asset == null) {
           resultHandler.replyError("The asset not found!")
@@ -104,7 +102,7 @@ class PhotoManager(private val context: Context) {
       return
     }
     try {
-      if (isExternalStorageLegacy()) {
+      if (useFilePath()) {
         val byteArray = File(asset.path).readBytes()
         resultHandler.reply(byteArray)
       } else {

@@ -305,7 +305,7 @@ object AndroidQDBUtils : IDBUtils {
   override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
     val assetEntity = getAssetEntity(context, id) ?: return null
 
-    if (isExternalStorageLegacy()) {
+    if (useFilePath()) {
       return assetEntity.path
     }
 

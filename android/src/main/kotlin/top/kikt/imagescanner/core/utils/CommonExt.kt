@@ -7,12 +7,19 @@ fun belowSdk(int: Int): Boolean {
   return Build.VERSION.SDK_INT < int
 }
 
-fun isExternalStorageLegacy(): Boolean {
-  if (Build.VERSION.SDK_INT <= 28) {
-    return true
+/**
+ * Whether to read the file path directly.
+ *
+ * When the sdk is 28 or lower, use file path
+ *
+ * When the sdk is 30,
+ */
+fun useFilePath(): Boolean {
+  return if (Build.VERSION.SDK_INT <= 28) {
+    true
   } else if (Build.VERSION.SDK_INT == 29) {
-    return Environment.isExternalStorageLegacy()
+    Environment.isExternalStorageLegacy()
   } else {
-    return false
+    true
   }
 }
