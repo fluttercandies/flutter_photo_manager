@@ -34,6 +34,37 @@ class PhotoManagerDeleteManager(val context: Context, val activity: Activity?) :
     return requestCode
   }
 
+  private val androidQResult = arrayListOf<String>()
+
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+    if (requestCode == androidRDeleteRequestCode) {
+      handleAndroidRDelete(resultCode, data)
+      return true
+    }
+    if (!isHandleCode(requestCode)) {
+      return false;
+    }
+
+    val uri = uriMap.remove(requestCode) ?: return true
+    if (resultCode == Activity.RESULT_OK) {
+      // User allow delete asset.
+      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+        deleteWithUriInApi29(uri, true)
+        uri.lastPathSegment?.let {
+          androidQResult.add(it)
+        }
+      }
+    }
+
+    if (uriMap.isEmpty()) {
+      androidQHandler?.reply(androidQResult)
+      androidQResult.clear()
+      androidQHandler = null
+    }
+
+    return true
+  }
+
   @RequiresApi(Build.VERSION_CODES.Q)
   fun deleteWithUriInApi29(uri: Uri, havePermission: Boolean) {
     try {
@@ -59,26 +90,6 @@ class PhotoManagerDeleteManager(val context: Context, val activity: Activity?) :
     }
   }
 
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-    if (requestCode == androidRDeleteRequestCode) {
-      handleAndroidRDelete(resultCode, data)
-      return true
-    }
-    if (!isHandleCode(requestCode)) {
-      return false;
-    }
-
-    val uri = uriMap.remove(requestCode) ?: return true
-    if (resultCode == Activity.RESULT_OK) {
-      // User allow delete asset.
-      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-        deleteWithUriInApi29(uri, true)
-      }
-    }
-
-    return true
-  }
-
   private fun handleAndroidRDelete(resultCode: Int, data: Intent?) {
     if (resultCode == Activity.RESULT_OK) {
       androidRHandler?.apply {
@@ -102,5 +113,16 @@ class PhotoManagerDeleteManager(val context: Context, val activity: Activity?) :
     this.androidRHandler = resultHandler
     val pendingIntent = MediaStore.createTrashRequest(cr, uris.mapNotNull { it }, true)
     activity?.startIntentSenderForResult(pendingIntent.intentSender, androidRDeleteRequestCode, null, 0, 0, 0)
+  }
+
+  private var androidQHandler: ResultHandler? = null
+
+  @RequiresApi(Build.VERSION_CODES.Q)
+  fun deleteWithUriInApi29(ids: List<String>, uris: List<Uri>, resultHandler: ResultHandler, havePermission: Boolean) {
+    androidQHandler = resultHandler
+    androidQResult.clear()
+    for (uri in uris) {
+      deleteWithUriInApi29(uri, havePermission)
+    }
   }
 }

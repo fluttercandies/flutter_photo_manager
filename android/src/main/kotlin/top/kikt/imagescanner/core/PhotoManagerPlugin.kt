@@ -302,12 +302,14 @@ class PhotoManagerPlugin(
               deleteManager.deleteInApi30(uris, resultHandler)
             }
           } else {
-            for (id in ids) {
-              val uri = photoManager.getUri(id)
-              if (uri != null) {
-                deleteManager.deleteWithUriInApi29(uri, false)
-              }
-            }
+            val uris = ids.mapNotNull { photoManager.getUri(it) }
+//            for (id in ids) {
+//              val uri = photoManager.getUri(id)
+//              if (uri != null) {
+//                deleteManager.deleteWithUriInApi29(uri, false)
+//              }
+//            }
+            deleteManager.deleteWithUriInApi29(ids, uris, resultHandler, false)
           }
         }
       }
