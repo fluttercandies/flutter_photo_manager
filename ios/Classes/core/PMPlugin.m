@@ -10,6 +10,7 @@
 #import "PMManager.h"
 #import "PMNotificationManager.h"
 #import "ResultHandler.h"
+#import "PMThumbLoadOption.h"
 
 @implementation PMPlugin {
 }
@@ -114,12 +115,14 @@
 
       } else if ([call.method isEqualToString:@"getThumb"]) {
         NSString *id = call.arguments[@"id"];
-        NSUInteger width = [call.arguments[@"width"] unsignedIntegerValue];
-        NSUInteger height = [call.arguments[@"height"] unsignedIntegerValue];
-        NSUInteger format = [call.arguments[@"format"] unsignedIntegerValue];
-        NSUInteger quality = [call.arguments[@"quality"] unsignedIntegerValue];
+//        NSUInteger width = [call.arguments[@"width"] unsignedIntegerValue];
+//        NSUInteger height = [call.arguments[@"height"] unsignedIntegerValue];
+//        NSUInteger format = [call.arguments[@"format"] unsignedIntegerValue];
+//        NSUInteger quality = [call.arguments[@"quality"] unsignedIntegerValue];
+        NSDictionary *dict = call.arguments[@"option"];
+        PMThumbLoadOption *option = [PMThumbLoadOption optionDict:dict];
 
-        [manager getThumbWithId:id width:width height:height format:format quality:quality resultHandler:handler];
+        [manager getThumbWithId:id option:option resultHandler:handler];
 
       } else if ([call.method isEqualToString:@"getFullFile"]) {
         NSString *id = call.arguments[@"id"];
