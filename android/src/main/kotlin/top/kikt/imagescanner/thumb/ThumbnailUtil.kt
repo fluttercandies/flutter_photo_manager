@@ -16,7 +16,7 @@ import java.io.File
  */
 object ThumbnailUtil {
 
-  fun getThumbnailByGlide(ctx: Context, path: String, width: Int, height: Int, format: Int, quality: Int, result: MethodChannel.Result?) {
+  fun getThumbnailByGlide(ctx: Context, path: String, width: Int, height: Int, format: Bitmap.CompressFormat, quality: Int, result: MethodChannel.Result?) {
     val resultHandler = ResultHandler(result)
 
     Glide.with(ctx)
@@ -27,14 +27,7 @@ object ThumbnailUtil {
                 super.onResourceReady(resource, transition)
                 val bos = ByteArrayOutputStream()
 
-                val compressFormat =
-                        if (format == 1) {
-                          Bitmap.CompressFormat.PNG
-                        } else {
-                          Bitmap.CompressFormat.JPEG
-                        }
-
-                resource.compress(compressFormat, quality, bos)
+                resource.compress(format, quality, bos)
                 resultHandler.reply(bos.toByteArray())
               }
 
@@ -49,7 +42,7 @@ object ThumbnailUtil {
   }
 
 
-  fun getThumbOfUri(context: Context, uri: Uri, width: Int, height: Int, format: Int, quality: Int, callback: (ByteArray?) -> Unit) {
+  fun getThumbOfUri(context: Context, uri: Uri, width: Int, height: Int, format: Bitmap.CompressFormat, quality: Int, callback: (ByteArray?) -> Unit) {
     Glide.with(context)
             .asBitmap()
             .load(uri)
@@ -58,14 +51,7 @@ object ThumbnailUtil {
                 super.onResourceReady(resource, transition)
                 val bos = ByteArrayOutputStream()
 
-                val compressFormat =
-                        if (format == 1) {
-                          Bitmap.CompressFormat.PNG
-                        } else {
-                          Bitmap.CompressFormat.JPEG
-                        }
-
-                resource.compress(compressFormat, quality, bos)
+                resource.compress(format, quality, bos)
                 callback(bos.toByteArray())
               }
 

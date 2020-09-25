@@ -14,6 +14,7 @@
 #import "NSString+PM_COMMON.h"
 #import "PMFolderUtils.h"
 #import "MD5Utils.h"
+#import "PMThumbLoadOption.h"
 
 @implementation PMManager {
   BOOL __isAuth;
@@ -302,47 +303,51 @@
   [cacheContainer clearCache];
 }
 
-- (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality resultHandler:(ResultHandler *)handler {
+- (void)getThumbWithId:(NSString *)id option:(PMThumbLoadOption *)option resultHandler:(ResultHandler *)handler {
   PMAssetEntity *entity = [self getAssetEntity:id];
   if (entity && entity.phAsset) {
     PHAsset *asset = entity.phAsset;
-    [self fetchThumb:asset width:width height:height format:format quality:quality resultHandler:handler];
+    [self fetchThumb:asset option:option resultHandler:handler];
   } else {
     [handler replyError:@"asset is not found"];
   }
 }
 
-- (void)fetchThumb:(PHAsset *)asset width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality resultHandler:(ResultHandler *)handler {
+- (void)fetchThumb:(PHAsset *)asset option:(PMThumbLoadOption *)option resultHandler:(ResultHandler *)handler {
   PHImageManager *manager = PHImageManager.defaultManager;
-  PHImageRequestOptions *options = [PHImageRequestOptions new];
-  [options setNetworkAccessAllowed:YES];
-  [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
-          NSDictionary *info) {
-      if (progress == 1.0) {
-        [self fetchThumb:asset width:width height:height format:format quality:quality resultHandler:handler];
-      }
+  PHImageRequestOptions *requestOptions = [PHImageRequestOptions new];
+  requestOptions.deliveryMode = option.deliveryMode;
+  requestOptions.resizeMode = option.resizeMode;
+
+  [requestOptions setNetworkAccessAllowed:YES];
+  [requestOptions setProgressHandler:^(double progress, NSError *error, BOOL *stop,
+      NSDictionary *info) {
+    if (progress == 1.0) {
+      [self fetchThumb:asset option:option resultHandler:handler];
+    }
   }];
+  int width = option.width;
+  int height = option.height;
   [manager requestImageForAsset:asset
                      targetSize:CGSizeMake(width, height)
-                    contentMode:PHImageContentModeAspectFill
-                        options:options
+                    contentMode:option.contentMode
+                        options:requestOptions
                   resultHandler:^(UIImage *result, NSDictionary *info) {
-                      BOOL downloadFinished = [PMManager isDownloadFinish:info];
+                    BOOL downloadFinished = [PMManager isDownloadFinish:info];
 
-                      if (!downloadFinished) {
-                        return;
-                      }
+                    if (!downloadFinished) {
+                      return;
+                    }
 
-                      if ([handler isReplied]) {
-                        return;
-                      }
+                    if ([handler isReplied]) {
+                      return;
+                    }
                       NSData *imageData;
-                      if (format == 1) {
-                        imageData = UIImagePNGRepresentation(result);
-                      } else {
-                        double qualityValue = (double) quality / 100.0;
-                        imageData = UIImageJPEGRepresentation(result, qualityValue);
-                      }
+                    if (option.format == PMThumbFormatTypePNG) {
+                      imageData = UIImagePNGRepresentation(result);
+                    } else {
+                      imageData = UIImageJPEGRepresentation(result, option.quality);
+                    }
 
                       FlutterStandardTypedData *data = [FlutterStandardTypedData typedDataWithBytes:imageData];
                       [handler reply:data];
@@ -1201,4 +1206,5 @@
 
   return YES;
 }
+
 @end
