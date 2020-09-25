@@ -82,17 +82,11 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
 
   Future<Uint8List> getThumb({
     @required String id,
-    int width = 100,
-    int height = 100,
-    ThumbFormat format,
-    int quality,
+    @required ThumbOption option,
   }) {
     return _channel.invokeMethod("getThumb", {
-      "width": width,
-      "height": height,
       "id": id,
-      "format": format.index,
-      "quality": quality,
+      "option": option.toMap(),
     });
   }
 

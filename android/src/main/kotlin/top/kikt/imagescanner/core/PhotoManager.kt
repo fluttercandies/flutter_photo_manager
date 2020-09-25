@@ -8,6 +8,7 @@ import android.util.Log
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
+import top.kikt.imagescanner.core.entity.ThumbLoadOption
 import top.kikt.imagescanner.core.utils.*
 import top.kikt.imagescanner.thumb.ThumbnailUtil
 import top.kikt.imagescanner.util.LogUtils
@@ -71,7 +72,11 @@ class PhotoManager(private val context: Context) {
   }
 
 
-  fun getThumb(id: String, width: Int, height: Int, format: Int, quality: Int, resultHandler: ResultHandler) {
+  fun getThumb(id: String, option:ThumbLoadOption, resultHandler: ResultHandler) {
+    val width = option.width
+    val height = option.height
+    val quality = option.quality
+    val format = option.format
     try {
       if (useFilePath()) {
         val asset = dbUtils.getAssetEntity(context, id)
@@ -79,7 +84,7 @@ class PhotoManager(private val context: Context) {
           resultHandler.replyError("The asset not found!")
           return
         }
-        ThumbnailUtil.getThumbnailByGlide(context, asset.path, width, height, format, quality, resultHandler.result)
+        ThumbnailUtil.getThumbnailByGlide(context, asset.path, option.width, option.height, format, quality, resultHandler.result)
       } else {
         // need use android Q  MediaStore thumbnail api
         val asset = dbUtils.getAssetEntity(context, id)

@@ -10,6 +10,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
+import top.kikt.imagescanner.core.entity.ThumbLoadOption
 import top.kikt.imagescanner.core.utils.ConvertUtils
 import top.kikt.imagescanner.core.utils.IDBUtils
 import top.kikt.imagescanner.core.utils.belowSdk
@@ -209,11 +210,9 @@ class PhotoManagerPlugin(
       "getThumb" -> {
         runOnBackground {
           val id = call.argument<String>("id")!!
-          val width = call.argument<Int>("width")!!
-          val height = call.argument<Int>("height")!!
-          val format = call.argument<Int>("format")!!
-          val quality = call.argument<Int>("quality")!!
-          photoManager.getThumb(id, width, height, format, quality, resultHandler)
+          val optionMap = call.argument<Map<*,*>>("option")!!
+          val option = ThumbLoadOption.fromMap(optionMap)
+          photoManager.getThumb(id, option, resultHandler)
         }
       }
       "assetExists" -> {

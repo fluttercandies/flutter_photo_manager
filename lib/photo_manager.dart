@@ -11,9 +11,11 @@ import 'src/filter/filter_options.dart';
 
 import 'src/plugin.dart';
 import 'src/type.dart';
+import 'src/thumb_option.dart';
 
 export 'src/plugin.dart';
 export 'src/filter/filter_options.dart';
+export 'src/thumb_option.dart';
 export 'src/type.dart';
 
 part './src/manager.dart';
