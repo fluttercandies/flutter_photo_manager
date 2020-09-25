@@ -1,5 +1,6 @@
 package top.kikt.imagescanner.core
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.os.Build
@@ -15,6 +16,7 @@ import java.io.File
 
 /// create 2019-09-05 by cai
 /// Do some business logic assembly
+@SuppressLint("LongLogTag")
 class PhotoManager(private val context: Context) {
 
   companion object {
@@ -67,6 +69,7 @@ class PhotoManager(private val context: Context) {
     val gId = if (galleryId == ALL_ID) "" else galleryId
     return dbUtils.getAssetFromGalleryIdRange(context, gId, start, end, type, timestamp, option)
   }
+
 
   fun getThumb(id: String, width: Int, height: Int, format: Int, quality: Int, resultHandler: ResultHandler) {
     try {

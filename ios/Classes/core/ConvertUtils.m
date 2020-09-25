@@ -110,6 +110,7 @@
   container.videoOption = [self convertMapToPMFilterOption:video];
   container.audioOption = [self convertMapToPMFilterOption:audio];
   container.dateOption = [self convertMapToPMDateOption:map[@"date"]];
+  container.containsEmptyAlbum = [map[@"containsEmptyAlbum"] boolValue];
 
   return container;
 }

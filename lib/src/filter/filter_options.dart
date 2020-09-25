@@ -19,6 +19,9 @@ class FilterOptionGroup {
 
   final Map<AssetType, FilterOption> _map = {};
 
+  /// 是否包含空相册
+  var containsEmptyAlbum = false;
+
   DateTimeCond dateTimeCond = DateTimeCond.def();
 
   FilterOption getOption(AssetType type) {
@@ -34,6 +37,7 @@ class FilterOptionGroup {
     for (final AssetType type in _map.keys) {
       _map[type] = _map[type]?.merge(other.getOption(type));
     }
+    this.containsEmptyAlbum = other.containsEmptyAlbum;
   }
 
   Map<String, dynamic> toMap() {
@@ -49,6 +53,7 @@ class FilterOptionGroup {
     }
 
     result["date"] = dateTimeCond.toMap();
+    result['containsEmptyAlbum'] = containsEmptyAlbum;
 
     return result;
   }

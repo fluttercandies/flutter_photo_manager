@@ -25,6 +25,15 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _containsEmptyAlbum = false;
+
+  bool get containsEmptyAlbum => _containsEmptyAlbum;
+
+  set containsEmptyAlbum(bool containsEmptyAlbum) {
+    _containsEmptyAlbum = containsEmptyAlbum;
+    notifyListeners();
+  }
+
   DateTime _startDt = DateTime.now()
       .subtract(Duration(days: 365 * 8)); // Default Before 8 years
 
@@ -115,6 +124,11 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void changeContainsEmptyAlbum(bool value) {
+    this.containsEmptyAlbum = value;
+    notifyListeners();
+  }
+
   void reset() {
     this.list.clear();
     pathProviderMap.clear();
@@ -189,7 +203,8 @@ class PhotoProvider extends ChangeNotifier {
       ..setOption(AssetType.video, option)
       ..setOption(AssetType.image, option)
       ..setOption(AssetType.audio, option)
-      ..dateTimeCond = dtCond;
+      ..dateTimeCond = dtCond
+      ..containsEmptyAlbum = _containsEmptyAlbum;
   }
 
   Future<void> refreshAllGalleryProperties() async {
