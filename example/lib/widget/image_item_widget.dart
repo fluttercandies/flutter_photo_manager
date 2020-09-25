@@ -51,7 +51,11 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
       return _buildImageWidget(item, u8List, size);
     } else {
       image = FutureBuilder<Uint8List>(
-        future: item.thumbDataWithSize(size, size, format: format),
+        future: item.thumbDataWithOption(ThumbOption(
+          width: size,
+          height: size,
+          format: format,
+        )),
         builder: (context, snapshot) {
           Widget w;
           if (snapshot.hasError) {

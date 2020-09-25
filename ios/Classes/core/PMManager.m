@@ -330,7 +330,7 @@
   int height = option.height;
   [manager requestImageForAsset:asset
                      targetSize:CGSizeMake(width, height)
-                    contentMode:PHImageContentModeAspectFill
+                    contentMode:option.contentMode
                         options:requestOptions
                   resultHandler:^(UIImage *result, NSDictionary *info) {
                     BOOL downloadFinished = [PMManager isDownloadFinish:info];

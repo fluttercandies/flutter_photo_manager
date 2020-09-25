@@ -285,7 +285,6 @@ class AssetEntity {
     }
 
     return thumbDataWithOption(
-      id,
       ThumbOption(
         width: width,
         height: height,
@@ -297,7 +296,6 @@ class AssetEntity {
 
   /// get thumb with size
   Future<Uint8List> thumbDataWithOption(
-    String id,
     ThumbOption option,
   ) {
     assert(() {

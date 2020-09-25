@@ -348,16 +348,19 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       title = await entity.titleAsync;
     }
     print("entity.title = $title");
-    if (title.toLowerCase().endsWith(".heic")) {
-      showToast(
-          "Heic no support by Flutter. Try to use entity.thumbDataWithSize to get thumb.");
-      return;
-    }
     showDialog(
         context: context,
         builder: (_) {
           return FutureBuilder<Uint8List>(
-            future: entity.thumbDataWithSize(size, size),
+            future: entity.thumbDataWithOption(
+              ThumbOption.ios(
+                width: 500,
+                height: 500,
+                deliveryMode: DeliveryMode.opportunistic,
+                resizeMode: ResizeMode.fast,
+                resizeContentMode: ResizeContentMode.fill,
+              ),
+            ),
             builder: (BuildContext context, snapshot) {
               Widget w;
               if (snapshot.hasError) {
