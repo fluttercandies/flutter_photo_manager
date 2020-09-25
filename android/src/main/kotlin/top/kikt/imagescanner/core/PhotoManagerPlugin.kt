@@ -66,8 +66,17 @@ class PhotoManagerPlugin(
 
   private val photoManager = PhotoManager(applicationContext)
 
+  private var ignorePermissionCheck = false;
+
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     val resultHandler = ResultHandler(result, call)
+
+    if (call.method == "ignorePermissionCheck") {
+      val ignore = call.argument<Boolean>("ignore")!!
+      ignorePermissionCheck = ignore
+      resultHandler.reply(ignore)
+      return
+    }
 
     var needLocationPermissions = false
 
@@ -129,6 +138,11 @@ class PhotoManagerPlugin(
       return
     }
 
+    if (ignorePermissionCheck) {
+      onHandlePermissionResult(call, resultHandler, true)
+      return
+    }
+
     val utils = permissionsUtils.apply {
       withActivity(activity)
       permissionsListener = object : PermissionsListener {
@@ -138,6 +152,7 @@ class PhotoManagerPlugin(
             resultHandler.reply(0)
           } else {
             if (grantedPermissions.containsAll(arrayListOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
+              LogUtils.info("onGranted call.method = ${call.method}")
               onHandlePermissionResult(call, resultHandler, false)
             } else {
               replyPermissionError(resultHandler)
@@ -146,6 +161,7 @@ class PhotoManagerPlugin(
         }
 
         override fun onGranted() {
+          LogUtils.info("onGranted call.method = ${call.method}")
           onHandlePermissionResult(call, resultHandler, true)
         }
       }
@@ -165,7 +181,6 @@ class PhotoManagerPlugin(
   }
 
   private fun onHandlePermissionResult(call: MethodCall, resultHandler: ResultHandler, haveLocationPermission: Boolean) {
-    LogUtils.info("onGranted call.method = ${call.method}")
     when (call.method) {
       "requestPermission" -> resultHandler.reply(1)
       "getGalleryList" -> {
@@ -210,7 +225,7 @@ class PhotoManagerPlugin(
       "getThumb" -> {
         runOnBackground {
           val id = call.argument<String>("id")!!
-          val optionMap = call.argument<Map<*,*>>("option")!!
+          val optionMap = call.argument<Map<*, *>>("option")!!
           val option = ThumbLoadOption.fromMap(optionMap)
           photoManager.getThumb(id, option, resultHandler)
         }

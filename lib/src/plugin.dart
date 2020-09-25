@@ -320,6 +320,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   Future getPropertiesFromAssetEntity(String id) async {
     return _channel.invokeMethod('getPropertiesFromAssetEntity', {"id": id});
   }
+
+  Future ignorePermissionCheck(bool ignore) async {
+    _channel.invokeMethod('ignorePermissionCheck', {'ignore': ignore});
+  }
 }
 
 mixin BasePlugin {
