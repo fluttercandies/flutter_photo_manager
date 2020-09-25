@@ -13,6 +13,7 @@
 #import "PMThumbLoadOption.h"
 
 @implementation PMPlugin {
+  BOOL ignoreCheckPermission;
 }
 
 - (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar {
@@ -48,12 +49,19 @@
     }];
   } else if ([call.method isEqualToString:@"openSetting"]) {
     [PMManager openSetting];
+    [handler reply:@1];
+  } else if ([call.method isEqualToString:@"ignorePermissionCheck"]) {
+    ignoreCheckPermission = [call.arguments[@"ignore"] boolValue];
+    [handler reply:@(ignoreCheckPermission)];
   } else if (manager.isAuth) {
     [self onAuth:call result:result];
-  } else if ([call.method isEqualToString:@"log"]){
+  } else if ([call.method isEqualToString:@"log"]) {
     PMLogUtils.sharedInstance.isLog = (BOOL) call.arguments;
   } else {
-    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+    if (ignoreCheckPermission) {
+      [self onAuth:call result:result];
+    } else {
+      [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
         BOOL auth = PHAuthorizationStatusAuthorized == status;
         [manager setAuth:auth];
         if (auth) {
@@ -61,7 +69,8 @@
         } else {
           [handler replyError:@"need permission"];
         }
-    }];
+      }];
+    }
   }
 }
 
@@ -313,6 +322,8 @@
         BOOL favoriteResult = [manager favoriteWithId:id favorite:favorite];
 
         [handler reply:@(favoriteResult)];
+      } else if ([@"isAuth" isEqualToString:call.method]) {
+        [handler reply:@YES];
       } else {
         [handler notImplemented];
       }
