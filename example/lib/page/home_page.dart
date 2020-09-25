@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_scanner_example/model/photo_provider.dart';
 import 'package:image_scanner_example/page/gallery_list_page.dart';
@@ -45,6 +47,7 @@ class _NewHomePageState extends State<NewHomePage> {
             _buildTypeChecks(provider),
             _buildHasAllCheck(),
             _buildOnlyAllCheck(),
+            _buildContainsEmptyCheck(),
             _buildPngCheck(),
             _buildNotifyCheck(),
             _buildFilterOption(provider),
@@ -132,6 +135,19 @@ class _NewHomePageState extends State<NewHomePage> {
         provider.changeOnlyAll(value);
       },
       title: Text("onlyAll"),
+    );
+  }
+
+  Widget _buildContainsEmptyCheck() {
+    if (!Platform.isIOS) {
+      return Container();
+    }
+    return CheckboxListTile(
+      value: provider.containsEmptyAlbum,
+      onChanged: (value) {
+        provider.changeContainsEmptyAlbum(value);
+      },
+      title: Text("contains empty album(only iOS)"),
     );
   }
 
