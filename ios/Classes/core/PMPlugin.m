@@ -115,10 +115,6 @@
 
       } else if ([call.method isEqualToString:@"getThumb"]) {
         NSString *id = call.arguments[@"id"];
-//        NSUInteger width = [call.arguments[@"width"] unsignedIntegerValue];
-//        NSUInteger height = [call.arguments[@"height"] unsignedIntegerValue];
-//        NSUInteger format = [call.arguments[@"format"] unsignedIntegerValue];
-//        NSUInteger quality = [call.arguments[@"quality"] unsignedIntegerValue];
         NSDictionary *dict = call.arguments[@"option"];
         PMThumbLoadOption *option = [PMThumbLoadOption optionDict:dict];
 

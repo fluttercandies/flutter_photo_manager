@@ -4,7 +4,6 @@
 
 #import "PMThumbLoadOption.h"
 
-
 @implementation PMThumbLoadOption {
 
 }
@@ -22,6 +21,62 @@
     } else {
         option.format = PMThumbFormatTypePNG;
     }
+
+    int dm = [dict[@"deliveryMode"] intValue];
+    int rm = [dict[@"resizeMode"] intValue];
+    int rcm = [dict[@"resizeContentMode"] intValue];
+
+    PHImageRequestOptionsDeliveryMode deliveryMode;
+    switch (dm) {
+        case 0:
+            deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
+        break;
+        case 1:
+            deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+        break;
+        case 2:
+            deliveryMode = PHImageRequestOptionsDeliveryModeFastFormat;
+        break;
+        default:
+            deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
+
+    }
+    option.deliveryMode = deliveryMode;
+
+
+    PHImageRequestOptionsResizeMode resizeMode;
+    switch (rm) {
+        case 0:
+            resizeMode = PHImageRequestOptionsResizeModeNone;
+        break;
+        case 1:
+            resizeMode = PHImageRequestOptionsResizeModeFast;
+        break;
+        case 2:
+            resizeMode = PHImageRequestOptionsResizeModeExact;
+        break;
+        default:
+            resizeMode = PHImageRequestOptionsResizeModeNone;
+
+    }
+    option.resizeMode = resizeMode;
+
+    PHImageContentMode resizeContentMode;
+    switch (rcm) {
+        case 0:
+            resizeContentMode = PHImageContentModeAspectFit;
+        break;
+        case 1:
+            resizeContentMode = PHImageContentModeAspectFill;
+        break;
+        case 2:
+            resizeContentMode = PHImageContentModeDefault;
+        break;
+        default:
+            resizeContentMode = PHImageContentModeAspectFit;
+
+    }
+    option.contentMode = resizeContentMode;
 
     return option;
 }

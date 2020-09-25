@@ -3,7 +3,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import <Photos/Photos.h>
 
 typedef enum PMThumbFormatType {
   PMThumbFormatTypeJPEG,
@@ -16,6 +16,11 @@ typedef enum PMThumbFormatType {
 @property(nonatomic, assign) int height;
 @property(nonatomic, assign) PMThumbFormatType format;
 @property(nonatomic, assign) float quality;
+
+#pragma mark only iOS
+@property(nonatomic, assign) PHImageContentMode contentMode;
+@property(nonatomic, assign) PHImageRequestOptionsDeliveryMode deliveryMode;
+@property(nonatomic, assign) PHImageRequestOptionsResizeMode resizeMode;
 
 + (instancetype)optionDict:(NSDictionary *)dict;
 

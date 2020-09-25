@@ -315,9 +315,12 @@
 
 - (void)fetchThumb:(PHAsset *)asset option:(PMThumbLoadOption *)option resultHandler:(ResultHandler *)handler {
   PHImageManager *manager = PHImageManager.defaultManager;
-  PHImageRequestOptions *options = [PHImageRequestOptions new];
-  [options setNetworkAccessAllowed:YES];
-  [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
+  PHImageRequestOptions *requestOptions = [PHImageRequestOptions new];
+  requestOptions.deliveryMode = option.deliveryMode;
+  requestOptions.resizeMode = option.resizeMode;
+
+  [requestOptions setNetworkAccessAllowed:YES];
+  [requestOptions setProgressHandler:^(double progress, NSError *error, BOOL *stop,
       NSDictionary *info) {
     if (progress == 1.0) {
       [self fetchThumb:asset option:option resultHandler:handler];
@@ -328,7 +331,7 @@
   [manager requestImageForAsset:asset
                      targetSize:CGSizeMake(width, height)
                     contentMode:PHImageContentModeAspectFill
-                        options:options
+                        options:requestOptions
                   resultHandler:^(UIImage *result, NSDictionary *info) {
                     BOOL downloadFinished = [PMManager isDownloadFinish:info];
 
@@ -336,9 +339,9 @@
                       return;
                     }
 
-                      if ([handler isReplied]) {
-                        return;
-                      }
+                    if ([handler isReplied]) {
+                      return;
+                    }
                       NSData *imageData;
                     if (option.format == PMThumbFormatTypePNG) {
                       imageData = UIImagePNGRepresentation(result);
