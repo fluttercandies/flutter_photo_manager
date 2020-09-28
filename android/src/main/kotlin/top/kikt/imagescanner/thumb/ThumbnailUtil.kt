@@ -64,7 +64,6 @@ object ThumbnailUtil {
   fun clearCache(context: Context) {
     Glide.get(context).apply {
       clearDiskCache()
-      clearMemory()
     }
   }
 

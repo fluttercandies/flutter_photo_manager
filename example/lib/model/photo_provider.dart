@@ -34,8 +34,7 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  DateTime _startDt = DateTime.now()
-      .subtract(Duration(days: 365 * 8)); // Default Before 8 years
+  DateTime _startDt = DateTime(2005); // Default Before 8 years
 
   DateTime get startDt => _startDt;
 

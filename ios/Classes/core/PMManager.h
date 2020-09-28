@@ -76,4 +76,6 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (void)removeCollectionWithId:(NSString *)id type:(int)type block:(void (^)(NSString *))block;
 
 - (BOOL)favoriteWithId:(NSString *)id favorite:(BOOL)favorite;
+
+- (void)clearFileCache;
 @end

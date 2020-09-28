@@ -57,6 +57,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
             child: Text("Create Entity ById"),
             onPressed: () => navToWidget(CreateEntityById()),
           ),
+          RaisedButton(
+            child: Text("Clear file caches"),
+            onPressed: _clearFileCaches,
+          ),
         ],
       ),
     );
@@ -136,5 +140,9 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
 
   void _openSetting() {
     PhotoManager.openSetting();
+  }
+
+  void _clearFileCaches() {
+    PhotoManager.clearFileCache();
   }
 }

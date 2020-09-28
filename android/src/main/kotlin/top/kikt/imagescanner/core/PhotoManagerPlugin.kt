@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.os.Handler
+import com.bumptech.glide.Glide
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -97,8 +98,11 @@ class PhotoManagerPlugin(
         true
       }
       "clearFileCache" -> {
-        photoManager.clearFileCache()
-        resultHandler.reply(1)
+        Glide.get(applicationContext).clearMemory()
+        runOnBackground {
+          photoManager.clearFileCache()
+          resultHandler.reply(1)
+        }
         true
       }
       "forceOldApi" -> {
