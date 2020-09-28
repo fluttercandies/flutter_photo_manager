@@ -235,6 +235,19 @@ PhotoManager.removeChangeCallback(changeNotify);
 PhotoManager.stopChangeNotify();
 ```
 
+### Clear file cache
+
+A cache is generated at runtime.
+Whether the use attribute contains cache can be seen in the table.
+
+| Platform                                   | thumb | file/originFile |
+| ------------------------------------------ | ----- | --------------- |
+| Android(28 or lower)                       | Yes   | No              |
+| Android(29) (requestLegacyExternalStorage) | Yes   | No              |
+| Android(29)                                | Yes   | Yes             |
+| Android(30)                                | Yes   | No              |
+| iOS                                        | No    | Yes             |
+
 ### Experimental
 
 **Important**: The functions are not guaranteed to be fully usable, because it involves data modification, some APIs will cause irreversible deletion / movement of the data, so please use test equipment to make sure that there is no problem before using it.
