@@ -12,6 +12,7 @@ import android.provider.BaseColumns._ID
 import android.provider.MediaStore
 import android.util.Log
 import androidx.exifinterface.media.ExifInterface
+import com.bumptech.glide.Glide
 import top.kikt.imagescanner.core.PhotoManager
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
@@ -36,8 +37,8 @@ object DBUtils : IDBUtils {
   private val cacheContainer = CacheContainer()
 
   private val locationKeys = arrayOf(
-          MediaStore.Images.ImageColumns.LONGITUDE,
-          MediaStore.Images.ImageColumns.LATITUDE
+      MediaStore.Images.ImageColumns.LONGITUDE,
+      MediaStore.Images.ImageColumns.LATITUDE
   )
 
   override fun getGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity> {
@@ -54,7 +55,7 @@ object DBUtils : IDBUtils {
 
     val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
     val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
-            ?: return emptyList()
+        ?: return emptyList()
     while (cursor.moveToNext()) {
       val id = cursor.getString(0)
       val name = cursor.getString(1) ?: ""
@@ -80,7 +81,7 @@ object DBUtils : IDBUtils {
     val selections = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
 
     val cursor = context.contentResolver.query(allUri, projection, selections, args.toTypedArray(), null)
-            ?: return list
+        ?: return list
 
     cursor.use {
       if (it.moveToNext()) {
@@ -115,7 +116,7 @@ object DBUtils : IDBUtils {
 
     val selection = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
     val cursor = context.contentResolver.query(uri, projection, selection, args.toTypedArray(), null)
-            ?: return null
+        ?: return null
     return if (cursor.moveToNext()) {
       val id = cursor.getString(0)
       val name = cursor.getString(1) ?: ""
@@ -134,14 +135,14 @@ object DBUtils : IDBUtils {
 
   @SuppressLint("Recycle")
   override fun getAssetFromGalleryId(
-          context: Context,
-          galleryId: String,
-          page: Int,
-          pageSize: Int,
-          requestType: Int,
-          timeStamp: Long,
-          option: FilterOption,
-          cacheContainer: CacheContainer?
+      context: Context,
+      galleryId: String,
+      page: Int,
+      pageSize: Int,
+      requestType: Int,
+      timeStamp: Long,
+      option: FilterOption,
+      cacheContainer: CacheContainer?
   ): List<AssetEntity> {
     val cache = cacheContainer ?: this.cacheContainer
 
@@ -169,7 +170,7 @@ object DBUtils : IDBUtils {
 
     val sortOrder = getSortOrder(page * pageSize, pageSize, option)
     val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
-            ?: return emptyList()
+        ?: return emptyList()
 
     while (cursor.moveToNext()) {
       val asset = convertCursorToAsset(cursor, requestType)
@@ -211,7 +212,7 @@ object DBUtils : IDBUtils {
 
     val sortOrder = getSortOrder(start, pageSize, option)
     val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
-            ?: return emptyList()
+        ?: return emptyList()
 
     while (cursor.moveToNext()) {
       val asset = convertCursorToAsset(cursor, requestType)
@@ -257,7 +258,7 @@ object DBUtils : IDBUtils {
     val args = arrayOf(id)
 
     val cursor = context.contentResolver.query(allUri, keys, selection, args, null)
-            ?: return null
+        ?: return null
 
     return if (cursor.moveToNext()) {
       val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
@@ -314,12 +315,12 @@ object DBUtils : IDBUtils {
     }
 
     val degrees =
-            try {
-              val exifInterface = ExifInterface(inputStream)
-              exifInterface.rotationDegrees
-            } catch (e: Exception) {
-              0
-            }
+        try {
+          val exifInterface = ExifInterface(inputStream)
+          exifInterface.rotationDegrees
+        } catch (e: Exception) {
+          0
+        }
     refreshInputStream()
     val bmp = BitmapFactory.decodeStream(inputStream)
     val width = bmp.width
@@ -329,7 +330,7 @@ object DBUtils : IDBUtils {
     refreshInputStream()
 
     val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
-            ?: "image/${File(title).extension}"
+        ?: "image/${File(title).extension}"
 
     val values = ContentValues().apply {
       put(MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
@@ -354,7 +355,7 @@ object DBUtils : IDBUtils {
 
     // write bytes
     val cursor = cr.query(insertUri, arrayOf(MediaStore.Images.ImageColumns.DATA), null, null, null)
-            ?: return null
+        ?: return null
 
     cursor.use {
       if (cursor.moveToNext()) {
@@ -388,16 +389,16 @@ object DBUtils : IDBUtils {
 
 
     val (width, height) =
-            try {
-              val bmp = BitmapFactory.decodeFile(path)
-              Pair(bmp.width, bmp.height)
-            } catch (e: Exception) {
-              Pair(0, 0)
-            }
+        try {
+          val bmp = BitmapFactory.decodeFile(path)
+          Pair(bmp.width, bmp.height)
+        } catch (e: Exception) {
+          Pair(0, 0)
+        }
 
 
     val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
-            ?: "image/${File(path).extension}"
+        ?: "image/${File(path).extension}"
 
     val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 
@@ -463,7 +464,7 @@ object DBUtils : IDBUtils {
   override fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity? {
 
     val (currentGalleryId, _) = getSomeInfo(context, assetId)
-            ?: throw RuntimeException("Cannot get gallery id of $assetId")
+        ?: throw RuntimeException("Cannot get gallery id of $assetId")
 
     if (galleryId == currentGalleryId) {
       throw RuntimeException("No copy required, because the target gallery is the same as the current one.")
@@ -472,19 +473,19 @@ object DBUtils : IDBUtils {
     val cr = context.contentResolver
 
     val asset = getAssetEntity(context, assetId)
-            ?: throw RuntimeException("No copy required, because the target gallery is the same as the current one.")
+        ?: throw RuntimeException("No copy required, because the target gallery is the same as the current one.")
 
     val copyKeys = arrayListOf(
-            MediaStore.MediaColumns.DISPLAY_NAME,
-            MediaStore.Video.VideoColumns.TITLE,
-            MediaStore.Video.VideoColumns.DATE_ADDED,
-            MediaStore.Video.VideoColumns.DATE_MODIFIED,
-            MediaStore.Video.VideoColumns.DATE_TAKEN,
-            MediaStore.Video.VideoColumns.DURATION,
-            MediaStore.Video.VideoColumns.LONGITUDE,
-            MediaStore.Video.VideoColumns.LATITUDE,
-            MediaStore.Video.VideoColumns.WIDTH,
-            MediaStore.Video.VideoColumns.HEIGHT
+        MediaStore.MediaColumns.DISPLAY_NAME,
+        MediaStore.Video.VideoColumns.TITLE,
+        MediaStore.Video.VideoColumns.DATE_ADDED,
+        MediaStore.Video.VideoColumns.DATE_MODIFIED,
+        MediaStore.Video.VideoColumns.DATE_TAKEN,
+        MediaStore.Video.VideoColumns.DURATION,
+        MediaStore.Video.VideoColumns.LONGITUDE,
+        MediaStore.Video.VideoColumns.LATITUDE,
+        MediaStore.Video.VideoColumns.WIDTH,
+        MediaStore.Video.VideoColumns.HEIGHT
     )
     val mediaType = convertTypeToMediaType(asset.type)
 
@@ -493,7 +494,7 @@ object DBUtils : IDBUtils {
     }
 
     val cursor = cr.query(allUri, copyKeys.toTypedArray() + arrayOf(MediaStore.Video.VideoColumns.DATA), idSelection, arrayOf(assetId), null)
-            ?: throw RuntimeException("Cannot find asset .")
+        ?: throw RuntimeException("Cannot find asset .")
 
     if (!cursor.moveToNext()) {
       throw RuntimeException("Cannot find asset .")
@@ -514,7 +515,7 @@ object DBUtils : IDBUtils {
 
     val insertedUri = cr.insert(insertUri, cv) ?: throw RuntimeException("Cannot insert new asset.")
     val outputStream = cr.openOutputStream(insertedUri)
-            ?: throw RuntimeException("Cannot open output stream for $insertedUri.")
+        ?: throw RuntimeException("Cannot open output stream for $insertedUri.")
     val inputStream = File(asset.path).inputStream()
     inputStream.use {
       outputStream.use {
@@ -523,7 +524,7 @@ object DBUtils : IDBUtils {
     }
 
     val insertedId = insertedUri.lastPathSegment
-            ?: throw RuntimeException("Cannot open output stream for $insertedUri.")
+        ?: throw RuntimeException("Cannot open output stream for $insertedUri.")
 
     return getAssetEntity(context, insertedId)
   }
@@ -531,10 +532,10 @@ object DBUtils : IDBUtils {
   override fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity? {
 
     val (currentGalleryId, _) = getSomeInfo(context, assetId)
-            ?: throwMsg("Cannot get gallery id of $assetId")
+        ?: throwMsg("Cannot get gallery id of $assetId")
 
     val targetGalleryInfo = getGalleryInfo(context, galleryId)
-            ?: throwMsg("Cannot get target gallery info")
+        ?: throwMsg("Cannot get target gallery info")
 
     if (galleryId == currentGalleryId) {
       throwMsg("No move required, because the target gallery is the same as the current one.")
@@ -543,7 +544,7 @@ object DBUtils : IDBUtils {
     val cr = context.contentResolver
 
     val cursor = cr.query(allUri, arrayOf(MediaStore.MediaColumns.DATA), idSelection, arrayOf(assetId), null)
-            ?: throwMsg("Cannot find $assetId path")
+        ?: throwMsg("Cannot find $assetId path")
 
     val targetPath = if (cursor.moveToNext()) {
       val srcPath = cursor.getString(0)
@@ -579,7 +580,7 @@ object DBUtils : IDBUtils {
       val cr = context.contentResolver
 
       val queryCursor = cr.query(allUri, arrayOf(_ID, MediaStore.MediaColumns.DATA), null, null, null)
-              ?: return false
+          ?: return false
       queryCursor.use {
         while (queryCursor.moveToNext()) {
           val id = queryCursor.getString(_ID)
@@ -612,7 +613,7 @@ object DBUtils : IDBUtils {
     val cr = context.contentResolver
 
     val cursor = cr.query(allUri, arrayOf(MediaStore.Files.FileColumns.BUCKET_ID, MediaStore.Files.FileColumns.DATA), "${MediaStore.Files.FileColumns._ID} = ?", arrayOf(assetId), null)
-            ?: return null
+        ?: return null
 
     cursor.use {
       if (!cursor.moveToNext()) {
@@ -630,12 +631,12 @@ object DBUtils : IDBUtils {
     val cr = context.contentResolver
 
     val keys = arrayOf(
-            MediaStore.Files.FileColumns.BUCKET_ID,
-            MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME,
-            MediaStore.Files.FileColumns.DATA
+        MediaStore.Files.FileColumns.BUCKET_ID,
+        MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME,
+        MediaStore.Files.FileColumns.DATA
     )
     val cursor = cr.query(allUri, keys, "${MediaStore.Files.FileColumns.BUCKET_ID} = ?", arrayOf(galleryId), null)
-            ?: return null
+        ?: return null
 
 
     cursor.use {
@@ -645,7 +646,7 @@ object DBUtils : IDBUtils {
 
       val path = cursor.getStringOrNull(MediaStore.Files.FileColumns.DATA) ?: return null
       val name = cursor.getStringOrNull(MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME)
-              ?: return null
+          ?: return null
 
       val galleryPath = File(path).parentFile?.absolutePath ?: return null
       return GalleryInfo(galleryPath, galleryId, name)
@@ -658,7 +659,7 @@ object DBUtils : IDBUtils {
     val timestamp = System.currentTimeMillis() / 1000
 
     val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
-            ?: "video/${File(path).extension}"
+        ?: "video/${File(path).extension}"
 
     val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
 

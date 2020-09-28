@@ -83,14 +83,22 @@ class PhotoManagerPlugin(
     val handleResult = when (call.method) {
       "releaseMemCache" -> {
         photoManager.clearCache()
+        resultHandler.reply(1)
         true
       }
       "log" -> {
         LogUtils.isLog = call.arguments()
+        resultHandler.reply(1)
         true
       }
       "openSetting" -> {
         permissionsUtils.getAppDetailSettingIntent(activity)
+        resultHandler.reply(1)
+        true
+      }
+      "clearFileCache" -> {
+        photoManager.clearFileCache()
+        resultHandler.reply(1)
         true
       }
       "forceOldApi" -> {

@@ -322,7 +322,11 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future ignorePermissionCheck(bool ignore) async {
-    _channel.invokeMethod('ignorePermissionCheck', {'ignore': ignore});
+    await _channel.invokeMethod('ignorePermissionCheck', {'ignore': ignore});
+  }
+
+  Future clearFileCache() async {
+    await _channel.invokeMethod('clearFileCache');
   }
 }
 
