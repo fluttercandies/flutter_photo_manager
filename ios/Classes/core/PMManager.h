@@ -78,4 +78,8 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (BOOL)favoriteWithId:(NSString *)id favorite:(BOOL)favorite;
 
 - (void)clearFileCache;
+
+- (void)requestCacheAssetsThumb:(NSArray *)identifiers option:(PMThumbLoadOption *)option;
+
+- (void)cancelCacheRequests;
 @end

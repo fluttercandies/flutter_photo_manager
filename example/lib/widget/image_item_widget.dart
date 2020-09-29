@@ -10,10 +10,12 @@ import 'package:provider/provider.dart';
 
 class ImageItemWidget extends StatefulWidget {
   final AssetEntity entity;
+  final ThumbOption option;
 
   const ImageItemWidget({
     Key key,
-    this.entity,
+    @required this.entity,
+    this.option,
   }) : super(key: key);
   @override
   _ImageItemWidgetState createState() => _ImageItemWidgetState();
@@ -42,7 +44,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
       );
     }
     final item = widget.entity;
-    final size = 130;
+    final size = widget.option.width;
     final u8List = ImageLruCache.getData(item, size, format);
 
     Widget image;
@@ -51,11 +53,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
       return _buildImageWidget(item, u8List, size);
     } else {
       image = FutureBuilder<Uint8List>(
-        future: item.thumbDataWithOption(ThumbOption(
-          width: size,
-          height: size,
-          format: format,
-        )),
+        future: item.thumbDataWithOption(widget.option),
         builder: (context, snapshot) {
           Widget w;
           if (snapshot.hasError) {

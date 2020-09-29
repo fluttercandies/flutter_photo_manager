@@ -328,6 +328,14 @@
         [handler reply:@(favoriteResult)];
       } else if ([@"isAuth" isEqualToString:call.method]) {
         [handler reply:@YES];
+      } else if ([@"requestCacheAssetsThumb" isEqualToString:call.method]) {
+        NSArray *ids = call.arguments[@"ids"];
+        PMThumbLoadOption *option = [PMThumbLoadOption optionDict:call.arguments[@"option"]];
+        [manager requestCacheAssetsThumb:ids option:option];
+        [handler reply:@YES];
+      } else if ([@"cancelCacheRequests" isEqualToString:call.method]) {
+        [manager cancelCacheRequests];
+        [handler reply:@YES];
       } else {
         [handler notImplemented];
       }
