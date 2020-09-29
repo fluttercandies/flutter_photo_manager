@@ -39,6 +39,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
       - [Origin description](#origin-description)
       - [Create with id](#create-with-id)
     - [observer](#observer)
+    - [Clear file cache](#clear-file-cache)
     - [Experimental](#experimental)
       - [Delete item](#delete-item)
       - [Insert new item](#insert-new-item)
@@ -237,8 +238,10 @@ PhotoManager.stopChangeNotify();
 
 ### Clear file cache
 
-A cache is generated at runtime.
-Whether the use attribute contains cache can be seen in the table.
+You can use `PhotoManager.clearFileCache()` to clear all of cache.
+
+The cache is generated at runtime when your call some methods.
+The following table will tell the user when the cache file will be generated.
 
 | Platform                                   | thumb | file/originFile |
 | ------------------------------------------ | ----- | --------------- |
@@ -379,14 +382,14 @@ So if you are sensitive to space, please delete it after using file(just iOS), a
 ```dart
 
 void useEntity(AssetEntity entity) async {
-	File file = null;
+  File file = null;
   try{
     file = await entity.file;
-  	doUpload(); // do upload
+    doUpload(); // do upload
   }finally{
     if(Platform.isIOS){
       file?.deleteSync();
-	  }
+    }
   }
 }
 ```
