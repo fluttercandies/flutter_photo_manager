@@ -40,6 +40,9 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   void initState() {
     super.initState();
     path.getAssetListRange(start: 0, end: path.assetCount).then((value) {
+      if (value.isEmpty) {
+        return;
+      }
       PhotoCachingManager().requestCacheAssets(
         assets: value,
         option: thumbOption,
