@@ -2,6 +2,7 @@ part of '../photo_manager.dart';
 
 /// asset entity, for entity info.
 class AssetPathEntity {
+  /// Obtained by [AssetPathEntity.id], not recommended
   static Future<AssetPathEntity> fromId(String id,
       {FilterOptionGroup filterOption}) async {
     filterOption ??= FilterOptionGroup();
@@ -63,6 +64,7 @@ class AssetPathEntity {
 
   AssetPathEntity({this.id, this.name, this.filterOption});
 
+  /// Call this method to update the property
   Future<void> refreshPathProperties({DateTimeCond dateTimeCond}) async {
     dateTimeCond ??=
         this.filterOption.dateTimeCond.copyWith(max: DateTime.now());
@@ -131,7 +133,7 @@ class AssetPathEntity {
 
 /// Used to describe a picture or video
 class AssetEntity {
-  /// Create from [AssetEntity.id].
+  /// Create from [AssetEntity.id], not recommended.
   static Future<AssetEntity> fromId(String id) async {
     final entity = AssetEntity();
     entity.id = id;
@@ -395,7 +397,11 @@ class AssetEntity {
   }
 }
 
+/// Longitude and latitude
 class LatLng {
+  /// longitude
   double longitude;
+
+  /// latitude
   double latitude;
 }

@@ -187,6 +187,7 @@ class PhotoManager {
     return _plugin.assetExistsWithId(id);
   }
 
+  /// [AssetPathEntity.refreshPathProperties]
   static Future<AssetPathEntity> fetchPathProperties(
     AssetPathEntity entity,
     DateTimeCond dateTimeCond,
@@ -214,6 +215,7 @@ class PhotoManager {
     }
   }
 
+  /// Only valid for Android 29. The API of API 28 must be used with the property of `requestLegacyExternalStorage`.
   static Future<void> forceOldApi() async {
     await _plugin.forceOldApi();
   }
@@ -226,14 +228,17 @@ class PhotoManager {
     return int.parse(systemVersion) >= 29;
   }
 
+  /// Get system version
   static Future<String> systemVersion() async {
     return _plugin.getSystemVersion();
   }
 
+  /// Clear all file cache.
   static Future<void> clearFileCache() async {
     await _plugin.clearFileCache();
   }
 
+  /// When set to true, originbytes in Android Q will be cached as a file. When use again, the file will be read.
   static Future<bool> setCacheAtOriginBytes(bool cache) =>
       _plugin.cacheOriginBytes(cache);
 
@@ -263,6 +268,7 @@ class PhotoManager {
     return _plugin.getSubPathEntities(assetPathEntity);
   }
 
+  /// Refresh the property of asset.
   static Future<AssetEntity> refreshAssetProperties(AssetEntity src) async {
     assert(src.id != null);
     final Map<dynamic, dynamic> map =
