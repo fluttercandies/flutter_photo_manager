@@ -72,7 +72,7 @@ class PhotoManager(private val context: Context) {
   }
 
 
-  fun getThumb(id: String, option:ThumbLoadOption, resultHandler: ResultHandler) {
+  fun getThumb(id: String, option: ThumbLoadOption, resultHandler: ResultHandler) {
     val width = option.width
     val height = option.height
     val quality = option.quality
@@ -128,6 +128,12 @@ class PhotoManager(private val context: Context) {
 
   fun clearCache() {
     dbUtils.clearCache()
+  }
+
+
+  fun clearFileCache() {
+    ThumbnailUtil.clearCache(context)
+    dbUtils.clearFileCache(context)
   }
 
   fun getPathEntity(id: String, type: Int, timestamp: Long, option: FilterOption): GalleryEntity? {

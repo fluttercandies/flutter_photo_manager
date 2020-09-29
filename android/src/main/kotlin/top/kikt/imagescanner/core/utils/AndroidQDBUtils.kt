@@ -302,6 +302,10 @@ object AndroidQDBUtils : IDBUtils {
     cacheContainer.clearCache()
   }
 
+  override fun clearFileCache(context: Context) {
+    androidQCache.clearAllCache(context)
+  }
+
   override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
     val assetEntity = getAssetEntity(context, id) ?: return null
 

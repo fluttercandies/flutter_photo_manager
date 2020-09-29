@@ -39,6 +39,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
       - [Origin description](#origin-description)
       - [Create with id](#create-with-id)
     - [observer](#observer)
+    - [Clear file cache](#clear-file-cache)
     - [Experimental](#experimental)
       - [Delete item](#delete-item)
       - [Insert new item](#insert-new-item)
@@ -48,9 +49,12 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
   - [iOS config](#ios-config)
     - [iOS plist config](#ios-plist-config)
     - [enabling localized system albums names](#enabling-localized-system-albums-names)
+    - [Cache problem of iOS](#cache-problem-of-ios)
   - [android config](#android-config)
+    - [Cache problem of android](#cache-problem-of-android)
     - [about androidX](#about-androidx)
-    - [Android Q privacy](#android-q-privacy)
+    - [Android Q (android10 , API 29)](#android-q-android10--api-29)
+    - [Android R (android 11, API30)](#android-r-android-11-api30)
     - [glide](#glide)
   - [common issues](#common-issues)
     - [ios build error](#ios-build-error)
@@ -232,6 +236,21 @@ PhotoManager.removeChangeCallback(changeNotify);
 PhotoManager.stopChangeNotify();
 ```
 
+### Clear file cache
+
+You can use `PhotoManager.clearFileCache()` to clear all of cache.
+
+The cache is generated at runtime when your call some methods.
+The following table will tell the user when the cache file will be generated.
+
+| Platform                                   | thumb | file/originFile |
+| ------------------------------------------ | ----- | --------------- |
+| Android(28 or lower)                       | Yes   | No              |
+| Android(29) (requestLegacyExternalStorage) | Yes   | No              |
+| Android(29)                                | Yes   | Yes             |
+| Android(30)                                | Yes   | No              |
+| iOS                                        | No    | Yes             |
+
 ### Experimental
 
 **Important**: The functions are not guaranteed to be fully usable, because it involves data modification, some APIs will cause irreversible deletion / movement of the data, so please use test equipment to make sure that there is no problem before using it.
@@ -352,7 +371,36 @@ Close xCode
 Rebuild your flutter project
 Now, the system albums should be displayed according to the device's language
 
+### Cache problem of iOS
+
+iOS does not directly provide APIs to access the original files of the album. The corresponding object is PHAsset,
+
+So when you want to use file or originFile, a cache file will be generated locally.
+
+So if you are sensitive to space, please delete it after using file(just iOS), and if it is only used for preview, you can consider using thumb or thumbWithSize.
+
+```dart
+
+void useEntity(AssetEntity entity) async {
+  File file = null;
+  try{
+    file = await entity.file;
+    doUpload(); // do upload
+  }finally{
+    if(Platform.isIOS){
+      file?.deleteSync();
+    }
+  }
+}
+```
+
 ## android config
+
+### Cache problem of android
+
+Because androidQ restricts the application’s ability to directly access the resource path, some large image caches will be generated. This is because: When the file/originFile attribute is used, the plugin will save a file in the cache folder and provide it to dart:io use.
+
+Fortunately, in androidP, the path attribute can be used again, but for androidQ, this is not good news, but we can use requestLegacyExternalStorage to avoid using androidQ's api, and I also recommend you to do so. See [Android Q](#android-q-android10--api-29) to add the attribute.
 
 ### about androidX
 
@@ -362,13 +410,31 @@ This library has been migrated in version 0.2.2, but it brings a problem. Someti
 
 The complete migration method can be consulted [gitbook](https://caijinglong.gitbooks.io/migrate-flutter-to-androidx/content/).
 
-### Android Q privacy
+### Android Q (android10 , API 29)
 
 Now, the android part of the plugin uses api 29 to compile the plugin, so your android sdk environment must contain api 29 (androidQ).
 
 AndroidQ has a new privacy policy, users can't access the original file.
 
-If your compileSdkVersion and targetSdkVersion are both below 28, you can use `PhotoManager.forceOldApi` to force the old api to access the album. If you are not sure about this part, don't call this method.
+If your compileSdkVersion and targetSdkVersion are both below 28, you can use `PhotoManager.forceOldApi` to force the old api to access the album. If you are not sure about this part, don't call this method. And, I recommand you add `android:requestLegacyExternalStorage="true"` to your `AndroidManifest.xml`, just like next.
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="top.kikt.imagescannerexample">
+
+    <application
+        android:name="io.flutter.app.FlutterApplication"
+        android:label="image_scanner_example"
+        android:requestLegacyExternalStorage="true"
+        android:icon="@mipmap/ic_launcher">
+    </application>
+</manifest>
+
+```
+
+### Android R (android 11, API30)
+
+Unlike androidQ, this version of `requestLegacyExternalStorage` is invalid, but I still recommend that you add this attribute to make it easier to use the old API on android29 of android device.
 
 ### glide
 
@@ -422,3 +488,5 @@ Xcode's output:
 [How To: Create a custom media picker in Flutter to select photos and videos from the gallery](https://medium.com/@mhstoller.it/how-to-create-a-custom-media-picker-in-flutter-to-select-photos-and-videos-from-the-gallery-988eea477643?sk=cb395a7c20f6002f92f83374b3cc3875)
 
 [Flutter 开发日记-如何实现一个照片选择器 plugin](https://juejin.im/post/5df797706fb9a016107974fc)
+
+If you have other articles about this library, you can contact me or open PR here.

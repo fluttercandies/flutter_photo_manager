@@ -27,44 +27,44 @@ interface IDBUtils {
     val isAndroidR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
     val storeImageKeys = arrayOf(
-            MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
-            MediaStore.MediaColumns.DATA, // 数据
-            MediaStore.MediaColumns._ID, // id
-            MediaStore.MediaColumns.TITLE, // id
-            MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
-            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
-            MediaStore.MediaColumns.WIDTH, // 宽
-            MediaStore.MediaColumns.HEIGHT, // 高
-            MediaStore.MediaColumns.ORIENTATION, // 角度
-            MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
-            MediaStore.MediaColumns.MIME_TYPE, // 高
-            MediaStore.MediaColumns.DATE_TAKEN //日期
+        MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
+        MediaStore.MediaColumns.DATA, // 数据
+        MediaStore.MediaColumns._ID, // id
+        MediaStore.MediaColumns.TITLE, // id
+        MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
+        MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
+        MediaStore.MediaColumns.WIDTH, // 宽
+        MediaStore.MediaColumns.HEIGHT, // 高
+        MediaStore.MediaColumns.ORIENTATION, // 角度
+        MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
+        MediaStore.MediaColumns.MIME_TYPE, // 高
+        MediaStore.MediaColumns.DATE_TAKEN //日期
     )
 
     val storeVideoKeys = arrayOf(
-            MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
-            MediaStore.MediaColumns.DATA, // 数据
-            MediaStore.MediaColumns._ID, // id
-            MediaStore.MediaColumns.TITLE, // id
-            MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
-            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
-            MediaStore.MediaColumns.DATE_TAKEN, //日期
-            MediaStore.MediaColumns.WIDTH, // 宽
-            MediaStore.MediaColumns.HEIGHT, // 高
-            MediaStore.MediaColumns.ORIENTATION, // 角度
-            MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
-            MediaStore.MediaColumns.MIME_TYPE, // 高
-            MediaStore.MediaColumns.DURATION //时长
+        MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
+        MediaStore.MediaColumns.DATA, // 数据
+        MediaStore.MediaColumns._ID, // id
+        MediaStore.MediaColumns.TITLE, // id
+        MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
+        MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
+        MediaStore.MediaColumns.DATE_TAKEN, //日期
+        MediaStore.MediaColumns.WIDTH, // 宽
+        MediaStore.MediaColumns.HEIGHT, // 高
+        MediaStore.MediaColumns.ORIENTATION, // 角度
+        MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
+        MediaStore.MediaColumns.MIME_TYPE, // 高
+        MediaStore.MediaColumns.DURATION //时长
     )
 
     val typeKeys = arrayOf(
-            MEDIA_TYPE,
-            MediaStore.Images.Media.DISPLAY_NAME
+        MEDIA_TYPE,
+        MediaStore.Images.Media.DISPLAY_NAME
     )
 
     val storeBucketKeys = arrayOf(
-            MediaStore.Images.Media.BUCKET_ID,
-            MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
+        MediaStore.Images.Media.BUCKET_ID,
+        MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
     )
 
     //    fun galleryIdKey(@MediaTypeDef mediaType: Int) :String{
@@ -308,11 +308,11 @@ interface IDBUtils {
 
   fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String {
     val asc =
-            if (filterOption.dateCond.asc) {
-              "ASC"
-            } else {
-              "DESC"
-            }
+        if (filterOption.dateCond.asc) {
+          "ASC"
+        } else {
+          "DESC"
+        }
     return "$DATE_ADDED $asc LIMIT $pageSize OFFSET $start"
   }
 
@@ -324,12 +324,12 @@ interface IDBUtils {
 
   fun getUri(id: String, type: Int, isOrigin: Boolean = false): Uri {
     var uri =
-            when (type) {
-              1 -> Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-              2 -> Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
-              3 -> Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-              else -> return Uri.EMPTY
-            }
+        when (type) {
+          1 -> Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+          2 -> Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+          3 -> Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+          else -> return Uri.EMPTY
+        }
 
     if (isOrigin) {
       uri = MediaStore.setRequireOriginal(uri)
@@ -342,4 +342,6 @@ interface IDBUtils {
   }
 
   fun removeAllExistsAssets(context: Context): Boolean
+
+  fun clearFileCache(context: Context) {}
 }

@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.os.Handler
+import com.bumptech.glide.Glide
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -83,14 +84,25 @@ class PhotoManagerPlugin(
     val handleResult = when (call.method) {
       "releaseMemCache" -> {
         photoManager.clearCache()
+        resultHandler.reply(1)
         true
       }
       "log" -> {
         LogUtils.isLog = call.arguments()
+        resultHandler.reply(1)
         true
       }
       "openSetting" -> {
         permissionsUtils.getAppDetailSettingIntent(activity)
+        resultHandler.reply(1)
+        true
+      }
+      "clearFileCache" -> {
+        Glide.get(applicationContext).clearMemory()
+        runOnBackground {
+          photoManager.clearFileCache()
+          resultHandler.reply(1)
+        }
         true
       }
       "forceOldApi" -> {

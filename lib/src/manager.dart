@@ -230,6 +230,10 @@ class PhotoManager {
     return _plugin.getSystemVersion();
   }
 
+  static Future<void> clearFileCache() async {
+    await _plugin.clearFileCache();
+  }
+
   static Future<bool> setCacheAtOriginBytes(bool cache) =>
       _plugin.cacheOriginBytes(cache);
 

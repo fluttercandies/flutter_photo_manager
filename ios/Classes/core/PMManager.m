@@ -1194,10 +1194,10 @@
   NSError *error;
 
   [PHPhotoLibrary.sharedPhotoLibrary
-          performChangesAndWait:^{
-              PHAssetChangeRequest *request = [PHAssetChangeRequest changeRequestForAsset:asset];
-              request.favorite = favorite;
-          } error:&error];
+      performChangesAndWait:^{
+        PHAssetChangeRequest *request = [PHAssetChangeRequest changeRequestForAsset:asset];
+        request.favorite = favorite;
+      } error:&error];
 
   if (error) {
     NSLog(@"favorite error: %@", error);
@@ -1205,6 +1205,27 @@
   }
 
   return YES;
+}
+
+- (NSString *)getCachePath:(NSString *)type {
+  NSString *homePath = NSTemporaryDirectory();
+  NSString *cachePath = type;
+  NSString *dirPath = [NSString stringWithFormat:@"%@%@", homePath, cachePath];
+  return dirPath;
+}
+
+- (void)clearFileCache {
+  NSString *videoPath = [self getCachePath:@".video"];
+  NSString *imagePath = [self getCachePath:@".image"];
+
+  NSFileManager *fm = NSFileManager.defaultManager;
+
+  NSError *err;
+
+  [fm removeItemAtPath:imagePath error:&err];
+  NSLog(@"remove cache file %@, error: %@", imagePath, err);
+  [fm removeItemAtPath:videoPath error:&err];
+  NSLog(@"remove cache file %@, error: %@", videoPath, err);
 }
 
 @end

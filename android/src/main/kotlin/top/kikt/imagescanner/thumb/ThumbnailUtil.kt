@@ -20,45 +20,51 @@ object ThumbnailUtil {
     val resultHandler = ResultHandler(result)
 
     Glide.with(ctx)
-            .asBitmap()
-            .load(File(path))
-            .into(object : BitmapTarget(width, height) {
-              override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                super.onResourceReady(resource, transition)
-                val bos = ByteArrayOutputStream()
+        .asBitmap()
+        .load(File(path))
+        .into(object : BitmapTarget(width, height) {
+          override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+            super.onResourceReady(resource, transition)
+            val bos = ByteArrayOutputStream()
 
-                resource.compress(format, quality, bos)
-                resultHandler.reply(bos.toByteArray())
-              }
+            resource.compress(format, quality, bos)
+            resultHandler.reply(bos.toByteArray())
+          }
 
-              override fun onLoadCleared(placeholder: Drawable?) {
-                resultHandler.reply(null)
-              }
+          override fun onLoadCleared(placeholder: Drawable?) {
+            resultHandler.reply(null)
+          }
 
-              override fun onLoadFailed(errorDrawable: Drawable?) {
-                resultHandler.reply(null)
-              }
-            })
+          override fun onLoadFailed(errorDrawable: Drawable?) {
+            resultHandler.reply(null)
+          }
+        })
   }
 
 
   fun getThumbOfUri(context: Context, uri: Uri, width: Int, height: Int, format: Bitmap.CompressFormat, quality: Int, callback: (ByteArray?) -> Unit) {
     Glide.with(context)
-            .asBitmap()
-            .load(uri)
-            .into(object : BitmapTarget(width, height) {
-              override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                super.onResourceReady(resource, transition)
-                val bos = ByteArrayOutputStream()
+        .asBitmap()
+        .load(uri)
+        .into(object : BitmapTarget(width, height) {
+          override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+            super.onResourceReady(resource, transition)
+            val bos = ByteArrayOutputStream()
 
-                resource.compress(format, quality, bos)
-                callback(bos.toByteArray())
-              }
+            resource.compress(format, quality, bos)
+            callback(bos.toByteArray())
+          }
 
-              override fun onLoadCleared(placeholder: Drawable?) {
-                callback(null)
-              }
-            })
+          override fun onLoadCleared(placeholder: Drawable?) {
+            callback(null)
+          }
+        })
+  }
+
+  fun clearCache(context: Context) {
+    Glide.get(context).apply {
+      clearDiskCache()
+    }
   }
 
 

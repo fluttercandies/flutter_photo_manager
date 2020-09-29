@@ -47,7 +47,10 @@
           [handler reply:@0];
         }
     }];
-  } else if ([call.method isEqualToString:@"openSetting"]) {
+  } else if ([call.method isEqualToString:@"clearFileCache"]) {
+    [manager clearFileCache];
+    [handler reply:@1];
+  }  else if ([call.method isEqualToString:@"openSetting"]) {
     [PMManager openSetting];
     [handler reply:@1];
   } else if ([call.method isEqualToString:@"ignorePermissionCheck"]) {
@@ -57,6 +60,7 @@
     [self onAuth:call result:result];
   } else if ([call.method isEqualToString:@"log"]) {
     PMLogUtils.sharedInstance.isLog = (BOOL) call.arguments;
+    [handler reply:@1];
   } else {
     if (ignoreCheckPermission) {
       [self onAuth:call result:result];
