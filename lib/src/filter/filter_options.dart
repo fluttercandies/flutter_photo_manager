@@ -30,7 +30,9 @@ class FilterOptionGroup {
 
   ///
   DateTimeCond createTimeCond = DateTimeCond.def();
-  DateTimeCond updateTimeCond = DateTimeCond.def();
+  DateTimeCond updateTimeCond = DateTimeCond.def().copyWith(
+    ignore: true,
+  );
 
   FilterOption getOption(AssetType type) {
     return _map[type];
