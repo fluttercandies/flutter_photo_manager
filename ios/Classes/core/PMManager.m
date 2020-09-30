@@ -723,8 +723,16 @@
   [cond appendString:@")"];
 
   PMDateOption *dateOption = optionGroup.dateOption;
-  [cond appendString:[dateOption dateCond]];
-  [args addObjectsFromArray:[dateOption dateArgs]];
+  if (!dateOption.ignore) {
+    [cond appendString:[dateOption dateCond:@"creationDate"]];
+    [args addObjectsFromArray:[dateOption dateArgs]];
+  }
+
+  PMDateOption *updateOption = optionGroup.dateOption;
+  if (updateOption) {
+    [cond appendString:[updateOption dateCond:@"modificationDate"]];
+    [args addObjectsFromArray:[updateOption dateArgs]];
+  }
 
   options.predicate = [NSPredicate predicateWithFormat:cond argumentArray:args];
 

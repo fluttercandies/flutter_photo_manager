@@ -110,6 +110,7 @@
   container.videoOption = [self convertMapToPMFilterOption:video];
   container.audioOption = [self convertMapToPMFilterOption:audio];
   container.dateOption = [self convertMapToPMDateOption:map[@"date"]];
+  container.updateOption = [self convertMapToPMDateOption:map[@"updateDate"]];
   container.containsEmptyAlbum = [map[@"containsEmptyAlbum"] boolValue];
 
   return container;
@@ -146,10 +147,12 @@
   long min = [map[@"min"] longValue];
   long max = [map[@"max"] longValue];
   BOOL asc = [map[@"asc"] boolValue];
+  BOOL ignore = [map[@"ignore"] boolValue];
 
   option.min = [NSDate dateWithTimeIntervalSince1970:(min / 1000.0)];
   option.max = [NSDate dateWithTimeIntervalSince1970:(max / 1000.0)];
   option.asc = asc;
+  option.ignore = ignore;
 
   return option;
 }

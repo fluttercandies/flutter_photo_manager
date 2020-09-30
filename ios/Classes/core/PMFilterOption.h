@@ -9,8 +9,9 @@
 @property(nonatomic, strong) NSDate *min;
 @property(nonatomic, strong) NSDate *max;
 @property(nonatomic, assign) BOOL asc;
+@property(nonatomic, assign) BOOL ignore;
 
-- (NSString *)dateCond;
+- (NSString *)dateCond:(NSString *)key;
 
 - (NSArray *)dateArgs;
 
@@ -56,6 +57,7 @@ typedef struct PMDurationConstraint {
 @property(nonatomic, strong) PMFilterOption *videoOption;
 @property(nonatomic, strong) PMFilterOption *audioOption;
 @property(nonatomic, strong) PMDateOption *dateOption;
+@property(nonatomic, strong) PMDateOption *updateOption;
 @property(nonatomic, assign) BOOL containsEmptyAlbum;
 
 - (NSArray<NSSortDescriptor *> *)sortCond;

@@ -9,8 +9,10 @@
 
 - (NSArray<NSSortDescriptor *> *)sortCond {
   PMDateOption *dateOption = self.dateOption;
+  PMDateOption *updateOption = self.updateOption;
   return @[
-      [dateOption sortCond]
+      [dateOption sortCond],
+      [updateOption sortCond],
   ];
 }
 
@@ -45,8 +47,31 @@
 
 }
 
-- (NSString *)dateCond {
-  return @"AND ( creationDate >= %@ AND creationDate <= %@ )";
+- (NSString *)dateCond:(NSString *)key {
+  NSMutableString *str = [NSMutableString new];
+
+  [str appendString:@"AND "];
+  [str appendString:@"( "];
+
+  // min
+
+  [str appendString:@"%@ >= "];
+
+  [str appendString:key];
+
+  // and
+  [str appendString:@" AND "];
+
+  // max
+
+  [str appendString:key];
+  [str appendString:@" <= %@ "];
+
+  [str appendString:@") "];
+
+  return str;
+
+//  return @"AND ( creationDate >= %@ AND creationDate <= %@ )";
 }
 
 - (NSArray *)dateArgs {
