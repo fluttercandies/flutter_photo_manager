@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
 import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.transition.Transition
 import io.flutter.plugin.common.MethodChannel
@@ -24,6 +25,7 @@ object ThumbnailUtil {
     Glide.with(ctx)
         .asBitmap()
         .load(File(path))
+        .priority(Priority.IMMEDIATE)
         .into(object : BitmapTarget(width, height) {
           override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
             super.onResourceReady(resource, transition)
@@ -48,6 +50,7 @@ object ThumbnailUtil {
     Glide.with(context)
         .asBitmap()
         .load(uri)
+        .priority(Priority.IMMEDIATE)
         .into(object : BitmapTarget(width, height) {
           override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
             super.onResourceReady(resource, transition)
@@ -66,6 +69,7 @@ object ThumbnailUtil {
   fun requestCacheThumb(context: Context, uri: Uri, thumbLoadOption: ThumbLoadOption): FutureTarget<Bitmap> {
     return Glide.with(context)
         .asBitmap()
+        .priority(Priority.LOW)
         .load(uri)
         .submit(thumbLoadOption.width, thumbLoadOption.height)
   }
@@ -74,6 +78,7 @@ object ThumbnailUtil {
   fun requestCacheThumb(context: Context, path: String, thumbLoadOption: ThumbLoadOption): FutureTarget<Bitmap> {
     return Glide.with(context)
         .asBitmap()
+        .priority(Priority.LOW)
         .load(path)
         .submit(thumbLoadOption.width, thumbLoadOption.height)
   }
