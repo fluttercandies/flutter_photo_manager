@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:meta/meta.dart';
 
 import '../type.dart';
 
@@ -20,9 +21,16 @@ class FilterOptionGroup {
   final Map<AssetType, FilterOption> _map = {};
 
   /// 是否包含空相册
+  ///
+  /// Whether to include an empty album
   var containsEmptyAlbum = false;
 
+  @Deprecated('Use createTimeCond.')
   DateTimeCond dateTimeCond = DateTimeCond.def();
+
+  ///
+  DateTimeCond createTimeCond = DateTimeCond.def();
+  DateTimeCond updateTimeCond = DateTimeCond.def();
 
   FilterOption getOption(AssetType type) {
     return _map[type];
@@ -52,7 +60,9 @@ class FilterOptionGroup {
       result["audio"] = _map[AssetType.audio].toMap();
     }
 
-    result["date"] = dateTimeCond.toMap();
+    // ignore: deprecated_member_use_from_same_package
+    result["date"] = createTimeCond.toMap() ?? dateTimeCond.toMap();
+    result["updateDate"] = updateTimeCond.toMap();
     result['containsEmptyAlbum'] = containsEmptyAlbum;
 
     return result;
@@ -170,16 +180,19 @@ class DurationConstraint {
   }
 }
 
+/// CreateDate
 class DateTimeCond {
-  static final DateTime zero = DateTime.utc(0);
+  static final DateTime zero = DateTime.fromMillisecondsSinceEpoch(0);
 
   final DateTime min;
   final DateTime max;
   final bool asc;
+  final bool ignore;
 
   const DateTimeCond({
-    this.min,
-    this.max,
+    @required this.min,
+    @required this.max,
+    this.ignore = false,
     this.asc = false, // default desc
   })  : assert(min != null),
         assert(max != null),
@@ -197,19 +210,22 @@ class DateTimeCond {
     final DateTime min,
     final DateTime max,
     final bool asc,
+    final bool ignore,
   }) {
     return DateTimeCond(
       min: min ?? this.min,
       max: max ?? this.max,
       asc: asc ?? this.asc,
+      ignore: ignore ?? this.ignore,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      "min": min.millisecondsSinceEpoch,
-      "max": max.millisecondsSinceEpoch,
-      "asc": asc,
+      'min': min.millisecondsSinceEpoch,
+      'max': max.millisecondsSinceEpoch,
+      'asc': asc,
+      'ignore': ignore,
     };
   }
 }

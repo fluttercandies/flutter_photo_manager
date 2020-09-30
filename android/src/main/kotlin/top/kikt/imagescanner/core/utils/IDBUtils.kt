@@ -11,6 +11,7 @@ import android.provider.MediaStore.VOLUME_EXTERNAL
 import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
+import top.kikt.imagescanner.core.entity.DateCond
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
 import top.kikt.imagescanner.util.LogUtils
@@ -295,15 +296,25 @@ interface IDBUtils {
   fun getOnlyGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity>
 
   fun getDateCond(args: ArrayList<String>, timestamp: Long, option: FilterOption): String {
-    val minMs = option.dateCond.minMs
-    val maxMs = option.dateCond.maxMs
-
-    val dateSelection = "AND ( ${MediaStore.Images.Media.DATE_ADDED} >= ? AND ${MediaStore.Images.Media.DATE_ADDED} <= ? )"
-    args.add((minMs / 1000).toString())
-    args.add((maxMs / 1000).toString())
-    return dateSelection
+    val createDateCond = addDateCond(args, option.dateCond, MediaStore.Images.Media.DATE_ADDED)
+    val updateDateCond = addDateCond(args, option.updateDateCond, MediaStore.Images.Media.DATE_MODIFIED)
+    return "$createDateCond $updateDateCond"
   }
 
+  private fun addDateCond(args: ArrayList<String>, dateCond: DateCond, dbKey: String): String {
+    if (dateCond.ignore) {
+      return ""
+    }
+
+    val minMs = dateCond.minMs
+    val maxMs = dateCond.maxMs
+
+    val dateSelection = "AND ( $dbKey >= ? AND $dbKey <= ? )"
+    args.add((minMs / 1000).toString())
+    args.add((maxMs / 1000).toString())
+
+    return dateSelection
+  }
 
   fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String {
     val asc =

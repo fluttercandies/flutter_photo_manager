@@ -11,6 +11,7 @@ class FilterOption(map: Map<*, *>) {
   val imageOption = ConvertUtils.getOptionFromType(map, AssetType.Image)
   val audioOption = ConvertUtils.getOptionFromType(map, AssetType.Audio)
   val dateCond = ConvertUtils.convertToDateCond(map["date"] as Map<*, *>)
+  val updateDateCond = ConvertUtils.convertToDateCond(map["updateDate"] as Map<*, *>)
 }
 
 class FilterCond {
@@ -62,5 +63,5 @@ class FilterCond {
 }
 
 data class DateCond(
-  val minMs: Long, val maxMs: Long, val asc: Boolean
+  val minMs: Long, val maxMs: Long, val asc: Boolean,val ignore:Boolean
 )
