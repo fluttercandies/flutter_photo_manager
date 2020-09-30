@@ -37,7 +37,7 @@ class PhotoCachingManager {
     ThumbOption option = defaultOption,
   }) async {
     assert(assets != null);
-    assert(assets.isEmpty);
+    assert(assets.isNotEmpty);
     assert(option != null);
 
     await _plugin.requestCacheAssetsThumb(
@@ -51,7 +51,7 @@ class PhotoCachingManager {
     ThumbOption option = defaultOption,
   }) async {
     assert(assetIds != null);
-    assert(assetIds.isEmpty);
+    assert(assetIds.isNotEmpty);
     assert(option != null);
 
     await _plugin.requestCacheAssetsThumb(

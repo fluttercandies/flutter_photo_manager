@@ -242,6 +242,19 @@ class PhotoManagerPlugin(
           photoManager.getThumb(id, option, resultHandler)
         }
       }
+      "requestCacheAssetsThumb" -> {
+        runOnBackground {
+          val ids = call.argument<List<String>>("ids")!!
+          val optionMap = call.argument<Map<*, *>>("option")!!
+          val option = ThumbLoadOption.fromMap(optionMap)
+          photoManager.requestCache(ids, option, resultHandler)
+        }
+      }
+      "cancelCacheRequests"->{
+        runOnBackground {
+          photoManager.cancelCacheRequests()
+        }
+      }
       "assetExists" -> {
         runOnBackground {
           val id = call.argument<String>("id")!!

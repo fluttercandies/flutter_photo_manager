@@ -1,7 +1,6 @@
 package top.kikt.imagescanner.core.utils
 
 import android.annotation.SuppressLint
-import android.content.ContentProviderOperation
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
@@ -337,6 +336,24 @@ interface IDBUtils {
     return uri
   }
 
+
+  fun getUriFromMediaType(id: String, mediaType: Int, isOrigin: Boolean = false): Uri {
+    var uri =
+        when (mediaType) {
+          MEDIA_TYPE_IMAGE -> Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+          MEDIA_TYPE_VIDEO -> Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+          MEDIA_TYPE_AUDIO -> Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+          MEDIA_TYPE_PLAYLIST -> Uri.withAppendedPath(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, id)
+          else -> return Uri.EMPTY
+        }
+
+    if (isOrigin) {
+      uri = MediaStore.setRequireOriginal(uri)
+    }
+    return uri
+  }
+
+
   fun throwMsg(msg: String): Nothing {
     throw RuntimeException(msg)
   }
@@ -344,4 +361,116 @@ interface IDBUtils {
   fun removeAllExistsAssets(context: Context): Boolean
 
   fun clearFileCache(context: Context) {}
+
+  @SuppressLint("Recycle")
+  fun getAssetsUri(context: Context, ids: List<String>): List<Uri> {
+    if (ids.count() > 500) {
+      val result = ArrayList<Uri>()
+
+      val total = ids.count()
+      var count = total / 500
+
+      if (total % 500 != 0) {
+        count++
+      }
+
+      for (i in 0 until count) {
+        val end = if (i == count - 1) {
+          ids.count()
+        } else {
+          (i + 1) * 500 - 1
+        }
+        val start = i * 500
+
+        val tmp = getAssetsUri(context, ids.subList(start, end))
+        result.addAll(tmp)
+      }
+
+      return result
+    }
+
+    val key = arrayOf(_ID, MEDIA_TYPE)
+    val idSelection = ids.joinToString(",") { "?" }
+    val selection = "$_ID in ($idSelection)";
+    val cursor = context.contentResolver.query(allUri, key, selection, ids.toTypedArray(), null)
+        ?: return emptyList()
+
+    val list = ArrayList<Uri>()
+
+    val map = HashMap<String, Uri>()
+
+    cursor.use {
+      while (it.moveToNext()) {
+        val id = it.getString(_ID)
+        val type = it.getInt(MEDIA_TYPE)
+        map[id] = getUriFromMediaType(id, type)
+      }
+    }
+
+
+    for (id in ids) {
+      map[id]?.let {
+        list.add(it)
+      }
+    }
+
+    return list
+  }
+
+  @SuppressLint("Recycle")
+  fun getAssetsPath(context: Context, ids: List<String>): List<String> {
+
+    if (ids.count() > 500) {
+      val result = ArrayList<String>()
+
+      val total = ids.count()
+      var count = total / 500
+
+      if (total % 500 != 0) {
+        count++
+      }
+
+      for (i in 0 until count) {
+        val end = if (i == count - 1) {
+          ids.count()
+        } else {
+          (i + 1) * 500 - 1
+        }
+        val start = i * 500
+
+        val tmp = getAssetsPath(context, ids.subList(start, end))
+        result.addAll(tmp)
+      }
+
+      return result
+    }
+
+    val key = arrayOf(_ID, MEDIA_TYPE, DATA)
+    val idSelection = ids.joinToString(",") { "?" }
+    val selection = "$_ID in ($idSelection)";
+    val cursor = context.contentResolver.query(allUri, key, selection, ids.toTypedArray(), null)
+        ?: return emptyList()
+
+    val list = ArrayList<String>()
+
+    val map = HashMap<String, String>()
+
+    cursor.use {
+      while (it.moveToNext()) {
+        val id = it.getString(_ID)
+        val path = it.getString(DATA)
+        map[id] = path
+      }
+    }
+
+    for (id in ids) {
+      map[id]?.let {
+        list.add(it)
+      }
+    }
+
+    return list
+  }
+
+
 }
