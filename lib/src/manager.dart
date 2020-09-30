@@ -194,7 +194,7 @@ class PhotoManager {
   ) async {
     assert(entity != null);
     assert(dateTimeCond != null);
-    entity.filterOption.dateTimeCond = dateTimeCond;
+    entity.filterOption.createTimeCond = dateTimeCond;
     final result = await _plugin.fetchPathProperties(
       entity.id,
       entity.typeInt,

@@ -28,7 +28,6 @@ class FilterOptionGroup {
   @Deprecated('Use createTimeCond.')
   DateTimeCond dateTimeCond = DateTimeCond.def();
 
-  ///
   DateTimeCond createTimeCond = DateTimeCond.def();
   DateTimeCond updateTimeCond = DateTimeCond.def().copyWith(
     ignore: true,

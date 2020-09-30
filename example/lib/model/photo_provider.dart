@@ -202,7 +202,7 @@ class PhotoProvider extends ChangeNotifier {
       ..setOption(AssetType.video, option)
       ..setOption(AssetType.image, option)
       ..setOption(AssetType.audio, option)
-      ..dateTimeCond = dtCond
+      ..createTimeCond = dtCond
       ..containsEmptyAlbum = _containsEmptyAlbum;
   }
 
