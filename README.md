@@ -41,6 +41,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
     - [observer](#observer)
     - [Clear file cache](#clear-file-cache)
     - [Experimental](#experimental)
+      - [Preload thumb](#preload-thumb)
       - [Delete item](#delete-item)
       - [Insert new item](#insert-new-item)
       - [Copy asset](#copy-asset)
@@ -259,9 +260,9 @@ The following table will tell the user when the cache file will be generated.
 
 ```dart
 PhotoCachingManager().requestCacheAssets(
-        assets: assets,
-        option: thumbOption,
-      );
+  assets: assets,
+  option: thumbOption,
+);
 ```
 
 
@@ -480,6 +481,8 @@ rootProject.allprojects {
     }
 }
 ```
+
+And, if you want to use ProGuard, you can see the [ProGuard of Glide](https://github.com/bumptech/glide#proguard).
 
 ## common issues
 
