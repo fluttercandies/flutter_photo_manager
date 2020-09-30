@@ -24,4 +24,6 @@ typedef enum PMThumbFormatType {
 
 + (instancetype)optionDict:(NSDictionary *)dict;
 
+-(CGSize)makeSize;
+
 @end

@@ -81,4 +81,9 @@
     return option;
 }
 
+- (CGSize)makeSize {
+  return CGSizeMake(self.width, self.height);
+}
+
+
 @end

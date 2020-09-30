@@ -41,6 +41,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
     - [observer](#observer)
     - [Clear file cache](#clear-file-cache)
     - [Experimental](#experimental)
+      - [Preload thumb](#preload-thumb)
       - [Delete item](#delete-item)
       - [Insert new item](#insert-new-item)
       - [Copy asset](#copy-asset)
@@ -255,6 +256,29 @@ The following table will tell the user when the cache file will be generated.
 
 **Important**: The functions are not guaranteed to be fully usable, because it involves data modification, some APIs will cause irreversible deletion / movement of the data, so please use test equipment to make sure that there is no problem before using it.
 
+#### Preload thumb
+
+```dart
+PhotoCachingManager().requestCacheAssets(
+  assets: assets,
+  option: thumbOption,
+);
+```
+
+
+
+And, if you want to stop, call `PhotoCachingManager().cancelCacheRequest();`
+
+
+
+Usually, when we preview an album, we use thumbnails.
+In flutter, becauseListView.builder,GridView.builderIt's all rendering that loads, but sometimes we might want to pre-load some pictures in advance to make them display faster.
+
+Now, I try to create a caching image manager (just like [PHCachingImageManager](https://developer.apple.com/documentation/photokit/phcachingimagemanager?language=objc)) to do it.  In IOS, I use the system API directly, and Android will use glide and use glide's file cache to complete this step
+This function is completely optional.
+
+
+
 #### Delete item
 
 Hint: this will delete the asset from your device. For iOS, it's not just about removing from the album.
@@ -457,6 +481,8 @@ rootProject.allprojects {
     }
 }
 ```
+
+And, if you want to use ProGuard, you can see the [ProGuard of Glide](https://github.com/bumptech/glide#proguard).
 
 ## common issues
 

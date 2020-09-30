@@ -8,7 +8,7 @@ class ThumbOption {
   final ThumbFormat format;
   final int quality;
 
-  ThumbOption({
+  const ThumbOption({
     @required this.width,
     @required this.height,
     this.format = ThumbFormat.jpeg,

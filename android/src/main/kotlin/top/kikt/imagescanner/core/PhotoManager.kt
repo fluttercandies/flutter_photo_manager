@@ -2,9 +2,12 @@ package top.kikt.imagescanner.core
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.FutureTarget
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
@@ -14,6 +17,8 @@ import top.kikt.imagescanner.thumb.ThumbnailUtil
 import top.kikt.imagescanner.util.LogUtils
 import top.kikt.imagescanner.util.ResultHandler
 import java.io.File
+import java.util.concurrent.Executors
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /// create 2019-09-05 by cai
 /// Do some business logic assembly
@@ -22,6 +27,8 @@ class PhotoManager(private val context: Context) {
 
   companion object {
     const val ALL_ID = "isAll"
+
+    private val threadPool = Executors.newFixedThreadPool(5)
   }
 
   var useOldApi: Boolean = false
@@ -242,5 +249,47 @@ class PhotoManager(private val context: Context) {
     return asset?.getUri()
   }
 
+  private val cacheFutures = ArrayList<FutureTarget<Bitmap>>()
+
+  fun requestCache(ids: List<String>, option: ThumbLoadOption, resultHandler: ResultHandler) {
+    if (useFilePath()) {
+      val pathList = dbUtils.getAssetsPath(context, ids)
+      for (s in pathList) {
+        val future = ThumbnailUtil.requestCacheThumb(context, s, option)
+        cacheFutures.add(future)
+      }
+
+    } else {
+      val uriList = dbUtils.getAssetsUri(context, ids)
+
+      for (uri in uriList) {
+        val future = ThumbnailUtil.requestCacheThumb(context, uri, option)
+        cacheFutures.add(future)
+      }
+
+    }
+
+    resultHandler.reply(1)
+
+    val needExecuteFutures = cacheFutures.toList()
+    for (cacheFuture in needExecuteFutures) {
+      threadPool.execute {
+        if (cacheFuture.isCancelled) {
+          return@execute
+        }
+        cacheFuture.get()
+      }
+    }
+
+  }
+
+  fun cancelCacheRequests() {
+    val needCancelFutures = cacheFutures.toList()
+    cacheFutures.clear()
+    for (futureTarget in needCancelFutures) {
+      Glide.with(context).clear(futureTarget)
+    }
+
+  }
 
 }

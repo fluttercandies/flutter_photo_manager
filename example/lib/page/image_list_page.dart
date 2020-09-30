@@ -39,7 +39,28 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   @override
   void initState() {
     super.initState();
+    path.getAssetListRange(start: 0, end: path.assetCount).then((value) {
+      if (value.isEmpty) {
+        return;
+      }
+      PhotoCachingManager().requestCacheAssets(
+        assets: value,
+        option: thumbOption,
+      );
+    });
   }
+
+  @override
+  void dispose() {
+    PhotoCachingManager().cancelCacheRequest();
+    super.dispose();
+  }
+
+  ThumbOption get thumbOption => ThumbOption(
+        width: 130,
+        height: 130,
+        format: photoProvider.thumbFormat,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -185,6 +206,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
           ImageItemWidget(
             key: ValueKey(entity),
             entity: entity,
+            option: thumbOption,
           ),
           Align(
             alignment: Alignment.topRight,

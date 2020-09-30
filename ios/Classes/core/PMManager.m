@@ -19,6 +19,8 @@
 @implementation PMManager {
   BOOL __isAuth;
   PMCacheContainer *cacheContainer;
+
+  PHCachingImageManager *cachingManager;
 }
 
 - (instancetype)init {
@@ -26,6 +28,7 @@
   if (self) {
     __isAuth = NO;
     cacheContainer = [PMCacheContainer new];
+    cachingManager = [PHCachingImageManager new];
   }
 
   return self;
@@ -1228,4 +1231,24 @@
   NSLog(@"remove cache file %@, error: %@", videoPath, err);
 }
 
+#pragma mark cache thumb
+
+- (void)requestCacheAssetsThumb:(NSArray *)identifiers option:(PMThumbLoadOption *)option {
+  PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:identifiers options:nil];
+  NSMutableArray *array = [NSMutableArray new];
+
+  for (id asset in fetchResult) {
+    [array addObject:asset];
+  }
+
+  PHImageRequestOptions *options = [PHImageRequestOptions new];
+  options.resizeMode = options.resizeMode;
+  options.deliveryMode = option.deliveryMode;
+
+  [cachingManager startCachingImagesForAssets:array targetSize:[option makeSize] contentMode:option.contentMode options:options];
+}
+
+- (void)cancelCacheRequests {
+  [cachingManager stopCachingImagesForAllAssets];
+}
 @end
