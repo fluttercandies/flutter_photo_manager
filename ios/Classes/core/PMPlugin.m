@@ -10,8 +10,10 @@
 #import "PMManager.h"
 #import "PMNotificationManager.h"
 #import "ResultHandler.h"
+#import "PMThumbLoadOption.h"
 
 @implementation PMPlugin {
+  BOOL ignoreCheckPermission;
 }
 
 - (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar {
@@ -45,14 +47,25 @@
           [handler reply:@0];
         }
     }];
-  } else if ([call.method isEqualToString:@"openSetting"]) {
+  } else if ([call.method isEqualToString:@"clearFileCache"]) {
+    [manager clearFileCache];
+    [handler reply:@1];
+  }  else if ([call.method isEqualToString:@"openSetting"]) {
     [PMManager openSetting];
+    [handler reply:@1];
+  } else if ([call.method isEqualToString:@"ignorePermissionCheck"]) {
+    ignoreCheckPermission = [call.arguments[@"ignore"] boolValue];
+    [handler reply:@(ignoreCheckPermission)];
   } else if (manager.isAuth) {
     [self onAuth:call result:result];
-  } else if ([call.method isEqualToString:@"log"]){
+  } else if ([call.method isEqualToString:@"log"]) {
     PMLogUtils.sharedInstance.isLog = (BOOL) call.arguments;
+    [handler reply:@1];
   } else {
-    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+    if (ignoreCheckPermission) {
+      [self onAuth:call result:result];
+    } else {
+      [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
         BOOL auth = PHAuthorizationStatusAuthorized == status;
         [manager setAuth:auth];
         if (auth) {
@@ -60,7 +73,8 @@
         } else {
           [handler replyError:@"need permission"];
         }
-    }];
+      }];
+    }
   }
 }
 
@@ -114,12 +128,10 @@
 
       } else if ([call.method isEqualToString:@"getThumb"]) {
         NSString *id = call.arguments[@"id"];
-        NSUInteger width = [call.arguments[@"width"] unsignedIntegerValue];
-        NSUInteger height = [call.arguments[@"height"] unsignedIntegerValue];
-        NSUInteger format = [call.arguments[@"format"] unsignedIntegerValue];
-        NSUInteger quality = [call.arguments[@"quality"] unsignedIntegerValue];
+        NSDictionary *dict = call.arguments[@"option"];
+        PMThumbLoadOption *option = [PMThumbLoadOption optionDict:dict];
 
-        [manager getThumbWithId:id width:width height:height format:format quality:quality resultHandler:handler];
+        [manager getThumbWithId:id option:option resultHandler:handler];
 
       } else if ([call.method isEqualToString:@"getFullFile"]) {
         NSString *id = call.arguments[@"id"];
@@ -314,6 +326,16 @@
         BOOL favoriteResult = [manager favoriteWithId:id favorite:favorite];
 
         [handler reply:@(favoriteResult)];
+      } else if ([@"isAuth" isEqualToString:call.method]) {
+        [handler reply:@YES];
+      } else if ([@"requestCacheAssetsThumb" isEqualToString:call.method]) {
+        NSArray *ids = call.arguments[@"ids"];
+        PMThumbLoadOption *option = [PMThumbLoadOption optionDict:call.arguments[@"option"]];
+        [manager requestCacheAssetsThumb:ids option:option];
+        [handler reply:@YES];
+      } else if ([@"cancelCacheRequests" isEqualToString:call.method]) {
+        [manager cancelCacheRequests];
+        [handler reply:@YES];
       } else {
         [handler notImplemented];
       }

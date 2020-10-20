@@ -2,6 +2,7 @@ part of '../photo_manager.dart';
 
 /// asset entity, for entity info.
 class AssetPathEntity {
+  /// Obtained by [AssetPathEntity.id], not recommended
   static Future<AssetPathEntity> fromId(String id,
       {FilterOptionGroup filterOption}) async {
     filterOption ??= FilterOptionGroup();
@@ -63,6 +64,7 @@ class AssetPathEntity {
 
   AssetPathEntity({this.id, this.name, this.filterOption});
 
+  /// Call this method to update the property
   Future<void> refreshPathProperties({DateTimeCond dateTimeCond}) async {
     dateTimeCond ??=
         this.filterOption.dateTimeCond.copyWith(max: DateTime.now());
@@ -131,7 +133,7 @@ class AssetPathEntity {
 
 /// Used to describe a picture or video
 class AssetEntity {
-  /// Create from [AssetEntity.id].
+  /// Create from [AssetEntity.id], not recommended.
   static Future<AssetEntity> fromId(String id) async {
     final entity = AssetEntity();
     entity.id = id;
@@ -266,7 +268,7 @@ class AssetEntity {
   Future<Uint8List> get originBytes => PhotoManager._getOriginBytes(this);
 
   /// thumb data , for display
-  Future<Uint8List> get thumbData => PhotoManager._getThumbDataWithId(id);
+  Future<Uint8List> get thumbData => thumbDataWithSize(150, 150);
 
   /// get thumb with size
   Future<Uint8List> thumbDataWithSize(
@@ -284,12 +286,33 @@ class AssetEntity {
       return null;
     }
 
-    return PhotoManager._getThumbDataWithId(
+    return thumbDataWithOption(
+      ThumbOption(
+        width: width,
+        height: height,
+        format: format,
+        quality: quality,
+      ),
+    );
+  }
+
+  /// get thumb with size
+  Future<Uint8List> thumbDataWithOption(
+    ThumbOption option,
+  ) {
+    assert(() {
+      option.checkAssert();
+      return true;
+    }());
+
+    /// Return null if asset is audio or other type, because they don't have such a thing.
+    if (type == AssetType.audio || type == AssetType.other) {
+      return null;
+    }
+
+    return PhotoManager._getThumbDataWithOption(
       id,
-      width: width,
-      height: height,
-      format: format,
-      quality: quality,
+      option,
     );
   }
 
@@ -374,7 +397,11 @@ class AssetEntity {
   }
 }
 
+/// Longitude and latitude
 class LatLng {
+  /// longitude
   double longitude;
+
+  /// latitude
   double latitude;
 }

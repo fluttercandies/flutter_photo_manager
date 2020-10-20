@@ -14,10 +14,13 @@
 #import "NSString+PM_COMMON.h"
 #import "PMFolderUtils.h"
 #import "MD5Utils.h"
+#import "PMThumbLoadOption.h"
 
 @implementation PMManager {
   BOOL __isAuth;
   PMCacheContainer *cacheContainer;
+
+  PHCachingImageManager *cachingManager;
 }
 
 - (instancetype)init {
@@ -25,6 +28,7 @@
   if (self) {
     __isAuth = NO;
     cacheContainer = [PMCacheContainer new];
+    cachingManager = [PHCachingImageManager new];
   }
 
   return self;
@@ -73,14 +77,18 @@
   [self injectAssetPathIntoArray:array
                           result:smartAlbumResult
                          options:assetOptions
-                          hasAll:hasAll];
+                          hasAll:hasAll
+              containsEmptyAlbum:option.containsEmptyAlbum
+   ];
 
   PHFetchResult<PHCollection *> *topLevelResult = [PHAssetCollection
           fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
   [self injectAssetPathIntoArray:array
                           result:topLevelResult
                          options:assetOptions
-                          hasAll:hasAll];
+                          hasAll:hasAll
+                    containsEmptyAlbum:option.containsEmptyAlbum
+   ];
 
   return array;
 }
@@ -101,7 +109,9 @@
 - (void)injectAssetPathIntoArray:(NSMutableArray<PMAssetPathEntity *> *)array
                           result:(PHFetchResult *)result
                          options:(PHFetchOptions *)options
-                          hasAll:(BOOL)hasAll {
+                          hasAll:(BOOL)hasAll
+              containsEmptyAlbum:(BOOL)containsEmptyAlbum
+{
   for (id collection in result) {
     if (![collection isMemberOfClass:[PHAssetCollection class]]) {
       continue;
@@ -131,6 +141,8 @@
     }
 
     if (entity.assetCount && entity.assetCount > 0) {
+      [array addObject:entity];
+    } else if(containsEmptyAlbum && assetCollection.assetCollectionType == PHAssetCollectionTypeAlbum){
       [array addObject:entity];
     }
   }
@@ -294,47 +306,51 @@
   [cacheContainer clearCache];
 }
 
-- (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality resultHandler:(ResultHandler *)handler {
+- (void)getThumbWithId:(NSString *)id option:(PMThumbLoadOption *)option resultHandler:(ResultHandler *)handler {
   PMAssetEntity *entity = [self getAssetEntity:id];
   if (entity && entity.phAsset) {
     PHAsset *asset = entity.phAsset;
-    [self fetchThumb:asset width:width height:height format:format quality:quality resultHandler:handler];
+    [self fetchThumb:asset option:option resultHandler:handler];
   } else {
     [handler replyError:@"asset is not found"];
   }
 }
 
-- (void)fetchThumb:(PHAsset *)asset width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality resultHandler:(ResultHandler *)handler {
+- (void)fetchThumb:(PHAsset *)asset option:(PMThumbLoadOption *)option resultHandler:(ResultHandler *)handler {
   PHImageManager *manager = PHImageManager.defaultManager;
-  PHImageRequestOptions *options = [PHImageRequestOptions new];
-  [options setNetworkAccessAllowed:YES];
-  [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
-          NSDictionary *info) {
-      if (progress == 1.0) {
-        [self fetchThumb:asset width:width height:height format:format quality:quality resultHandler:handler];
-      }
+  PHImageRequestOptions *requestOptions = [PHImageRequestOptions new];
+  requestOptions.deliveryMode = option.deliveryMode;
+  requestOptions.resizeMode = option.resizeMode;
+
+  [requestOptions setNetworkAccessAllowed:YES];
+  [requestOptions setProgressHandler:^(double progress, NSError *error, BOOL *stop,
+      NSDictionary *info) {
+    if (progress == 1.0) {
+      [self fetchThumb:asset option:option resultHandler:handler];
+    }
   }];
+  int width = option.width;
+  int height = option.height;
   [manager requestImageForAsset:asset
                      targetSize:CGSizeMake(width, height)
-                    contentMode:PHImageContentModeAspectFill
-                        options:options
+                    contentMode:option.contentMode
+                        options:requestOptions
                   resultHandler:^(UIImage *result, NSDictionary *info) {
-                      BOOL downloadFinished = [PMManager isDownloadFinish:info];
+                    BOOL downloadFinished = [PMManager isDownloadFinish:info];
 
-                      if (!downloadFinished) {
-                        return;
-                      }
+                    if (!downloadFinished) {
+                      return;
+                    }
 
-                      if ([handler isReplied]) {
-                        return;
-                      }
+                    if ([handler isReplied]) {
+                      return;
+                    }
                       NSData *imageData;
-                      if (format == 1) {
-                        imageData = UIImagePNGRepresentation(result);
-                      } else {
-                        double qualityValue = (double) quality / 100.0;
-                        imageData = UIImageJPEGRepresentation(result, qualityValue);
-                      }
+                    if (option.format == PMThumbFormatTypePNG) {
+                      imageData = UIImagePNGRepresentation(result);
+                    } else {
+                      imageData = UIImageJPEGRepresentation(result, option.quality);
+                    }
 
                       FlutterStandardTypedData *data = [FlutterStandardTypedData typedDataWithBytes:imageData];
                       [handler reply:data];
@@ -1181,10 +1197,10 @@
   NSError *error;
 
   [PHPhotoLibrary.sharedPhotoLibrary
-          performChangesAndWait:^{
-              PHAssetChangeRequest *request = [PHAssetChangeRequest changeRequestForAsset:asset];
-              request.favorite = favorite;
-          } error:&error];
+      performChangesAndWait:^{
+        PHAssetChangeRequest *request = [PHAssetChangeRequest changeRequestForAsset:asset];
+        request.favorite = favorite;
+      } error:&error];
 
   if (error) {
     NSLog(@"favorite error: %@", error);
@@ -1192,5 +1208,47 @@
   }
 
   return YES;
+}
+
+- (NSString *)getCachePath:(NSString *)type {
+  NSString *homePath = NSTemporaryDirectory();
+  NSString *cachePath = type;
+  NSString *dirPath = [NSString stringWithFormat:@"%@%@", homePath, cachePath];
+  return dirPath;
+}
+
+- (void)clearFileCache {
+  NSString *videoPath = [self getCachePath:@".video"];
+  NSString *imagePath = [self getCachePath:@".image"];
+
+  NSFileManager *fm = NSFileManager.defaultManager;
+
+  NSError *err;
+
+  [fm removeItemAtPath:imagePath error:&err];
+  NSLog(@"remove cache file %@, error: %@", imagePath, err);
+  [fm removeItemAtPath:videoPath error:&err];
+  NSLog(@"remove cache file %@, error: %@", videoPath, err);
+}
+
+#pragma mark cache thumb
+
+- (void)requestCacheAssetsThumb:(NSArray *)identifiers option:(PMThumbLoadOption *)option {
+  PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:identifiers options:nil];
+  NSMutableArray *array = [NSMutableArray new];
+
+  for (id asset in fetchResult) {
+    [array addObject:asset];
+  }
+
+  PHImageRequestOptions *options = [PHImageRequestOptions new];
+  options.resizeMode = options.resizeMode;
+  options.deliveryMode = option.deliveryMode;
+
+  [cachingManager startCachingImagesForAssets:array targetSize:[option makeSize] contentMode:option.contentMode options:options];
+}
+
+- (void)cancelCacheRequests {
+  [cachingManager stopCachingImagesForAllAssets];
 }
 @end

@@ -29,14 +29,12 @@ import java.net.URLConnection
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-/// create 2019-09-11 by cai
+/// create 2020-09-23 by cai
 @Suppress("DEPRECATION")
-@RequiresApi(Build.VERSION_CODES.Q)
+@RequiresApi(Build.VERSION_CODES.R)
 @SuppressLint("Recycle")
-object AndroidQDBUtils : IDBUtils {
+object Android30DbUtils : IDBUtils {
   private const val TAG = "PhotoManagerPlugin"
-
-  private val cacheContainer = CacheContainer()
 
   private var androidQCache = AndroidQCache()
 
@@ -61,19 +59,19 @@ object AndroidQDBUtils : IDBUtils {
     val cursor = context.contentResolver.query(allUri, galleryKeys, selections, args.toTypedArray(), null)
         ?: return list
 
-    LogUtils.logCursor(cursor)
+    LogUtils.logCursor(cursor, BUCKET_ID)
 
     val nameMap = HashMap<String, String>()
     val countMap = HashMap<String, Int>()
 
     while (cursor.moveToNext()) {
-      val galleryId = cursor.getString(0)
+      val galleryId = cursor.getString(MediaStore.Images.Media.BUCKET_ID)
 
       if (nameMap.containsKey(galleryId)) {
         countMap[galleryId] = countMap[galleryId]!! + 1
         continue
       }
-      val galleryName = cursor.getString(1) ?: ""
+      val galleryName = cursor.getString(MediaStore.Images.Media.BUCKET_DISPLAY_NAME) ?: ""
 
       nameMap[galleryId] = galleryName
       countMap[galleryId] = 1
@@ -117,9 +115,29 @@ object AndroidQDBUtils : IDBUtils {
     return list
   }
 
+  override fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String {
+    val asc =
+        if (filterOption.dateCond.asc) {
+          "ASC"
+        } else {
+          "DESC"
+        }
+    return "$DATE_ADDED $asc"
+  }
+
+
+  private fun cursorWithRange(cursor: Cursor, start: Int, pageSize: Int, block: (cursor: Cursor) -> Unit) {
+    cursor.moveToPosition(start - 1)
+
+    for (i in 0 until pageSize) {
+      if (cursor.moveToNext()) {
+        block(cursor)
+      }
+    }
+  }
+
   @SuppressLint("Recycle")
   override fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int, timeStamp: Long, option: FilterOption, cacheContainer: CacheContainer?): List<AssetEntity> {
-    val cache = cacheContainer ?: this.cacheContainer
 
     val isAll = galleryId.isEmpty()
 
@@ -133,6 +151,7 @@ object AndroidQDBUtils : IDBUtils {
     val typeSelection: String = getCondFromType(requestType, option, args)
 
     val sizeWhere = sizeWhere(requestType, option)
+//    val sizeWhere = ""
 
     val dateSelection = getDateCond(args, timeStamp, option)
 
@@ -144,14 +163,19 @@ object AndroidQDBUtils : IDBUtils {
     }
 
     val sortOrder = getSortOrder(page * pageSize, pageSize, option)
+
     val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
         ?: return emptyList()
 
-    while (cursor.moveToNext()) {
+    cursorWithRange(cursor, page * pageSize, pageSize) {
       val asset = convertCursorToAssetEntity(cursor)
       list.add(asset)
-      cache.putAsset(asset)
     }
+
+//    while (cursor.moveToNext()) {
+//      val asset = convertCursorToAssetEntity(cursor)
+//      list.add(asset)
+//    }
 
     cursor.close()
 
@@ -159,9 +183,8 @@ object AndroidQDBUtils : IDBUtils {
 
   }
 
-  override fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOption): List<AssetEntity> {
-    val cache = cacheContainer
 
+  override fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOption): List<AssetEntity> {
     val isAll = gId.isEmpty()
 
     val list = ArrayList<AssetEntity>()
@@ -190,11 +213,15 @@ object AndroidQDBUtils : IDBUtils {
     val cursor = context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
         ?: return emptyList()
 
-    while (cursor.moveToNext()) {
+    cursorWithRange(cursor, start, pageSize) {
       val asset = convertCursorToAssetEntity(cursor)
       list.add(asset)
-      cache.putAsset(asset)
     }
+
+//    while (cursor.moveToNext()) {
+//      val asset = convertCursorToAssetEntity(cursor)
+//      list.add(asset)
+//    }
 
     cursor.close()
 
@@ -221,11 +248,6 @@ object AndroidQDBUtils : IDBUtils {
   }
 
   override fun getAssetEntity(context: Context, id: String): AssetEntity? {
-    val asset = cacheContainer.getAsset(id)
-    if (asset != null) {
-      return asset
-    }
-
     val keys = assetKeys().distinct().toTypedArray()
 
     val selection = "$_ID = ?"
@@ -236,7 +258,6 @@ object AndroidQDBUtils : IDBUtils {
     cursor?.use {
       return if (cursor.moveToNext()) {
         val dbAsset = convertCursorToAssetEntity(cursor)
-        cacheContainer.putAsset(dbAsset)
         cursor.close()
         dbAsset
       } else {
@@ -299,23 +320,11 @@ object AndroidQDBUtils : IDBUtils {
   }
 
   override fun clearCache() {
-    cacheContainer.clearCache()
-  }
-
-  override fun clearFileCache(context: Context) {
-    androidQCache.clearAllCache(context)
   }
 
   override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
     val assetEntity = getAssetEntity(context, id) ?: return null
-
-    if (useFilePath()) {
-      return assetEntity.path
-    }
-
-    val cacheFile = androidQCache.getCacheFile(context, id, assetEntity.displayName, assetEntity.type, origin)
-        ?: return null
-    return cacheFile.path
+    return assetEntity.path
   }
 
   override fun getThumbUri(context: Context, id: String, width: Int, height: Int, type: Int?): Uri? {

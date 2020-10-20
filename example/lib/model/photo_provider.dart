@@ -25,8 +25,16 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  DateTime _startDt = DateTime.now()
-      .subtract(Duration(days: 365 * 8)); // Default Before 8 years
+  bool _containsEmptyAlbum = false;
+
+  bool get containsEmptyAlbum => _containsEmptyAlbum;
+
+  set containsEmptyAlbum(bool containsEmptyAlbum) {
+    _containsEmptyAlbum = containsEmptyAlbum;
+    notifyListeners();
+  }
+
+  DateTime _startDt = DateTime(2005); // Default Before 8 years
 
   DateTime get startDt => _startDt;
 
@@ -68,7 +76,7 @@ class PhotoProvider extends ChangeNotifier {
   String maxWidth = "10000";
   String minHeight = "0";
   String maxHeight = "10000";
-  bool _ignoreSize = false;
+  bool _ignoreSize = true;
 
   bool get ignoreSize => _ignoreSize;
 
@@ -112,6 +120,11 @@ class PhotoProvider extends ChangeNotifier {
 
   void changeOnlyAll(bool value) {
     this.onlyAll = value;
+    notifyListeners();
+  }
+
+  void changeContainsEmptyAlbum(bool value) {
+    this.containsEmptyAlbum = value;
     notifyListeners();
   }
 
@@ -189,7 +202,8 @@ class PhotoProvider extends ChangeNotifier {
       ..setOption(AssetType.video, option)
       ..setOption(AssetType.image, option)
       ..setOption(AssetType.audio, option)
-      ..dateTimeCond = dtCond;
+      ..dateTimeCond = dtCond
+      ..containsEmptyAlbum = _containsEmptyAlbum;
   }
 
   Future<void> refreshAllGalleryProperties() async {
@@ -266,6 +280,9 @@ class AssetPathProvider extends ChangeNotifier {
   void deleteSelectedAssets(List<AssetEntity> entity) async {
     final ids = entity.map((e) => e.id).toList();
     await PhotoManager.editor.deleteWithIds(ids);
+    await path.refreshPathProperties();
+    showToast('The path ${path.name} asset count have :${path.assetCount}');
+    notifyListeners();
   }
 
   void removeInAlbum(AssetEntity entity) async {

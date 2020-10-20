@@ -7,9 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager/src/utils/convert_utils.dart';
 
+/// Any method of this class is not recommended to be called directly outside the library.
 class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   static Plugin _plugin;
 
+  /// Any method of this class is not recommended to be called directly outside the library.
   factory Plugin() {
     _plugin ??= Plugin._();
     return _plugin;
@@ -40,10 +42,12 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     );
   }
 
+  /// request permission.
   Future<bool> requestPermission() async {
     return (await _channel.invokeMethod("requestPermission")) == 1;
   }
 
+  /// Use pagination to get album content.
   Future<List<AssetEntity>> getAssetWithGalleryIdPaged(
     String id, {
     int page = 0,
@@ -62,6 +66,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     return ConvertUtils.convertToAssetList(result);
   }
 
+  /// Asset in the specified range.
   Future<List<AssetEntity>> getAssetWithRange(
     String id, {
     int typeInt,
@@ -80,19 +85,14 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     return ConvertUtils.convertToAssetList(map);
   }
 
+  /// Get thumb of asset id.
   Future<Uint8List> getThumb({
     @required String id,
-    int width = 100,
-    int height = 100,
-    ThumbFormat format,
-    int quality,
+    @required ThumbOption option,
   }) {
     return _channel.invokeMethod("getThumb", {
-      "width": width,
-      "height": height,
       "id": id,
-      "format": format.index,
-      "quality": quality,
+      "option": option.toMap(),
     });
   }
 
@@ -325,6 +325,29 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
 
   Future getPropertiesFromAssetEntity(String id) async {
     return _channel.invokeMethod('getPropertiesFromAssetEntity', {"id": id});
+  }
+
+  Future ignorePermissionCheck(bool ignore) async {
+    await _channel.invokeMethod('ignorePermissionCheck', {'ignore': ignore});
+  }
+
+  Future clearFileCache() async {
+    await _channel.invokeMethod('clearFileCache');
+  }
+
+  Future<void> cancelCacheRequests() async {
+    await _channel.invokeMethod('cancelCacheRequests');
+  }
+
+  Future<void> requestCacheAssetsThumb(
+      List<String> ids, ThumbOption option) async {
+    assert(ids != null);
+    assert(ids.isNotEmpty);
+    assert(option != null);
+    await _channel.invokeMethod('requestCacheAssetsThumb', {
+      'ids': ids,
+      'option': option.toMap(),
+    });
   }
 }
 

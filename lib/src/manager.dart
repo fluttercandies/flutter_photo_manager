@@ -69,6 +69,15 @@ class PhotoManager {
     return _plugin.setLog(isLog);
   }
 
+  /// Ignore permission checks at runtime, you can use third-party permission plugins to request permission. Default is false.
+  ///
+  /// For Android, a typical usage scenario may be to use it in Service, because Activity cannot be used in Service to detect runtime permissions, but it should be noted that deleting resources above android10 require activity to accept the result, so the delete system does not apply to this Attributes.
+  ///
+  /// For iOS, this feature is only added, please explore the specific application scenarios by yourself
+  static Future<void> setIgnorePermissionCheck(bool ignore) async {
+    await _plugin.ignorePermissionCheck(ignore);
+  }
+
   /// get video asset
   /// open setting page
   static void openSetting() {
@@ -167,19 +176,10 @@ class PhotoManager {
     return _plugin.getOriginBytes(id);
   }
 
-  static _getThumbDataWithId(
-    String id, {
-    int width = 150,
-    int height = 150,
-    ThumbFormat format = ThumbFormat.jpeg,
-    int quality = 100,
-  }) {
+  static _getThumbDataWithOption(String id, ThumbOption option) {
     return _plugin.getThumb(
       id: id,
-      width: width,
-      height: height,
-      format: format,
-      quality: quality,
+      option: option,
     );
   }
 
@@ -187,6 +187,7 @@ class PhotoManager {
     return _plugin.assetExistsWithId(id);
   }
 
+  /// [AssetPathEntity.refreshPathProperties]
   static Future<AssetPathEntity> fetchPathProperties(
     AssetPathEntity entity,
     DateTimeCond dateTimeCond,
@@ -214,6 +215,7 @@ class PhotoManager {
     }
   }
 
+  /// Only valid for Android 29. The API of API 28 must be used with the property of `requestLegacyExternalStorage`.
   static Future<void> forceOldApi() async {
     await _plugin.forceOldApi();
   }
@@ -226,10 +228,17 @@ class PhotoManager {
     return int.parse(systemVersion) >= 29;
   }
 
+  /// Get system version
   static Future<String> systemVersion() async {
     return _plugin.getSystemVersion();
   }
 
+  /// Clear all file cache.
+  static Future<void> clearFileCache() async {
+    await _plugin.clearFileCache();
+  }
+
+  /// When set to true, originbytes in Android Q will be cached as a file. When use again, the file will be read.
   static Future<bool> setCacheAtOriginBytes(bool cache) =>
       _plugin.cacheOriginBytes(cache);
 
@@ -259,6 +268,7 @@ class PhotoManager {
     return _plugin.getSubPathEntities(assetPathEntity);
   }
 
+  /// Refresh the property of asset.
   static Future<AssetEntity> refreshAssetProperties(AssetEntity src) async {
     assert(src.id != null);
     final Map<dynamic, dynamic> map =

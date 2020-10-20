@@ -1,36 +1,47 @@
 package top.kikt.imagescanner.core
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import android.util.Log
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.FutureTarget
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
-import top.kikt.imagescanner.core.utils.AndroidQDBUtils
-import top.kikt.imagescanner.core.utils.ConvertUtils
-import top.kikt.imagescanner.core.utils.DBUtils
-import top.kikt.imagescanner.core.utils.IDBUtils
-import top.kikt.imagescanner.core.utils.IDBUtils.Companion.isAndroidQ
+import top.kikt.imagescanner.core.entity.ThumbLoadOption
+import top.kikt.imagescanner.core.utils.*
 import top.kikt.imagescanner.thumb.ThumbnailUtil
 import top.kikt.imagescanner.util.LogUtils
 import top.kikt.imagescanner.util.ResultHandler
 import java.io.File
+import java.util.concurrent.Executors
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /// create 2019-09-05 by cai
 /// Do some business logic assembly
+@SuppressLint("LongLogTag")
 class PhotoManager(private val context: Context) {
 
   companion object {
     const val ALL_ID = "isAll"
+
+    private val threadPool = Executors.newFixedThreadPool(5)
   }
 
   var useOldApi: Boolean = false
 
   private val dbUtils: IDBUtils
-    get() = if (useOldApi || Build.VERSION.SDK_INT < 29) {
-      DBUtils
-    } else {
-      AndroidQDBUtils
+    get() {
+      return if (IDBUtils.isAndroidR) {
+        Android30DbUtils
+      } else if (useOldApi || Build.VERSION.SDK_INT < 29) {
+        DBUtils
+      } else {
+        AndroidQDBUtils
+      }
     }
 
   fun getGalleryList(type: Int, timeStamp: Long, hasAll: Boolean, onlyAll: Boolean, option: FilterOption): List<GalleryEntity> {
@@ -67,22 +78,26 @@ class PhotoManager(private val context: Context) {
     return dbUtils.getAssetFromGalleryIdRange(context, gId, start, end, type, timestamp, option)
   }
 
-  fun getThumb(id: String, width: Int, height: Int, format: Int, quality: Int, resultHandler: ResultHandler) {
+
+  fun getThumb(id: String, option: ThumbLoadOption, resultHandler: ResultHandler) {
+    val width = option.width
+    val height = option.height
+    val quality = option.quality
+    val format = option.format
     try {
-      if (!isAndroidQ) {
+      if (useFilePath()) {
         val asset = dbUtils.getAssetEntity(context, id)
         if (asset == null) {
           resultHandler.replyError("The asset not found!")
           return
         }
-        ThumbnailUtil.getThumbnailByGlide(context, asset.path, width, height, format, quality, resultHandler.result)
+        ThumbnailUtil.getThumbnailByGlide(context, asset.path, option.width, option.height, format, quality, resultHandler.result)
       } else {
         // need use android Q  MediaStore thumbnail api
-
         val asset = dbUtils.getAssetEntity(context, id)
         val type = asset?.type
         val uri = dbUtils.getThumbUri(context, id, width, height, type)
-                ?: throw RuntimeException("Cannot load uri of $id.")
+            ?: throw RuntimeException("Cannot load uri of $id.")
         ThumbnailUtil.getThumbOfUri(context, uri, width, height, format, quality) {
           resultHandler.reply(it)
         }
@@ -102,7 +117,7 @@ class PhotoManager(private val context: Context) {
       return
     }
     try {
-      if (!isAndroidQ) {
+      if (useFilePath()) {
         val byteArray = File(asset.path).readBytes()
         resultHandler.reply(byteArray)
       } else {
@@ -120,6 +135,12 @@ class PhotoManager(private val context: Context) {
 
   fun clearCache() {
     dbUtils.clearCache()
+  }
+
+
+  fun clearFileCache() {
+    ThumbnailUtil.clearCache(context)
+    dbUtils.clearFileCache(context)
   }
 
   fun getPathEntity(id: String, type: Int, timestamp: Long, option: FilterOption): GalleryEntity? {
@@ -144,10 +165,6 @@ class PhotoManager(private val context: Context) {
   fun getFile(id: String, isOrigin: Boolean, resultHandler: ResultHandler) {
     val path = dbUtils.getFilePath(context, id, isOrigin)
     resultHandler.reply(path)
-  }
-
-  fun deleteAssetWithIds(ids: List<String>): List<String> {
-    return dbUtils.deleteWithIds(context, ids)
   }
 
   fun saveImage(image: ByteArray, title: String, description: String): AssetEntity? {
@@ -175,13 +192,13 @@ class PhotoManager(private val context: Context) {
     val latLong = exifInfo?.latLong
     return if (latLong == null) {
       mapOf(
-              "lat" to 0.0,
-              "lng" to 0.0
+          "lat" to 0.0,
+          "lng" to 0.0
       )
     } else {
       mapOf(
-              "lat" to latLong[0],
-              "lng" to latLong[1]
+          "lat" to latLong[0],
+          "lng" to latLong[1]
       )
     }
   }
@@ -203,7 +220,7 @@ class PhotoManager(private val context: Context) {
       resultHandler.reply(null)
     }
   }
-  
+
   fun moveToGallery(assetId: String, albumId: String, resultHandler: ResultHandler) {
     try {
       val assetEntity = dbUtils.moveToGallery(context, assetId, albumId)
@@ -217,14 +234,62 @@ class PhotoManager(private val context: Context) {
       resultHandler.reply(null)
     }
   }
-  
+
   fun removeAllExistsAssets(resultHandler: ResultHandler) {
     val result = dbUtils.removeAllExistsAssets(context)
     resultHandler.reply(result)
   }
-  
+
   fun getAssetProperties(id: String): AssetEntity? {
     return dbUtils.getAssetEntity(context, id)
   }
-  
+
+  fun getUri(id: String): Uri? {
+    val asset = dbUtils.getAssetEntity(context, id)
+    return asset?.getUri()
+  }
+
+  private val cacheFutures = ArrayList<FutureTarget<Bitmap>>()
+
+  fun requestCache(ids: List<String>, option: ThumbLoadOption, resultHandler: ResultHandler) {
+    if (useFilePath()) {
+      val pathList = dbUtils.getAssetsPath(context, ids)
+      for (s in pathList) {
+        val future = ThumbnailUtil.requestCacheThumb(context, s, option)
+        cacheFutures.add(future)
+      }
+
+    } else {
+      val uriList = dbUtils.getAssetsUri(context, ids)
+
+      for (uri in uriList) {
+        val future = ThumbnailUtil.requestCacheThumb(context, uri, option)
+        cacheFutures.add(future)
+      }
+
+    }
+
+    resultHandler.reply(1)
+
+    val needExecuteFutures = cacheFutures.toList()
+    for (cacheFuture in needExecuteFutures) {
+      threadPool.execute {
+        if (cacheFuture.isCancelled) {
+          return@execute
+        }
+        cacheFuture.get()
+      }
+    }
+
+  }
+
+  fun cancelCacheRequests() {
+    val needCancelFutures = cacheFutures.toList()
+    cacheFutures.clear()
+    for (futureTarget in needCancelFutures) {
+      Glide.with(context).clear(futureTarget)
+    }
+
+  }
+
 }

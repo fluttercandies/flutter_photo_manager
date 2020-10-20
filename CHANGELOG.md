@@ -1,6 +1,8 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [0.6.0-dev.5](#060-dev5)
+  - [0.5.8](#058)
   - [0.5.7](#057)
   - [0.5.6](#056)
   - [0.5.5+1](#0551)
@@ -42,6 +44,26 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 0.6.0-dev.5
+
+- Feature
+
+  - Support android API 30.
+  - Support show empty album in iOS([#365](https://github.com/CaiJingLong/flutter_photo_manager/issues/365)).
+  - User can ignore check permission(User can choose favorite permission plugin, but at the same time user have to bear the risks corresponding to the permission).
+  - Support clean file cache.
+  - Experimental
+    - Preload image (Use `PhotoCachingManager` api.)
+
+- Fixes
+  - [#362](https://github.com/CaiJingLong/flutter_photo_manager/issues/362)
+
+## 0.5.8
+
+Fix:
+
+Delete assets in androidQ.
 
 ## 0.5.7
 
