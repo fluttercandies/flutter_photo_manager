@@ -58,7 +58,7 @@ object ConvertUtils {
 
     val data = mapOf(
         "id" to entity.id,
-        "duration" to entity.duration,
+        "duration" to entity.duration / 1000,
         "type" to entity.type,
         "createDt" to entity.createDt / 1000,
         "width" to entity.width,
