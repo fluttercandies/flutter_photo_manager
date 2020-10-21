@@ -296,7 +296,7 @@ interface IDBUtils {
   fun getOnlyGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity>
 
   fun getDateCond(args: ArrayList<String>, timestamp: Long, option: FilterOption): String {
-    val createDateCond = addDateCond(args, option.dateCond, MediaStore.Images.Media.DATE_ADDED)
+    val createDateCond = addDateCond(args, option.createDateCond, MediaStore.Images.Media.DATE_ADDED)
     val updateDateCond = addDateCond(args, option.updateDateCond, MediaStore.Images.Media.DATE_MODIFIED)
     return "$createDateCond $updateDateCond"
   }
@@ -318,7 +318,7 @@ interface IDBUtils {
 
   fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String {
     val asc =
-        if (filterOption.dateCond.asc) {
+        if (filterOption.createDateCond.asc) {
           "ASC"
         } else {
           "DESC"

@@ -10,7 +10,7 @@ class FilterOption(map: Map<*, *>) {
   val videoOption = ConvertUtils.getOptionFromType(map, AssetType.Video)
   val imageOption = ConvertUtils.getOptionFromType(map, AssetType.Image)
   val audioOption = ConvertUtils.getOptionFromType(map, AssetType.Audio)
-  val dateCond = ConvertUtils.convertToDateCond(map["createDate"] as Map<*, *>)
+  val createDateCond = ConvertUtils.convertToDateCond(map["createDate"] as Map<*, *>)
   val updateDateCond = ConvertUtils.convertToDateCond(map["updateDate"] as Map<*, *>)
 }
 

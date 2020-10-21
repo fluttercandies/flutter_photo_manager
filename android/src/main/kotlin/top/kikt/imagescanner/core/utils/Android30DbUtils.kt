@@ -117,7 +117,7 @@ object Android30DbUtils : IDBUtils {
 
   override fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String {
     val asc =
-        if (filterOption.dateCond.asc) {
+        if (filterOption.createDateCond.asc) {
           "ASC"
         } else {
           "DESC"
