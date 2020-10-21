@@ -65,10 +65,20 @@ class AssetPathEntity {
   AssetPathEntity({this.id, this.name, this.filterOption});
 
   /// Call this method to update the property
-  Future<void> refreshPathProperties({DateTimeCond dateTimeCond}) async {
+  Future<void> refreshPathProperties({
+    DateTimeCond dateTimeCond,
+    DateTimeCond updateTimeCond,
+  }) async {
     dateTimeCond ??=
         this.filterOption.createTimeCond.copyWith(max: DateTime.now());
-    final result = await PhotoManager.fetchPathProperties(this, dateTimeCond);
+    updateTimeCond ??=
+        this.filterOption.updateTimeCond.copyWith(max: DateTime.now());
+
+    final result = await PhotoManager.fetchPathProperties(
+      entity: this,
+      dateTimeCond: dateTimeCond,
+      updateTimeCond: updateTimeCond,
+    );
     if (result != null) {
       this.assetCount = result.assetCount;
       this.name = result.name;

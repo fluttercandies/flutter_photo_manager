@@ -192,16 +192,21 @@ class PhotoProvider extends ChangeNotifier {
       needTitle: needTitle,
     );
 
-    final dtCond = DateTimeCond(
+    final createDtCond = DateTimeCond(
       min: startDt,
       max: endDt,
     );
+
+    // final createDtCond = DateTimeCond(
+    //   min: DateTime(2018, 1, 1),
+    //   max: DateTime(2018, 12, 1),
+    // );
 
     return FilterOptionGroup()
       ..setOption(AssetType.video, option)
       ..setOption(AssetType.image, option)
       ..setOption(AssetType.audio, option)
-      ..createTimeCond = dtCond
+      ..createTimeCond = createDtCond
       ..containsEmptyAlbum = _containsEmptyAlbum
       ..addOrderOption(OrderOption(
         type: OrderOptionType.createDate,
@@ -246,7 +251,10 @@ class AssetPathProvider extends ChangeNotifier {
   }
 
   Future onRefresh() async {
-    await path.refreshPathProperties();
+    await path.refreshPathProperties(
+      dateTimeCond: path.filterOption.createTimeCond,
+      updateTimeCond: path.filterOption.updateTimeCond,
+    );
     final list = await path.getAssetListPaged(0, loadCount);
     page = 0;
     this.list.clear();

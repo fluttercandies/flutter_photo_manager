@@ -188,13 +188,15 @@ class PhotoManager {
   }
 
   /// [AssetPathEntity.refreshPathProperties]
-  static Future<AssetPathEntity> fetchPathProperties(
+  static Future<AssetPathEntity> fetchPathProperties({
     AssetPathEntity entity,
     DateTimeCond dateTimeCond,
-  ) async {
+    DateTimeCond updateTimeCond,
+  }) async {
     assert(entity != null);
     assert(dateTimeCond != null);
     entity.filterOption.createTimeCond = dateTimeCond;
+    entity.filterOption.updateTimeCond = updateTimeCond;
     final result = await _plugin.fetchPathProperties(
       entity.id,
       entity.typeInt,
