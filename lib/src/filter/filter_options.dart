@@ -25,8 +25,13 @@ class FilterOptionGroup {
   /// Whether to include an empty album
   var containsEmptyAlbum = false;
 
-  @Deprecated('Use createTimeCond.')
-  DateTimeCond dateTimeCond = DateTimeCond.def();
+  @Deprecated('Please use createTimeCond.')
+  DateTimeCond get dateTimeCond => createTimeCond;
+
+  @Deprecated('Please use createTimeCond.')
+  set dateTimeCond(DateTimeCond dateTimeCond) {
+    createTimeCond = dateTimeCond;
+  }
 
   DateTimeCond createTimeCond = DateTimeCond.def();
   DateTimeCond updateTimeCond = DateTimeCond.def().copyWith(
@@ -61,8 +66,7 @@ class FilterOptionGroup {
       result["audio"] = _map[AssetType.audio].toMap();
     }
 
-    // ignore: deprecated_member_use_from_same_package
-    result["date"] = createTimeCond.toMap() ?? dateTimeCond.toMap();
+    result["createDate"] = createTimeCond.toMap();
     result["updateDate"] = updateTimeCond.toMap();
     result['containsEmptyAlbum'] = containsEmptyAlbum;
 
