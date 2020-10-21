@@ -316,14 +316,9 @@ interface IDBUtils {
     return dateSelection
   }
 
-  fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String {
-    val asc =
-        if (filterOption.createDateCond.asc) {
-          "ASC"
-        } else {
-          "DESC"
-        }
-    return "$DATE_ADDED $asc LIMIT $pageSize OFFSET $start"
+  fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String? {
+    val orderBy = filterOption.orderByCondString()
+    return "$orderBy LIMIT $pageSize OFFSET $start"
   }
 
   fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity?

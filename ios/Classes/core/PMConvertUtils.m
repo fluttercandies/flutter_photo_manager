@@ -113,6 +113,9 @@
   container.updateOption = [self convertMapToPMDateOption:map[@"updateDate"]];
   container.containsEmptyAlbum = [map[@"containsEmptyAlbum"] boolValue];
 
+  NSArray *sortArray = map[@"orders"];
+  [container injectSortArray: sortArray];
+
   return container;
 }
 
@@ -138,6 +141,7 @@
           [PMConvertUtils convertNSNumberToSecond:durationMap[@"max"]];
   option.durationConstraint = durationConstraint;
 
+
   return option;
 }
 
@@ -151,7 +155,6 @@
 
   option.min = [NSDate dateWithTimeIntervalSince1970:(min / 1000.0)];
   option.max = [NSDate dateWithTimeIntervalSince1970:(max / 1000.0)];
-  option.asc = asc;
   option.ignore = ignore;
 
   return option;

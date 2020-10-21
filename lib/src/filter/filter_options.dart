@@ -46,6 +46,12 @@ class FilterOptionGroup {
     _map[type] = option;
   }
 
+  final orders = <OrderOption>[];
+
+  void addOrderOption(OrderOption option) {
+    orders.add(option);
+  }
+
   void merge(FilterOptionGroup other) {
     assert(other != null, 'Cannot merge null.');
     for (final AssetType type in _map.keys) {
@@ -69,6 +75,7 @@ class FilterOptionGroup {
     result["createDate"] = createTimeCond.toMap();
     result["updateDate"] = updateTimeCond.toMap();
     result['containsEmptyAlbum'] = containsEmptyAlbum;
+    result['orders'] = orders.map((e) => e.toMap()).toList();
 
     return result;
   }
@@ -191,23 +198,19 @@ class DateTimeCond {
 
   final DateTime min;
   final DateTime max;
-  final bool asc;
   final bool ignore;
 
   const DateTimeCond({
     @required this.min,
     @required this.max,
     this.ignore = false,
-    this.asc = false, // default desc
   })  : assert(min != null),
-        assert(max != null),
-        assert(asc != null);
+        assert(max != null);
 
   factory DateTimeCond.def() {
     return DateTimeCond(
       min: zero,
       max: DateTime.now(),
-      asc: false,
     );
   }
 
@@ -220,7 +223,6 @@ class DateTimeCond {
     return DateTimeCond(
       min: min ?? this.min,
       max: max ?? this.max,
-      asc: asc ?? this.asc,
       ignore: ignore ?? this.ignore,
     );
   }
@@ -229,8 +231,29 @@ class DateTimeCond {
     return {
       'min': min.millisecondsSinceEpoch,
       'max': max.millisecondsSinceEpoch,
-      'asc': asc,
       'ignore': ignore,
     };
   }
+}
+
+class OrderOption {
+  final OrderOptionType type;
+  final bool asc;
+
+  OrderOption({
+    this.type = OrderOptionType.createDate,
+    this.asc = false,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'type': type.index,
+      'asc': asc,
+    };
+  }
+}
+
+enum OrderOptionType {
+  createDate,
+  updateDate,
 }

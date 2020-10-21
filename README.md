@@ -60,6 +60,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
   - [common issues](#common-issues)
     - [ios build error](#ios-build-error)
   - [Some articles about to use this library](#some-articles-about-to-use-this-library)
+  - [Migration Guide](#migration-guide)
 
 ## install
 
@@ -510,3 +511,7 @@ Xcode's output:
 [Flutter 开发日记-如何实现一个照片选择器 plugin](https://juejin.im/post/5df797706fb9a016107974fc)
 
 If you have other articles about this library, you can contact me or open PR here.
+
+## Migration Guide
+
+See [Migration-Guide](./Migration-Guide.md)

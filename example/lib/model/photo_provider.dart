@@ -195,7 +195,6 @@ class PhotoProvider extends ChangeNotifier {
     final dtCond = DateTimeCond(
       min: startDt,
       max: endDt,
-      asc: asc,
     );
 
     return FilterOptionGroup()
@@ -203,7 +202,11 @@ class PhotoProvider extends ChangeNotifier {
       ..setOption(AssetType.image, option)
       ..setOption(AssetType.audio, option)
       ..createTimeCond = dtCond
-      ..containsEmptyAlbum = _containsEmptyAlbum;
+      ..containsEmptyAlbum = _containsEmptyAlbum
+      ..addOrderOption(OrderOption(
+        type: OrderOptionType.createDate,
+        asc: asc,
+      ));
   }
 
   Future<void> refreshAllGalleryProperties() async {

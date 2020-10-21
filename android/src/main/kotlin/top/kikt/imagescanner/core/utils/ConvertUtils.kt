@@ -1,5 +1,6 @@
 package top.kikt.imagescanner.core.utils
 
+import android.provider.MediaStore
 import top.kikt.imagescanner.AssetType
 import top.kikt.imagescanner.core.entity.*
 
@@ -124,12 +125,31 @@ object ConvertUtils {
   fun convertToDateCond(map: Map<*, *>): DateCond {
     val min = map["min"].toString().toLong()
     val max = map["max"].toString().toLong()
-    val asc = map["asc"].toString().toBoolean()
     val ignore = map["ignore"].toString().toBoolean()
-    return DateCond(min, max, asc, ignore)
+    return DateCond(min, max, ignore)
   }
 
   fun convertFilterOptionsFromMap(map: Map<*, *>): FilterOption {
     return FilterOption(map)
+  }
+
+  fun convertOrderByCondList(orders: List<*>): List<OrderByCond> {
+    val list = ArrayList<OrderByCond>()
+
+    for (order in orders) {
+      val map = order as Map<*, *>
+      val keyIndex = map["type"] as Int
+      val asc = map["asc"] as Boolean
+
+      val key = when(keyIndex){
+        0 -> MediaStore.MediaColumns.DATE_ADDED
+        1 -> MediaStore.MediaColumns.DATE_MODIFIED
+        else -> null
+      } ?: continue
+
+      list.add(OrderByCond(key, asc))
+    }
+
+    return list
   }
 }
