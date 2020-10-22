@@ -85,9 +85,9 @@ interface IDBUtils {
   private val typeUtils: RequestTypeUtils
     get() = RequestTypeUtils
 
-  fun getGalleryList(context: Context, requestType: Int = 0, timeStamp: Long, option: FilterOption): List<GalleryEntity>
+  fun getGalleryList(context: Context, requestType: Int = 0, option: FilterOption): List<GalleryEntity>
 
-  fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int = 0, timeStamp: Long, option: FilterOption, cacheContainer: CacheContainer? = null): List<AssetEntity>
+  fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int = 0, option: FilterOption, cacheContainer: CacheContainer? = null): List<AssetEntity>
 
   fun getAssetEntity(context: Context, id: String): AssetEntity?
 
@@ -134,7 +134,7 @@ interface IDBUtils {
     return getDouble(getColumnIndex(columnName))
   }
 
-  fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long, option: FilterOption): GalleryEntity?
+  fun getGalleryEntity(context: Context, galleryId: String, type: Int, option: FilterOption): GalleryEntity?
 
   fun clearCache()
 
@@ -142,7 +142,7 @@ interface IDBUtils {
 
   fun getThumbUri(context: Context, id: String, width: Int, height: Int, type: Int?): Uri?
 
-  fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOption): List<AssetEntity>
+  fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, option: FilterOption): List<AssetEntity>
 
   fun findDeleteUri(context: Context, id: String): Uri? {
     val assetEntity = getAssetEntity(context, id) ?: return null
@@ -293,9 +293,9 @@ interface IDBUtils {
     return uri.toString()
   }
 
-  fun getOnlyGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity>
+  fun getOnlyGalleryList(context: Context, requestType: Int, option: FilterOption): List<GalleryEntity>
 
-  fun getDateCond(args: ArrayList<String>, timestamp: Long, option: FilterOption): String {
+  fun getDateCond(args: ArrayList<String>, option: FilterOption): String {
     val createDateCond = addDateCond(args, option.createDateCond, MediaStore.Images.Media.DATE_ADDED)
     val updateDateCond = addDateCond(args, option.updateDateCond, MediaStore.Images.Media.DATE_MODIFIED)
     return "$createDateCond $updateDateCond"

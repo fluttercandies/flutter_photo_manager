@@ -105,7 +105,7 @@ List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
 | ------------ | ---------------------------------- |
 | hasAll       | Is there an album containing "all" |
 | type         | image/video/all , default all.     |
-| filterOption | See FilterOption.                  |
+| filterOption | See [FilterOption](#FilterOption). |
 
 #### FilterOption
 
@@ -114,9 +114,13 @@ List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
 | needTitle          | The title attribute of the picture must be included in android (even if it is false), it is more performance-consuming in iOS, please consider whether you need it. The default is false. |
 | sizeConstraint     | Constraints on resource size.                                                                                                                                                             |
 | durationConstraint | Constraints of time, pictures will ignore this constraint.                                                                                                                                |
-| dateTimeCond       | Includes date filtering and date sorting                                                                                                                                                  |
+| createDateTimeCond | Create date filter                                                                                                                                                                        |
+| updateDateTimeCond | Update date filter                                                                                                                                                                        |
+| orders             | The sort option, use `addOrderOption`.                                                                                                                                                    |
 
 Example see [filter_option_page.dart](https://github.com/CaiJingLong/flutter_photo_manager/example/lib/page/filter_option_page.dart).
+
+Most classes of FilterOption support `copyWith`.
 
 ### Get asset list from `AssetPathEntity`
 

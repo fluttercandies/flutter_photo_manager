@@ -195,12 +195,8 @@ class PhotoProvider extends ChangeNotifier {
     final createDtCond = DateTimeCond(
       min: startDt,
       max: endDt,
+      ignore: false,
     );
-
-    // final createDtCond = DateTimeCond(
-    //   min: DateTime(2018, 1, 1),
-    //   max: DateTime(2018, 12, 1),
-    // );
 
     return FilterOptionGroup()
       ..setOption(AssetType.video, option)
@@ -208,10 +204,12 @@ class PhotoProvider extends ChangeNotifier {
       ..setOption(AssetType.audio, option)
       ..createTimeCond = createDtCond
       ..containsEmptyAlbum = _containsEmptyAlbum
-      ..addOrderOption(OrderOption(
-        type: OrderOptionType.createDate,
-        asc: asc,
-      ));
+      ..addOrderOption(
+        OrderOption(
+          type: OrderOptionType.createDate,
+          asc: asc,
+        ),
+      );
   }
 
   Future<void> refreshAllGalleryProperties() async {
@@ -250,10 +248,16 @@ class AssetPathProvider extends ChangeNotifier {
     }
   }
 
+  bool refreshing = false;
+
   Future onRefresh() async {
+    if (refreshing) {
+      return;
+    }
+
+    refreshing = true;
     await path.refreshPathProperties(
-      dateTimeCond: path.filterOption.createTimeCond,
-      updateTimeCond: path.filterOption.updateTimeCond,
+      maxDateTimeToNow: false,
     );
     final list = await path.getAssetListPaged(0, loadCount);
     page = 0;
@@ -262,9 +266,14 @@ class AssetPathProvider extends ChangeNotifier {
     isInit = true;
     notifyListeners();
     printListLength("onRefresh");
+
+    refreshing = false;
   }
 
   Future<void> onLoadMore() async {
+    if (refreshing) {
+      return;
+    }
     if (showItemCount > path.assetCount) {
       print("already max");
       return;

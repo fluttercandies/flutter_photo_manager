@@ -12,7 +12,6 @@ import android.provider.BaseColumns._ID
 import android.provider.MediaStore
 import android.util.Log
 import androidx.exifinterface.media.ExifInterface
-import com.bumptech.glide.Glide
 import top.kikt.imagescanner.core.PhotoManager
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
@@ -41,7 +40,7 @@ object DBUtils : IDBUtils {
       MediaStore.Images.ImageColumns.LATITUDE
   )
 
-  override fun getGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity> {
+  override fun getGalleryList(context: Context, requestType: Int, option: FilterOption): List<GalleryEntity> {
     val list = ArrayList<GalleryEntity>()
     val uri = allUri
     val projection = storeBucketKeys + arrayOf("count(1)")
@@ -49,7 +48,7 @@ object DBUtils : IDBUtils {
     val args = ArrayList<String>()
     val typeSelection: String = getCondFromType(requestType, option, args)
 
-    val dateSelection = getDateCond(args, timeStamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val sizeWhere = sizeWhere(requestType, option)
 
@@ -67,14 +66,14 @@ object DBUtils : IDBUtils {
     return list
   }
 
-  override fun getOnlyGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity> {
+  override fun getOnlyGalleryList(context: Context, requestType: Int, option: FilterOption): List<GalleryEntity> {
     val list = ArrayList<GalleryEntity>()
 
     val args = ArrayList<String>()
     val typeSelection: String = AndroidQDBUtils.getCondFromType(requestType, option, args)
     val projection = storeBucketKeys + arrayOf("count(1)")
 
-    val dateSelection = getDateCond(args, timeStamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val sizeWhere = sizeWhere(requestType, option)
 
@@ -95,14 +94,14 @@ object DBUtils : IDBUtils {
     return list
   }
 
-  override fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long, option: FilterOption): GalleryEntity? {
+  override fun getGalleryEntity(context: Context, galleryId: String, type: Int, option: FilterOption): GalleryEntity? {
     val uri = allUri
     val projection = storeBucketKeys + arrayOf("count(1)")
 
     val args = ArrayList<String>()
     val typeSelection: String = getCondFromType(type, option, args)
 
-    val dateSelection = getDateCond(args, timeStamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val idSelection: String
     if (galleryId == "") {
@@ -135,14 +134,13 @@ object DBUtils : IDBUtils {
 
   @SuppressLint("Recycle")
   override fun getAssetFromGalleryId(
-      context: Context,
-      galleryId: String,
-      page: Int,
-      pageSize: Int,
-      requestType: Int,
-      timeStamp: Long,
-      option: FilterOption,
-      cacheContainer: CacheContainer?
+          context: Context,
+          galleryId: String,
+          page: Int,
+          pageSize: Int,
+          requestType: Int,
+          option: FilterOption,
+          cacheContainer: CacheContainer?
   ): List<AssetEntity> {
     val cache = cacheContainer ?: this.cacheContainer
 
@@ -157,7 +155,7 @@ object DBUtils : IDBUtils {
     }
     val typeSelection = getCondFromType(requestType, option, args)
 
-    val dateSelection = getDateCond(args, timeStamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val sizeWhere = sizeWhere(requestType, option)
 
@@ -183,7 +181,7 @@ object DBUtils : IDBUtils {
     return list
   }
 
-  override fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOption): List<AssetEntity> {
+  override fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, option: FilterOption): List<AssetEntity> {
     val cache = cacheContainer
 
     val isAll = gId.isEmpty()
@@ -197,7 +195,7 @@ object DBUtils : IDBUtils {
     }
     val typeSelection = getCondFromType(requestType, option, args)
 
-    val dateSelection = getDateCond(args, timestamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val sizeWhere = sizeWhere(requestType, option)
 

@@ -71,32 +71,46 @@
   }
 
   PHFetchResult<PHAssetCollection *> *smartAlbumResult = [PHAssetCollection
-          fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
-                                subtype:PHAssetCollectionSubtypeAlbumRegular
-                                options:fetchCollectionOptions];
+      fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
+                            subtype:PHAssetCollectionSubtypeAlbumRegular
+                            options:fetchCollectionOptions];
+
+  [self logCollections:smartAlbumResult option:assetOptions];
+
   [self injectAssetPathIntoArray:array
                           result:smartAlbumResult
                          options:assetOptions
                           hasAll:hasAll
               containsEmptyAlbum:option.containsEmptyAlbum
-   ];
+  ];
 
   PHFetchResult<PHCollection *> *topLevelResult = [PHAssetCollection
-          fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
+      fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
+
+  [self logCollections:topLevelResult option:assetOptions];
+
   [self injectAssetPathIntoArray:array
                           result:topLevelResult
                          options:assetOptions
                           hasAll:hasAll
-                    containsEmptyAlbum:option.containsEmptyAlbum
-   ];
+              containsEmptyAlbum:option.containsEmptyAlbum
+  ];
 
   return array;
 }
 
+- (void)logCollections:(PHFetchResult *)collections option:(PHFetchOptions *)option {
+  for (PHAssetCollection *collection in collections) {
+    PHFetchResult<PHAsset *> *result = [PHAsset fetchKeyAssetsInAssetCollection:collection options:option];
+    
+    NSLog(@"collection name = %@, count = %ld", collection.localizedTitle, result.count);
+  }
+}
+
 - (BOOL)existsWithId:(NSString *)assetId {
   PHFetchResult<PHAsset *> *result =
-          [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId]
-                                           options:[PHFetchOptions new]];
+      [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId]
+                                       options:[PHFetchOptions new]];
   if (!result) {
     return NO;
   }
@@ -728,8 +742,8 @@
     [args addObjectsFromArray:[dateOption dateArgs]];
   }
 
-  PMDateOption *updateOption = optionGroup.dateOption;
-  if (updateOption) {
+  PMDateOption *updateOption = optionGroup.updateOption;
+  if (!updateOption.ignore) {
     [cond appendString:[updateOption dateCond:@"modificationDate"]];
     [args addObjectsFromArray:[updateOption dateArgs]];
   }

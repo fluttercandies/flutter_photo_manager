@@ -80,6 +80,42 @@ class FilterOptionGroup {
     return result;
   }
 
+  FilterOptionGroup copyWith({
+    FilterOption imageOption,
+    FilterOption videoOption,
+    FilterOption audioOption,
+    DateTimeCond createTimeCond,
+    DateTimeCond updateTimeCond,
+    bool containsEmptyAlbum,
+    List<OrderOption> orders,
+  }) {
+    imageOption ??= _map[AssetType.image];
+    videoOption ??= _map[AssetType.video];
+    audioOption ??= _map[AssetType.audio];
+
+    createTimeCond ??= this.createTimeCond;
+    updateTimeCond ??= this.updateTimeCond;
+
+    containsEmptyAlbum ??= this.containsEmptyAlbum;
+
+    orders ??= this.orders;
+
+    final result = FilterOptionGroup();
+
+    result.setOption(AssetType.image, imageOption);
+    result.setOption(AssetType.video, videoOption);
+    result.setOption(AssetType.audio, audioOption);
+
+    result.createTimeCond = createTimeCond;
+    result.updateTimeCond = updateTimeCond;
+
+    result.containsEmptyAlbum = containsEmptyAlbum;
+
+    result.orders.addAll(orders);
+
+    return result;
+  }
+
   @override
   String toString() {
     return const JsonEncoder.withIndent('  ').convert(toMap());
@@ -161,6 +197,30 @@ class SizeConstraint {
     this.ignoreSize = false,
   });
 
+  SizeConstraint copyWith({
+    int minWidth,
+    int maxWidth,
+    int minHeight,
+    int maxHeight,
+    bool ignoreSize,
+  }) {
+    minWidth ??= this.minWidth;
+    maxWidth ??= this.maxHeight;
+
+    maxWidth ??= this.maxHeight;
+    maxHeight ??= this.maxHeight;
+
+    ignoreSize ??= this.ignoreSize;
+
+    return SizeConstraint(
+      minWidth: minWidth,
+      maxWidth: maxWidth,
+      minHeight: minHeight,
+      maxHeight: maxHeight,
+      ignoreSize: ignoreSize,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       "minWidth": minWidth,
@@ -217,7 +277,6 @@ class DateTimeCond {
   DateTimeCond copyWith({
     final DateTime min,
     final DateTime max,
-    final bool asc,
     final bool ignore,
   }) {
     return DateTimeCond(
@@ -240,10 +299,20 @@ class OrderOption {
   final OrderOptionType type;
   final bool asc;
 
-  OrderOption({
+  const OrderOption({
     this.type = OrderOptionType.createDate,
     this.asc = false,
   });
+
+  OrderOption copyWith({
+    OrderOptionType type,
+    bool asc,
+  }) {
+    return OrderOption(
+      asc: asc ?? this.asc,
+      type: type ?? this.type,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {

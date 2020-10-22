@@ -18,7 +18,6 @@ import top.kikt.imagescanner.util.LogUtils
 import top.kikt.imagescanner.util.ResultHandler
 import java.io.File
 import java.util.concurrent.Executors
-import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /// create 2019-09-05 by cai
 /// Do some business logic assembly
@@ -44,12 +43,12 @@ class PhotoManager(private val context: Context) {
       }
     }
 
-  fun getGalleryList(type: Int, timeStamp: Long, hasAll: Boolean, onlyAll: Boolean, option: FilterOption): List<GalleryEntity> {
+  fun getGalleryList(type: Int, hasAll: Boolean, onlyAll: Boolean, option: FilterOption): List<GalleryEntity> {
     if (onlyAll) {
-      return dbUtils.getOnlyGalleryList(context, type, timeStamp, option)
+      return dbUtils.getOnlyGalleryList(context, type, option)
     }
 
-    val fromDb = dbUtils.getGalleryList(context, type, timeStamp, option)
+    val fromDb = dbUtils.getGalleryList(context, type, option)
 
     if (!hasAll) {
       return fromDb
@@ -67,18 +66,16 @@ class PhotoManager(private val context: Context) {
     return listOf(entity) + fromDb
   }
 
-  fun getAssetList(galleryId: String, page: Int, pageCount: Int, typeInt: Int = 0, timestamp: Long, option: FilterOption): List<AssetEntity> {
+  fun getAssetList(galleryId: String, page: Int, pageCount: Int, typeInt: Int = 0, option: FilterOption): List<AssetEntity> {
     val gId = if (galleryId == ALL_ID) "" else galleryId
-    return dbUtils.getAssetFromGalleryId(context, gId, page, pageCount, typeInt, timestamp, option)
+    return dbUtils.getAssetFromGalleryId(context, gId, page, pageCount, typeInt, option)
   }
 
-
-  fun getAssetListWithRange(galleryId: String, type: Int, start: Int, end: Int, timestamp: Long, option: FilterOption): List<AssetEntity> {
+  fun getAssetListWithRange(galleryId: String, type: Int, start: Int, end: Int, option: FilterOption): List<AssetEntity> {
     val gId = if (galleryId == ALL_ID) "" else galleryId
-    return dbUtils.getAssetFromGalleryIdRange(context, gId, start, end, type, timestamp, option)
+    return dbUtils.getAssetFromGalleryIdRange(context, gId, start, end, type, option)
   }
-
-
+  
   fun getThumb(id: String, option: ThumbLoadOption, resultHandler: ResultHandler) {
     val width = option.width
     val height = option.height
@@ -143,9 +140,9 @@ class PhotoManager(private val context: Context) {
     dbUtils.clearFileCache(context)
   }
 
-  fun getPathEntity(id: String, type: Int, timestamp: Long, option: FilterOption): GalleryEntity? {
+  fun getPathEntity(id: String, type: Int, option: FilterOption): GalleryEntity? {
     if (id == ALL_ID) {
-      val allGalleryList = dbUtils.getGalleryList(context, type, timestamp, option)
+      val allGalleryList = dbUtils.getGalleryList(context, type, option)
       return if (allGalleryList.isEmpty()) {
         null
       } else {
@@ -159,7 +156,7 @@ class PhotoManager(private val context: Context) {
         }
       }
     }
-    return dbUtils.getGalleryEntity(context, id, type, timestamp, option)
+    return dbUtils.getGalleryEntity(context, id, type, option)
   }
 
   fun getFile(id: String, isOrigin: Boolean, resultHandler: ResultHandler) {

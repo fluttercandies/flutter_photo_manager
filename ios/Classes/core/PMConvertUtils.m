@@ -150,7 +150,6 @@
 
   long min = [map[@"min"] longValue];
   long max = [map[@"max"] longValue];
-  BOOL asc = [map[@"asc"] boolValue];
   BOOL ignore = [map[@"ignore"] boolValue];
 
   option.min = [NSDate dateWithTimeIntervalSince1970:(min / 1000.0)];

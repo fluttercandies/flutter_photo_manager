@@ -74,9 +74,9 @@
 
   // min
 
-  [str appendString:@"%@ >= "];
-
   [str appendString:key];
+  [str appendString:@" >= %@ "];
+
 
   // and
   [str appendString:@" AND "];
