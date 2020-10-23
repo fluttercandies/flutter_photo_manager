@@ -46,13 +46,13 @@ object AndroidQDBUtils : IDBUtils {
   )
 
   @SuppressLint("Recycle")
-  override fun getGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity> {
+  override fun getGalleryList(context: Context, requestType: Int, option: FilterOption): List<GalleryEntity> {
     val list = ArrayList<GalleryEntity>()
 
     val args = ArrayList<String>()
     val typeSelection: String = getCondFromType(requestType, option, args)
 
-    val dateSelection = getDateCond(args, timeStamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val sizeWhere = sizeWhere(requestType, option)
 
@@ -93,13 +93,13 @@ object AndroidQDBUtils : IDBUtils {
     return list
   }
 
-  override fun getOnlyGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity> {
+  override fun getOnlyGalleryList(context: Context, requestType: Int, option: FilterOption): List<GalleryEntity> {
     val list = ArrayList<GalleryEntity>()
 
     val args = ArrayList<String>()
     val typeSelection: String = getCondFromType(requestType, option, args)
 
-    val dateSelection = getDateCond(args, timeStamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val sizeWhere = sizeWhere(requestType, option)
 
@@ -118,7 +118,7 @@ object AndroidQDBUtils : IDBUtils {
   }
 
   @SuppressLint("Recycle")
-  override fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int, timeStamp: Long, option: FilterOption, cacheContainer: CacheContainer?): List<AssetEntity> {
+  override fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int, option: FilterOption, cacheContainer: CacheContainer?): List<AssetEntity> {
     val cache = cacheContainer ?: this.cacheContainer
 
     val isAll = galleryId.isEmpty()
@@ -134,7 +134,7 @@ object AndroidQDBUtils : IDBUtils {
 
     val sizeWhere = sizeWhere(requestType, option)
 
-    val dateSelection = getDateCond(args, timeStamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val keys = (assetKeys()).distinct().toTypedArray()
     val selection = if (isAll) {
@@ -159,7 +159,7 @@ object AndroidQDBUtils : IDBUtils {
 
   }
 
-  override fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOption): List<AssetEntity> {
+  override fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, option: FilterOption): List<AssetEntity> {
     val cache = cacheContainer
 
     val isAll = gId.isEmpty()
@@ -175,7 +175,7 @@ object AndroidQDBUtils : IDBUtils {
 
     val sizeWhere = sizeWhere(requestType, option)
 
-    val dateSelection = getDateCond(args, timestamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val keys = assetKeys().distinct().toTypedArray()
     val selection = if (isAll) {
@@ -248,7 +248,7 @@ object AndroidQDBUtils : IDBUtils {
   }
 
   @SuppressLint("Recycle")
-  override fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long, option: FilterOption): GalleryEntity? {
+  override fun getGalleryEntity(context: Context, galleryId: String, type: Int, option: FilterOption): GalleryEntity? {
     val uri = allUri
     val projection = IDBUtils.storeBucketKeys
 
@@ -257,7 +257,7 @@ object AndroidQDBUtils : IDBUtils {
     val args = ArrayList<String>()
     val typeSelection: String = getCondFromType(type, option, args)
 
-    val dateSelection = getDateCond(args, timeStamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val idSelection: String
     if (isAll) {

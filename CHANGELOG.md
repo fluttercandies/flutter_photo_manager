@@ -55,9 +55,15 @@
   - Support clean file cache.
   - Experimental
     - Preload image (Use `PhotoCachingManager` api.)
+  - Add `OrderOption` as sort condition.
 
 - Fixes
   - [#362](https://github.com/CaiJingLong/flutter_photo_manager/issues/362)
+
+Breaking change:
+
+- Feature
+  - Support multiple sorting conditions, and the `asc` of `DateTimeCond` is removed.
 
 ## 0.5.8
 

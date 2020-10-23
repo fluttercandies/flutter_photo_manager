@@ -43,6 +43,9 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       if (value.isEmpty) {
         return;
       }
+      if (mounted) {
+        return;
+      }
       PhotoCachingManager().requestCacheAssets(
         assets: value,
         option: thumbOption,
