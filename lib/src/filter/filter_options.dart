@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:meta/meta.dart';
+
+import 'package:flutter/foundation.dart';
 
 import '../type.dart';
 
