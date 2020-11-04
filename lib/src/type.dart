@@ -91,3 +91,11 @@ enum ResizeMode { none, fast, exact }
 
 /// Resize content mode
 enum ResizeContentMode { fit, fill, def }
+
+/// Represent possible permission states,
+enum PhotoPermission {
+  none,
+  full,
+  // only applicable to iOS 14+
+  limited,
+}

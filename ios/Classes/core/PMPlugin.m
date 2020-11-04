@@ -38,15 +38,29 @@
   PMManager *manager = self.manager;
 
   if ([call.method isEqualToString:@"requestPermission"]) {
-    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-        BOOL auth = PHAuthorizationStatusAuthorized == status;
-        [manager setAuth:auth];
-        if (auth) {
-          [handler reply:@1];
-        } else {
-          [handler reply:@0];
-        }
-    }];
+      if (@available(iOS 14, *)) {
+          [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelReadWrite handler: ^(PHAuthorizationStatus status) {
+            id result = 0;
+            BOOL auth = PHAuthorizationStatusAuthorized == status || PHAuthorizationStatusLimited == status;
+            [manager setAuth:auth];
+            if (PHAuthorizationStatusAuthorized == status) {
+                result = @1;
+            }
+            else if (PHAuthorizationStatusLimited == status) {
+                result = @2;
+            }
+            else {
+                result = @0;
+            }
+          [handler reply:result];
+          }];
+    } else {
+        [PHPhotoLibrary requestAuthorization: ^(PHAuthorizationStatus status) {
+            BOOL auth = PHAuthorizationStatusAuthorized == status;
+            [manager setAuth:auth];
+            [handler reply:auth ? @1 : @0];
+        }];
+    }
   } else if ([call.method isEqualToString:@"clearFileCache"]) {
     [manager clearFileCache];
     [handler reply:@1];

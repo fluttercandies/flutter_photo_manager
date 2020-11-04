@@ -13,6 +13,10 @@ class PhotoManager {
     return _plugin.requestPermission();
   }
 
+  /// Provide more information about the actual permission being granted.
+  /// This can account for the .limited permission in iOS 14.
+  static Future<PhotoPermission> requestPermissionExtended() async => _plugin.requestPermissionExtended();
+
   static Editor editor = Editor();
 
   /// get gallery list
@@ -37,8 +41,7 @@ class PhotoManager {
     }
     filterOption ??= FilterOptionGroup();
 
-    assert(
-        type.index != 0, 'The request type must have video, image or audio.');
+    assert(type.index != 0, 'The request type must have video, image or audio.');
 
     if (type.index == 0) {
       return [];
@@ -148,12 +151,10 @@ class PhotoManager {
   static _NotifyManager _notifyManager = _NotifyManager();
 
   /// see [_NotifyManager]
-  static void addChangeCallback(ValueChanged<MethodCall> callback) =>
-      _notifyManager.addCallback(callback);
+  static void addChangeCallback(ValueChanged<MethodCall> callback) => _notifyManager.addCallback(callback);
 
   /// see [_NotifyManager]
-  static void removeChangeCallback(ValueChanged<MethodCall> callback) =>
-      _notifyManager.removeCallback(callback);
+  static void removeChangeCallback(ValueChanged<MethodCall> callback) => _notifyManager.removeCallback(callback);
 
   /// see [_NotifyManager]
   static void startChangeNotify() => _notifyManager.startHandleNotify();
@@ -239,8 +240,7 @@ class PhotoManager {
   }
 
   /// When set to true, originbytes in Android Q will be cached as a file. When use again, the file will be read.
-  static Future<bool> setCacheAtOriginBytes(bool cache) =>
-      _plugin.cacheOriginBytes(cache);
+  static Future<bool> setCacheAtOriginBytes(bool cache) => _plugin.cacheOriginBytes(cache);
 
   static Future<Uint8List> _getOriginBytes(AssetEntity assetEntity) async {
     assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
@@ -262,8 +262,7 @@ class PhotoManager {
     return _plugin.getMediaUrl(assetEntity);
   }
 
-  static Future<List<AssetPathEntity>> _getSubPath(
-      AssetPathEntity assetPathEntity) {
+  static Future<List<AssetPathEntity>> _getSubPath(AssetPathEntity assetPathEntity) {
     assert(Platform.isIOS || Platform.isMacOS);
     return _plugin.getSubPathEntities(assetPathEntity);
   }
@@ -271,8 +270,7 @@ class PhotoManager {
   /// Refresh the property of asset.
   static Future<AssetEntity> refreshAssetProperties(AssetEntity src) async {
     assert(src.id != null);
-    final Map<dynamic, dynamic> map =
-        await _plugin.getPropertiesFromAssetEntity(src.id);
+    final Map<dynamic, dynamic> map = await _plugin.getPropertiesFromAssetEntity(src.id);
 
     final asset = ConvertUtils.convertToAsset(map);
 

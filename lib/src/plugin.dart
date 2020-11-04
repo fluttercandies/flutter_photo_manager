@@ -44,7 +44,13 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
 
   /// request permission.
   Future<bool> requestPermission() async {
-    return (await _channel.invokeMethod("requestPermission")) == 1;
+    final permission = await requestPermissionExtended();
+    return permission == PhotoPermission.full || permission == PhotoPermission.limited;
+  }
+
+  Future<PhotoPermission> requestPermissionExtended() async {
+    final permission = await _channel.invokeMethod("requestPermission");
+    return PhotoPermission.values[permission];
   }
 
   /// Use pagination to get album content.
@@ -119,8 +125,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     _channel.invokeMethod("openSetting");
   }
 
-  Future<Map> fetchPathProperties(
-      String id, int type, FilterOptionGroup optionGroup) async {
+  Future<Map> fetchPathProperties(String id, int type, FilterOptionGroup optionGroup) async {
     return _channel.invokeMethod(
       "fetchPathProperties",
       {
@@ -148,13 +153,11 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<List<String>> deleteWithIds(List<String> ids) async {
-    final List<dynamic> deleted =
-        (await _channel.invokeMethod("deleteWithIds", {"ids": ids}));
+    final List<dynamic> deleted = (await _channel.invokeMethod("deleteWithIds", {"ids": ids}));
     return deleted.cast<String>();
   }
 
-  Future<AssetEntity> saveImage(Uint8List uint8list,
-      {String title, String desc = ""}) async {
+  Future<AssetEntity> saveImage(Uint8List uint8list, {String title, String desc = ""}) async {
     title ??= "image_${DateTime.now().millisecondsSinceEpoch / 1000}";
 
     final result = await _channel.invokeMethod(
@@ -169,8 +172,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     return ConvertUtils.convertToAsset(result);
   }
 
-  Future<AssetEntity> saveImageWithPath(String path,
-      {String title, String desc = ""}) async {
+  Future<AssetEntity> saveImageWithPath(String path, {String title, String desc = ""}) async {
     final file = File(path);
     if (!file.existsSync()) {
       assert(file.existsSync(), "file must exists");
@@ -223,8 +225,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     if (Platform.isAndroid) {
       final version = int.parse(await getSystemVersion());
       if (version >= 29) {
-        final map = await _channel
-            .invokeMethod("getLatLngAndroidQ", {"id": assetEntity.id});
+        final map = await _channel.invokeMethod("getLatLngAndroidQ", {"id": assetEntity.id});
         if (map is Map) {
           /// 将返回的数据传入map
           return LatLng()
@@ -262,8 +263,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     });
   }
 
-  Future<List<AssetPathEntity>> getSubPathEntities(
-      AssetPathEntity pathEntity) async {
+  Future<List<AssetPathEntity>> getSubPathEntities(AssetPathEntity pathEntity) async {
     final result = await _channel.invokeMethod("getSubPath", {
       "id": pathEntity.id,
       "type": pathEntity.type.value,
@@ -280,11 +280,9 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     );
   }
 
-  Future<AssetEntity> copyAssetToGallery(
-      AssetEntity asset, AssetPathEntity pathEntity) async {
+  Future<AssetEntity> copyAssetToGallery(AssetEntity asset, AssetPathEntity pathEntity) async {
     if (pathEntity.isAll) {
-      assert(pathEntity.isAll,
-          "You don't need to copy the asset into the album containing all the pictures.");
+      assert(pathEntity.isAll, "You don't need to copy the asset into the album containing all the pictures.");
       return null;
     }
 
@@ -339,8 +337,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     await _channel.invokeMethod('cancelCacheRequests');
   }
 
-  Future<void> requestCacheAssetsThumb(
-      List<String> ids, ThumbOption option) async {
+  Future<void> requestCacheAssetsThumb(List<String> ids, ThumbOption option) async {
     assert(ids != null);
     assert(ids.isNotEmpty);
     assert(option != null);
@@ -356,8 +353,7 @@ mixin BasePlugin {
 }
 
 mixin IosPlugin on BasePlugin {
-  Future<AssetPathEntity> iosCreateFolder(
-      String name, bool isRoot, AssetPathEntity parent) async {
+  Future<AssetPathEntity> iosCreateFolder(String name, bool isRoot, AssetPathEntity parent) async {
     final map = {
       "name": name,
       "isRoot": isRoot,
@@ -386,8 +382,7 @@ mixin IosPlugin on BasePlugin {
       ..albumType = 2;
   }
 
-  Future<AssetPathEntity> iosCreateAlbum(
-      String name, bool isRoot, AssetPathEntity parent) async {
+  Future<AssetPathEntity> iosCreateAlbum(String name, bool isRoot, AssetPathEntity parent) async {
     final map = {
       "name": name,
       "isRoot": isRoot,
@@ -416,8 +411,7 @@ mixin IosPlugin on BasePlugin {
       ..albumType = 1;
   }
 
-  Future<bool> iosRemoveInAlbum(
-      List<AssetEntity> entities, AssetPathEntity path) async {
+  Future<bool> iosRemoveInAlbum(List<AssetEntity> entities, AssetPathEntity path) async {
     final result = await _channel.invokeMethod(
       "removeInAlbum",
       {
@@ -436,8 +430,7 @@ mixin IosPlugin on BasePlugin {
 }
 
 mixin AndroidPlugin on BasePlugin {
-  Future<bool> androidMoveAssetToPath(
-      AssetEntity entity, AssetPathEntity target) async {
+  Future<bool> androidMoveAssetToPath(AssetEntity entity, AssetPathEntity target) async {
     final result = await _channel.invokeMethod("moveAssetToPath", {
       "assetId": entity.id,
       "albumId": target.id,
