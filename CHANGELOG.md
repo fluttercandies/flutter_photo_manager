@@ -1,7 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
-  - [0.6.0-dev.5](#060-dev5)
+  - [0.6.0-dev.6](#060-dev6)
   - [0.5.8](#058)
   - [0.5.7](#057)
   - [0.5.6](#056)
@@ -45,7 +45,7 @@
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
 
-## 0.6.0-dev.5
+## 0.6.0-dev.6
 
 - Feature
 
@@ -59,6 +59,7 @@
 
 - Fixes
   - [#362](https://github.com/CaiJingLong/flutter_photo_manager/issues/362)
+  - Delete assets in androidQ.
 
 Breaking change:
 

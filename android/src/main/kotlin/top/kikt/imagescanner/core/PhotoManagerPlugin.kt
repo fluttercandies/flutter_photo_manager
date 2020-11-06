@@ -29,11 +29,16 @@ import java.util.concurrent.TimeUnit
 class PhotoManagerPlugin(
     private val applicationContext: Context,
     private val messenger: BinaryMessenger,
-    var activity: Activity?,
+    private var activity: Activity?,
     private val permissionsUtils: PermissionsUtils
 ) : MethodChannel.MethodCallHandler {
 
   val deleteManager = PhotoManagerDeleteManager(applicationContext, activity)
+
+  fun bindActivity(activity: Activity?) {
+    this.activity = activity
+    deleteManager.bindActivity(activity)
+  }
 
   companion object {
     private const val poolSize = 8

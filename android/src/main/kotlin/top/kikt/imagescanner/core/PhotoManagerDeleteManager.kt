@@ -14,7 +14,11 @@ import io.flutter.plugin.common.PluginRegistry
 import top.kikt.imagescanner.core.utils.IDBUtils
 import top.kikt.imagescanner.util.ResultHandler
 
-class PhotoManagerDeleteManager(val context: Context, val activity: Activity?) : PluginRegistry.ActivityResultListener {
+class PhotoManagerDeleteManager(val context: Context, var activity: Activity?) : PluginRegistry.ActivityResultListener {
+
+  fun bindActivity(activity: Activity?) {
+    this.activity = activity
+  }
 
   private var requestCodeIndex = 3000
   private var androidRDeleteRequestCode = 103000
@@ -79,7 +83,7 @@ class PhotoManagerDeleteManager(val context: Context, val activity: Activity?) :
           return
         }
         val requestCode = addRequestUri(uri)
-        activity.startIntentSenderForResult(
+        activity?.startIntentSenderForResult(
             e.userAction.actionIntent.intentSender,
             requestCode,
             null,
@@ -132,4 +136,5 @@ class PhotoManagerDeleteManager(val context: Context, val activity: Activity?) :
       deleteWithUriInApi29(uri, havePermission)
     }
   }
+
 }
