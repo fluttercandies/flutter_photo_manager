@@ -17,6 +17,10 @@ class FilterOptionGroup {
     setOption(AssetType.image, FilterOption());
     setOption(AssetType.video, FilterOption());
     setOption(AssetType.audio, FilterOption());
+    addOrderOption(OrderOption(
+      type: OrderOptionType.createDate,
+      asc: false,
+    ));
   }
 
   final Map<AssetType, FilterOption> _map = {};
