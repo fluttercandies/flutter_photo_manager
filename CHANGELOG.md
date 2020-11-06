@@ -55,7 +55,7 @@
   - Support clean file cache.
   - Experimental
     - Preload image (Use `PhotoCachingManager` api.)
-  - Add `OrderOption` as sort condition.
+  - Add `OrderOption` as sort condition. The option default value is order by create date desc;
 
 - Fixes
   - [#362](https://github.com/CaiJingLong/flutter_photo_manager/issues/362)
