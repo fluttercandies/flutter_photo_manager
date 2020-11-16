@@ -594,10 +594,10 @@
   NSLog(@"The asset has %lu resources.", (unsigned long) resources.count);
   PHAssetResource *imageResource;
 
-  if (resources.firstObject && [self isImage:resources.firstObject]) {
-    imageResource = resources.firstObject;
+  if (resources.lastObject && [self isImage:resources.lastObject]) {
+    imageResource = resources.lastObject;
   } else {
-    for (PHAssetResource *resource in resources) {
+    for (PHAssetResource *resource in [resources reverseObjectEnumerator]) {
       if ([self isImage:resource]) {
         imageResource = resource;
         break;
