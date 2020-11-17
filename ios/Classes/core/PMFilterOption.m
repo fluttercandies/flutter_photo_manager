@@ -8,12 +8,33 @@
 }
 
 - (NSArray<NSSortDescriptor *> *)sortCond {
-  PMDateOption *dateOption = self.dateOption;
-  return @[
-      [dateOption sortCond]
-  ];
+  return self.sortArray;
 }
 
+- (void)injectSortArray:(NSArray *)array {
+  NSMutableArray<NSSortDescriptor *> *result = [NSMutableArray new];
+
+  for (NSDictionary *dict in array) {
+    int typeValue = [dict[@"type"] intValue];
+    BOOL asc = [dict[@"asc"] boolValue];
+
+    NSString *key = nil;
+    if (typeValue == 0) {
+      key = @"creationDate";
+    } else if (typeValue == 1) {
+      key = @"modificationDate";
+    }
+
+    if (key) {
+      NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:key ascending:asc];
+      if (descriptor) {
+        [result addObject:descriptor];
+      }
+    }
+  }
+
+  self.sortArray = result;
+}
 @end
 
 @implementation PMFilterOption {
@@ -45,16 +66,33 @@
 
 }
 
-- (NSString *)dateCond {
-  return @"AND ( creationDate >= %@ AND creationDate <= %@ )";
+- (NSString *)dateCond:(NSString *)key {
+  NSMutableString *str = [NSMutableString new];
+
+  [str appendString:@"AND "];
+  [str appendString:@"( "];
+
+  // min
+
+  [str appendString:key];
+  [str appendString:@" >= %@ "];
+
+
+  // and
+  [str appendString:@" AND "];
+
+  // max
+
+  [str appendString:key];
+  [str appendString:@" <= %@ "];
+
+  [str appendString:@") "];
+
+  return str;
 }
 
 - (NSArray *)dateArgs {
   return @[self.min, self.max];
-}
-
-- (NSSortDescriptor *)sortCond {
-  return [NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:self.asc];
 }
 
 @end

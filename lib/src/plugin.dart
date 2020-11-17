@@ -112,7 +112,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<void> setLog(bool isLog) async {
-    return _channel.invokeMethod("log", isLog);
+    await _channel.invokeMethod("log", isLog);
   }
 
   void openSetting() {

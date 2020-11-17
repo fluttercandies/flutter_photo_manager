@@ -54,22 +54,21 @@ class ImageScannerPlugin : FlutterPlugin, ActivityAware {
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-
+    this.binding = binding
+    plugin?.bindActivity(binding.activity)
   }
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     this.binding = binding
-    plugin?.activity = binding.activity
+    plugin?.bindActivity(binding.activity)
     binding.addRequestPermissionsResultListener(createAddRequestPermissionsResultListener(permissionsUtils))
-    if (plugin != null) {
       plugin?.let {
         binding.addActivityResultListener(it.deleteManager)
       }
-    }
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
-
+    plugin?.bindActivity(null)
   }
 }
 

@@ -1,5 +1,6 @@
 package top.kikt.imagescanner.core.utils
 
+import android.provider.MediaStore
 import top.kikt.imagescanner.AssetType
 import top.kikt.imagescanner.core.entity.*
 
@@ -12,10 +13,10 @@ object ConvertUtils {
 
     for (entity in list) {
       val element = mapOf(
-              "id" to entity.id,
-              "name" to entity.name,
-              "length" to entity.length,
-              "isAll" to entity.isAll
+          "id" to entity.id,
+          "name" to entity.name,
+          "length" to entity.length,
+          "isAll" to entity.isAll
       )
 
       if (entity.length > 0) {
@@ -24,7 +25,7 @@ object ConvertUtils {
     }
 
     return mapOf(
-            "data" to data
+        "data" to data
     )
   }
 
@@ -33,45 +34,45 @@ object ConvertUtils {
 
     for (entity in list) {
       val element = mapOf(
-              "id" to entity.id,
-              "duration" to entity.duration / 1000,
-              "type" to entity.type,
-              "createDt" to entity.createDt / 1000,
-              "width" to entity.width,
-              "height" to entity.height,
-              "orientation" to entity.orientation,
-              "modifiedDt" to entity.modifiedDate,
-              "lat" to entity.lat,
-              "lng" to entity.lng,
-              "title" to entity.displayName,
-              "relativePath" to entity.relativePath
+          "id" to entity.id,
+          "duration" to entity.duration / 1000,
+          "type" to entity.type,
+          "createDt" to entity.createDt / 1000,
+          "width" to entity.width,
+          "height" to entity.height,
+          "orientation" to entity.orientation,
+          "modifiedDt" to entity.modifiedDate,
+          "lat" to entity.lat,
+          "lng" to entity.lng,
+          "title" to entity.displayName,
+          "relativePath" to entity.relativePath
       )
       data.add(element)
     }
 
     return mapOf(
-            "data" to data
+        "data" to data
     )
   }
 
   fun convertToAssetResult(entity: AssetEntity): Map<String, Any?> {
 
     val data = mapOf(
-            "id" to entity.id,
-            "duration" to entity.duration / 1000,
-            "type" to entity.type,
-            "createDt" to entity.createDt / 1000,
-            "width" to entity.width,
-            "height" to entity.height,
-            "modifiedDt" to entity.modifiedDate,
-            "lat" to entity.lat,
-            "lng" to entity.lng,
-            "title" to entity.displayName,
-            "relativePath" to entity.relativePath
+        "id" to entity.id,
+        "duration" to entity.duration / 1000,
+        "type" to entity.type,
+        "createDt" to entity.createDt / 1000,
+        "width" to entity.width,
+        "height" to entity.height,
+        "modifiedDt" to entity.modifiedDate,
+        "lat" to entity.lat,
+        "lng" to entity.lng,
+        "title" to entity.displayName,
+        "relativePath" to entity.relativePath
     )
 
     return mapOf(
-            "data" to data
+        "data" to data
     )
   }
 
@@ -124,11 +125,31 @@ object ConvertUtils {
   fun convertToDateCond(map: Map<*, *>): DateCond {
     val min = map["min"].toString().toLong()
     val max = map["max"].toString().toLong()
-    val asc = map["asc"].toString().toBoolean()
-    return DateCond(min, max, asc)
+    val ignore = map["ignore"].toString().toBoolean()
+    return DateCond(min, max, ignore)
   }
 
   fun convertFilterOptionsFromMap(map: Map<*, *>): FilterOption {
     return FilterOption(map)
+  }
+
+  fun convertOrderByCondList(orders: List<*>): List<OrderByCond> {
+    val list = ArrayList<OrderByCond>()
+
+    for (order in orders) {
+      val map = order as Map<*, *>
+      val keyIndex = map["type"] as Int
+      val asc = map["asc"] as Boolean
+
+      val key = when(keyIndex){
+        0 -> MediaStore.MediaColumns.DATE_ADDED
+        1 -> MediaStore.MediaColumns.DATE_MODIFIED
+        else -> null
+      } ?: continue
+
+      list.add(OrderByCond(key, asc))
+    }
+
+    return list
   }
 }

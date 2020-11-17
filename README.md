@@ -60,6 +60,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
   - [common issues](#common-issues)
     - [ios build error](#ios-build-error)
   - [Some articles about to use this library](#some-articles-about-to-use-this-library)
+  - [Migration Guide](#migration-guide)
 
 ## install
 
@@ -104,7 +105,7 @@ List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
 | ------------ | ---------------------------------- |
 | hasAll       | Is there an album containing "all" |
 | type         | image/video/all , default all.     |
-| filterOption | See FilterOption.                  |
+| filterOption | See [FilterOption](#FilterOption). |
 
 #### FilterOption
 
@@ -113,9 +114,13 @@ List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
 | needTitle          | The title attribute of the picture must be included in android (even if it is false), it is more performance-consuming in iOS, please consider whether you need it. The default is false. |
 | sizeConstraint     | Constraints on resource size.                                                                                                                                                             |
 | durationConstraint | Constraints of time, pictures will ignore this constraint.                                                                                                                                |
-| dateTimeCond       | Includes date filtering and date sorting                                                                                                                                                  |
+| createDateTimeCond | Create date filter                                                                                                                                                                        |
+| updateDateTimeCond | Update date filter                                                                                                                                                                        |
+| orders             | The sort option, use `addOrderOption`.                                                                                                                                                    |
 
 Example see [filter_option_page.dart](https://github.com/CaiJingLong/flutter_photo_manager/example/lib/page/filter_option_page.dart).
+
+Most classes of FilterOption support `copyWith`.
 
 ### Get asset list from `AssetPathEntity`
 
@@ -265,19 +270,13 @@ PhotoCachingManager().requestCacheAssets(
 );
 ```
 
-
-
 And, if you want to stop, call `PhotoCachingManager().cancelCacheRequest();`
-
-
 
 Usually, when we preview an album, we use thumbnails.
 In flutter, becauseListView.builder,GridView.builderIt's all rendering that loads, but sometimes we might want to pre-load some pictures in advance to make them display faster.
 
-Now, I try to create a caching image manager (just like [PHCachingImageManager](https://developer.apple.com/documentation/photokit/phcachingimagemanager?language=objc)) to do it.  In IOS, I use the system API directly, and Android will use glide and use glide's file cache to complete this step
+Now, I try to create a caching image manager (just like [PHCachingImageManager](https://developer.apple.com/documentation/photokit/phcachingimagemanager?language=objc)) to do it. In IOS, I use the system API directly, and Android will use glide and use glide's file cache to complete this step
 This function is completely optional.
-
-
 
 #### Delete item
 
@@ -516,3 +515,7 @@ Xcode's output:
 [Flutter 开发日记-如何实现一个照片选择器 plugin](https://juejin.im/post/5df797706fb9a016107974fc)
 
 If you have other articles about this library, you can contact me or open PR here.
+
+## Migration Guide
+
+See [Migration-Guide](./Migration-Guide.md)

@@ -11,6 +11,7 @@ import android.provider.MediaStore.VOLUME_EXTERNAL
 import androidx.exifinterface.media.ExifInterface
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
+import top.kikt.imagescanner.core.entity.DateCond
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
 import top.kikt.imagescanner.util.LogUtils
@@ -84,9 +85,9 @@ interface IDBUtils {
   private val typeUtils: RequestTypeUtils
     get() = RequestTypeUtils
 
-  fun getGalleryList(context: Context, requestType: Int = 0, timeStamp: Long, option: FilterOption): List<GalleryEntity>
+  fun getGalleryList(context: Context, requestType: Int = 0, option: FilterOption): List<GalleryEntity>
 
-  fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int = 0, timeStamp: Long, option: FilterOption, cacheContainer: CacheContainer? = null): List<AssetEntity>
+  fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int = 0, option: FilterOption, cacheContainer: CacheContainer? = null): List<AssetEntity>
 
   fun getAssetEntity(context: Context, id: String): AssetEntity?
 
@@ -133,7 +134,7 @@ interface IDBUtils {
     return getDouble(getColumnIndex(columnName))
   }
 
-  fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long, option: FilterOption): GalleryEntity?
+  fun getGalleryEntity(context: Context, galleryId: String, type: Int, option: FilterOption): GalleryEntity?
 
   fun clearCache()
 
@@ -141,7 +142,7 @@ interface IDBUtils {
 
   fun getThumbUri(context: Context, id: String, width: Int, height: Int, type: Int?): Uri?
 
-  fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOption): List<AssetEntity>
+  fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, option: FilterOption): List<AssetEntity>
 
   fun findDeleteUri(context: Context, id: String): Uri? {
     val assetEntity = getAssetEntity(context, id) ?: return null
@@ -292,27 +293,32 @@ interface IDBUtils {
     return uri.toString()
   }
 
-  fun getOnlyGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity>
+  fun getOnlyGalleryList(context: Context, requestType: Int, option: FilterOption): List<GalleryEntity>
 
-  fun getDateCond(args: ArrayList<String>, timestamp: Long, option: FilterOption): String {
-    val minMs = option.dateCond.minMs
-    val maxMs = option.dateCond.maxMs
+  fun getDateCond(args: ArrayList<String>, option: FilterOption): String {
+    val createDateCond = addDateCond(args, option.createDateCond, MediaStore.Images.Media.DATE_ADDED)
+    val updateDateCond = addDateCond(args, option.updateDateCond, MediaStore.Images.Media.DATE_MODIFIED)
+    return "$createDateCond $updateDateCond"
+  }
 
-    val dateSelection = "AND ( ${MediaStore.Images.Media.DATE_ADDED} >= ? AND ${MediaStore.Images.Media.DATE_ADDED} <= ? )"
+  private fun addDateCond(args: ArrayList<String>, dateCond: DateCond, dbKey: String): String {
+    if (dateCond.ignore) {
+      return ""
+    }
+
+    val minMs = dateCond.minMs
+    val maxMs = dateCond.maxMs
+
+    val dateSelection = "AND ( $dbKey >= ? AND $dbKey <= ? )"
     args.add((minMs / 1000).toString())
     args.add((maxMs / 1000).toString())
+
     return dateSelection
   }
 
-
-  fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String {
-    val asc =
-        if (filterOption.dateCond.asc) {
-          "ASC"
-        } else {
-          "DESC"
-        }
-    return "$DATE_ADDED $asc LIMIT $pageSize OFFSET $start"
+  fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String? {
+    val orderBy = filterOption.orderByCondString()
+    return "$orderBy LIMIT $pageSize OFFSET $start"
   }
 
   fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity?

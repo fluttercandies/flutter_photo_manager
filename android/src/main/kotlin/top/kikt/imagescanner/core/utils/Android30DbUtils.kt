@@ -44,13 +44,13 @@ object Android30DbUtils : IDBUtils {
   )
 
   @SuppressLint("Recycle")
-  override fun getGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity> {
+  override fun getGalleryList(context: Context, requestType: Int, option: FilterOption): List<GalleryEntity> {
     val list = ArrayList<GalleryEntity>()
 
     val args = ArrayList<String>()
     val typeSelection: String = getCondFromType(requestType, option, args)
 
-    val dateSelection = getDateCond(args, timeStamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val sizeWhere = sizeWhere(requestType, option)
 
@@ -91,13 +91,13 @@ object Android30DbUtils : IDBUtils {
     return list
   }
 
-  override fun getOnlyGalleryList(context: Context, requestType: Int, timeStamp: Long, option: FilterOption): List<GalleryEntity> {
+  override fun getOnlyGalleryList(context: Context, requestType: Int, option: FilterOption): List<GalleryEntity> {
     val list = ArrayList<GalleryEntity>()
 
     val args = ArrayList<String>()
     val typeSelection: String = getCondFromType(requestType, option, args)
 
-    val dateSelection = getDateCond(args, timeStamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val sizeWhere = sizeWhere(requestType, option)
 
@@ -115,14 +115,8 @@ object Android30DbUtils : IDBUtils {
     return list
   }
 
-  override fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String {
-    val asc =
-        if (filterOption.dateCond.asc) {
-          "ASC"
-        } else {
-          "DESC"
-        }
-    return "$DATE_ADDED $asc"
+  override fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String? {
+    return filterOption.orderByCondString()
   }
 
 
@@ -137,7 +131,7 @@ object Android30DbUtils : IDBUtils {
   }
 
   @SuppressLint("Recycle")
-  override fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int, timeStamp: Long, option: FilterOption, cacheContainer: CacheContainer?): List<AssetEntity> {
+  override fun getAssetFromGalleryId(context: Context, galleryId: String, page: Int, pageSize: Int, requestType: Int, option: FilterOption, cacheContainer: CacheContainer?): List<AssetEntity> {
 
     val isAll = galleryId.isEmpty()
 
@@ -153,7 +147,7 @@ object Android30DbUtils : IDBUtils {
     val sizeWhere = sizeWhere(requestType, option)
 //    val sizeWhere = ""
 
-    val dateSelection = getDateCond(args, timeStamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val keys = (assetKeys()).distinct().toTypedArray()
     val selection = if (isAll) {
@@ -184,7 +178,7 @@ object Android30DbUtils : IDBUtils {
   }
 
 
-  override fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, timestamp: Long, option: FilterOption): List<AssetEntity> {
+  override fun getAssetFromGalleryIdRange(context: Context, gId: String, start: Int, end: Int, requestType: Int, option: FilterOption): List<AssetEntity> {
     val isAll = gId.isEmpty()
 
     val list = ArrayList<AssetEntity>()
@@ -198,7 +192,7 @@ object Android30DbUtils : IDBUtils {
 
     val sizeWhere = sizeWhere(requestType, option)
 
-    val dateSelection = getDateCond(args, timestamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val keys = assetKeys().distinct().toTypedArray()
     val selection = if (isAll) {
@@ -269,7 +263,7 @@ object Android30DbUtils : IDBUtils {
   }
 
   @SuppressLint("Recycle")
-  override fun getGalleryEntity(context: Context, galleryId: String, type: Int, timeStamp: Long, option: FilterOption): GalleryEntity? {
+  override fun getGalleryEntity(context: Context, galleryId: String, type: Int, option: FilterOption): GalleryEntity? {
     val uri = allUri
     val projection = IDBUtils.storeBucketKeys
 
@@ -278,7 +272,7 @@ object Android30DbUtils : IDBUtils {
     val args = ArrayList<String>()
     val typeSelection: String = getCondFromType(type, option, args)
 
-    val dateSelection = getDateCond(args, timeStamp, option)
+    val dateSelection = getDateCond(args, option)
 
     val idSelection: String
     if (isAll) {

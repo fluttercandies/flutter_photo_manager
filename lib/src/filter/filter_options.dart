@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 import '../type.dart';
 
 /// Filter option for get asset.
@@ -15,14 +17,31 @@ class FilterOptionGroup {
     setOption(AssetType.image, FilterOption());
     setOption(AssetType.video, FilterOption());
     setOption(AssetType.audio, FilterOption());
+    addOrderOption(OrderOption(
+      type: OrderOptionType.createDate,
+      asc: false,
+    ));
   }
 
   final Map<AssetType, FilterOption> _map = {};
 
   /// 是否包含空相册
+  ///
+  /// Whether to include an empty album
   var containsEmptyAlbum = false;
 
-  DateTimeCond dateTimeCond = DateTimeCond.def();
+  @Deprecated('Please use createTimeCond.')
+  DateTimeCond get dateTimeCond => createTimeCond;
+
+  @Deprecated('Please use createTimeCond.')
+  set dateTimeCond(DateTimeCond dateTimeCond) {
+    createTimeCond = dateTimeCond;
+  }
+
+  DateTimeCond createTimeCond = DateTimeCond.def();
+  DateTimeCond updateTimeCond = DateTimeCond.def().copyWith(
+    ignore: true,
+  );
 
   FilterOption getOption(AssetType type) {
     return _map[type];
@@ -30,6 +49,12 @@ class FilterOptionGroup {
 
   void setOption(AssetType type, FilterOption option) {
     _map[type] = option;
+  }
+
+  final orders = <OrderOption>[];
+
+  void addOrderOption(OrderOption option) {
+    orders.add(option);
   }
 
   void merge(FilterOptionGroup other) {
@@ -52,8 +77,46 @@ class FilterOptionGroup {
       result["audio"] = _map[AssetType.audio].toMap();
     }
 
-    result["date"] = dateTimeCond.toMap();
+    result["createDate"] = createTimeCond.toMap();
+    result["updateDate"] = updateTimeCond.toMap();
     result['containsEmptyAlbum'] = containsEmptyAlbum;
+    result['orders'] = orders.map((e) => e.toMap()).toList();
+
+    return result;
+  }
+
+  FilterOptionGroup copyWith({
+    FilterOption imageOption,
+    FilterOption videoOption,
+    FilterOption audioOption,
+    DateTimeCond createTimeCond,
+    DateTimeCond updateTimeCond,
+    bool containsEmptyAlbum,
+    List<OrderOption> orders,
+  }) {
+    imageOption ??= _map[AssetType.image];
+    videoOption ??= _map[AssetType.video];
+    audioOption ??= _map[AssetType.audio];
+
+    createTimeCond ??= this.createTimeCond;
+    updateTimeCond ??= this.updateTimeCond;
+
+    containsEmptyAlbum ??= this.containsEmptyAlbum;
+
+    orders ??= this.orders;
+
+    final result = FilterOptionGroup();
+
+    result.setOption(AssetType.image, imageOption);
+    result.setOption(AssetType.video, videoOption);
+    result.setOption(AssetType.audio, audioOption);
+
+    result.createTimeCond = createTimeCond;
+    result.updateTimeCond = updateTimeCond;
+
+    result.containsEmptyAlbum = containsEmptyAlbum;
+
+    result.orders.addAll(orders);
 
     return result;
   }
@@ -139,6 +202,30 @@ class SizeConstraint {
     this.ignoreSize = false,
   });
 
+  SizeConstraint copyWith({
+    int minWidth,
+    int maxWidth,
+    int minHeight,
+    int maxHeight,
+    bool ignoreSize,
+  }) {
+    minWidth ??= this.minWidth;
+    maxWidth ??= this.maxHeight;
+
+    maxWidth ??= this.maxHeight;
+    maxHeight ??= this.maxHeight;
+
+    ignoreSize ??= this.ignoreSize;
+
+    return SizeConstraint(
+      minWidth: minWidth,
+      maxWidth: maxWidth,
+      minHeight: minHeight,
+      maxHeight: maxHeight,
+      ignoreSize: ignoreSize,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       "minWidth": minWidth,
@@ -170,46 +257,77 @@ class DurationConstraint {
   }
 }
 
+/// CreateDate
 class DateTimeCond {
-  static final DateTime zero = DateTime.utc(0);
+  static final DateTime zero = DateTime.fromMillisecondsSinceEpoch(0);
 
   final DateTime min;
   final DateTime max;
-  final bool asc;
+  final bool ignore;
 
   const DateTimeCond({
-    this.min,
-    this.max,
-    this.asc = false, // default desc
+    @required this.min,
+    @required this.max,
+    this.ignore = false,
   })  : assert(min != null),
-        assert(max != null),
-        assert(asc != null);
+        assert(max != null);
 
   factory DateTimeCond.def() {
     return DateTimeCond(
       min: zero,
       max: DateTime.now(),
-      asc: false,
     );
   }
 
   DateTimeCond copyWith({
     final DateTime min,
     final DateTime max,
-    final bool asc,
+    final bool ignore,
   }) {
     return DateTimeCond(
       min: min ?? this.min,
       max: max ?? this.max,
-      asc: asc ?? this.asc,
+      ignore: ignore ?? this.ignore,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      "min": min.millisecondsSinceEpoch,
-      "max": max.millisecondsSinceEpoch,
-      "asc": asc,
+      'min': min.millisecondsSinceEpoch,
+      'max': max.millisecondsSinceEpoch,
+      'ignore': ignore,
     };
   }
+}
+
+class OrderOption {
+  final OrderOptionType type;
+  final bool asc;
+
+  const OrderOption({
+    this.type = OrderOptionType.createDate,
+    this.asc = false,
+  });
+
+  OrderOption copyWith({
+    OrderOptionType type,
+    bool asc,
+  }) {
+    return OrderOption(
+      asc: asc ?? this.asc,
+      type: type ?? this.type,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'type': type.index,
+      'asc': asc,
+    };
+  }
+}
+
+enum OrderOptionType {
+  createDate,
+  updateDate,
 }

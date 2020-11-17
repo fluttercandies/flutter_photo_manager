@@ -3,7 +3,7 @@
 //
 
 #import "PMPlugin.h"
-#import "ConvertUtils.h"
+#import "PMConvertUtils.h"
 #import "PMAssetPathEntity.h"
 #import "PMFilterOption.h"
 #import "PMLogUtils.h"
@@ -94,9 +94,9 @@
         BOOL hasAll = [call.arguments[@"hasAll"] boolValue];
         BOOL onlyAll = [call.arguments[@"onlyAll"] boolValue];
         PMFilterOptionGroup *option =
-                [ConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
+                [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
         NSArray<PMAssetPathEntity *> *array = [manager getGalleryList:type hasAll:hasAll onlyAll:onlyAll option:option];
-        NSDictionary *dictionary = [ConvertUtils convertPathToMap:array];
+        NSDictionary *dictionary = [PMConvertUtils convertPathToMap:array];
         [handler reply:dictionary];
 
 
@@ -106,11 +106,11 @@
         NSUInteger page = [call.arguments[@"page"] unsignedIntValue];
         NSUInteger pageCount = [call.arguments[@"pageCount"] unsignedIntValue];
         PMFilterOptionGroup *option =
-                [ConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
+                [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
         NSArray<PMAssetEntity *> *array =
                 [manager getAssetEntityListWithGalleryId:id type:type page:page pageCount:pageCount filterOption:option];
         NSDictionary *dictionary =
-                [ConvertUtils convertAssetToMap:array optionGroup:option];
+                [PMConvertUtils convertAssetToMap:array optionGroup:option];
         [handler reply:dictionary];
 
       } else if ([call.method isEqualToString:@"getAssetListWithRange"]) {
@@ -119,11 +119,11 @@
         NSUInteger start = [call.arguments[@"start"] unsignedIntegerValue];
         NSUInteger end = [call.arguments[@"end"] unsignedIntegerValue];
         PMFilterOptionGroup *option =
-                [ConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
+                [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
         NSArray<PMAssetEntity *> *array =
                 [manager getAssetEntityListWithRange:galleryId type:type start:start end:end filterOption:option];
         NSDictionary *dictionary =
-                [ConvertUtils convertAssetToMap:array optionGroup:option];
+                [PMConvertUtils convertAssetToMap:array optionGroup:option];
         [handler reply:dictionary];
 
       } else if ([call.method isEqualToString:@"getThumb"]) {
@@ -145,11 +145,11 @@
         NSString *id = call.arguments[@"id"];
         int requestType = [call.arguments[@"type"] intValue];
         PMFilterOptionGroup *option =
-                [ConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
+                [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
         PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id type:requestType filterOption:option];
         if (pathEntity) {
           NSDictionary *dictionary =
-                  [ConvertUtils convertPathToMap:@[pathEntity]];
+                  [PMConvertUtils convertPathToMap:@[pathEntity]];
           [handler reply:dictionary];
         } else {
           [handler reply:nil];
@@ -190,7 +190,7 @@
                            return;
                          }
                          NSDictionary *resultData =
-                                 [ConvertUtils convertPMAssetToMap:asset needTitle:NO];
+                                 [PMConvertUtils convertPMAssetToMap:asset needTitle:NO];
                          [handler reply:@{@"data": resultData}];
                      }];
 
@@ -208,7 +208,7 @@
                                    return;
                                  }
                                  NSDictionary *resultData =
-                                         [ConvertUtils convertPMAssetToMap:asset needTitle:NO];
+                                         [PMConvertUtils convertPMAssetToMap:asset needTitle:NO];
                                  [handler reply:@{@"data": resultData}];
                              }];
 
@@ -226,7 +226,7 @@
                            return;
                          }
                          NSDictionary *resultData =
-                                 [ConvertUtils convertPMAssetToMap:asset needTitle:NO];
+                                 [PMConvertUtils convertPMAssetToMap:asset needTitle:NO];
                          [handler reply:@{@"data": resultData}];
                      }];
 
@@ -247,17 +247,17 @@
           [handler reply:nil];
           return;
         }
-        NSDictionary *resultMap = [ConvertUtils convertPMAssetToMap:entity needTitle:YES];
+        NSDictionary *resultMap = [PMConvertUtils convertPMAssetToMap:entity needTitle:YES];
         [handler reply:@{@"data": resultMap}];
       } else if ([@"getSubPath" isEqualToString:call.method]) {
         NSString *galleryId = call.arguments[@"id"];
         int type = [call.arguments[@"type"] intValue];
         int albumType = [call.arguments[@"albumType"] intValue];
         NSDictionary *optionMap = call.arguments[@"option"];
-        PMFilterOptionGroup *option = [ConvertUtils convertMapToOptionContainer:optionMap];
+        PMFilterOptionGroup *option = [PMConvertUtils convertMapToOptionContainer:optionMap];
 
         NSArray<PMAssetPathEntity *> *array = [manager getSubPathWithId:galleryId type:type albumType:albumType option:option];
-        NSDictionary *pathData = [ConvertUtils convertPathToMap:array];
+        NSDictionary *pathData = [PMConvertUtils convertPathToMap:array];
 
         [handler reply:@{@"list": pathData}];
       } else if ([@"copyAsset" isEqualToString:call.method]) {
@@ -268,7 +268,7 @@
               NSLog(@"copy asset error, cause by : %@", msg);
               [handler reply:nil];
             } else {
-              [handler reply:[ConvertUtils convertPMAssetToMap:entity needTitle:NO]];
+              [handler reply:[PMConvertUtils convertPMAssetToMap:entity needTitle:NO]];
             }
         }];
 

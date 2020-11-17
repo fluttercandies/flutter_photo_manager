@@ -2,13 +2,13 @@
 // Created by Caijinglong on 2019-09-06.
 //
 
-#import "ConvertUtils.h"
+#import "PMConvertUtils.h"
 #import "PHAsset+PHAsset_checkType.h"
 #import "PHAsset+PHAsset_getTitle.h"
 #import "PMAssetPathEntity.h"
 #import "PMFilterOption.h"
 
-@implementation ConvertUtils {
+@implementation PMConvertUtils {
 }
 
 + (NSDictionary *)convertPathToMap:(NSArray<PMAssetPathEntity *> *)array {
@@ -41,9 +41,9 @@
     NSDictionary *item;
 
     if ([asset.phAsset isImage]) {
-      item = [ConvertUtils convertPMAssetToMap:asset needTitle:imageShowTitle];
+      item = [PMConvertUtils convertPMAssetToMap:asset needTitle:imageShowTitle];
     } else if ([asset.phAsset isVideo]) {
-      item = [ConvertUtils convertPMAssetToMap:asset needTitle:videoShowTitle];
+      item = [PMConvertUtils convertPMAssetToMap:asset needTitle:videoShowTitle];
     } else {
       continue;
     }
@@ -109,8 +109,12 @@
   container.imageOption = [self convertMapToPMFilterOption:image];
   container.videoOption = [self convertMapToPMFilterOption:video];
   container.audioOption = [self convertMapToPMFilterOption:audio];
-  container.dateOption = [self convertMapToPMDateOption:map[@"date"]];
+  container.dateOption = [self convertMapToPMDateOption:map[@"createDate"]];
+  container.updateOption = [self convertMapToPMDateOption:map[@"updateDate"]];
   container.containsEmptyAlbum = [map[@"containsEmptyAlbum"] boolValue];
+
+  NSArray *sortArray = map[@"orders"];
+  [container injectSortArray: sortArray];
 
   return container;
 }
@@ -132,10 +136,11 @@
 
   PMDurationConstraint durationConstraint;
   durationConstraint.minDuration =
-          [ConvertUtils convertNSNumberToSecond:durationMap[@"min"]];
+          [PMConvertUtils convertNSNumberToSecond:durationMap[@"min"]];
   durationConstraint.maxDuration =
-          [ConvertUtils convertNSNumberToSecond:durationMap[@"max"]];
+          [PMConvertUtils convertNSNumberToSecond:durationMap[@"max"]];
   option.durationConstraint = durationConstraint;
+
 
   return option;
 }
@@ -145,11 +150,11 @@
 
   long min = [map[@"min"] longValue];
   long max = [map[@"max"] longValue];
-  BOOL asc = [map[@"asc"] boolValue];
+  BOOL ignore = [map[@"ignore"] boolValue];
 
   option.min = [NSDate dateWithTimeIntervalSince1970:(min / 1000.0)];
   option.max = [NSDate dateWithTimeIntervalSince1970:(max / 1000.0)];
-  option.asc = asc;
+  option.ignore = ignore;
 
   return option;
 }

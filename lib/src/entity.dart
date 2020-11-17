@@ -36,7 +36,7 @@ class AssetPathEntity {
   /// path asset type.
   RequestType _type;
 
-  final FilterOptionGroup filterOption;
+  FilterOptionGroup filterOption;
 
   /// The value used internally by the user.
   /// Used to indicate the value that should be available inside the path.
@@ -65,15 +65,35 @@ class AssetPathEntity {
   AssetPathEntity({this.id, this.name, this.filterOption});
 
   /// Call this method to update the property
-  Future<void> refreshPathProperties({DateTimeCond dateTimeCond}) async {
-    dateTimeCond ??=
-        this.filterOption.dateTimeCond.copyWith(max: DateTime.now());
-    final result = await PhotoManager.fetchPathProperties(this, dateTimeCond);
+  Future<void> refreshPathProperties({
+    FilterOptionGroup filterOptionGroup,
+    bool maxDateTimeToNow = true,
+  }) async {
+    assert(maxDateTimeToNow != null);
+
+    filterOptionGroup ??= this.filterOption.copyWith();
+
+    if (maxDateTimeToNow) {
+      filterOptionGroup = filterOptionGroup.copyWith(
+        createTimeCond: filterOptionGroup.createTimeCond.copyWith(
+          max: DateTime.now(),
+        ),
+        updateTimeCond: filterOptionGroup.updateTimeCond.copyWith(
+          max: DateTime.now(),
+        ),
+      );
+    }
+
+    final result = await PhotoManager.fetchPathProperties(
+      entity: this,
+      filterOptionGroup: filterOptionGroup,
+    );
     if (result != null) {
       this.assetCount = result.assetCount;
       this.name = result.name;
-      this.filterOption.dateTimeCond = dateTimeCond;
       this.isAll = result.isAll;
+
+      this.filterOption = filterOptionGroup;
     }
   }
 
