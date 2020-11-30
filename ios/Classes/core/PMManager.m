@@ -100,10 +100,14 @@
 }
 
 - (void)logCollections:(PHFetchResult *)collections option:(PHFetchOptions *)option {
-  for (PHAssetCollection *collection in collections) {
-    PHFetchResult<PHAsset *> *result = [PHAsset fetchKeyAssetsInAssetCollection:collection options:option];
-    
-    NSLog(@"collection name = %@, count = %ld", collection.localizedTitle, result.count);
+  for (PHCollection *phCollection in collections) {
+    if ([phCollection isMemberOfClass:[PHAssetCollection class]]) {
+      PHAssetCollection *collection = (PHAssetCollection *) phCollection;
+      PHFetchResult<PHAsset *> *result = [PHAsset fetchKeyAssetsInAssetCollection:collection options:option];
+      NSLog(@"collection name = %@, count = %ld", collection.localizedTitle, result.count);
+    } else {
+      NSLog(@"collection name = %@", phCollection.localizedTitle);
+    }
   }
 }
 
