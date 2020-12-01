@@ -592,22 +592,7 @@
 
 - (void)fetchOriginImageFile:(PHAsset *)asset
                resultHandler:(ResultHandler *)handler {
-  NSArray<PHAssetResource *> *resources =
-          [PHAssetResource assetResourcesForAsset:asset];
-  // find asset
-  NSLog(@"The asset has %lu resources.", (unsigned long) resources.count);
-  PHAssetResource *imageResource;
-
-  if (resources.firstObject && [self isImage:resources.firstObject]) {
-    imageResource = resources.firstObject;
-  } else {
-    for (PHAssetResource *resource in resources) {
-      if ([self isImage:resource]) {
-        imageResource = resource;
-        break;
-      }
-    }
-  }
+  PHAssetResource *imageResource = [asset getAdjustResource];
 
   if (!imageResource) {
     [handler reply:nil];
