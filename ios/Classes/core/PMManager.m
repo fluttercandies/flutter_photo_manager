@@ -401,21 +401,8 @@
 }
 
 - (void)fetchOriginVideoFile:(PHAsset *)asset handler:(ResultHandler *)handler {
-  NSArray<PHAssetResource *> *resources =
-          [PHAssetResource assetResourcesForAsset:asset];
-  // find asset
-  NSLog(@"The asset has %lu resources.", (unsigned long) resources.count);
-  PHAssetResource *dstResource;
-  if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypeVideo) {
-    dstResource = resources.lastObject;
-  } else {
-    for (PHAssetResource *resource in resources) {
-      if (resource.type == PHAssetResourceTypeVideo) {
-        dstResource = resource;
-        break;
-      }
-    }
-  }
+  PHAssetResource *dstResource = [asset getAdjustResource];
+    
   if (!dstResource) {
     [handler reply:nil];
     return;
@@ -584,10 +571,6 @@
 
   [manager createFileAtPath:path contents:imageData attributes:@{}];
   return path;
-}
-
-- (BOOL)isImage:(PHAssetResource *)resource {
-  return resource.type == PHAssetResourceTypePhoto || resource.type == PHAssetResourceTypeFullSizePhoto;
 }
 
 - (void)fetchOriginImageFile:(PHAsset *)asset

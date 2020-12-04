@@ -107,14 +107,16 @@
     return nil;
   }
 
-  for (PHAssetResource *res in resources) {
+  for (PHAssetResource *res in [resources reverseObjectEnumerator]) {
     if (self.mediaType == PHAssetMediaTypeImage ||
-        res.type == PHAssetResourceTypeFullSizePhoto) {
+        res.type == PHAssetResourceTypeFullSizePhoto ||
+        res.type == PHAssetResourceTypePhoto) {
       return res;
     }
 
     if (self.mediaType == PHAssetMediaTypeVideo ||
-        res.type == PHAssetResourceTypeFullSizeVideo) {
+        res.type == PHAssetResourceTypeFullSizeVideo ||
+        res.type == PHAssetResourceTypeVideo) {
       return res;
     }
   }
