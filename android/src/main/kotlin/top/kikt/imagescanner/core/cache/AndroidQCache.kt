@@ -10,6 +10,7 @@ import top.kikt.imagescanner.core.utils.AndroidQDBUtils
 import top.kikt.imagescanner.util.LogUtils
 import java.io.File
 import java.io.FileOutputStream
+import java.lang.Exception
 
 /// create 2019-09-10 by cai
 
@@ -40,13 +41,15 @@ class AndroidQCache {
     if (uri == Uri.EMPTY) {
       return null
     }
-    if (isOrigin) {
-      uri = MediaStore.setRequireOriginal(uri)
-    }
-    val inputStream = contentResolver.openInputStream(uri)
-    val outputStream = FileOutputStream(targetFile)
-    outputStream.use {
-      inputStream?.copyTo(it)
+    try {
+      val inputStream = contentResolver.openInputStream(uri)
+      val outputStream = FileOutputStream(targetFile)
+      outputStream.use {
+        inputStream?.copyTo(it)
+      }
+    }catch (e:Exception){
+      LogUtils.info("$assetId , isOrigin: $isOrigin, copy file error:${e.localizedMessage}")
+      return null
     }
     return targetFile
   }
