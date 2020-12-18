@@ -21,7 +21,7 @@ class PhotoManagerDeleteManager(val context: Context, var activity: Activity?) :
   }
 
   private var requestCodeIndex = 3000
-  private var androidRDeleteRequestCode = 103000
+  private var androidRDeleteRequestCode = 40069
 
   private val uriMap = HashMap<Int, Uri>()
 
