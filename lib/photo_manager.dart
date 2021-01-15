@@ -22,3 +22,4 @@ part './src/entity.dart';
 part './src/notify.dart';
 part './src/editor.dart';
 part './src/caching_manager.dart';
+part './src/progress_handler.dart';

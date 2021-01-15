@@ -296,6 +296,7 @@ class AssetEntity {
     int height, {
     ThumbFormat format = ThumbFormat.jpeg,
     int quality = 100,
+    PMProgressHandler progressHandler,
   }) {
     assert(width > 0 && height > 0, "The width and height must better 0.");
     assert(format != null, "The format must not be null.");
@@ -313,13 +314,26 @@ class AssetEntity {
         format: format,
         quality: quality,
       ),
+      progressHandler: progressHandler,
+    );
+  }
+
+  Future<File> loadFile({
+    PMProgressHandler progressHandler,
+    bool isOrigin = true,
+  }) async {
+    return PhotoManager._getFileWithId(
+      id,
+      isOrigin: isOrigin,
+      progressHandler: progressHandler,
     );
   }
 
   /// get thumb with size
   Future<Uint8List> thumbDataWithOption(
-    ThumbOption option,
-  ) {
+    ThumbOption option, {
+    PMProgressHandler progressHandler,
+  }) {
     assert(() {
       option.checkAssert();
       return true;
@@ -333,6 +347,7 @@ class AssetEntity {
     return PhotoManager._getThumbDataWithOption(
       id,
       option,
+      progressHandler,
     );
   }
 
@@ -398,8 +413,6 @@ class AssetEntity {
     return PhotoManager.refreshAssetProperties(this);
   }
 
-  Future<void> loadImage({PMProgressHandler progressHandler}) async {}
-
   @override
   int get hashCode {
     return id.hashCode;
@@ -426,47 +439,4 @@ class LatLng {
 
   /// latitude
   double latitude;
-}
-
-class PMProgressHandler {
-  static int _index = 0;
-
-  StreamController<PMProgresState> _controller = StreamController.broadcast();
-
-  Stream<PMProgresState> get stream => _controller.stream;
-
-  PMProgressHandler() {
-    final index = _index;
-    _index = _index + 1;
-    _channel = OptionalMethodChannel('top.kikt/photo_manager/progress/$index');
-    _channel.setMethodCallHandler(this._onProgress);
-  }
-
-  OptionalMethodChannel _channel;
-
-  Future<dynamic> _onProgress(MethodCall call) async {
-    switch (call.method) {
-      case 'notifyProgress':
-        final double progress = call.arguments['progress'];
-        final int stateIndex = call.arguments['state'];
-        final state = PMRequestState.values[stateIndex];
-        _controller.add(PMProgresState(progress, state));
-        break;
-    }
-    return;
-  }
-}
-
-class PMProgresState {
-  final double progress;
-  final PMRequestState state;
-
-  PMProgresState(this.progress, this.state);
-}
-
-enum PMRequestState {
-  prepare,
-  requesting,
-  sucesss,
-  failed,
 }

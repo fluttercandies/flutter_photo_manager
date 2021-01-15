@@ -85,30 +85,48 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     return ConvertUtils.convertToAssetList(map);
   }
 
+  void _injectParams(Map params, PMProgressHandler progressHandler) {
+    if (progressHandler != null) {
+      params['progressHandler'] = progressHandler.channelIndex;
+    }
+  }
+
   /// Get thumb of asset id.
   Future<Uint8List> getThumb({
     @required String id,
     @required ThumbOption option,
+    PMProgressHandler progressHandler,
   }) {
-    return _channel.invokeMethod("getThumb", {
+    final params = {
       "id": id,
       "option": option.toMap(),
-    });
+    };
+    _injectParams(params, progressHandler);
+    return _channel.invokeMethod(
+      "getThumb",
+      params,
+    );
   }
 
-  Future<Uint8List> getOriginBytes(String id) async {
-    return _channel.invokeMethod("getOriginBytes", {"id": id});
+  Future<Uint8List> getOriginBytes(String id,
+      {PMProgressHandler progressHandler}) async {
+    final params = {"id": id};
+    _injectParams(params, progressHandler);
+    return _channel.invokeMethod("getOriginBytes", params);
   }
 
   Future<void> releaseCache() async {
     await _channel.invokeMethod("releaseMemCache");
   }
 
-  Future<String> getFullFile(String id, {bool isOrigin}) async {
-    return _channel.invokeMethod("getFullFile", {
+  Future<String> getFullFile(String id,
+      {bool isOrigin, PMProgressHandler progressHandler}) async {
+    final params = {
       "id": id,
       "isOrigin": isOrigin,
-    });
+    };
+    _injectParams(params, progressHandler);
+    return _channel.invokeMethod("getFullFile", params);
   }
 
   Future<void> setLog(bool isLog) async {

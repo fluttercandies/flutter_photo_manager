@@ -161,9 +161,17 @@ class PhotoManager {
   /// see [_NotifyManager]
   static void stopChangeNotify() => _notifyManager.stopHandleNotify();
 
-  static Future<File> _getFileWithId(String id, {bool isOrigin = false}) async {
+  static Future<File> _getFileWithId(
+    String id, {
+    bool isOrigin = false,
+    PMProgressHandler progressHandler,
+  }) async {
     if (Platform.isIOS || Platform.isMacOS || Platform.isAndroid) {
-      final path = await _plugin.getFullFile(id, isOrigin: isOrigin);
+      final path = await _plugin.getFullFile(
+        id,
+        isOrigin: isOrigin,
+        progressHandler: progressHandler,
+      );
       if (path == null) {
         return null;
       }
@@ -176,10 +184,15 @@ class PhotoManager {
     return _plugin.getOriginBytes(id);
   }
 
-  static _getThumbDataWithOption(String id, ThumbOption option) {
+  static _getThumbDataWithOption(
+    String id,
+    ThumbOption option,
+    PMProgressHandler progressHandler,
+  ) {
     return _plugin.getThumb(
       id: id,
       option: option,
+      progressHandler: progressHandler,
     );
   }
 
@@ -242,11 +255,17 @@ class PhotoManager {
   static Future<bool> setCacheAtOriginBytes(bool cache) =>
       _plugin.cacheOriginBytes(cache);
 
-  static Future<Uint8List> _getOriginBytes(AssetEntity assetEntity) async {
+  static Future<Uint8List> _getOriginBytes(
+    AssetEntity assetEntity, {
+    PMProgressHandler progressHandler,
+  }) async {
     assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
     if (Platform.isAndroid) {
       if (await _isAndroidQ()) {
-        return _plugin.getOriginBytes(assetEntity.id);
+        return _plugin.getOriginBytes(
+          assetEntity.id,
+          progressHandler: progressHandler,
+        );
       } else {
         return (await assetEntity.originFile).readAsBytes();
       }

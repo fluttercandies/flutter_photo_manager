@@ -11,12 +11,16 @@
 #import "PMNotificationManager.h"
 #import "ResultHandler.h"
 #import "PMThumbLoadOption.h"
+#import "PMProgressHandler.h"
+#import "../../../../../../../../../Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/InstantMessage.framework/Headers/IMAVControl.h"
 
 @implementation PMPlugin {
   BOOL ignoreCheckPermission;
+  NSObject <FlutterPluginRegistrar> *privateRegistrar;
 }
 
 - (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar {
+  privateRegistrar = registrar;
   [self initNotificationManager:registrar];
 
   FlutterMethodChannel *channel =
@@ -129,15 +133,17 @@
       } else if ([call.method isEqualToString:@"getThumb"]) {
         NSString *id = call.arguments[@"id"];
         NSDictionary *dict = call.arguments[@"option"];
+        PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:dict];
         PMThumbLoadOption *option = [PMThumbLoadOption optionDict:dict];
 
-        [manager getThumbWithId:id option:option resultHandler:handler];
+        [manager getThumbWithId:id option:option resultHandler:handler progressHandler:progressHandler];
 
       } else if ([call.method isEqualToString:@"getFullFile"]) {
         NSString *id = call.arguments[@"id"];
         BOOL isOrigin = [call.arguments[@"isOrigin"] boolValue];
+        PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:call.arguments];
 
-        [manager getFullSizeFileWithId:id isOrigin:isOrigin resultHandler:handler];
+        [manager getFullSizeFileWithId:id isOrigin:isOrigin resultHandler:handler progressHandler:progressHandler];
 
       } else if ([call.method isEqualToString:@"releaseMemCache"]) {
         [manager clearCache];
@@ -354,6 +360,18 @@
     }
 
     return mutableDictionary;
+}
+
+- (PMProgressHandler *)getProgressHandlerFromDict:(NSDictionary *)dict {
+    id progressIndex = dict[@"progressHandler"];
+    if(!progressIndex){
+      return nil;
+    }
+    int index = [progressIndex intValue];
+    PMProgressHandler *handler = [PMProgressHandler new];
+    [handler register:privateRegistrar channelIndex: index];
+
+  return handler;
 }
 
 @end
