@@ -12,7 +12,6 @@
 #import "ResultHandler.h"
 #import "PMThumbLoadOption.h"
 #import "PMProgressHandler.h"
-#import "../../../../../../../../../Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/InstantMessage.framework/Headers/IMAVControl.h"
 
 @implementation PMPlugin {
   BOOL ignoreCheckPermission;
