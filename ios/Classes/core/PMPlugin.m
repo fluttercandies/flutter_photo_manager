@@ -132,7 +132,7 @@
       } else if ([call.method isEqualToString:@"getThumb"]) {
         NSString *id = call.arguments[@"id"];
         NSDictionary *dict = call.arguments[@"option"];
-        PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:dict];
+        PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:call.arguments];
         PMThumbLoadOption *option = [PMThumbLoadOption optionDict:dict];
 
         [manager getThumbWithId:id option:option resultHandler:handler progressHandler:progressHandler];

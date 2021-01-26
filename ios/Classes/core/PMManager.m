@@ -355,10 +355,7 @@
       [progressHandler deinit];
       return;
     }
-    if (progress == 1) {
-      [self notifyProgress:progressHandler progress:1 state:PMProgressStateSuccess];
-      [progressHandler deinit];
-    } else {
+    if (progress != 1) {
       [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
     }
   }];
@@ -387,6 +384,8 @@
 
                     FlutterStandardTypedData *data = [FlutterStandardTypedData typedDataWithBytes:imageData];
                     [handler reply:data];
+
+                    [self notifySuccess:progressHandler];
                   }];
 }
 
@@ -446,10 +445,7 @@
 
   [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
   [options setProgressHandler:^(double progress) {
-    if(progress == 1){
-      [self notifyProgress:progressHandler progress:1 state:PMProgressStateSuccess];
-      [progressHandler deinit];
-    }else{
+    if (progress != 1) {
       [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
     }
   }];
@@ -463,6 +459,7 @@
                        [handler reply:nil];
                      } else {
                        [handler reply:path];
+                       [self notifySuccess:progressHandler];
                      }
                    }];
 }
@@ -503,10 +500,7 @@
       [progressHandler deinit];
       return;
     }
-    if (progress == 1) {
-      [self notifyProgress:progressHandler progress:1 state:PMProgressStateSuccess];
-      [progressHandler deinit];
-    } else {
+    if (progress != 1) {
       [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
     }
   }];
@@ -535,6 +529,8 @@
                    [exportSession exportAsynchronouslyWithCompletionHandler:^{
                      [handler reply:path];
                    }];
+
+                   [self notifySuccess:progressHandler];
                  } else {
                    [handler reply:nil];
                  }
@@ -580,10 +576,7 @@
       [progressHandler deinit];
       return;
     }
-    if (progress == 1) {
-      [self notifyProgress:progressHandler progress:1 state:PMProgressStateSuccess];
-      [progressHandler deinit];
-    } else {
+    if (progress != 1) {
       [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
     }
   }];
@@ -607,6 +600,7 @@
                     NSString *path = [self writeFullFileWithAssetId:asset imageData:UIImageJPEGRepresentation(image, 1.0)];
 
                     [handler reply:path];
+                    [self notifySuccess:progressHandler];
                   }];
 }
 
@@ -662,10 +656,7 @@
   [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
 
   [options setProgressHandler:^(double progress) {
-    if (progress == 1) {
-      [self notifyProgress:progressHandler progress:1 state:PMProgressStateSuccess];
-      [progressHandler deinit];
-    } else {
+    if (progress != 1) {
       [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
     }
   }];
@@ -679,6 +670,7 @@
                        [handler reply:nil];
                      } else {
                        [handler reply:path];
+                       [self notifySuccess:progressHandler];
                      }
                    }];
 }
@@ -1329,6 +1321,12 @@
     return;
   }
 
-  [handler notify: progress state:state];
+  [handler notify:progress state:state];
 }
+
+- (void)notifySuccess:(PMProgressHandler *)handler {
+  [self notifyProgress:handler progress:1 state:PMProgressStateSuccess];
+  [handler deinit];
+}
+
 @end
