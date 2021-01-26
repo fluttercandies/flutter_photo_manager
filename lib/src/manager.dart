@@ -291,6 +291,7 @@ class PhotoManager {
       ..longitude = asset.longitude
       ..latitude = asset.latitude
       ..title = asset.title
+      ..isFavorite = asset.isFavorite
       ..relativePath = asset.relativePath;
 
     return src;
