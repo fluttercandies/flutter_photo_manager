@@ -192,6 +192,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               ),
               _buildMoveAnotherPath(entity),
               _buildRemoveInAlbumWidget(entity),
+              RaisedButton(
+                child: Text("Test progress"),
+                onPressed: () => testProgressHandler(entity),
+              ),
             ],
           ),
         );
@@ -408,5 +412,29 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             },
           );
         });
+  }
+
+  Future<void> testProgressHandler(AssetEntity entity) async {
+    final progressHandler = PMProgressHandler();
+    progressHandler.stream.listen((event) {
+      final progress = event.progress;
+      print('progress state onChange: ${event.state}, progress: $progress');
+    });
+    // final file = await entity.loadFile(progressHandler: progressHandler);
+    // print('file = $file');
+
+    // final thumb = await entity.thumbDataWithSize(
+    //   300,
+    //   300,
+    //   progressHandler: progressHandler,
+    // );
+
+    // print('thumb length = ${thumb.length}');
+
+    final file = await entity.loadFile(
+      progressHandler: progressHandler,
+      isOrigin: true,
+    );
+    print('file = $file');
   }
 }

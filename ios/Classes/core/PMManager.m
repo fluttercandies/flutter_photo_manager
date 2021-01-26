@@ -15,6 +15,7 @@
 #import "PMFolderUtils.h"
 #import "MD5Utils.h"
 #import "PMThumbLoadOption.h"
+#import "PMProgressHandler.h"
 
 @implementation PMManager {
   BOOL __isAuth;
@@ -324,27 +325,38 @@
   [cacheContainer clearCache];
 }
 
-- (void)getThumbWithId:(NSString *)id option:(PMThumbLoadOption *)option resultHandler:(ResultHandler *)handler {
-  PMAssetEntity *entity = [self getAssetEntity:id];
+- (void)getThumbWithId:(NSString *)id1 option:(PMThumbLoadOption *)option resultHandler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler {
+  PMAssetEntity *entity = [self getAssetEntity:id1];
   if (entity && entity.phAsset) {
     PHAsset *asset = entity.phAsset;
-    [self fetchThumb:asset option:option resultHandler:handler];
+    [self fetchThumb:asset option:option resultHandler:handler progressHandler:progressHandler];
   } else {
     [handler replyError:@"asset is not found"];
   }
 }
 
-- (void)fetchThumb:(PHAsset *)asset option:(PMThumbLoadOption *)option resultHandler:(ResultHandler *)handler {
+- (void)fetchThumb:(PHAsset *)asset option:(PMThumbLoadOption *)option resultHandler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler {
   PHImageManager *manager = PHImageManager.defaultManager;
   PHImageRequestOptions *requestOptions = [PHImageRequestOptions new];
   requestOptions.deliveryMode = option.deliveryMode;
   requestOptions.resizeMode = option.resizeMode;
 
+  [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+
   [requestOptions setNetworkAccessAllowed:YES];
   [requestOptions setProgressHandler:^(double progress, NSError *error, BOOL *stop,
       NSDictionary *info) {
     if (progress == 1.0) {
-      [self fetchThumb:asset option:option resultHandler:handler];
+      [self fetchThumb:asset option:option resultHandler:handler progressHandler:nil];
+    }
+
+    if (error) {
+      [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
+      [progressHandler deinit];
+      return;
+    }
+    if (progress != 1) {
+      [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
     }
   }];
   int width = option.width;
@@ -363,36 +375,36 @@
                     if ([handler isReplied]) {
                       return;
                     }
-                      NSData *imageData;
+                    NSData *imageData;
                     if (option.format == PMThumbFormatTypePNG) {
                       imageData = UIImagePNGRepresentation(result);
                     } else {
                       imageData = UIImageJPEGRepresentation(result, option.quality);
                     }
 
-                      FlutterStandardTypedData *data = [FlutterStandardTypedData typedDataWithBytes:imageData];
-                      [handler reply:data];
+                    FlutterStandardTypedData *data = [FlutterStandardTypedData typedDataWithBytes:imageData];
+                    [handler reply:data];
+
+                    [self notifySuccess:progressHandler];
                   }];
 }
 
-- (void)getFullSizeFileWithId:(NSString *)id
-                     isOrigin:(BOOL)isOrigin
-                resultHandler:(ResultHandler *)handler {
+- (void)getFullSizeFileWithId:(NSString *)id isOrigin:(BOOL)isOrigin resultHandler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler {
   PMAssetEntity *entity = [self getAssetEntity:id];
   if (entity && entity.phAsset) {
     PHAsset *asset = entity.phAsset;
     if (asset.isVideo) {
       if (isOrigin) {
-        [self fetchOriginVideoFile:asset handler:handler];
+        [self fetchOriginVideoFile:asset handler:handler progressHandler:progressHandler];
       } else {
-        [self fetchFullSizeVideo:asset handler:handler];
+        [self fetchFullSizeVideo:asset handler:handler progressHandler:progressHandler];
       }
       return;
     } else {
       if (isOrigin) {
-        [self fetchOriginImageFile:asset resultHandler:handler];
+        [self fetchOriginImageFile:asset resultHandler:handler progressHandler:progressHandler];
       } else {
-        [self fetchFullSizeImageFile:asset resultHandler:handler];
+        [self fetchFullSizeImageFile:asset resultHandler:handler  progressHandler:progressHandler];
       }
     }
   } else {
@@ -400,9 +412,9 @@
   }
 }
 
-- (void)fetchOriginVideoFile:(PHAsset *)asset handler:(ResultHandler *)handler {
+- (void)fetchOriginVideoFile:(PHAsset *)asset handler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler {
   NSArray<PHAssetResource *> *resources =
-          [PHAssetResource assetResourcesForAsset:asset];
+      [PHAssetResource assetResourcesForAsset:asset];
   // find asset
   NSLog(@"The asset has %lu resources.", (unsigned long) resources.count);
   PHAssetResource *dstResource;
@@ -431,20 +443,28 @@
   PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
   [options setNetworkAccessAllowed:YES];
 
+  [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+  [options setProgressHandler:^(double progress) {
+    if (progress != 1) {
+      [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+    }
+  }];
+
   [manager writeDataForAssetResource:dstResource
                               toFile:fileUrl
                              options:options
                    completionHandler:^(NSError *_Nullable error) {
-                       if (error) {
-                         NSLog(@"error = %@", error);
-                         [handler reply:nil];
-                       } else {
-                         [handler reply:path];
-                       }
+                     if (error) {
+                       NSLog(@"error = %@", error);
+                       [handler reply:nil];
+                     } else {
+                       [handler reply:path];
+                       [self notifySuccess:progressHandler];
+                     }
                    }];
 }
 
-- (void)fetchFullSizeVideo:(PHAsset *)asset handler:(ResultHandler *)handler {
+- (void)fetchFullSizeVideo:(PHAsset *)asset handler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler {
   NSString *homePath = NSTemporaryDirectory();
   NSFileManager *manager = NSFileManager.defaultManager;
 
@@ -462,46 +482,59 @@
   PHVideoRequestOptions *options = [PHVideoRequestOptions new];
   if ([manager fileExistsAtPath:path]) {
     [[PMLogUtils sharedInstance]
-            info:[NSString stringWithFormat:@"read cache from %@", path]];
+        info:[NSString stringWithFormat:@"read cache from %@", path]];
     [handler reply:path];
     return;
   }
 
+
+  [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
   [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
-          NSDictionary *info) {
-      if (progress == 1.0) {
-        [self fetchFullSizeVideo:asset handler:handler];
-      }
+      NSDictionary *info) {
+    if (progress == 1.0) {
+      [self fetchFullSizeVideo:asset handler:handler progressHandler:nil];
+    }
+
+    if (error) {
+      [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
+      [progressHandler deinit];
+      return;
+    }
+    if (progress != 1) {
+      [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+    }
   }];
 
   [options setNetworkAccessAllowed:YES];
 
   [[PHImageManager defaultManager]
-          requestAVAssetForVideo:asset
-                         options:options
-                   resultHandler:^(AVAsset *_Nullable asset,
-                           AVAudioMix *_Nullable audioMix,
-                           NSDictionary *_Nullable info) {
-                       BOOL downloadFinish = [PMManager isDownloadFinish:info];
+      requestAVAssetForVideo:asset
+                     options:options
+               resultHandler:^(AVAsset *_Nullable asset,
+                   AVAudioMix *_Nullable audioMix,
+                   NSDictionary *_Nullable info) {
+                 BOOL downloadFinish = [PMManager isDownloadFinish:info];
 
-                       if (!downloadFinish) {
-                         return;
-                       }
+                 if (!downloadFinish) {
+                   return;
+                 }
 
-                       NSString *preset = AVAssetExportPresetHighestQuality;
-                       AVAssetExportSession *exportSession =
-                               [AVAssetExportSession exportSessionWithAsset:asset
-                                                                 presetName:preset];
-                       if (exportSession) {
-                         exportSession.outputFileType = AVFileTypeMPEG4;
-                         exportSession.outputURL = [NSURL fileURLWithPath:path];
-                         [exportSession exportAsynchronouslyWithCompletionHandler:^{
-                             [handler reply:path];
-                         }];
-                       } else {
-                         [handler reply:nil];
-                       }
+                 NSString *preset = AVAssetExportPresetHighestQuality;
+                 AVAssetExportSession *exportSession =
+                     [AVAssetExportSession exportSessionWithAsset:asset
+                                                       presetName:preset];
+                 if (exportSession) {
+                   exportSession.outputFileType = AVFileTypeMPEG4;
+                   exportSession.outputURL = [NSURL fileURLWithPath:path];
+                   [exportSession exportAsynchronouslyWithCompletionHandler:^{
+                     [handler reply:path];
                    }];
+
+                   [self notifySuccess:progressHandler];
+                 } else {
+                   [handler reply:nil];
+                 }
+               }];
 }
 
 - (NSString *)makeAssetOutputPath:(PHAsset *)asset isOrigin:(Boolean)isOrigin {
@@ -523,19 +556,29 @@
   return path;
 }
 
-- (void)fetchFullSizeImageFile:(PHAsset *)asset
-                 resultHandler:(ResultHandler *)handler {
+- (void)fetchFullSizeImageFile:(PHAsset *)asset resultHandler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler {
   PHImageManager *manager = PHImageManager.defaultManager;
   PHImageRequestOptions *options = [PHImageRequestOptions new];
   options.synchronous = YES;
   options.version = PHImageRequestOptionsVersionCurrent;
 
+
   [options setNetworkAccessAllowed:YES];
+  [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
   [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
-          NSDictionary *info) {
-      if (progress == 1.0) {
-        [self fetchFullSizeImageFile:asset resultHandler:handler];
-      }
+      NSDictionary *info) {
+    if (progress == 1.0) {
+      [self fetchFullSizeImageFile:asset resultHandler:handler progressHandler:nil];
+    }
+
+    if (error) {
+      [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
+      [progressHandler deinit];
+      return;
+    }
+    if (progress != 1) {
+      [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+    }
   }];
 
   [manager requestImageForAsset:asset
@@ -543,20 +586,21 @@
                     contentMode:PHImageContentModeDefault
                         options:options
                   resultHandler:^(UIImage *_Nullable image,
-                          NSDictionary *_Nullable info) {
+                      NSDictionary *_Nullable info) {
 
-                      BOOL downloadFinished = [PMManager isDownloadFinish:info];
-                      if (!downloadFinished) {
-                        return;
-                      }
+                    BOOL downloadFinished = [PMManager isDownloadFinish:info];
+                    if (!downloadFinished) {
+                      return;
+                    }
 
-                      if ([handler isReplied]) {
-                        return;
-                      }
+                    if ([handler isReplied]) {
+                      return;
+                    }
 
-                      NSString *path = [self writeFullFileWithAssetId:asset imageData:UIImageJPEGRepresentation(image, 1.0)];
+                    NSString *path = [self writeFullFileWithAssetId:asset imageData:UIImageJPEGRepresentation(image, 1.0)];
 
-                      [handler reply:path];
+                    [handler reply:path];
+                    [self notifySuccess:progressHandler];
                   }];
 }
 
@@ -590,8 +634,7 @@
   return resource.type == PHAssetResourceTypePhoto || resource.type == PHAssetResourceTypeFullSizePhoto;
 }
 
-- (void)fetchOriginImageFile:(PHAsset *)asset
-               resultHandler:(ResultHandler *)handler {
+- (void)fetchOriginImageFile:(PHAsset *)asset resultHandler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler {
   PHAssetResource *imageResource = [asset getAdjustResource];
 
   if (!imageResource) {
@@ -609,16 +652,26 @@
   PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
   [options setNetworkAccessAllowed:YES];
 
+
+  [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+
+  [options setProgressHandler:^(double progress) {
+    if (progress != 1) {
+      [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+    }
+  }];
+
   [manager writeDataForAssetResource:imageResource
                               toFile:fileUrl
                              options:options
                    completionHandler:^(NSError *_Nullable error) {
-                       if (error) {
-                         NSLog(@"error = %@", error);
-                         [handler reply:nil];
-                       } else {
-                         [handler reply:path];
-                       }
+                     if (error) {
+                       NSLog(@"error = %@", error);
+                       [handler reply:nil];
+                     } else {
+                       [handler reply:path];
+                       [self notifySuccess:progressHandler];
+                     }
                    }];
 }
 
@@ -1262,4 +1315,18 @@
 - (void)cancelCacheRequests {
   [cachingManager stopCachingImagesForAllAssets];
 }
+
+- (void)notifyProgress:(PMProgressHandler *)handler progress:(double)progress state:(PMProgressState)state {
+  if (!handler) {
+    return;
+  }
+
+  [handler notify:progress state:state];
+}
+
+- (void)notifySuccess:(PMProgressHandler *)handler {
+  [self notifyProgress:handler progress:1 state:PMProgressStateSuccess];
+  [handler deinit];
+}
+
 @end
