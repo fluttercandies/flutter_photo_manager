@@ -4,12 +4,15 @@ part of '../photo_manager.dart';
 class PMProgressHandler {
   static int _index = 0;
 
-  StreamController<PMProgresState> _controller = StreamController.broadcast();
+  StreamController<PMProgressState> _controller = StreamController.broadcast();
 
-  Stream<PMProgresState> get stream => _controller.stream;
+  /// Get the download progress and status of icloud by monitoring the stream.
+  Stream<PMProgressState> get stream => _controller.stream;
 
+  /// For internal use of SDK, users should not use it.
   int channelIndex = 0;
 
+  /// Only works in iOS.
   PMProgressHandler() {
     final index = _index;
     _index = _index + 1;
@@ -26,20 +29,25 @@ class PMProgressHandler {
         final double progress = call.arguments['progress'];
         final int stateIndex = call.arguments['state'];
         final state = PMRequestState.values[stateIndex];
-        _controller.add(PMProgresState(progress, state));
+        _controller.add(PMProgressState(progress, state));
         break;
     }
     return;
   }
 }
 
-class PMProgresState {
+/// Status of progress for [PMProgressHandler].
+class PMProgressState {
+  /// Values range from 0.0 to 1.0.
   final double progress;
+
+  /// See [PMRequestState]
   final PMRequestState state;
 
-  PMProgresState(this.progress, this.state);
+  PMProgressState(this.progress, this.state);
 }
 
+/// Current asset loading status
 enum PMRequestState {
   prepare,
   loading,
