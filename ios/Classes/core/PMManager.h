@@ -14,6 +14,7 @@ typedef void (^ChangeIds)(NSArray<NSString *> *);
 @class PMFilterOption;
 @class PMFilterOptionGroup;
 @class PMThumbLoadOption;
+@class PMProgressHandler;
 
 typedef void (^AssetResult)(PMAssetEntity *);
 
