@@ -423,12 +423,18 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     // final file = await entity.loadFile(progressHandler: progressHandler);
     // print('file = $file');
 
-    final thumb = await entity.thumbDataWithSize(
-      300,
-      300,
-      progressHandler: progressHandler,
-    );
+    // final thumb = await entity.thumbDataWithSize(
+    //   300,
+    //   300,
+    //   progressHandler: progressHandler,
+    // );
 
-    print('thumb length = ${thumb.length}');
+    // print('thumb length = ${thumb.length}');
+
+    final file = await entity.loadFile(
+      progressHandler: progressHandler,
+      isOrigin: true,
+    );
+    print('file = $file');
   }
 }
