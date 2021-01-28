@@ -27,6 +27,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
     - [Add to pubspec](#add-to-pubspec)
     - [import in dart code](#import-in-dart-code)
   - [Usage](#usage)
+    - [Configure your flutter project to use the plugin](#configure-your-flutter-project-to-use-the-plugin)
     - [request permission](#request-permission)
     - [you get all of asset list (gallery)](#you-get-all-of-asset-list-gallery)
       - [FilterOption](#filteroption)
@@ -80,6 +81,14 @@ import 'package:photo_manager/photo_manager.dart';
 ```
 
 ## Usage
+
+### Configure your flutter project to use the plugin
+
+Before using the plug-in, there are several points to note.
+Please click the link below.
+
+1. [Android](#android-config)
+2. [iOS](#ios-config)
 
 ### request permission
 

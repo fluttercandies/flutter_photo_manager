@@ -43,6 +43,7 @@ class ConvertUtils {
         ..longitude = item["lng"]
         ..latitude = item["lat"]
         ..title = item["title"]
+        ..isFavorite = item["favorite"]
         ..relativePath = item['relativePath'];
 
       result.add(entity);
@@ -72,7 +73,8 @@ class ConvertUtils {
       ..typeInt = data["type"]
       ..longitude = data["lng"]
       ..latitude = data["lat"]
-      ..title = data["title"];
+      ..title = data["title"]
+      ..isFavorite = data["favorite"];
 
     return entity;
   }

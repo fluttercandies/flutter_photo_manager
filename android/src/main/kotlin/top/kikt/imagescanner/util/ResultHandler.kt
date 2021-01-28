@@ -27,7 +27,11 @@ class ResultHandler( var result: MethodChannel.Result?,val call: MethodCall? = n
     val result = this.result
     this.result = null
     handler.post {
-      result?.success(any)
+      try {
+        result?.success(any)
+      } catch (e: IllegalStateException) {
+        // Do nothing
+      }
     }
   }
 

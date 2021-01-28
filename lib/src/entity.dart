@@ -265,12 +265,16 @@ class AssetEntity {
     return _plugin.getLatLngAsync(this);
   }
 
-  /// if you need upload file ,then you can use the file, nullable.
+  /// If you need upload file ,then you can use the file, nullable.
+  ///
+  /// If you need to see the loading status, look at the [loadFile].
   Future<File> get file async => PhotoManager._getFileWithId(this.id);
 
   /// This contains all the EXIF information, but in contrast, `Image` widget may not be able to display pictures.
   ///
-  /// Usually, you can use the [file] attribute
+  /// Usually, you can use the [file] attribute.
+  ///
+  /// If you need to see the loading status, look at the [loadFile].
   Future<File> get originFile async =>
       PhotoManager._getFileWithId(id, isOrigin: true);
 
@@ -287,7 +291,9 @@ class AssetEntity {
   /// This property is not recommended for video types.
   Future<Uint8List> get originBytes => PhotoManager._getOriginBytes(this);
 
-  /// thumb data , for display
+  /// The thumb data of asset, use it to display.
+  ///
+  /// If you need to see the loading status, look at the [thumbDataWithSize] or [thumbDataWithOption].
   Future<Uint8List> get thumbData => thumbDataWithSize(150, 150);
 
   /// get thumb with size
@@ -296,6 +302,7 @@ class AssetEntity {
     int height, {
     ThumbFormat format = ThumbFormat.jpeg,
     int quality = 100,
+    PMProgressHandler progressHandler,
   }) {
     assert(width > 0 && height > 0, "The width and height must better 0.");
     assert(format != null, "The format must not be null.");
@@ -313,13 +320,27 @@ class AssetEntity {
         format: format,
         quality: quality,
       ),
+      progressHandler: progressHandler,
     );
   }
 
-  /// get thumb with size
+  /// Use the method to load file.
+  Future<File> loadFile({
+    PMProgressHandler progressHandler,
+    bool isOrigin = true,
+  }) async {
+    return PhotoManager._getFileWithId(
+      id,
+      isOrigin: isOrigin,
+      progressHandler: progressHandler,
+    );
+  }
+
+  /// Get thumb with size of option.
   Future<Uint8List> thumbDataWithOption(
-    ThumbOption option,
-  ) {
+    ThumbOption option, {
+    PMProgressHandler progressHandler,
+  }) {
     assert(() {
       option.checkAssert();
       return true;
@@ -333,6 +354,7 @@ class AssetEntity {
     return PhotoManager._getThumbDataWithOption(
       id,
       option,
+      progressHandler,
     );
   }
 
