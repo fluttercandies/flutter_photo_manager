@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class ListDialog extends StatefulWidget {
-  final List<Widget> children;
-
   const ListDialog({
-    Key key,
-    @required this.children,
+    Key? key,
+    required this.children,
   }) : super(key: key);
+
+  final List<Widget> children;
 
   @override
   _ListDialogState createState() => _ListDialogState();

@@ -3,8 +3,13 @@ import 'dart:io';
 import 'package:photo_manager/photo_manager.dart';
 
 class UploadToDevServer {
-  upload(AssetEntity entity) async {
+  const UploadToDevServer._();
+
+  static void upload(AssetEntity entity) async {
     final data = await entity.originBytes;
+    if (data == null) {
+      return;
+    }
     print(data.length);
     final client = HttpClient();
 

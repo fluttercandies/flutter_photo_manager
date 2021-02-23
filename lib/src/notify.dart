@@ -41,6 +41,6 @@ class _NotifyManager {
   }
 
   Future<dynamic> _onChange(MethodCall methodCall) async {
-    notifyCallback.forEach((callback) => callback?.call(methodCall));
+    notifyCallback.forEach((callback) => callback.call(methodCall));
   }
 }

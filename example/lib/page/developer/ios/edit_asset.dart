@@ -10,7 +10,7 @@ class EditAssetPage extends StatefulWidget {
 }
 
 class _EditAssetPageState extends State<EditAssetPage> {
-  AssetEntity entity;
+  AssetEntity? entity;
 
   @override
   void initState() {
@@ -31,25 +31,25 @@ class _EditAssetPageState extends State<EditAssetPage> {
                 children: <Widget>[
                   AspectRatio(
                     aspectRatio: 1,
-                    child: FutureBuilder<Uint8List>(
-                      future: entity.originBytes,
+                    child: FutureBuilder<Uint8List?>(
+                      future: entity!.originBytes,
                       builder: (_, s) {
                         if (!s.hasData) {
                           return Container();
                         }
-                        return Image.memory(s.data);
+                        return Image.memory(s.data!);
                       },
                     ),
                   ),
                   AspectRatio(
                     aspectRatio: 1,
-                    child: FutureBuilder<File>(
-                      future: entity.file,
+                    child: FutureBuilder<File?>(
+                      future: entity!.file,
                       builder: (_, s) {
                         if (!s.hasData) {
                           return Container();
                         }
-                        return Image.file(s.data);
+                        return Image.file(s.data!);
                       },
                     ),
                   ),

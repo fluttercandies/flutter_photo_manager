@@ -75,8 +75,8 @@ class _NewHomePageState extends State<NewHomePage> {
         child: CheckboxListTile(
           title: Text(typeText),
           value: currentType.containsType(type),
-          onChanged: (bool value) {
-            if (value) {
+          onChanged: (bool? value) {
+            if (value == true) {
               provider.changeType(currentType + type);
             } else {
               provider.changeType(currentType - type);
@@ -157,8 +157,7 @@ class _NewHomePageState extends State<NewHomePage> {
         title: Text("onChanged"),
         onChanged: (value) {
           provider.notifying = value;
-
-          if (value) {
+          if (value == true) {
             PhotoManager.startChangeNotify();
           } else {
             PhotoManager.stopChangeNotify();
@@ -169,7 +168,7 @@ class _NewHomePageState extends State<NewHomePage> {
   void onChange(call) {}
 
   Widget _buildFilterOption(PhotoProvider provider) {
-    return RaisedButton(
+    return ElevatedButton(
       child: Text("Change filter options."),
       onPressed: () {
         Navigator.push(
@@ -185,8 +184,8 @@ class _NewHomePageState extends State<NewHomePage> {
   }
 }
 
-Widget buildButton(String text, Function function) {
-  return RaisedButton(
+Widget buildButton(String text, VoidCallback function) {
+  return ElevatedButton(
     child: Text(text),
     onPressed: function,
   );

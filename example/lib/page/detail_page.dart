@@ -7,20 +7,21 @@ import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class DetailPage extends StatefulWidget {
-  final AssetEntity entity;
-  final String mediaUrl;
   const DetailPage({
-    Key key,
-    this.entity,
+    Key? key,
+    required this.entity,
     this.mediaUrl,
   }) : super(key: key);
+
+  final AssetEntity entity;
+  final String? mediaUrl;
 
   @override
   _DetailPageState createState() => _DetailPageState();
 }
 
 class _DetailPageState extends State<DetailPage> {
-  bool useOrigin = true;
+  bool? useOrigin = true;
 
   @override
   Widget build(BuildContext context) {
@@ -70,8 +71,8 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget buildImage() {
-    return FutureBuilder<File>(
-      future: useOrigin ? widget.entity.originFile : widget.entity.file,
+    return FutureBuilder<File?>(
+      future: useOrigin == true ? widget.entity.originFile : widget.entity.file,
       builder: (_, snapshot) {
         if (snapshot.data == null) {
           return Center(
@@ -82,15 +83,18 @@ class _DetailPageState extends State<DetailPage> {
             ),
           );
         }
-        return Image.file(snapshot.data);
+        return Image.file(snapshot.data!);
       },
     );
   }
 
   Widget buildVideo() {
+    if (widget.mediaUrl == null) {
+      return const SizedBox.shrink();
+    }
     return VideoWidget(
       isAudio: widget.entity.type == AssetType.audio,
-      mediaUrl: widget.mediaUrl,
+      mediaUrl: widget.mediaUrl!,
     );
   }
 

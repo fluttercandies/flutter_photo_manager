@@ -31,7 +31,7 @@ class _CreateEntityByIdState extends State<CreateEntityById> {
               hintText: "input asset id",
             ),
           ),
-          RaisedButton(
+          ElevatedButton(
             child: Text('Create assetEntity'),
             onPressed: createAssetEntityAndShow,
           ),

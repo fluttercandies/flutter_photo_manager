@@ -2,30 +2,28 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DurationPicker extends StatefulWidget {
-  final Duration initDuration;
-
   const DurationPicker({
-    Key key,
-    this.initDuration,
+    Key? key,
+    required this.initDuration,
   }) : super(key: key);
+
+  final Duration initDuration;
 
   @override
   _DurationPickerState createState() => _DurationPickerState();
 }
 
 class _DurationPickerState extends State<DurationPicker> {
-  int hours;
-  int minutes;
-  int seconds;
+  late int hours =
+      widget.initDuration.inMicroseconds ~/ Duration.microsecondsPerHour;
+  late int minutes =
+      widget.initDuration.inMicroseconds ~/ Duration.microsecondsPerMinute % 60;
+  late int seconds =
+      widget.initDuration.inMicroseconds ~/ Duration.microsecondsPerSecond % 60;
 
   @override
   void initState() {
     super.initState();
-
-    final duration = widget.initDuration;
-    hours = duration.inMicroseconds ~/ Duration.microsecondsPerHour;
-    minutes = duration.inMicroseconds ~/ Duration.microsecondsPerMinute % 60;
-    seconds = duration.inMicroseconds ~/ Duration.microsecondsPerSecond % 60;
 
     print(hours);
     print(minutes);
@@ -44,9 +42,7 @@ class _DurationPickerState extends State<DurationPicker> {
               alignment: Alignment.topRight,
               child: Material(
                 color: Colors.transparent,
-                child: RaisedButton(
-                  padding: const EdgeInsets.all(0),
-                  color: Theme.of(context).primaryColor,
+                child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(
                       context,
@@ -107,10 +103,10 @@ class _DurationPickerState extends State<DurationPicker> {
   }
 
   Widget _buildPicker({
-    String title,
-    int currentValue,
-    int max,
-    ValueChanged<int> valueChanged,
+    required String title,
+    required int currentValue,
+    required int max,
+    ValueChanged<int>? valueChanged,
   }) {
     return Expanded(
         child: Stack(
@@ -121,7 +117,7 @@ class _DurationPickerState extends State<DurationPicker> {
           itemExtent: 88,
           childCount: max + 1,
           onSelectedItemChanged: (value) {
-            valueChanged(value);
+            valueChanged?.call(value);
           },
           itemBuilder: (context, index) {
             return Center(
@@ -142,9 +138,9 @@ class _DurationPickerState extends State<DurationPicker> {
   }
 }
 
-Future<Duration> showCupertinoDurationPicker({
-  @required BuildContext context,
-  @required Duration initDuration,
+Future<Duration?> showCupertinoDurationPicker({
+  required BuildContext context,
+  required Duration initDuration,
 }) {
   return showDialog(
     context: context,

@@ -95,7 +95,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
       builder: (context, snapshot) {
         return CheckboxListTile(
           title: Text('need title'),
-          onChanged: (bool value) {
+          onChanged: (bool? value) {
             provider.needTitle = value;
           },
           value: provider.needTitle,
@@ -110,7 +110,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
       builder: (context, snapshot) {
         return CheckboxListTile(
           title: Text('Ignore size with image'),
-          onChanged: (bool value) {
+          onChanged: (bool? value) {
             provider.ignoreSize = value;
           },
           value: provider.ignoreSize,
@@ -173,7 +173,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
           onChange(result);
         }
       },
-      trailing: RaisedButton(
+      trailing: ElevatedButton(
         child: Text("Today"),
         onPressed: () {
           onChange(DateTime.now());
@@ -186,7 +186,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
     return CheckboxListTile(
       title: Text("Date sort asc"),
       value: provider.asc,
-      onChanged: (bool value) {
+      onChanged: (bool? value) {
         provider.asc = value;
       },
     );

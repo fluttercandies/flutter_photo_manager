@@ -25,39 +25,39 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
       ),
       body: ListView(
         children: <Widget>[
-          RaisedButton(
+          ElevatedButton(
             child: Text("Show iOS create folder example."),
             onPressed: () => navToWidget(CreateFolderExample()),
           ),
-          RaisedButton(
+          ElevatedButton(
             child: Text("Test edit image"),
             onPressed: () => navToWidget(EditAssetPage()),
           ),
-          RaisedButton(
+          ElevatedButton(
             child: Text("Show Android remove not exists asset example."),
             onPressed: () => navToWidget(RemoveAndroidNotExistsExample()),
           ),
-          RaisedButton(
+          ElevatedButton(
             child: Text("upload file to local to test EXIF."),
             onPressed: _upload,
           ),
-          RaisedButton(
+          ElevatedButton(
             child: Text("Save video to photos."),
             onPressed: _saveVideo,
           ),
-          RaisedButton(
+          ElevatedButton(
             child: Text("Open test title page"),
             onPressed: _navigatorSpeedOfTitle,
           ),
-          RaisedButton(
+          ElevatedButton(
             child: Text("Open setting."),
             onPressed: _openSetting,
           ),
-          RaisedButton(
+          ElevatedButton(
             child: Text("Create Entity ById"),
             onPressed: () => navToWidget(CreateEntityById()),
           ),
-          RaisedButton(
+          ElevatedButton(
             child: Text("Clear file caches"),
             onPressed: _clearFileCaches,
           ),
@@ -76,10 +76,13 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
     // }
 
     final file = await asset.originFile;
+    if (file == null) {
+      return;
+    }
 
     print("file length = ${file.lengthSync()}");
 
-    http.BaseClient client = http.Client();
+    http.Client client = http.Client();
     final req = http.MultipartRequest(
       "post",
       Uri.parse("http://172.16.100.7:10001/upload/file"),

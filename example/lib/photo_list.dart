@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class PhotoList extends StatefulWidget {
-  final List<AssetEntity> photos;
+  const PhotoList({required this.photos});
 
-  PhotoList({this.photos});
+  final List<AssetEntity> photos;
 
   @override
   _PhotoListState createState() => _PhotoListState();
@@ -41,9 +41,9 @@ class _PhotoListState extends State<PhotoList> {
     //   print("duration = $v");
     // });
 
-    return FutureBuilder<Uint8List>(
+    return FutureBuilder<Uint8List?>(
       future: entity.thumbDataWithSize(150, 150),
-      builder: (BuildContext context, AsyncSnapshot<Uint8List> snapshot) {
+      builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.data != null) {
           return InkWell(
@@ -51,7 +51,7 @@ class _PhotoListState extends State<PhotoList> {
             child: Stack(
               children: <Widget>[
                 Image.memory(
-                  snapshot.data,
+                  snapshot.data!,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
@@ -69,22 +69,26 @@ class _PhotoListState extends State<PhotoList> {
             ),
           );
         }
-        return Center(
-          child: Text('loading...'),
-        );
+        return Center(child: Text('loading...'));
       },
     );
   }
 
-  showInfo(AssetEntity entity) async {
+  Future<void> showInfo(AssetEntity entity) async {
     if (entity.type == AssetType.video) {
       var file = await entity.file;
+      if (file == null) {
+        return;
+      }
       var length = file.lengthSync();
       var size = entity.size;
       print(
-          "${entity.id} length = $length , size = $size , dateTime = ${entity.createDateTime}");
+        "${entity.id} length = $length, "
+        "size = $size, "
+        "dateTime = ${entity.createDateTime}",
+      );
     } else {
-      var size = entity.size;
+      final Size size = entity.size;
       print("${entity.id} size = $size, dateTime = ${entity.createDateTime}");
     }
 

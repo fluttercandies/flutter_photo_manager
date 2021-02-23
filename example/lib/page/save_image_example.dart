@@ -39,11 +39,12 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
       dir = (await getApplicationSupportDirectory()).absolute.path;
     } else if (Platform.isAndroid) {
       dir = (await getExternalStorageDirectories(
-              type: StorageDirectory.downloads))[0]
+        type: StorageDirectory.downloads,
+      ))![0]
           .absolute
           .path;
     } else {
-      dir = (await getDownloadsDirectory()).absolute.path;
+      dir = (await getDownloadsDirectory())!.absolute.path;
     }
 
     return "$dir/$name.jpg";
@@ -76,15 +77,15 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
       body: Container(
         child: Column(
           children: <Widget>[
-            RaisedButton(
+            ElevatedButton(
               child: Text("Save image with bytes"),
               onPressed: saveImageWithBytes,
             ),
-            RaisedButton(
+            ElevatedButton(
               child: Text("Save image with path"),
               onPressed: saveImageWithPath,
             ),
-            RaisedButton(
+            ElevatedButton(
               child: Text("Save video"),
               onPressed: saveVideo,
             ),

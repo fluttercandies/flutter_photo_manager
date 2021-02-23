@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 
-typedef Widget ChangeNotifierWidgetBuilder<T extends ChangeNotifier>(
+typedef ChangeNotifierWidgetBuilder<T extends ChangeNotifier> = Widget Function(
   BuildContext context,
   T value,
 );
 
 class ChangeNotifierBuilder<T extends ChangeNotifier> extends StatefulWidget {
-  final ChangeNotifierWidgetBuilder<T> builder;
-
-  final T value;
-
   const ChangeNotifierBuilder({
-    Key key,
-    @required this.builder,
-    @required this.value,
+    Key? key,
+    required this.builder,
+    required this.value,
   }) : super(key: key);
+
+  final ChangeNotifierWidgetBuilder<T> builder;
+  final T value;
 
   @override
   _ChangeNotifierBuilderState createState() => _ChangeNotifierBuilderState();
