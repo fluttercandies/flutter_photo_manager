@@ -103,8 +103,8 @@ class _DetailPageState extends State<DetailPage> {
 
     final latlng = await entity.latlngAsync();
 
-    final lat = entity.latitude == 0 ? latlng.latitude : latlng.latitude;
-    final lng = entity.longitude == 0 ? latlng.longitude : latlng.longitude;
+    final lat = entity.latitude == 0 ? latlng.latitude : entity.latitude;
+    final lng = entity.longitude == 0 ? latlng.longitude : entity.longitude;
 
     Widget w = Center(
       child: Container(
@@ -128,8 +128,8 @@ class _DetailPageState extends State<DetailPage> {
               buildInfoItem("orientation", entity.orientation.toString()),
               buildInfoItem("duration", entity.videoDuration.toString()),
               buildInfoItemAsync("title", entity.titleAsync),
-              buildInfoItem("lat", lat?.toString() ?? "null"),
-              buildInfoItem("lng", lng?.toString() ?? "null"),
+              buildInfoItem("lat", lat?.toString()),
+              buildInfoItem("lng", lng?.toString()),
               buildInfoItem("relative path", entity.relativePath ?? 'null'),
             ],
           ),
@@ -139,7 +139,7 @@ class _DetailPageState extends State<DetailPage> {
     showDialog(context: context, builder: (c) => w);
   }
 
-  Widget buildInfoItem(String title, String info) {
+  Widget buildInfoItem(String title, String? info) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -154,7 +154,7 @@ class _DetailPageState extends State<DetailPage> {
             width: 88,
           ),
           Expanded(
-            child: Text(info.padLeft(40, " ")),
+            child: Text((info ?? 'null').padLeft(40, " ")),
           ),
         ],
       ),

@@ -11,11 +11,9 @@ class FilterOptionPage extends StatefulWidget {
 class _FilterOptionPageState extends State<FilterOptionPage> {
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<PhotoProvider>(context);
+    final provider = context.watch<PhotoProvider>();
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Filter Options.'),
-      ),
+      appBar: AppBar(title: Text('Filter Options.')),
       body: ListView(
         children: <Widget>[
           buildInput(provider.minWidth, "minWidth", (value) {
@@ -127,7 +125,12 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
         return ListTile(
           title: Text(title),
           subtitle: Text(
-              "${value.inHours.toString().padLeft(2, '0')}h : ${(value.inMinutes % 60).toString().padLeft(2, '0')}m : ${(value.inSeconds % 60).toString().padLeft(2, '0')}s"),
+            "${value.inHours.toString().padLeft(2, '0')}h"
+            " : "
+            "${(value.inMinutes % 60).toString().padLeft(2, '0')}m"
+            " : "
+            "${(value.inSeconds % 60).toString().padLeft(2, '0')}s",
+          ),
           onTap: () async {
             final duration = await showCupertinoDurationPicker(
                 context: context, initDuration: value);

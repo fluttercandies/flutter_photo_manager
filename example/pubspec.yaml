@@ -12,7 +12,7 @@ dependencies:
 
   photo_manager:
     path: ../
-  oktoast: ^2.3.1
+  oktoast: ^3.0.0
   provider: ^5.0.0-nullsafety.5
   video_player: ^2.0.0-nullsafety.10
   http: ^0.13.0

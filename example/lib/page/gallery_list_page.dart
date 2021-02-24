@@ -11,7 +11,7 @@ class GalleryListPage extends StatefulWidget {
 }
 
 class _GalleryListPageState extends State<GalleryListPage> {
-  PhotoProvider get provider => Provider.of<PhotoProvider>(context);
+  PhotoProvider get provider => context.watch<PhotoProvider>();
 
   @override
   Widget build(BuildContext context) {
