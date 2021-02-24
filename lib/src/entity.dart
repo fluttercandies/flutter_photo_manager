@@ -244,7 +244,7 @@ class AssetEntity {
   /// Gps information when shooting, nullable.
   ///
   /// When the device is android10 or above, always null.
-  set latitude(double latitude) {
+  set latitude(double? latitude) {
     _latitude = latitude;
   }
 
@@ -261,7 +261,7 @@ class AssetEntity {
   /// Gps information when shooting, nullable.
   ///
   /// When the device is android10 or above, always null.
-  set longitude(double longitude) {
+  set longitude(double? longitude) {
     _longitude = longitude;
   }
 

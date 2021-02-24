@@ -248,14 +248,12 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     if (Platform.isAndroid) {
       final version = int.parse(await getSystemVersion());
       if (version >= 29) {
-        final map = await _channel.invokeMethod(
+        final Map? map = await _channel.invokeMethod(
           'getLatLngAndroidQ',
           {'id': assetEntity.id},
         );
-        if (map is Map) {
-          /// 将返回的数据传入map
-          return LatLng(latitude: map['lat'], longitude: map['lng']);
-        }
+        /// 将返回的数据传入map
+        return LatLng(latitude: map?['lat'], longitude: map?['lng']);
       }
     }
     return LatLng(

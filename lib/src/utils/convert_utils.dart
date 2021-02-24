@@ -65,7 +65,7 @@ class ConvertUtils {
       duration: data['duration'],
       width: data['width'],
       height: data['height'],
-      orientation: data['orientation'],
+      orientation: data['orientation'] ?? 0,
       isFavorite: data['favorite'] ?? false,
       title: data['title'],
       createDtSecond: data['createDt'],
