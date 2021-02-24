@@ -35,7 +35,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   PhotoProvider get photoProvider => Provider.of<PhotoProvider>(context);
 
   AssetPathProvider get provider =>
-      Provider.of<PhotoProvider>(context).getOrCreatePathProvider(path);
+      context.read<PhotoProvider>().getOrCreatePathProvider(path);
 
   List<AssetEntity> checked = [];
 
@@ -87,18 +87,19 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                   provider.deleteSelectedAssets(checked);
                 },
               ),
-              ChangeNotifierBuilder<PhotoProvider>(
-                value: photoProvider,
-                builder: (context, provider) {
-                  final formatType = provider.thumbFormat == ThumbFormat.jpeg
-                      ? ThumbFormat.png
-                      : ThumbFormat.jpeg;
+              AnimatedBuilder(
+                animation: photoProvider,
+                builder: (_, __) {
+                  final formatType =
+                      photoProvider.thumbFormat == ThumbFormat.jpeg
+                          ? ThumbFormat.png
+                          : ThumbFormat.jpeg;
                   return IconButton(
                     icon: Icon(Icons.swap_horiz),
                     iconSize: 22,
                     tooltip: "Use another format.",
                     onPressed: () {
-                      provider.thumbFormat = formatType;
+                      photoProvider.thumbFormat = formatType;
                     },
                   );
                 },

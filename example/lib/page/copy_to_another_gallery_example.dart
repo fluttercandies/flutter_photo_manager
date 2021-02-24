@@ -23,7 +23,7 @@ class _CopyToAnotherGalleryPageState extends State<CopyToAnotherGalleryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<PhotoProvider>(context);
+    final provider = Provider.of<PhotoProvider>(context, listen: false);
     final list = provider.list;
     return Scaffold(
       appBar: AppBar(
