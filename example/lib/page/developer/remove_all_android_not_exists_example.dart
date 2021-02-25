@@ -17,7 +17,7 @@ class _RemoveAndroidNotExistsExampleState
       ),
       body: Column(
         children: <Widget>[
-          RaisedButton(
+          ElevatedButton(
             child: Text("Click and see android logcat log."),
             onPressed: () {
               PhotoManager.editor.android.removeAllNoExistsAsset();

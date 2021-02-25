@@ -9,14 +9,15 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
 class ImageItemWidget extends StatefulWidget {
+  const ImageItemWidget({
+    Key? key,
+    required this.entity,
+    required this.option,
+  }) : super(key: key);
+
   final AssetEntity entity;
   final ThumbOption option;
 
-  const ImageItemWidget({
-    Key key,
-    @required this.entity,
-    this.option,
-  }) : super(key: key);
   @override
   _ImageItemWidgetState createState() => _ImageItemWidgetState();
 }
@@ -52,7 +53,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
     if (u8List != null) {
       return _buildImageWidget(item, u8List, size);
     } else {
-      image = FutureBuilder<Uint8List>(
+      image = FutureBuilder<Uint8List?>(
         future: item.thumbDataWithOption(widget.option),
         builder: (context, snapshot) {
           Widget w;
@@ -62,8 +63,8 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
             );
           }
           if (snapshot.hasData) {
-            ImageLruCache.setData(item, size, format, snapshot.data);
-            w = _buildImageWidget(item, snapshot.data, size);
+            ImageLruCache.setData(item, size, format, snapshot.data!);
+            w = _buildImageWidget(item, snapshot.data!, size);
           } else {
             w = Center(
               child: loadWidget,

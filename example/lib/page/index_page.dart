@@ -27,7 +27,7 @@ class _IndexPageState extends State<IndexPage> {
   }
 
   Widget routePage(String title, Widget page) {
-    return RaisedButton(
+    return ElevatedButton(
       onPressed: () {
         Navigator.push(
           context,

@@ -3,10 +3,14 @@ import 'package:photo_manager/photo_manager.dart';
 import 'photo_list.dart';
 
 class PhotoPage extends StatefulWidget {
+  const PhotoPage({
+    Key? key,
+    required this.pathEntity,
+    required this.photos,
+  }) : super(key: key);
+
   final AssetPathEntity pathEntity;
   final List<AssetEntity> photos;
-
-  const PhotoPage({Key key, this.pathEntity, this.photos}) : super(key: key);
 
   @override
   _PhotoPageState createState() => _PhotoPageState();

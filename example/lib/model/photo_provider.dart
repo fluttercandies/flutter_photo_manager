@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:image_scanner_example/main.dart';
+
 import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 
@@ -20,7 +21,10 @@ class PhotoProvider extends ChangeNotifier {
 
   bool get needTitle => _needTitle;
 
-  set needTitle(bool needTitle) {
+  set needTitle(bool? needTitle) {
+    if (needTitle == null) {
+      return;
+    }
     _needTitle = needTitle;
     notifyListeners();
   }
@@ -56,7 +60,10 @@ class PhotoProvider extends ChangeNotifier {
 
   bool get asc => _asc;
 
-  set asc(bool asc) {
+  set asc(bool? asc) {
+    if (asc == null) {
+      return;
+    }
     _asc = asc;
     notifyListeners();
   }
@@ -80,7 +87,10 @@ class PhotoProvider extends ChangeNotifier {
 
   bool get ignoreSize => _ignoreSize;
 
-  set ignoreSize(bool ignoreSize) {
+  set ignoreSize(bool? ignoreSize) {
+    if (ignoreSize == null) {
+      return;
+    }
     _ignoreSize = ignoreSize;
     notifyListeners();
   }
@@ -103,7 +113,10 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  set notifying(bool notifying) {
+  set notifying(bool? notifying) {
+    if (notifying == null) {
+      return;
+    }
     _notifying = notifying;
     notifyListeners();
   }
@@ -113,17 +126,26 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeHasAll(bool value) {
+  void changeHasAll(bool? value) {
+    if (value == null) {
+      return;
+    }
     this.hasAll = value;
     notifyListeners();
   }
 
-  void changeOnlyAll(bool value) {
+  void changeOnlyAll(bool? value) {
+    if (value == null) {
+      return;
+    }
     this.onlyAll = value;
     notifyListeners();
   }
 
-  void changeContainsEmptyAlbum(bool value) {
+  void changeContainsEmptyAlbum(bool? value) {
+    if (value == null) {
+      return;
+    }
     this.containsEmptyAlbum = value;
     notifyListeners();
   }
@@ -135,11 +157,6 @@ class PhotoProvider extends ChangeNotifier {
 
   Future<void> refreshGalleryList() async {
     final option = makeOption();
-
-    if (option == null) {
-      assert(option != null);
-      return;
-    }
 
     reset();
     var galleryList = await PhotoManager.getAssetPathList(
@@ -159,36 +176,22 @@ class PhotoProvider extends ChangeNotifier {
 
   AssetPathProvider getOrCreatePathProvider(AssetPathEntity pathEntity) {
     pathProviderMap[pathEntity] ??= AssetPathProvider(pathEntity);
-    return pathProviderMap[pathEntity];
+    return pathProviderMap[pathEntity]!;
   }
 
   FilterOptionGroup makeOption() {
-    SizeConstraint sizeConstraint;
-    try {
-      final minW = int.tryParse(minWidth);
-      final maxW = int.tryParse(maxWidth);
-      final minH = int.tryParse(minHeight);
-      final maxH = int.tryParse(maxHeight);
-      sizeConstraint = SizeConstraint(
-        minWidth: minW,
-        maxWidth: maxW,
-        minHeight: minH,
-        maxHeight: maxH,
-        ignoreSize: ignoreSize,
-      );
-    } catch (e) {
-      showToast("Cannot convert your size.");
-      return null;
-    }
-
-    DurationConstraint durationConstraint = DurationConstraint(
-      min: minDuration,
-      max: maxDuration,
-    );
-
     final option = FilterOption(
-      sizeConstraint: sizeConstraint,
-      durationConstraint: durationConstraint,
+      sizeConstraint: SizeConstraint(
+        minWidth: int.tryParse(minWidth) ?? 0,
+        maxWidth: int.tryParse(maxWidth) ?? 100000,
+        minHeight: int.tryParse(minHeight) ?? 0,
+        maxHeight: int.tryParse(maxHeight) ?? 100000,
+        ignoreSize: ignoreSize,
+      ),
+      durationConstraint: DurationConstraint(
+        min: minDuration,
+        max: maxDuration,
+      ),
       needTitle: needTitle,
     );
 

@@ -1,23 +1,16 @@
-import 'package:flutter/material.dart';
-
 import 'type.dart';
 
 class ThumbOption {
-  final int width;
-  final int height;
-  final ThumbFormat format;
-  final int quality;
-
   const ThumbOption({
-    @required this.width,
-    @required this.height,
+    required this.width,
+    required this.height,
     this.format = ThumbFormat.jpeg,
     this.quality = 95,
   });
 
   factory ThumbOption.ios({
-    @required int width,
-    @required int height,
+    required int width,
+    required int height,
     ThumbFormat format = ThumbFormat.jpeg,
     int quality = 95,
     DeliveryMode deliveryMode = DeliveryMode.opportunistic,
@@ -35,6 +28,11 @@ class ThumbOption {
     );
   }
 
+  final int width;
+  final int height;
+  final ThumbFormat format;
+  final int quality;
+
   Map<String, Object> toMap() {
     return {
       'width': width,
@@ -45,31 +43,20 @@ class ThumbOption {
   }
 
   void checkAssert() {
-    assert(width != null && height != null,
-        "The width and height must not be null.");
     assert(width > 0 && height > 0, "The width and height must better 0.");
     assert(quality > 0 && quality <= 100, "The quality must between 0 and 100");
-    _checkNotNull('format', format);
-  }
-
-  void _checkNotNull(String key, value) {
-    assert(value != null, 'The $key must not be null.');
   }
 }
 
 class _IosThumbOption extends ThumbOption {
-  final DeliveryMode deliveryMode;
-  final ResizeMode resizeMode;
-  final ResizeContentMode resizeContentMode;
-
-  _IosThumbOption({
-    @required int width,
-    @required int height,
+  const _IosThumbOption({
+    required int width,
+    required int height,
     ThumbFormat format = ThumbFormat.jpeg,
     int quality = 95,
-    this.deliveryMode,
-    this.resizeMode,
-    this.resizeContentMode,
+    required this.deliveryMode,
+    required this.resizeMode,
+    required this.resizeContentMode,
   }) : super(
           width: width,
           height: height,
@@ -77,13 +64,9 @@ class _IosThumbOption extends ThumbOption {
           quality: quality,
         );
 
-  @override
-  void checkAssert() {
-    super.checkAssert();
-    _checkNotNull('deliveryMode', deliveryMode);
-    _checkNotNull('resizeMode', resizeMode);
-    _checkNotNull('resizeContentMode', resizeContentMode);
-  }
+  final DeliveryMode deliveryMode;
+  final ResizeMode resizeMode;
+  final ResizeContentMode resizeContentMode;
 
   @override
   Map<String, Object> toMap() {

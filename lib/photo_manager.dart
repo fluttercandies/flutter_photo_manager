@@ -17,9 +17,9 @@ export 'src/filter/filter_options.dart';
 export 'src/thumb_option.dart';
 export 'src/type.dart';
 
-part './src/manager.dart';
-part './src/entity.dart';
-part './src/notify.dart';
-part './src/editor.dart';
-part './src/caching_manager.dart';
-part './src/progress_handler.dart';
+part 'src/manager.dart';
+part 'src/entity.dart';
+part 'src/notify.dart';
+part 'src/editor.dart';
+part 'src/caching_manager.dart';
+part 'src/progress_handler.dart';

@@ -2,30 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoWidget extends StatefulWidget {
-  final String mediaUrl;
-  final bool isAudio;
-
   const VideoWidget({
-    Key key,
-    @required this.mediaUrl,
+    Key? key,
+    required this.mediaUrl,
     this.isAudio = false,
   }) : super(key: key);
+
+  final String mediaUrl;
+  final bool isAudio;
 
   @override
   _VideoWidgetState createState() => _VideoWidgetState();
 }
 
 class _VideoWidgetState extends State<VideoWidget> {
-  VideoPlayerController _controller;
+  late final VideoPlayerController _controller =
+      VideoPlayerController.network(widget.mediaUrl)
+        ..initialize().then((_) => setState(() {}));
 
   @override
   void initState() {
     super.initState();
     print(widget.isAudio);
-    _controller = VideoPlayerController.network(widget.mediaUrl)
-      ..initialize().then((_) {
-        setState(() {});
-      });
   }
 
   @override
@@ -36,7 +34,7 @@ class _VideoWidgetState extends State<VideoWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return _controller.value.initialized
+    return _controller.value.isInitialized
         ? AspectRatio(
             aspectRatio: widget.isAudio ? 1 : _controller.value.aspectRatio,
             child: GestureDetector(

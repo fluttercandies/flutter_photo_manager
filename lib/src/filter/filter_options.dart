@@ -1,34 +1,25 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-
 import '../type.dart';
 
 /// Filter option for get asset.
 ///
-/// 筛选选项, 可以分别设置图片类型和视频类型对应的[FilterOption]
+/// 筛选选项, 可以分别设置图片类型和视频类型对应的 [FilterOption]
 ///
 /// See [FilterOption]
 class FilterOptionGroup {
-  /// An empty option
-  FilterOptionGroup.empty();
+  FilterOptionGroup();
 
-  FilterOptionGroup() {
-    setOption(AssetType.image, FilterOption());
-    setOption(AssetType.video, FilterOption());
-    setOption(AssetType.audio, FilterOption());
-    addOrderOption(OrderOption(
-      type: OrderOptionType.createDate,
-      asc: false,
-    ));
-  }
-
-  final Map<AssetType, FilterOption> _map = {};
+  final Map<AssetType, FilterOption> _map = {
+    AssetType.image: FilterOption(),
+    AssetType.video: FilterOption(),
+    AssetType.audio: FilterOption(),
+  };
 
   /// 是否包含空相册
   ///
   /// Whether to include an empty album
-  var containsEmptyAlbum = false;
+  bool containsEmptyAlbum = false;
 
   @Deprecated('Please use createTimeCond.')
   DateTimeCond get dateTimeCond => createTimeCond;
@@ -43,24 +34,26 @@ class FilterOptionGroup {
     ignore: true,
   );
 
-  FilterOption getOption(AssetType type) {
-    return _map[type];
-  }
+  FilterOption getOption(AssetType type) => _map[type]!;
 
   void setOption(AssetType type, FilterOption option) {
     _map[type] = option;
   }
 
-  final orders = <OrderOption>[];
+  final orders = <OrderOption>[
+    OrderOption(
+      type: OrderOptionType.createDate,
+      asc: false,
+    ),
+  ];
 
   void addOrderOption(OrderOption option) {
     orders.add(option);
   }
 
   void merge(FilterOptionGroup other) {
-    assert(other != null, 'Cannot merge null.');
     for (final AssetType type in _map.keys) {
-      _map[type] = _map[type]?.merge(other.getOption(type));
+      _map[type] = _map[type]!.merge(other.getOption(type));
     }
     this.containsEmptyAlbum = other.containsEmptyAlbum;
   }
@@ -68,13 +61,13 @@ class FilterOptionGroup {
   Map<String, dynamic> toMap() {
     Map<String, dynamic> result = {};
     if (_map.containsKey(AssetType.image)) {
-      result["image"] = _map[AssetType.image].toMap();
+      result["image"] = getOption(AssetType.image).toMap();
     }
     if (_map.containsKey(AssetType.video)) {
-      result["video"] = _map[AssetType.video].toMap();
+      result["video"] = getOption(AssetType.video).toMap();
     }
     if (_map.containsKey(AssetType.audio)) {
-      result["audio"] = _map[AssetType.audio].toMap();
+      result["audio"] = getOption(AssetType.audio).toMap();
     }
 
     result["createDate"] = createTimeCond.toMap();
@@ -86,13 +79,13 @@ class FilterOptionGroup {
   }
 
   FilterOptionGroup copyWith({
-    FilterOption imageOption,
-    FilterOption videoOption,
-    FilterOption audioOption,
-    DateTimeCond createTimeCond,
-    DateTimeCond updateTimeCond,
-    bool containsEmptyAlbum,
-    List<OrderOption> orders,
+    FilterOption? imageOption,
+    FilterOption? videoOption,
+    FilterOption? audioOption,
+    DateTimeCond? createTimeCond,
+    DateTimeCond? updateTimeCond,
+    bool? containsEmptyAlbum,
+    List<OrderOption>? orders,
   }) {
     imageOption ??= _map[AssetType.image];
     videoOption ??= _map[AssetType.video];
@@ -107,9 +100,9 @@ class FilterOptionGroup {
 
     final result = FilterOptionGroup();
 
-    result.setOption(AssetType.image, imageOption);
-    result.setOption(AssetType.video, videoOption);
-    result.setOption(AssetType.audio, audioOption);
+    result.setOption(AssetType.image, imageOption!);
+    result.setOption(AssetType.video, videoOption!);
+    result.setOption(AssetType.audio, audioOption!);
 
     result.createTimeCond = createTimeCond;
     result.updateTimeCond = updateTimeCond;
@@ -149,9 +142,9 @@ class FilterOption {
 
   /// Create a new [FilterOption] with specific properties merging.
   FilterOption copyWith({
-    bool needTitle,
-    SizeConstraint sizeConstraint,
-    DurationConstraint durationConstraint,
+    bool? needTitle,
+    SizeConstraint? sizeConstraint,
+    DurationConstraint? durationConstraint,
   }) {
     return FilterOption(
       needTitle: needTitle ?? this.needTitle,
@@ -162,11 +155,10 @@ class FilterOption {
 
   /// Merge a [FilterOption] into another.
   FilterOption merge(FilterOption other) {
-    assert(other != null, 'Cannot merge null.');
     return FilterOption(
-      needTitle: other.needTitle ?? this.needTitle,
-      sizeConstraint: other.sizeConstraint ?? this.sizeConstraint,
-      durationConstraint: other.durationConstraint ?? this.durationConstraint,
+      needTitle: other.needTitle,
+      sizeConstraint: other.sizeConstraint,
+      durationConstraint: other.durationConstraint,
     );
   }
 
@@ -203,16 +195,16 @@ class SizeConstraint {
   });
 
   SizeConstraint copyWith({
-    int minWidth,
-    int maxWidth,
-    int minHeight,
-    int maxHeight,
-    bool ignoreSize,
+    int? minWidth,
+    int? maxWidth,
+    int? minHeight,
+    int? maxHeight,
+    bool? ignoreSize,
   }) {
     minWidth ??= this.minWidth;
     maxWidth ??= this.maxHeight;
 
-    maxWidth ??= this.maxHeight;
+    minHeight ??= this.minHeight;
     maxHeight ??= this.maxHeight;
 
     ignoreSize ??= this.ignoreSize;
@@ -266,11 +258,10 @@ class DateTimeCond {
   final bool ignore;
 
   const DateTimeCond({
-    @required this.min,
-    @required this.max,
+    required this.min,
+    required this.max,
     this.ignore = false,
-  })  : assert(min != null),
-        assert(max != null);
+  });
 
   factory DateTimeCond.def() {
     return DateTimeCond(
@@ -280,9 +271,9 @@ class DateTimeCond {
   }
 
   DateTimeCond copyWith({
-    final DateTime min,
-    final DateTime max,
-    final bool ignore,
+    DateTime? min,
+    DateTime? max,
+    bool? ignore,
   }) {
     return DateTimeCond(
       min: min ?? this.min,
@@ -310,8 +301,8 @@ class OrderOption {
   });
 
   OrderOption copyWith({
-    OrderOptionType type,
-    bool asc,
+    OrderOptionType? type,
+    bool? asc,
   }) {
     return OrderOption(
       asc: asc ?? this.asc,
@@ -327,7 +318,4 @@ class OrderOption {
   }
 }
 
-enum OrderOptionType {
-  createDate,
-  updateDate,
-}
+enum OrderOptionType { createDate, updateDate }

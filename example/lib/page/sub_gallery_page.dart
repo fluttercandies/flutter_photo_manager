@@ -3,14 +3,14 @@ import 'package:image_scanner_example/widget/gallery_item_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class SubFolderPage extends StatefulWidget {
+  const SubFolderPage({
+    Key? key,
+    required this.pathList,
+    required this.title,
+  }) : super(key: key);
+
   final List<AssetPathEntity> pathList;
   final String title;
-
-  const SubFolderPage({
-    Key key,
-    @required this.pathList,
-    @required this.title,
-  }) : super(key: key);
 
   @override
   _SubFolderPageState createState() => _SubFolderPageState();

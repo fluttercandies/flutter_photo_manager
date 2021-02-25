@@ -11,11 +11,9 @@ class FilterOptionPage extends StatefulWidget {
 class _FilterOptionPageState extends State<FilterOptionPage> {
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<PhotoProvider>(context);
+    final provider = context.watch<PhotoProvider>();
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Filter Options.'),
-      ),
+      appBar: AppBar(title: Text('Filter Options.')),
       body: ListView(
         children: <Widget>[
           buildInput(provider.minWidth, "minWidth", (value) {
@@ -95,7 +93,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
       builder: (context, snapshot) {
         return CheckboxListTile(
           title: Text('need title'),
-          onChanged: (bool value) {
+          onChanged: (bool? value) {
             provider.needTitle = value;
           },
           value: provider.needTitle,
@@ -110,7 +108,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
       builder: (context, snapshot) {
         return CheckboxListTile(
           title: Text('Ignore size with image'),
-          onChanged: (bool value) {
+          onChanged: (bool? value) {
             provider.ignoreSize = value;
           },
           value: provider.ignoreSize,
@@ -127,7 +125,12 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
         return ListTile(
           title: Text(title),
           subtitle: Text(
-              "${value.inHours.toString().padLeft(2, '0')}h : ${(value.inMinutes % 60).toString().padLeft(2, '0')}m : ${(value.inSeconds % 60).toString().padLeft(2, '0')}s"),
+            "${value.inHours.toString().padLeft(2, '0')}h"
+            " : "
+            "${(value.inMinutes % 60).toString().padLeft(2, '0')}m"
+            " : "
+            "${(value.inSeconds % 60).toString().padLeft(2, '0')}s",
+          ),
           onTap: () async {
             final duration = await showCupertinoDurationPicker(
                 context: context, initDuration: value);
@@ -173,7 +176,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
           onChange(result);
         }
       },
-      trailing: RaisedButton(
+      trailing: ElevatedButton(
         child: Text("Today"),
         onPressed: () {
           onChange(DateTime.now());
@@ -186,7 +189,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
     return CheckboxListTile(
       title: Text("Date sort asc"),
       value: provider.asc,
-      onChanged: (bool value) {
+      onChanged: (bool? value) {
         provider.asc = value;
       },
     );

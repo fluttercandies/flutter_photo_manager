@@ -7,20 +7,21 @@ import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class DetailPage extends StatefulWidget {
-  final AssetEntity entity;
-  final String mediaUrl;
   const DetailPage({
-    Key key,
-    this.entity,
+    Key? key,
+    required this.entity,
     this.mediaUrl,
   }) : super(key: key);
+
+  final AssetEntity entity;
+  final String? mediaUrl;
 
   @override
   _DetailPageState createState() => _DetailPageState();
 }
 
 class _DetailPageState extends State<DetailPage> {
-  bool useOrigin = true;
+  bool? useOrigin = true;
 
   @override
   Widget build(BuildContext context) {
@@ -70,8 +71,8 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget buildImage() {
-    return FutureBuilder<File>(
-      future: useOrigin ? widget.entity.originFile : widget.entity.file,
+    return FutureBuilder<File?>(
+      future: useOrigin == true ? widget.entity.originFile : widget.entity.file,
       builder: (_, snapshot) {
         if (snapshot.data == null) {
           return Center(
@@ -82,15 +83,18 @@ class _DetailPageState extends State<DetailPage> {
             ),
           );
         }
-        return Image.file(snapshot.data);
+        return Image.file(snapshot.data!);
       },
     );
   }
 
   Widget buildVideo() {
+    if (widget.mediaUrl == null) {
+      return const SizedBox.shrink();
+    }
     return VideoWidget(
       isAudio: widget.entity.type == AssetType.audio,
-      mediaUrl: widget.mediaUrl,
+      mediaUrl: widget.mediaUrl!,
     );
   }
 
@@ -99,8 +103,8 @@ class _DetailPageState extends State<DetailPage> {
 
     final latlng = await entity.latlngAsync();
 
-    final lat = entity.latitude == 0 ? latlng.latitude : latlng.latitude;
-    final lng = entity.longitude == 0 ? latlng.longitude : latlng.longitude;
+    final lat = entity.latitude == 0 ? latlng.latitude : entity.latitude;
+    final lng = entity.longitude == 0 ? latlng.longitude : entity.longitude;
 
     Widget w = Center(
       child: Container(
@@ -124,8 +128,8 @@ class _DetailPageState extends State<DetailPage> {
               buildInfoItem("orientation", entity.orientation.toString()),
               buildInfoItem("duration", entity.videoDuration.toString()),
               buildInfoItemAsync("title", entity.titleAsync),
-              buildInfoItem("lat", lat?.toString() ?? "null"),
-              buildInfoItem("lng", lng?.toString() ?? "null"),
+              buildInfoItem("lat", lat?.toString()),
+              buildInfoItem("lng", lng?.toString()),
               buildInfoItem("relative path", entity.relativePath ?? 'null'),
             ],
           ),
@@ -135,7 +139,7 @@ class _DetailPageState extends State<DetailPage> {
     showDialog(context: context, builder: (c) => w);
   }
 
-  Widget buildInfoItem(String title, String info) {
+  Widget buildInfoItem(String title, String? info) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -150,7 +154,7 @@ class _DetailPageState extends State<DetailPage> {
             width: 88,
           ),
           Expanded(
-            child: Text(info.padLeft(40, " ")),
+            child: Text((info ?? 'null').padLeft(40, " ")),
           ),
         ],
       ),

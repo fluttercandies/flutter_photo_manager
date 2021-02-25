@@ -6,12 +6,12 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
 class CopyToAnotherGalleryPage extends StatefulWidget {
-  final AssetEntity assetEntity;
-
   const CopyToAnotherGalleryPage({
-    Key key,
-    @required this.assetEntity,
+    Key? key,
+    required this.assetEntity,
   }) : super(key: key);
+
+  final AssetEntity assetEntity;
 
   @override
   _CopyToAnotherGalleryPageState createState() =>
@@ -19,11 +19,11 @@ class CopyToAnotherGalleryPage extends StatefulWidget {
 }
 
 class _CopyToAnotherGalleryPageState extends State<CopyToAnotherGalleryPage> {
-  AssetPathEntity targetGallery;
+  AssetPathEntity? targetGallery;
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<PhotoProvider>(context);
+    final provider = Provider.of<PhotoProvider>(context, listen: false);
     final list = provider.list;
     return Scaffold(
       appBar: AppBar(
@@ -33,11 +33,11 @@ class _CopyToAnotherGalleryPageState extends State<CopyToAnotherGalleryPage> {
         children: <Widget>[
           AspectRatio(
             aspectRatio: 1,
-            child: FutureBuilder<Uint8List>(
+            child: FutureBuilder<Uint8List?>(
               future: widget.assetEntity.thumbDataWithSize(500, 500),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return Image.memory(snapshot.data);
+                  return Image.memory(snapshot.data!);
                 }
                 return Text("loading");
               },
@@ -73,18 +73,20 @@ class _CopyToAnotherGalleryPageState extends State<CopyToAnotherGalleryPage> {
     }
     final result = await PhotoManager.editor.copyAssetToPath(
       asset: widget.assetEntity,
-      pathEntity: this.targetGallery,
+      pathEntity: this.targetGallery!,
     );
 
     print("copy result = $result");
   }
 
   Widget _buildCopyButton() {
-    return RaisedButton(
+    return ElevatedButton(
       onPressed: _copy,
-      child: Text(targetGallery == null
-          ? "Please select gallery"
-          : "copy to ${targetGallery.name}"),
+      child: Text(
+        targetGallery == null
+            ? "Please select gallery"
+            : "copy to ${targetGallery!.name}",
+      ),
     );
   }
 }

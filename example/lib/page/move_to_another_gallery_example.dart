@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class MoveToAnotherExample extends StatefulWidget {
-  final AssetEntity entity;
+  const MoveToAnotherExample({
+    Key? key,
+    required this.entity,
+  }) : super(key: key);
 
-  const MoveToAnotherExample({Key key, this.entity}) : super(key: key);
+  final AssetEntity entity;
 
   @override
   _MoveToAnotherExampleState createState() => _MoveToAnotherExampleState();
@@ -14,7 +17,7 @@ class MoveToAnotherExample extends StatefulWidget {
 
 class _MoveToAnotherExampleState extends State<MoveToAnotherExample> {
   List<AssetPathEntity> targetPathList = [];
-  AssetPathEntity target;
+  AssetPathEntity? target;
 
   @override
   void initState() {
@@ -49,11 +52,11 @@ class _MoveToAnotherExampleState extends State<MoveToAnotherExample> {
   }
 
   Widget _buildPreview() {
-    return FutureBuilder<Uint8List>(
+    return FutureBuilder<Uint8List?>(
       future: widget.entity.thumbDataWithSize(500, 500),
       builder: (_, snapshot) {
         if (snapshot.data != null) {
-          return Image.memory(snapshot.data);
+          return Image.memory(snapshot.data!);
         }
         return Center(
           child: SizedBox(
@@ -70,7 +73,7 @@ class _MoveToAnotherExampleState extends State<MoveToAnotherExample> {
     return DropdownButton(
       items: targetPathList.map((v) => _buildItem(v)).toList(),
       value: target,
-      onChanged: (value) {
+      onChanged: (AssetPathEntity? value) {
         this.target = value;
         setState(() {});
       },
@@ -86,14 +89,16 @@ class _MoveToAnotherExampleState extends State<MoveToAnotherExample> {
 
   Widget buildMoveButton() {
     if (target == null) {
-      return Container();
+      return const SizedBox.shrink();
     }
-    return RaisedButton(
+    return ElevatedButton(
       onPressed: () {
-        PhotoManager.editor.android
-            .moveAssetToAnother(entity: widget.entity, target: target);
+        PhotoManager.editor.android.moveAssetToAnother(
+          entity: widget.entity,
+          target: target!,
+        );
       },
-      child: Text("Move to ' ${target.name} '"),
+      child: Text("Move to ' ${target!.name} '"),
     );
   }
 }

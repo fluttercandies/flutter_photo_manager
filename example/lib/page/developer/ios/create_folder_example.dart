@@ -7,24 +7,16 @@ class CreateFolderExample extends StatefulWidget {
 }
 
 class _CreateFolderExampleState extends State<CreateFolderExample> {
-  TextEditingController nameController;
+  final TextEditingController nameController = TextEditingController();
 
   List<AssetPathEntity> subDir = [];
 
-  AssetPathEntity parent;
-
-  @override
-  void initState() {
-    super.initState();
-    nameController = TextEditingController();
-  }
+  AssetPathEntity? parent;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Create folder"),
-      ),
+      appBar: AppBar(title: Text("Create folder")),
       body: Column(
         children: <Widget>[
           TextField(
@@ -32,24 +24,20 @@ class _CreateFolderExampleState extends State<CreateFolderExample> {
           ),
           Row(
             children: <Widget>[
-              RaisedButton.icon(
+              ElevatedButton.icon(
                 onPressed: createFolder,
                 icon: Icon(Icons.create_new_folder),
-                label: Text(
-                  "Create folder",
-                ),
+                label: Text("Create folder"),
               ),
-              RaisedButton.icon(
+              ElevatedButton.icon(
                 onPressed: createAlbum,
                 icon: Icon(Icons.create_new_folder),
-                label: Text(
-                  "Create album",
-                ),
+                label: Text("Create album"),
               ),
             ],
           ),
           _buildParentTarget(),
-          RaisedButton.icon(
+          ElevatedButton.icon(
             onPressed: () async {
               final path =
                   (await PhotoManager.getAssetPathList(onlyAll: true))[0];
@@ -59,9 +47,7 @@ class _CreateFolderExampleState extends State<CreateFolderExample> {
               setState(() {});
             },
             icon: Icon(Icons.refresh),
-            label: Text(
-              "Refresh sub path",
-            ),
+            label: Text("Refresh sub path"),
           ),
         ],
       ),
@@ -101,9 +87,7 @@ class _CreateFolderExampleState extends State<CreateFolderExample> {
   DropdownMenuItem<AssetPathEntity> _buildItem(AssetPathEntity pathEntity) {
     return DropdownMenuItem<AssetPathEntity>(
       value: pathEntity,
-      child: Container(
-        child: Text(pathEntity.name),
-      ),
+      child: Container(child: Text(pathEntity.name)),
     );
   }
 }

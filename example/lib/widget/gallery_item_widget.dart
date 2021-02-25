@@ -9,14 +9,14 @@ import 'package:photo_manager/photo_manager.dart';
 import 'dialog/list_dialog.dart';
 
 class GalleryItemWidget extends StatelessWidget {
+  const GalleryItemWidget({
+    Key? key,
+    required this.path,
+    required this.setState,
+  }) : super(key: key);
+
   final AssetPathEntity path;
   final ValueSetter<VoidCallback> setState;
-
-  const GalleryItemWidget({
-    Key key,
-    this.path,
-    this.setState,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -54,14 +54,14 @@ class GalleryItemWidget extends StatelessWidget {
           builder: (_) {
             return ListDialog(
               children: [
-                RaisedButton(
+                ElevatedButton(
                   child: Text("refresh properties"),
                   onPressed: () async {
                     await item.refreshPathProperties();
                     setState(() {});
                   },
                 ),
-                RaisedButton(
+                ElevatedButton(
                   child: Text("Delete self (${item.name})"),
                   onPressed: () async {
                     if (!(Platform.isIOS || Platform.isMacOS)) {
@@ -90,7 +90,7 @@ class GalleryItemWidget extends StatelessWidget {
   Widget _buildSubButton(AssetPathEntity item) {
     if (item.isAll || item.albumType == 2) {
       return Builder(
-        builder: (ctx) => RaisedButton(
+        builder: (ctx) => ElevatedButton(
           onPressed: () async {
             final sub = await item.getSubPathList();
             Navigator.push(ctx, MaterialPageRoute(builder: (_) {
