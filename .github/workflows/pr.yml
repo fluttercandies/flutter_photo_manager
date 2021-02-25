@@ -16,7 +16,7 @@ jobs:
           java-version: "12.x"
       - uses: subosito/flutter-action@v1
         with:
-          flutter-version: "1.12.13+hotfix.7"
+          channel: beta
       - run: flutter pub get
       - run: flutter analyze lib example/lib
       - run: cd example ; flutter build ios --no-codesign
@@ -33,8 +33,8 @@ jobs:
           java-version: "12.x"
       - uses: subosito/flutter-action@v1
         with:
-          flutter-version: "1.12.13+hotfix.7"
+          channel: beta
       - run: flutter pub get
       - run: flutter analyze lib example/lib
-      - run: sudo echo "y"|sudo $ANDROID_HOME/tools/bin/sdkmanager "ndk;20.0.5594570"
-      - run: cd example && sudo /opt/hostedtoolcache/flutter/1.12.13-hotfix.7-stable/x64/bin/flutter build apk --debug
+      - run: sudo echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "ndk;20.0.5594570"
+      - run: cd example; flutter build apk --debug
