@@ -1,7 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
-  - [1.0.0-nullsafety.0](#100-nullsafety0)
+  - [1.0.0](#100)
   - [0.6.0](#060)
   - [0.5.8](#058)
   - [0.5.7](#057)
@@ -46,7 +46,7 @@
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
 
-## 1.0.0-nullsafety.0
+## 1.0.0
 
 Breaking change:
 
