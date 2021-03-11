@@ -372,7 +372,7 @@ class AssetEntity {
   /// nullable, if the manager is null.
   Size get size => Size(width.toDouble(), height.toDouble());
 
-  /// unix timestamp of asset, milliseconds
+  /// unix timestamp second of asset
   int? createDtSecond;
 
   /// create time of asset
@@ -381,7 +381,7 @@ class AssetEntity {
     return DateTime.fromMillisecondsSinceEpoch(sec * 1000);
   }
 
-  /// second of modified.
+  /// unix time second of modified.
   int? modifiedDateSecond;
 
   DateTime get modifiedDateTime {
