@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [1.0.1](#101)
   - [1.0.0](#100)
   - [0.6.0](#060)
   - [0.5.8](#058)
@@ -45,6 +46,11 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 1.0.1
+
+- Fix
+  - orientation bug.
 
 ## 1.0.0
 
