@@ -156,6 +156,21 @@ class AssetPathEntity {
 
 /// Used to describe a picture or video
 class AssetEntity {
+  /// see [id]
+  AssetEntity({
+    required this.id,
+    required this.typeInt,
+    required this.width,
+    required this.height,
+    this.duration = 0,
+    this.orientation = 0,
+    this.isFavorite = false,
+    this.title,
+    this.createDtSecond,
+    this.modifiedDateSecond,
+    this.relativePath,
+  });
+
   /// Create from [AssetEntity.id], not recommended.
   static Future<AssetEntity?> fromId(String id) async {
     try {
@@ -181,21 +196,6 @@ class AssetEntity {
   ///
   /// It is [PHAsset valueForKey:@"filename"] in iOS.
   Future<String> get titleAsync => _plugin.getTitleAsync(this);
-
-  /// see [id]
-  AssetEntity({
-    required this.id,
-    required this.typeInt,
-    required this.duration,
-    required this.width,
-    required this.height,
-    required this.orientation,
-    required this.isFavorite,
-    this.title,
-    this.createDtSecond,
-    this.modifiedDateSecond,
-    this.relativePath,
-  });
 
   /// the asset type
   ///

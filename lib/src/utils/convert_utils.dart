@@ -34,9 +34,9 @@ class ConvertUtils {
       final entity = AssetEntity(
         id: item['id'],
         typeInt: item['type'],
-        duration: item['duration'],
         width: item['width'],
         height: item['height'],
+        duration: item['duration'] = 0,
         orientation: item['orientation'] ?? 0,
         isFavorite: item['favorite'] ?? false,
         title: item['title'],
@@ -62,9 +62,9 @@ class ConvertUtils {
     return AssetEntity(
       id: data['id'],
       typeInt: data['type'],
-      duration: data['duration'],
       width: data['width'],
       height: data['height'],
+      duration: data['duration'] = 0,
       orientation: data['orientation'] ?? 0,
       isFavorite: data['favorite'] ?? false,
       title: data['title'],
