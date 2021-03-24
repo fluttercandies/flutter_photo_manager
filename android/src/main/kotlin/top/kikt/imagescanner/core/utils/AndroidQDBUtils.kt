@@ -209,6 +209,7 @@ object AndroidQDBUtils : IDBUtils {
     val path = cursor.getString(MediaStore.MediaColumns.DATA)
     val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
     val type = cursor.getInt(MEDIA_TYPE)
+    val mimeType = cursor.getString(MIME_TYPE)
 
     val duration = if (type == MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
     val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
@@ -217,7 +218,7 @@ object AndroidQDBUtils : IDBUtils {
     val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
     val orientation: Int = cursor.getInt(MediaStore.MediaColumns.ORIENTATION)
     val relativePath: String = cursor.getString(MediaStore.MediaColumns.RELATIVE_PATH)
-    return AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate, orientation, androidQRelativePath = relativePath)
+    return AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate, orientation, androidQRelativePath = relativePath, mimeType = mimeType)
   }
 
   override fun getAssetEntity(context: Context, id: String): AssetEntity? {

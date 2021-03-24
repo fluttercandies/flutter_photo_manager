@@ -37,7 +37,7 @@ interface IDBUtils {
         MediaStore.MediaColumns.HEIGHT, // 高
         MediaStore.MediaColumns.ORIENTATION, // 角度
         MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
-        MediaStore.MediaColumns.MIME_TYPE, // 高
+        MediaStore.MediaColumns.MIME_TYPE, // mime type
         MediaStore.MediaColumns.DATE_TAKEN //日期
     )
 
@@ -53,7 +53,7 @@ interface IDBUtils {
         MediaStore.MediaColumns.HEIGHT, // 高
         MediaStore.MediaColumns.ORIENTATION, // 角度
         MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
-        MediaStore.MediaColumns.MIME_TYPE, // 高
+        MediaStore.MediaColumns.MIME_TYPE, // mime type
         MediaStore.MediaColumns.DURATION //时长
     )
 

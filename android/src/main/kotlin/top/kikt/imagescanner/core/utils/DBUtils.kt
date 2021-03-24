@@ -17,6 +17,7 @@ import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
+import top.kikt.imagescanner.core.utils.AndroidQDBUtils.getString
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeBucketKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeImageKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeVideoKeys
@@ -239,7 +240,9 @@ object DBUtils : IDBUtils {
     val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
     val orientation: Int = cursor.getInt(MediaStore.MediaColumns.ORIENTATION)
 
-    return AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate, orientation, lat, lng)
+    val mimeType = cursor.getString(MediaStore.Files.FileColumns.MIME_TYPE)
+
+    return AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate, orientation, lat, lng, mimeType = mimeType)
   }
 
   @SuppressLint("Recycle")

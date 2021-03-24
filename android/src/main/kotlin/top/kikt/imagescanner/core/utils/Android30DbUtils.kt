@@ -20,6 +20,7 @@ import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
+import top.kikt.imagescanner.core.utils.AndroidQDBUtils.getString
 import top.kikt.imagescanner.util.LogUtils
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -231,6 +232,8 @@ object Android30DbUtils : IDBUtils {
     val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
     val type = cursor.getInt(MEDIA_TYPE)
 
+    val mimeType = cursor.getString(MIME_TYPE)
+
     val duration = if (type == MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
     val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
     val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
@@ -238,7 +241,7 @@ object Android30DbUtils : IDBUtils {
     val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
     val orientation: Int = cursor.getInt(MediaStore.MediaColumns.ORIENTATION)
     val relativePath: String = cursor.getString(MediaStore.MediaColumns.RELATIVE_PATH)
-    return AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate, orientation, androidQRelativePath = relativePath)
+    return AssetEntity(id, path, duration, date, width, height, getMediaType(type), displayName, modifiedDate, orientation, androidQRelativePath = relativePath, mimeType = mimeType)
   }
 
   override fun getAssetEntity(context: Context, id: String): AssetEntity? {

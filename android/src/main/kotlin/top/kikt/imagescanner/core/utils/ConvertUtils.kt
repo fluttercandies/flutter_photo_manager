@@ -33,7 +33,7 @@ object ConvertUtils {
     val data = ArrayList<Map<String, Any?>>()
 
     for (entity in list) {
-      val element = mapOf(
+      val element = hashMapOf(
           "id" to entity.id,
           "duration" to entity.duration / 1000,
           "type" to entity.type,
@@ -47,6 +47,11 @@ object ConvertUtils {
           "title" to entity.displayName,
           "relativePath" to entity.relativePath
       )
+
+      if (entity.mimeType != null) {
+        element["mimeType"] = entity.mimeType
+      }
+
       data.add(element)
     }
 
@@ -57,7 +62,7 @@ object ConvertUtils {
 
   fun convertToAssetResult(entity: AssetEntity): Map<String, Any?> {
 
-    val data = mapOf(
+    val data = hashMapOf(
         "id" to entity.id,
         "duration" to entity.duration / 1000,
         "type" to entity.type,
@@ -70,6 +75,10 @@ object ConvertUtils {
         "title" to entity.displayName,
         "relativePath" to entity.relativePath
     )
+
+    if (entity.mimeType != null) {
+      data["mimeType"] = entity.mimeType
+    }
 
     return mapOf(
         "data" to data
@@ -141,7 +150,7 @@ object ConvertUtils {
       val keyIndex = map["type"] as Int
       val asc = map["asc"] as Boolean
 
-      val key = when(keyIndex){
+      val key = when (keyIndex) {
         0 -> MediaStore.MediaColumns.DATE_ADDED
         1 -> MediaStore.MediaColumns.DATE_MODIFIED
         else -> null

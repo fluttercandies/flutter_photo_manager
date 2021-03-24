@@ -47,6 +47,10 @@ class ConvertUtils {
         ..latitude = item['lat']
         ..longitude = item['lng'];
 
+      if (item.containsKey('mimeType')) {
+        entity.mimeType = item['mimeType'];
+      }
+
       result.add(entity);
     }
 
@@ -59,7 +63,7 @@ class ConvertUtils {
       return null;
     }
 
-    return AssetEntity(
+    final result = AssetEntity(
       id: data['id'],
       typeInt: data['type'],
       duration: data['duration'],
@@ -74,5 +78,11 @@ class ConvertUtils {
     )
       ..latitude = data['lat']
       ..longitude = data['lng'];
+
+    if (data.containsKey('mimeType')) {
+      result.mimeType = data['mimeType'];
+    }
+
+    return result;
   }
 }
