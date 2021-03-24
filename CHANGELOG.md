@@ -1,6 +1,8 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [1.0.3](#103)
+  - [1.0.2](#102)
   - [1.0.1](#101)
   - [1.0.0](#100)
   - [0.6.0](#060)
@@ -46,6 +48,14 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 1.0.3
+
+- Fix serious code usage issue in convert utils.
+
+## 1.0.2
+
+- Improve the constructor for `AssetEntity`.
 
 ## 1.0.1
 
