@@ -290,20 +290,6 @@ class PhotoManager {
       return null;
     }
 
-    return AssetEntity(
-      id: asset.id,
-      typeInt: asset.typeInt,
-      duration: asset.duration,
-      width: asset.width,
-      height: asset.height,
-      orientation: asset.orientation,
-      isFavorite: asset.isFavorite,
-      title: asset.title,
-      createDtSecond: asset.createDtSecond,
-      modifiedDateSecond: asset.modifiedDateSecond,
-      relativePath: asset.relativePath,
-    )
-      ..latitude = asset.latitude
-      ..longitude = asset.longitude;
+    return asset;
   }
 }

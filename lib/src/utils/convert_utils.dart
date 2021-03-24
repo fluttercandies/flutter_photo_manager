@@ -31,27 +31,10 @@ class ConvertUtils {
 
     List list = data["data"];
     for (final Map item in list) {
-      final entity = AssetEntity(
-        id: item['id'],
-        typeInt: item['type'],
-        width: item['width'],
-        height: item['height'],
-        duration: item['duration'] ?? 0,
-        orientation: item['orientation'] ?? 0,
-        isFavorite: item['favorite'] ?? false,
-        title: item['title'],
-        createDtSecond: item['createDt'],
-        modifiedDateSecond: item['modifiedDt'],
-        relativePath: item['relativePath'],
-      )
-        ..latitude = item['lat']
-        ..longitude = item['lng'];
-
-      if (item.containsKey('mimeType')) {
-        entity.mimeType = item['mimeType'];
+      final asset = convertToAsset(item);
+      if (asset != null) {
+        result.add(asset);
       }
-
-      result.add(entity);
     }
 
     return result;
