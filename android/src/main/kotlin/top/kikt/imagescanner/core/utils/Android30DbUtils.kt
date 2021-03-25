@@ -362,7 +362,7 @@ object Android30DbUtils : IDBUtils {
     androidQCache.saveAssetCache(context, asset, byteArray, true)
   }
 
-  override fun saveImage(context: Context, image: ByteArray, title: String, desc: String): AssetEntity? {
+  override fun saveImage(context: Context, image: ByteArray, title: String, desc: String, relativePath: String): AssetEntity? {
     val (width, height) =
         try {
           val bmp = BitmapFactory.decodeByteArray(image, 0, image.count())
@@ -393,6 +393,7 @@ object Android30DbUtils : IDBUtils {
       put(MediaStore.Images.ImageColumns.WIDTH, width)
       put(MediaStore.Images.ImageColumns.HEIGHT, height)
     }
+    if (relativePath != null) values.put(MediaStore.Images.ImageColumns.RELATIVE_PATH, relativePath)
 
     val contentUri = cr.insert(uri, values) ?: return null
     val outputStream = cr.openOutputStream(contentUri)
@@ -409,7 +410,7 @@ object Android30DbUtils : IDBUtils {
     return getAssetEntity(context, id.toString())
   }
 
-  override fun saveImage(context: Context, path: String, title: String, desc: String): AssetEntity? {
+  override fun saveImage(context: Context, path: String, title: String, desc: String, relativePath: String): AssetEntity? {
     val cr = context.contentResolver
     val timestamp = System.currentTimeMillis() / 1000
     val inputStream = FileInputStream(path)
@@ -441,6 +442,7 @@ object Android30DbUtils : IDBUtils {
       put(MediaStore.Images.ImageColumns.WIDTH, width)
       put(MediaStore.Images.ImageColumns.HEIGHT, height)
     }
+    if (relativePath != null) values.put(MediaStore.Images.ImageColumns.RELATIVE_PATH, relativePath)
 
     val contentUri = cr.insert(uri, values) ?: return null
     val outputStream = cr.openOutputStream(contentUri)
@@ -638,7 +640,7 @@ object Android30DbUtils : IDBUtils {
     }
   }
 
-  override fun saveVideo(context: Context, path: String, title: String, desc: String): AssetEntity? {
+  override fun saveVideo(context: Context, path: String, title: String, desc: String, relativePath: String): AssetEntity? {
     val cr = context.contentResolver
     val timestamp = System.currentTimeMillis() / 1000
     val inputStream = FileInputStream(path)
@@ -664,6 +666,7 @@ object Android30DbUtils : IDBUtils {
       put(MediaStore.Video.VideoColumns.WIDTH, info.width)
       put(MediaStore.Video.VideoColumns.HEIGHT, info.height)
     }
+    if (relativePath != null) values.put(MediaStore.Video.VideoColumns.RELATIVE_PATH, relativePath)
 
     val contentUri = cr.insert(uri, values) ?: return null
     val outputStream = cr.openOutputStream(contentUri)
