@@ -169,7 +169,11 @@ class AssetEntity {
     this.createDtSecond,
     this.modifiedDateSecond,
     this.relativePath,
-  });
+    double? latitude,
+    double? longitude,
+    this.mimeType,
+  })  : _latitude = latitude,
+        _longitude = longitude;
 
   /// Create from [AssetEntity.id], not recommended.
   static Future<AssetEntity?> fromId(String id) async {
@@ -423,6 +427,13 @@ class AssetEntity {
   ///
   /// API 28 or lower: it is `MediaStore.MediaColumns.DATA` parent path.
   String? relativePath;
+
+  /// MimeType of the asset.
+  ///
+  /// In Android, it reads the value in [MediaStore](https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#MIME_TYPE) without guarantee of accuracy.
+  ///
+  /// In iOS, it it always null.
+  String? mimeType;
 
   /// refreshProperties
   Future<AssetEntity?> refreshProperties() async {

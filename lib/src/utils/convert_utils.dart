@@ -31,23 +31,10 @@ class ConvertUtils {
 
     List list = data["data"];
     for (final Map item in list) {
-      final entity = AssetEntity(
-        id: item['id'],
-        typeInt: item['type'],
-        width: item['width'],
-        height: item['height'],
-        duration: item['duration'] ?? 0,
-        orientation: item['orientation'] ?? 0,
-        isFavorite: item['favorite'] ?? false,
-        title: item['title'],
-        createDtSecond: item['createDt'],
-        modifiedDateSecond: item['modifiedDt'],
-        relativePath: item['relativePath'],
-      )
-        ..latitude = item['lat']
-        ..longitude = item['lng'];
-
-      result.add(entity);
+      final asset = _convertMapToAsset(item);
+      if (asset != null) {
+        result.add(asset);
+      }
     }
 
     return result;
@@ -59,7 +46,15 @@ class ConvertUtils {
       return null;
     }
 
-    return AssetEntity(
+    return _convertMapToAsset(data);
+  }
+
+  static AssetEntity? _convertMapToAsset(Map? data) {
+    if (data == null) {
+      return null;
+    }
+
+    final result = AssetEntity(
       id: data['id'],
       typeInt: data['type'],
       width: data['width'],
@@ -71,8 +66,11 @@ class ConvertUtils {
       createDtSecond: data['createDt'],
       modifiedDateSecond: data['modifiedDt'],
       relativePath: data['relativePath'],
-    )
-      ..latitude = data['lat']
-      ..longitude = data['lng'];
+      latitude: data['lat'],
+      longitude: data['lng'],
+      mimeType: data['mimeType'],
+    );
+
+    return result;
   }
 }
