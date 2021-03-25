@@ -31,7 +31,7 @@ class ConvertUtils {
 
     List list = data["data"];
     for (final Map item in list) {
-      final asset = convertToAsset(item);
+      final asset = _convertMapToAsset(item);
       if (asset != null) {
         result.add(asset);
       }
@@ -42,6 +42,14 @@ class ConvertUtils {
 
   static AssetEntity? convertToAsset(Map? map) {
     final Map? data = map?['data'];
+    if (data == null) {
+      return null;
+    }
+
+    return _convertMapToAsset(data);
+  }
+
+  static AssetEntity? _convertMapToAsset(Map? data) {
     if (data == null) {
       return null;
     }
