@@ -66,13 +66,10 @@ class ConvertUtils {
       createDtSecond: data['createDt'],
       modifiedDateSecond: data['modifiedDt'],
       relativePath: data['relativePath'],
-    )
-      ..latitude = data['lat']
-      ..longitude = data['lng'];
-
-    if (data.containsKey('mimeType')) {
-      result.mimeType = data['mimeType'];
-    }
+      latitude: data['lat'],
+      longitude: data['lng'],
+      mimeType: data['mimeType'],
+    );
 
     return result;
   }

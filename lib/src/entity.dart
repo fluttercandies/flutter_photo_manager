@@ -169,7 +169,11 @@ class AssetEntity {
     this.createDtSecond,
     this.modifiedDateSecond,
     this.relativePath,
-  });
+    double? latitude,
+    double? longitude,
+    this.mimeType,
+  })  : _latitude = latitude,
+        _longitude = longitude;
 
   /// Create from [AssetEntity.id], not recommended.
   static Future<AssetEntity?> fromId(String id) async {
