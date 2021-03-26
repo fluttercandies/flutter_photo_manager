@@ -25,6 +25,7 @@ class Editor {
   /// in Android is Picture.
   /// On Android 28 or lower, if the file is located in the external storage, it's path will be used in the MediaStore.
   /// On Android 29 or above, you can use [relativePath] to specify a RELATIVE_PATH used in the MediaStore.
+  /// The mimeType will either be formed from the title if you pass one, or guessed by the system, which does not always work.
   Future<AssetEntity?> saveImage(
     Uint8List data, {
     String? title,

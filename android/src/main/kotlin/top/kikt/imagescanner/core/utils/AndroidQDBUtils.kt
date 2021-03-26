@@ -371,7 +371,14 @@ object AndroidQDBUtils : IDBUtils {
     val cr = context.contentResolver
     val timestamp = System.currentTimeMillis() / 1000
 
-    val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
+    var typeFromStream: String;
+    if (title.contains(".")){
+      //title contains file extension, form mimeType from it
+      typeFromStream = "image/${File(title).extension}"
+    } else {
+      typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
+              ?: "image/${File(title).extension}"
+    }
 
     val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 

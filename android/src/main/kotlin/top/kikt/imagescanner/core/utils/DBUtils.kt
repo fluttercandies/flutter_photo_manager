@@ -330,8 +330,15 @@ object DBUtils : IDBUtils {
     val timestamp = System.currentTimeMillis() / 1000
     refreshInputStream()
 
-    val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
-        ?: "image/${File(title).extension}"
+    var typeFromStream: String;
+    if (title.contains(".")){
+      //title contains file extension, form mimeType from it
+      typeFromStream = "image/${File(title).extension}"
+    } else {
+      typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
+              ?: "image/${File(title).extension}"
+    }
+
 
     val values = ContentValues().apply {
       put(MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
