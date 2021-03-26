@@ -382,7 +382,7 @@ object Android30DbUtils : IDBUtils {
       typeFromStream = "image/${File(title).extension}"
     } else {
       typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
-              ?: "image/${File(title).extension}"
+              ?: "image/*"
     }
 
     val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI

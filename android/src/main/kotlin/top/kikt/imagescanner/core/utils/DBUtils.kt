@@ -336,7 +336,7 @@ object DBUtils : IDBUtils {
       typeFromStream = "image/${File(title).extension}"
     } else {
       typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
-              ?: "image/${File(title).extension}"
+              ?: "image/*"
     }
 
 
