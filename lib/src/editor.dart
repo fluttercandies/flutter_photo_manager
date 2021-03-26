@@ -64,8 +64,12 @@ class Editor {
     String? desc,
     String? relativePath,
   }) async {
-    return _plugin.saveVideo(file,
-        title: title, desc: desc, relativePath: relativePath);
+    return _plugin.saveVideo(
+      file,
+      title: title,
+      desc: desc,
+      relativePath: relativePath,
+    );
   }
 
   /// Copy asset to another gallery.
