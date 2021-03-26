@@ -48,8 +48,12 @@ class Editor {
     String? desc,
     String? relativePath,
   }) async {
-    return _plugin.saveImageWithPath(path,
-        title: title, desc: desc, relativePath: relativePath);
+    return _plugin.saveImageWithPath(
+      path,
+      title: title,
+      desc: desc,
+      relativePath: relativePath,
+    );
   }
 
   /// Save video to gallery.
