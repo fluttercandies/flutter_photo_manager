@@ -333,7 +333,7 @@ class PhotoManagerPlugin(
           val ids = call.argument<List<String>>("ids")!!
           if (belowSdk(29)) {
             deleteManager.deleteInApi28(ids)
-            resultHandler.reply(true)
+            resultHandler.reply(ids)
           } else if (IDBUtils.isAndroidR) {
             val uris = ids.map {
               photoManager.getUri(it)
