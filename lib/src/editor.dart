@@ -23,36 +23,57 @@ class Editor {
   ///
   /// in iOS is Recent.
   /// in Android is Picture.
+  /// On Android 28 or lower, if the file is located in the external storage, it's path will be used in the MediaStore.
+  /// On Android 29 or above, you can use [relativePath] to specify a RELATIVE_PATH used in the MediaStore.
+  /// The mimeType will either be formed from the title if you pass one, or guessed by the system, which does not always work.
   Future<AssetEntity?> saveImage(
     Uint8List data, {
     String? title,
     String? desc,
+    String? relativePath,
   }) async {
-    return _plugin.saveImage(data, title: title, desc: desc);
+    return _plugin.saveImage(data,
+        title: title, desc: desc, relativePath: relativePath);
   }
 
   /// Save image to gallery.
   ///
   /// in iOS is Recent.
-  /// in Android is picture directory .(in android 28 or lower, If the path at the external storage, It will use the path.)
+  /// in Android is picture directory.
+  /// On Android 28 or lower, if the file is located in the external storage, it's path will be used in the MediaStore.
+  /// On Android 29 or above, you can use [relativePath] to specify a RELATIVE_PATH used in the MediaStore.
   Future<AssetEntity?> saveImageWithPath(
     String path, {
     String? title,
     String? desc,
+    String? relativePath,
   }) async {
-    return _plugin.saveImageWithPath(path, title: title, desc: desc);
+    return _plugin.saveImageWithPath(
+      path,
+      title: title,
+      desc: desc,
+      relativePath: relativePath,
+    );
   }
 
   /// Save video to gallery.
   ///
   /// in iOS is Recent.
-  /// in Android is video directory .(in android 28 or lower, If the path at the external storage, It will use the path.)
+  /// in Android is video directory.
+  /// On Android 28 or lower, if the file is located in the external storage, it's path will be used in the MediaStore.
+  /// On Android 29 or above, you can use [relativePath] to specify a RELATIVE_PATH used in the MediaStore.
   Future<AssetEntity?> saveVideo(
     File file, {
     String? title,
     String? desc,
+    String? relativePath,
   }) async {
-    return _plugin.saveVideo(file, title: title, desc: desc);
+    return _plugin.saveVideo(
+      file,
+      title: title,
+      desc: desc,
+      relativePath: relativePath,
+    );
   }
 
   /// Copy asset to another gallery.

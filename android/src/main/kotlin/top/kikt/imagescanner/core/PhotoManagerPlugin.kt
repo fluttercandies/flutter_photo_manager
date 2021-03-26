@@ -359,7 +359,8 @@ class PhotoManagerPlugin(
             val image = call.argument<ByteArray>("image")!!
             val title = call.argument<String>("title") ?: ""
             val desc = call.argument<String>("desc") ?: ""
-            val entity = photoManager.saveImage(image, title, desc)
+            val relativePath = call.argument<String>("relativePath") ?: ""
+            val entity = photoManager.saveImage(image, title, desc, relativePath)
             if (entity == null) {
               resultHandler.reply(null)
               return@runOnBackground
@@ -378,7 +379,8 @@ class PhotoManagerPlugin(
             val imagePath = call.argument<String>("path")!!
             val title = call.argument<String>("title") ?: ""
             val desc = call.argument<String>("desc") ?: ""
-            val entity = photoManager.saveImage(imagePath, title, desc)
+            val relativePath = call.argument<String>("relativePath") ?: ""
+            val entity = photoManager.saveImage(imagePath, title, desc, relativePath)
             if (entity == null) {
               resultHandler.reply(null)
               return@runOnBackground
@@ -397,7 +399,8 @@ class PhotoManagerPlugin(
             val videoPath = call.argument<String>("path")!!
             val title = call.argument<String>("title")!!
             val desc = call.argument<String>("desc") ?: ""
-            val entity = photoManager.saveVideo(videoPath, title, desc)
+            val relativePath = call.argument<String>("relativePath") ?: ""
+            val entity = photoManager.saveVideo(videoPath, title, desc, relativePath)
             if (entity == null) {
               resultHandler.reply(null)
               return@runOnBackground

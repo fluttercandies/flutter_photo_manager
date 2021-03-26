@@ -164,19 +164,19 @@ class PhotoManager(private val context: Context) {
     resultHandler.reply(path)
   }
 
-  fun saveImage(image: ByteArray, title: String, description: String): AssetEntity? {
-    return dbUtils.saveImage(context, image, title, description)
+  fun saveImage(image: ByteArray, title: String, description: String, relativePath: String): AssetEntity? {
+    return dbUtils.saveImage(context, image, title, description, relativePath)
   }
 
-  fun saveImage(path: String, title: String, description: String): AssetEntity? {
-    return dbUtils.saveImage(context, path, title, description)
+  fun saveImage(path: String, title: String, description: String, relativePath: String): AssetEntity? {
+    return dbUtils.saveImage(context, path, title, description, relativePath)
   }
 
-  fun saveVideo(path: String, title: String, desc: String): AssetEntity? {
+  fun saveVideo(path: String, title: String, desc: String, relativePath: String): AssetEntity? {
     if (!File(path).exists()) {
       return null
     }
-    return dbUtils.saveVideo(context, path, title, desc)
+    return dbUtils.saveVideo(context, path, title, desc, relativePath)
   }
 
   fun assetExists(id: String, resultHandler: ResultHandler) {

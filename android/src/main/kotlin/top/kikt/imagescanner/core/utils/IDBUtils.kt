@@ -149,11 +149,11 @@ interface IDBUtils {
     return assetEntity.getUri()
   }
 
-  fun saveImage(context: Context, image: ByteArray, title: String, desc: String): AssetEntity?
+  fun saveImage(context: Context, image: ByteArray, title: String, desc: String, relativePath: String): AssetEntity?
 
-  fun saveImage(context: Context, path: String, title: String, desc: String): AssetEntity?
+  fun saveImage(context: Context, path: String, title: String, desc: String, relativePath: String): AssetEntity?
 
-  fun saveVideo(context: Context, path: String, title: String, desc: String): AssetEntity?
+  fun saveVideo(context: Context, path: String, title: String, desc: String, relativePath: String): AssetEntity?
 
   fun exists(context: Context, id: String): Boolean {
     val columns = arrayOf(_ID)

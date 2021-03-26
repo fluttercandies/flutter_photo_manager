@@ -176,6 +176,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     Uint8List data, {
     String? title,
     String? desc,
+    String? relativePath,
   }) async {
     title ??= 'image_${DateTime.now().millisecondsSinceEpoch / 1000}';
 
@@ -185,6 +186,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
         'image': data,
         'title': title,
         'desc': desc ?? '',
+        'relativePath': relativePath,
       },
     );
 
@@ -195,6 +197,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     String path, {
     String? title,
     String? desc,
+    String? relativePath,
   }) async {
     final file = File(path);
     if (!file.existsSync()) {
@@ -210,6 +213,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
         'path': path,
         'title': title,
         'desc': desc ?? '',
+        'relativePath': relativePath,
       },
     );
 
@@ -220,6 +224,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     File file, {
     String? title,
     String? desc,
+    String? relativePath,
   }) async {
     if (!file.existsSync()) {
       assert(file.existsSync(), 'file must exists');
@@ -231,6 +236,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
         'path': file.absolute.path,
         'title': title,
         'desc': desc ?? '',
+        'relativePath': relativePath,
       },
     );
     return ConvertUtils.convertToAsset(result);
@@ -252,6 +258,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
           'getLatLngAndroidQ',
           {'id': assetEntity.id},
         );
+
         /// 将返回的数据传入map
         return LatLng(latitude: map?['lat'], longitude: map?['lng']);
       }

@@ -357,7 +357,7 @@ object AndroidQDBUtils : IDBUtils {
     androidQCache.saveAssetCache(context, asset, byteArray, true)
   }
 
-  override fun saveImage(context: Context, image: ByteArray, title: String, desc: String): AssetEntity? {
+  override fun saveImage(context: Context, image: ByteArray, title: String, desc: String, relativePath: String): AssetEntity? {
     val (width, height) =
         try {
           val bmp = BitmapFactory.decodeByteArray(image, 0, image.count())
@@ -371,7 +371,14 @@ object AndroidQDBUtils : IDBUtils {
     val cr = context.contentResolver
     val timestamp = System.currentTimeMillis() / 1000
 
-    val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
+    var typeFromStream: String;
+    if (title.contains(".")){
+      //title contains file extension, form mimeType from it
+      typeFromStream = "image/${File(title).extension}"
+    } else {
+      typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
+              ?: "image/*"
+    }
 
     val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 
@@ -388,6 +395,7 @@ object AndroidQDBUtils : IDBUtils {
       put(MediaStore.Images.ImageColumns.WIDTH, width)
       put(MediaStore.Images.ImageColumns.HEIGHT, height)
     }
+    if (relativePath != null) values.put(MediaStore.Images.ImageColumns.RELATIVE_PATH, relativePath)
 
     val contentUri = cr.insert(uri, values) ?: return null
     val outputStream = cr.openOutputStream(contentUri)
@@ -404,7 +412,7 @@ object AndroidQDBUtils : IDBUtils {
     return getAssetEntity(context, id.toString())
   }
 
-  override fun saveImage(context: Context, path: String, title: String, desc: String): AssetEntity? {
+  override fun saveImage(context: Context, path: String, title: String, desc: String, relativePath: String): AssetEntity? {
     val cr = context.contentResolver
     val timestamp = System.currentTimeMillis() / 1000
     val inputStream = FileInputStream(path)
@@ -436,6 +444,7 @@ object AndroidQDBUtils : IDBUtils {
       put(MediaStore.Images.ImageColumns.WIDTH, width)
       put(MediaStore.Images.ImageColumns.HEIGHT, height)
     }
+    if (relativePath != null) values.put(MediaStore.Images.ImageColumns.RELATIVE_PATH, relativePath)
 
     val contentUri = cr.insert(uri, values) ?: return null
     val outputStream = cr.openOutputStream(contentUri)
@@ -633,7 +642,7 @@ object AndroidQDBUtils : IDBUtils {
     }
   }
 
-  override fun saveVideo(context: Context, path: String, title: String, desc: String): AssetEntity? {
+  override fun saveVideo(context: Context, path: String, title: String, desc: String, relativePath: String): AssetEntity? {
     val cr = context.contentResolver
     val timestamp = System.currentTimeMillis() / 1000
     val inputStream = FileInputStream(path)
@@ -659,6 +668,7 @@ object AndroidQDBUtils : IDBUtils {
       put(MediaStore.Video.VideoColumns.WIDTH, info.width)
       put(MediaStore.Video.VideoColumns.HEIGHT, info.height)
     }
+    if (relativePath != null) values.put(MediaStore.Video.VideoColumns.RELATIVE_PATH, relativePath)
 
     val contentUri = cr.insert(uri, values) ?: return null
     val outputStream = cr.openOutputStream(contentUri)
