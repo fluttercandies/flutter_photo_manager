@@ -297,7 +297,7 @@ object DBUtils : IDBUtils {
     cacheContainer.clearCache()
   }
 
-  override fun saveImage(context: Context, image: ByteArray, title: String, desc: String, relativePath: String): AssetEntity? {
+  override fun saveImage(context: Context, image: ByteArray, title: String, desc: String, relativePath: String?): AssetEntity? {
     val cr = context.contentResolver
     var inputStream = ByteArrayInputStream(image)
 
@@ -330,13 +330,11 @@ object DBUtils : IDBUtils {
     val timestamp = System.currentTimeMillis() / 1000
     refreshInputStream()
 
-    var typeFromStream: String;
-    if (title.contains(".")){
-      //title contains file extension, form mimeType from it
-      typeFromStream = "image/${File(title).extension}"
+    val typeFromStream: String = if (title.contains(".")) {
+      // title contains file extension, form mimeType from it
+      "image/${File(title).extension}"
     } else {
-      typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
-              ?: "image/*"
+      URLConnection.guessContentTypeFromStream(inputStream) ?: "image/*"
     }
 
 
@@ -381,7 +379,7 @@ object DBUtils : IDBUtils {
     return getAssetEntity(context, id.toString())
   }
 
-  override fun saveImage(context: Context, path: String, title: String, desc: String, relativePath: String): AssetEntity? {
+  override fun saveImage(context: Context, path: String, title: String, desc: String, relativePath: String?): AssetEntity? {
     val inputStream = FileInputStream(path)
     val cr = context.contentResolver
     val timestamp = System.currentTimeMillis() / 1000
@@ -661,7 +659,7 @@ object DBUtils : IDBUtils {
     }
   }
 
-  override fun saveVideo(context: Context, path: String, title: String, desc: String, relativePath: String): AssetEntity? {
+  override fun saveVideo(context: Context, path: String, title: String, desc: String, relativePath: String?): AssetEntity? {
     val inputStream = FileInputStream(path)
     val cr = context.contentResolver
     val timestamp = System.currentTimeMillis() / 1000

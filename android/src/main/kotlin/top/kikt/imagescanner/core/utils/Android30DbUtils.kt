@@ -362,7 +362,7 @@ object Android30DbUtils : IDBUtils {
     androidQCache.saveAssetCache(context, asset, byteArray, true)
   }
 
-  override fun saveImage(context: Context, image: ByteArray, title: String, desc: String, relativePath: String): AssetEntity? {
+  override fun saveImage(context: Context, image: ByteArray, title: String, desc: String, relativePath: String?): AssetEntity? {
     val (width, height) =
         try {
           val bmp = BitmapFactory.decodeByteArray(image, 0, image.count())
@@ -376,13 +376,11 @@ object Android30DbUtils : IDBUtils {
     val cr = context.contentResolver
     val timestamp = System.currentTimeMillis() / 1000
 
-    var typeFromStream: String;
-    if (title.contains(".")){
-      //title contains file extension, form mimeType from it
-      typeFromStream = "image/${File(title).extension}"
+    val typeFromStream: String = if (title.contains(".")) {
+      // title contains file extension, form mimeType from it
+      "image/${File(title).extension}"
     } else {
-      typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
-              ?: "image/*"
+      URLConnection.guessContentTypeFromStream(inputStream) ?: "image/*"
     }
 
     val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -417,7 +415,7 @@ object Android30DbUtils : IDBUtils {
     return getAssetEntity(context, id.toString())
   }
 
-  override fun saveImage(context: Context, path: String, title: String, desc: String, relativePath: String): AssetEntity? {
+  override fun saveImage(context: Context, path: String, title: String, desc: String, relativePath: String?): AssetEntity? {
     val cr = context.contentResolver
     val timestamp = System.currentTimeMillis() / 1000
     val inputStream = FileInputStream(path)
@@ -647,7 +645,7 @@ object Android30DbUtils : IDBUtils {
     }
   }
 
-  override fun saveVideo(context: Context, path: String, title: String, desc: String, relativePath: String): AssetEntity? {
+  override fun saveVideo(context: Context, path: String, title: String, desc: String, relativePath: String?): AssetEntity? {
     val cr = context.contentResolver
     val timestamp = System.currentTimeMillis() / 1000
     val inputStream = FileInputStream(path)

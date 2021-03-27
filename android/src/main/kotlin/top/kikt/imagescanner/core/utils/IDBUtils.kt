@@ -149,11 +149,11 @@ interface IDBUtils {
     return assetEntity.getUri()
   }
 
-  fun saveImage(context: Context, image: ByteArray, title: String, desc: String, relativePath: String): AssetEntity?
+  fun saveImage(context: Context, image: ByteArray, title: String, desc: String, relativePath: String?): AssetEntity?
 
-  fun saveImage(context: Context, path: String, title: String, desc: String, relativePath: String): AssetEntity?
+  fun saveImage(context: Context, path: String, title: String, desc: String, relativePath: String?): AssetEntity?
 
-  fun saveVideo(context: Context, path: String, title: String, desc: String, relativePath: String): AssetEntity?
+  fun saveVideo(context: Context, path: String, title: String, desc: String, relativePath: String?): AssetEntity?
 
   fun exists(context: Context, id: String): Boolean {
     val columns = arrayOf(_ID)
@@ -397,7 +397,7 @@ interface IDBUtils {
 
     val key = arrayOf(_ID, MEDIA_TYPE)
     val idSelection = ids.joinToString(",") { "?" }
-    val selection = "$_ID in ($idSelection)";
+    val selection = "$_ID in ($idSelection)"
     val cursor = context.contentResolver.query(allUri, key, selection, ids.toTypedArray(), null)
         ?: return emptyList()
 
@@ -453,7 +453,7 @@ interface IDBUtils {
 
     val key = arrayOf(_ID, MEDIA_TYPE, DATA)
     val idSelection = ids.joinToString(",") { "?" }
-    val selection = "$_ID in ($idSelection)";
+    val selection = "$_ID in ($idSelection)"
     val cursor = context.contentResolver.query(allUri, key, selection, ids.toTypedArray(), null)
         ?: return emptyList()
 
