@@ -1,7 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
-  - [1.0.5](#105)
+  - [1.0.6](#106)
   - [1.0.4](#104)
   - [1.0.3](#103)
   - [1.0.2](#102)
@@ -51,7 +51,7 @@
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
 
-## 1.0.5
+## 1.0.6
 
 - Add relative path when saving files to the MediaStore on Android 29+ (#462)
 - Fix deleteWithIds typecast issue with Android 29- (#460)
