@@ -1,9 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:image_scanner_example/util/common_util.dart';
 import 'package:image_scanner_example/widget/video_widget.dart';
-import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class DetailPage extends StatefulWidget {
@@ -99,78 +98,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   void _showInfo() async {
-    final entity = widget.entity;
-
-    final latlng = await entity.latlngAsync();
-
-    final lat = entity.latitude == 0 ? latlng.latitude : entity.latitude;
-    final lng = entity.longitude == 0 ? latlng.longitude : entity.longitude;
-
-    Widget w = Center(
-      child: Container(
-        color: Colors.white,
-        padding: const EdgeInsets.all(15),
-        child: Material(
-          color: Colors.white,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              GestureDetector(
-                child: buildInfoItem("id", entity.id),
-                onLongPress: () {
-                  Clipboard.setData(ClipboardData(text: entity.id));
-                  showToast('The id already copied.');
-                },
-              ),
-              buildInfoItem("create", entity.createDateTime.toString()),
-              buildInfoItem("modified", entity.modifiedDateTime.toString()),
-              buildInfoItem("size", entity.size.toString()),
-              buildInfoItem("orientation", entity.orientation.toString()),
-              buildInfoItem("duration", entity.videoDuration.toString()),
-              buildInfoItemAsync("title", entity.titleAsync),
-              buildInfoItem("lat", lat?.toString()),
-              buildInfoItem("lng", lng?.toString()),
-              buildInfoItem("relative path", entity.relativePath ?? 'null'),
-            ],
-          ),
-        ),
-      ),
-    );
-    showDialog(context: context, builder: (c) => w);
-  }
-
-  Widget buildInfoItem(String title, String? info) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          Container(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              title.padLeft(10, " "),
-              textAlign: TextAlign.start,
-            ),
-            width: 88,
-          ),
-          Expanded(
-            child: Text((info ?? 'null').padLeft(40, " ")),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildInfoItemAsync(String title, Future<String> info) {
-    return FutureBuilder(
-      future: info,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (!snapshot.hasData) {
-          return buildInfoItem(title, "");
-        }
-        return buildInfoItem(title, snapshot.data);
-      },
-    );
+    await CommonUtil.showInfoDialog(context, widget.entity);
   }
 
   Widget buildAudio() {

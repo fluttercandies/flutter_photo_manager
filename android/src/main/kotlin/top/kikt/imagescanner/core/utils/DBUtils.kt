@@ -135,13 +135,13 @@ object DBUtils : IDBUtils {
 
   @SuppressLint("Recycle")
   override fun getAssetFromGalleryId(
-          context: Context,
-          galleryId: String,
-          page: Int,
-          pageSize: Int,
-          requestType: Int,
-          option: FilterOption,
-          cacheContainer: CacheContainer?
+      context: Context,
+      galleryId: String,
+      page: Int,
+      pageSize: Int,
+      requestType: Int,
+      option: FilterOption,
+      cacheContainer: CacheContainer?
   ): List<AssetEntity> {
     val cache = cacheContainer ?: this.cacheContainer
 
@@ -228,7 +228,7 @@ object DBUtils : IDBUtils {
   private fun convertCursorToAsset(cursor: Cursor, requestType: Int): AssetEntity {
     val id = cursor.getString(MediaStore.MediaColumns._ID)
     val path = cursor.getString(MediaStore.MediaColumns.DATA)
-    val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
+    val date = cursor.getLong(MediaStore.Images.Media.DATE_ADDED)
     val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
     val duration = if (requestType == 1) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
     val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
