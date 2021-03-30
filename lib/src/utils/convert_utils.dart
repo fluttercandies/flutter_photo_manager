@@ -23,7 +23,7 @@ class ConvertUtils {
       final int? modifiedDate = item['modified'];
 
       if (modifiedDate != null) {
-        entity.modified =
+        entity.modifiedDate =
             DateTime.fromMillisecondsSinceEpoch(modifiedDate * 1000);
       }
 

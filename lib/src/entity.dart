@@ -45,7 +45,7 @@ class AssetPathEntity {
   /// The modification time of the latest asset contained in an album.
   ///
   /// See [FilterOptionGroup.containsPathModified]
-  DateTime? modified;
+  DateTime? modifiedDate;
 
   /// The value used internally by the user.
   /// Used to indicate the value that should be available inside the path.
@@ -96,7 +96,7 @@ class AssetPathEntity {
       this.isAll = result.isAll;
       this.type = result.type;
       this.filterOption = filterOption;
-      this.modified = result.modified;
+      this.modifiedDate = result.modifiedDate;
     }
   }
 

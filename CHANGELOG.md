@@ -54,6 +54,8 @@
 
 ## 1.0.7
 
+- Feature: `modified` of `AssetPathEntity`.
+
 - Fix: Order option of the `FilterOptionGroup`.
 
 ## 1.0.6
