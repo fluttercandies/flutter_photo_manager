@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:photo_manager/photo_manager.dart';
+
 import '../type.dart';
 
 /// Filter option for get asset.
@@ -25,6 +27,13 @@ class FilterOptionGroup {
   ///
   /// Whether to include an empty album
   bool containsEmptyAlbum = false;
+
+  /// If true, the [AssetPathEntity] will return with the last modified time.
+  ///
+  /// See [AssetPathEntity.modified]
+  ///
+  /// This is a performance consuming option. Only if you really need it, it is recommended to set it to true.
+  bool containsPathModified = false;
 
   @Deprecated('Please use createTimeCond.')
   DateTimeCond get dateTimeCond => createTimeCond;
@@ -73,6 +82,7 @@ class FilterOptionGroup {
     result["createDate"] = createTimeCond.toMap();
     result["updateDate"] = updateTimeCond.toMap();
     result['containsEmptyAlbum'] = containsEmptyAlbum;
+    result['containsPathModified'] = containsPathModified;
 
     final ordersList = List<OrderOption>.of(orders);
     if (ordersList.isEmpty) {

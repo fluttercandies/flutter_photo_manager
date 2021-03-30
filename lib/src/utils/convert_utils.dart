@@ -20,6 +20,13 @@ class ConvertUtils {
         ..albumType = (item["albumType"] ?? 1)
         ..filterOption = optionGroup ?? FilterOptionGroup();
 
+      final int? modifiedDate = item['modified'];
+
+      if (modifiedDate != null) {
+        entity.modified =
+            DateTime.fromMillisecondsSinceEpoch(modifiedDate * 1000);
+      }
+
       result.add(entity);
     }
 

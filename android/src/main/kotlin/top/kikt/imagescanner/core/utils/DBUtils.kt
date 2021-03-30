@@ -17,7 +17,6 @@ import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
-import top.kikt.imagescanner.core.utils.AndroidQDBUtils.getString
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeBucketKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeImageKeys
 import top.kikt.imagescanner.core.utils.IDBUtils.Companion.storeVideoKeys
@@ -60,7 +59,11 @@ object DBUtils : IDBUtils {
       val id = cursor.getString(0)
       val name = cursor.getString(1) ?: ""
       val count = cursor.getInt(2)
-      list.add(GalleryEntity(id, name, count, 0))
+      val entity = GalleryEntity(id, name, count, 0)
+      if (option.containsPathModified) {
+        injectModifiedDate(context, entity)
+      }
+      list.add(entity)
     }
 
     cursor.close()

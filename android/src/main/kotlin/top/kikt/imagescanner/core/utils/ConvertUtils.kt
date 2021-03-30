@@ -12,12 +12,16 @@ object ConvertUtils {
     val data = ArrayList<Map<String, Any>>()
 
     for (entity in list) {
-      val element = mapOf(
+      val element = mutableMapOf<String, Any>(
           "id" to entity.id,
           "name" to entity.name,
           "length" to entity.length,
           "isAll" to entity.isAll
       )
+
+      if (entity.modifiedDate != null) {
+        element["modified"] = entity.modifiedDate!!
+      }
 
       if (entity.length > 0) {
         data.add(element)
