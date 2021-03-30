@@ -81,4 +81,6 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (void)requestCacheAssetsThumb:(NSArray *)identifiers option:(PMThumbLoadOption *)option;
 
 - (void)cancelCacheRequests;
+
+- (void)injectModifyToDate:(PMAssetPathEntity *)path;
 @end

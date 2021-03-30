@@ -1329,4 +1329,23 @@
   [handler deinit];
 }
 
+
+#pragma mark inject modify date
+
+- (void)injectModifyToDate:(PMAssetPathEntity *)path {
+  NSString *pathId = path.id;
+  PHFetchResult<PHAssetCollection *> *fetchResult = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[pathId] options:nil];
+  if (fetchResult.count > 0) {
+    PHAssetCollection *collection = fetchResult.firstObject;
+
+    PHFetchOptions *options = [PHFetchOptions new];
+    NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"modificationDate" ascending:NO];
+    options.sortDescriptors = @[sortDescriptor];
+
+    PHFetchResult<PHAsset *> *assets = [PHAsset fetchAssetsInAssetCollection:collection options:options];
+    PHAsset *asset = assets.firstObject;
+    path.modifiedDate = (long) asset.modificationDate.timeIntervalSince1970;
+  }
+}
+
 @end

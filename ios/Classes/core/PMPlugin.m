@@ -97,8 +97,15 @@
         BOOL hasAll = [call.arguments[@"hasAll"] boolValue];
         BOOL onlyAll = [call.arguments[@"onlyAll"] boolValue];
         PMFilterOptionGroup *option =
-                [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
+            [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
         NSArray<PMAssetPathEntity *> *array = [manager getGalleryList:type hasAll:hasAll onlyAll:onlyAll option:option];
+
+        if (option.containsModified) {
+          for (PMAssetPathEntity *path in array) {
+            [manager injectModifyToDate:path];
+          }
+        }
+
         NSDictionary *dictionary = [PMConvertUtils convertPathToMap:array];
         [handler reply:dictionary];
 
@@ -150,11 +157,14 @@
         NSString *id = call.arguments[@"id"];
         int requestType = [call.arguments[@"type"] intValue];
         PMFilterOptionGroup *option =
-                [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
+            [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
         PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id type:requestType filterOption:option];
+        if (option.containsModified) {
+          [manager injectModifyToDate:pathEntity];
+        }
         if (pathEntity) {
           NSDictionary *dictionary =
-                  [PMConvertUtils convertPathToMap:@[pathEntity]];
+              [PMConvertUtils convertPathToMap:@[pathEntity]];
           [handler reply:dictionary];
         } else {
           [handler reply:nil];

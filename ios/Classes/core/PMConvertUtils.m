@@ -16,14 +16,21 @@
 
   for (PMAssetPathEntity *entity in array) {
     NSDictionary *item = @{
-            @"id": entity.id,
-            @"name": entity.name,
-            @"length": @(entity.assetCount),
-            @"isAll": @(entity.isAll),
-            @"albumType": @(entity.type),
+        @"id": entity.id,
+        @"name": entity.name,
+        @"length": @(entity.assetCount),
+        @"isAll": @(entity.isAll),
+        @"albumType": @(entity.type),
     };
 
-    [data addObject:item];
+    NSMutableDictionary *params = [NSMutableDictionary new];
+    [params addEntriesFromDictionary:item];
+
+    if (entity.modifiedDate != 0) {
+      params[@"modified"] = @(entity.modifiedDate);
+    }
+
+    [data addObject:params];
   }
 
   return @{@"data": data};
@@ -112,6 +119,7 @@
   container.dateOption = [self convertMapToPMDateOption:map[@"createDate"]];
   container.updateOption = [self convertMapToPMDateOption:map[@"updateDate"]];
   container.containsEmptyAlbum = [map[@"containsEmptyAlbum"] boolValue];
+  container.containsModified = [map[@"containsPathModified"] boolValue];
 
   NSArray *sortArray = map[@"orders"];
   [container injectSortArray: sortArray];
