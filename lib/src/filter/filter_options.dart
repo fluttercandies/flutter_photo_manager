@@ -8,6 +8,11 @@ import '../type.dart';
 ///
 /// See [FilterOption]
 class FilterOptionGroup {
+  static final _defaultOrderOption = OrderOption(
+    type: OrderOptionType.updateDate,
+    asc: false,
+  );
+
   FilterOptionGroup();
 
   final Map<AssetType, FilterOption> _map = {
@@ -40,12 +45,7 @@ class FilterOptionGroup {
     _map[type] = option;
   }
 
-  final orders = <OrderOption>[
-    OrderOption(
-      type: OrderOptionType.createDate,
-      asc: false,
-    ),
-  ];
+  final orders = <OrderOption>[];
 
   void addOrderOption(OrderOption option) {
     orders.add(option);
@@ -73,7 +73,13 @@ class FilterOptionGroup {
     result["createDate"] = createTimeCond.toMap();
     result["updateDate"] = updateTimeCond.toMap();
     result['containsEmptyAlbum'] = containsEmptyAlbum;
-    result['orders'] = orders.map((e) => e.toMap()).toList();
+
+    final ordersList = List<OrderOption>.of(orders);
+    if (ordersList.isEmpty) {
+      ordersList.add(_defaultOrderOption);
+    }
+
+    result['orders'] = ordersList.map((e) => e.toMap()).toList();
 
     return result;
   }

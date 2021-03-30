@@ -58,7 +58,7 @@ object AndroidQDBUtils : IDBUtils {
 
     val selections = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
 
-    val cursor = context.contentResolver.query(allUri, galleryKeys, selections, args.toTypedArray(), null)
+    val cursor = context.contentResolver.query(allUri, galleryKeys, selections, args.toTypedArray(), option.orderByCondString())
         ?: return list
 
     LogUtils.logCursor(cursor)
@@ -105,7 +105,7 @@ object AndroidQDBUtils : IDBUtils {
 
     val selections = "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
 
-    val cursor = context.contentResolver.query(allUri, galleryKeys, selections, args.toTypedArray(), null)
+    val cursor = context.contentResolver.query(allUri, galleryKeys, selections, args.toTypedArray(), option.orderByCondString())
         ?: return list
 
     cursor.use {
@@ -207,7 +207,7 @@ object AndroidQDBUtils : IDBUtils {
   private fun convertCursorToAssetEntity(cursor: Cursor): AssetEntity {
     val id = cursor.getString(MediaStore.MediaColumns._ID)
     val path = cursor.getString(MediaStore.MediaColumns.DATA)
-    val date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
+    val date = cursor.getLong(MediaStore.Images.Media.DATE_ADDED)
     val type = cursor.getInt(MEDIA_TYPE)
     val mimeType = cursor.getString(MIME_TYPE)
 

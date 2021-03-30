@@ -209,7 +209,7 @@ class PhotoProvider extends ChangeNotifier {
       ..containsEmptyAlbum = _containsEmptyAlbum
       ..addOrderOption(
         OrderOption(
-          type: OrderOptionType.createDate,
+          type: OrderOptionType.updateDate,
           asc: asc,
         ),
       );

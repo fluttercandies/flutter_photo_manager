@@ -36,6 +36,7 @@ interface IDBUtils {
         MediaStore.MediaColumns.WIDTH, // 宽
         MediaStore.MediaColumns.HEIGHT, // 高
         MediaStore.MediaColumns.ORIENTATION, // 角度
+        DATE_ADDED,
         MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
         MediaStore.MediaColumns.MIME_TYPE, // mime type
         MediaStore.MediaColumns.DATE_TAKEN //日期

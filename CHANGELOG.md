@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [1.0.7](#107)
   - [1.0.6](#106)
   - [1.0.4](#104)
   - [1.0.3](#103)
@@ -50,6 +51,10 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 1.0.7
+
+- Fix: Order option of the `FilterOptionGroup`.
 
 ## 1.0.6
 

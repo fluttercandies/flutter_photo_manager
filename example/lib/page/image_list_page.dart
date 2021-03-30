@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_scanner_example/develop/upload_to_dev_serve.dart';
 import 'package:image_scanner_example/model/photo_provider.dart';
 import 'package:image_scanner_example/page/detail_page.dart';
+import 'package:image_scanner_example/util/common_util.dart';
 import 'package:image_scanner_example/widget/change_notifier_builder.dart';
 import 'package:image_scanner_example/widget/dialog/list_dialog.dart';
 import 'package:image_scanner_example/widget/image_item_widget.dart';
@@ -177,6 +178,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               ElevatedButton(
                 child: Text("Show detail page"),
                 onPressed: () => routeToDetailPage(entity),
+              ),
+              ElevatedButton(
+                child: Text("Show info dialog"),
+                onPressed: () => CommonUtil.showInfoDialog(context, entity),
               ),
               ElevatedButton(
                 child: Text("show 500 size thumb "),
