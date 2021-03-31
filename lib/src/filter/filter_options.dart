@@ -30,7 +30,7 @@ class FilterOptionGroup {
 
   /// If true, the [AssetPathEntity] will return with the last modified time.
   ///
-  /// See [AssetPathEntity.modifiedDate]
+  /// See [AssetPathEntity.lastModified]
   ///
   /// This is a performance consuming option. Only if you really need it, it is recommended to set it to true.
   bool containsPathModified = false;

@@ -74,7 +74,7 @@ class GalleryItemWidget extends StatelessWidget {
                 ElevatedButton(
                   child: Text("Show modified date"),
                   onPressed: () async {
-                    showToast('modified date = ${item.modifiedDate}');
+                    showToast('modified date = ${item.lastModified}');
                   },
                 ),
               ],
