@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:photo_manager/photo_manager.dart';
-
 import '../type.dart';
 
 /// Filter option for get asset.
