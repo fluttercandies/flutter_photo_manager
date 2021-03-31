@@ -65,6 +65,7 @@ class FilterOptionGroup {
       _map[type] = _map[type]!.merge(other.getOption(type));
     }
     this.containsEmptyAlbum = other.containsEmptyAlbum;
+    this.containsPathModified = other.containsPathModified;
   }
 
   Map<String, dynamic> toMap() {
@@ -101,6 +102,7 @@ class FilterOptionGroup {
     DateTimeCond? createTimeCond,
     DateTimeCond? updateTimeCond,
     bool? containsEmptyAlbum,
+    bool? containsPathModified,
     List<OrderOption>? orders,
   }) {
     imageOption ??= _map[AssetType.image];
@@ -111,6 +113,7 @@ class FilterOptionGroup {
     updateTimeCond ??= this.updateTimeCond;
 
     containsEmptyAlbum ??= this.containsEmptyAlbum;
+    containsPathModified ??= this.containsPathModified;
 
     orders ??= this.orders;
 
@@ -124,6 +127,7 @@ class FilterOptionGroup {
     result.updateTimeCond = updateTimeCond;
 
     result.containsEmptyAlbum = containsEmptyAlbum;
+    result.containsPathModified = containsPathModified;
 
     result.orders.addAll(orders);
 
