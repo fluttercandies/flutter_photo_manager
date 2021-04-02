@@ -49,6 +49,7 @@ class _NewHomePageState extends State<NewHomePage> {
             _buildHasAllCheck(),
             _buildOnlyAllCheck(),
             _buildContainsEmptyCheck(),
+            _buildPathContainsModifiedDateCheck(),
             _buildPngCheck(),
             _buildNotifyCheck(),
             _buildFilterOption(watchProvider),
@@ -149,6 +150,16 @@ class _NewHomePageState extends State<NewHomePage> {
         readProvider.changeContainsEmptyAlbum(value);
       },
       title: Text("contains empty album(only iOS)"),
+    );
+  }
+
+  Widget _buildPathContainsModifiedDateCheck() {
+    return CheckboxListTile(
+      value: watchProvider.containsPathModified,
+      onChanged: (value) {
+        readProvider.changeContainsPathModified(value);
+      },
+      title: Text("contains path modified date"),
     );
   }
 

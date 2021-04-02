@@ -71,6 +71,12 @@ class GalleryItemWidget extends StatelessWidget {
                     PhotoManager.editor.iOS.deletePath(path);
                   },
                 ),
+                ElevatedButton(
+                  child: Text("Show modified date"),
+                  onPressed: () async {
+                    showToast('modified date = ${item.lastModified}');
+                  },
+                ),
               ],
             );
           },

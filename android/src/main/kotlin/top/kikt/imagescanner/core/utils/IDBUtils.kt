@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.*
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import androidx.exifinterface.media.ExifInterface
+import top.kikt.imagescanner.core.PhotoManager
 import top.kikt.imagescanner.core.cache.CacheContainer
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.DateCond
@@ -479,5 +480,27 @@ interface IDBUtils {
     return list
   }
 
+  fun injectModifiedDate(context: Context, entity: GalleryEntity) {
+    val modifiedDate = getPathModifiedDate(context, entity.id)
+    entity.modifiedDate = modifiedDate
+  }
 
+  @SuppressLint("Recycle")
+  fun getPathModifiedDate(context: Context, pathId: String): Long {
+    val columns = arrayOf(MediaStore.MediaColumns.DATE_MODIFIED)
+    val sortOrder = "${MediaStore.MediaColumns.DATE_MODIFIED} desc"
+    val cursor =
+        if (pathId == PhotoManager.ALL_ID) {
+          context.contentResolver.query(allUri, columns, null, null, sortOrder)
+        } else {
+          context.contentResolver.query(allUri, columns, "${MediaStore.MediaColumns.BUCKET_ID} = ?", arrayOf(pathId), sortOrder)
+              ?: return 0
+        }
+    cursor?.use {
+      if (cursor.moveToNext()) {
+        return cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
+      }
+    }
+    return 0
+  }
 }

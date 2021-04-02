@@ -26,6 +26,13 @@ class FilterOptionGroup {
   /// Whether to include an empty album
   bool containsEmptyAlbum = false;
 
+  /// If true, the [AssetPathEntity] will return with the last modified time.
+  ///
+  /// See [AssetPathEntity.lastModified]
+  ///
+  /// This is a performance consuming option. Only if you really need it, it is recommended to set it to true.
+  bool containsPathModified = false;
+
   @Deprecated('Please use createTimeCond.')
   DateTimeCond get dateTimeCond => createTimeCond;
 
@@ -56,6 +63,7 @@ class FilterOptionGroup {
       _map[type] = _map[type]!.merge(other.getOption(type));
     }
     this.containsEmptyAlbum = other.containsEmptyAlbum;
+    this.containsPathModified = other.containsPathModified;
   }
 
   Map<String, dynamic> toMap() {
@@ -73,6 +81,7 @@ class FilterOptionGroup {
     result["createDate"] = createTimeCond.toMap();
     result["updateDate"] = updateTimeCond.toMap();
     result['containsEmptyAlbum'] = containsEmptyAlbum;
+    result['containsPathModified'] = containsPathModified;
 
     final ordersList = List<OrderOption>.of(orders);
     if (ordersList.isEmpty) {
@@ -91,6 +100,7 @@ class FilterOptionGroup {
     DateTimeCond? createTimeCond,
     DateTimeCond? updateTimeCond,
     bool? containsEmptyAlbum,
+    bool? containsPathModified,
     List<OrderOption>? orders,
   }) {
     imageOption ??= _map[AssetType.image];
@@ -101,6 +111,7 @@ class FilterOptionGroup {
     updateTimeCond ??= this.updateTimeCond;
 
     containsEmptyAlbum ??= this.containsEmptyAlbum;
+    containsPathModified ??= this.containsPathModified;
 
     orders ??= this.orders;
 
@@ -114,6 +125,7 @@ class FilterOptionGroup {
     result.updateTimeCond = updateTimeCond;
 
     result.containsEmptyAlbum = containsEmptyAlbum;
+    result.containsPathModified = containsPathModified;
 
     result.orders.addAll(orders);
 

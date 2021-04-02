@@ -38,6 +38,15 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _containsPathModified = false;
+
+  bool get containsPathModified => _containsPathModified;
+
+  set containsPathModified(bool containsPathModified) {
+    _containsPathModified = containsPathModified;
+    notifyListeners();
+  }
+
   DateTime _startDt = DateTime(2005); // Default Before 8 years
 
   DateTime get startDt => _startDt;
@@ -150,6 +159,13 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void changeContainsPathModified(bool? value) {
+    if (value == null) {
+      return;
+    }
+    this.containsPathModified = value;
+  }
+
   void reset() {
     this.list.clear();
     pathProviderMap.clear();
@@ -207,6 +223,7 @@ class PhotoProvider extends ChangeNotifier {
       ..setOption(AssetType.audio, option)
       ..createTimeCond = createDtCond
       ..containsEmptyAlbum = _containsEmptyAlbum
+      ..containsPathModified = _containsPathModified
       ..addOrderOption(
         OrderOption(
           type: OrderOptionType.updateDate,

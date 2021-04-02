@@ -84,6 +84,11 @@ object Android30DbUtils : IDBUtils {
       val count = countMap[id]!!
 
       val entity = GalleryEntity(id, name, count, requestType, false)
+
+      if (option.containsPathModified) {
+        injectModifiedDate(context, entity)
+      }
+
       list.add(entity)
     }
 

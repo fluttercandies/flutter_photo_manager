@@ -12,7 +12,9 @@ class FilterOption(map: Map<*, *>) {
   val createDateCond = ConvertUtils.convertToDateCond(map["createDate"] as Map<*, *>)
   val updateDateCond = ConvertUtils.convertToDateCond(map["updateDate"] as Map<*, *>)
 
-  private val orderByCond :List<OrderByCond> = ConvertUtils.convertOrderByCondList(map["orders"] as List<*>)
+  private val orderByCond: List<OrderByCond> = ConvertUtils.convertOrderByCondList(map["orders"] as List<*>)
+
+  val containsPathModified = map["containsPathModified"] as Boolean
 
   fun orderByCondString(): String? {
     if (orderByCond.isEmpty()) {
@@ -34,6 +36,7 @@ class FilterCond {
   companion object {
     private const val widthKey = MediaStore.Files.FileColumns.WIDTH
     private const val heightKey = MediaStore.Files.FileColumns.HEIGHT
+
     @SuppressLint("InlinedApi")
     private const val durationKey = MediaStore.Video.VideoColumns.DURATION
   }
@@ -75,14 +78,14 @@ class FilterCond {
 }
 
 data class DateCond(
-        val minMs: Long,
-        val maxMs: Long,
-        val ignore: Boolean
+    val minMs: Long,
+    val maxMs: Long,
+    val ignore: Boolean
 )
 
 data class OrderByCond(
-        val key: String,
-        val asc: Boolean
+    val key: String,
+    val asc: Boolean
 ) {
   fun getOrder(): String {
     val ascValue = if (asc) {
