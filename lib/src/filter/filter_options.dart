@@ -13,13 +13,32 @@ class FilterOptionGroup {
     asc: false,
   );
 
-  FilterOptionGroup();
+  FilterOptionGroup({
+    FilterOption imageOption = const FilterOption(),
+    FilterOption videoOption = const FilterOption(),
+    FilterOption audioOption = const FilterOption(),
+    bool containsEmptyAlbum = false,
+    bool containsPathModified = false,
+    DateTimeCond? createTimeCond,
+    DateTimeCond? updateTimeCond,
+    List<OrderOption> orders = const [],
+  }) {
+    _map[AssetType.image] = imageOption;
+    _map[AssetType.video] = videoOption;
+    _map[AssetType.audio] = audioOption;
+    this.containsEmptyAlbum = containsEmptyAlbum;
+    this.containsPathModified = containsPathModified;
+    this.createTimeCond = createTimeCond ?? DateTimeCond.def();
+    this.updateTimeCond = createTimeCond ??
+        DateTimeCond.def().copyWith(
+          ignore: true,
+        );
+    this.orders.addAll(orders);
+  }
 
-  final Map<AssetType, FilterOption> _map = {
-    AssetType.image: FilterOption(),
-    AssetType.video: FilterOption(),
-    AssetType.audio: FilterOption(),
-  };
+  FilterOptionGroup.empty();
+
+  final Map<AssetType, FilterOption> _map = {};
 
   /// 是否包含空相册
   ///
