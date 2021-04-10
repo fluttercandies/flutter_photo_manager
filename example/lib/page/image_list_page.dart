@@ -17,6 +17,7 @@ import 'package:provider/provider.dart';
 
 import 'copy_to_another_gallery_example.dart';
 import 'move_to_another_gallery_example.dart';
+import 'dart:ui' as ui;
 
 class GalleryContentListPage extends StatefulWidget {
   const GalleryContentListPage({
@@ -204,6 +205,11 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               ElevatedButton(
                 child: Text("Test progress"),
                 onPressed: () => testProgressHandler(entity),
+              ),
+              ElevatedButton(
+                child: Text("Test thumb size"),
+                onPressed: () =>
+                    testThumbSize(entity, [500, 600, 700, 1000, 1500, 2000]),
               ),
             ],
           ),
@@ -395,7 +401,8 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               height: 500,
               deliveryMode: DeliveryMode.opportunistic,
               resizeMode: ResizeMode.fast,
-              resizeContentMode: ResizeContentMode.fill,
+              resizeContentMode: ResizeContentMode.fit,
+              // resizeContentMode: ResizeContentMode.fill,
             ),
           ),
           builder: (BuildContext context, snapshot) {
@@ -403,7 +410,12 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             if (snapshot.hasError) {
               return ErrorWidget(snapshot.error!);
             } else if (snapshot.hasData) {
-              w = Image.memory(snapshot.data!);
+              final data = snapshot.data!;
+              ui.decodeImageFromList(data, (result) {
+                print('result size: ${result.width}x${result.height}');
+                // for 4288x2848
+              });
+              w = Image.memory(data);
             } else {
               w = Center(
                 child: Container(
@@ -445,5 +457,22 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       isOrigin: true,
     );
     print('file = $file');
+  }
+
+  testThumbSize(AssetEntity entity, List<int> list) async {
+    for (final size in list) {
+      final data = await entity.thumbDataWithOption(ThumbOption.ios(
+        width: size,
+        height: size,
+        resizeMode: ResizeMode.exact,
+      ));
+      if (data == null) {
+        return;
+      }
+      ui.decodeImageFromList(data, (result) {
+        print(
+            'size:$size length:${data.length}, size: ${result.width}x${result.height}');
+      });
+    }
   }
 }

@@ -14,7 +14,7 @@ class ThumbOption {
     ThumbFormat format = ThumbFormat.jpeg,
     int quality = 95,
     DeliveryMode deliveryMode = DeliveryMode.opportunistic,
-    ResizeMode resizeMode = ResizeMode.none,
+    ResizeMode resizeMode = ResizeMode.fast,
     ResizeContentMode resizeContentMode = ResizeContentMode.fit,
   }) {
     return _IosThumbOption(
