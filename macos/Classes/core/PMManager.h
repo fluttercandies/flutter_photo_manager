@@ -13,6 +13,8 @@ typedef void (^ChangeIds)(NSArray<NSString *> *);
 @class ResultHandler;
 @class PMFilterOption;
 @class PMFilterOptionGroup;
+@class PMThumbLoadOption;
+@class PMProgressHandler;
 
 typedef void (^AssetResult)(PMAssetEntity *);
 
@@ -32,11 +34,9 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (void)clearCache;
 
-- (void)getThumbWithId:(NSString *)id width:(NSUInteger)width height:(NSUInteger)height format:(NSUInteger)format quality:(NSUInteger)quality resultHandler:(ResultHandler *)handler;
+- (void)getThumbWithId:(NSString *)id1 option:(PMThumbLoadOption *)option resultHandler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler;
 
-- (void)getFullSizeFileWithId:(NSString *)id
-                     isOrigin:(BOOL)isOrigin
-                resultHandler:(ResultHandler *)handler;
+- (void)getFullSizeFileWithId:(NSString *)id isOrigin:(BOOL)isOrigin resultHandler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler;
 
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type filterOption:(PMFilterOptionGroup *)filterOption;
 
@@ -75,4 +75,12 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (void)removeCollectionWithId:(NSString *)id type:(int)type block:(void (^)(NSString *))block;
 
 - (BOOL)favoriteWithId:(NSString *)id favorite:(BOOL)favorite;
+
+- (void)clearFileCache;
+
+- (void)requestCacheAssetsThumb:(NSArray *)identifiers option:(PMThumbLoadOption *)option;
+
+- (void)cancelCacheRequests;
+
+- (void)injectModifyToDate:(PMAssetPathEntity *)path;
 @end
