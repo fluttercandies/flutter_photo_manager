@@ -16,7 +16,7 @@
 #import "MD5Utils.h"
 #import "PMThumbLoadOption.h"
 #import "PMProgressHandler.h"
-#import "NSImageUtil.h"
+#import "PMImageUtil.h"
 
 @implementation PMManager {
   BOOL __isAuth;
@@ -366,7 +366,7 @@
                      targetSize:CGSizeMake(width, height)
                     contentMode:option.contentMode
                         options:requestOptions
-                  resultHandler:^(NSImage *result, NSDictionary *info) {
+                  resultHandler:^(PMImage *result, NSDictionary *info) {
                     BOOL downloadFinished = [PMManager isDownloadFinish:info];
 
                     if (!downloadFinished) {
@@ -376,7 +376,7 @@
                     if ([handler isReplied]) {
                       return;
                     }
-                    NSData *imageData = [NSImageUtil convertToData:result formatType:option.format quality:option.quality];
+                    NSData *imageData = [PMImageUtil convertToData:result formatType:option.format quality:option.quality];
 
                     FlutterStandardTypedData *data = [FlutterStandardTypedData typedDataWithBytes:imageData];
                     [handler reply:data];
@@ -582,7 +582,7 @@
                      targetSize:PHImageManagerMaximumSize
                     contentMode:PHImageContentModeDefault
                         options:options
-                  resultHandler:^(NSImage *_Nullable image,
+                  resultHandler:^(PMImage *_Nullable image,
                       NSDictionary *_Nullable info) {
 
                     BOOL downloadFinished = [PMManager isDownloadFinish:info];
@@ -594,7 +594,7 @@
                       return;
                     }
 
-                    NSData *data = [NSImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
+                    NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
 
                     NSString *path = [self writeFullFileWithAssetId:asset imageData: data];
 

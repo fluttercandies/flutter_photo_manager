@@ -1,15 +1,15 @@
 //
-//  NSImageUtil.m
+//  PMImageUtil.m
 //  path_provider_macos
 //
 //  Created by jinglong cai on 2021/4/12.
 //
 
-#import "NSImageUtil.h"
+#import "PMImageUtil.h"
 
-@implementation NSImageUtil
+@implementation PMImageUtil
 
-+ (NSData *)convertToData:(NSImage *)image formatType:(PMThumbFormatType)type quality:(float)quality {
++ (NSData *)convertToData:(PMImage *)image formatType:(PMThumbFormatType)type quality:(float)quality {
   NSData *imageData = [image TIFFRepresentation];
   NSBitmapImageRep *imageRep = [NSBitmapImageRep imageRepWithData:imageData];
   NSData *resultData;
