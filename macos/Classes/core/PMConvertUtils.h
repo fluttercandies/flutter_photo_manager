@@ -9,7 +9,7 @@
 @class PMFilterOption;
 @class PMFilterOptionGroup;
 
-@interface ConvertUtils : NSObject
+@interface PMConvertUtils : NSObject
 
 + (NSDictionary *)convertPathToMap:(NSArray<PMAssetPathEntity *> *)array;
 

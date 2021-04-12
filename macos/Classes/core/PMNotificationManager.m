@@ -3,10 +3,7 @@
 //
 
 #import "PMNotificationManager.h"
-#import "ConvertUtils.h"
-#import <FlutterMacOS/FlutterMacOS.h>
-#import <Photos/PHPhotoLibrary.h>
-#import <Photos/Photos.h>
+#import "PMConvertUtils.h"
 
 @interface PMNotificationManager () <PHPhotoLibraryChangeObserver>
 @end
