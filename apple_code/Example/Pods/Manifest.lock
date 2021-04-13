@@ -1,0 +1,16 @@
+PODS:
+  - photo_manager (1.0.0)
+
+DEPENDENCIES:
+  - photo_manager (from `../..`)
+
+EXTERNAL SOURCES:
+  photo_manager:
+    :path: "../.."
+
+SPEC CHECKSUMS:
+  photo_manager: 92b145a16bd9711030dcb96967981a908fc238f1
+
+PODFILE CHECKSUM: 09c310a5814cd2367b8f44cff5059e3b846c8691
+
+COCOAPODS: 1.9.3

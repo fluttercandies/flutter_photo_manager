@@ -1,0 +1,6 @@
+framework module photo_manager {
+  umbrella header "photo_manager-umbrella.h"
+
+  export *
+  module * { export * }
+}

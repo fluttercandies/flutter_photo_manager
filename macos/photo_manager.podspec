@@ -3,6 +3,10 @@
 # Run `pod lib lint flutter_photo_manager.podspec' to validate before publishing.
 #
 Pod::Spec.new do |s|
+  puts RUBY_PLATFORM.index('darwin')
+  a = 0x11
+  puts("target.platform_name = #{a}")
+  
   s.name             = 'photo_manager'
   s.version          = '0.0.1'
   s.summary          = 'A new flutter plugin project.'

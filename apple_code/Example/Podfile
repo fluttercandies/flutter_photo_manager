@@ -1,0 +1,11 @@
+use_frameworks!
+
+platform :ios, '9.0'
+
+target 'photo_manager_Example' do
+  pod 'photo_manager', :path => '../..'
+
+  target 'photo_manager_Tests' do
+    inherit! :search_paths
+  end
+end

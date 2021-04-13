@@ -3,7 +3,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <FlutterMacOS/FlutterMacOS.h>
+#import "PMImport.h"
 
 @interface PhotoChangeObserver : NSObject
 - (void)initWithRegister:(NSObject <FlutterPluginRegistrar> *)registrar;
