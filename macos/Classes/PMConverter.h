@@ -3,7 +3,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PMConvertProtocol.h"
+#import <photo_manager_core/photo_manager_core-umbrella.h>
 
 @interface PMConverter : NSObject <PMConvertProtocol>
 

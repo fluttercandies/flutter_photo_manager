@@ -3,10 +3,6 @@
 # Run `pod lib lint flutter_photo_manager.podspec' to validate before publishing.
 #
 Pod::Spec.new do |s|
-  puts RUBY_PLATFORM.index('darwin')
-  a = 0x11
-  puts("target.platform_name = #{a}")
-  
   s.name             = 'photo_manager'
   s.version          = '0.0.1'
   s.summary          = 'A new flutter plugin project.'
@@ -20,6 +16,7 @@ A new flutter plugin project.
   s.source_files     = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h','Classes/**/**/*.h'
   s.dependency 'FlutterMacOS'
+  s.dependency 'photo_manager_core'
 
   s.platform = :osx, '10.15'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }

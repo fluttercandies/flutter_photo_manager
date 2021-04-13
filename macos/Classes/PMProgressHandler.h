@@ -6,8 +6,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <photo_manager_core/photo_manager_core-umbrella.h>
 #import "PMImport.h"
-#import "PMProgressHandlerProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

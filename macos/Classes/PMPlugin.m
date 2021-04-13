@@ -12,6 +12,7 @@
 #import "ResultHandler.h"
 #import "PMThumbLoadOption.h"
 #import "PMProgressHandler.h"
+#import "PMConverter.h"
 
 @implementation PMPlugin {
   BOOL ignoreCheckPermission;
@@ -26,7 +27,7 @@
       [FlutterMethodChannel methodChannelWithName:@"top.kikt/photo_manager"
                                   binaryMessenger:[registrar messenger]];
   PMManager *manager = [PMManager new];
-  manager.converter = ;
+  manager.converter = [PMConverter new];
   [self setManager:manager];
   [channel
       setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
