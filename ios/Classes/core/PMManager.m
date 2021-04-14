@@ -9,13 +9,12 @@
 #import "PMCacheContainer.h"
 #import "PMFilterOption.h"
 #import "PMLogUtils.h"
-#import "ResultHandler.h"
 #import "PMRequestTypeUtils.h"
 #import "NSString+PM_COMMON.h"
 #import "PMFolderUtils.h"
 #import "MD5Utils.h"
 #import "PMThumbLoadOption.h"
-#import "PMProgressHandler.h"
+#import "PMImageUtil.h"
 
 @implementation PMManager {
   BOOL __isAuth;
@@ -52,9 +51,9 @@
 
   if (onlyAll) {
     PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection
-            fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
-                                  subtype:PHAssetCollectionSubtypeAlbumRegular
-                                  options:fetchCollectionOptions];
+        fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
+                              subtype:PHAssetCollectionSubtypeAlbumRegular
+                              options:fetchCollectionOptions];
 
     if (result && result.count) {
       for (PHAssetCollection *collection in result) {
@@ -129,8 +128,7 @@
                           result:(PHFetchResult *)result
                          options:(PHFetchOptions *)options
                           hasAll:(BOOL)hasAll
-              containsEmptyAlbum:(BOOL)containsEmptyAlbum
-{
+              containsEmptyAlbum:(BOOL)containsEmptyAlbum {
   for (id collection in result) {
     if (![collection isMemberOfClass:[PHAssetCollection class]]) {
       continue;
@@ -139,21 +137,21 @@
     PHAssetCollection *assetCollection = (PHAssetCollection *) collection;
 
     if (assetCollection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumRecentlyAdded
-            || assetCollection.assetCollectionSubtype == 1000000201) {// Recently Deleted
+        || assetCollection.assetCollectionSubtype == 1000000201) {// Recently Deleted
       continue;
     }
 
 
     PHFetchResult<PHAsset *> *fetchResult =
-            [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
+        [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
 
     PMAssetPathEntity *entity =
-            [PMAssetPathEntity entityWithId:assetCollection.localIdentifier
-                                       name:assetCollection.localizedTitle
-                                 assetCount:(int) fetchResult.count];
+        [PMAssetPathEntity entityWithId:assetCollection.localIdentifier
+                                   name:assetCollection.localizedTitle
+                             assetCount:(int) fetchResult.count];
 
     entity.isAll = assetCollection.assetCollectionSubtype ==
-            PHAssetCollectionSubtypeSmartAlbumUserLibrary;
+        PHAssetCollectionSubtypeSmartAlbumUserLibrary;
 
     if (!hasAll && entity.isAll) {
       continue;
@@ -161,7 +159,7 @@
 
     if (entity.assetCount && entity.assetCount > 0) {
       [array addObject:entity];
-    } else if(containsEmptyAlbum && assetCollection.assetCollectionType == PHAssetCollectionTypeAlbum){
+    } else if (containsEmptyAlbum && assetCollection.assetCollectionType == PHAssetCollectionTypeAlbum) {
       [array addObject:entity];
     }
   }
@@ -175,8 +173,8 @@
   PHFetchOptions *options = [PHFetchOptions new];
 
   PHFetchResult<PHAssetCollection *> *fetchResult =
-          [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[id]
-                                                               options:options];
+      [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[id]
+                                                           options:options];
   if (fetchResult && fetchResult.count == 0) {
     return result;
   }
@@ -186,7 +184,7 @@
   PHAssetCollection *collection = fetchResult.firstObject;
 
   PHFetchResult<PHAsset *> *assetArray =
-          [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
+      [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
 
   if (assetArray.count == 0) {
     return result;
@@ -225,8 +223,8 @@
   PHFetchOptions *options = [PHFetchOptions new];
 
   PHFetchResult<PHAssetCollection *> *fetchResult =
-          [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[id]
-                                                               options:options];
+      [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[id]
+                                                           options:options];
   if (fetchResult && fetchResult.count == 0) {
     return result;
   }
@@ -235,7 +233,7 @@
 
   PHAssetCollection *collection = fetchResult.firstObject;
   PHFetchResult<PHAsset *> *assetArray =
-          [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
+      [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
 
   if (assetArray.count == 0) {
     return result;
@@ -310,7 +308,7 @@
     return entity;
   }
   PHFetchResult<PHAsset *> *result =
-          [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil];
+      [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil];
   if (result == nil || result.count == 0) {
     return nil;
   }
@@ -325,7 +323,7 @@
   [cacheContainer clearCache];
 }
 
-- (void)getThumbWithId:(NSString *)id1 option:(PMThumbLoadOption *)option resultHandler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler {
+- (void)getThumbWithId:(NSString *)id1 option:(PMThumbLoadOption *)option resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
   PMAssetEntity *entity = [self getAssetEntity:id1];
   if (entity && entity.phAsset) {
     PHAsset *asset = entity.phAsset;
@@ -335,7 +333,7 @@
   }
 }
 
-- (void)fetchThumb:(PHAsset *)asset option:(PMThumbLoadOption *)option resultHandler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler {
+- (void)fetchThumb:(PHAsset *)asset option:(PMThumbLoadOption *)option resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
   PHImageManager *manager = PHImageManager.defaultManager;
   PHImageRequestOptions *requestOptions = [PHImageRequestOptions new];
   requestOptions.deliveryMode = option.deliveryMode;
@@ -361,11 +359,12 @@
   }];
   int width = option.width;
   int height = option.height;
+
   [manager requestImageForAsset:asset
                      targetSize:CGSizeMake(width, height)
                     contentMode:option.contentMode
                         options:requestOptions
-                  resultHandler:^(UIImage *result, NSDictionary *info) {
+                  resultHandler:^(PMImage *result, NSDictionary *info) {
                     BOOL downloadFinished = [PMManager isDownloadFinish:info];
 
                     if (!downloadFinished) {
@@ -375,21 +374,17 @@
                     if ([handler isReplied]) {
                       return;
                     }
-                    NSData *imageData;
-                    if (option.format == PMThumbFormatTypePNG) {
-                      imageData = UIImagePNGRepresentation(result);
-                    } else {
-                      imageData = UIImageJPEGRepresentation(result, option.quality);
-                    }
+                    NSData *imageData = [PMImageUtil convertToData:result formatType:option.format quality:option.quality];
 
-                    FlutterStandardTypedData *data = [FlutterStandardTypedData typedDataWithBytes:imageData];
+                    id data = [self.converter convertData:imageData];
                     [handler reply:data];
 
                     [self notifySuccess:progressHandler];
                   }];
+
 }
 
-- (void)getFullSizeFileWithId:(NSString *)id isOrigin:(BOOL)isOrigin resultHandler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler {
+- (void)getFullSizeFileWithId:(NSString *)id isOrigin:(BOOL)isOrigin resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
   PMAssetEntity *entity = [self getAssetEntity:id];
   if (entity && entity.phAsset) {
     PHAsset *asset = entity.phAsset;
@@ -404,7 +399,7 @@
       if (isOrigin) {
         [self fetchOriginImageFile:asset resultHandler:handler progressHandler:progressHandler];
       } else {
-        [self fetchFullSizeImageFile:asset resultHandler:handler  progressHandler:progressHandler];
+        [self fetchFullSizeImageFile:asset resultHandler:handler progressHandler:progressHandler];
       }
     }
   } else {
@@ -412,7 +407,7 @@
   }
 }
 
-- (void)fetchOriginVideoFile:(PHAsset *)asset handler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler {
+- (void)fetchOriginVideoFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
   NSArray<PHAssetResource *> *resources =
       [PHAssetResource assetResourcesForAsset:asset];
   // find asset
@@ -464,7 +459,7 @@
                    }];
 }
 
-- (void)fetchFullSizeVideo:(PHAsset *)asset handler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler {
+- (void)fetchFullSizeVideo:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
   NSString *homePath = NSTemporaryDirectory();
   NSFileManager *manager = NSFileManager.defaultManager;
 
@@ -556,7 +551,7 @@
   return path;
 }
 
-- (void)fetchFullSizeImageFile:(PHAsset *)asset resultHandler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler {
+- (void)fetchFullSizeImageFile:(PHAsset *)asset resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
   PHImageManager *manager = PHImageManager.defaultManager;
   PHImageRequestOptions *options = [PHImageRequestOptions new];
   options.synchronous = YES;
@@ -585,7 +580,7 @@
                      targetSize:PHImageManagerMaximumSize
                     contentMode:PHImageContentModeDefault
                         options:options
-                  resultHandler:^(UIImage *_Nullable image,
+                  resultHandler:^(PMImage *_Nullable image,
                       NSDictionary *_Nullable info) {
 
                     BOOL downloadFinished = [PMManager isDownloadFinish:info];
@@ -597,7 +592,9 @@
                       return;
                     }
 
-                    NSString *path = [self writeFullFileWithAssetId:asset imageData:UIImageJPEGRepresentation(image, 1.0)];
+                    NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
+
+                    NSString *path = [self writeFullFileWithAssetId:asset imageData: data];
 
                     [handler reply:path];
                     [self notifySuccess:progressHandler];
@@ -634,7 +631,7 @@
   return resource.type == PHAssetResourceTypePhoto || resource.type == PHAssetResourceTypeFullSizePhoto;
 }
 
-- (void)fetchOriginImageFile:(PHAsset *)asset resultHandler:(ResultHandler *)handler progressHandler:(PMProgressHandler *)progressHandler {
+- (void)fetchOriginImageFile:(PHAsset *)asset resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
   PHAssetResource *imageResource = [asset getAdjustResource];
 
   if (!imageResource) {
@@ -677,15 +674,15 @@
 
 + (BOOL)isDownloadFinish:(NSDictionary *)info {
   return ![info[PHImageCancelledKey] boolValue] &&      // No cancel.
-          !info[PHImageErrorKey] &&                      // Error.
-          ![info[PHImageResultIsDegradedKey] boolValue]; // thumbnail
+      !info[PHImageErrorKey] &&                      // Error.
+      ![info[PHImageResultIsDegradedKey] boolValue]; // thumbnail
 }
 
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type filterOption:(PMFilterOptionGroup *)filterOption {
   PHFetchOptions *collectionFetchOptions = [PHFetchOptions new];
   PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection
-          fetchAssetCollectionsWithLocalIdentifiers:@[id]
-                                            options:collectionFetchOptions];
+      fetchAssetCollectionsWithLocalIdentifiers:@[id]
+                                        options:collectionFetchOptions];
 
   if (result == nil || result.count == 0) {
     return nil;
@@ -693,7 +690,7 @@
   PHAssetCollection *collection = result[0];
   PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:filterOption];
   PHFetchResult<PHAsset *> *fetchResult =
-          [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
+      [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
 
   return [PMAssetPathEntity entityWithId:id
                                     name:collection.localizedTitle
@@ -799,40 +796,40 @@
 #pragma ide diagnostic ignored "UnavailableInDeploymentTarget"
 
 + (void)openSetting {
-  NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-  if ([[UIApplication sharedApplication] canOpenURL:url]) {
-    if ([UIDevice currentDevice].systemVersion.floatValue >= 10.0) {
-      [[UIApplication sharedApplication] openURL:url
-                                         options:@{}
-                               completionHandler:^(BOOL success) {
-                               }];
-    } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-      [[UIApplication sharedApplication] openURL:url];
-#pragma clang diagnostic pop
-    }
-
-  }
+//  NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+//  if ([[UIApplication sharedApplication] canOpenURL:url]) {
+//    if ([UIDevice currentDevice].systemVersion.floatValue >= 10.0) {
+//      [[UIApplication sharedApplication] openURL:url
+//                                         options:@{}
+//                               completionHandler:^(BOOL success) {
+//                               }];
+//    } else {
+//#pragma clang diagnostic push
+//#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+//      [[UIApplication sharedApplication] openURL:url];
+//#pragma clang diagnostic pop
+//    }
+//
+//  }
 }
 
 #pragma clang diagnostic pop
 
 - (void)deleteWithIds:(NSArray<NSString *> *)ids changedBlock:(ChangeIds)block {
   [[PHPhotoLibrary sharedPhotoLibrary]
-          performChanges:^{
-              PHFetchResult<PHAsset *> *result =
-                      [PHAsset fetchAssetsWithLocalIdentifiers:ids
-                                                       options:[PHFetchOptions new]];
-              [PHAssetChangeRequest deleteAssets:result];
-          }
-       completionHandler:^(BOOL success, NSError *error) {
-           if (success) {
-             block(ids);
-           } else {
-             block(@[]);
-           }
-       }];
+      performChanges:^{
+        PHFetchResult<PHAsset *> *result =
+            [PHAsset fetchAssetsWithLocalIdentifiers:ids
+                                             options:[PHFetchOptions new]];
+        [PHAssetChangeRequest deleteAssets:result];
+      }
+   completionHandler:^(BOOL success, NSError *error) {
+     if (success) {
+       block(ids);
+     } else {
+       block(@[]);
+     }
+   }];
 }
 
 - (void)saveImage:(NSData *)data
@@ -844,26 +841,26 @@
   [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save image with data, length: %ld, title:%@, desc: %@", data.length, title, desc]];
 
   [[PHPhotoLibrary sharedPhotoLibrary]
-          performChanges:^{
-              PHAssetCreationRequest *request =
-                      [PHAssetCreationRequest creationRequestForAsset];
-              PHAssetResourceCreationOptions *options =
-                      [PHAssetResourceCreationOptions new];
-              [options setOriginalFilename:title];
-              [request addResourceWithType:PHAssetResourceTypePhoto
-                                      data:data
-                                   options:options];
-              assetId = request.placeholderForCreatedAsset.localIdentifier;
-          }
-       completionHandler:^(BOOL success, NSError *error) {
-           if (success) {
-             NSLog(@"create asset : id = %@", assetId);
-             block([self getAssetEntity:assetId]);
-           } else {
-             NSLog(@"create fail");
-             block(nil);
-           }
-       }];
+      performChanges:^{
+        PHAssetCreationRequest *request =
+            [PHAssetCreationRequest creationRequestForAsset];
+        PHAssetResourceCreationOptions *options =
+            [PHAssetResourceCreationOptions new];
+        [options setOriginalFilename:title];
+        [request addResourceWithType:PHAssetResourceTypePhoto
+                                data:data
+                             options:options];
+        assetId = request.placeholderForCreatedAsset.localIdentifier;
+      }
+   completionHandler:^(BOOL success, NSError *error) {
+     if (success) {
+       NSLog(@"create asset : id = %@", assetId);
+       block([self getAssetEntity:assetId]);
+     } else {
+       NSLog(@"create fail");
+       block(nil);
+     }
+   }];
 }
 
 - (void)saveImageWithPath:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(void (^)(PMAssetEntity *))block {
@@ -872,27 +869,27 @@
 
   __block NSString *assetId = nil;
   [[PHPhotoLibrary sharedPhotoLibrary]
-          performChanges:^{
-              PHAssetCreationRequest *request =
-                      [PHAssetCreationRequest creationRequestForAsset];
-              PHAssetResourceCreationOptions *options =
-                      [PHAssetResourceCreationOptions new];
-              [options setOriginalFilename:title];
-              NSData *data = [NSData dataWithContentsOfFile:path];
-              [request addResourceWithType:PHAssetResourceTypePhoto
-                                      data:data
-                                   options:options];
-              assetId = request.placeholderForCreatedAsset.localIdentifier;
-          }
-       completionHandler:^(BOOL success, NSError *error) {
-           if (success) {
-             NSLog(@"create asset : id = %@", assetId);
-             block([self getAssetEntity:assetId]);
-           } else {
-             NSLog(@"create fail");
-             block(nil);
-           }
-       }];
+      performChanges:^{
+        PHAssetCreationRequest *request =
+            [PHAssetCreationRequest creationRequestForAsset];
+        PHAssetResourceCreationOptions *options =
+            [PHAssetResourceCreationOptions new];
+        [options setOriginalFilename:title];
+        NSData *data = [NSData dataWithContentsOfFile:path];
+        [request addResourceWithType:PHAssetResourceTypePhoto
+                                data:data
+                             options:options];
+        assetId = request.placeholderForCreatedAsset.localIdentifier;
+      }
+   completionHandler:^(BOOL success, NSError *error) {
+     if (success) {
+       NSLog(@"create asset : id = %@", assetId);
+       block([self getAssetEntity:assetId]);
+     } else {
+       NSLog(@"create fail");
+       block(nil);
+     }
+   }];
 }
 
 - (void)saveVideo:(NSString *)path
@@ -903,8 +900,8 @@
   NSURL *fileURL = [NSURL fileURLWithPath:path];
   __block NSString *assetId = nil;
   [[PHPhotoLibrary sharedPhotoLibrary]
-          performChanges:^{
-              PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromVideoAtFileURL:fileURL];
+      performChanges:^{
+        PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromVideoAtFileURL:fileURL];
 //              PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
 //              [options setOriginalFilename:title];
 
@@ -916,17 +913,17 @@
 //              [request addResourceWithType:PHAssetResourceTypeVideo
 //                                   fileURL:fileURL
 //                                   options:options];
-              assetId = request.placeholderForCreatedAsset.localIdentifier;
-          }
-       completionHandler:^(BOOL success, NSError *error) {
-           if (success) {
-             NSLog(@"create asset : id = %@", assetId);
-             block([self getAssetEntity:assetId]);
-           } else {
-             NSLog(@"create fail, error: %@", error);
-             block(nil);
-           }
-       }];
+        assetId = request.placeholderForCreatedAsset.localIdentifier;
+      }
+   completionHandler:^(BOOL success, NSError *error) {
+     if (success) {
+       NSLog(@"create asset : id = %@", assetId);
+       block([self getAssetEntity:assetId]);
+     } else {
+       NSLog(@"create fail, error: %@", error);
+       block(nil);
+     }
+   }];
 }
 
 - (NSString *)getTitleAsyncWithAssetId:(NSString *)assetId {
@@ -937,17 +934,17 @@
   return @"";
 }
 
-- (void)getMediaUrl:(NSString *)assetId resultHandler:(ResultHandler *)handler {
+- (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler {
   PHAsset *phAsset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
   if (phAsset.isVideo) {
     [PHCachingImageManager.defaultManager requestAVAssetForVideo:phAsset options:nil resultHandler:^(AVAsset *asset, AVAudioMix *audioMix, NSDictionary *info) {
-        if ([asset isKindOfClass:[AVURLAsset class]]) {
-          NSURL *url = ((AVURLAsset *) asset).URL;
-          NSLog(@"The asset asset URL = %@", url);
-          [handler reply:url.absoluteString];
-        } else {
-          [handler replyError:@"cannot get videoUrl"];
-        }
+      if ([asset isKindOfClass:[AVURLAsset class]]) {
+        NSURL *url = ((AVURLAsset *) asset).URL;
+        NSLog(@"The asset asset URL = %@", url);
+        [handler reply:url.absoluteString];
+      } else {
+        [handler replyError:@"cannot get videoUrl"];
+      }
     }];
   }
 }
@@ -1044,12 +1041,12 @@
   NSError *error;
 
   [PHPhotoLibrary.sharedPhotoLibrary
-          performChangesAndWait:^{
-              PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
-              [request addAssets:asset];
+      performChangesAndWait:^{
+        PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
+        [request addAssets:asset];
 //              [request insertAssets:asset atIndexes:[NSIndexSet indexSetWithIndex:0]];
 
-          } error:&error];
+      } error:&error];
 
   if (error) {
     NSString *msg = [NSString stringWithFormat:@"Can't copy, error : %@ ", error];
@@ -1069,21 +1066,21 @@
       PHCollectionList *parent = result.firstObject;
 
       [PHPhotoLibrary.sharedPhotoLibrary
-              performChangesAndWait:^{
-                  PHCollectionListChangeRequest *request = [PHCollectionListChangeRequest creationRequestForCollectionListWithTitle:name];
-                  targetId = request.placeholderForCreatedCollectionList.localIdentifier;
-              } error:&error];
+          performChangesAndWait:^{
+            PHCollectionListChangeRequest *request = [PHCollectionListChangeRequest creationRequestForCollectionListWithTitle:name];
+            targetId = request.placeholderForCreatedCollectionList.localIdentifier;
+          } error:&error];
 
       if (error) {
         NSLog(@"createFolderWithName 1: error : %@", error);
       }
 
       [PHPhotoLibrary.sharedPhotoLibrary
-              performChangesAndWait:^{
-                  PHCollectionListChangeRequest *request = [PHCollectionListChangeRequest changeRequestForCollectionList:parent];
-                  PHFetchResult<PHCollectionList *> *fetchResult = [PHCollectionList fetchCollectionListsWithLocalIdentifiers:@[targetId] options:nil];
-                  [request addChildCollections:fetchResult];
-              } error:&error];
+          performChangesAndWait:^{
+            PHCollectionListChangeRequest *request = [PHCollectionListChangeRequest changeRequestForCollectionList:parent];
+            PHFetchResult<PHCollectionList *> *fetchResult = [PHCollectionList fetchCollectionListsWithLocalIdentifiers:@[targetId] options:nil];
+            [request addChildCollections:fetchResult];
+          } error:&error];
 
 
       if (error) {
@@ -1099,10 +1096,10 @@
     }
   } else { // create in top
     [PHPhotoLibrary.sharedPhotoLibrary
-            performChangesAndWait:^{
-                PHCollectionListChangeRequest *request = [PHCollectionListChangeRequest creationRequestForCollectionListWithTitle:name];
-                targetId = request.placeholderForCreatedCollectionList.localIdentifier;
-            } error:&error];
+        performChangesAndWait:^{
+          PHCollectionListChangeRequest *request = [PHCollectionListChangeRequest creationRequestForCollectionListWithTitle:name];
+          targetId = request.placeholderForCreatedCollectionList.localIdentifier;
+        } error:&error];
 
     if (error) {
       NSLog(@"createFolderWithName 3: error : %@", error);
@@ -1121,21 +1118,21 @@
       PHCollectionList *parent = result.firstObject;
 
       [PHPhotoLibrary.sharedPhotoLibrary
-              performChangesAndWait:^{
-                  PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:name];
-                  targetId = request.placeholderForCreatedAssetCollection.localIdentifier;
-              } error:&error];
+          performChangesAndWait:^{
+            PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:name];
+            targetId = request.placeholderForCreatedAssetCollection.localIdentifier;
+          } error:&error];
 
       if (error) {
         NSLog(@"createAlbumWithName 1: error : %@", error);
       }
 
       [PHPhotoLibrary.sharedPhotoLibrary
-              performChangesAndWait:^{
-                  PHCollectionListChangeRequest *request = [PHCollectionListChangeRequest changeRequestForCollectionList:parent];
-                  PHFetchResult<PHAssetCollection *> *fetchResult = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[targetId] options:nil];
-                  [request addChildCollections:fetchResult];
-              } error:&error];
+          performChangesAndWait:^{
+            PHCollectionListChangeRequest *request = [PHCollectionListChangeRequest changeRequestForCollectionList:parent];
+            PHFetchResult<PHAssetCollection *> *fetchResult = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[targetId] options:nil];
+            [request addChildCollections:fetchResult];
+          } error:&error];
 
       if (error) {
         NSLog(@"createAlbumWithName 2: error : %@", error);
@@ -1149,10 +1146,10 @@
     }
   } else { // create in top
     [PHPhotoLibrary.sharedPhotoLibrary
-            performChangesAndWait:^{
-                PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:name];
-                targetId = request.placeholderForCreatedAssetCollection.localIdentifier;
-            } error:&error];
+        performChangesAndWait:^{
+          PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:name];
+          targetId = request.placeholderForCreatedAssetCollection.localIdentifier;
+        } error:&error];
 
     if (error) {
       NSLog(@"createAlbumWithName 3: error : %@", error);
@@ -1179,10 +1176,10 @@
   PHFetchResult<PHAsset *> *assetResult = [PHAsset fetchAssetsWithLocalIdentifiers:id options:nil];
   NSError *error;
   [PHPhotoLibrary.sharedPhotoLibrary
-          performChangesAndWait:^{
-              PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
-              [request removeAssets:assetResult];
-          } error:&error];
+      performChangesAndWait:^{
+        PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
+        [request removeAssets:assetResult];
+      } error:&error];
   if (error) {
     block([NSString stringWithFormat:@"Remove error: %@", error]);
     return;
@@ -1212,7 +1209,7 @@
     }
     NSError *error;
     [PHPhotoLibrary.sharedPhotoLibrary performChangesAndWait:^{
-        [PHAssetCollectionChangeRequest deleteAssetCollections:@[collection]];
+      [PHAssetCollectionChangeRequest deleteAssetCollections:@[collection]];
     }                                                  error:&error];
 
     if (error) {
@@ -1235,7 +1232,7 @@
     }
     NSError *error;
     [PHPhotoLibrary.sharedPhotoLibrary performChangesAndWait:^{
-        [PHCollectionListChangeRequest deleteCollectionLists:@[collection]];
+      [PHCollectionListChangeRequest deleteCollectionLists:@[collection]];
     }                                                  error:&error];
 
     if (error) {
@@ -1316,7 +1313,7 @@
   [cachingManager stopCachingImagesForAllAssets];
 }
 
-- (void)notifyProgress:(PMProgressHandler *)handler progress:(double)progress state:(PMProgressState)state {
+- (void)notifyProgress:(NSObject <PMProgressHandlerProtocol> *)handler progress:(double)progress state:(PMProgressState)state {
   if (!handler) {
     return;
   }
@@ -1324,7 +1321,7 @@
   [handler notify:progress state:state];
 }
 
-- (void)notifySuccess:(PMProgressHandler *)handler {
+- (void)notifySuccess:(NSObject <PMProgressHandlerProtocol> *)handler {
   [self notifyProgress:handler progress:1 state:PMProgressStateSuccess];
   [handler deinit];
 }

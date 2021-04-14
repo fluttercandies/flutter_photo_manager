@@ -6,19 +6,14 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <FlutterMacOS/FlutterMacOS.h>
+#import "PMProgressHandlerProtocol.h"
+#import "PMImport.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
-typedef enum PMProgressState{
-  PMProgressStatePrepare = 0,
-  PMProgressStateLoading = 1,
-  PMProgressStateSuccess = 2,
-  PMProgressStateFailed = 3,
-} PMProgressState;
+@interface PMProgressHandler : NSObject <PMProgressHandlerProtocol>
 
-@interface PMProgressHandler : NSObject
-
-@property(nonatomic, assign)int channelIndex;
+@property(nonatomic, assign) int channelIndex;
 
 - (void)notify:(double)progress state:(PMProgressState)state;
 

@@ -1,36 +1,37 @@
-.idea/
-.vagrant/
-.sconsign.dblite
-.svn/
-
+# OS X
 .DS_Store
-*.swp
-profile
 
-DerivedData/
+# Xcode
 build/
-GeneratedPluginRegistrant.h
-GeneratedPluginRegistrant.m
-
-.generated/
-
 *.pbxuser
-*.mode1v3
-*.mode2v3
-*.perspectivev3
-
 !default.pbxuser
+*.mode1v3
 !default.mode1v3
+*.mode2v3
 !default.mode2v3
+*.perspectivev3
 !default.perspectivev3
-
-xcuserdata
-
+xcuserdata/
+*.xccheckout
+profile
 *.moved-aside
+DerivedData
+*.hmap
+*.ipa
 
-*.pyc
-*sync/
-Icon?
-.tags*
+# Bundler
+.bundle
 
-/Flutter/Generated.xcconfig
+# Add this line if you want to avoid checking in source code from Carthage dependencies.
+# Carthage/Checkouts
+
+Carthage/Build
+
+# We recommend against adding the Pods directory to your .gitignore. However
+# you should judge for yourself, the pros and cons are mentioned at:
+# https://guides.cocoapods.org/using/using-cocoapods.html#should-i-ignore-the-pods-directory-in-source-control
+# 
+# Note: if you ignore the Pods directory, make sure to uncomment
+# `pod install` in .travis.yml
+#
+# Pods/
