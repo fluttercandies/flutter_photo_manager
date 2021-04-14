@@ -15,6 +15,7 @@ A new flutter plugin project.
   s.source_files = 'Classes/**/*','Classes/**/**/*'
   s.public_header_files = 'Classes/**/*.h','Classes/**/**/*.h'
   s.dependency 'Flutter'
+  s.dependency 'photo_manager_core'
   
   s.ios.deployment_target = '9.0'
 end

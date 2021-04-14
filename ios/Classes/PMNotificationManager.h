@@ -3,7 +3,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <Flutter/Flutter.h>
+#import "PMImport.h"
 
 @protocol FlutterPluginRegistrar;
 
