@@ -570,7 +570,7 @@
   [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
       NSDictionary *info) {
     if (progress == 1.0) {
-      [self fetchFullSizeImageFile:asset resultHandler:handler progressHandler:nil];
+      [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
     }
 
     if (error) {
@@ -588,22 +588,22 @@
                     contentMode:PHImageContentModeDefault
                         options:options
                   resultHandler:^(UIImage *_Nullable image,
-                      NSDictionary *_Nullable info) {
-
-                    BOOL downloadFinished = [PMManager isDownloadFinish:info];
-                    if (!downloadFinished) {
-                      return;
-                    }
-
-                    if ([handler isReplied]) {
-                      return;
-                    }
-
-                    NSString *path = [self writeFullFileWithAssetId:asset imageData:UIImageJPEGRepresentation(image, 1.0)];
-
-                    [handler reply:path];
-                    [self notifySuccess:progressHandler];
-                  }];
+                                  NSDictionary *_Nullable info) {
+    if ([handler isReplied]) {
+      return;
+    }
+    
+    BOOL downloadFinished = [PMManager isDownloadFinish:info];
+    if (!downloadFinished) {
+      [handler reply:nil];
+      return;
+    }
+    
+    NSString *path = [self writeFullFileWithAssetId:asset imageData:UIImageJPEGRepresentation(image, 1.0)];
+    
+    [self notifySuccess:progressHandler];
+    [handler reply:path];
+  }];
 }
 
 - (NSString *)writeFullFileWithAssetId:(PHAsset *)asset imageData:(NSData *)imageData {
@@ -671,8 +671,8 @@
                        NSLog(@"error = %@", error);
                        [handler reply:nil];
                      } else {
-                       [handler reply:path];
                        [self notifySuccess:progressHandler];
+                       [handler reply:path];
                      }
                    }];
 }
