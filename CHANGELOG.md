@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [1.1.3](#113)
   - [1.1.2](#112)
   - [1.1.1](#111)
   - [1.1.0](#110)
@@ -53,6 +54,10 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 1.1.3
+
+Merged the code of macos and ios.
 
 ## 1.1.2
 

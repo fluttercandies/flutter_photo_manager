@@ -3,7 +3,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <FlutterMacOS/FlutterMacOS.h>
+#import "PMImport.h"
 
 @class PMManager;
 @class PMNotificationManager;
