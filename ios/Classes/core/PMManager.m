@@ -473,23 +473,24 @@
                       attributes:@{}
                            error:nil];
 
-  [path appendFormat:@"%@/%@", @".video", filename];
+  [path appendFormat:@"%@/%d_%@", @".video", (int)asset.modificationDate.timeIntervalSince1970 ,filename];
+  
   PHVideoRequestOptions *options = [PHVideoRequestOptions new];
+  options.version = PHVideoRequestOptionsVersionCurrent;
   if ([manager fileExistsAtPath:path]) {
     [[PMLogUtils sharedInstance]
         info:[NSString stringWithFormat:@"read cache from %@", path]];
     [handler reply:path];
     return;
   }
-
-
+    
   [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
   [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
-      NSDictionary *info) {
+                                NSDictionary *info) {
     if (progress == 1.0) {
-      [self fetchFullSizeVideo:asset handler:handler progressHandler:nil];
+      [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
     }
-
+    
     if (error) {
       [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
       [progressHandler deinit];
@@ -501,35 +502,36 @@
   }];
 
   [options setNetworkAccessAllowed:YES];
-
   [[PHImageManager defaultManager]
-      requestAVAssetForVideo:asset
-                     options:options
-               resultHandler:^(AVAsset *_Nullable asset,
-                   AVAudioMix *_Nullable audioMix,
-                   NSDictionary *_Nullable info) {
-                 BOOL downloadFinish = [PMManager isDownloadFinish:info];
-
-                 if (!downloadFinish) {
-                   return;
-                 }
-
-                 NSString *preset = AVAssetExportPresetHighestQuality;
-                 AVAssetExportSession *exportSession =
-                     [AVAssetExportSession exportSessionWithAsset:asset
-                                                       presetName:preset];
-                 if (exportSession) {
-                   exportSession.outputFileType = AVFileTypeMPEG4;
-                   exportSession.outputURL = [NSURL fileURLWithPath:path];
-                   [exportSession exportAsynchronouslyWithCompletionHandler:^{
-                     [handler reply:path];
-                   }];
-
-                   [self notifySuccess:progressHandler];
-                 } else {
-                   [handler reply:nil];
-                 }
-               }];
+   requestExportSessionForVideo:asset options:options exportPreset:AVAssetExportPresetHighestQuality resultHandler:^(AVAssetExportSession *_Nullable exportSession, NSDictionary *_Nullable info) {
+    BOOL downloadFinish = [PMManager isDownloadFinish:info];
+    
+    if (!downloadFinish) {
+      NSLog(@"Asset download fail: %@");
+      [handler reply:nil];
+      return;
+    }
+    
+    if (exportSession) {
+      exportSession.shouldOptimizeForNetworkUse = YES;
+      exportSession.outputFileType = AVFileTypeMPEG4;
+      exportSession.outputURL = [NSURL fileURLWithPath:path];
+      [exportSession exportAsynchronouslyWithCompletionHandler:^{
+        if ([exportSession status] == AVAssetExportSessionStatusCompleted) {
+          [handler reply:path];
+        } else if ([exportSession status] == AVAssetExportSessionStatusFailed) {
+          NSLog(@"Export session failed: %@", exportSession.error);
+          [handler reply:nil];
+        } else if ([exportSession status] == AVAssetExportSessionStatusCancelled) {
+          NSLog(@"Export session cancelled: %@", exportSession.error);
+          [handler reply:nil];
+        }
+      }];
+      [self notifySuccess:progressHandler];
+    } else {
+      [handler reply:nil];
+    }
+  }];
 }
 
 - (NSString *)makeAssetOutputPath:(PHAsset *)asset isOrigin:(Boolean)isOrigin {
@@ -563,7 +565,7 @@
   [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
       NSDictionary *info) {
     if (progress == 1.0) {
-      [self fetchFullSizeImageFile:asset resultHandler:handler progressHandler:nil];
+      [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
     }
 
     if (error) {
@@ -580,25 +582,23 @@
                      targetSize:PHImageManagerMaximumSize
                     contentMode:PHImageContentModeDefault
                         options:options
-                  resultHandler:^(PMImage *_Nullable image,
-                      NSDictionary *_Nullable info) {
-
-                    BOOL downloadFinished = [PMManager isDownloadFinish:info];
-                    if (!downloadFinished) {
-                      return;
-                    }
-
-                    if ([handler isReplied]) {
-                      return;
-                    }
-
-                    NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
-
-                    NSString *path = [self writeFullFileWithAssetId:asset imageData: data];
-
-                    [handler reply:path];
-                    [self notifySuccess:progressHandler];
-                  }];
+                  resultHandler:^(UIImage *_Nullable image,
+                                  NSDictionary *_Nullable info) {
+    if ([handler isReplied]) {
+      return;
+    }
+    
+    BOOL downloadFinished = [PMManager isDownloadFinish:info];
+    if (!downloadFinished) {
+      [handler reply:nil];
+      return;
+    }
+    
+    NSString *path = [self writeFullFileWithAssetId:asset imageData:UIImageJPEGRepresentation(image, 1.0)];
+    
+    [self notifySuccess:progressHandler];
+    [handler reply:path];
+  }];
 }
 
 - (NSString *)writeFullFileWithAssetId:(PHAsset *)asset imageData:(NSData *)imageData {
@@ -666,8 +666,8 @@
                        NSLog(@"error = %@", error);
                        [handler reply:nil];
                      } else {
-                       [handler reply:path];
                        [self notifySuccess:progressHandler];
+                       [handler reply:path];
                      }
                    }];
 }
