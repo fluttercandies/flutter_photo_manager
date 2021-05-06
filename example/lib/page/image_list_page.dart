@@ -461,11 +461,13 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
 
   testThumbSize(AssetEntity entity, List<int> list) async {
     for (final size in list) {
-      final data = await entity.thumbDataWithOption(ThumbOption.ios(
-        width: size,
-        height: size,
-        resizeMode: ResizeMode.exact,
-      ));
+      // final data = await entity.thumbDataWithOption(ThumbOption.ios(
+      //   width: size,
+      //   height: size,
+      //   resizeMode: ResizeMode.exact,
+      // ));
+      final data = await entity.thumbDataWithSize(size, size);
+
       if (data == null) {
         return;
       }
