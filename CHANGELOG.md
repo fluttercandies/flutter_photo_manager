@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [1.1.5](#115)
   - [1.1.4](#114)
   - [1.1.3](#113)
   - [1.1.2](#112)
@@ -55,6 +56,14 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 1.1.5
+
+Revert [#478](https://github.com/CaiJingLong/flutter_photo_manager/pull/478)
+
+Fix:
+
+- Thumb size of the entity on iOS/macOS.
 
 ## 1.1.4
 
