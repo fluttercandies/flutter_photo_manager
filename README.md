@@ -58,6 +58,7 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
     - [Android Q (android10 , API 29)](#android-q-android10--api-29)
     - [Android R (android 11, API30)](#android-r-android-11-api30)
     - [glide](#glide)
+    - [Remove Media Location permission](#remove-media-location-permission)
   - [common issues](#common-issues)
     - [ios build error](#ios-build-error)
   - [Some articles about to use this library](#some-articles-about-to-use-this-library)
@@ -491,6 +492,21 @@ rootProject.allprojects {
 ```
 
 And, if you want to use ProGuard, you can see the [ProGuard of Glide](https://github.com/bumptech/glide#proguard).
+
+### Remove Media Location permission
+
+Android contains [ACCESS_MEDIA_LOCATION](https://developer.android.com/training/data-storage/shared/media#media-location-permission) permission by default.
+
+This permission is introduced in Android Q. If your app doesn't need this permission, you need to add the following node to the Android manifest in your app.
+
+```xml
+<uses-permission
+  android:name="android.permission.ACCESS_MEDIA_LOCATION"
+  tools:node="remove"
+  />
+```
+
+See code in the [example](https://github.com/CaiJingLong/flutter_photo_manager/blob/e083c7d5f4eb5f5b355a75357c0a0c3e2d534b2e/example/android/app/src/main/AndroidManifest.xml#L11-L14).
 
 ## common issues
 
