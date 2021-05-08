@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [1.1.6](#116)
   - [1.1.5](#115)
   - [1.1.4](#114)
   - [1.1.3](#113)
@@ -56,6 +57,10 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 1.1.6
+
+The MEDIA_LOCATION permission of android can be removed through configuration.
 
 ## 1.1.5
 
