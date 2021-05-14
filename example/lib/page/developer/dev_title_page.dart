@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
@@ -18,7 +20,13 @@ class _DevelopingExampleState extends State<DevelopingExample> {
             final start = DateTime.now();
             int count = 1000;
             var result = await PhotoManager.requestPermissionExtend();
-            if (result == PermissionState.grand) {
+
+            if (Platform.isIOS) {
+              final iOSState = result.iosState!;
+              print("ios result state = $iOSState");
+            }
+
+            if (result.state) {
               List<AssetEntity> imageList = [];
               List<AssetPathEntity> list = await PhotoManager.getAssetPathList(
                 type: RequestType.image,

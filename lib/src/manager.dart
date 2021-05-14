@@ -25,10 +25,19 @@ class PhotoManager {
   ///   - com.apple.security.assets.music.read-write
   ///
   /// Also see [PermissionState].
-  // static Future<PermissionResult> requestPermissionExtend() async {
-  //   // final Map map = await _plugin.requestPermissionExtend();
-  //   // return PermissionState.values[stateIndex];
-  // }
+  static Future<PermissionResult> requestPermissionExtend() async {
+    final Map map = await _plugin.requestPermissionExtend();
+    final bool result = map["result"];
+    final int? iOSStateIndex = map["iOS"];
+
+    PermissionIosState? iOSState;
+
+    if (iOSStateIndex != null) {
+      iOSState = PermissionIosState.values[iOSStateIndex];
+    }
+
+    return PermissionResult(result, iosState: iOSState);
+  }
 
   static Editor editor = Editor();
 

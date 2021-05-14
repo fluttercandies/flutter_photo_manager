@@ -82,9 +82,21 @@
 #if __IPHONE_14_0
 
 - (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler{
-    [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelReadWrite handler:^(PHAuthorizationStatus status) {
-        
-    }];
+    if (@available(iOS 14, *)) {
+        [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelReadWrite handler:^(PHAuthorizationStatus status) {
+          [handler reply:@(status)];
+        }];
+    } else {
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+          BOOL auth = PHAuthorizationStatusAuthorized == status;
+          [manager setAuth:auth];
+          if (auth) {
+            [handler reply:@0];
+          } else {
+            [handler reply:@2];
+          }
+        }];
+    }
 }
 
 #else
