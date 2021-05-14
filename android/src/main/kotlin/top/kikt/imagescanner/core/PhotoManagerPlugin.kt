@@ -168,7 +168,7 @@ class PhotoManagerPlugin(
         override fun onDenied(deniedPermissions: MutableList<String>, grantedPermissions: MutableList<String>) {
           LogUtils.info("onDenied call.method = ${call.method}")
           if (call.method == "requestPermission") {
-            resultHandler.reply(0)
+            resultHandler.reply(2)
           } else {
             if (grantedPermissions.containsAll(arrayListOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
               LogUtils.info("onGranted call.method = ${call.method}")
@@ -214,7 +214,7 @@ class PhotoManagerPlugin(
 
   private fun onHandlePermissionResult(call: MethodCall, resultHandler: ResultHandler, haveLocationPermission: Boolean) {
     when (call.method) {
-      "requestPermission" -> resultHandler.reply(1)
+      "requestPermission" -> resultHandler.reply(2)
       "getGalleryList" -> {
         if (Build.VERSION.SDK_INT >= 29) {
           notifyChannel.setAndroidQExperimental(true)

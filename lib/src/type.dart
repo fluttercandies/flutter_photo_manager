@@ -91,3 +91,31 @@ enum ResizeMode { none, fast, exact }
 
 /// Resize content mode
 enum ResizeContentMode { fit, fill, def }
+
+
+/// Result of permission
+// class PermissionResult {
+
+//   /// Permission of state;
+//   final bool state;
+
+//   /// This field is only available in iOS 14 and higher.
+//   final PermissionIosState? iosState;
+
+//   const PermissionResult(this.state, {this.iosState});
+// }
+
+// /// Result of permission state
+// enum PermissionState {
+//   grand,
+//   deny,
+// }
+
+// /// See https://developer.apple.com/documentation/photokit/phauthorizationstatus?language=objc
+// enum PermissionIosState {
+//   notDetermined,
+//   restricted,
+//   denied,
+//   authorized,
+//   limited,
+// }

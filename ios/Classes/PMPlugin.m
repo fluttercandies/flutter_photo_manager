@@ -44,15 +44,9 @@
   PMManager *manager = self.manager;
 
   if ([call.method isEqualToString:@"requestPermission"]) {
-    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-      BOOL auth = PHAuthorizationStatusAuthorized == status;
-      [manager setAuth:auth];
-      if (auth) {
-        [handler reply:@1];
-      } else {
-        [handler reply:@0];
-      }
-    }];
+    [self handlePermission:manager handler:handler];
+  } else if ([call.method isEqualToString:@"requestPermissionExtend"]) {
+    [self handlePermission:manager handler:handler];
   } else if ([call.method isEqualToString:@"clearFileCache"]) {
     [manager clearFileCache];
     [handler reply:@1];
@@ -83,6 +77,46 @@
     }
   }
 }
+
+#if TARGET_OS_IOS
+#if __IPHONE_14_0
+
+- (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler{
+    [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelReadWrite handler:^(PHAuthorizationStatus status) {
+        
+    }];
+}
+
+#else
+
+- (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler{
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+      BOOL auth = PHAuthorizationStatusAuthorized == status;
+      [manager setAuth:auth];
+      if (auth) {
+        [handler reply:@0];
+      } else {
+        [handler reply:@2];
+      }
+    }];
+}
+
+#endif
+#endif
+
+#if TARGET_OS_OSX
+- (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler {
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+      BOOL auth = PHAuthorizationStatusAuthorized == status;
+      [manager setAuth:auth];
+      if (auth) {
+        [handler reply:@0];
+      } else {
+        [handler reply:@2];
+      }
+    }];
+}
+#endif
 
 - (void)runInBackground:(dispatch_block_t)block {
   dispatch_async(dispatch_get_global_queue(0, 0), block);
