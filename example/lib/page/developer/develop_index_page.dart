@@ -61,6 +61,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
             child: Text("Clear file caches"),
             onPressed: _clearFileCaches,
           ),
+          ElevatedButton(
+            child: Text("Request permission extend"),
+            onPressed: _requestPermssionExtend,
+          ),
         ],
       ),
     );
@@ -147,5 +151,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
 
   void _clearFileCaches() {
     PhotoManager.clearFileCache();
+  }
+
+  void _requestPermssionExtend() async {
+    final result = await PhotoManager.requestPermissionExtend();
+    print('result --- state: ${result.state}, iOS: ${result.iosState}');
   }
 }
