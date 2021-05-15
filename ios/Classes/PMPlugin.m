@@ -80,7 +80,7 @@
 
 -(void)replyPermssionResult:(ResultHandler*) handler status:(PHAuthorizationStatus)status{
     BOOL auth = PHAuthorizationStatusAuthorized == status;
-    [manager setAuth:auth];
+    [self.manager setAuth:auth];
     [handler reply:@(status)];
 }
 
