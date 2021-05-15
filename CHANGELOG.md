@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [1.2.0](#120)
   - [1.1.6](#116)
   - [1.1.5](#115)
   - [1.1.4](#114)
@@ -57,6 +58,12 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 1.2.0
+
+Feature:
+
+- Add requestPermissionExtend code to support iOS 14 permission.
 
 ## 1.1.6
 
