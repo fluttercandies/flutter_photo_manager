@@ -78,23 +78,23 @@
   }
 }
 
+-(void)replyPermssionResult:(ResultHandler*) handler status:(PHAuthorizationStatus)status{
+    BOOL auth = PHAuthorizationStatusAuthorized == status;
+    [manager setAuth:auth];
+    [handler reply:@(status)];
+}
+
 #if TARGET_OS_IOS
 #if __IPHONE_14_0
 
 - (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler{
     if (@available(iOS 14, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelReadWrite handler:^(PHAuthorizationStatus status) {
-          [handler reply:@(status)];
+          [self replyPermssionResult:handler status:status];
         }];
     } else {
         [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-          BOOL auth = PHAuthorizationStatusAuthorized == status;
-          [manager setAuth:auth];
-          if (auth) {
-            [handler reply:@0];
-          } else {
-            [handler reply:@2];
-          }
+          [self replyPermssionResult:handler status:status];
         }];
     }
 }
@@ -103,13 +103,7 @@
 
 - (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler{
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-      BOOL auth = PHAuthorizationStatusAuthorized == status;
-      [manager setAuth:auth];
-      if (auth) {
-        [handler reply:@0];
-      } else {
-        [handler reply:@2];
-      }
+      [self replyPermssionResult:handler status:status];
     }];
 }
 
@@ -119,13 +113,7 @@
 #if TARGET_OS_OSX
 - (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler {
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-      BOOL auth = PHAuthorizationStatusAuthorized == status;
-      [manager setAuth:auth];
-      if (auth) {
-        [handler reply:@0];
-      } else {
-        [handler reply:@2];
-      }
+      [self replyPermssionResult:handler status:status];
     }];
 }
 #endif

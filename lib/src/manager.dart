@@ -26,17 +26,15 @@ class PhotoManager {
   ///
   /// Also see [PermissionState].
   static Future<PermissionResult> requestPermissionExtend() async {
-    final Map map = await _plugin.requestPermissionExtend();
-    final int auth = map["auth"];
-    final int? iOSStateIndex = map["iOS"];
+    final int resultIndex = await _plugin.requestPermissionExtend();
 
-    PermissionIosState? iOSState;
+    ApplePermissionState? appleState;
 
-    if (iOSStateIndex != null) {
-      iOSState = PermissionIosState.values[iOSStateIndex];
+    if (Platform.isIOS || Platform.isMacOS) {
+      appleState = ApplePermissionState.values[resultIndex];
     }
 
-    return PermissionResult(auth == 0, iosState: iOSState);
+    return PermissionResult(resultIndex == 0, appleState: appleState);
   }
 
   static Editor editor = Editor();

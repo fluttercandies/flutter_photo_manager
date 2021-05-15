@@ -155,6 +155,6 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
 
   void _requestPermssionExtend() async {
     final result = await PhotoManager.requestPermissionExtend();
-    print('result --- state: ${result.state}, iOS: ${result.iosState}');
+    print('result --- state: ${result.state}, iOS: ${result.appleState}');
   }
 }

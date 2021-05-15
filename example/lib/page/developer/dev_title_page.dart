@@ -22,7 +22,7 @@ class _DevelopingExampleState extends State<DevelopingExample> {
             var result = await PhotoManager.requestPermissionExtend();
 
             if (Platform.isIOS) {
-              final iOSState = result.iosState!;
+              final iOSState = result.appleState!;
               print("ios result state = $iOSState");
             }
 

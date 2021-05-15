@@ -1,3 +1,5 @@
+import 'dart:io';
+
 /// asset type
 ///
 /// 用于资源类型属性
@@ -92,17 +94,15 @@ enum ResizeMode { none, fast, exact }
 /// Resize content mode
 enum ResizeContentMode { fit, fill, def }
 
-
 /// Result of permission
 class PermissionResult {
-
   /// Permission of state;
   final bool state;
 
-  /// This field is only available in iOS 14 and higher.
-  final PermissionIosState? iosState;
+  /// This field is only available in iOS or macOS.
+  final ApplePermissionState? appleState;
 
-  const PermissionResult(this.state, {this.iosState});
+  const PermissionResult(this.state, {this.appleState});
 }
 
 /// Result of permission state
@@ -112,10 +112,12 @@ enum PermissionState {
 }
 
 /// See https://developer.apple.com/documentation/photokit/phauthorizationstatus?language=objc
-enum PermissionIosState {
+enum ApplePermissionState {
   notDetermined,
   restricted,
   denied,
   authorized,
+
+  /// The type is noly support iOS 14 or higher.
   limited,
 }

@@ -44,7 +44,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     return (await _channel.invokeMethod('requestPermission')) == 0;
   }
 
-  Future<Map> requestPermissionExtend() async {
+  Future<int> requestPermissionExtend() async {
     return await _channel.invokeMethod('requestPermissionExtend');
   }
 
