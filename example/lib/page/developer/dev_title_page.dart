@@ -21,12 +21,7 @@ class _DevelopingExampleState extends State<DevelopingExample> {
             int count = 1000;
             var result = await PhotoManager.requestPermissionExtend();
 
-            if (Platform.isIOS) {
-              final iOSState = result.appleState!;
-              print("ios result state = $iOSState");
-            }
-
-            if (result.state) {
+            if (result.isAuth) {
               List<AssetEntity> imageList = [];
               List<AssetPathEntity> list = await PhotoManager.getAssetPathList(
                 type: RequestType.image,

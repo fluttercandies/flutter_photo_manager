@@ -13,7 +13,7 @@ class PhotoManager {
   /// Use [requestPermissionExtend] to instead;
   // @Deprecated("Use requestPermissionExtend")
   static Future<bool> requestPermission() async {
-    return _plugin.requestPermission();
+    return (await requestPermissionExtend()).isAuth;
   }
 
   /// Android: WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, MEDIA_LOCATION
@@ -25,16 +25,9 @@ class PhotoManager {
   ///   - com.apple.security.assets.music.read-write
   ///
   /// Also see [PermissionState].
-  static Future<PermissionResult> requestPermissionExtend() async {
+  static Future<PermissionState> requestPermissionExtend() async {
     final int resultIndex = await _plugin.requestPermissionExtend();
-
-    ApplePermissionState? appleState;
-
-    if (Platform.isIOS || Platform.isMacOS) {
-      appleState = ApplePermissionState.values[resultIndex];
-    }
-
-    return PermissionResult(resultIndex == 0, appleState: appleState);
+    return PermissionState.values[resultIndex];
   }
 
   static Editor editor = Editor();

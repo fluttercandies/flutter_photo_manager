@@ -13,6 +13,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import top.kikt.imagescanner.core.entity.AssetEntity
 import top.kikt.imagescanner.core.entity.FilterOption
+import top.kikt.imagescanner.core.entity.PermissionResult
 import top.kikt.imagescanner.core.entity.ThumbLoadOption
 import top.kikt.imagescanner.core.utils.ConvertUtils
 import top.kikt.imagescanner.core.utils.IDBUtils
@@ -168,7 +169,7 @@ class PhotoManagerPlugin(
         override fun onDenied(deniedPermissions: MutableList<String>, grantedPermissions: MutableList<String>) {
           LogUtils.info("onDenied call.method = ${call.method}")
           if (call.method == "requestPermission") {
-            resultHandler.reply(2)
+            resultHandler.reply(PermissionResult.Denied.value)
           } else {
             if (grantedPermissions.containsAll(arrayListOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
               LogUtils.info("onGranted call.method = ${call.method}")
@@ -214,7 +215,7 @@ class PhotoManagerPlugin(
 
   private fun onHandlePermissionResult(call: MethodCall, resultHandler: ResultHandler, haveLocationPermission: Boolean) {
     when (call.method) {
-      "requestPermission" -> resultHandler.reply(2)
+      "requestPermission" -> resultHandler.reply(PermissionResult.Authorized.value)
       "getGalleryList" -> {
         if (Build.VERSION.SDK_INT >= 29) {
           notifyChannel.setAndroidQExperimental(true)
