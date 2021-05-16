@@ -122,8 +122,7 @@ class PhotoManagerPlugin(
         true
       }
       "cacheOriginBytes" -> {
-        val cacheOriginBytes = call.arguments<Boolean>()
-        PhotoManagerPlugin.cacheOriginBytes = cacheOriginBytes
+        cacheOriginBytes = call.arguments<Boolean>()
         resultHandler.reply(cacheOriginBytes)
         true
       }
