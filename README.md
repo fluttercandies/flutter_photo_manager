@@ -128,7 +128,7 @@ List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
 | updateDateTimeCond | Update date filter                                                                                                                                                                        |
 | orders             | The sort option, use `addOrderOption`.                                                                                                                                                    |
 
-Example see [filter_option_page.dart](https://github.com/CaiJingLong/flutter_photo_manager/example/lib/page/filter_option_page.dart).
+Example see [filter_option_page.dart](https://github.com/CaiJingLong/flutter_photo_manager/blob/master/example/lib/page/filter_option_page.dart).
 
 Most classes of FilterOption support `copyWith`.
 
