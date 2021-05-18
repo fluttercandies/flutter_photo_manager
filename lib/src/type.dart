@@ -123,3 +123,33 @@ extension PermissionStateExt on PermissionState {
     return this == PermissionState.authorized;
   }
 }
+
+class PermisstionRequestOption {
+  final IosAccessLevel iosAccessLevel;
+
+  const PermisstionRequestOption({
+    this.iosAccessLevel = IosAccessLevel.readWrite,
+  });
+
+  Map toMap() {
+    return {
+      'iosAccessLevel': iosAccessLevel.getValue(),
+    };
+  }
+}
+
+enum IosAccessLevel {
+  addOnly,
+  readWrite,
+}
+
+extension on IosAccessLevel {
+  int getValue() {
+    switch (this) {
+      case IosAccessLevel.addOnly:
+        return 1;
+      case IosAccessLevel.readWrite:
+        return 2;
+    }
+  }
+}

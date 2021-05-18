@@ -43,10 +43,9 @@
   ResultHandler *handler = [ResultHandler handlerWithResult:result];
   PMManager *manager = self.manager;
 
-  if ([call.method isEqualToString:@"requestPermission"]) {
-    [self handlePermission:manager handler:handler];
-  } else if ([call.method isEqualToString:@"requestPermissionExtend"]) {
-    [self handlePermission:manager handler:handler];
+  if ([call.method isEqualToString:@"requestPermissionExtend"]) {
+    int requestAccessLevel = [call.arguments[@"iosAccessLevel"] intValue];
+    [self handlePermission:manager handler:handler requestAccessLevel:requestAccessLevel];
   } else if ([call.method isEqualToString:@"clearFileCache"]) {
     [manager clearFileCache];
     [handler reply:@1];
@@ -87,9 +86,9 @@
 #if TARGET_OS_IOS
 #if __IPHONE_14_0
 
-- (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler{
+- (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler requestAccessLevel:(int)requestAccessLevel {
     if (@available(iOS 14, *)) {
-        [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelReadWrite handler:^(PHAuthorizationStatus status) {
+        [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
           [self replyPermssionResult:handler status:status];
         }];
     } else {
@@ -101,7 +100,7 @@
 
 #else
 
-- (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler{
+- (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler requestAccessLevel:(int)requestAccessLevel {
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
       [self replyPermssionResult:handler status:status];
     }];
@@ -111,7 +110,7 @@
 #endif
 
 #if TARGET_OS_OSX
-- (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler {
+- (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler requestAccessLevel:(int)requestAccessLevel {
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
       [self replyPermssionResult:handler status:status];
     }];

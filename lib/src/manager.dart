@@ -25,8 +25,11 @@ class PhotoManager {
   ///  - com.apple.security.assets.music.read-write
   ///
   /// Also see [PermissionState].
-  static Future<PermissionState> requestPermissionExtend() async {
-    final int resultIndex = await _plugin.requestPermissionExtend();
+  static Future<PermissionState> requestPermissionExtend({
+    PermisstionRequestOption requestOption = const PermisstionRequestOption(),
+  }) async {
+    final int resultIndex =
+        await _plugin.requestPermissionExtend(requestOption);
     return PermissionState.values[resultIndex];
   }
 
