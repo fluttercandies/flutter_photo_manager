@@ -21,8 +21,8 @@ class PhotoManager {
   /// iOS: NSPhotoLibraryUsageDescription of info.plist
   ///
   /// macOS of Release.entitlements:
-  ///   - com.apple.security.assets.movies.read-write
-  ///   - com.apple.security.assets.music.read-write
+  ///  - com.apple.security.assets.movies.read-write
+  ///  - com.apple.security.assets.music.read-write
   ///
   /// Also see [PermissionState].
   static Future<PermissionState> requestPermissionExtend() async {
