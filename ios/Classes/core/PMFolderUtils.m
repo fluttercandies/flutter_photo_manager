@@ -3,7 +3,7 @@
 //
 
 #import "PMFolderUtils.h"
-
+#import "PMLogUtils.h"
 
 @implementation PMFolderUtils {
 
@@ -59,9 +59,9 @@
 + (void)debugInfo:(PHCollection *)collection {
   NSString *title = collection.localizedTitle;
   if ([collection isMemberOfClass:PHCollectionList.class]) {
-    NSLog(@"title = %@, type: %@", title, @"文件夹");
+      [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"title = %@, type: %@", title, @"文件夹"]];
   } else {
-    NSLog(@"title = %@, type: %@", title, @"相簿");
+      [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"title = %@, type: %@", title, @"相簿"]];
   }
 }
 

@@ -100,6 +100,9 @@
 }
 
 - (void)logCollections:(PHFetchResult *)collections option:(PHFetchOptions *)option {
+  if(!PMLogUtils.sharedInstance.isLog){
+      return;
+  }
   for (PHCollection *phCollection in collections) {
     if ([phCollection isMemberOfClass:[PHAssetCollection class]]) {
       PHAssetCollection *collection = (PHAssetCollection *) phCollection;
@@ -411,7 +414,7 @@
   NSArray<PHAssetResource *> *resources =
       [PHAssetResource assetResourcesForAsset:asset];
   // find asset
-  NSLog(@"The asset has %lu resources.", (unsigned long) resources.count);
+  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset has %lu resources.", (unsigned long) resources.count] ];
   PHAssetResource *dstResource;
   if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypeVideo) {
     dstResource = resources.lastObject;
@@ -541,7 +544,7 @@
                                            attributes:@{}
                                                 error:nil];
 
-  NSLog(@"cache path = %@", dirPath);
+  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"cache path = %@", dirPath]];
 
 //  NSString *title = [asset title];
   NSMutableString *path = [NSMutableString stringWithString:dirPath];
@@ -767,7 +770,7 @@
     [cond appendString:durationCond];
     [args addObjectsFromArray:durationArgs];
 
-    NSLog(@"duration = %.2f ~ %.2f", [durationArgs[0] floatValue], [durationArgs[1] floatValue]);
+    [PMLogUtils.sharedInstance info: [NSString stringWithFormat: @"duration = %.2f ~ %.2f", [durationArgs[0] floatValue], [durationArgs[1] floatValue]]];
 
     [cond appendString:@" ) "];
   }
@@ -854,7 +857,7 @@
       }
    completionHandler:^(BOOL success, NSError *error) {
      if (success) {
-       NSLog(@"create asset : id = %@", assetId);
+       [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"create asset : id = %@", assetId]];
        block([self getAssetEntity:assetId]);
      } else {
        NSLog(@"create fail");
@@ -883,7 +886,7 @@
       }
    completionHandler:^(BOOL success, NSError *error) {
      if (success) {
-       NSLog(@"create asset : id = %@", assetId);
+       [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"create asset : id = %@", assetId]];
        block([self getAssetEntity:assetId]);
      } else {
        NSLog(@"create fail");
@@ -917,7 +920,7 @@
       }
    completionHandler:^(BOOL success, NSError *error) {
      if (success) {
-       NSLog(@"create asset : id = %@", assetId);
+       [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"create asset : id = %@", assetId]];
        block([self getAssetEntity:assetId]);
      } else {
        NSLog(@"create fail, error: %@", error);
@@ -940,7 +943,7 @@
     [PHCachingImageManager.defaultManager requestAVAssetForVideo:phAsset options:nil resultHandler:^(AVAsset *asset, AVAudioMix *audioMix, NSDictionary *info) {
       if ([asset isKindOfClass:[AVURLAsset class]]) {
         NSURL *url = ((AVURLAsset *) asset).URL;
-        NSLog(@"The asset asset URL = %@", url);
+        [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset asset URL = %@", url]];
         [handler reply:url.absoluteString];
       } else {
         [handler replyError:@"cannot get videoUrl"];
@@ -1287,9 +1290,9 @@
   NSError *err;
 
   [fm removeItemAtPath:imagePath error:&err];
-  NSLog(@"remove cache file %@, error: %@", imagePath, err);
+  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"remove cache file %@, error: %@", imagePath, err]];
   [fm removeItemAtPath:videoPath error:&err];
-  NSLog(@"remove cache file %@, error: %@", videoPath, err);
+  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"remove cache file %@, error: %@", videoPath, err]];
 }
 
 #pragma mark cache thumb
