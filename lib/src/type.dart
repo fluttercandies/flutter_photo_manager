@@ -91,3 +91,65 @@ enum ResizeMode { none, fast, exact }
 
 /// Resize content mode
 enum ResizeContentMode { fit, fill, def }
+
+/// Android: The effective values are [authorized] or [denied].
+///
+/// iOS/macOS: All values are valid.
+///
+/// See [document of Apple](https://developer.apple.com/documentation/photokit/phauthorizationstatus?language=objc)
+enum PermissionState {
+  /// The user hasn’t set the app’s authorization status.
+  notDetermined,
+
+  /// The app isn’t authorized to access the photo library, and the user can’t grant such permission.
+  restricted,
+
+  /// The user explicitly denied this app access to the photo library.
+  denied,
+
+  /// The user explicitly granted this app access to the photo library.
+  authorized,
+
+  /// The user authorized this app for limited photo library access.
+  ///
+  /// The state is only support iOS 14 or higher.
+  limited,
+}
+
+/// See [PermissionState].
+extension PermissionStateExt on PermissionState {
+  /// Whether authorized or not.
+  bool get isAuth {
+    return this == PermissionState.authorized;
+  }
+}
+
+class PermisstionRequestOption {
+  final IosAccessLevel iosAccessLevel;
+
+  const PermisstionRequestOption({
+    this.iosAccessLevel = IosAccessLevel.readWrite,
+  });
+
+  Map toMap() {
+    return {
+      'iosAccessLevel': iosAccessLevel.getValue(),
+    };
+  }
+}
+
+enum IosAccessLevel {
+  addOnly,
+  readWrite,
+}
+
+extension on IosAccessLevel {
+  int getValue() {
+    switch (this) {
+      case IosAccessLevel.addOnly:
+        return 1;
+      case IosAccessLevel.readWrite:
+        return 2;
+    }
+  }
+}

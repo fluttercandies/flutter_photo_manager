@@ -8,7 +8,7 @@ PODS:
 
 DEPENDENCIES:
   - path_provider_macos (from `/Users/jinglongcai/.pub-cache/hosted/pub.flutter-io.cn/path_provider_macos-2.0.0//macos/path_provider_macos.podspec`)
-  - photo_manager (from `/Users/jinglongcai/code/flutter/self/flutter_photo_manager//macos/photo_manager.podspec`)
+  - photo_manager (from `/Users/jinglongcai/code/flutter/self/pm2//macos/photo_manager.podspec`)
 
 SPEC REPOS:
   trunk:
@@ -18,7 +18,7 @@ EXTERNAL SOURCES:
   path_provider_macos:
     :path: "/Users/jinglongcai/.pub-cache/hosted/pub.flutter-io.cn/path_provider_macos-2.0.0//macos/path_provider_macos.podspec"
   photo_manager:
-    :path: "/Users/jinglongcai/code/flutter/self/flutter_photo_manager//macos/photo_manager.podspec"
+    :path: "/Users/jinglongcai/code/flutter/self/pm2//macos/photo_manager.podspec"
 
 SPEC CHECKSUMS:
   FlutterMacOS: 2f1b456c4d9436c4d4d13919bd3be8ef03ba6322

@@ -39,9 +39,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     );
   }
 
-  /// request permission.
-  Future<bool> requestPermission() async {
-    return (await _channel.invokeMethod('requestPermission')) == 1;
+  Future<int> requestPermissionExtend(
+      PermisstionRequestOption requestOption) async {
+    return await _channel.invokeMethod(
+        'requestPermissionExtend', requestOption.toMap());
   }
 
   /// Use pagination to get album content.

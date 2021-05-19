@@ -8,5 +8,7 @@
 	<true/>
 	<key>com.apple.security.assets.music.read-write</key>
 	<true/>
+	<key>com.apple.security.assets.pictures.read-write</key>
+	<true/>
 </dict>
 </plist>

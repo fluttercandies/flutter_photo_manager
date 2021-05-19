@@ -43,16 +43,9 @@
   ResultHandler *handler = [ResultHandler handlerWithResult:result];
   PMManager *manager = self.manager;
 
-  if ([call.method isEqualToString:@"requestPermission"]) {
-    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-      BOOL auth = PHAuthorizationStatusAuthorized == status;
-      [manager setAuth:auth];
-      if (auth) {
-        [handler reply:@1];
-      } else {
-        [handler reply:@0];
-      }
-    }];
+  if ([call.method isEqualToString:@"requestPermissionExtend"]) {
+    int requestAccessLevel = [call.arguments[@"iosAccessLevel"] intValue];
+    [self handlePermission:manager handler:handler requestAccessLevel:requestAccessLevel];
   } else if ([call.method isEqualToString:@"clearFileCache"]) {
     [manager clearFileCache];
     [handler reply:@1];
@@ -83,6 +76,52 @@
     }
   }
 }
+
+-(void)replyPermssionResult:(ResultHandler*) handler status:(PHAuthorizationStatus)status{
+    BOOL auth = PHAuthorizationStatusAuthorized == status;
+    [self.manager setAuth:auth];
+    [handler reply:@(status)];
+}
+
+#if TARGET_OS_IOS
+#if __IPHONE_14_0
+
+- (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler requestAccessLevel:(int)requestAccessLevel {
+    if (@available(iOS 14, *)) {
+        [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
+          [self replyPermssionResult:handler status:status];
+        }];
+    } else {
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+          [self replyPermssionResult:handler status:status];
+        }];
+    }
+}
+
+#else
+
+- (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler requestAccessLevel:(int)requestAccessLevel {
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+      [self replyPermssionResult:handler status:status];
+    }];
+}
+
+#endif
+#endif
+
+#if TARGET_OS_OSX
+- (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler requestAccessLevel:(int)requestAccessLevel {
+    if (@available(macOS 11.0, *)) {
+        [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
+            [self replyPermssionResult:handler status:status];
+        }];
+    } else {
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+          [self replyPermssionResult:handler status:status];
+        }];
+    }
+}
+#endif
 
 - (void)runInBackground:(dispatch_block_t)block {
   dispatch_async(dispatch_get_global_queue(0, 0), block);

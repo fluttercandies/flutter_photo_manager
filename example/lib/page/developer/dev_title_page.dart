@@ -17,8 +17,9 @@ class _DevelopingExampleState extends State<DevelopingExample> {
           onPressed: () async {
             final start = DateTime.now();
             int count = 1000;
-            var result = await PhotoManager.requestPermission();
-            if (result) {
+            var result = await PhotoManager.requestPermissionExtend();
+
+            if (result.isAuth) {
               List<AssetEntity> imageList = [];
               List<AssetPathEntity> list = await PhotoManager.getAssetPathList(
                 type: RequestType.image,

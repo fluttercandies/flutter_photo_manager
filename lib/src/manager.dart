@@ -4,13 +4,33 @@ Plugin _plugin = Plugin();
 
 /// use the class method to help user load asset list and asset info.
 ///
-/// 这个类可以获取
+/// 这个类是整个库的核心类
 class PhotoManager {
   /// in android WRITE_EXTERNAL_STORAGE  READ_EXTERNAL_STORAGE
   ///
   /// in ios request the photo permission
+  ///
+  /// Use [requestPermissionExtend] to instead;
+  // @Deprecated("Use requestPermissionExtend")
   static Future<bool> requestPermission() async {
-    return _plugin.requestPermission();
+    return (await requestPermissionExtend()).isAuth;
+  }
+
+  /// Android: WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, MEDIA_LOCATION
+  ///
+  /// iOS: NSPhotoLibraryUsageDescription of info.plist
+  ///
+  /// macOS of Release.entitlements:
+  ///  - com.apple.security.assets.movies.read-write
+  ///  - com.apple.security.assets.music.read-write
+  ///
+  /// Also see [PermissionState].
+  static Future<PermissionState> requestPermissionExtend({
+    PermisstionRequestOption requestOption = const PermisstionRequestOption(),
+  }) async {
+    final int resultIndex =
+        await _plugin.requestPermissionExtend(requestOption);
+    return PermissionState.values[resultIndex];
   }
 
   static Editor editor = Editor();
