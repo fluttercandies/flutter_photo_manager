@@ -29,6 +29,8 @@ If you just need a picture selector, you can choose to use [photo](https://pub.d
   - [Usage](#usage)
     - [Configure your flutter project to use the plugin](#configure-your-flutter-project-to-use-the-plugin)
     - [request permission](#request-permission)
+      - [About `requestPermissionExtend`](#about-requestpermissionextend)
+      - [Limit photos](#limit-photos)
     - [you get all of asset list (gallery)](#you-get-all-of-asset-list-gallery)
       - [FilterOption](#filteroption)
     - [Get asset list from `AssetPathEntity`](#get-asset-list-from-assetpathentity)
@@ -96,14 +98,32 @@ Please click the link below.
 You must get the user's permission on android/ios.
 
 ```dart
-var result = await PhotoManager.requestPermission();
-if (result) {
+var result = await PhotoManager.requestPermissionExtend();
+if (result.isAuth) {
     // success
 } else {
     // fail
     /// if result is fail, you can call `PhotoManager.openSetting();`  to open android/ios applicaton's setting to get permission
 }
 ```
+
+#### About `requestPermissionExtend`
+
+In iOS14, Apple inclue "LimitedPhotos Library" to iOS.
+
+We need use the `PhotoManager.requestPermissionExtend()` to request permission.
+
+The method will return `PermissionState`. See it in [document of Apple](https://developer.apple.com/documentation/photokit/phauthorizationstatus?language=objc).
+
+So, because of compatibility, Android also recommends using this method to request permission, use `state.isAuth`, use a to be equivalent to the previous method `requestPermission`.
+
+#### Limit photos
+
+Because apple inclue "LimitedPhotos Library" to iOS.
+
+Let the user select the visible image for app again, we can use `PhotoManager.presentLimited()` to repick again.
+
+The method is only valid when iOS14 and user authorization mode is `PermissionState.limited`, other platform will ignore.
 
 ### you get all of asset list (gallery)
 

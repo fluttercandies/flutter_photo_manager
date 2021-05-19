@@ -64,6 +64,7 @@
 Feature:
 
 - Add requestPermissionExtend code to support iOS 14 permission.
+- Add update limited photos method for iOS 14.
 
 ## 1.1.6
 
