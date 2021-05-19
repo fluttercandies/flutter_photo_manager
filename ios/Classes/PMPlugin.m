@@ -111,9 +111,15 @@
 
 #if TARGET_OS_OSX
 - (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler requestAccessLevel:(int)requestAccessLevel {
-    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-      [self replyPermssionResult:handler status:status];
-    }];
+    if (@available(macOS 11.0, *)) {
+        [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
+            [self replyPermssionResult:handler status:status];
+        }];
+    } else {
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+          [self replyPermssionResult:handler status:status];
+        }];
+    }
 }
 #endif
 
