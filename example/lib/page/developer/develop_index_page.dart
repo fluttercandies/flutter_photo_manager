@@ -65,6 +65,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
             child: Text("Request permission extend"),
             onPressed: _requestPermssionExtend,
           ),
+          ElevatedButton(
+            child: Text("PresentLimited"),
+            onPressed: _persentLimited,
+          ),
         ],
       ),
     );
@@ -156,5 +160,9 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
   void _requestPermssionExtend() async {
     final state = await PhotoManager.requestPermissionExtend();
     print('result --- state: $state');
+  }
+
+  Future<void> _persentLimited() async {
+    await PhotoManager.presentLimited();
   }
 }
