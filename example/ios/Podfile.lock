@@ -27,7 +27,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
-  photo_manager: a8db3597a3b44e17ecb331fa099731c99b849496
+  photo_manager: 61cdd6835af271b9ad1bb533fccf71d5db02fff3
   video_player: 9cc823b1d9da7e8427ee591e8438bfbcde500e6e
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c

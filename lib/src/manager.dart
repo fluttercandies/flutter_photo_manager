@@ -33,6 +33,17 @@ class PhotoManager {
     return PermissionState.values[resultIndex];
   }
 
+  /// Prompts the user to update their limited library selection.
+  ///
+  /// This method just support iOS(14.0+).
+  ///
+  /// See document of [Apple doc][].
+  ///
+  /// [Apple doc]: https://developer.apple.com/documentation/photokit/phphotolibrary/3616113-presentlimitedlibrarypickerfromv/
+  static Future<void> presentLimited() async {
+    await _plugin.presentLimited();
+  }
+
   static Editor editor = Editor();
 
   /// get gallery list

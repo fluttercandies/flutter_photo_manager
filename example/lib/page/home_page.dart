@@ -36,6 +36,9 @@ class _NewHomePageState extends State<NewHomePage> {
         body: Column(
           children: <Widget>[
             buildButton("Get all gallery list", _scanGalleryList),
+            if (Platform.isIOS)
+              buildButton(
+                  "Change limited photos with PhotosUI", _changeLimitPhotos),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -193,6 +196,10 @@ class _NewHomePageState extends State<NewHomePage> {
         );
       },
     );
+  }
+
+  Future<void> _changeLimitPhotos() async {
+    await PhotoManager.presentLimited();
   }
 }
 

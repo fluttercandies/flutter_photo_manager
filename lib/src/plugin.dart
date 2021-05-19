@@ -390,6 +390,12 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
       'option': option.toMap(),
     });
   }
+
+  Future<void> presentLimited() async {
+    if (Platform.isIOS) {
+      await _channel.invokeMethod('presentLimited');
+    }
+  }
 }
 
 mixin BasePlugin {

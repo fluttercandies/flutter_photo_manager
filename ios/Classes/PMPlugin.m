@@ -14,6 +14,9 @@
 #import "PMProgressHandler.h"
 #import "PMConverter.h"
 
+#import <Photos/Photos.h>
+#import <PhotosUI/PhotosUI.h>
+
 @implementation PMPlugin {
   BOOL ignoreCheckPermission;
   NSObject <FlutterPluginRegistrar> *privateRegistrar;
@@ -46,6 +49,8 @@
   if ([call.method isEqualToString:@"requestPermissionExtend"]) {
     int requestAccessLevel = [call.arguments[@"iosAccessLevel"] intValue];
     [self handlePermission:manager handler:handler requestAccessLevel:requestAccessLevel];
+  } else if ([call.method isEqualToString:@"presentLimited"]) {
+    [self presentLimited];
   } else if ([call.method isEqualToString:@"clearFileCache"]) {
     [manager clearFileCache];
     [handler reply:@1];
@@ -98,12 +103,40 @@
     }
 }
 
+-(UIViewController*) getCurrentViewController {
+    UIViewController *ctl = UIApplication.sharedApplication.keyWindow.rootViewController;
+    if(ctl){
+        UIViewController *result = ctl;
+        while(1){
+            if(result.presentedViewController) {
+                result = result.presentedViewController;
+            } else {
+                return result;
+            }
+        }
+    }
+    return nil;
+}
+
+-(void)presentLimited {
+    if (@available(iOS 14, *)) {
+        UIViewController* ctl = [self getCurrentViewController];
+        if(!ctl){
+            return;
+        }
+        [PHPhotoLibrary.sharedPhotoLibrary presentLimitedLibraryPickerFromViewController: ctl];
+    }
+}
+
 #else
 
 - (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler requestAccessLevel:(int)requestAccessLevel {
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
       [self replyPermssionResult:handler status:status];
     }];
+}
+
+-(void)presentLimited {
 }
 
 #endif
@@ -121,6 +154,10 @@
         }];
     }
 }
+
+-(void)presentLimited {
+}
+
 #endif
 
 - (void)runInBackground:(dispatch_block_t)block {

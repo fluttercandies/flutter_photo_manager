@@ -17,6 +17,12 @@ A new flutter plugin project.
   s.public_header_files = 'Classes/**/*.h','Classes/**/**/*.h'
   s.osx.dependency 'FlutterMacOS'
   s.ios.dependency 'Flutter'
+  
+  s.ios.framework = 'Photos'
+  s.ios.framework = 'PhotosUI'
+
+  s.osx.framework = 'Photos'
+  s.osx.framework = 'PhotosUI'
   # s.dependency 'photo_manager_core'
 
   # s.platform = :osx, '10.15'
