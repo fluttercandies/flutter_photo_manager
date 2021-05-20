@@ -66,6 +66,10 @@ Feature:
 - Add requestPermissionExtend code to support iOS 14 permission.
 - Add update limited photos method for iOS 14.
 
+Fix:
+
+- Permissions dialog of launch on old iOS versions. [#503](https://github.com/CaiJingLong/flutter_photo_manager/pull/503)
+
 ## 1.1.6
 
 The MEDIA_LOCATION permission of android can be removed through configuration.
