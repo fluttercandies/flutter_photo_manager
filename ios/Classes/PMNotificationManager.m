@@ -74,9 +74,9 @@
   NSArray<PHObject *> *insertedObjects = details.insertedObjects;
   NSArray<PHObject *> *removedObjects = details.removedObjects;
 
-  [PMLogUtils.sharedInstance info: [@"changed = %@", changedObjects]];
-  [PMLogUtils.sharedInstance info: [@"inserted = %@", insertedObjects]];
-  [PMLogUtils.sharedInstance info: [@"removed = %@", removedObjects]];
+  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"changed = %@", changedObjects]];
+  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"inserted = %@", insertedObjects]];
+  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"removed = %@", removedObjects]];
 
   [self addToResult:dictionary key:@"update" objects:changedObjects];
   [self addToResult:dictionary key:@"create" objects:insertedObjects];
