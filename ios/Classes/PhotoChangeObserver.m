@@ -4,6 +4,7 @@
 
 #import <Photos/Photos.h>
 #import "PhotoChangeObserver.h"
+#import "core/PMLogUtils.h"
 
 @interface PhotoChangeObserver () <PHPhotoLibraryChangeObserver>
 @property(nonatomic, strong) FlutterMethodChannel *handler;
@@ -33,7 +34,7 @@
 
     PHObjectChangeDetails *details = [changeInstance changeDetailsForObject:collection];
     PHObject *object = details.objectAfterChanges;
-    NSLog(@"%@, %@", object.localIdentifier, object.class);
+    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"%@, %@", object.localIdentifier, object.class]];
 
     [self.handler invokeMethod:@"change" arguments:@1];
 }

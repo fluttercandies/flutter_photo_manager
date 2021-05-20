@@ -4,6 +4,7 @@
 
 #import "PMNotificationManager.h"
 #import "PMConvertUtils.h"
+#import "core/PMLogUtils.h"
 
 @interface PMNotificationManager () <PHPhotoLibraryChangeObserver>
 @end
@@ -57,7 +58,7 @@
 
   NSDictionary *detailResult = [self convertChangeDetailsToNotifyDetail:details];
 
-  NSLog(@"on change result = %@", detailResult);
+  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"on change result = %@", detailResult]];
   [self refreshFetchResult];
 
   [channel invokeMethod:@"change" arguments:detailResult];
@@ -73,9 +74,9 @@
   NSArray<PHObject *> *insertedObjects = details.insertedObjects;
   NSArray<PHObject *> *removedObjects = details.removedObjects;
 
-  NSLog(@"changed = %@", changedObjects);
-  NSLog(@"inserted = %@", insertedObjects);
-  NSLog(@"removed = %@", removedObjects);
+  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"changed = %@", changedObjects]];
+  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"inserted = %@", insertedObjects]];
+  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"removed = %@", removedObjects]];
 
   [self addToResult:dictionary key:@"update" objects:changedObjects];
   [self addToResult:dictionary key:@"create" objects:insertedObjects];

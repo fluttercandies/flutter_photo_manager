@@ -13,7 +13,7 @@
 
 - (NSString *)title {
     PMLogUtils *logger = [PMLogUtils sharedInstance];
-    NSLog(@"get title start");
+    [logger info:@"get title start"];
     @try {
         NSString *result = [self valueForKey:@"filename"];
         [logger info:@"get title from kvo"];
