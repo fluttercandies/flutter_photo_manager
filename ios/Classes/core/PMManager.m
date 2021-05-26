@@ -385,11 +385,13 @@
                       return;
                     }
                     NSData *imageData = [PMImageUtil convertToData:result formatType:option.format quality:option.quality];
+                    if (imageData) {
+                      id data = [self.converter convertData:imageData];
+                      [handler reply:data];
 
-                    id data = [self.converter convertData:imageData];
-                    [handler reply:data];
-
-                    [self notifySuccess:progressHandler];
+                      [self notifySuccess:progressHandler];
+                    }
+                    
                   }];
 
 }
