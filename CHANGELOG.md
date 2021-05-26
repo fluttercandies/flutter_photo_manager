@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [1.2.1](#121)
   - [1.2.0](#120)
   - [1.1.6](#116)
   - [1.1.5](#115)
@@ -58,6 +59,12 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 1.2.1
+
+Fix:
+
+- An error of iOS. See [#509](https://github.com/CaiJingLong/flutter_photo_manager/pull/509), [#510](https://github.com/CaiJingLong/flutter_photo_manager/pull/510).
 
 ## 1.2.0
 
