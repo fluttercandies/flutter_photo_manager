@@ -388,9 +388,11 @@
                     if (imageData) {
                       id data = [self.converter convertData:imageData];
                       [handler reply:data];
-
-                      [self notifySuccess:progressHandler];
+                    } else {
+                      [handler reply: nil];
                     }
+      
+                    [self notifySuccess:progressHandler];
                     
                   }];
 
@@ -605,10 +607,14 @@
                     }
 
                     NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
+                
+                    if (data) {
+                      NSString *path = [self writeFullFileWithAssetId:asset imageData: data];
+                      [handler reply:path];
+                    } else {
+                      [handler reply:nil];
+                    }
 
-                    NSString *path = [self writeFullFileWithAssetId:asset imageData: data];
-
-                    [handler reply:path];
                     [self notifySuccess:progressHandler];
                   }];
 }
