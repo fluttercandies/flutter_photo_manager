@@ -15,6 +15,8 @@ class ImageScannerPlugin : FlutterPlugin, ActivityAware {
 
   private var binding: ActivityPluginBinding? = null
 
+  private var requestPermissionsResultListener: RequestPermissionsResultListener? = null
+
   companion object {
     fun register(plugin: PhotoManagerPlugin, messenger: BinaryMessenger) {
       val newChannel = MethodChannel(messenger, "top.kikt/photo_manager")
@@ -39,8 +41,8 @@ class ImageScannerPlugin : FlutterPlugin, ActivityAware {
   }
 
   override fun onDetachedFromActivity() {
-    plugin?.let {
-      binding?.removeActivityResultListener(it.deleteManager)
+    binding?.let {
+      onRemoveRequestPermissionResultListener(it)
     }
   }
 
@@ -57,15 +59,30 @@ class ImageScannerPlugin : FlutterPlugin, ActivityAware {
   }
 
   private fun activityAttached(binding: ActivityPluginBinding) {
+    if (this.binding != null) {
+      onRemoveRequestPermissionResultListener(this.binding!!)
+    }
+
     this.binding = binding
     plugin?.bindActivity(binding.activity)
     addRequestPermissionsResultListener(binding)
   }
 
   private fun addRequestPermissionsResultListener(binding: ActivityPluginBinding) {
-    binding.addRequestPermissionsResultListener(createAddRequestPermissionsResultListener(permissionsUtils))
+    val listener = createAddRequestPermissionsResultListener(permissionsUtils)
+    requestPermissionsResultListener = listener
+    binding.addRequestPermissionsResultListener(listener)
     plugin?.let {
       binding.addActivityResultListener(it.deleteManager)
+    }
+  }
+
+  private fun onRemoveRequestPermissionResultListener(oldBinding: ActivityPluginBinding) {
+    requestPermissionsResultListener?.let { listener ->
+      oldBinding.removeRequestPermissionsResultListener(listener)
+    }
+    plugin?.let { p ->
+      oldBinding.removeActivityResultListener(p.deleteManager)
     }
   }
 }
