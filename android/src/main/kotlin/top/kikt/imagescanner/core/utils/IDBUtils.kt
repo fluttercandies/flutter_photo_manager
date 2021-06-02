@@ -151,7 +151,7 @@ interface IDBUtils {
     return assetEntity.getUri()
   }
 
-  fun saveImage(context: Context, image: ByteArray, title: String, desc: String, relativePath: String?): AssetEntity?
+  fun saveImage(context: Context, image: ByteArray, title: String, desc: String, creationTime: Int, relativePath: String?): AssetEntity?
 
   fun saveImage(context: Context, path: String, title: String, desc: String, relativePath: String?): AssetEntity?
 

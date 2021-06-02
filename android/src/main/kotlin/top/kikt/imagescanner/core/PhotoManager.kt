@@ -174,8 +174,8 @@ class PhotoManager(private val context: Context) {
     resultHandler.reply(path)
   }
 
-  fun saveImage(image: ByteArray, title: String, description: String, relativePath: String?): AssetEntity? {
-    return dbUtils.saveImage(context, image, title, description, relativePath)
+  fun saveImage(image: ByteArray, title: String, description: String, creationTime: Int, relativePath: String?): AssetEntity? {
+    return dbUtils.saveImage(context, image, title, description, creationTime, relativePath)
   }
 
   fun saveImage(path: String, title: String, description: String, relativePath: String?): AssetEntity? {

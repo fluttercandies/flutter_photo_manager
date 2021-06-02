@@ -30,10 +30,12 @@ class Editor {
     Uint8List data, {
     String? title,
     String? desc,
+    int? creationTime,
     String? relativePath,
   }) async {
+    print("Creating image with creationTime " + creationTime.toString());
     return _plugin.saveImage(data,
-        title: title, desc: desc, relativePath: relativePath);
+        title: title, desc: desc, creationTime: creationTime ?? DateTime.now().millisecondsSinceEpoch, relativePath: relativePath);
   }
 
   /// Save image to gallery.

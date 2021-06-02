@@ -374,8 +374,10 @@ class PhotoManagerPlugin(
             val image = call.argument<ByteArray>("image")!!
             val title = call.argument<String>("title") ?: ""
             val desc = call.argument<String>("desc") ?: ""
+            val creationTime = call.argument<Int>("creationTime")!!
             val relativePath = call.argument<String>("relativePath") ?: ""
-            val entity = photoManager.saveImage(image, title, desc, relativePath)
+            val entity = photoManager.saveImage(image, title, desc, creationTime, relativePath)
+            LogUtils.info("creating image with time " + creationTime);
             if (entity == null) {
               resultHandler.reply(null)
               return@runOnBackground

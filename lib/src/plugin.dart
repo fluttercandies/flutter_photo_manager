@@ -177,6 +177,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     Uint8List data, {
     String? title,
     String? desc,
+    int? creationTime,
     String? relativePath,
   }) async {
     title ??= 'image_${DateTime.now().millisecondsSinceEpoch / 1000}';
@@ -187,6 +188,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
         'image': data,
         'title': title,
         'desc': desc ?? '',
+        'creationTime': creationTime ?? 0,
         'relativePath': relativePath,
       },
     );

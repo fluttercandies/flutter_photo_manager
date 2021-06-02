@@ -300,7 +300,7 @@ object DBUtils : IDBUtils {
     cacheContainer.clearCache()
   }
 
-  override fun saveImage(context: Context, image: ByteArray, title: String, desc: String, relativePath: String?): AssetEntity? {
+  override fun saveImage(context: Context, image: ByteArray, title: String, desc: String, timestamp: Int, relativePath: String?): AssetEntity? {
     val cr = context.contentResolver
     var inputStream = ByteArrayInputStream(image)
 
@@ -330,7 +330,6 @@ object DBUtils : IDBUtils {
     val width = bmp.width
     val height = bmp.height
 
-    val timestamp = System.currentTimeMillis() / 1000
     refreshInputStream()
 
     val typeFromStream: String = if (title.contains(".")) {

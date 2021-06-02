@@ -367,7 +367,7 @@ object Android30DbUtils : IDBUtils {
     androidQCache.saveAssetCache(context, asset, byteArray, true)
   }
 
-  override fun saveImage(context: Context, image: ByteArray, title: String, desc: String, relativePath: String?): AssetEntity? {
+  override fun saveImage(context: Context, image: ByteArray, title: String, desc: String, timestamp: Int, relativePath: String?): AssetEntity? {
     val (width, height) =
         try {
           val bmp = BitmapFactory.decodeByteArray(image, 0, image.count())
@@ -379,7 +379,6 @@ object Android30DbUtils : IDBUtils {
     val inputStream = ByteArrayInputStream(image)
 
     val cr = context.contentResolver
-    val timestamp = System.currentTimeMillis() / 1000
 
     val typeFromStream: String = if (title.contains(".")) {
       // title contains file extension, form mimeType from it
