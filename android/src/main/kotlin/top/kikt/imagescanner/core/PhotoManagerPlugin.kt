@@ -345,26 +345,31 @@ class PhotoManagerPlugin(
       }
       "deleteWithIds" -> {
         runOnBackground {
-          val ids = call.argument<List<String>>("ids")!!
-          if (belowSdk(29)) {
-            deleteManager.deleteInApi28(ids)
-            resultHandler.reply(ids)
-          } else if (IDBUtils.isAndroidR) {
-            val uris = ids.map {
-              photoManager.getUri(it)
-            }.toList()
-            if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-              deleteManager.deleteInApi30(uris, resultHandler)
+          try {
+            val ids = call.argument<List<String>>("ids")!!
+            if (belowSdk(29)) {
+              deleteManager.deleteInApi28(ids)
+              resultHandler.reply(ids)
+            } else if (IDBUtils.isAndroidR) {
+              val uris = ids.map {
+                photoManager.getUri(it)
+              }.toList()
+              if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                deleteManager.deleteInApi30(uris, resultHandler)
+              }
+            } else {
+              val uris = ids.mapNotNull { photoManager.getUri(it) }
+  //            for (id in ids) {
+  //              val uri = photoManager.getUri(id)
+  //              if (uri != null) {
+  //                deleteManager.deleteWithUriInApi29(uri, false)
+  //              }
+  //            }
+              deleteManager.deleteWithUriInApi29(ids, uris, resultHandler, false)
             }
-          } else {
-            val uris = ids.mapNotNull { photoManager.getUri(it) }
-//            for (id in ids) {
-//              val uri = photoManager.getUri(id)
-//              if (uri != null) {
-//                deleteManager.deleteWithUriInApi29(uri, false)
-//              }
-//            }
-            deleteManager.deleteWithUriInApi29(ids, uris, resultHandler, false)
+          } catch (e: Exception) {
+            LogUtils.error("deleteWithIds failed", e)
+            resultHandler.replyError("deleteWithIds failed")
           }
         }
       }
