@@ -51,6 +51,7 @@
     [self handlePermission:manager handler:handler requestAccessLevel:requestAccessLevel];
   } else if ([call.method isEqualToString:@"presentLimited"]) {
     [self presentLimited];
+    [handler reply:@1];
   } else if ([call.method isEqualToString:@"clearFileCache"]) {
     [manager clearFileCache];
     [handler reply:@1];

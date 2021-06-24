@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_scanner_example/page/developer/create_entity_by_id.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -163,6 +164,15 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
   }
 
   Future<void> _persentLimited() async {
-    await PhotoManager.presentLimited();
+    if (Platform.isIOS) {
+      PhotoManager.addChangeCallback(_callback);
+      PhotoManager.startChangeNotify();
+      await PhotoManager.presentLimited();
+    }
+  }
+
+  void _callback(MethodCall call) {
+    print('on change ${call.method} ${call.arguments}');
+    PhotoManager.removeChangeCallback(_callback);
   }
 }
