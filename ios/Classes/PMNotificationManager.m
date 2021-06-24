@@ -16,13 +16,13 @@
 }
 
 - (instancetype)initWithRegistrar:
-        (NSObject <FlutterPluginRegistrar> *)registrar {
+    (NSObject<FlutterPluginRegistrar> *)registrar {
   self = [super init];
   if (self) {
     self.registrar = registrar;
     channel = [FlutterMethodChannel
-            methodChannelWithName:@"top.kikt/photo_manager/notify"
-                  binaryMessenger:[registrar messenger]];
+        methodChannelWithName:@"top.kikt/photo_manager/notify"
+              binaryMessenger:[registrar messenger]];
     _notifying = NO;
   }
 
@@ -30,7 +30,7 @@
 }
 
 + (instancetype)managerWithRegistrar:
-        (NSObject <FlutterPluginRegistrar> *)registrar {
+    (NSObject<FlutterPluginRegistrar> *)registrar {
   return [[self alloc] initWithRegistrar:registrar];
 }
 
@@ -54,13 +54,20 @@
     return;
   }
 
-  PHFetchResultChangeDetails *details = [changeInstance changeDetailsForFetchResult:result];
+  PHFetchResultChangeDetails *details =
+      [changeInstance changeDetailsForFetchResult:result];
 
-  NSDictionary *detailResult = [self convertChangeDetailsToNotifyDetail:details];
+  NSMutableDictionary *detailResult =
+      [self convertChangeDetailsToNotifyDetail:details];
 
-  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"on change result = %@", detailResult]];
+  NSUInteger oldCount = result.count;
   [self refreshFetchResult];
+  NSUInteger newCount = result.count;
+  detailResult[@"oldCount"] = @(oldCount);
+  detailResult[@"newCount"] = @(newCount);
 
+  [PMLogUtils.sharedInstance
+      info:[NSString stringWithFormat:@"on change result = %@", detailResult]];
   [channel invokeMethod:@"change" arguments:detailResult];
 }
 
@@ -68,36 +75,48 @@
   result = [self getLastAssets];
 }
 
-- (NSDictionary *)convertChangeDetailsToNotifyDetail:(PHFetchResultChangeDetails *)details {
+- (NSMutableDictionary *)convertChangeDetailsToNotifyDetail:
+    (PHFetchResultChangeDetails *)details {
   NSMutableDictionary *dictionary = [NSMutableDictionary new];
   NSArray<PHObject *> *changedObjects = details.changedObjects;
   NSArray<PHObject *> *insertedObjects = details.insertedObjects;
   NSArray<PHObject *> *removedObjects = details.removedObjects;
 
-  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"changed = %@", changedObjects]];
-  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"inserted = %@", insertedObjects]];
-  [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"removed = %@", removedObjects]];
+  [PMLogUtils.sharedInstance
+      info:[NSString stringWithFormat:@"changed = %@", changedObjects]];
+  [PMLogUtils.sharedInstance
+      info:[NSString stringWithFormat:@"inserted = %@", insertedObjects]];
+  [PMLogUtils.sharedInstance
+      info:[NSString stringWithFormat:@"removed = %@", removedObjects]];
 
   [self addToResult:dictionary key:@"update" objects:changedObjects];
   [self addToResult:dictionary key:@"create" objects:insertedObjects];
   [self addToResult:dictionary key:@"delete" objects:removedObjects];
 
-//  return @{@"platform": @"iOS", result: dictionary};
+  //  return @{@"platform": @"iOS", result: dictionary};
   return dictionary;
 }
 
-- (void)addToResult:(NSMutableDictionary *)dictionary key:(NSString *)key objects:(NSArray<PHObject *> *)changedObjects {
+- (void)addToResult:(NSMutableDictionary *)dictionary
+                key:(NSString *)key
+            objects:(NSArray<PHObject *> *)changedObjects {
   NSMutableArray *items = [NSMutableArray new];
 
-  for (PHObject *object in  changedObjects) {
+  for (PHObject *object in changedObjects) {
     if ([object isMemberOfClass:PHAsset.class]) {
-      PHAsset *asset = (PHAsset *) object;
+      PHAsset *asset = (PHAsset *)object;
       NSMutableDictionary *itemDict = [NSMutableDictionary new];
-      PHFetchResult<PHAssetCollection *> *collections = [PHAssetCollection fetchAssetCollectionsContainingAsset:asset withType:PHAssetCollectionTypeAlbum options:nil];
+      PHFetchResult<PHAssetCollection *> *collections = [PHAssetCollection
+          fetchAssetCollectionsContainingAsset:asset
+                                      withType:PHAssetCollectionTypeAlbum
+                                       options:nil];
       itemDict[@"id"] = object.localIdentifier;
       NSMutableArray *collectionArray = [NSMutableArray new];
       for (PHAssetCollection *collection in collections) {
-        NSDictionary *collectionDict = @{@"id": collection.localIdentifier, @"title": collection.localizedTitle};
+        NSDictionary *collectionDict = @{
+          @"id" : collection.localIdentifier,
+          @"title" : collection.localizedTitle
+        };
         [collectionArray addObject:collectionDict];
       }
       [items addObject:itemDict];
