@@ -7,6 +7,10 @@ class _NotifyManager {
   static const MethodChannel _channel =
       const MethodChannel("top.kikt/photo_manager/notify");
 
+  StreamController<bool> _controller = StreamController.broadcast();
+
+  Stream<bool> get notifyStream => _controller.stream;
+
   /// callbacks
   var notifyCallback = <ValueChanged<MethodCall>>[];
 
@@ -22,12 +26,14 @@ class _NotifyManager {
   void startHandleNotify() {
     _channel.setMethodCallHandler(_notify);
     _plugin.notifyChange(start: true);
+    _controller.add(true);
   }
 
   /// stop handle notify
   void stopHandleNotify() {
     _plugin.notifyChange(start: false);
     _channel.setMethodCallHandler(null);
+    _controller.add(false);
   }
 
   Future<dynamic> _notify(MethodCall call) async {
