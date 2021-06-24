@@ -6,11 +6,16 @@ class AssetPathEntity {
   static Future<AssetPathEntity> fromId(
     String id, {
     FilterOptionGroup? filterOption,
+    RequestType type = RequestType.common,
+    int albumType = 1,
   }) async {
+    assert(albumType == 1 || Platform.isIOS || Platform.isMacOS);
     filterOption ??= FilterOptionGroup();
     final entity = AssetPathEntity()
       ..id = id
-      ..filterOption = filterOption;
+      ..filterOption = filterOption
+      ..typeInt = type.index
+      ..albumType = 1;
     await entity.refreshPathProperties();
     return entity;
   }
