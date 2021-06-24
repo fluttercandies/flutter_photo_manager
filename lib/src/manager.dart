@@ -182,21 +182,22 @@ class PhotoManager {
   static void removeChangeCallback(ValueChanged<MethodCall> callback) =>
       _notifyManager.removeCallback(callback);
 
-  ///
-  static bool changeNotifying = false;
+  /// Whether to monitor the change of photo album.
+  static bool notifyingOfChange = false;
 
+  /// See [_NotifyManager.notifyStream]
   static Stream<bool> get notifyStream => _notifyManager.notifyStream;
 
   /// see [_NotifyManager]
   static void startChangeNotify() {
     _notifyManager.startHandleNotify();
-    changeNotifying = true;
+    notifyingOfChange = true;
   }
 
   /// see [_NotifyManager]
   static void stopChangeNotify() {
     _notifyManager.stopHandleNotify();
-    changeNotifying = false;
+    notifyingOfChange = false;
   }
 
   static Future<File?> _getFileWithId(

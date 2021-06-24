@@ -9,6 +9,7 @@ class _NotifyManager {
 
   StreamController<bool> _controller = StreamController.broadcast();
 
+  /// When the notification status change, the listen of stream will be called.
   Stream<bool> get notifyStream => _controller.stream;
 
   /// callbacks

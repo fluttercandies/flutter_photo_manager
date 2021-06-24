@@ -75,7 +75,7 @@ class _ChangeNotifyExampleState extends State<ChangeNotifyExample> {
           },
         );
       },
-      initialData: PhotoManager.changeNotifying,
+      initialData: PhotoManager.notifyingOfChange,
       stream: PhotoManager.notifyStream,
     );
   }
