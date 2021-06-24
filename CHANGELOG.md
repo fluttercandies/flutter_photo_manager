@@ -72,6 +72,7 @@ Fix:
 Feature:
 
 - Old count and new count of change notify on iOS.
+- Add some notify for change notify.
 
 ## 1.2.2
 
