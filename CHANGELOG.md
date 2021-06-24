@@ -69,6 +69,10 @@ Fix:
 - A change notify bug of remove callback.
 - Add result for presentLimited.
 
+Feature:
+
+- Old count and new count of change notify on iOS.
+
 ## 1.2.2
 
 Fix:
