@@ -181,4 +181,12 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
     PhotoManager.removeChangeCallback(_callback);
     _isNotify = false;
   }
+
+  @override
+  void dispose() {
+    if (_isNotify) {
+      PhotoManager.removeChangeCallback(_callback);
+    }
+    super.dispose();
+  }
 }
