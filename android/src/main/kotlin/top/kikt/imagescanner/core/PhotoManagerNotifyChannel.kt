@@ -48,7 +48,7 @@ class PhotoManagerNotifyChannel(val applicationContext: Context, private val mes
   }
 
   private fun registerObserver(mediaObserver: MediaObserver, uri: Uri) {
-    context.contentResolver.registerContentObserver(uri, false, mediaObserver)
+    context.contentResolver.registerContentObserver(uri, true, mediaObserver)
     mediaObserver.uri = uri
   }
 
@@ -64,10 +64,10 @@ class PhotoManagerNotifyChannel(val applicationContext: Context, private val mes
 
   fun onOuterChange(uri: Uri?, changeType: String, id: Long?, galleryId: Long?, observerType: Int) {
     val resultMap = hashMapOf<String, Any?>(
-            "platform" to "android",
-            "uri" to uri.toString(),
-            "type" to changeType,
-            "mediaType" to observerType
+        "platform" to "android",
+        "uri" to uri.toString(),
+        "type" to changeType,
+        "mediaType" to observerType
     )
     if (id != null) {
       resultMap["id"] = id
@@ -95,7 +95,6 @@ class PhotoManagerNotifyChannel(val applicationContext: Context, private val mes
       get() = context.contentResolver
 
     override fun onChange(selfChange: Boolean, uri: Uri?) {
-      super.onChange(selfChange, uri)
       if (uri == null) {
         return
       }
@@ -104,17 +103,19 @@ class PhotoManagerNotifyChannel(val applicationContext: Context, private val mes
 
       if (id != null) { // insert or update
         val cursor = cr.query(
-                allUri,
-                arrayOf(DATE_ADDED, DATE_MODIFIED, MEDIA_TYPE),
-                "${BaseColumns._ID} = ?",
-                arrayOf(id.toString()),
-                null
+            allUri,
+            arrayOf(DATE_ADDED, DATE_MODIFIED, MEDIA_TYPE),
+            "${BaseColumns._ID} = ?",
+            arrayOf(id.toString()),
+            null
         )
         cursor?.use {
-          // find date to know insert or update
-          if (cursor.moveToNext()) {
+          if (!cursor.moveToNext()) {
+            // If the id not have item, I think the item was deleted.
+            onOuterChange(uri, "delete", id, null, type)
             return
           }
+          // find date to know insert or update
           val addTimestampSecond = cursor.getLong(cursor.getColumnIndex(DATE_ADDED))
           val currentTimeMillis = System.currentTimeMillis()
 
@@ -153,11 +154,11 @@ class PhotoManagerNotifyChannel(val applicationContext: Context, private val mes
       when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
           val cursor = cr.query(
-                  allUri,
-                  arrayOf(MediaStore.MediaColumns.BUCKET_ID, MediaStore.MediaColumns.BUCKET_DISPLAY_NAME),
-                  "${BaseColumns._ID} = ?",
-                  arrayOf(id.toString()),
-                  null
+              allUri,
+              arrayOf(MediaStore.MediaColumns.BUCKET_ID, MediaStore.MediaColumns.BUCKET_DISPLAY_NAME),
+              "${BaseColumns._ID} = ?",
+              arrayOf(id.toString()),
+              null
           )
           cursor?.use {
             if (cursor.moveToNext()) {
@@ -170,11 +171,11 @@ class PhotoManagerNotifyChannel(val applicationContext: Context, private val mes
         }
         type == MEDIA_TYPE_AUDIO -> {
           val cursor = cr.query(
-                  allUri,
-                  arrayOf(MediaStore.Audio.AudioColumns.ALBUM_ID, MediaStore.Audio.AudioColumns.ALBUM),
-                  "${BaseColumns._ID} = ?",
-                  arrayOf(id.toString()),
-                  null
+              allUri,
+              arrayOf(MediaStore.Audio.AudioColumns.ALBUM_ID, MediaStore.Audio.AudioColumns.ALBUM),
+              "${BaseColumns._ID} = ?",
+              arrayOf(id.toString()),
+              null
           )
 
           cursor?.use {
@@ -187,11 +188,11 @@ class PhotoManagerNotifyChannel(val applicationContext: Context, private val mes
         }
         else -> {
           val cursor = cr.query(
-                  allUri,
-                  arrayOf("bucket_id", "bucket_display_name"),
-                  "${BaseColumns._ID} = ?",
-                  arrayOf(id.toString()),
-                  null
+              allUri,
+              arrayOf("bucket_id", "bucket_display_name"),
+              "${BaseColumns._ID} = ?",
+              arrayOf(id.toString()),
+              null
           )
 
           cursor?.use {
