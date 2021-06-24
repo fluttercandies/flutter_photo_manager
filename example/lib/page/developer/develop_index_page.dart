@@ -163,9 +163,14 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
     print('result --- state: $state');
   }
 
+  var _isNotify = false;
+
   Future<void> _persentLimited() async {
     if (Platform.isIOS) {
-      PhotoManager.addChangeCallback(_callback);
+      if (!_isNotify) {
+        _isNotify = true;
+        PhotoManager.addChangeCallback(_callback);
+      }
       PhotoManager.startChangeNotify();
       await PhotoManager.presentLimited();
     }
@@ -174,5 +179,6 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
   void _callback(MethodCall call) {
     print('on change ${call.method} ${call.arguments}');
     PhotoManager.removeChangeCallback(_callback);
+    _isNotify = false;
   }
 }
