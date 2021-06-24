@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [1.2.3](#123)
   - [1.2.2](#122)
   - [1.2.1](#121)
   - [1.2.0](#120)
@@ -61,23 +62,34 @@
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
 
+## 1.2.3
+
+Fix:
+
+- A change notify bug of remove callback.
+- Add result for presentLimited.
+
 ## 1.2.2
 
 Fix:
+
 - Add request permissions result listener when activity re-attached. [#515](../../pull/515)
 
 ## 1.2.1
 
 Fix:
+
 - An error of iOS. See [#509](../../pull/509), [#510](../../pull/510).
 
 ## 1.2.0
 
 Feature:
+
 - Add requestPermissionExtend code to support iOS 14 permission.
 - Add update limited photos method for iOS 14.
 
 Fix:
+
 - Permissions dialog of launch on old iOS versions. [#503](../../pull/503)
 
 ## 1.1.6
@@ -89,6 +101,7 @@ The MEDIA_LOCATION permission of android can be removed through configuration.
 Revert [#478](../../pull/478)
 
 Fix:
+
 - Thumb size of the entity on iOS/macOS.
 
 ## 1.1.4
@@ -139,12 +152,14 @@ Merged the code of macos and ios.
 ## 1.0.0
 
 Breaking change:
+
 - Migrate to null safety.
 - Correct type in `PMRequestState` .
 
 ## 0.6.0
 
 - Feature
+
   - Support android API 30.
   - Support show empty album in iOS([#365](../../issues/365)).
   - User can ignore check permission(User can choose favorite permission plugin, but at the same time user have to bear the risks corresponding to the permission).
@@ -174,6 +189,7 @@ Delete assets in androidQ.
 ## 0.5.7
 
 Fix:
+
 - Audio asset error for androidQ. See [#340](../../issues/340) [#341](../../pull/341).
 
 ## 0.5.6
@@ -211,6 +227,7 @@ From the version, Starting from this version, 1.9 or earlier versions are not su
 ## 0.5.1
 
 Feature:
+
 - Save image asset with file path.
 - Copy asset to another album.
 - Create AssetEntity with id.
@@ -226,6 +243,7 @@ Feature:
   - add `relativePath` for android.
 
 Fix:
+
 - Problem of AssetPathEntity.refreshPathProperties.
 - Open setting in iOS.
 - Edited asset in iOS.
@@ -241,6 +259,7 @@ Change:
 ## 0.5.0
 
 Feature:
+
 - Add `getSubPathEntities` for `AssetPathEntity`.
 - Add `quality` for `AssetEntity.thumbDataWithSize`.
 - Add `orientation` for `AssetEntity`.
