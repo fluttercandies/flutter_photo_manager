@@ -66,13 +66,13 @@
 
 Fix:
 
-- A change notify bug of remove callback.
-- Add result for presentLimited.
+- Change notify issue on remove callback.
+- Reply result for `presentLimited` method.
 
 Feature:
 
-- Old count and new count of change notify on iOS.
-- Add some property and method for change notify.
+- Add assets count change when notify on iOS.
+- Add some properties and methods for change notify.
 
 ## 1.2.2
 
