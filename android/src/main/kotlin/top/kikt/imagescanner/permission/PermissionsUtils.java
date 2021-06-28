@@ -267,6 +267,9 @@ public final class PermissionsUtils {
   public void getAppDetailSettingIntent(Context context) {
     Intent localIntent = new Intent();
     localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    localIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+    localIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+    localIntent.addCategory(Intent.CATEGORY_DEFAULT);
     localIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
     localIntent.setData(Uri.fromParts("package", context.getPackageName(), null));
     context.startActivity(localIntent);
