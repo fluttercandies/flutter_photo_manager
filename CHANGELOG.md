@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [1.2.4](#124)
   - [1.2.3](#123)
   - [1.2.2](#122)
   - [1.2.1](#121)
@@ -61,6 +62,13 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 1.2.4
+
+Fix:
+
+- `saveImage` method missing file extension for the fallback title.
+- `openSettings` method.
 
 ## 1.2.3
 
