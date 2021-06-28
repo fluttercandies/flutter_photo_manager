@@ -179,7 +179,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     String? desc,
     String? relativePath,
   }) async {
-    title ??= 'image_${DateTime.now().millisecondsSinceEpoch / 1000}';
+    title ??= 'image_${DateTime.now().millisecondsSinceEpoch / 1000}.jpg';
 
     final result = await _channel.invokeMethod(
       'saveImage',
