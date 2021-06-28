@@ -813,22 +813,19 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnavailableInDeploymentTarget"
 
-+ (void)openSetting {
-//  NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-//  if ([[UIApplication sharedApplication] canOpenURL:url]) {
-//    if ([UIDevice currentDevice].systemVersion.floatValue >= 10.0) {
-//      [[UIApplication sharedApplication] openURL:url
-//                                         options:@{}
-//                               completionHandler:^(BOOL success) {
-//                               }];
-//    } else {
-//#pragma clang diagnostic push
-//#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-//      [[UIApplication sharedApplication] openURL:url];
-//#pragma clang diagnostic pop
-//    }
-//
-//  }
++ (void)openSetting:(FlutterResult)result {
+    if (@available(iOS 10, *)) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]
+                                           options:[[NSDictionary alloc] init]
+                                 completionHandler:^(BOOL success) {
+                                     result([[NSNumber alloc] initWithBool:success]);
+                                 }];
+    } else if (@available(iOS 8.0, *)) {
+        BOOL success = [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+        result([[NSNumber alloc] initWithBool:success]);
+    } else {
+        result(@false);
+    }
 }
 
 #pragma clang diagnostic pop

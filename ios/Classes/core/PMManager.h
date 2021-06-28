@@ -3,6 +3,7 @@
 //
 
 #import "PMFileHelper.h"
+#import "PMImport.h"
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
 
@@ -27,7 +28,7 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (BOOL)isAuth;
 
-+ (void)openSetting;
++ (void)openSetting:(FlutterResult)result;
 
 - (void)setAuth:(BOOL)auth;
 
