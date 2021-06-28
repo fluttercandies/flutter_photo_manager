@@ -40,9 +40,12 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<int> requestPermissionExtend(
-      PermisstionRequestOption requestOption) async {
+    PermisstionRequestOption requestOption,
+  ) async {
     return await _channel.invokeMethod(
-        'requestPermissionExtend', requestOption.toMap());
+      'requestPermissionExtend',
+      requestOption.toMap(),
+    );
   }
 
   /// Use pagination to get album content.
@@ -106,14 +109,14 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   Future<Uint8List?> getOriginBytes(
     String id, {
     PMProgressHandler? progressHandler,
-  }) async {
+  }) {
     final params = {'id': id};
     _injectParams(params, progressHandler);
     return _channel.invokeMethod('getOriginBytes', params);
   }
 
-  Future<void> releaseCache() async {
-    await _channel.invokeMethod('releaseMemCache');
+  Future<void> releaseCache() {
+    return _channel.invokeMethod('releaseMemCache');
   }
 
   Future<String?> getFullFile(
@@ -121,20 +124,17 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     required bool isOrigin,
     PMProgressHandler? progressHandler,
   }) async {
-    final params = {
-      'id': id,
-      'isOrigin': isOrigin,
-    };
+    final params = {'id': id, 'isOrigin': isOrigin};
     _injectParams(params, progressHandler);
     return _channel.invokeMethod('getFullFile', params);
   }
 
-  Future<void> setLog(bool isLog) async {
-    await _channel.invokeMethod('log', isLog);
+  Future<void> setLog(bool isLog) {
+    return _channel.invokeMethod('log', isLog);
   }
 
-  void openSetting() {
-    _channel.invokeMethod('openSetting');
+  Future<void> openSetting() {
+    return _channel.invokeMethod('openSetting');
   }
 
   /// Nullable
@@ -383,9 +383,9 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   Future<void> requestCacheAssetsThumb(
     List<String> ids,
     ThumbOption option,
-  ) async {
+  ) {
     assert(ids.isNotEmpty);
-    await _channel.invokeMethod('requestCacheAssetsThumb', {
+    return _channel.invokeMethod('requestCacheAssetsThumb', {
       'ids': ids,
       'option': option.toMap(),
     });
