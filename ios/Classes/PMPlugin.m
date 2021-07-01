@@ -61,11 +61,11 @@
   } else if ([call.method isEqualToString:@"ignorePermissionCheck"]) {
     ignoreCheckPermission = [call.arguments[@"ignore"] boolValue];
     [handler reply:@(ignoreCheckPermission)];
+  } else if ([call.method isEqualToString:@"log"]) {
+      PMLogUtils.sharedInstance.isLog = (BOOL) call.arguments;
+      [handler reply:@1];
   } else if (manager.isAuth) {
     [self onAuth:call result:result];
-  } else if ([call.method isEqualToString:@"log"]) {
-    PMLogUtils.sharedInstance.isLog = (BOOL) call.arguments;
-    [handler reply:@1];
   } else {
     if (ignoreCheckPermission) {
       [self onAuth:call result:result];
