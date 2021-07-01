@@ -50,8 +50,7 @@
     int requestAccessLevel = [call.arguments[@"iosAccessLevel"] intValue];
     [self handlePermission:manager handler:handler requestAccessLevel:requestAccessLevel];
   } else if ([call.method isEqualToString:@"presentLimited"]) {
-    [self presentLimited];
-    [handler reply:@1];
+    [self presentLimited handler:handler];
   } else if ([call.method isEqualToString:@"clearFileCache"]) {
     [manager clearFileCache];
     [handler reply:@1];
@@ -119,13 +118,16 @@
     return nil;
 }
 
--(void)presentLimited {
+-(void)presentLimited:(ResultHandler*) handler {
     if (@available(iOS 14, *)) {
         UIViewController* ctl = [self getCurrentViewController];
         if(!ctl){
+            [handler replyError:@"No valid controller"];
             return;
         }
-        [PHPhotoLibrary.sharedPhotoLibrary presentLimitedLibraryPickerFromViewController: ctl];
+        [PHPhotoLibrary.sharedPhotoLibrary presentLimitedLibraryPickerFromViewController: ctl completion:^{
+            [handler reply:@1];
+        }];
     }
 }
 
