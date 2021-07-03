@@ -813,6 +813,16 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnavailableInDeploymentTarget"
 
+#if TARGET_OS_OSX
+
++ (void)openSetting:(FlutterResult)result {
+    result(@false);
+}
+
+#endif
+
+#if TARGET_OS_IOS
+
 + (void)openSetting:(FlutterResult)result {
     if (@available(iOS 10, *)) {
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]
@@ -827,6 +837,8 @@
         result(@false);
     }
 }
+
+#endif
 
 #pragma clang diagnostic pop
 
