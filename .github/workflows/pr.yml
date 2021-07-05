@@ -3,8 +3,8 @@ name: CI
 on: [pull_request]
 
 jobs:
-  test_iOS_and_macOS:
-    name: Test iOS and macOS on ${{ matrix.os }}
+  test_iOS:
+    name: Test iOS on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -20,8 +20,26 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze lib example/lib
       - run: cd example ; flutter build ios --no-codesign
+      
+  test_macOS:
+    name: Test macOS on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: "12.x"
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: beta
+      - run: flutter pub get
+      - run: flutter analyze lib example/lib
       - run: flutter config --enable-macos-desktop
       - run: cd example ; flutter build macos --debug
+      
   test_android:
     name: Test android on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
