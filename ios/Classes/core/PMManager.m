@@ -813,20 +813,36 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnavailableInDeploymentTarget"
 
-+ (void)openSetting:(FlutterResult)result {
+#if TARGET_OS_OSX
+
++ (void)openSetting:(NSObject<PMResultHandler>*)result {
+    NSTask *task = [[NSTask alloc] init];
+    task.launchPath = @"/bin/sh";
+    task.arguments = @[@"-c" , @"open x-apple.systempreferences:com.apple.preference.security?Privacy_Photos"];
+    [task launch];
+    [result reply:@true];
+}
+
+#endif
+
+#if TARGET_OS_IOS
+
++ (void)openSetting:(NSObject<PMResultHandler>*)result {
     if (@available(iOS 10, *)) {
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]
                                            options:[[NSDictionary alloc] init]
                                  completionHandler:^(BOOL success) {
-                                     result([[NSNumber alloc] initWithBool:success]);
+                                    [result reply: @(success)];
                                  }];
     } else if (@available(iOS 8.0, *)) {
         BOOL success = [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-        result([[NSNumber alloc] initWithBool:success]);
+        [result reply: @(success)];
     } else {
-        result(@false);
+        [result reply: @false];
     }
 }
+
+#endif
 
 #pragma clang diagnostic pop
 

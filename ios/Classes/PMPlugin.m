@@ -56,8 +56,7 @@
     [manager clearFileCache];
     [handler reply:@1];
   } else if ([call.method isEqualToString:@"openSetting"]) {
-    [PMManager openSetting:result];
-    [handler reply:@1];
+    [PMManager openSetting: handler];
   } else if ([call.method isEqualToString:@"ignorePermissionCheck"]) {
     ignoreCheckPermission = [call.arguments[@"ignore"] boolValue];
     [handler reply:@(ignoreCheckPermission)];
@@ -145,6 +144,9 @@
 
 #if TARGET_OS_OSX
 - (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler requestAccessLevel:(int)requestAccessLevel {
+    
+#if __MAC_11_0
+    
     if (@available(macOS 11.0, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
             [self replyPermssionResult:handler status:status];
@@ -154,6 +156,11 @@
           [self replyPermssionResult:handler status:status];
         }];
     }
+#else
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+      [self replyPermssionResult:handler status:status];
+    }];
+#endif
 }
 
 -(void)presentLimited {
@@ -250,8 +257,6 @@
         [handler reply:nil];
       }
 
-    } else if ([call.method isEqualToString:@"openSetting"]) {
-      [PMManager openSetting:result];
     } else if ([call.method isEqualToString:@"notify"]) {
       BOOL notify = [call.arguments[@"notify"] boolValue];
       if (notify) {
