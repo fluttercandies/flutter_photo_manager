@@ -56,8 +56,7 @@
     [manager clearFileCache];
     [handler reply:@1];
   } else if ([call.method isEqualToString:@"openSetting"]) {
-    [PMManager openSetting:result];
-    [handler reply:@1];
+    [PMManager openSetting: handler];
   } else if ([call.method isEqualToString:@"ignorePermissionCheck"]) {
     ignoreCheckPermission = [call.arguments[@"ignore"] boolValue];
     [handler reply:@(ignoreCheckPermission)];
@@ -258,8 +257,6 @@
         [handler reply:nil];
       }
 
-    } else if ([call.method isEqualToString:@"openSetting"]) {
-      [PMManager openSetting:result];
     } else if ([call.method isEqualToString:@"notify"]) {
       BOOL notify = [call.arguments[@"notify"] boolValue];
       if (notify) {

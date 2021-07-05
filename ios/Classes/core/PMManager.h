@@ -28,7 +28,7 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (BOOL)isAuth;
 
-+ (void)openSetting:(FlutterResult)result;
++ (void)openSetting:(NSObject<PMResultHandler>*)result;
 
 - (void)setAuth:(BOOL)auth;
 

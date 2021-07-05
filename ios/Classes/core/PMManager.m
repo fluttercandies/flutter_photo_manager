@@ -815,26 +815,26 @@
 
 #if TARGET_OS_OSX
 
-+ (void)openSetting:(FlutterResult)result {
-    result(@false);
++ (void)openSetting:(NSObject<PMResultHandler>*)result {
+    [result reply:@false];
 }
 
 #endif
 
 #if TARGET_OS_IOS
 
-+ (void)openSetting:(FlutterResult)result {
++ (void)openSetting:(NSObject<PMResultHandler>*)result {
     if (@available(iOS 10, *)) {
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]
                                            options:[[NSDictionary alloc] init]
                                  completionHandler:^(BOOL success) {
-                                     result([[NSNumber alloc] initWithBool:success]);
+                                    [result reply: @(success)];
                                  }];
     } else if (@available(iOS 8.0, *)) {
         BOOL success = [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
-        result([[NSNumber alloc] initWithBool:success]);
+        [result reply: @(success)];
     } else {
-        result(@false);
+        [result reply: @false];
     }
 }
 
