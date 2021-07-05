@@ -3,8 +3,8 @@ name: CI
 on: [pull_request]
 
 jobs:
-  test_iOS:
-    name: Test iOS on ${{ matrix.os }}
+  test_iOS_and_macOS:
+    name: Test iOS and macOS on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -20,6 +20,8 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze lib example/lib
       - run: cd example ; flutter build ios --no-codesign
+      - run: flutter config --enable-macos-desktop
+      - run: cd example ; flutter build macos --debug
   test_android:
     name: Test android on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
