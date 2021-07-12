@@ -500,10 +500,6 @@
   [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
   [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
       NSDictionary *info) {
-    if (progress == 1.0) {
-      [self fetchFullSizeVideo:asset handler:handler progressHandler:nil];
-    }
-
     if (error) {
       [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
       [progressHandler deinit];
@@ -535,11 +531,16 @@
                  if (exportSession) {
                    exportSession.outputFileType = AVFileTypeMPEG4;
                    exportSession.outputURL = [NSURL fileURLWithPath:path];
-                   [exportSession exportAsynchronouslyWithCompletionHandler:^{
-                     [handler reply:path];
-                   }];
-
-                   [self notifySuccess:progressHandler];
+                     if (exportSession.status == AVAssetExportSessionStatusCompleted) {
+                         [handler reply:path];
+                         [self notifySuccess:progressHandler];
+                     } else if (exportSession.status == AVAssetExportSessionStatusFailed ||
+                                exportSession.status == AVAssetExportSessionStatusCancelled) {
+                         [handler reply:nil];
+                         
+                         [self notifyProgress:progressHandler progress:1.0 state:PMProgressStateFailed];
+                         [progressHandler deinit];
+                     }
                  } else {
                    [handler reply:nil];
                  }
