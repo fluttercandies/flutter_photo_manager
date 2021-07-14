@@ -180,6 +180,7 @@ class AssetEntity {
     this.createDtSecond,
     this.modifiedDateSecond,
     this.relativePath,
+    this.isLocallyAvailable = true,
     double? latitude,
     double? longitude,
     this.mimeType,
@@ -279,6 +280,11 @@ class AssetEntity {
   set longitude(double? longitude) {
     _longitude = longitude;
   }
+
+  /// Whether this asset is locally available.
+  ///
+  /// Defaults to true.
+  bool isLocallyAvailable = true;
 
   /// Get latitude and longitude from MediaStore(android) / Photos(iOS).
   ///
@@ -477,9 +483,7 @@ class AssetEntity {
   }
 
   @override
-  String toString() {
-    return "AssetEntity{ id:$id , type: $type}";
-  }
+  String toString() => "AssetEntity (id:$id , type: $type)";
 }
 
 /// Longitude and latitude
