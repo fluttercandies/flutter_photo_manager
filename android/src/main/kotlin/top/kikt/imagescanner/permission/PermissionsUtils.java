@@ -36,6 +36,11 @@ public final class PermissionsUtils {
   private Activity mActivity;
 
   /**
+   * 是否正在请求权限
+   */
+  private Boolean isRequesting = false;
+
+  /**
    * 需要申请的权限的List
    */
   private List<String> needToRequestPermissionsList = new ArrayList<>();
@@ -91,34 +96,42 @@ public final class PermissionsUtils {
    * @param permissions 要申请的权限数组
    * @return 返回 {@link PermissionsUtils} 自身，进行链式调用
    */
-  public PermissionsUtils getPermissions(Activity activity, int requestCode, List<String> permissions) {
-    return getPermissionsWithTips(activity, requestCode, null, permissions.toArray(new String[0]));
+  public PermissionsUtils getPermissions(int requestCode, List<String> permissions) {
+    return getPermissionsWithTips(requestCode, null, permissions.toArray(new String[0]));
   }
 
   /**
    * 进行权限申请，带拒绝弹框提示
    *
-   * @param activity    告诉工具是Activity申请权限还是Fragment申请权限
    * @param requestCode 指定该次申请的requestCode
    * @param tips        要申请的权限的被拒绝后的提示的数组
    * @param permissions 要申请的权限数组
    * @return 返回 {@link PermissionsUtils} 自身，进行链式调用
    */
   @TargetApi(23)
-  private PermissionsUtils getPermissionsWithTips(Activity activity, int requestCode, String[] tips, String... permissions) {
+  private PermissionsUtils getPermissionsWithTips(int requestCode, String[] tips, String... permissions) {
     if (mActivity == null) {
-      throw new NullPointerException("获取权限的Activity不存在");
+      throw new NullPointerException("Activity for the permission request is not exist.");
     }
+    if (isRequesting) {
+      throw new IllegalStateException("Another permission request is ongoing.");
+    }
+    isRequesting = true;
     this.requestCode = requestCode;
     if (!checkPermissions(tips, permissions)) {
-      // 通过上面的checkPermissions，可以知道能得到进入到这里面的都是6.0的机子
-      ActivityCompat.requestPermissions(mActivity
-              , needToRequestPermissionsList.toArray(new String[needToRequestPermissionsList.size()])
-              , requestCode);
+      // 通过上面的 checkPermissions，可以知道能得到进入到这里面的都是 6.0 的机子
+      ActivityCompat.requestPermissions(
+          mActivity,
+          needToRequestPermissionsList.toArray(new String[needToRequestPermissionsList.size()]),
+          requestCode
+      );
       for (int i = 0; i < needToRequestPermissionsList.size(); i++) {
-        LogUtils.info("需要申请的权限列表" + needToRequestPermissionsList.get(i));
+        LogUtils.info("Permissions: " + needToRequestPermissionsList.get(i));
       }
-    } else if (mPermissionsListener != null) mPermissionsListener.onGranted();
+    } else if (mPermissionsListener != null) {
+        mPermissionsListener.onGranted();
+    }
+    isRequesting = false;
     return this;
   }
 
@@ -152,9 +165,8 @@ public final class PermissionsUtils {
       }
       // 全部权限获取成功返回true，否则返回false
       return needToRequestPermissionsList.isEmpty();
-    } else {
-      return true;
     }
+    return true;
   }
 
   /**
@@ -180,7 +192,7 @@ public final class PermissionsUtils {
 //            }
 
       for (int i = 0; i < permissions.length; i++) {
-        LogUtils.info("返回权限列表" + permissions[i]);
+        LogUtils.info("Returned permissions: " + permissions[i]);
         if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
           deniedPermissionsList.add(permissions[i]);
           if (tipList != null && deniedTipsList == null) {

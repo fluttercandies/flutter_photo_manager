@@ -192,7 +192,7 @@ class PhotoManagerPlugin(
       permissions.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
     }
 
-    utils.getPermissions(activity, 3001, permissions)
+    utils.getPermissions(3001, permissions)
   }
 
 
