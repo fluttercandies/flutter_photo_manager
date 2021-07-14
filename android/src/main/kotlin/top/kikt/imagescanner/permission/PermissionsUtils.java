@@ -40,6 +40,10 @@ public final class PermissionsUtils {
    */
   private Boolean isRequesting = false;
 
+  public Boolean getIsRequesting() {
+    return isRequesting;
+  }
+
   /**
    * 需要申请的权限的List
    */
