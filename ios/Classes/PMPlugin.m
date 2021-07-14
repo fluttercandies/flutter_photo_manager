@@ -271,20 +271,21 @@
     } else if ([call.method isEqualToString:@"releaseMemCache"]) {
       [manager clearCache];
     } else if ([call.method isEqualToString:@"fetchPathProperties"]) {
-        if (self->ignoreCheckPermission) {
-            [self fetchPathProperties:call manager:manager handler:handler];
-            return;
+        NSString *id = call.arguments[@"id"];
+        int requestType = [call.arguments[@"type"] intValue];
+        PMFilterOptionGroup *option =
+            [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
+        PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id type:requestType filterOption:option];
+        if (option.containsModified) {
+          [manager injectModifyToDate:pathEntity];
         }
-        [self requestPermissionStatus:2 completeHandler:^(PHAuthorizationStatus status) {
-            if (status == PHAuthorizationStatusAuthorized) {
-                [self fetchPathProperties:call manager:manager handler:handler];
-            } else {
-                [handler reply:[FlutterError
-                                 errorWithCode:@"PERMISSION_NOT_AUTHORIZED"
-                                 message:@"fetchPathProperties only works with authorized permission."
-                                 details:nil]];
-            }
-        }];
+        if (pathEntity) {
+          NSDictionary *dictionary =
+              [PMConvertUtils convertPathToMap:@[pathEntity]];
+          [handler reply:dictionary];
+        } else {
+          [handler reply:nil];
+        }
     } else if ([call.method isEqualToString:@"notify"]) {
       BOOL notify = [call.arguments[@"notify"] boolValue];
       if (notify) {
@@ -526,24 +527,6 @@
     [manager createAlbumWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
         [handler reply:[self convertToResult:id errorMsg:errorMsg]];
     }];
-}
-
-- (void) fetchPathProperties:(FlutterMethodCall *) call manager:(PMManager *) manager handler:(ResultHandler *) handler {
-    NSString *id = call.arguments[@"id"];
-    int requestType = [call.arguments[@"type"] intValue];
-    PMFilterOptionGroup *option =
-        [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
-    PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id type:requestType filterOption:option];
-    if (option.containsModified) {
-      [manager injectModifyToDate:pathEntity];
-    }
-    if (pathEntity) {
-      NSDictionary *dictionary =
-          [PMConvertUtils convertPathToMap:@[pathEntity]];
-      [handler reply:dictionary];
-    } else {
-      [handler reply:nil];
-    }
 }
 
 @end
