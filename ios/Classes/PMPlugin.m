@@ -181,8 +181,9 @@
 #endif
 }
 
-- (void) requestPermissionStatus:((int)) requestAccessLevel completeHandler:(void (^)(PHAuthorizationStatus status)) completeHandler {
-    if (@available(iOS 14, *)) {
+- (void) requestPermissionStatus:(int) requestAccessLevel completeHandler:(void (^)(PHAuthorizationStatus status)) completeHandler {
+#if __MAC_11_0
+    if (@available(macOS 11.0, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
             completeHandler(status);
         }];
@@ -191,6 +192,11 @@
             completeHandler(status);
         }];
     }
+#else
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        completeHandler(status);
+    }];
+#endif
 }
 
 -(void)presentLimited {
