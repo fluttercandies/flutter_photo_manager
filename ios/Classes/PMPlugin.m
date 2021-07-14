@@ -103,7 +103,8 @@
     }
 }
 
-- (void) requestPermissionStatus:(int) requestAccessLevel completeHandler:(void (^)(PHAuthorizationStatus status)) completeHandler {
+- (void)requestPermissionStatus:(int)requestAccessLevel
+                completeHandler:(void (^)(PHAuthorizationStatus status))completeHandler {
     if (@available(iOS 14, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
             completeHandler(status);
@@ -148,7 +149,8 @@
     }];
 }
 
-- (void) requestPermissionStatus:((int)) requestAccessLevel completeHandler:(void (^)(PHAuthorizationStatus status)) completeHandler {
+- (void)requestPermissionStatus:(int)requestAccessLevel
+                completeHandler:(void (^)(PHAuthorizationStatus status))completeHandler {
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
         completeHandler(status);
     }];
@@ -164,7 +166,7 @@
 - (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler requestAccessLevel:(int)requestAccessLevel {
     
 #if __MAC_11_0
-    
+
     if (@available(macOS 11.0, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
             [self replyPermssionResult:handler status:status];
@@ -181,7 +183,8 @@
 #endif
 }
 
-- (void) requestPermissionStatus:(int) requestAccessLevel completeHandler:(void (^)(PHAuthorizationStatus status)) completeHandler {
+- (void)requestPermissionStatus:(int)requestAccessLevel
+                completeHandler:(void (^)(PHAuthorizationStatus status))completeHandler {
 #if __MAC_11_0
     if (@available(macOS 11.0, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
@@ -281,7 +284,9 @@
         int requestType = [call.arguments[@"type"] intValue];
         PMFilterOptionGroup *option =
             [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
-        PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id type:requestType filterOption:option];
+        PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id
+                                                                type:requestType
+                                                        filterOption:option];
         if (option.containsModified) {
           [manager injectModifyToDate:pathEntity];
         }
@@ -507,7 +512,7 @@
   return handler;
 }
 
-- (void) createFolder:(FlutterMethodCall *) call manager:(PMManager *) manager handler:(ResultHandler *) handler {
+- (void)createFolder:(FlutterMethodCall *)call manager:(PMManager *)manager handler:(ResultHandler *)handler {
     NSString *name = call.arguments[@"name"];
     BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
     NSString *parentId = call.arguments[@"folderId"];
@@ -521,7 +526,7 @@
     }];
 }
 
-- (void) createAlbum:(FlutterMethodCall *) call manager:(PMManager *) manager handler:(ResultHandler *) handler {
+- (void) createAlbum:(FlutterMethodCall *)call manager:(PMManager *)manager handler:(ResultHandler *)handler {
     NSString *name = call.arguments[@"name"];
     BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
     NSString *parentId = call.arguments[@"folderId"];
