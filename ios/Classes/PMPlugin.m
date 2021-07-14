@@ -103,7 +103,7 @@
     }
 }
 
-- (void) requestPermissionStatus:(PHAccessLevel) requestAccessLevel completeHandler:(void (^)(PHAuthorizationStatus status)) completeHandler {
+- (void) requestPermissionStatus:(int) requestAccessLevel completeHandler:(void (^)(PHAuthorizationStatus status)) completeHandler {
     if (@available(iOS 14, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
             completeHandler(status);
@@ -148,7 +148,7 @@
     }];
 }
 
-- (void) requestPermissionStatus:(PHAccessLevel) requestAccessLevel completeHandler:(void (^)(PHAuthorizationStatus status)) completeHandler {
+- (void) requestPermissionStatus:((int)) requestAccessLevel completeHandler:(void (^)(PHAuthorizationStatus status)) completeHandler {
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
         completeHandler(status);
     }];
@@ -181,7 +181,7 @@
 #endif
 }
 
-- (void) requestPermissionStatus:(PHAccessLevel) requestAccessLevel completeHandler:(void (^)(PHAuthorizationStatus status)) completeHandler {
+- (void) requestPermissionStatus:((int)) requestAccessLevel completeHandler:(void (^)(PHAuthorizationStatus status)) completeHandler {
     if (@available(iOS 14, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
             completeHandler(status);
@@ -275,11 +275,14 @@
             [self fetchPathProperties:call manager:manager handler:handler];
             return;
         }
-        [self requestPermissionStatus:PHAccessLevelReadWrite completeHandler:^(PHAuthorizationStatus status) {
+        [self requestPermissionStatus:2 completeHandler:^(PHAuthorizationStatus status) {
             if (status == PHAuthorizationStatusAuthorized) {
                 [self fetchPathProperties:call manager:manager handler:handler];
             } else {
-                result([FlutterError errorWithCode:@"PERMISSION_NOT_AUTHORIZED" message:@"fetchPathProperties only works with authorized permission." details:nil]);
+                [handler reply:[FlutterError
+                                 errorWithCode:@"PERMISSION_NOT_AUTHORIZED"
+                                 message:@"fetchPathProperties only works with authorized permission."
+                                 details:nil]];
             }
         }];
     } else if ([call.method isEqualToString:@"notify"]) {
@@ -398,31 +401,35 @@
       }];
 
     } else if ([@"createFolder" isEqualToString:call.method]) {
-      NSString *name = call.arguments[@"name"];
-      BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
-      NSString *parentId = call.arguments[@"folderId"];
-
-      if (isRoot) {
-        parentId = nil;
-      }
-
-      [manager createFolderWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
-        [handler reply:[self convertToResult:id errorMsg:errorMsg]];
-      }];
-
+        if (self->ignoreCheckPermission) {
+            [self createFolder:call manager:manager handler:handler];
+            return;
+        }
+        [self requestPermissionStatus:2 completeHandler:^(PHAuthorizationStatus status) {
+            if (status == PHAuthorizationStatusAuthorized) {
+                [self createFolder:call manager:manager handler:handler];
+                return;
+            }
+            [handler reply:[FlutterError
+                            errorWithCode:@"PERMISSION_NOT_AUTHORIZED"
+                            message:@"fetchPathProperties only works with authorized permission."
+                            details:nil]];
+        }];
     } else if ([@"createAlbum" isEqualToString:call.method]) {
-      NSString *name = call.arguments[@"name"];
-      BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
-      NSString *parentId = call.arguments[@"folderId"];
-
-      if (isRoot) {
-        parentId = nil;
-      }
-
-      [manager createAlbumWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
-        [handler reply:[self convertToResult:id errorMsg:errorMsg]];
-      }];
-
+        if (self->ignoreCheckPermission) {
+            [self createAlbum:call manager:manager handler:handler];
+            return;
+        }
+        [self requestPermissionStatus:2 completeHandler:^(PHAuthorizationStatus status) {
+            if (status == PHAuthorizationStatusAuthorized) {
+                [self createAlbum:call manager:manager handler:handler];
+                return;
+            }
+            [handler reply:[FlutterError
+                            errorWithCode:@"PERMISSION_NOT_AUTHORIZED"
+                            message:@"fetchPathProperties only works with authorized permission."
+                            details:nil]];
+        }];
     } else if ([@"removeInAlbum" isEqualToString:call.method]) {
       NSArray *assetId = call.arguments[@"assetId"];
       NSString *pathId = call.arguments[@"pathId"];
@@ -493,7 +500,35 @@
   return handler;
 }
 
-- (void) fetchPathProperties:(FlutterMethodCall *)call manager:(PMManager *) manager handler:(ResultHandler *) handler {
+- (void) createFolder:(FlutterMethodCall *) call manager:(PMManager *) manager handler:(ResultHandler *) handler {
+    NSString *name = call.arguments[@"name"];
+    BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
+    NSString *parentId = call.arguments[@"folderId"];
+
+    if (isRoot) {
+        parentId = nil;
+    }
+
+    [manager createFolderWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
+        [handler reply:[self convertToResult:id errorMsg:errorMsg]];
+    }];
+}
+
+- (void) createAlbum:(FlutterMethodCall *) call manager:(PMManager *) manager handler:(ResultHandler *) handler {
+    NSString *name = call.arguments[@"name"];
+    BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
+    NSString *parentId = call.arguments[@"folderId"];
+
+    if (isRoot) {
+        parentId = nil;
+    }
+
+    [manager createAlbumWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
+        [handler reply:[self convertToResult:id errorMsg:errorMsg]];
+    }];
+}
+
+- (void) fetchPathProperties:(FlutterMethodCall *) call manager:(PMManager *) manager handler:(ResultHandler *) handler {
     NSString *id = call.arguments[@"id"];
     int requestType = [call.arguments[@"type"] intValue];
     PMFilterOptionGroup *option =
