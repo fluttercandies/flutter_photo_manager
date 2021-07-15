@@ -135,7 +135,6 @@ public final class PermissionsUtils {
     } else if (mPermissionsListener != null) {
         mPermissionsListener.onGranted();
     }
-    isRequesting = false;
     return this;
   }
 
@@ -152,7 +151,7 @@ public final class PermissionsUtils {
 //                needToRequestPermissionsList.clear();
       if (tips != null) {
         if (tips.length != permissions.length) {
-          throw new IndexOutOfBoundsException("传入的提示数组和需要申请的权限数组长度不一致");
+          throw new IndexOutOfBoundsException("Tips length is not equals to permissions length.");
         }
         if (this.tipList == null)
           this.tipList = new ArrayList<>();
@@ -219,6 +218,7 @@ public final class PermissionsUtils {
         mPermissionsListener.onGranted();
       }
     }
+    isRequesting = false;
     return this;
   }
 
