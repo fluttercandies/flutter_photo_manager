@@ -163,7 +163,11 @@ class PhotoManagerPlugin(
     }
 
     if (permissionsUtils.isRequesting) {
-      resultHandler.reply(PermissionResult.Denied.value)
+      resultHandler.replyError(
+        "PERMISSION_REQUESTING",
+        "Another permission request is still ongoing. Please request after the existing one is done.",
+        null
+      )
       return
     }
 
