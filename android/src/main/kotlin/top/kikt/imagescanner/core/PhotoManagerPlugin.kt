@@ -162,6 +162,15 @@ class PhotoManagerPlugin(
       return
     }
 
+    if (permissionsUtils.isRequesting) {
+      resultHandler.replyError(
+        "PERMISSION_REQUESTING",
+        "Another permission request is still ongoing. Please request after the existing one is done.",
+        null
+      )
+      return
+    }
+
     val utils = permissionsUtils.apply {
       withActivity(activity)
       permissionsListener = object : PermissionsListener {
@@ -169,13 +178,16 @@ class PhotoManagerPlugin(
           LogUtils.info("onDenied call.method = ${call.method}")
           if (call.method == "requestPermissionExtend") {
             resultHandler.reply(PermissionResult.Denied.value)
+            return
+          }
+          if (grantedPermissions.containsAll(arrayListOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ))) {
+            LogUtils.info("onGranted call.method = ${call.method}")
+            onHandlePermissionResult(call, resultHandler, false)
           } else {
-            if (grantedPermissions.containsAll(arrayListOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
-              LogUtils.info("onGranted call.method = ${call.method}")
-              onHandlePermissionResult(call, resultHandler, false)
-            } else {
-              replyPermissionError(resultHandler)
-            }
+            replyPermissionError(resultHandler)
           }
         }
 
@@ -192,7 +204,7 @@ class PhotoManagerPlugin(
       permissions.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
     }
 
-    utils.getPermissions(activity, 3001, permissions)
+    utils.getPermissions(3001, permissions)
   }
 
 
@@ -354,7 +366,7 @@ class PhotoManagerPlugin(
               val uris = ids.map {
                 photoManager.getUri(it)
               }.toList()
-              if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 deleteManager.deleteInApi30(uris, resultHandler)
               }
             } else {
