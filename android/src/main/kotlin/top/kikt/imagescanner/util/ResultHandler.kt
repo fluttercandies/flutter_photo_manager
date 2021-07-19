@@ -1,13 +1,11 @@
 package top.kikt.imagescanner.util
 
-
 import android.os.Handler
 import android.os.Looper
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
 class ResultHandler(var result: MethodChannel.Result?, val call: MethodCall? = null) {
-
     companion object {
         @JvmField
         val handler = Handler(Looper.getMainLooper())
@@ -58,5 +56,4 @@ class ResultHandler(var result: MethodChannel.Result?, val call: MethodCall? = n
             result?.notImplemented()
         }
     }
-
 }

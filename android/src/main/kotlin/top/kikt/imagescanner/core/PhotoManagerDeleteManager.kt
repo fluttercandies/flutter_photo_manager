@@ -149,5 +149,4 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
             deleteWithUriInApi29(uri, havePermission)
         }
     }
-
 }

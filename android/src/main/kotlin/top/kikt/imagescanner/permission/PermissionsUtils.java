@@ -309,5 +309,4 @@ public final class PermissionsUtils {
         this.mPermissionsListener = permissionsListener;
         return this;
     }
-
 }

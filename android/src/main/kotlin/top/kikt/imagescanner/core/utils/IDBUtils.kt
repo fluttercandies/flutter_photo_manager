@@ -17,7 +17,6 @@ import top.kikt.imagescanner.core.entity.FilterOption
 import top.kikt.imagescanner.core.entity.GalleryEntity
 import top.kikt.imagescanner.util.LogUtils
 
-
 /// create 2019-09-11 by cai
 @Suppress("DEPRECATION")
 @SuppressLint("InlinedApi")

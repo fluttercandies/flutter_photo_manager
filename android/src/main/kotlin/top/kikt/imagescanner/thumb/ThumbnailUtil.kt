@@ -18,7 +18,6 @@ import java.io.File
  * Created by debuggerx on 18-9-27 下午2:08
  */
 object ThumbnailUtil {
-
     fun getThumbnailByGlide(
         ctx: Context,
         path: String,
@@ -52,7 +51,6 @@ object ThumbnailUtil {
                 }
             })
     }
-
 
     fun getThumbOfUri(
         context: Context,
@@ -94,7 +92,6 @@ object ThumbnailUtil {
             .submit(thumbLoadOption.width, thumbLoadOption.height)
     }
 
-
     fun requestCacheThumb(
         context: Context,
         path: String,
@@ -112,6 +109,4 @@ object ThumbnailUtil {
             clearDiskCache()
         }
     }
-
-
 }

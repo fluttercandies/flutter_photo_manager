@@ -58,7 +58,6 @@ class PhotoManagerPlugin(
         }
 
         var cacheOriginBytes = true
-
     }
 
     private val notifyChannel = PhotoManagerNotifyChannel(applicationContext, messenger, Handler())
@@ -78,7 +77,7 @@ class PhotoManagerPlugin(
 
     private val photoManager = PhotoManager(applicationContext)
 
-    private var ignorePermissionCheck = false;
+    private var ignorePermissionCheck = false
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result, call)
@@ -225,7 +224,7 @@ class PhotoManagerPlugin(
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun haveManifestMediaLocation(context: Context): Boolean {
-//    Debug.waitForDebugger()
+//        Debug.waitForDebugger()
         val applicationInfo = context.applicationInfo
         val packageInfo = context.packageManager.getPackageInfo(
             applicationInfo.packageName,
@@ -506,5 +505,4 @@ class PhotoManagerPlugin(
         val arguments = argument<Map<*, *>>("option")!!
         return ConvertUtils.convertFilterOptionsFromMap(arguments)
     }
-
 }

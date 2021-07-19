@@ -12,19 +12,16 @@ import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.*
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.PluginRegistry
 import top.kikt.imagescanner.core.utils.IDBUtils
 import top.kikt.imagescanner.util.LogUtils
 
 /// create 2019-09-09 by cai
-
 
 class PhotoManagerNotifyChannel(
     val applicationContext: Context,
     messenger: BinaryMessenger,
     handler: Handler
 ) {
-
     private var notifying = false
 
     private val videoObserver = MediaObserver(MEDIA_TYPE_VIDEO, handler)
@@ -87,7 +84,6 @@ class PhotoManagerNotifyChannel(
         }
 
         LogUtils.debug(resultMap)
-
         methodChannel.invokeMethod("change", resultMap)
     }
 
@@ -151,7 +147,6 @@ class PhotoManagerNotifyChannel(
                     onOuterChange(uri, typeString, id, gId, type)
                 }
             } else { // delete
-
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                     if (uri == this.uri) {
                         onOuterChange(uri, "insert", null, null, type)
@@ -198,7 +193,6 @@ class PhotoManagerNotifyChannel(
                         arrayOf(id.toString()),
                         null
                     )
-
                     cursor?.use {
                         if (cursor.moveToNext()) {
                             val galleryId =
@@ -217,7 +211,6 @@ class PhotoManagerNotifyChannel(
                         arrayOf(id.toString()),
                         null
                     )
-
                     cursor?.use {
                         if (cursor.moveToNext()) {
                             val galleryId = cursor.getLong(cursor.getColumnIndex("bucket_id"))
@@ -228,11 +221,7 @@ class PhotoManagerNotifyChannel(
                     }
                 }
             }
-
             return Pair(null, null)
         }
     }
-
-
 }
-

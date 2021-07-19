@@ -23,7 +23,6 @@ import java.util.concurrent.Executors
 /// Do some business logic assembly
 @SuppressLint("LongLogTag")
 class PhotoManager(private val context: Context) {
-
     companion object {
         const val ALL_ID = "isAll"
 
@@ -191,7 +190,6 @@ class PhotoManager(private val context: Context) {
             }
         }
         val galleryEntity = dbUtils.getGalleryEntity(context, id, type, option)
-
         if (galleryEntity != null && option.containsPathModified) {
             dbUtils.injectModifiedDate(context, galleryEntity)
         }
@@ -238,15 +236,9 @@ class PhotoManager(private val context: Context) {
         val exifInfo = dbUtils.getExif(context, id)
         val latLong = exifInfo?.latLong
         return if (latLong == null) {
-            mapOf(
-                "lat" to 0.0,
-                "lng" to 0.0
-            )
+            mapOf("lat" to 0.0, "lng" to 0.0)
         } else {
-            mapOf(
-                "lat" to latLong[0],
-                "lng" to latLong[1]
-            )
+            mapOf("lat" to latLong[0], "lng" to latLong[1])
         }
     }
 
@@ -305,15 +297,12 @@ class PhotoManager(private val context: Context) {
                 val future = ThumbnailUtil.requestCacheThumb(context, s, option)
                 cacheFutures.add(future)
             }
-
         } else {
             val uriList = dbUtils.getAssetsUri(context, ids)
-
             for (uri in uriList) {
                 val future = ThumbnailUtil.requestCacheThumb(context, uri, option)
                 cacheFutures.add(future)
             }
-
         }
 
         resultHandler.reply(1)
@@ -327,7 +316,6 @@ class PhotoManager(private val context: Context) {
                 cacheFuture.get()
             }
         }
-
     }
 
     fun cancelCacheRequests() {
@@ -338,5 +326,4 @@ class PhotoManager(private val context: Context) {
         }
 
     }
-
 }

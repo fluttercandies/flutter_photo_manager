@@ -6,7 +6,6 @@ import top.kikt.imagescanner.core.entity.*
 
 /// create 2019-09-05 by cai
 
-
 object ConvertUtils {
     fun convertToGalleryResult(list: List<GalleryEntity>): Map<String, Any> {
         val data = ArrayList<Map<String, Any>>()
