@@ -103,6 +103,19 @@
     }
 }
 
+- (void)requestPermissionStatus:(int)requestAccessLevel
+                completeHandler:(void (^)(PHAuthorizationStatus status))completeHandler {
+    if (@available(iOS 14, *)) {
+        [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
+            completeHandler(status);
+        }];
+    } else {
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+            completeHandler(status);
+        }];
+    }
+}
+
 -(UIViewController*) getCurrentViewController {
     UIViewController *ctl = UIApplication.sharedApplication.keyWindow.rootViewController;
     if(ctl){
@@ -136,6 +149,13 @@
     }];
 }
 
+- (void)requestPermissionStatus:(int)requestAccessLevel
+                completeHandler:(void (^)(PHAuthorizationStatus status))completeHandler {
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        completeHandler(status);
+    }];
+}
+
 -(void)presentLimited {
 }
 
@@ -146,7 +166,7 @@
 - (void) handlePermission:(PMManager *)manager handler:(ResultHandler*) handler requestAccessLevel:(int)requestAccessLevel {
     
 #if __MAC_11_0
-    
+
     if (@available(macOS 11.0, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
             [self replyPermssionResult:handler status:status];
@@ -159,6 +179,25 @@
 #else
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
       [self replyPermssionResult:handler status:status];
+    }];
+#endif
+}
+
+- (void)requestPermissionStatus:(int)requestAccessLevel
+                completeHandler:(void (^)(PHAuthorizationStatus status))completeHandler {
+#if __MAC_11_0
+    if (@available(macOS 11.0, *)) {
+        [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
+            completeHandler(status);
+        }];
+    } else {
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+            completeHandler(status);
+        }];
+    }
+#else
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        completeHandler(status);
     }];
 #endif
 }
@@ -241,22 +280,23 @@
     } else if ([call.method isEqualToString:@"releaseMemCache"]) {
       [manager clearCache];
     } else if ([call.method isEqualToString:@"fetchPathProperties"]) {
-      NSString *id = call.arguments[@"id"];
-      int requestType = [call.arguments[@"type"] intValue];
-      PMFilterOptionGroup *option =
-          [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
-      PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id type:requestType filterOption:option];
-      if (option.containsModified) {
-        [manager injectModifyToDate:pathEntity];
-      }
-      if (pathEntity) {
-        NSDictionary *dictionary =
-            [PMConvertUtils convertPathToMap:@[pathEntity]];
-        [handler reply:dictionary];
-      } else {
-        [handler reply:nil];
-      }
-
+        NSString *id = call.arguments[@"id"];
+        int requestType = [call.arguments[@"type"] intValue];
+        PMFilterOptionGroup *option =
+            [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
+        PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id
+                                                                type:requestType
+                                                        filterOption:option];
+        if (option.containsModified) {
+          [manager injectModifyToDate:pathEntity];
+        }
+        if (pathEntity) {
+          NSDictionary *dictionary =
+              [PMConvertUtils convertPathToMap:@[pathEntity]];
+          [handler reply:dictionary];
+        } else {
+          [handler reply:nil];
+        }
     } else if ([call.method isEqualToString:@"notify"]) {
       BOOL notify = [call.arguments[@"notify"] boolValue];
       if (notify) {
@@ -373,31 +413,35 @@
       }];
 
     } else if ([@"createFolder" isEqualToString:call.method]) {
-      NSString *name = call.arguments[@"name"];
-      BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
-      NSString *parentId = call.arguments[@"folderId"];
-
-      if (isRoot) {
-        parentId = nil;
-      }
-
-      [manager createFolderWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
-        [handler reply:[self convertToResult:id errorMsg:errorMsg]];
-      }];
-
+        if (self->ignoreCheckPermission) {
+            [self createFolder:call manager:manager handler:handler];
+            return;
+        }
+        [self requestPermissionStatus:2 completeHandler:^(PHAuthorizationStatus status) {
+            if (status == PHAuthorizationStatusAuthorized) {
+                [self createFolder:call manager:manager handler:handler];
+                return;
+            }
+            [handler reply:[FlutterError
+                            errorWithCode:@"PERMISSION_NOT_AUTHORIZED"
+                            message:@"fetchPathProperties only works with authorized permission."
+                            details:nil]];
+        }];
     } else if ([@"createAlbum" isEqualToString:call.method]) {
-      NSString *name = call.arguments[@"name"];
-      BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
-      NSString *parentId = call.arguments[@"folderId"];
-
-      if (isRoot) {
-        parentId = nil;
-      }
-
-      [manager createAlbumWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
-        [handler reply:[self convertToResult:id errorMsg:errorMsg]];
-      }];
-
+        if (self->ignoreCheckPermission) {
+            [self createAlbum:call manager:manager handler:handler];
+            return;
+        }
+        [self requestPermissionStatus:2 completeHandler:^(PHAuthorizationStatus status) {
+            if (status == PHAuthorizationStatusAuthorized) {
+                [self createAlbum:call manager:manager handler:handler];
+                return;
+            }
+            [handler reply:[FlutterError
+                            errorWithCode:@"PERMISSION_NOT_AUTHORIZED"
+                            message:@"fetchPathProperties only works with authorized permission."
+                            details:nil]];
+        }];
     } else if ([@"removeInAlbum" isEqualToString:call.method]) {
       NSArray *assetId = call.arguments[@"assetId"];
       NSString *pathId = call.arguments[@"pathId"];
@@ -466,6 +510,34 @@
   [handler register:privateRegistrar channelIndex:index];
 
   return handler;
+}
+
+- (void)createFolder:(FlutterMethodCall *)call manager:(PMManager *)manager handler:(ResultHandler *)handler {
+    NSString *name = call.arguments[@"name"];
+    BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
+    NSString *parentId = call.arguments[@"folderId"];
+
+    if (isRoot) {
+        parentId = nil;
+    }
+
+    [manager createFolderWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
+        [handler reply:[self convertToResult:id errorMsg:errorMsg]];
+    }];
+}
+
+- (void) createAlbum:(FlutterMethodCall *)call manager:(PMManager *)manager handler:(ResultHandler *)handler {
+    NSString *name = call.arguments[@"name"];
+    BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
+    NSString *parentId = call.arguments[@"folderId"];
+
+    if (isRoot) {
+        parentId = nil;
+    }
+
+    [manager createAlbumWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
+        [handler reply:[self convertToResult:id errorMsg:errorMsg]];
+    }];
 }
 
 @end
