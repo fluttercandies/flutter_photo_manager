@@ -23,6 +23,7 @@ buildscript {
         if (isChina) {
             maven { url 'https://maven.aliyun.com/repository/google' }
             maven { url 'https://maven.aliyun.com/repository/public' }
+            maven { url 'https://storage.flutter-io.cn/download.flutter.io' }
         } else {
             google()
             mavenCentral()
@@ -39,7 +40,7 @@ allprojects {
     repositories {
         if (isChina) {
             maven { url 'https://maven.aliyun.com/repository/google' }
-            maven { url 'https://maven.aliyun.com/repository/jcenter' }
+            maven { url 'https://maven.aliyun.com/repository/public' }
             maven { url 'https://storage.flutter-io.cn/download.flutter.io' }
         } else {
             google()
