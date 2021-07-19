@@ -7,6 +7,7 @@
 #import "PHAsset+PHAsset_getTitle.h"
 #import "PMAssetPathEntity.h"
 #import "PMCacheContainer.h"
+#import "PMConvertUtils.h"
 #import "PMFilterOption.h"
 #import "PMLogUtils.h"
 #import "PMRequestTypeUtils.h"
@@ -258,10 +259,8 @@
   }
 
   for (NSUInteger i = startIndex; i <= endIndex; i++) {
-    BOOL needTitle;
-
     PHAsset *asset = assetArray[i];
-
+    BOOL needTitle;
     if ([asset isVideo]) {
       needTitle = filterOption.videoOption.needTitle;
     } else if ([asset isImage]) {
@@ -308,6 +307,7 @@
   entity.lng = asset.location.coordinate.longitude;
   entity.title = needTitle ? [asset title] : @"";
   entity.favorite = asset.isFavorite;
+  entity.isLocallyAvailable = [PMConvertUtils entityIsLocallyAvailable:asset];
 
   return entity;
 }
