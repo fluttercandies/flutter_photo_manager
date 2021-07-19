@@ -4,8 +4,8 @@
 @implementation ImageScannerPlugin {
 }
 + (void)registerWithRegistrar:(NSObject <FlutterPluginRegistrar> *)registrar {
-  PMPlugin *plugin = [PMPlugin new];
-  [plugin registerPlugin:registrar];
+    PMPlugin *plugin = [PMPlugin new];
+    [plugin registerPlugin:registrar];
 }
 
 @end

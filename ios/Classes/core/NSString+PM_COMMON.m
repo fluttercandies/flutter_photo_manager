@@ -7,7 +7,7 @@
 @implementation NSString (PM_COMMON)
 
 - (BOOL)isEmpty{
-  return [self isEqualToString:@""];
+    return [self isEqualToString:@""];
 }
 
 @end

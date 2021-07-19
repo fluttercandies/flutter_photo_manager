@@ -13,7 +13,7 @@
     NSFileManager *fileManager = NSFileManager.defaultManager;
     BOOL *isDir = NULL;
     BOOL exists = [fileManager fileExistsAtPath:path isDirectory: isDir];
-    if(exists){
+    if (exists) {
         [fileManager removeItemAtPath:path error:nil];
     }
 }
