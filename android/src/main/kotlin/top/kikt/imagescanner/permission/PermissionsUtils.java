@@ -133,7 +133,8 @@ public final class PermissionsUtils {
         LogUtils.info("Permissions: " + needToRequestPermissionsList.get(i));
       }
     } else if (mPermissionsListener != null) {
-        mPermissionsListener.onGranted();
+      isRequesting = false;
+      mPermissionsListener.onGranted();
     }
     return this;
   }
