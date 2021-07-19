@@ -4,7 +4,7 @@ import android.os.Build
 import android.os.Environment
 
 fun belowSdk(int: Int): Boolean {
-  return Build.VERSION.SDK_INT < int
+    return Build.VERSION.SDK_INT < int
 }
 
 /**
@@ -15,11 +15,9 @@ fun belowSdk(int: Int): Boolean {
  * When the sdk is 30,
  */
 fun useFilePath(): Boolean {
-  return if (Build.VERSION.SDK_INT <= 28) {
-    true
-  } else if (Build.VERSION.SDK_INT == 29) {
-    Environment.isExternalStorageLegacy()
-  } else {
-    true
-  }
+    return when {
+        Build.VERSION.SDK_INT <= 28 -> true
+        Build.VERSION.SDK_INT == 29 -> Environment.isExternalStorageLegacy()
+        else -> true
+    }
 }

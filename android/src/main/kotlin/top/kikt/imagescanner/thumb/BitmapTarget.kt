@@ -20,5 +20,4 @@ abstract class BitmapTarget(width: Int, height: Int) : CustomTarget<Bitmap>(widt
             bitmap?.recycle()
         }
     }
-
 }
