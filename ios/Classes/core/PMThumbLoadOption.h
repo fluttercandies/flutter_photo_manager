@@ -6,8 +6,8 @@
 #import <Photos/Photos.h>
 
 typedef enum PMThumbFormatType {
-  PMThumbFormatTypeJPEG,
-  PMThumbFormatTypePNG,
+    PMThumbFormatTypeJPEG,
+    PMThumbFormatTypePNG,
 } PMThumbFormatType;
 
 @interface PMThumbLoadOption : NSObject

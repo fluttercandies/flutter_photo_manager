@@ -6,7 +6,7 @@
 
 
 @implementation PMLogUtils {
-
+    
 }
 + (instancetype)sharedInstance {
     static PMLogUtils *_sharedInstance = nil;
@@ -15,7 +15,7 @@
         _sharedInstance = [[self alloc] init];
         _sharedInstance.isLog = NO;
     });
-
+    
     return _sharedInstance;
 }
 

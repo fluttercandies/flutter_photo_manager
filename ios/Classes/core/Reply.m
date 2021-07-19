@@ -6,14 +6,14 @@
 
 
 @implementation Reply {
-
+    
 }
 - (instancetype)initWithIsReply:(BOOL)isReply {
     self = [super init];
     if (self) {
         self.isReply = isReply;
     }
-
+    
     return self;
 }
 

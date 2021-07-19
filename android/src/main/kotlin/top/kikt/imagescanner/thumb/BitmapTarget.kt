@@ -5,7 +5,6 @@ import com.bumptech.glide.request.transition.Transition
 
 /// create 2019-09-12 by cai
 
-
 abstract class BitmapTarget(width: Int, height: Int) : CustomTarget<Bitmap>(width, height) {
 
     private var bitmap: Bitmap? = null
@@ -20,5 +19,4 @@ abstract class BitmapTarget(width: Int, height: Int) : CustomTarget<Bitmap>(widt
             bitmap?.recycle()
         }
     }
-
 }
