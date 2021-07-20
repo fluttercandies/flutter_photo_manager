@@ -477,6 +477,7 @@
                      completionHandler:^(NSError *_Nullable error) {
         if (error) {
             NSLog(@"error = %@", error);
+            [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
             [handler reply:nil];
         } else {
             [handler reply:path];
@@ -986,10 +987,25 @@
                 NSURL *url = ((AVURLAsset *) asset).URL;
                 [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset asset URL = %@", url]];
                 [handler reply:url.absoluteString];
+            } else if ([asset isKindOfClass:[AVComposition class]]) {
+                // Try to handle this asset as a slow motion video, and return an original video url.
+                PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+                options.version = PHVideoRequestOptionsVersionOriginal;
+                [PHCachingImageManager.defaultManager requestAVAssetForVideo:phAsset options:options resultHandler:^(AVAsset *asset, AVAudioMix *audioMix, NSDictionary *info) {
+                    if ([asset isKindOfClass:[AVURLAsset class]]) {
+                        NSURL *url = ((AVURLAsset *) asset).URL;
+                        [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset asset URL = %@", url]];
+                        [handler reply:url.absoluteString];
+                    } else {
+                        [handler replyError:@"Asset is not an AVURLAsset which does not include a media url."];
+                    }
+                }];
             } else {
-                [handler replyError:@"cannot get videoUrl"];
+                [handler replyError:@"Asset is not an AVURLAsset which does not include a media url."];
             }
         }];
+    } else {
+        [handler replyError:@"Only video type of assets can get a media url."];
     }
 }
 
