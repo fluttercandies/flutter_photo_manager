@@ -87,7 +87,6 @@
         @"lng": @(asset.location.coordinate.longitude),
         @"lat": @(asset.location.coordinate.latitude),
         @"title": needTitle ? [asset title] : @"",
-        @"isLocallyAvailable": @([self entityIsLocallyAvailable:asset]),
     };
 }
 
@@ -105,7 +104,6 @@
         @"lng": @(asset.lng),
         @"lat": @(asset.lat),
         @"title": needTitle ? asset.title : @"",
-        @"isLocallyAvailable": @(asset.isLocallyAvailable),
     };
 }
 
@@ -172,12 +170,6 @@
 + (double)convertNSNumberToSecond:(NSNumber *)number {
     unsigned int i = number.unsignedIntValue;
     return (double) i / 1000.0;
-}
-
-+ (BOOL)entityIsLocallyAvailable:(PHAsset *)asset {
-    NSArray *rArray = [PHAssetResource assetResourcesForAsset:asset];
-    // If this returns NO, then the asset is in iCloud and not saved locally yet.
-    return [[rArray.firstObject valueForKey:@"locallyAvailable"] boolValue];
 }
 
 @end

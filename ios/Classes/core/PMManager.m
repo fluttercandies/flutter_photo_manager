@@ -132,6 +132,19 @@
     return result.count >= 1;
 }
 
+- (BOOL)entityIsLocallyAvailable:(NSString *)assetId {
+    PHFetchResult<PHAsset *> *result =
+    [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId]
+                                     options:[PHFetchOptions new]];
+    if (!result) {
+        return NO;
+    }
+    PHAsset *asset = result.firstObject;
+    NSArray *rArray = [PHAssetResource assetResourcesForAsset:asset];
+    // If this returns NO, then the asset is in iCloud and not saved locally yet.
+    return [[rArray.firstObject valueForKey:@"locallyAvailable"] boolValue];
+}
+
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
 
@@ -307,7 +320,6 @@
     entity.lng = asset.location.coordinate.longitude;
     entity.title = needTitle ? [asset title] : @"";
     entity.favorite = asset.isFavorite;
-    entity.isLocallyAvailable = [PMConvertUtils entityIsLocallyAvailable:asset];
     
     return entity;
 }

@@ -180,7 +180,6 @@ class AssetEntity {
     this.createDtSecond,
     this.modifiedDateSecond,
     this.relativePath,
-    this.isLocallyAvailable = true,
     double? latitude,
     double? longitude,
     this.mimeType,
@@ -283,8 +282,8 @@ class AssetEntity {
 
   /// Whether this asset is locally available.
   ///
-  /// Defaults to true.
-  bool isLocallyAvailable = true;
+  /// Defaults to true, and it'll always be true on Android.
+  Future<bool> get isLocallyAvailable => PhotoManager._isLocallyAvailable(id);
 
   /// Get latitude and longitude from MediaStore(android) / Photos(iOS).
   ///

@@ -264,6 +264,10 @@ class PhotoManager {
     }
   }
 
+  static Future<bool> _isLocallyAvailable(String id) {
+    return _plugin.isLocallyAvailable(id);
+  }
+
   /// Only valid for Android 29. The API of API 28 must be used with the property of `requestLegacyExternalStorage`.
   static Future<void> forceOldApi() async {
     await _plugin.forceOldApi();
