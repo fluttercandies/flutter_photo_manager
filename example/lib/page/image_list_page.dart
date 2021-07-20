@@ -177,6 +177,22 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             children: <Widget>[
               previewOriginBytesWidget,
               ElevatedButton(
+                child: Text("isLocallyAvailable"),
+                onPressed: () => entity.isLocallyAvailable.then(
+                  (bool r) => print('isLocallyAvailable: $r'),
+                ),
+              ),
+              ElevatedButton(
+                child: Text("getMediaUrl"),
+                onPressed: () async {
+                  Stopwatch watch = Stopwatch()..start();
+                  final String? url = await entity.getMediaUrl();
+                  watch.stop();
+                  print('Media URL: $url');
+                  print(watch.elapsed);
+                },
+              ),
+              ElevatedButton(
                 child: Text("Show detail page"),
                 onPressed: () => routeToDetailPage(entity),
               ),
