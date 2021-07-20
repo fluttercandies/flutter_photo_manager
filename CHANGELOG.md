@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [1.2.7](#127)
   - [1.2.6+1](#1261)
   - [1.2.6](#126)
   - [1.2.5](#125)
@@ -65,6 +66,17 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 1.2.7
+
+Improvements:
+
+- Improve `AssetEntity.getMediaUrl()` behaviors.
+
+Fixes:
+
+- Merge all fields for `FilterOptionGroup`.
+- Make `AssetEntity.isLocallyAvailable` as a `Future` getter.
 
 ## 1.2.6+1
 
