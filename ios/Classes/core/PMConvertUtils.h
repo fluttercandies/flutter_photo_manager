@@ -25,6 +25,4 @@
 + (PMFilterOption *)convertMapToPMFilterOption:(NSDictionary *)map;
 
 + (PMFilterOptionGroup *)convertMapToOptionContainer:(NSDictionary *)map;
-
-+ (BOOL)entityIsLocallyAvailable:(PHAsset *)asset;
 @end

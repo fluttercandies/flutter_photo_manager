@@ -403,6 +403,13 @@ mixin BasePlugin {
 }
 
 mixin IosPlugin on BasePlugin {
+  Future<bool> isLocallyAvailable(String id) async {
+    if (Platform.isAndroid) {
+      return true;
+    }
+    return await _channel.invokeMethod('isLocallyAvailable', {'id': id});
+  }
+
   Future<AssetPathEntity?> iosCreateFolder(
     String name,
     bool isRoot,

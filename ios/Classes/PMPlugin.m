@@ -369,10 +369,13 @@
                 [PMConvertUtils convertPMAssetToMap:asset needTitle:NO];
                 [handler reply:@{@"data": resultData}];
             }];
-            
         } else if ([call.method isEqualToString:@"assetExists"]) {
             NSString *assetId = call.arguments[@"id"];
             BOOL exists = [manager existsWithId:assetId];
+            [handler reply:@(exists)];
+        } else if ([call.method isEqualToString:@"isLocallyAvailable"]) {
+            NSString *assetId = call.arguments[@"id"];
+            BOOL exists = [manager entityIsLocallyAvailable:assetId];
             [handler reply:@(exists)];
         } else if ([call.method isEqualToString:@"getTitleAsync"]) {
             NSString *assetId = call.arguments[@"id"];

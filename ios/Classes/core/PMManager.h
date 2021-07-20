@@ -62,6 +62,8 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (BOOL)existsWithId:(NSString *)assetId;
 
+- (BOOL)entityIsLocallyAvailable:(NSString *)assetId;
+
 - (NSString*)getTitleAsyncWithAssetId: (NSString *) assetId;
 
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler;

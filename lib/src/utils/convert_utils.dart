@@ -76,7 +76,6 @@ class ConvertUtils {
       latitude: data['lat'],
       longitude: data['lng'],
       mimeType: data['mimeType'],
-      isLocallyAvailable: data['isLocallyAvailable'] ?? true,
     );
 
     return result;
