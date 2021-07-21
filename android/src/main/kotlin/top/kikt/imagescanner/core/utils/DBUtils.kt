@@ -519,7 +519,12 @@ object DBUtils : IDBUtils {
             inputStream.close()
         } else {
             val tmpPath = assetEntity?.path!!
-            val tmpFile = File(tmpPath)
+            var tmpFile = File(tmpPath)
+            val directoryFile = File(tmpFile.parent!!)
+            if (!directoryFile.exists()){
+                directoryFile.mkdirs()
+                tmpFile = File(tmpPath)
+            }
             val targetPath = "${tmpFile.parent}/$title"
             val targetFile = File(targetPath)
 
