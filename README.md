@@ -449,6 +449,13 @@ void useEntity(AssetEntity entity) async {
 
 ## android config
 
+### Kotlin and Gradle version
+
+Start from 1.2.7, We're shipping this package using Kotlin `1.5.21` and AGP `4.1.0`. If your projects are using a lower version of Kotlin or Gradle, please upgrade them to a newer version.
+More specifically:
+- Upgrade your Gradle version (the one in `gradle-wrapper.properties`) to `6.8.3` or the latest version but lower than `7.0.0`.
+- Upgrade your Kotlin version (`ext.kotlin_version`) to `1.4.32` or the latest version.
+
 ### Cache problem of android
 
 Because androidQ restricts the application’s ability to directly access the resource path, some large image caches will be generated. This is because: When the file/originFile attribute is used, the plugin will save a file in the cache folder and provide it to dart:io use.
