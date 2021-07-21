@@ -38,11 +38,12 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
     if (Platform.isIOS || Platform.isMacOS) {
       dir = (await getApplicationSupportDirectory()).absolute.path;
     } else if (Platform.isAndroid) {
-      dir = (await getExternalStorageDirectories(
-        type: StorageDirectory.downloads,
-      ))![0]
-          .absolute
-          .path;
+      // dir = (await getExternalStorageDirectories(
+      //   type: StorageDirectory.downloads,
+      // ))![0]
+      //     .absolute
+      //     .path;
+      dir = (await getTemporaryDirectory()).path;
     } else {
       dir = (await getDownloadsDirectory())!.absolute.path;
     }
@@ -109,9 +110,10 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
     }
     resp.listen((data) {
       file.writeAsBytesSync(data, mode: FileMode.append);
-    }, onDone: () {
+    }, onDone: () async {
       print("file path = ${file.lengthSync()}");
-      PhotoManager.editor.saveVideo(file, title: "$name");
+      final asset = await PhotoManager.editor.saveVideo(file, title: "$name");
+      print("saved asset: $asset");
       client.close();
     });
   }
