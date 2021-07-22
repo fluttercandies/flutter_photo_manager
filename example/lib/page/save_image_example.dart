@@ -134,7 +134,7 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
 
   void saveImage(Uint8List uint8List) async {
     final asset = await PhotoManager.editor.saveImage(uint8List);
-    print(asset);
+    print("saved asset: $asset");
   }
 
   void saveImageWithPath() async {
