@@ -24,7 +24,7 @@ fun useFilePath(): Boolean {
 }
 
 /**
- * Check if the directories exists, if not, create it
+ * Create the directory if it's not exist.
  */
 fun String.checkDirs() {
     val targetFile = File(this)
