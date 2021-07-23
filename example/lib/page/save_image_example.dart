@@ -38,12 +38,11 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
     if (Platform.isIOS || Platform.isMacOS) {
       dir = (await getApplicationSupportDirectory()).absolute.path;
     } else if (Platform.isAndroid) {
-      // dir = (await getExternalStorageDirectories(
-      //   type: StorageDirectory.downloads,
-      // ))![0]
-      //     .absolute
-      //     .path;
-      dir = (await getTemporaryDirectory()).path;
+      dir = (await getExternalStorageDirectories(
+        type: StorageDirectory.downloads,
+      ))![0]
+          .absolute
+          .path;
     } else {
       dir = (await getDownloadsDirectory())!.absolute.path;
     }
