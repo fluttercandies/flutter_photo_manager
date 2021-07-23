@@ -510,6 +510,7 @@ object AndroidQDBUtils : IDBUtils {
         desc: String,
         relativePath: String?
     ): AssetEntity? {
+        path.checkDirs()
         val cr = context.contentResolver
         val timestamp = System.currentTimeMillis() / 1000
         val inputStream = FileInputStream(path)
