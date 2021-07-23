@@ -109,9 +109,10 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
     }
     resp.listen((data) {
       file.writeAsBytesSync(data, mode: FileMode.append);
-    }, onDone: () {
+    }, onDone: () async {
       print("file path = ${file.lengthSync()}");
-      PhotoManager.editor.saveVideo(file, title: "$name");
+      final asset = await PhotoManager.editor.saveVideo(file, title: "$name");
+      print("saved asset: $asset");
       client.close();
     });
   }
@@ -132,7 +133,7 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
 
   void saveImage(Uint8List uint8List) async {
     final asset = await PhotoManager.editor.saveImage(uint8List);
-    print(asset);
+    print("saved asset: $asset");
   }
 
   void saveImageWithPath() async {

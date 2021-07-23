@@ -436,6 +436,7 @@ object DBUtils : IDBUtils {
         cursor.use {
             if (cursor.moveToNext()) {
                 val targetPath = cursor.getString(0)
+                targetPath.checkDirs()
                 val outputStream = FileOutputStream(targetPath)
                 refreshInputStream()
                 outputStream.use {
@@ -519,6 +520,7 @@ object DBUtils : IDBUtils {
             inputStream.close()
         } else {
             val tmpPath = assetEntity?.path!!
+            tmpPath.checkDirs()
             val tmpFile = File(tmpPath)
             val targetPath = "${tmpFile.parent}/$title"
             val targetFile = File(targetPath)
@@ -813,6 +815,7 @@ object DBUtils : IDBUtils {
             inputStream.close()
         } else {
             val tmpPath = assetEntity?.path!!
+            tmpPath.checkDirs()
             val tmpFile = File(tmpPath)
             val targetPath = "${tmpFile.parent}/$title"
             val targetFile = File(targetPath)
