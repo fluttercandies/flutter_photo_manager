@@ -27,6 +27,12 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSBonjourServices</key>
+	<array>
+	    <string>_dartobservatory._tcp</string>
+	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Requesting local network for debugging processes</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>You must agree with the photo album to see your pictures</string>
 	<key>UILaunchStoryboardName</key>
