@@ -246,6 +246,14 @@ class AssetEntity {
   /// height of asset.
   int height;
 
+  bool get _isLandscape => orientation == 90 || orientation == 270;
+
+  int get orientatedWidth => _isLandscape ? height : width;
+
+  int get orientatedHeight => _isLandscape ? width : height;
+
+  Size get orientatedSize => _isLandscape ? size.flipped : size;
+
   /// Gps information when shooting, nullable.
   ///
   /// When the device is android10 or above, always null.
@@ -401,7 +409,7 @@ class AssetEntity {
   /// if not video, duration is 0
   Duration get videoDuration => Duration(seconds: duration);
 
-  /// nullable, if the manager is null.
+  /// The [Size] for the asset.
   Size get size => Size(width.toDouble(), height.toDouble());
 
   /// unix timestamp second of asset
