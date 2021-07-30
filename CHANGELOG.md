@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [1.2.9](#129)
   - [1.2.8](#128)
   - [1.2.7](#127)
   - [1.2.6+1](#1261)
@@ -67,6 +68,11 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 1.2.9
+
+Features:
+- Add orientated getters. (#575)
 
 ## 1.2.8
 
