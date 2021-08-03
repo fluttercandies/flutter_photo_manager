@@ -366,10 +366,6 @@
     [requestOptions setNetworkAccessAllowed:YES];
     [requestOptions setProgressHandler:^(double progress, NSError *error, BOOL *stop,
                                          NSDictionary *info) {
-        if (progress == 1.0) {
-            [self fetchThumb:asset option:option resultHandler:handler progressHandler:nil];
-        }
-        
         if (error) {
             [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
             [progressHandler deinit];
@@ -590,10 +586,6 @@
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
     [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
                                   NSDictionary *info) {
-        if (progress == 1.0) {
-            [self fetchFullSizeImageFile:asset resultHandler:handler progressHandler:nil];
-        }
-        
         if (error) {
             [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
             [progressHandler deinit];
