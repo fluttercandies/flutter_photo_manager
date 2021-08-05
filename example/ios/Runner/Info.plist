@@ -29,7 +29,7 @@
 	</dict>
 	<key>NSBonjourServices</key>
 	<array>
-	    <string>_dartobservatory._tcp</string>
+		<string>_dartobservatory._tcp</string>
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Requesting local network for debugging processes</string>
