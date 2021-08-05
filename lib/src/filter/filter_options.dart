@@ -30,7 +30,7 @@ class FilterOptionGroup {
     this.containsPathModified = containsPathModified;
     this.createTimeCond = createTimeCond ?? DateTimeCond.def();
     this.updateTimeCond =
-        createTimeCond ?? DateTimeCond.def().copyWith(ignore: true);
+        updateTimeCond ?? DateTimeCond.def().copyWith(ignore: true);
     this.orders.addAll(orders);
   }
 
