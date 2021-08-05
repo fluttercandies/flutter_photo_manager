@@ -713,12 +713,13 @@
     }
     PHAssetCollection *collection = result[0];
     PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:filterOption];
-    PHFetchResult<PHAsset *> *fetchResult =
-    [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
+    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
     
-    return [PMAssetPathEntity entityWithId:id
-                                      name:collection.localizedTitle
-                                assetCount:(int) fetchResult.count];
+    PMAssetPathEntity *entity = [PMAssetPathEntity entityWithId:id
+                                                           name:collection.localizedTitle
+                                                     assetCount:(int) fetchResult.count];
+    entity.isAll = collection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumUserLibrary;
+    return entity;
 }
 
 - (PHFetchOptions *)getAssetOptions:(int)type filterOption:(PMFilterOptionGroup *)optionGroup {
