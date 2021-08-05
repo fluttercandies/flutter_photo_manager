@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [CHANGELOG](#changelog)
+  - [1.3.1](#131)
   - [1.3.0](#130)
   - [1.2.9](#129)
   - [1.2.8](#128)
@@ -69,6 +70,12 @@
   - [0.0.3 fix bug](#003-fix-bug)
   - [0.0.2 update readme](#002-update-readme)
   - [0.0.1](#001)
+
+## 1.3.1
+
+Fixes:
+- `fetchPathProperties` returned wrong `isAll` on iOS. (#580)
+- `updateTimeCond` not constructed correctly with `FilterOptionGroup`.
 
 ## 1.3.0
 
