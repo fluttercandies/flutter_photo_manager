@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.Priority
 import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.transition.Transition
@@ -32,6 +33,7 @@ object ThumbnailUtil {
         Glide.with(ctx)
             .asBitmap()
             .load(File(path))
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
             .priority(Priority.IMMEDIATE)
             .into(object : BitmapTarget(width, height) {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
@@ -64,6 +66,7 @@ object ThumbnailUtil {
         Glide.with(context)
             .asBitmap()
             .load(uri)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
             .priority(Priority.IMMEDIATE)
             .into(object : BitmapTarget(width, height) {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
