@@ -92,6 +92,7 @@
                 containsEmptyAlbum:option.containsEmptyAlbum
      ];
     
+    /*
     PHFetchResult<PHCollection *> *topLevelResult = [PHAssetCollection
                                                      fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
     
@@ -103,7 +104,17 @@
                             hasAll:hasAll
                 containsEmptyAlbum:option.containsEmptyAlbum
      ];
-    
+     */
+
+    PHFetchResult *userAlbumsResult = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeSmartAlbumUserLibrary options:fetchCollectionOptions];
+    [self logCollections:userAlbumsResult option:assetOptions];
+    [self injectAssetPathIntoArray:array
+                            result:userAlbumsResult
+                           options:assetOptions
+                            hasAll:hasAll
+                containsEmptyAlbum:option.containsEmptyAlbum
+     ];
+
     return array;
 }
 
