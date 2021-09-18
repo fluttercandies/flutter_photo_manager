@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_scanner_example/page/image_list_page.dart';
-import 'package:image_scanner_example/page/sub_gallery_page.dart';
+import 'package:photo_manager_example/page/image_list_page.dart';
+import 'package:photo_manager_example/page/sub_gallery_page.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 

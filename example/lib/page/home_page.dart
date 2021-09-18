@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_scanner_example/model/photo_provider.dart';
-import 'package:image_scanner_example/page/gallery_list_page.dart';
-import 'package:image_scanner_example/widget/change_notifier_builder.dart';
+import 'package:photo_manager_example/model/photo_provider.dart';
+import 'package:photo_manager_example/page/gallery_list_page.dart';
+import 'package:photo_manager_example/widget/change_notifier_builder.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 

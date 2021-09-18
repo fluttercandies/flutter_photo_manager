@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:image_scanner_example/core/lru_map.dart';
-import 'package:image_scanner_example/model/photo_provider.dart';
-import 'package:image_scanner_example/widget/change_notifier_builder.dart';
-import 'package:image_scanner_example/widget/loading_widget.dart';
+import 'package:photo_manager_example/core/lru_map.dart';
+import 'package:photo_manager_example/model/photo_provider.dart';
+import 'package:photo_manager_example/widget/change_notifier_builder.dart';
+import 'package:photo_manager_example/widget/loading_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 

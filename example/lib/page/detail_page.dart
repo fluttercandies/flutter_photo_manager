@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_scanner_example/util/common_util.dart';
-import 'package:image_scanner_example/widget/video_widget.dart';
+import 'package:photo_manager_example/util/common_util.dart';
+import 'package:photo_manager_example/widget/video_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class DetailPage extends StatefulWidget {
