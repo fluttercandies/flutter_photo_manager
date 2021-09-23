@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:image_scanner_example/main.dart';
+import 'package:photo_manager_example/main.dart';
 
 import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -12,8 +12,6 @@ class PhotoProvider extends ChangeNotifier {
   var hasAll = true;
 
   var onlyAll = false;
-
-  Map<AssetPathEntity, AssetPathProvider> pathProviderMap = {};
 
   bool _notifying = false;
 
@@ -168,7 +166,6 @@ class PhotoProvider extends ChangeNotifier {
 
   void reset() {
     this.list.clear();
-    pathProviderMap.clear();
   }
 
   Future<void> refreshGalleryList() async {
@@ -188,11 +185,6 @@ class PhotoProvider extends ChangeNotifier {
 
     this.list.clear();
     this.list.addAll(galleryList);
-  }
-
-  AssetPathProvider getOrCreatePathProvider(AssetPathEntity pathEntity) {
-    pathProviderMap[pathEntity] ??= AssetPathProvider(pathEntity);
-    return pathProviderMap[pathEntity]!;
   }
 
   FilterOptionGroup makeOption() {
@@ -249,12 +241,15 @@ class PhotoProvider extends ChangeNotifier {
 }
 
 class AssetPathProvider extends ChangeNotifier {
+  AssetPathProvider(this.path) {
+    onRefresh();
+  }
+
   static const loadCount = 50;
 
   bool isInit = false;
 
   final AssetPathEntity path;
-  AssetPathProvider(this.path);
 
   List<AssetEntity> list = [];
 
