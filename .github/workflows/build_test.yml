@@ -1,8 +1,21 @@
-name: CI
+name: Build test
 
 on: [push, pull_request]
 
 jobs:
+  dry_run:
+    name: "Test with 'pub publish --dry-run'"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Publish
+        uses: sakebook/actions-flutter-pub-publisher@v1.3.0
+        with:
+          credential: ${{ secrets.CREDENTIAL_JSON }}
+          flutter_package: true
+          skip_test: true
+          dry_run: true
   test_iOS:
     name: Test iOS on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
