@@ -3,21 +3,6 @@ name: Build test
 on: [push, pull_request]
 
 jobs:
-  dry_run:
-    name: "Test with 'pub publish --dry-run'"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: Copy macos code on publish
-        run: ./copy_on_publish.sh
-      - name: Publish
-        uses: sakebook/actions-flutter-pub-publisher@v1.3.0
-        with:
-          credential: ${{ secrets.CREDENTIAL_JSON }}
-          flutter_package: true
-          skip_test: true
-          dry_run: true
   test_iOS:
     name: Test iOS on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -31,8 +16,10 @@ jobs:
           java-version: "12.x"
       - uses: subosito/flutter-action@v1
         with:
-          channel: beta
+          channel: stable
+      - run: ./copy_on_publish.sh
       - run: flutter pub get
+      - run: flutter pub publish --dry-run
       - run: flutter analyze lib example/lib
       - run: cd example ; flutter build ios --no-codesign
 
@@ -49,8 +36,10 @@ jobs:
           java-version: "12.x"
       - uses: subosito/flutter-action@v1
         with:
-          channel: beta
+          channel: stable
+      - run: ./copy_on_publish.sh
       - run: flutter pub get
+      - run: flutter pub publish --dry-run
       - run: flutter analyze lib example/lib
       - run: flutter config --enable-macos-desktop
       - run: cd example ; flutter build macos --debug
@@ -68,8 +57,10 @@ jobs:
           java-version: "12.x"
       - uses: subosito/flutter-action@v1
         with:
-          channel: beta
+          channel: stable
+      - run: ./copy_on_publish.sh
       - run: flutter pub get
+      - run: flutter pub publish --dry-run
       - run: flutter analyze lib example/lib
       - run: sudo echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "ndk;20.0.5594570"
       - run: cd example; flutter build apk --debug
