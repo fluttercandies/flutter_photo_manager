@@ -82,38 +82,23 @@
                                                             fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
                                                             subtype:PHAssetCollectionSubtypeAlbumRegular
                                                             options:fetchCollectionOptions];
-    
     [self logCollections:smartAlbumResult option:assetOptions];
-    
     [self injectAssetPathIntoArray:array
                             result:smartAlbumResult
                            options:assetOptions
                             hasAll:hasAll
-                containsEmptyAlbum:option.containsEmptyAlbum
-     ];
-    
-    /*
-    PHFetchResult<PHCollection *> *topLevelResult = [PHAssetCollection
-                                                     fetchTopLevelUserCollectionsWithOptions:fetchCollectionOptions];
-    
-    [self logCollections:topLevelResult option:assetOptions];
-    
+                containsEmptyAlbum:option.containsEmptyAlbum];
+  
+    PHFetchResult<PHAssetCollection *> *albumResult = [PHAssetCollection
+                                                                fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum
+                                                                subtype:PHAssetCollectionSubtypeAny
+                                                                options:fetchCollectionOptions];
+    [self logCollections:albumResult option:assetOptions];
     [self injectAssetPathIntoArray:array
-                            result:topLevelResult
+                            result:albumResult
                            options:assetOptions
                             hasAll:hasAll
-                containsEmptyAlbum:option.containsEmptyAlbum
-     ];
-     */
-
-    PHFetchResult *userAlbumsResult = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeSmartAlbumUserLibrary options:fetchCollectionOptions];
-    [self logCollections:userAlbumsResult option:assetOptions];
-    [self injectAssetPathIntoArray:array
-                            result:userAlbumsResult
-                           options:assetOptions
-                            hasAll:hasAll
-                containsEmptyAlbum:option.containsEmptyAlbum
-     ];
+                containsEmptyAlbum:option.containsEmptyAlbum];
 
     return array;
 }
