@@ -9,6 +9,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+      - name: Copy macos code on publish
+        run: ./copy_on_publish.sh
       - name: Publish
         uses: sakebook/actions-flutter-pub-publisher@v1.3.0
         with:
@@ -33,7 +35,7 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze lib example/lib
       - run: cd example ; flutter build ios --no-codesign
-      
+
   test_macOS:
     name: Test macOS on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -52,7 +54,7 @@ jobs:
       - run: flutter analyze lib example/lib
       - run: flutter config --enable-macos-desktop
       - run: cd example ; flutter build macos --debug
-      
+
   test_android:
     name: Test android on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
