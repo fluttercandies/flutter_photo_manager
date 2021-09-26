@@ -170,9 +170,8 @@ class AssetPathEntity {
   }
 }
 
-/// Used to describe a picture or video
+/// Used to describe an asset.
 class AssetEntity {
-  /// see [id]
   AssetEntity({
     required this.id,
     required this.typeInt,
@@ -482,19 +481,14 @@ class AssetEntity {
   }
 
   @override
-  int get hashCode =>
-      hashValues(id, typeInt, duration, orientation, isFavorite);
+  int get hashCode => hashValues(id, isFavorite);
 
   @override
   bool operator ==(other) {
     if (other is! AssetEntity) {
       return false;
     }
-    return id == other.id &&
-        typeInt == other.typeInt &&
-        duration == other.duration &&
-        orientation == other.orientation &&
-        isFavorite == other.isFavorite;
+    return id == other.id && isFavorite == other.isFavorite;
   }
 
   @override

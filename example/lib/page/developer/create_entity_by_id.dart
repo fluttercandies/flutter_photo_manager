@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:image_scanner_example/page/detail_page.dart';
+import 'package:photo_manager_example/page/detail_page.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 

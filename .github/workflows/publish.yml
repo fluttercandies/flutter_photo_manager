@@ -3,16 +3,17 @@ name: Publish to pub
 on:
   release:
     types:
-     - created
+      - created
 
 jobs:
   publish:
-
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+      - name: Copy on publish
+        run: ./copy_on_publish.sh
       - name: Publish
         uses: sakebook/actions-flutter-pub-publisher@v1.3.1
         with:

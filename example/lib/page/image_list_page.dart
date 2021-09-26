@@ -3,14 +3,13 @@ import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:image_scanner_example/develop/upload_to_dev_serve.dart';
-import 'package:image_scanner_example/model/photo_provider.dart';
-import 'package:image_scanner_example/page/detail_page.dart';
-import 'package:image_scanner_example/util/common_util.dart';
-import 'package:image_scanner_example/widget/change_notifier_builder.dart';
-import 'package:image_scanner_example/widget/dialog/list_dialog.dart';
-import 'package:image_scanner_example/widget/image_item_widget.dart';
-import 'package:image_scanner_example/widget/loading_widget.dart';
+import 'package:photo_manager_example/develop/upload_to_dev_serve.dart';
+import 'package:photo_manager_example/model/photo_provider.dart';
+import 'package:photo_manager_example/page/detail_page.dart';
+import 'package:photo_manager_example/util/common_util.dart';
+import 'package:photo_manager_example/widget/dialog/list_dialog.dart';
+import 'package:photo_manager_example/widget/image_item_widget.dart';
+import 'package:photo_manager_example/widget/loading_widget.dart';
 
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
@@ -36,8 +35,11 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
 
   PhotoProvider get photoProvider => Provider.of<PhotoProvider>(context);
 
-  AssetPathProvider get provider =>
-      context.read<PhotoProvider>().getOrCreatePathProvider(path);
+  AssetPathProvider readPathProvider(BuildContext c) =>
+      c.read<AssetPathProvider>();
+
+  AssetPathProvider watchPathProvider(BuildContext c) =>
+      c.watch<AssetPathProvider>();
 
   List<AssetEntity> checked = [];
 
@@ -72,71 +74,61 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierBuilder(
-      value: provider,
-      builder: (_, __) {
-        var length = path.assetCount;
-        return Scaffold(
-          appBar: AppBar(
-            title: Text("${path.name}"),
-            actions: <Widget>[
-              IconButton(
-                icon: Icon(
-                  Icons.delete,
+    return ChangeNotifierProvider(
+      create: (_) => AssetPathProvider(widget.path),
+      builder: (BuildContext context, _) => Scaffold(
+        appBar: AppBar(
+          title: Text("${path.name}"),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(
+                Icons.delete,
+              ),
+              tooltip: 'Delete selected ',
+              onPressed: () {
+                readPathProvider(context);
+              },
+            ),
+            AnimatedBuilder(
+              animation: photoProvider,
+              builder: (_, __) {
+                final formatType = photoProvider.thumbFormat == ThumbFormat.jpeg
+                    ? ThumbFormat.png
+                    : ThumbFormat.jpeg;
+                return IconButton(
+                  icon: Icon(Icons.swap_horiz),
+                  iconSize: 22,
+                  tooltip: "Use another format.",
+                  onPressed: () {
+                    photoProvider.thumbFormat = formatType;
+                  },
+                );
+              },
+            ),
+            Tooltip(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Icon(
+                  Icons.info_outline,
+                  size: 22,
                 ),
-                tooltip: 'Delete selected ',
-                onPressed: () {
-                  provider.deleteSelectedAssets(checked);
-                },
               ),
-              AnimatedBuilder(
-                animation: photoProvider,
-                builder: (_, __) {
-                  final formatType =
-                      photoProvider.thumbFormat == ThumbFormat.jpeg
-                          ? ThumbFormat.png
-                          : ThumbFormat.jpeg;
-                  return IconButton(
-                    icon: Icon(Icons.swap_horiz),
-                    iconSize: 22,
-                    tooltip: "Use another format.",
-                    onPressed: () {
-                      photoProvider.thumbFormat = formatType;
-                    },
-                  );
-                },
-              ),
-              Tooltip(
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Icon(
-                    Icons.info_outline,
-                    size: 22,
-                  ),
-                ),
-                message: "Long tap to delete item.",
-              ),
-            ],
-          ),
-          body: buildRefreshIndicator(length),
-        );
-      },
+              message: "Long tap to delete item.",
+            ),
+          ],
+        ),
+        body: buildRefreshIndicator(context, path.assetCount),
+      ),
     );
   }
 
-  Widget buildRefreshIndicator(int length) {
-    if (!provider.isInit) {
-      provider.onRefresh();
-      return Center(
-        child: Text("loading"),
-      );
-    }
+  Widget buildRefreshIndicator(BuildContext context, int length) {
     return RefreshIndicator(
-      onRefresh: _onRefresh,
+      onRefresh: () => _onRefresh(context),
       child: Scrollbar(
         child: GridView.builder(
           itemBuilder: _buildItem,
-          itemCount: provider.showItemCount,
+          itemCount: watchPathProvider(context).showItemCount,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 4,
           ),
@@ -146,9 +138,9 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   }
 
   Widget _buildItem(BuildContext context, int index) {
-    final list = provider.list;
+    final list = watchPathProvider(context).list;
     if (list.length == index) {
-      onLoadMore();
+      onLoadMore(context);
       return loadWidget;
     }
 
@@ -280,18 +272,18 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     );
   }
 
-  Future<void> onLoadMore() async {
+  Future<void> onLoadMore(BuildContext context) async {
     if (!mounted) {
       return;
     }
-    await provider.onLoadMore();
+    await readPathProvider(context).onLoadMore();
   }
 
-  Future<void> _onRefresh() async {
+  Future<void> _onRefresh(BuildContext context) async {
     if (!mounted) {
       return;
     }
-    await provider.onRefresh();
+    await readPathProvider(context).onRefresh();
   }
 
   void _deleteCurrent(AssetEntity entity) async {
@@ -305,7 +297,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               style: const TextStyle(color: Colors.red),
             ),
             onPressed: () async {
-              provider.delete(entity);
+              readPathProvider(context).delete(entity);
               Navigator.pop(context);
             },
           ),
@@ -317,7 +309,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       );
       showDialog(context: context, builder: (_) => dialog);
     } else {
-      provider.delete(entity);
+      readPathProvider(context).delete(entity);
     }
   }
 
@@ -379,7 +371,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   }
 
   void deleteAssetInAlbum(entity) {
-    provider.removeInAlbum(entity);
+    readPathProvider(context).removeInAlbum(entity);
   }
 
   Widget _buildMoveAnotherPath(AssetEntity entity) {

@@ -1,4 +1,4 @@
-name: CI
+name: Build test
 
 on: [push, pull_request]
 
@@ -16,11 +16,13 @@ jobs:
           java-version: "12.x"
       - uses: subosito/flutter-action@v1
         with:
-          channel: beta
+          channel: stable
+      - run: ./copy_on_publish.sh
       - run: flutter pub get
+      - run: flutter pub publish --dry-run
       - run: flutter analyze lib example/lib
       - run: cd example ; flutter build ios --no-codesign
-      
+
   test_macOS:
     name: Test macOS on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -34,12 +36,14 @@ jobs:
           java-version: "12.x"
       - uses: subosito/flutter-action@v1
         with:
-          channel: beta
+          channel: stable
+      - run: ./copy_on_publish.sh
       - run: flutter pub get
+      - run: flutter pub publish --dry-run
       - run: flutter analyze lib example/lib
       - run: flutter config --enable-macos-desktop
       - run: cd example ; flutter build macos --debug
-      
+
   test_android:
     name: Test android on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -53,8 +57,10 @@ jobs:
           java-version: "12.x"
       - uses: subosito/flutter-action@v1
         with:
-          channel: beta
+          channel: stable
+      - run: ./copy_on_publish.sh
       - run: flutter pub get
+      - run: flutter pub publish --dry-run
       - run: flutter analyze lib example/lib
       - run: sudo echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "ndk;20.0.5594570"
       - run: cd example; flutter build apk --debug

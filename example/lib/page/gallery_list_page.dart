@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:image_scanner_example/model/photo_provider.dart';
-import 'package:image_scanner_example/widget/gallery_item_widget.dart';
+import 'package:photo_manager_example/model/photo_provider.dart';
+import 'package:photo_manager_example/widget/gallery_item_widget.dart';
 import 'package:provider/provider.dart';
 
 class GalleryListPage extends StatefulWidget {
