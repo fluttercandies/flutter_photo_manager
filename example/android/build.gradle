@@ -1,7 +1,7 @@
 import groovy.json.JsonSlurper
 
 buildscript {
-    ext.kotlin_version = '1.4.30'
+    ext.kotlin_version = '1.5.21'
     def isChina = false
     try {
         def connection = new URL('https://api.ip.sb/geoip').openConnection()
@@ -22,16 +22,16 @@ buildscript {
     repositories {
         if (isChina) {
             maven { url 'https://maven.aliyun.com/repository/google' }
-            maven { url 'https://maven.aliyun.com/repository/jcenter' }
-            maven { url 'http://download.flutter.io' }
+            maven { url 'https://maven.aliyun.com/repository/public' }
+            maven { url 'https://storage.flutter-io.cn/download.flutter.io' }
         } else {
             google()
-            jcenter()
+            mavenCentral()
         }
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.4'
+        classpath 'com.android.tools.build:gradle:4.1.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -40,11 +40,11 @@ allprojects {
     repositories {
         if (isChina) {
             maven { url 'https://maven.aliyun.com/repository/google' }
-            maven { url 'https://maven.aliyun.com/repository/jcenter' }
-            maven { url 'http://download.flutter.io' }
+            maven { url 'https://maven.aliyun.com/repository/public' }
+            maven { url 'https://storage.flutter-io.cn/download.flutter.io' }
         } else {
             google()
-            jcenter()
+            mavenCentral()
         }
     }
 }

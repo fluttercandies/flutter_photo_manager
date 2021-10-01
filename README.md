@@ -1,21 +1,21 @@
 # photo_manager
 
-[![pub package](https://img.shields.io/pub/v/photo_manager.svg)](https://pub.dartlang.org/packages/photo_manager)
+[![pub package](https://img.shields.io/pub/v/photo_manager.svg)](https://pub.dev/packages/photo_manager)
 [![GitHub](https://img.shields.io/github/license/Caijinglong/flutter_photo_manager.svg)](https://github.com/Caijinglong/flutter_photo_manager)
 [![GitHub stars](https://img.shields.io/github/stars/Caijinglong/flutter_photo_manager.svg?style=social&label=Stars)](https://github.com/Caijinglong/flutter_photo_manager)
 
-A flutter api for photo, you can get image/video from ios or android.
+Photo/Assets management APIs for Flutter without UI integration,
+you can get assets (image/video/audio) from Android, iOS and macOS.
 
-一个提供相册 api 的插件, android ios 可用,没有 ui,以便于自定义自己的界面, 你可以通过提供的 api 来制作图片相关的 ui 或插件
+提供相册操作 API 的插件，Android、iOS 和 macOS 可用。
+没有 UI 内容，以便于自定义自己的界面，你可以通过提供的 API 来实现图片相关的 UI 或插件。
 
-## Other projects using this library
-
-If you just need a picture selector, you can choose to use [photo](https://pub.dartlang.org/packages/photo) library , a multi image picker. All UI create by flutter.
+## Projects that using this packages
 
 | name                 | owner          | description                                                                                                                                       | pub                                                                                                                    | github                                                                                                                                                                  |
 | :------------------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| photo                | Caijinglong    | A selector for multiple pictures / videos, The style is like the 6.0 version of wechat.                                                           | [![pub package](https://img.shields.io/pub/v/photo.svg)](https://pub.dev/packages/photo)                               | [![star](https://img.shields.io/github/stars/Caijinglong/flutter_photo?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker)                   |
-| wechat_assets_picker | fluttercandies | An assets picker in WeChat 7.x style, support multi assets picking.                                                                               | [![pub package](https://img.shields.io/pub/v/wechat_assets_picker.svg)](https://pub.dev/packages/wechat_assets_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker) |
+| wechat_assets_picker | fluttercandies | An audio/video/image picker in pure Dart which is the same with WeChat, support multi picking.                                                    | [![pub package](https://img.shields.io/pub/v/wechat_assets_picker.svg)](https://pub.dev/packages/wechat_assets_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker) |
+| photo                | Caijinglong    | A selector for multiple pictures / videos, The style is like the 6.0 version of wechat.                                                           | [![pub package](https://img.shields.io/pub/v/photo.svg)](https://pub.dev/packages/photo)                               | [![star](https://img.shields.io/github/stars/Caijinglong/flutter_photo?style=social)](https://github.com/caijinglong/flutter_photo)                                     |
 | photo_widget         | fluttercandies | Not just selectors, but to provide each widget as a separate component, which is convenient for quickly combining and customizing your own style. | [![pub package](https://img.shields.io/pub/v/photo_widget.svg)](https://pub.dev/packages/photo_widget)                 | [![star](https://img.shields.io/github/stars/fluttercandies/photo_widget?style=social)](https://github.com/fluttercandies/photo_widget)                                 |
 
 ## Table of contents
@@ -448,6 +448,13 @@ void useEntity(AssetEntity entity) async {
 ```
 
 ## android config
+
+### Kotlin and Gradle version
+
+Start from 1.2.7, We're shipping this package using Kotlin `1.5.21` and AGP `4.1.0`. If your projects are using a lower version of Kotlin or Gradle, please upgrade them to a newer version.
+More specifically:
+- Upgrade your Gradle version (the one in `gradle-wrapper.properties`) to `6.8.3` or the latest version but lower than `7.0.0`.
+- Upgrade your Kotlin version (`ext.kotlin_version`) to `1.4.32` or the latest version.
 
 ### Cache problem of android
 

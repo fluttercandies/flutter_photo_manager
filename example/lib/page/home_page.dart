@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_scanner_example/model/photo_provider.dart';
-import 'package:image_scanner_example/page/gallery_list_page.dart';
-import 'package:image_scanner_example/widget/change_notifier_builder.dart';
+import 'package:photo_manager_example/model/photo_provider.dart';
+import 'package:photo_manager_example/page/gallery_list_page.dart';
+import 'package:photo_manager_example/widget/change_notifier_builder.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +16,7 @@ class NewHomePage extends StatefulWidget {
 
 class _NewHomePageState extends State<NewHomePage> {
   PhotoProvider get readProvider => context.read<PhotoProvider>();
+
   PhotoProvider get watchProvider => context.watch<PhotoProvider>();
 
   @override
@@ -33,19 +34,19 @@ class _NewHomePageState extends State<NewHomePage> {
         appBar: AppBar(
           title: Text("photo manager example"),
         ),
-        body: Column(
+        body: ListView(
           children: <Widget>[
             buildButton("Get all gallery list", _scanGalleryList),
             if (Platform.isIOS)
               buildButton(
-                  "Change limited photos with PhotosUI", _changeLimitPhotos),
+                "Change limited photos with PhotosUI",
+                _changeLimitPhotos,
+              ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text("scan type"),
-                Container(
-                  width: 10,
-                ),
+                Container(width: 10),
               ],
             ),
             _buildTypeChecks(watchProvider),
@@ -78,6 +79,8 @@ class _NewHomePageState extends State<NewHomePage> {
 
       return Expanded(
         child: CheckboxListTile(
+          dense: true,
+          contentPadding: EdgeInsets.symmetric(horizontal: 6),
           title: Text(typeText),
           value: currentType.containsType(type),
           onChanged: (bool? value) {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:image_scanner_example/widget/gallery_item_widget.dart';
+import 'package:photo_manager_example/widget/gallery_item_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class SubFolderPage extends StatefulWidget {

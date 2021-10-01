@@ -6,7 +6,7 @@ import '../type.dart';
 ///
 /// 筛选选项, 可以分别设置图片类型和视频类型对应的 [FilterOption]
 ///
-/// See [FilterOption]
+/// See [FilterOption].
 class FilterOptionGroup {
   static final _defaultOrderOption = OrderOption(
     type: OrderOptionType.updateDate,
@@ -29,10 +29,8 @@ class FilterOptionGroup {
     this.containsEmptyAlbum = containsEmptyAlbum;
     this.containsPathModified = containsPathModified;
     this.createTimeCond = createTimeCond ?? DateTimeCond.def();
-    this.updateTimeCond = createTimeCond ??
-        DateTimeCond.def().copyWith(
-          ignore: true,
-        );
+    this.updateTimeCond =
+        updateTimeCond ?? DateTimeCond.def().copyWith(ignore: true);
     this.orders.addAll(orders);
   }
 
@@ -47,9 +45,10 @@ class FilterOptionGroup {
 
   /// If true, the [AssetPathEntity] will return with the last modified time.
   ///
-  /// See [AssetPathEntity.lastModified]
+  /// See [AssetPathEntity.lastModified].
   ///
-  /// This is a performance consuming option. Only if you really need it, it is recommended to set it to true.
+  /// This is a performance consuming option.
+  /// It's recommended to be true only if you really need it.
   bool containsPathModified = false;
 
   @Deprecated('Please use createTimeCond.')
@@ -83,24 +82,28 @@ class FilterOptionGroup {
     }
     this.containsEmptyAlbum = other.containsEmptyAlbum;
     this.containsPathModified = other.containsPathModified;
+    this.createTimeCond = other.createTimeCond;
+    this.updateTimeCond = other.updateTimeCond;
+    this.orders
+      ..clear()
+      ..addAll(other.orders);
   }
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> result = {};
     if (_map.containsKey(AssetType.image)) {
-      result["image"] = getOption(AssetType.image).toMap();
+      result['image'] = getOption(AssetType.image).toMap();
     }
     if (_map.containsKey(AssetType.video)) {
-      result["video"] = getOption(AssetType.video).toMap();
+      result['video'] = getOption(AssetType.video).toMap();
     }
     if (_map.containsKey(AssetType.audio)) {
-      result["audio"] = getOption(AssetType.audio).toMap();
+      result['audio'] = getOption(AssetType.audio).toMap();
     }
-
-    result["createDate"] = createTimeCond.toMap();
-    result["updateDate"] = updateTimeCond.toMap();
     result['containsEmptyAlbum'] = containsEmptyAlbum;
     result['containsPathModified'] = containsPathModified;
+    result['createDate'] = createTimeCond.toMap();
+    result['updateDate'] = updateTimeCond.toMap();
 
     final ordersList = List<OrderOption>.of(orders);
     if (ordersList.isEmpty) {
@@ -125,28 +128,21 @@ class FilterOptionGroup {
     imageOption ??= _map[AssetType.image];
     videoOption ??= _map[AssetType.video];
     audioOption ??= _map[AssetType.audio];
-
-    createTimeCond ??= this.createTimeCond;
-    updateTimeCond ??= this.updateTimeCond;
-
     containsEmptyAlbum ??= this.containsEmptyAlbum;
     containsPathModified ??= this.containsPathModified;
-
+    createTimeCond ??= this.createTimeCond;
+    updateTimeCond ??= this.updateTimeCond;
     orders ??= this.orders;
 
-    final result = FilterOptionGroup();
-
-    result.setOption(AssetType.image, imageOption!);
-    result.setOption(AssetType.video, videoOption!);
-    result.setOption(AssetType.audio, audioOption!);
-
-    result.createTimeCond = createTimeCond;
-    result.updateTimeCond = updateTimeCond;
-
-    result.containsEmptyAlbum = containsEmptyAlbum;
-    result.containsPathModified = containsPathModified;
-
-    result.orders.addAll(orders);
+    final result = FilterOptionGroup()
+      ..setOption(AssetType.image, imageOption!)
+      ..setOption(AssetType.video, videoOption!)
+      ..setOption(AssetType.audio, audioOption!)
+      ..createTimeCond = createTimeCond
+      ..updateTimeCond = updateTimeCond
+      ..containsEmptyAlbum = containsEmptyAlbum
+      ..containsPathModified = containsPathModified
+      ..orders.addAll(orders);
 
     return result;
   }
@@ -158,10 +154,8 @@ class FilterOptionGroup {
 }
 
 /// Filter option
-///
 /// 筛选选项的详细情况
 class FilterOption {
-  /// See [needTitle], [sizeConstraint] and [durationConstraint]
   const FilterOption({
     this.needTitle = false,
     this.sizeConstraint = const SizeConstraint(),
@@ -201,9 +195,9 @@ class FilterOption {
 
   Map<String, dynamic> toMap() {
     return {
-      "title": needTitle,
-      "size": sizeConstraint.toMap(),
-      "duration": durationConstraint.toMap(),
+      'title': needTitle,
+      'size': sizeConstraint.toMap(),
+      'duration': durationConstraint.toMap(),
     };
   }
 
@@ -257,11 +251,11 @@ class SizeConstraint {
 
   Map<String, dynamic> toMap() {
     return {
-      "minWidth": minWidth,
-      "maxWidth": maxWidth,
-      "minHeight": minHeight,
-      "maxHeight": maxHeight,
-      "ignoreSize": ignoreSize,
+      'minWidth': minWidth,
+      'maxWidth': maxWidth,
+      'minHeight': minHeight,
+      'maxHeight': maxHeight,
+      'ignoreSize': ignoreSize,
     };
   }
 }
@@ -280,8 +274,8 @@ class DurationConstraint {
 
   Map<String, dynamic> toMap() {
     return {
-      "min": min.inMilliseconds,
-      "max": max.inMilliseconds,
+      'min': min.inMilliseconds,
+      'max': max.inMilliseconds,
     };
   }
 }

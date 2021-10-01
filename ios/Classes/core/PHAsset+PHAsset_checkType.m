@@ -9,19 +9,19 @@
 
 @implementation PHAsset (PHAsset_checkType)
 
--(bool)isImage{
+- (bool)isImage{
     return [self mediaType] == PHAssetMediaTypeImage;
 }
 
--(bool)isVideo{
+- (bool)isVideo{
     return [self mediaType] == PHAssetMediaTypeVideo;
 }
 
--(bool)isAudio{
+- (bool)isAudio{
     return [self mediaType] == PHAssetMediaTypeAudio;
 }
 
--(bool)isImageOrVideo{
+- (bool)isImageOrVideo{
     return [self isVideo] || [self isImage];
 }
 

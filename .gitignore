@@ -7,11 +7,11 @@ pubspec.lock
 
 build/
 .idea/
+.vscode/
+android/.classpath
+android/.project
 
 fvm
-.vscode/settings.json
-
-android/.settings/org.eclipse.buildship.core.prefs
 doc/
-
 .env
+*.iml

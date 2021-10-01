@@ -9,23 +9,23 @@
 #define PM_TYPE_AUDIO 1<<2
 
 @implementation PMRequestTypeUtils {
-
+    
 }
 
 + (BOOL)checkContainsType:(int)type targetType:(int)targetType {
-  return (type & targetType) == targetType;
+    return (type & targetType) == targetType;
 }
 
 + (BOOL)containsImage:(int)type {
-  return [self checkContainsType:type targetType:PM_TYPE_IMAGE];
+    return [self checkContainsType:type targetType:PM_TYPE_IMAGE];
 }
 
 + (BOOL)containsVideo:(int)type {
-  return [self checkContainsType:type targetType:PM_TYPE_VIDEO];
+    return [self checkContainsType:type targetType:PM_TYPE_VIDEO];
 }
 
 + (BOOL)containsAudio:(int)type {
-  return [self checkContainsType:type targetType:PM_TYPE_AUDIO];
+    return [self checkContainsType:type targetType:PM_TYPE_AUDIO];
 }
 
 @end
