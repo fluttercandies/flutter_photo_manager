@@ -1,5 +1,5 @@
 #import "PMImport.h"
 
-@interface ImageScannerPlugin : NSObject <FlutterPlugin>
+@interface PhotoManagerPlugin : NSObject <FlutterPlugin>
 @property(nonatomic, strong) NSObject <FlutterPluginRegistrar> *registrar;
 @end

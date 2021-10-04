@@ -19,6 +19,6 @@ flutter:
         package: top.kikt.photo_manager
         pluginClass: PhotoManagerPlugin
       ios:
-        pluginClass: ImageScannerPlugin
+        pluginClass: PhotoManagerPlugin
       macos:
-        pluginClass: ImageScannerPlugin
+        pluginClass: PhotoManagerPlugin

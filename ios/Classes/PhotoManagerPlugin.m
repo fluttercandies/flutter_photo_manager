@@ -1,7 +1,7 @@
-#import "ImageScannerPlugin.h"
+#import "PhotoManagerPlugin.h"
 #import "PMPlugin.h"
 
-@implementation ImageScannerPlugin {
+@implementation PhotoManagerPlugin {
 }
 + (void)registerWithRegistrar:(NSObject <FlutterPluginRegistrar> *)registrar {
     PMPlugin *plugin = [PMPlugin new];
