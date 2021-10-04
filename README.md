@@ -555,7 +555,7 @@ Xcode's output:
             ^
     1 error generated.
     /Users/cai/IdeaProjects/flutter/sxw_order/ios/Runner/GeneratedPluginRegistrant.m:9:9: fatal error: could not build module 'photo_manager'
-    #import <photo_manager/ImageScannerPlugin.h>
+    #import <photo_manager/PhotoManagerPlugin.h>
      ~~~~~~~^
     2 errors generated.
 ```
