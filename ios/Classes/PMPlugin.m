@@ -104,7 +104,7 @@
     return nil;
 }
 - (void)handlePermission:(PMManager *)manager
-                 handler:(ResultHandler*) handler
+                 handler:(ResultHandler*)handler
       requestAccessLevel:(int)requestAccessLevel {
     if (@available(iOS 14, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
@@ -133,7 +133,7 @@
 #endif
 
 #if __IPHONE_15_0
-- (void)presentLimited:(ResultHandler*) handler {
+- (void)presentLimited:(ResultHandler*)handler {
     if (@available(iOS 15, *)) {
         UIViewController* controller = [self getCurrentViewController];
         if (!controller) {
@@ -152,7 +152,7 @@
 }
 
 #elif __IPHONE_14_0
-- (void)presentLimited:(ResultHandler*) handler {
+- (void)presentLimited:(ResultHandler*)handler {
     if (@available(iOS 14, *)) {
         UIViewController* controller = [self getCurrentViewController];
         if (!controller) {
@@ -166,7 +166,7 @@
 
 #else
 - (void)handlePermission:(PMManager *)manager
-                 handler:(ResultHandler*) handler
+                 handler:(ResultHandler*)handler
       requestAccessLevel:(int)requestAccessLevel {
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
         [self replyPermssionResult:handler status:status];
@@ -187,8 +187,8 @@
 
 #if TARGET_OS_OSX
 - (void)handlePermission:(PMManager *)manager
-                  handler:(ResultHandler*) handler
-       requestAccessLevel:(int)requestAccessLevel {
+                 handler:(ResultHandler*)handler
+      requestAccessLevel:(int)requestAccessLevel {
 #if __MAC_11_0
     if (@available(macOS 11.0, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
@@ -225,7 +225,7 @@
 #endif
 }
 
--(void)presentLimited:(ResultHandler*) handler {
+- (void)presentLimited:(ResultHandler*)handler {
     [handler replyError:@"Not supported on macOS."];
 }
 
