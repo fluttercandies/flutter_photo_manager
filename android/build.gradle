@@ -1,4 +1,4 @@
-group 'top.kikt.imagescanner'
+group 'top.kikt.photo_manager'
 version '1.0-SNAPSHOT'
 
 buildscript {
