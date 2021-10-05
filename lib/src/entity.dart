@@ -42,9 +42,6 @@ class AssetPathEntity {
   /// In android: always 1.
   late int albumType;
 
-  /// path asset type.
-  late RequestType _type;
-
   late FilterOptionGroup filterOption;
 
   /// The modification time of the latest asset contained in an album.
@@ -55,6 +52,7 @@ class AssetPathEntity {
   /// The value used internally by the user.
   /// Used to indicate the value that should be available inside the path.
   RequestType get type => _type;
+  late RequestType _type;
 
   set type(RequestType type) {
     _type = type;
@@ -64,7 +62,7 @@ class AssetPathEntity {
   /// Users should not edit this value.
   ///
   /// This is a field used internally by the library.
-  int get typeInt => type.value;
+  int get typeInt => _type.value;
 
   /// Users should not edit this value.
   ///
@@ -105,22 +103,16 @@ class AssetPathEntity {
     }
   }
 
-  /// the image entity list with pagination
-  ///
-  /// Doesn't support AssetPathEntity with only(Video/Image) flag.
-  /// Throws UnsupportedError
+  /// Entity list with pagination support.
   ///
   /// [page] is starting 0.
-  ///
   /// [pageSize] is item count of page.
-  ///
   Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) {
     assert(this.albumType == 1, "Just album type can get asset.");
     assert(pageSize > 0, "The pageSize must better than 0.");
     return PhotoManager._getAssetListPaged(this, page, pageSize);
   }
 
-  /// The [start] and [end] like the [String.substring].
   Future<List<AssetEntity>> getAssetListRange({
     required int start,
     required int end,
@@ -135,15 +127,21 @@ class AssetPathEntity {
     );
   }
 
-  /// all of asset, It is recommended to use the latest api (pagination) [getAssetListPaged].
+  /// All of asset.
+  ///
+  /// It is recommended to use [getAssetListPaged] or [getAssetListRange].
+  @Deprecated(
+    'Use getAssetListPaged or getAssetListRange for better performance. '
+    'This feature was deprecated after v1.4.0.',
+  )
   Future<List<AssetEntity>> get assetList => getAssetListPaged(0, assetCount);
 
   /// In android, always return empty list.
   Future<List<AssetPathEntity>> getSubPathList() async {
-    if (!(Platform.isIOS || Platform.isMacOS)) {
-      return [];
+    if (Platform.isIOS || Platform.isMacOS) {
+      return PhotoManager._getSubPath(this);
     }
-    return PhotoManager._getSubPath(this);
+    return <AssetPathEntity>[];
   }
 
   @override
@@ -318,14 +316,6 @@ class AssetEntity {
   /// If you need to see the loading status, look at the [loadFile].
   Future<File?> get originFile async =>
       PhotoManager._getFileWithId(id, isOrigin: true);
-
-  /// The asset's bytes.
-  ///
-  /// Use [originBytes]
-  ///
-  /// The property will be remove in 0.5.0.
-  @Deprecated("Use originBytes instead")
-  Future<Uint8List?> get fullData => PhotoManager._getFullDataWithId(id);
 
   /// The raw data stored in the device, the data may be large.
   ///
