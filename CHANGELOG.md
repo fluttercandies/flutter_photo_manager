@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.3.6
+Improvements:
+- Prettify file name on iOS. (#615)
+
 ## 1.3.5
 Improvements:
 - Support `presentLimited` with the new API on iOS 15. (#609)
