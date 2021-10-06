@@ -127,9 +127,6 @@ class AssetPathEntity {
     );
   }
 
-  /// All of asset.
-  ///
-  /// It is recommended to use [getAssetListPaged] or [getAssetListRange].
   @Deprecated(
     'Use getAssetListPaged or getAssetListRange for better performance. '
     'This feature was deprecated after v1.4.0.',

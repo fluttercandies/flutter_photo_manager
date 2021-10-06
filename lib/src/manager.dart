@@ -7,7 +7,7 @@ Plugin _plugin = Plugin();
 /// 这个类是整个库的核心类
 class PhotoManager {
   @Deprecated(
-    'Use requestPermissionExtend for support latest OS systems. '
+    'Use requestPermissionExtend for better compatibility. '
     'This feature was deprecated after v1.4.0.',
   )
   static Future<bool> requestPermission() async {
@@ -21,13 +21,15 @@ class PhotoManager {
   ///
   /// ### iOS (Info.plist)
   ///  * NSPhotoLibraryUsageDescription
+  ///  * NSPhotoLibraryAddUsageDescription
   ///
   /// ### macOS (Debug/Release.entitlements)
   ///  * com.apple.security.assets.movies.read-write
   ///  * com.apple.security.assets.music.read-write
   ///
   /// See also:
-  ///  * [PermissionState] which defines the state of the current application.
+  ///  * [PermissionState] which defines the permission state
+  ///    of the current application.
   static Future<PermissionState> requestPermissionExtend({
     PermisstionRequestOption requestOption = const PermisstionRequestOption(),
   }) async {
