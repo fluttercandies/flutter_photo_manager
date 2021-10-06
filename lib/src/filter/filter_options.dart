@@ -51,18 +51,8 @@ class FilterOptionGroup {
   /// It's recommended to be true only if you really need it.
   bool containsPathModified = false;
 
-  @Deprecated('Please use createTimeCond.')
-  DateTimeCond get dateTimeCond => createTimeCond;
-
-  @Deprecated('Please use createTimeCond.')
-  set dateTimeCond(DateTimeCond dateTimeCond) {
-    createTimeCond = dateTimeCond;
-  }
-
   DateTimeCond createTimeCond = DateTimeCond.def();
-  DateTimeCond updateTimeCond = DateTimeCond.def().copyWith(
-    ignore: true,
-  );
+  DateTimeCond updateTimeCond = DateTimeCond.def().copyWith(ignore: true);
 
   FilterOption getOption(AssetType type) => _map[type]!;
 

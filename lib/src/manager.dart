@@ -6,25 +6,30 @@ Plugin _plugin = Plugin();
 ///
 /// 这个类是整个库的核心类
 class PhotoManager {
-  /// in android WRITE_EXTERNAL_STORAGE  READ_EXTERNAL_STORAGE
-  ///
-  /// in ios request the photo permission
-  ///
-  /// Use [requestPermissionExtend] to instead;
-  // @Deprecated("Use requestPermissionExtend")
+  @Deprecated(
+    'Use requestPermissionExtend for better compatibility. '
+    'This feature was deprecated after v1.4.0.',
+  )
   static Future<bool> requestPermission() async {
     return (await requestPermissionExtend()).isAuth;
   }
 
-  /// Android: WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, MEDIA_LOCATION
+  /// ### Android (AndroidManifest.xml)
+  ///  * WRITE_EXTERNAL_STORAGE
+  ///  * READ_EXTERNAL_STORAGE
+  ///  * ACCESS_MEDIA_LOCATION
   ///
-  /// iOS: NSPhotoLibraryUsageDescription of info.plist
+  /// ### iOS (Info.plist)
+  ///  * NSPhotoLibraryUsageDescription
+  ///  * NSPhotoLibraryAddUsageDescription
   ///
-  /// macOS of Release.entitlements:
-  ///  - com.apple.security.assets.movies.read-write
-  ///  - com.apple.security.assets.music.read-write
+  /// ### macOS (Debug/Release.entitlements)
+  ///  * com.apple.security.assets.movies.read-write
+  ///  * com.apple.security.assets.music.read-write
   ///
-  /// Also see [PermissionState].
+  /// See also:
+  ///  * [PermissionState] which defines the permission state
+  ///    of the current application.
   static Future<PermissionState> requestPermissionExtend({
     PermisstionRequestOption requestOption = const PermisstionRequestOption(),
   }) async {
@@ -83,36 +88,20 @@ class PhotoManager {
     );
   }
 
-  /// Use [getAssetPathList] replaced.
-  @Deprecated("Use getAssetPathList replaced.")
-  static Future<List<AssetPathEntity>> getImageAsset() {
-    return getAssetPathList(type: RequestType.image);
-  }
-
-  /// Use [getAssetPathList] replaced.
-  @Deprecated("Use getAssetPathList replaced.")
-  static Future<List<AssetPathEntity>> getVideoAsset() {
-    return getAssetPathList(type: RequestType.video);
-  }
-
-  static Future<void> setLog(bool isLog) {
-    return _plugin.setLog(isLog);
-  }
+  static Future<void> setLog(bool isLog) => _plugin.setLog(isLog);
 
   /// Ignore permission checks at runtime, you can use third-party permission plugins to request permission. Default is false.
   ///
   /// For Android, a typical usage scenario may be to use it in Service, because Activity cannot be used in Service to detect runtime permissions, but it should be noted that deleting resources above android10 require activity to accept the result, so the delete system does not apply to this Attributes.
   ///
   /// For iOS, this feature is only added, please explore the specific application scenarios by yourself
-  static Future<void> setIgnorePermissionCheck(bool ignore) async {
-    await _plugin.ignorePermissionCheck(ignore);
+  static Future<void> setIgnorePermissionCheck(bool ignore) {
+    return _plugin.ignorePermissionCheck(ignore);
   }
 
   /// get video asset
   /// open setting page
-  static void openSetting() {
-    _plugin.openSetting();
-  }
+  static Future<void> openSetting() => _plugin.openSetting();
 
   static Future<List<AssetEntity>> _getAssetListPaged(
     AssetPathEntity entity,
@@ -219,10 +208,6 @@ class PhotoManager {
       return File(path);
     }
     return null;
-  }
-
-  static Future<Uint8List?> _getFullDataWithId(String id) async {
-    return _plugin.getOriginBytes(id);
   }
 
   static _getThumbDataWithOption(
