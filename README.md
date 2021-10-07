@@ -18,7 +18,7 @@ you can get assets (image/video/audio) on Android, iOS and macOS.
 ## Table of Contents
 * [Common issues](#common-issues)
 * [Prepare for use](#prepare-for-use)
-  * [Add the plugin reference into pubspec.yaml](#add-the-plugin-reference-into-pubspecyaml)
+  * [Add the plugin reference to pubspec.yaml](#add-the-plugin-reference-to-pubspecyaml)
   * [Import in your projects](#import-in-your-projects)
   * [Configure native platforms](#configure-native-platforms)
     * [Android config preparation](#android-config-preparation)
@@ -34,7 +34,7 @@ you can get assets (image/video/audio) on Android, iOS and macOS.
     * [From ID](#from-id)
     * [From raw data](#from-raw-data)
     * [Limitations](#limitations)
-      * [Android 10 (Q) media location permission](#android-10-q-media-location-permission)
+      * [Android 10 media location permission](#android-10-media-location-permission)
       * [Usage of the original data](#usage-of-the-original-data)
   * [Entities change notify](#entities-change-notify)
 * [Cache mechanism](#cache-mechanism)
@@ -43,7 +43,7 @@ you can get assets (image/video/audio) on Android, iOS and macOS.
   * [Clear caches](#clear-caches)
 * [Native extra configs](#native-extra-configs)
   * [Android extra configs](#android-extra-configs)
-    * [Android 10 extra configs (Q, 29)](#android-10-extra-configs-q-29)
+    * [Android 10 extra configs](#android-10-extra-configs)
     * [Glide issues](#glide-issues)
     * [Remove media location permission](#remove-media-location-permission)
   * [iOS extra configs](#ios-extra-configs)
@@ -68,9 +68,9 @@ for build errors, runtime exceptions, etc.
 
 ## Prepare for use
 
-### Add the plugin reference into pubspec.yaml
+### Add the plugin reference to pubspec.yaml
 
-Two ways to add the plugin into your pubspec:
+Two ways to add the plugin to your pubspec:
 - **(Recommend)** Run `flutter pub add photo_manager`. 
 - Add the plugin reference in your `pubspec.yaml`'s `dependencies` section:
 ```yaml
@@ -100,22 +100,23 @@ Minumum platform versions:
 
 ##### Kotlin, Gradle, AGP
 
-Starting from 1.2.7, We're shipping this plugin with
+Starting from 1.2.7, We ship this plugin with
 **Kotlin `1.5.21`** and **Android Gradle Plugin `4.1.0`**.
-If your projects use a lower version of Kotlin/Gradle Wrapper/AGP,
+If your projects use a lower version of Kotlin/Gradle/AGP,
 please upgrade them to a newer version.
 
 More specifically:
-- Upgrade your Gradle version (the one in `gradle-wrapper.properties`)
+- Upgrade your Gradle version (`gradle-wrapper.properties`)
   to `6.8.3` or the latest version but lower than `7.0.0`.
-- Upgrade your Kotlin version (`ext.kotlin_version`) to `1.4.32` or the latest version.
+- Upgrade your Kotlin version (`ext.kotlin_version`)
+  to `1.4.32` or the latest version.
 
 ##### Glide
 
 The plugin use [Glide][] to create thumbnail bytes for Android.
 
 If you found some warning logs with Glide appearing,
-then the main project needs an implementation of `AppGlideModule`.
+it means the main project needs an implementation of `AppGlideModule`.
 See [Generated API][] for the implementation.
 
 #### iOS config preparation
@@ -128,8 +129,8 @@ key-value in the `ios/Runner/Info.plist`:
 <string>In order to access your photo library</string>
 ```
 
-If you want to grant with write-access to the photo library only on iOS 11 above,
-you can define the `NSPhotoLibraryAddUsageDescription`
+If you want to grant only write-access to the photo library on iOS 11 and above,
+define the `NSPhotoLibraryAddUsageDescription`
 key-value in the `ios/Runner/Info.plist`.
 It's pretty much the same as the `NSPhotoLibraryUsageDescription`.
 
@@ -139,7 +140,7 @@ It's pretty much the same as the `NSPhotoLibraryUsageDescription`.
 
 ### Request for permission
 
-Most of APIs can only being used with permissions granted.
+Most of APIs can only use with granted permission.
 
 ```dart
 final PermissionState _ps = await PhotoManager.requestPermissionExtend();
@@ -151,8 +152,8 @@ if (_ps.isAuth) {
 }
 ```
 
-But if you're pretty sure your callers will be only called after permissions are granted,
-you can configure the plugin to ignore permission checks:
+But if you're pretty sure your callers will be only called
+after the permission is granted, you can ignore permission checks:
 
 ```dart
 PhotoManager.setIgnorePermissionCheck(true);
@@ -162,23 +163,22 @@ PhotoManager.setIgnorePermissionCheck(true);
 
 With iOS 14 released,
 Apple broughts a "Limited Photos Library" to iOS.
-So you need to use the `PhotoManager.requestPermissionExtend()`
+So use the `PhotoManager.requestPermissionExtend()`
 to request permissions.
 The method will return `PermissionState`.
 See [PHAuthorizationStatus][] for more detail.
 
-To reselect the accessible entites for the app,
+To reselect accessible entites for the app,
 use `PhotoManager.presentLimited()` to call the modal of
 accessible entities management.
-The method is available for iOS 14+ and when the permission state
+This method only available for iOS 14+ and when the permission state
 is limited (`PermissionState.limited`),
 other platform won't make a valid call.
 
 ### Get albums/directories (`AssetPathEntity`)
 
-Albums or directories are abstracted
-as the [`AssetPathEntity`][] class.
-Use the code below to get all of them:
+Albums or directories are abstracted as the [`AssetPathEntity`][] class.
+To get all of them:
 
 ```dart
 final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList();
@@ -189,7 +189,7 @@ See [`getAssetPathList`][] for more detail.
 ### Get assets (`AssetEntity`)
 
 Assets (images/videos/audios) are abstracted as the [`AssetEntity`][] class.
-It represents a series of search column with `MediaStore` on Android,
+It represents a series fields with `MediaStore` on Android,
 and the `PHAsset` object on iOS/macOS.
 
 #### From `AssetPathEntity`
@@ -210,12 +210,17 @@ The ID concept represents:
 * The `localIdentifier` field of the `PHAsset` on iOS.
 
 You can store the ID if you want to implement features
-that's relate to presistent selections or something else.
-Then use [`AssetEntity.fromId`][] to retrieve the entity.
+that's related to presistent selections.
+Use [`AssetEntity.fromId`][] to retrieve the entity
+once you persist an ID.
 
 ```dart
 final AssetEntity? asset = await AssetEntity.fromId(id);
 ```
+
+Be aware that the created asset might have
+limited access or got deleted in anytime,
+so the result might be null.
 
 #### From raw data
 
@@ -248,16 +253,16 @@ final AssetEntity? videoEntity = await PhotoManager.editor.saveVideo(
 
 Be aware that the created asset might have
 limited access or got deleted in anytime,
-so the result will be nullable.
+so the result might be null.
 
 #### Limitations
 
-##### Android 10 (Q) media location permission
+##### Android 10 media location permission
 
-Due to the privacy policy issues on Android Q,
-it is necessary to grant the location permissions
-to obtain the original data,
-also read the Exif metadata from the data.
+Due to the privacy policy issues on Android 10,
+it is necessary to grant the location permission
+to obtain the original data with the location info
+and the EXIF metadata.
 
 If you don't want to use the location permission,
 see [Remove media location permission](#remove-media-location-permission)
@@ -316,22 +321,26 @@ PhotoManager.stopChangeNotify();
 
 ### Cache on Android
 
-Because Android 10 (Q) restricts the ability to access the resource path directly,
+Because Android 10 restricts the ability to access the resource path directly,
 some large image caches will be generated during I/O processes.
-More specifically, when the `file`, `originFile` and any other I/O getters are called,
+More specifically, when the `file`, `originFile`
+and any other I/O getters are called,
 the plugin will save a file in the cache folder for further use.
 
-Fortunately, in Android 11 (P), the resource path can be obtained directly again,
-but for Android 10 (Q), we can only use `requestLegacyExternalStorage` as a workaround.
-See [Android 10 extra configs](#android-10-extra-configs-q-29) for how to add the attribute.
+Fortunately, in Android 11, the resource path can be obtained directly again,
+but for Android 10, we can only use
+`requestLegacyExternalStorage` as a workaround.
+See [Android 10 extra configs](#android-10-extra-configs)
+for how to add the attribute.
 
 ### Cache on iOS
 
 iOS does not directly provide APIs to access the original files of the album.
-So a cached file will be generated locally into the container of the current application
+So a cached file will be generated locally
+into the container of the current application
 when you called `file`, `originFile` and any other I/O getters.
 
-If occupied disk spaces are sensitive for your use case,
+If occupied disk spaces are sensitive in your use case,
 you can delete it after your usage has done (iOS only).
 
 ```dart
@@ -353,7 +362,7 @@ Future<void> useEntity(AssetEntity entity) async {
 ### Clear caches
 
 You can use the `PhotoManager.clearFileCache()` method
-to clear all caches that generated by this plugin.
+to clear all caches that generated by the plugin.
 Here are caches generate timing with
 different platforms, types and resolutions.
 
@@ -369,12 +378,12 @@ different platforms, types and resolutions.
 
 ### Android extra configs
 
-#### Android 10 extra configs (Q, 29)
+#### Android 10 extra configs
 
 _If you're targeting with Android version other than 29,
 you can skip this section._
 
-On Android 10 (Q), **Scoped Storage** was introduced,
+On Android 10, **Scoped Storage** was introduced,
 which causes the origin resource file inaccessible.
 
 If your `compileSdkVersion` and `targetSdkVersion` are both 29,
@@ -397,7 +406,7 @@ to your `AndroidManifest.xml` in order to obtain original resources files:
 #### Glide issues
 
 If your found any conflicting issues against Glide,
-then you'll need to edit the `android/build.gradle` file.
+then you'll need to edit the `android/build.gradle` file:
 
 ```gradle
 rootProject.allprojects {
@@ -419,11 +428,12 @@ if you want to know more about using ProGuard and Glide together.
 
 #### Remove media location permission
 
-The plugin vendored [`ACCESS_MEDIA_LOCATION`][] permission as a requirement.
+The plugin vendored [`ACCESS_MEDIA_LOCATION`][]
+permission as a requirement.
 
-It's introduced and required from Android 10 (Q).
+It's introduced and required from Android 10.
 If you don't need this permission, add the `android:node`
-to the `AndroidManifest.xml` for your app to remove it.
+to your app's `AndroidManifest.xml` to remove it.
 
 ```xml
 <uses-permission
@@ -448,7 +458,7 @@ To change the default language, see the following steps:
 
 * Select the adequate language(s) you want to retrieve localized strings.
 * Validate the popup screen without any modification.
-* Rebuild your flutter project
+* Rebuild your flutter project.
 
 Now system albums label should display accordingly.
 
@@ -549,7 +559,7 @@ await PhotoManager.editor.android.removeAllNoExistsAsset();
 ```
 
 Some operating systems will prompt confirmation dialogs
-for each entities' deletion, there are no way to avoid them.
+for each entities' deletion, we have no way to avoid them.
 Make sure your customers accept repeatly confirmations.
 
 #### Features for iOS only
