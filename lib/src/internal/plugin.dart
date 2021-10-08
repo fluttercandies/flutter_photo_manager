@@ -3,16 +3,22 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
-import 'package:photo_manager/photo_manager.dart';
 
-import 'utils/convert_utils.dart';
+import '../filter/filter_option_group.dart';
+import '../types/entity.dart';
+import 'progress_handler.dart';
+import '../types/thumb_option.dart';
+import '../types/types.dart';
+import '../utils/convert_utils.dart';
+
+final Plugin plugin = Plugin();
 
 /// Any method of this class is not recommended to be called directly outside
 /// the library.
 class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
-  static final Plugin _plugin = Plugin._();
+  static late final Plugin _instance = Plugin._();
 
-  factory Plugin() => _plugin;
+  factory Plugin() => _instance;
 
   Plugin._();
 

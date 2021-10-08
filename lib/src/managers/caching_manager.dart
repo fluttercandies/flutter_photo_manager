@@ -1,12 +1,15 @@
-part of '../photo_manager.dart';
+import '../types/entity.dart';
+import '../internal/enums.dart';
+import '../internal/plugin.dart';
+import '../types/thumb_option.dart';
 
 /// Cached thumbnails for album management.
 class PhotoCachingManager {
   PhotoCachingManager._();
 
-  static late final PhotoCachingManager _ins = PhotoCachingManager._();
+  factory PhotoCachingManager() => instance;
 
-  final _plugin = Plugin();
+  static late final PhotoCachingManager instance = PhotoCachingManager._();
 
   static const ThumbOption defaultOption = const ThumbOption(
     width: 150,
@@ -14,9 +17,6 @@ class PhotoCachingManager {
     format: ThumbFormat.jpeg,
     quality: 100,
   );
-
-  /// Singleton.
-  factory PhotoCachingManager() => _ins;
 
   // /// Request to cache the photo album's thumbnails.
   // ///
@@ -32,10 +32,10 @@ class PhotoCachingManager {
   Future<void> requestCacheAssets({
     required List<AssetEntity> assets,
     ThumbOption option = defaultOption,
-  }) async {
+  }) {
     assert(assets.isNotEmpty);
 
-    await _plugin.requestCacheAssetsThumb(
+    return plugin.requestCacheAssetsThumb(
       assets.map((e) => e.id).toList(),
       option,
     );
@@ -44,15 +44,15 @@ class PhotoCachingManager {
   Future<void> requestCacheAssetsWithIds({
     required List<String> assetIds,
     ThumbOption option = defaultOption,
-  }) async {
+  }) {
     assert(assetIds.isNotEmpty);
 
-    await _plugin.requestCacheAssetsThumb(
+    return plugin.requestCacheAssetsThumb(
       assetIds,
       option,
     );
   }
 
   /// Cancel all cache request.
-  Future<void> cancelCacheRequest() => _plugin.cancelCacheRequests();
+  Future<void> cancelCacheRequest() => plugin.cancelCacheRequests();
 }

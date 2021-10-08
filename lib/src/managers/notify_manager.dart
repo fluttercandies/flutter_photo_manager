@@ -1,13 +1,19 @@
-part of '../photo_manager.dart';
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+
+import '../internal/plugin.dart';
 
 /// manage photo changes
 ///
 /// 当相册发生变化时, 通知
-class _NotifyManager {
-  static const MethodChannel _channel =
-      const MethodChannel("top.kikt/photo_manager/notify");
+class NotifyManager {
+  static const MethodChannel _channel = MethodChannel(
+    "top.kikt/photo_manager/notify",
+  );
 
-  StreamController<bool> _controller = StreamController.broadcast();
+  final StreamController<bool> _controller = StreamController.broadcast();
 
   /// When the notification status change, the listen of stream will be called.
   Stream<bool> get notifyStream => _controller.stream;
@@ -26,13 +32,13 @@ class _NotifyManager {
   /// start handle notify
   void startHandleNotify() {
     _channel.setMethodCallHandler(_notify);
-    _plugin.notifyChange(start: true);
+    plugin.notifyChange(start: true);
     _controller.add(true);
   }
 
   /// stop handle notify
   void stopHandleNotify() {
-    _plugin.notifyChange(start: false);
+    plugin.notifyChange(start: false);
     _channel.setMethodCallHandler(null);
     _controller.add(false);
   }
