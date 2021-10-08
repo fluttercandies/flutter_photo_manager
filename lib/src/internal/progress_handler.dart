@@ -1,4 +1,8 @@
-part of '../photo_manager.dart';
+import 'dart:async';
+
+import 'package:flutter/services.dart';
+
+import 'enums.dart';
 
 /// Only works in iOS.
 class PMProgressHandler {
@@ -45,12 +49,4 @@ class PMProgressState {
   final PMRequestState state;
 
   PMProgressState(this.progress, this.state);
-}
-
-/// Current asset loading status
-enum PMRequestState {
-  prepare,
-  loading,
-  success,
-  failed,
 }

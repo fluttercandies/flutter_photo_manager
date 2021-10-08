@@ -1,4 +1,15 @@
-part of '../photo_manager.dart';
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui';
+
+import '../internal/editor.dart';
+import '../filter/filter_option_group.dart';
+import '../internal/enums.dart';
+import '../internal/plugin.dart';
+import '../managers/photo_manager.dart';
+import '../internal/progress_handler.dart';
+import 'thumb_option.dart';
+import 'types.dart';
 
 /// asset entity, for entity info.
 class AssetPathEntity {
@@ -108,22 +119,33 @@ class AssetPathEntity {
   /// [page] is starting 0.
   /// [pageSize] is item count of page.
   Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) {
-    assert(this.albumType == 1, "Just album type can get asset.");
-    assert(pageSize > 0, "The pageSize must better than 0.");
-    return PhotoManager._getAssetListPaged(this, page, pageSize);
+    assert(albumType == 1, 'Only album can request for assets.');
+    assert(pageSize > 0, "The pageSize must be greater than 0.");
+    return plugin.getAssetWithGalleryIdPaged(
+      id,
+      page: page,
+      pageCount: pageSize,
+      type: typeInt,
+      optionGroup: filterOption,
+    );
   }
 
   Future<List<AssetEntity>> getAssetListRange({
     required int start,
     required int end,
   }) async {
-    assert(this.albumType == 1, "Just album type can get asset.");
-    assert(start >= 0, "The start must better than 0.");
-    assert(end > start, "The end must better than start.");
-    return PhotoManager._getAssetWithRange(
-      entity: this,
+    assert(albumType == 1, 'Only album can request for assets.');
+    assert(start >= 0, 'The start must be greater than 0.');
+    assert(end > start, 'The end must be greater than start.');
+    if (end > assetCount) {
+      end = assetCount;
+    }
+    return plugin.getAssetWithRange(
+      id,
+      typeInt: typeInt,
       start: start,
       end: end,
+      optionGroup: filterOption,
     );
   }
 
@@ -136,7 +158,7 @@ class AssetPathEntity {
   /// In android, always return empty list.
   Future<List<AssetPathEntity>> getSubPathList() async {
     if (Platform.isIOS || Platform.isMacOS) {
-      return PhotoManager._getSubPath(this);
+      return plugin.getSubPathEntities(this);
     }
     return <AssetPathEntity>[];
   }
@@ -209,7 +231,7 @@ class AssetEntity {
   /// It is [title] in Android.
   ///
   /// It is [PHAsset valueForKey:@"filename"] in iOS.
-  Future<String> get titleAsync => _plugin.getTitleAsync(this);
+  Future<String> get titleAsync => plugin.getTitleAsync(this);
 
   /// the asset type
   ///
@@ -290,7 +312,7 @@ class AssetEntity {
   /// Whether this asset is locally available.
   ///
   /// Defaults to true, and it'll always be true on Android.
-  Future<bool> get isLocallyAvailable => PhotoManager._isLocallyAvailable(id);
+  Future<bool> get isLocallyAvailable => plugin.isLocallyAvailable(id);
 
   /// Get latitude and longitude from MediaStore(android) / Photos(iOS).
   ///
@@ -298,26 +320,25 @@ class AssetEntity {
   ///
   /// [LatLng.latitude] or [LatLng.longitude] maybe zero or null.
   Future<LatLng> latlngAsync() {
-    return _plugin.getLatLngAsync(this);
+    return plugin.getLatLngAsync(this);
   }
 
   /// If you need upload file ,then you can use the file, nullable.
   ///
   /// If you need to see the loading status, look at the [loadFile].
-  Future<File?> get file async => PhotoManager._getFileWithId(this.id);
+  Future<File?> get file async => _getFile();
 
   /// This contains all the EXIF information, but in contrast, `Image` widget may not be able to display pictures.
   ///
   /// Usually, you can use the [file] attribute.
   ///
   /// If you need to see the loading status, look at the [loadFile].
-  Future<File?> get originFile async =>
-      PhotoManager._getFileWithId(id, isOrigin: true);
+  Future<File?> get originFile async => _getFile(isOrigin: true);
 
   /// The raw data stored in the device, the data may be large.
   ///
   /// This property is not recommended for video types.
-  Future<Uint8List?> get originBytes => PhotoManager._getOriginBytes(this);
+  Future<Uint8List?> get originBytes => _getOriginBytes();
 
   /// The thumb data of asset, use it to display.
   ///
@@ -335,7 +356,7 @@ class AssetEntity {
     assert(width > 0 && height > 0, "The width and height must better 0.");
     assert(quality > 0 && quality <= 100, "The quality must between 0 and 100");
 
-    /// Return null if asset is audio or other type, because they don't have such a thing.
+    // Return null if asset is audio or other type, because they don't have such a thing.
     if (type == AssetType.audio || type == AssetType.other) {
       return null;
     }
@@ -368,8 +389,7 @@ class AssetEntity {
     bool isOrigin = true,
     PMProgressHandler? progressHandler,
   }) async {
-    return PhotoManager._getFileWithId(
-      id,
+    return _getFile(
       isOrigin: isOrigin,
       progressHandler: progressHandler,
     );
@@ -384,16 +404,14 @@ class AssetEntity {
       option.checkAssert();
       return true;
     }());
-
-    /// Return null if asset is audio or other type, because they don't have such a thing.
+    // Return null if asset is audio or other type, because they don't have such a thing.
     if (type == AssetType.audio || type == AssetType.other) {
       return null;
     }
-
-    return PhotoManager._getThumbDataWithOption(
-      id,
-      option,
-      progressHandler,
+    return plugin.getThumb(
+      id: id,
+      option: option,
+      progressHandler: progressHandler,
     );
   }
 
@@ -421,7 +439,7 @@ class AssetEntity {
   }
 
   /// If the asset is deleted, return false.
-  Future<bool> get exists => PhotoManager._assetExistsWithId(id);
+  Future<bool> get exists => plugin.assetExistsWithId(id);
 
   /// The url is provided to some video player.
   /// Such as [flutter_ijkplayer](https://pub.dev/packages/flutter_ijkplayer)
@@ -431,9 +449,47 @@ class AssetEntity {
   /// Android: `content://media/external/video/media/894857`
   Future<String?> getMediaUrl() async {
     if (type == AssetType.video || type == AssetType.audio) {
-      return PhotoManager._getMediaUrl(this);
+      return plugin.getMediaUrl(this);
     }
+    return null;
+  }
 
+  Future<File?> _getFile({
+    bool isOrigin = false,
+    PMProgressHandler? progressHandler,
+  }) async {
+    if (Platform.isIOS || Platform.isMacOS || Platform.isAndroid) {
+      final path = await plugin.getFullFile(
+        id,
+        isOrigin: isOrigin,
+        progressHandler: progressHandler,
+      );
+      if (path == null) {
+        return null;
+      }
+      return File(path);
+    }
+    return null;
+  }
+
+  Future<Uint8List?> _getOriginBytes({
+    PMProgressHandler? progressHandler,
+  }) async {
+    assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
+    if (Platform.isAndroid) {
+      final String systemVersion = await plugin.getSystemVersion();
+      if (int.parse(systemVersion) >= 29) {
+        return plugin.getOriginBytes(
+          id,
+          progressHandler: progressHandler,
+        );
+      } else {
+        return (await originFile)?.readAsBytes();
+      }
+    } else if (Platform.isIOS || Platform.isMacOS) {
+      final file = await originFile;
+      return file?.readAsBytes();
+    }
     return null;
   }
 

@@ -1,6 +1,15 @@
-part of '../photo_manager.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
-Plugin _plugin = Plugin();
+import '../internal/editor.dart';
+import '../types/entity.dart';
+import '../filter/filter_option_group.dart';
+import 'notify_manager.dart';
+import '../internal/enums.dart';
+import '../internal/extensions.dart';
+import '../internal/plugin.dart';
+import '../types/types.dart';
+import '../utils/convert_utils.dart';
 
 /// use the class method to help user load asset list and asset info.
 ///
@@ -33,8 +42,7 @@ class PhotoManager {
   static Future<PermissionState> requestPermissionExtend({
     PermisstionRequestOption requestOption = const PermisstionRequestOption(),
   }) async {
-    final int resultIndex =
-        await _plugin.requestPermissionExtend(requestOption);
+    final int resultIndex = await plugin.requestPermissionExtend(requestOption);
     return PermissionState.values[resultIndex];
   }
 
@@ -49,7 +57,7 @@ class PhotoManager {
   /// See the documents from Apple:
   ///  * iOS 14: https://developer.apple.com/documentation/photokit/phphotolibrary/3616113-presentlimitedlibrarypickerfromv/
   ///  * iOS 15: https://developer.apple.com/documentation/photokit/phphotolibrary/3752108-presentlimitedlibrarypickerfromv/
-  static Future<void> presentLimited() => _plugin.presentLimited();
+  static Future<void> presentLimited() => plugin.presentLimited();
 
   static Editor editor = Editor();
 
@@ -80,7 +88,7 @@ class PhotoManager {
       return [];
     }
 
-    return _plugin.getAllGalleryList(
+    return plugin.getAllGalleryList(
       type: type.index,
       hasAll: hasAll,
       onlyAll: onlyAll,
@@ -88,7 +96,7 @@ class PhotoManager {
     );
   }
 
-  static Future<void> setLog(bool isLog) => _plugin.setLog(isLog);
+  static Future<void> setLog(bool isLog) => plugin.setLog(isLog);
 
   /// Ignore permission checks at runtime, you can use third-party permission plugins to request permission. Default is false.
   ///
@@ -96,43 +104,12 @@ class PhotoManager {
   ///
   /// For iOS, this feature is only added, please explore the specific application scenarios by yourself
   static Future<void> setIgnorePermissionCheck(bool ignore) {
-    return _plugin.ignorePermissionCheck(ignore);
+    return plugin.ignorePermissionCheck(ignore);
   }
 
   /// get video asset
   /// open setting page
-  static Future<void> openSetting() => _plugin.openSetting();
-
-  static Future<List<AssetEntity>> _getAssetListPaged(
-    AssetPathEntity entity,
-    int page,
-    int pageCount,
-  ) async {
-    return _plugin.getAssetWithGalleryIdPaged(
-      entity.id,
-      page: page,
-      pageCount: pageCount,
-      type: entity.typeInt,
-      optionGroup: entity.filterOption,
-    );
-  }
-
-  static Future<List<AssetEntity>> _getAssetWithRange({
-    required AssetPathEntity entity,
-    required int start,
-    required int end,
-  }) {
-    if (end > entity.assetCount) {
-      end = entity.assetCount;
-    }
-    return _plugin.getAssetWithRange(
-      entity.id,
-      typeInt: entity.typeInt,
-      start: start,
-      end: end,
-      optionGroup: entity.filterOption,
-    );
-  }
+  static Future<void> openSetting() => plugin.openSetting();
 
   /// Release all native(ios/android) caches, normally no calls are required.
   ///
@@ -159,71 +136,36 @@ class PhotoManager {
   ///
   /// 这个方法是异步的,在本方法的Future返回前调用getAssetPathList 可能会产生错误
   static Future releaseCache() async {
-    await _plugin.releaseCache();
+    await plugin.releaseCache();
   }
 
   /// Notification class for managing photo changes.
-  static _NotifyManager _notifyManager = _NotifyManager();
+  static NotifyManager _notifyManager = NotifyManager();
 
-  /// see [_NotifyManager]
+  /// see [NotifyManager]
   static void addChangeCallback(ValueChanged<MethodCall> callback) =>
       _notifyManager.addCallback(callback);
 
-  /// see [_NotifyManager]
+  /// see [NotifyManager]
   static void removeChangeCallback(ValueChanged<MethodCall> callback) =>
       _notifyManager.removeCallback(callback);
 
   /// Whether to monitor the change of photo album.
   static bool notifyingOfChange = false;
 
-  /// See [_NotifyManager.notifyStream]
+  /// See [NotifyManager.notifyStream]
   static Stream<bool> get notifyStream => _notifyManager.notifyStream;
 
-  /// see [_NotifyManager]
+  /// see [NotifyManager]
   static void startChangeNotify() {
     _notifyManager.startHandleNotify();
     notifyingOfChange = true;
   }
 
-  /// see [_NotifyManager]
+  /// see [NotifyManager]
   static void stopChangeNotify() {
     _notifyManager.stopHandleNotify();
     notifyingOfChange = false;
-  }
-
-  static Future<File?> _getFileWithId(
-    String id, {
-    bool isOrigin = false,
-    PMProgressHandler? progressHandler,
-  }) async {
-    if (Platform.isIOS || Platform.isMacOS || Platform.isAndroid) {
-      final path = await _plugin.getFullFile(
-        id,
-        isOrigin: isOrigin,
-        progressHandler: progressHandler,
-      );
-      if (path == null) {
-        return null;
-      }
-      return File(path);
-    }
-    return null;
-  }
-
-  static _getThumbDataWithOption(
-    String id,
-    ThumbOption option,
-    PMProgressHandler? progressHandler,
-  ) {
-    return _plugin.getThumb(
-      id: id,
-      option: option,
-      progressHandler: progressHandler,
-    );
-  }
-
-  static Future<bool> _assetExistsWithId(String id) {
-    return _plugin.assetExistsWithId(id);
   }
 
   /// [AssetPathEntity.refreshPathProperties]
@@ -231,7 +173,7 @@ class PhotoManager {
     required AssetPathEntity entity,
     required FilterOptionGroup filterOptionGroup,
   }) async {
-    final result = await _plugin.fetchPathProperties(
+    final result = await plugin.fetchPathProperties(
       entity.id,
       entity.typeInt,
       entity.filterOption,
@@ -251,72 +193,28 @@ class PhotoManager {
     }
   }
 
-  static Future<bool> _isLocallyAvailable(String id) {
-    return _plugin.isLocallyAvailable(id);
-  }
-
   /// Only valid for Android 29. The API of API 28 must be used with the property of `requestLegacyExternalStorage`.
   static Future<void> forceOldApi() async {
-    await _plugin.forceOldApi();
-  }
-
-  static Future<bool> _isAndroidQ() async {
-    if (!Platform.isAndroid) {
-      return false;
-    }
-    final systemVersion = await _plugin.getSystemVersion();
-    return int.parse(systemVersion) >= 29;
+    await plugin.forceOldApi();
   }
 
   /// Get system version
   static Future<String> systemVersion() async {
-    return _plugin.getSystemVersion();
+    return plugin.getSystemVersion();
   }
 
   /// Clear all file cache.
   static Future<void> clearFileCache() async {
-    await _plugin.clearFileCache();
+    await plugin.clearFileCache();
   }
 
   /// When set to true, origin bytes in Android Q will be cached as a file. When use again, the file will be read.
   static Future<bool> setCacheAtOriginBytes(bool cache) =>
-      _plugin.cacheOriginBytes(cache);
-
-  static Future<Uint8List?> _getOriginBytes(
-    AssetEntity assetEntity, {
-    PMProgressHandler? progressHandler,
-  }) async {
-    assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
-    if (Platform.isAndroid) {
-      if (await _isAndroidQ()) {
-        return _plugin.getOriginBytes(
-          assetEntity.id,
-          progressHandler: progressHandler,
-        );
-      } else {
-        return (await assetEntity.originFile)?.readAsBytes();
-      }
-    } else if (Platform.isIOS || Platform.isMacOS) {
-      final file = await assetEntity.originFile;
-      return file?.readAsBytes();
-    }
-    return null;
-  }
-
-  static Future<String?> _getMediaUrl(AssetEntity assetEntity) {
-    assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
-    return _plugin.getMediaUrl(assetEntity);
-  }
-
-  static Future<List<AssetPathEntity>> _getSubPath(
-      AssetPathEntity assetPathEntity) {
-    assert(Platform.isIOS || Platform.isMacOS);
-    return _plugin.getSubPathEntities(assetPathEntity);
-  }
+      plugin.cacheOriginBytes(cache);
 
   /// Refresh the property of asset.
   static Future<AssetEntity?> refreshAssetProperties(String id) async {
-    final Map? map = await _plugin.getPropertiesFromAssetEntity(id);
+    final Map? map = await plugin.getPropertiesFromAssetEntity(id);
 
     final asset = ConvertUtils.convertToAsset(map);
 
