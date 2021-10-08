@@ -178,6 +178,8 @@ other platform won't make a valid call.
 ### Get albums/directories (`AssetPathEntity`)
 
 Albums or directories are abstracted as the [`AssetPathEntity`][] class.
+It represent a bucket in the `MediaStore` on Android,
+and the `PHAssetCollection` object on iOS/macOS.
 To get all of them:
 
 ```dart
