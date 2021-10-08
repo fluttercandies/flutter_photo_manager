@@ -1,4 +1,4 @@
-import 'type.dart';
+import '../internal/enums.dart';
 
 class ThumbOption {
   const ThumbOption({
