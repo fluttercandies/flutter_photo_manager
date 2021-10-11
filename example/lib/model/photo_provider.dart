@@ -120,6 +120,10 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  OrderOptionType _orderOptionType = OrderOptionType.updateDate;
+
+  OrderOptionType get orderOptionType => _orderOptionType;
+
   set notifying(bool? notifying) {
     if (notifying == null) {
       return;
@@ -162,6 +166,13 @@ class PhotoProvider extends ChangeNotifier {
       return;
     }
     this.containsPathModified = value;
+  }
+
+  void changeOrderOptionType(OrderOptionType? orderOptionType) {
+    this._orderOptionType = orderOptionType != null
+        ? orderOptionType
+        : OrderOptionType.iosDefaultSort;
+    notifyListeners();
   }
 
   void reset() {
@@ -218,7 +229,7 @@ class PhotoProvider extends ChangeNotifier {
       ..containsPathModified = _containsPathModified
       ..addOrderOption(
         OrderOption(
-          type: OrderOptionType.updateDate,
+          type: _orderOptionType,
           asc: asc,
         ),
       );

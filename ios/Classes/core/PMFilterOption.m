@@ -23,6 +23,9 @@
             key = @"creationDate";
         } else if (typeValue == 1) {
             key = @"modificationDate";
+        } else if(typeValue == 2) {
+            // no need handle, because the iosDefault is null key. the sort by asc field.
+            // key = @"iosDefaultSort";
         }
         
         if (key) {

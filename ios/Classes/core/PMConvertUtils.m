@@ -122,6 +122,7 @@
     container.containsModified = [map[@"containsPathModified"] boolValue];
     
     NSArray *sortArray = map[@"orders"];
+    container.asc = sortArray.count != 0 ? [sortArray[0][@"asc"] boolValue] : false;
     [container injectSortArray: sortArray];
     
     return container;

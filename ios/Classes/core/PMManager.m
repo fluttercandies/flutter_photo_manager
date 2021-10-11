@@ -222,7 +222,13 @@
     BOOL videoNeedTitle = filterOption.videoOption.needTitle;
     
     for (NSUInteger i = startIndex; i <= endIndex; i++) {
-        PHAsset *asset = assetArray[count - 1 - i];
+        NSUInteger index = i;
+        // if filterOption.sortArray.count is 0, the sort should be use filterOption.asc.
+        // else index use i;
+        if(filterOption.sortArray.count == 0 && !filterOption.asc) {
+            index = count - 1 - i;
+        }
+        PHAsset *asset = assetArray[index];
         BOOL needTitle = NO;
         if ([asset isVideo]) {
             needTitle = videoNeedTitle;
@@ -268,7 +274,11 @@
     }
     
     for (NSUInteger i = startIndex; i <= endIndex; i++) {
-        PHAsset *asset = assetArray[count - 1 - i];
+        NSUInteger index = i;
+        if(!filterOption.asc){
+            index = count - 1 - i;
+        }
+        PHAsset *asset = assetArray[index];
         BOOL needTitle;
         if ([asset isVideo]) {
             needTitle = filterOption.videoOption.needTitle;
@@ -720,7 +730,9 @@
 
 - (PHFetchOptions *)getAssetOptions:(int)type filterOption:(PMFilterOptionGroup *)optionGroup {
     PHFetchOptions *options = [PHFetchOptions new];
-//    options.sortDescriptors = [optionGroup sortCond];
+    options.sortDescriptors = [optionGroup sortCond];
+    
+    NSLog(@"optionGroup 值: %@", optionGroup.sortCond);
     
     NSMutableString *cond = [NSMutableString new];
     NSMutableArray *args = [NSMutableArray new];

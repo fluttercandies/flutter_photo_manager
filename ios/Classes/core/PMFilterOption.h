@@ -58,6 +58,7 @@ typedef struct PMDurationConstraint {
 @property(nonatomic, strong) PMDateOption *updateOption;
 @property(nonatomic, assign) BOOL containsEmptyAlbum;
 @property(nonatomic, assign) BOOL containsModified;
+@property(nonatomic, assign) BOOL asc;
 @property(nonatomic, strong) NSArray<NSSortDescriptor*> *sortArray;
 
 - (NSArray<NSSortDescriptor *> *)sortCond;

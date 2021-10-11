@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_example/model/photo_provider.dart';
 import 'package:photo_manager_example/widget/dialog/duration_picker.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +29,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
           buildInput(provider.maxHeight, "maxHeight", (value) {
             provider.maxHeight = value;
           }),
+          buildOrderOptionType(provider),
           buildIgnoreSize(provider),
           buildNeedTitleCheck(provider),
           buildDurationWidget(
@@ -97,6 +99,41 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
             provider.needTitle = value;
           },
           value: provider.needTitle,
+        );
+      },
+    );
+  }
+
+  Widget buildOrderOptionType(PhotoProvider provider) {
+    return AnimatedBuilder(
+      animation: provider,
+      builder: (context, snapshot) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'OrderOptionType',
+                style: Theme.of(context).textTheme.headline6,
+              ),
+            ),
+            RadioListTile<OrderOptionType>(
+                title: Text('createDate'),
+                value: OrderOptionType.createDate,
+                groupValue: provider.orderOptionType,
+                onChanged: provider.changeOrderOptionType),
+            RadioListTile<OrderOptionType>(
+                title: Text('updateDate'),
+                value: OrderOptionType.updateDate,
+                groupValue: provider.orderOptionType,
+                onChanged: provider.changeOrderOptionType),
+            RadioListTile<OrderOptionType>(
+                title: Text('iosDefault'),
+                value: OrderOptionType.iosDefaultSort,
+                groupValue: provider.orderOptionType,
+                onChanged: provider.changeOrderOptionType)
+          ],
         );
       },
     );

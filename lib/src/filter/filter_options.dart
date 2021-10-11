@@ -349,4 +349,12 @@ class OrderOption {
   }
 }
 
-enum OrderOptionType { createDate, updateDate }
+enum OrderOptionType {
+  createDate,
+
+  updateDate,
+
+  /// only in iOS.
+  /// Keep the album order consistent with the system's album app
+  iosDefaultSort
+}
