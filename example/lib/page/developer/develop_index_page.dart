@@ -66,10 +66,11 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
             child: Text("Request permission extend"),
             onPressed: _requestPermssionExtend,
           ),
-          ElevatedButton(
-            child: Text("PresentLimited"),
-            onPressed: _persentLimited,
-          ),
+          if (Platform.isIOS)
+            ElevatedButton(
+              child: Text("PresentLimited"),
+              onPressed: _persentLimited,
+            ),
         ],
       ),
     );
@@ -166,14 +167,16 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
   var _isNotify = false;
 
   Future<void> _persentLimited() async {
-    if (Platform.isIOS) {
-      if (!_isNotify) {
-        _isNotify = true;
-        PhotoManager.addChangeCallback(_callback);
-      }
-      PhotoManager.startChangeNotify();
-      await PhotoManager.presentLimited();
+    final PermissionState _ps = await PhotoManager.requestPermissionExtend();
+    if (_ps == PermissionState.authorized) {
+      return;
     }
+    if (!_isNotify) {
+      _isNotify = true;
+      PhotoManager.addChangeCallback(_callback);
+    }
+    PhotoManager.startChangeNotify();
+    await PhotoManager.presentLimited();
   }
 
   void _callback(MethodCall call) {

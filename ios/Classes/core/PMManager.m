@@ -573,11 +573,9 @@
     
     [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"cache path = %@", dirPath]];
     
-    //  NSString *title = [asset title];
+    NSString *title = [asset title];
     NSMutableString *path = [NSMutableString stringWithString:dirPath];
-    NSString *filename = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
-    NSString *extName = [asset title];
-    [path appendFormat:@"/%@%@.%@", filename, isOrigin ? @"_origin" : @"", extName];
+    [path appendFormat:@"/%@", title];
     return path;
 }
 

@@ -46,8 +46,8 @@ def install_plugin_pods(application_path = nil, relative_symlink_dir, platform)
     plugin_name = plugin_hash['name']
     plugin_path = plugin_hash['path']
     if (plugin_name && plugin_path)
-        specPath = "#{plugin_path}/#{platform}/#{plugin_name}.podspec"
-        pod plugin_name, :path => specPath
+      specPath = "#{plugin_path}/#{platform}/#{plugin_name}.podspec"
+      pod plugin_name, :path => specPath
     end
   end
 end
@@ -56,7 +56,7 @@ target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
-  # flutter_install_all_macos_pods File.dirname(File.realpath(__FILE__))
+  flutter_install_macos_engine_pod(File.dirname(File.realpath(__FILE__)))
   install_plugin_pods(File.dirname(File.realpath(__FILE__)), '.symlinks', 'macos')
 end
 
