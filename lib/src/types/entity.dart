@@ -24,9 +24,9 @@ class AssetPathEntity {
     filterOption ??= FilterOptionGroup();
     final entity = AssetPathEntity()
       ..id = id
-      ..filterOption = filterOption
-      ..typeInt = type.index
-      ..albumType = 1;
+      ..albumType = albumType
+      ..filterOption = filterOption ?? FilterOptionGroup()
+      ..type = type;
     await entity.refreshPathProperties();
     return entity;
   }
@@ -125,7 +125,7 @@ class AssetPathEntity {
       id,
       page: page,
       pageCount: pageSize,
-      type: typeInt,
+      type: type,
       optionGroup: filterOption,
     );
   }
@@ -142,7 +142,7 @@ class AssetPathEntity {
     }
     return plugin.getAssetWithRange(
       id,
-      typeInt: typeInt,
+      type: type,
       start: start,
       end: end,
       optionGroup: filterOption,

@@ -22,9 +22,8 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
 
   Plugin._();
 
-  /// [type] 0 : all , 1: image ,2 video
   Future<List<AssetPathEntity>> getAllGalleryList({
-    int type = 0,
+    RequestType type = RequestType.all,
     bool hasAll = true,
     bool onlyAll = false,
     required FilterOptionGroup optionGroup,
@@ -59,14 +58,14 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     String id, {
     int page = 0,
     int pageCount = 15,
-    int type = 0,
+    RequestType type = RequestType.all,
     required FilterOptionGroup optionGroup,
   }) async {
     final result = await _channel.invokeMethod('getAssetWithGalleryId', {
       'id': id,
       'page': page,
       'pageCount': pageCount,
-      'type': type,
+      'type': type.value,
       'option': optionGroup.toMap(),
     });
 
@@ -76,14 +75,14 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   /// Asset in the specified range.
   Future<List<AssetEntity>> getAssetWithRange(
     String id, {
-    required int typeInt,
+    required RequestType type,
     required int start,
     required int end,
     required FilterOptionGroup optionGroup,
   }) async {
     final Map map = await _channel.invokeMethod('getAssetListWithRange', {
       'galleryId': id,
-      'type': typeInt,
+      'type': type.value,
       'start': start,
       'end': end,
       'option': optionGroup.toMap(),
@@ -146,7 +145,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   /// Nullable
   Future<Map?> fetchPathProperties(
     String id,
-    int type,
+    RequestType type,
     FilterOptionGroup optionGroup,
   ) {
     return _channel.invokeMethod(
@@ -154,7 +153,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
       {
         'id': id,
         'timestamp': 0,
-        'type': type,
+        'type': type.value,
         'option': optionGroup.toMap(),
       },
     );
@@ -317,7 +316,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
 
     return ConvertUtils.convertPath(
       items,
-      type: pathEntity.typeInt,
+      type: pathEntity.type,
       optionGroup: pathEntity.filterOption,
     );
   }

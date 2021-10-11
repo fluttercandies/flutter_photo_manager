@@ -1,10 +1,11 @@
 import '../types/entity.dart';
+import '../types/types.dart';
 import '../filter/filter_option_group.dart';
 
 class ConvertUtils {
   static List<AssetPathEntity> convertPath(
     Map data, {
-    int type = 0,
+    RequestType type = RequestType.all,
     FilterOptionGroup? optionGroup,
   }) {
     List<AssetPathEntity> result = [];
@@ -15,7 +16,7 @@ class ConvertUtils {
       final entity = AssetPathEntity()
         ..id = item["id"]
         ..name = item["name"]
-        ..typeInt = type
+        ..type = type
         ..isAll = item["isAll"]
         ..assetCount = item["length"]
         ..albumType = (item["albumType"] ?? 1)
