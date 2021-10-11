@@ -11,9 +11,14 @@ import '../internal/progress_handler.dart';
 import 'thumb_option.dart';
 import 'types.dart';
 
-/// asset entity, for entity info.
+/// The abstraction of albums and folders.
+/// It represent a bucket in the `MediaStore` on Android,
+/// and the `PHAssetCollection` object on iOS/macOS.
 class AssetPathEntity {
-  /// Obtained by [AssetPathEntity.id], not recommended
+  /// Obtain an entity from ID.
+  ///
+  /// This method is not recommend in general, since the correspoding folder
+  /// could be deleted in anytime, which will cause properties invalid.
   static Future<AssetPathEntity> fromId(
     String id, {
     FilterOptionGroup? filterOption,
@@ -21,7 +26,6 @@ class AssetPathEntity {
     int albumType = 1,
   }) async {
     assert(albumType == 1 || Platform.isIOS || Platform.isMacOS);
-    filterOption ??= FilterOptionGroup();
     final entity = AssetPathEntity()
       ..id = id
       ..albumType = albumType
@@ -31,59 +35,58 @@ class AssetPathEntity {
     return entity;
   }
 
-  /// id
-  ///
-  /// in ios is localIdentifier
-  ///
-  /// in android is content provider database _id column
+  /// The ID of the album (asset collection).
+  ///  * Android: `MediaStore.Images.Media.BUCKET_ID`
+  ///  * iOS/macOS: localIndentifier
   late final String id;
 
-  /// name
-  ///
-  /// in android is path name
-  ///
-  /// in ios is photos gallery name
+  /// The name of the album.
+  ///  * Android: Path name.
+  ///  * iOS/macOS: Album/Folder name.
   late String name;
 
-  /// gallery asset count
+  /// Total assets count of the album.
   late int assetCount;
 
-  /// In iOS: 1: album, 2: folder
-  ///
-  /// In android: always 1.
+  /// The type of the album.
+  ///  * Android: Always be 1.
+  ///  * iOS: 1 - Album, 2 - Folder.
   late int albumType;
 
+  /// The collection of filter options of the album.
   late FilterOptionGroup filterOption;
 
-  /// The modification time of the latest asset contained in an album.
+  /// The latest modification date of the album.
   ///
-  /// See [FilterOptionGroup.containsPathModified]
+  /// This field will only be included when
+  /// [FilterOptionGroup.containsPathModified] is true.
   DateTime? lastModified;
 
   /// The value used internally by the user.
   /// Used to indicate the value that should be available inside the path.
-  RequestType get type => _type;
-  late RequestType _type;
-
-  set type(RequestType type) {
-    _type = type;
-    typeInt = type.index;
-  }
-
-  /// Users should not edit this value.
+  /// The [RequestType] of the album.
   ///
-  /// This is a field used internally by the library.
-  int get typeInt => _type.value;
+  /// this value is determined as final when user construct the album.
+  late RequestType type;
 
-  /// Users should not edit this value.
-  ///
-  /// This is a field used internally by the library.
+  @Deprecated(
+    'This is an internal field and should not being used anymore. '
+    'This feature was deprecated after v1.4.0.',
+  )
+  int get typeInt => type.value;
+
+  @Deprecated(
+    'This is an internal field and should not being used anymore. '
+    'This feature was deprecated after v1.4.0.',
+  )
   set typeInt(int typeInt) {
-    _type = RequestType(typeInt);
+    type = RequestType(typeInt);
   }
 
-  /// This path is the path that contains all the assets.
-  bool isAll = false;
+  /// Whether the album contains all assets.
+  ///
+  /// An album includes all assets is the default album in general.
+  late bool isAll;
 
   /// Call this method to update the property
   Future<void> refreshPathProperties({
@@ -130,6 +133,11 @@ class AssetPathEntity {
     );
   }
 
+  /// Getting assets in range using [start] and [end].
+  ///
+  /// The [start] and [end] are similar to [String.substring], but it'll return
+  /// the maxmium assets if the total count of assets is fewer than the range,
+  /// instead of throwing a [RangeError] like [String.substring].
   Future<List<AssetEntity>> getAssetListRange({
     required int start,
     required int end,
@@ -155,10 +163,12 @@ class AssetPathEntity {
   )
   Future<List<AssetEntity>> get assetList => getAssetListPaged(0, assetCount);
 
-  /// In android, always return empty list.
+  /// Request subpaths for the album.
+  ///
+  /// An empty list will always be returned on Android.
   Future<List<AssetPathEntity>> getSubPathList() async {
     if (Platform.isIOS || Platform.isMacOS) {
-      return plugin.getSubPathEntities(this);
+      return await plugin.getSubPathEntities(this);
     }
     return <AssetPathEntity>[];
   }
@@ -183,7 +193,7 @@ class AssetPathEntity {
 
   @override
   String toString() {
-    return "AssetPathEntity(name: $name, id:$id, assetCount: $assetCount)";
+    return 'AssetPathEntity(id: $id, name: $name, assetCount: $assetCount)';
   }
 }
 
