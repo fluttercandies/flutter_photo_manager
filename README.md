@@ -28,7 +28,7 @@ you can get assets (image/video/audio) on Android, iOS and macOS.
 * [Usage](#usage)
   * [Request for permission](#request-for-permission)
     * [Limited entities access on iOS](#limited-entities-access-on-ios)
-  * [Get albums/directories (AssetPathEntity)](#get-albumsdirectories-assetpathentity)
+  * [Get albums/folders (AssetPathEntity)](#get-albumsfolders-assetpathentity)
   * [Get assets (AssetEntity)](#get-assets-assetentity)
     * [From AssetPathEntity](#from-assetpathentity)
     * [From ID](#from-id)
@@ -175,9 +175,9 @@ This method only available for iOS 14+ and when the permission state
 is limited (`PermissionState.limited`),
 other platform won't make a valid call.
 
-### Get albums/directories (`AssetPathEntity`)
+### Get albums/folders (`AssetPathEntity`)
 
-Albums or directories are abstracted as the [`AssetPathEntity`][] class.
+Albums or folders are abstracted as the [`AssetPathEntity`][] class.
 It represent a bucket in the `MediaStore` on Android,
 and the `PHAssetCollection` object on iOS/macOS.
 To get all of them:
