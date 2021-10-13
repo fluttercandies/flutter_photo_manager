@@ -8,6 +8,9 @@
 }
 
 - (NSArray<NSSortDescriptor *> *)sortCond {
+    if (self.sortArray.count == 0) {
+        return @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:false]];
+    }
     return self.sortArray;
 }
 
