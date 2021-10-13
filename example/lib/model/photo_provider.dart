@@ -216,12 +216,7 @@ class PhotoProvider extends ChangeNotifier {
       ..createTimeCond = createDtCond
       ..containsEmptyAlbum = _containsEmptyAlbum
       ..containsPathModified = _containsPathModified
-      ..addOrderOption(
-        OrderOption(
-          type: OrderOptionType.updateDate,
-          asc: asc,
-        ),
-      );
+      ..addOrderOption(OrderOption(type: OrderOptionType.createDate, asc: asc));
   }
 
   Future<void> refreshAllGalleryProperties() async {
