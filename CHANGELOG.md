@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.3.7
+Improvements:
+- Improve sort orders on iOS. (#620)
+
 ## 1.3.6
 Improvements:
 - Prettify file name on iOS. (#615)

@@ -5,11 +5,6 @@ import 'filter_options.dart';
 
 /// The group class to obtain [FilterOption]s.
 class FilterOptionGroup {
-  static final _defaultOrderOption = OrderOption(
-    type: OrderOptionType.updateDate,
-    asc: false,
-  );
-
   /// Construct a default options group.
   FilterOptionGroup({
     FilterOption imageOption = const FilterOption(),
@@ -78,7 +73,7 @@ class FilterOptionGroup {
   }
 
   Map<String, dynamic> toMap() {
-    Map<String, dynamic> result = {
+    return {
       if (_map.containsKey(AssetType.image))
         'image': getOption(AssetType.image).toMap(),
       if (_map.containsKey(AssetType.video))
@@ -89,15 +84,8 @@ class FilterOptionGroup {
       'containsPathModified': containsPathModified,
       'createDate': createTimeCond.toMap(),
       'updateDate': updateTimeCond.toMap(),
+      'orders': orders.map((e) => e.toMap()).toList(),
     };
-
-    final ordersList = List<OrderOption>.of(orders);
-    if (ordersList.isEmpty) {
-      ordersList.add(_defaultOrderOption);
-    }
-    result['orders'] = ordersList.map((e) => e.toMap()).toList();
-
-    return result;
   }
 
   FilterOptionGroup copyWith({
