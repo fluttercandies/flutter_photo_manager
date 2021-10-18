@@ -8,18 +8,14 @@
 }
 
 - (NSArray<NSSortDescriptor *> *)sortCond {
+    if (self.sortArray.count == 0) {
+        return nil;
+    }
     return self.sortArray;
 }
 
 - (void)injectSortArray:(NSArray *)array {
     NSMutableArray<NSSortDescriptor *> *result = [NSMutableArray new];
-
-    // Use "creationDate" as the default descriptor when the sort array is empty.
-    if (array.count == 0) {
-        NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:false];
-        self.sortArray = @[descriptor];
-        return;
-    }
 
     for (NSDictionary *dict in array) {
         int typeValue = [dict[@"type"] intValue];
