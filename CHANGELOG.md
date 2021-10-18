@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.3.8
+Improvements:
+- Improve sort orders on all platforms. (#623)
+
 ## 1.3.7
 Improvements:
 - Improve sort orders on iOS. (#620)
