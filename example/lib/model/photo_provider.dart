@@ -215,8 +215,7 @@ class PhotoProvider extends ChangeNotifier {
       ..setOption(AssetType.audio, option)
       ..createTimeCond = createDtCond
       ..containsEmptyAlbum = _containsEmptyAlbum
-      ..containsPathModified = _containsPathModified
-      ..addOrderOption(OrderOption(type: OrderOptionType.createDate, asc: asc));
+      ..containsPathModified = _containsPathModified;
   }
 
   Future<void> refreshAllGalleryProperties() async {
