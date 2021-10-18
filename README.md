@@ -191,7 +191,7 @@ See [`getAssetPathList`][] for more detail.
 ### Get assets (`AssetEntity`)
 
 Assets (images/videos/audios) are abstracted as the [`AssetEntity`][] class.
-It represents a series fields with `MediaStore` on Android,
+It represents a series of fields with `MediaStore` on Android,
 and the `PHAsset` object on iOS/macOS.
 
 #### From `AssetPathEntity`

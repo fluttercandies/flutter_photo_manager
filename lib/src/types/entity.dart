@@ -36,8 +36,8 @@ class AssetPathEntity {
   }
 
   /// The ID of the album (asset collection).
-  ///  * Android: `MediaStore.Images.Media.BUCKET_ID`
-  ///  * iOS/macOS: localIndentifier
+  ///  * Android: `MediaStore.Images.Media.BUCKET_ID`.
+  ///  * iOS/macOS: localIndentifier.
   late final String id;
 
   /// The name of the album.
@@ -119,8 +119,8 @@ class AssetPathEntity {
 
   /// Entity list with pagination support.
   ///
-  /// [page] is starting 0.
-  /// [pageSize] is item count of page.
+  /// [page] should starts with and greater than 0.
+  /// [pageSize] is item count of current [page].
   Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) {
     assert(albumType == 1, 'Only album can request for assets.');
     assert(pageSize > 0, "The pageSize must be greater than 0.");
@@ -197,7 +197,9 @@ class AssetPathEntity {
   }
 }
 
-/// Used to describe an asset.
+/// The abstraction of assets (images/videos/audios).
+/// It represent a series of fields with `MediaStore` on Android,
+/// and the `PHAsset` object on iOS/macOS.
 class AssetEntity {
   AssetEntity({
     required this.id,
@@ -217,7 +219,10 @@ class AssetEntity {
   })  : _latitude = latitude,
         _longitude = longitude;
 
-  /// Create from [AssetEntity.id], not recommended.
+  /// Obtain an entity from ID.
+  ///
+  /// This method is not recommend in general, since the correspoding asset
+  /// could be deleted in anytime, which will cause properties invalid.
   static Future<AssetEntity?> fromId(String id) async {
     try {
       return await PhotoManager.refreshAssetProperties(id);
@@ -226,56 +231,53 @@ class AssetEntity {
     }
   }
 
-  /// in android is database _id column
-  ///
-  /// in ios is local id
-  String id;
-
-  /// It is title `MediaStore.MediaColumns.DISPLAY_NAME` in MediaStore on android.
-  ///
-  /// It is `PHAssetResource.filename` on iOS.
-  ///
-  /// Nullable in iOS. If you must need it, See [FilterOption.needTitle] or use [titleAsync].
-  String? title;
-
-  /// It is [title] in Android.
-  ///
-  /// It is [PHAsset valueForKey:@"filename"] in iOS.
-  Future<String> get titleAsync => plugin.getTitleAsync(this);
-
-  /// the asset type
-  ///
-  /// see [AssetType]
-  AssetType get type {
-    switch (typeInt) {
-      case 1:
-        return AssetType.image;
-      case 2:
-        return AssetType.video;
-      case 3:
-        return AssetType.audio;
-      default:
-        return AssetType.other;
-    }
+  /// Refresh properties for the current asset and return a new object.
+  Future<AssetEntity?> refreshProperties() {
+    return PhotoManager.refreshAssetProperties(this.id);
   }
 
-  /// Asset type int value.
-  ///
-  /// see [type]
-  int typeInt;
+  /// The ID of the asset.
+  ///  * Android: `_id` column in `MediaStore` database.
+  ///  * iOS/macOS: `localIndentifier`.
+  final String id;
 
-  /// Duration of video, unit is second.
+  /// The title field of the asset.
+  ///  * Android: `MediaStore.MediaColumns.DISPLAY_NAME`.
+  ///  * iOS/macOS: `PHAssetResource.filename`.
   ///
-  /// If [type] is [AssetType.image], then it's value is 0.
+  /// This field is nullable on iOS.
+  /// If you need to obtain it, set [FilterOption.needTitle] to `true`
+  /// or use the async getter [titleAsync].
+  final String? title;
+
+  ///  * Android: `MediaStore.MediaColumns.DISPLAY_NAME`.
+  ///  * iOS/macOS: `PHAssetResource.filename`.
+  Future<String> get titleAsync => plugin.getTitleAsync(this);
+
+  /// {@macro photo_manager.AssetType}
+  AssetType get type => AssetType.values[typeInt];
+
+  /// The type value of the [type].
+  final int typeInt;
+
+  /// The duration of the asset, but in different units.
+  ///  * [AssetType.audio]: Milliseconds.
+  ///  * [AssetType.video]: Seconds.
+  ///  * [AssetType.image] and [AssetType.other]: Always 0.
   ///
-  /// Also see [videoDuration]
-  int duration;
+  /// See also:
+  ///  * [videoDuration] which is a duration getter for videos.
+  final int duration;
 
-  /// width of asset.
-  int width;
+  /// The width of the asset.
+  ///
+  /// This field could be 0 in cases that EXIF info is failed to parse.
+  final int width;
 
-  /// height of asset.
-  int height;
+  /// The height of the asset.
+  ///
+  /// This field could be 0 in cases that EXIF info is failed to parse.
+  final int height;
 
   bool get _isLandscape => orientation == 90 || orientation == 270;
 
@@ -285,139 +287,158 @@ class AssetEntity {
 
   Size get orientatedSize => _isLandscape ? size.flipped : size;
 
-  /// Gps information when shooting, nullable.
+  /// Latitude value of the location when shooting.
+  ///  * Android: `MediaStore.Images.ImageColumns.LATITUDE`.
+  ///  * iOS/macOS: `PHAsset.location.coordinate.latitude`.
   ///
-  /// When the device is android10 or above, always null.
+  /// It's always null when the device is Android 10 or above.
+  ///
+  /// See also:
+  ///  * https://developer.android.com/reference/android/provider/MediaStore.Images.ImageColumns#LATITUDE
+  ///  * https://developer.apple.com/documentation/corelocation/cllocation?language=objc#declaration
+  double? get latitude => _latitude;
   double? _latitude;
 
-  /// Gps information when shooting, nullable.
+  /// Latitude value of the location when shooting.
+  ///  * Android: `MediaStore.Images.ImageColumns.LONGITUDE`.
+  ///  * iOS/macOS: `PHAsset.location.coordinate.longitude`.
   ///
-  /// When the device is android10 or above, always null.
-  double get latitude => _latitude ?? 0;
-
-  /// Gps information when shooting, nullable.
+  /// It's always null when the device is Android 10 or above.
   ///
-  /// When the device is android10 or above, always null.
-  set latitude(double? latitude) {
-    _latitude = latitude;
-  }
-
-  /// Gps information when shooting, nullable.
-  ///
-  /// When the device is android10 or above, always null.
+  /// See also:
+  ///  * https://developer.android.com/reference/android/provider/MediaStore.Images.ImageColumns#LATITUDE
+  ///  * https://developer.apple.com/documentation/corelocation/cllocation?language=objc#declaration
+  double? get longitude => _longitude;
   double? _longitude;
 
-  /// Gps information when shooting, nullable.
-  ///
-  /// When the device is android10 or above, always null.
-  double get longitude => _longitude ?? 0;
-
-  /// Gps information when shooting, nullable.
-  ///
-  /// When the device is android10 or above, always null.
-  set longitude(double? longitude) {
-    _longitude = longitude;
-  }
-
   /// Whether this asset is locally available.
-  ///
-  /// Defaults to true, and it'll always be true on Android.
+  ///  * Android: Always true.
+  ///  * iOS/macOS: Whether the asset has been uploaded to iCloud
+  ///    and locally exist.
   Future<bool> get isLocallyAvailable => plugin.isLocallyAvailable(id);
 
-  /// Get latitude and longitude from MediaStore(android) / Photos(iOS).
+  /// Obtain latitude and longitude.
+  ///  * Android: Obtain from `MediaStore` or EXIF (Android 10).
+  ///  * iOS/macOS: Obtain from photos.
   ///
-  /// except : In androidQ, the location info come from exif.
+  /// [LatLng.latitude] and [LatLng.longitude] might be 0.
+  Future<LatLng> latlngAsync() => plugin.getLatLngAsync(this);
+
+  /// Obtain the compressed file of the asset.
   ///
-  /// [LatLng.latitude] or [LatLng.longitude] maybe zero or null.
-  Future<LatLng> latlngAsync() {
-    return plugin.getLatLngAsync(this);
+  /// See also:
+  ///  * [originFile] which can obtain the origin file.
+  ///  * [loadFile] which can obtain file with [PMProgressHandler].
+  Future<File?> get file => _getFile();
+
+  /// Obtain the original file that contain all EXIF informations.
+  ///
+  /// Be aware the original file is not always suit for all kinds of usages.
+  /// Typically when you're using an [Image] to display a HEIC image on
+  /// Android 10, it'll failed to display the image.
+  ///
+  /// See also:
+  ///  * [file] which can obtain the compressed file.
+  ///  * [loadFile] which can obtain file with [PMProgressHandler].
+  Future<File?> get originFile => _getFile(isOrigin: true);
+
+  /// Obtain file of the asset with a [PMProgressHandler].
+  ///
+  /// See also:
+  ///  * [file] which can obtain the compressed file.
+  ///  * [originFile] which can obtain the original file.
+  Future<File?> loadFile({
+    bool isOrigin = true,
+    PMProgressHandler? progressHandler,
+  }) {
+    return _getFile(isOrigin: isOrigin, progressHandler: progressHandler);
   }
 
-  /// If you need upload file ,then you can use the file, nullable.
+  /// Obtain the raw data of the asset.
   ///
-  /// If you need to see the loading status, look at the [loadFile].
-  Future<File?> get file async => _getFile();
-
-  /// This contains all the EXIF information, but in contrast, `Image` widget may not be able to display pictures.
-  ///
-  /// Usually, you can use the [file] attribute.
-  ///
-  /// If you need to see the loading status, look at the [loadFile].
-  Future<File?> get originFile async => _getFile(isOrigin: true);
-
-  /// The raw data stored in the device, the data may be large.
-  ///
-  /// This property is not recommended for video types.
+  /// **Use it with cautious** since the original data might be epic large.
+  /// Generally use this method only for images.
   Future<Uint8List?> get originBytes => _getOriginBytes();
 
-  /// The thumb data of asset, use it to display.
+  /// Obtain the thumbnail data with fixed size 150x150 of the asset,
+  /// typically use it for preview displays.
   ///
-  /// If you need to see the loading status, look at the [thumbDataWithSize] or [thumbDataWithOption].
+  /// {@template photo_manager.thumbnailForVideos}
+  /// Thumbnail data for videos are images, not compressed video.
+  /// {@endtemplate}
+  ///
+  /// See also:
+  ///  * [thumbDataWithSize] which is a common method to obtain thumbnails.
+  ///  * [thumbDataWithOption] which accepts customized [ThumbOption].
   Future<Uint8List?> get thumbData => thumbDataWithSize(150, 150);
 
-  /// get thumb with size
+  /// Obtain the thumbnail data with the given [width] and [height] of the asset.
+  ///
+  /// {@macro photo_manager.thumbnailForVideos}
+  ///
+  /// See also:
+  ///  * [thumbData] which obtain the thumbnail data with fixed size.
+  ///  * [thumbDataWithOption] which accepts customized [ThumbOption].
   Future<Uint8List?> thumbDataWithSize(
     int width,
     int height, {
     ThumbFormat format = ThumbFormat.jpeg,
     int quality = 100,
     PMProgressHandler? progressHandler,
-  }) async {
-    assert(width > 0 && height > 0, "The width and height must better 0.");
-    assert(quality > 0 && quality <= 100, "The quality must between 0 and 100");
-
-    // Return null if asset is audio or other type, because they don't have such a thing.
+  }) {
+    assert(() {
+      _checkThumbnailAssertion();
+      return true;
+    }());
+    // Return null if the asset is audio or others.
     if (type == AssetType.audio || type == AssetType.other) {
-      return null;
+      return Future.value(null);
     }
-
+    final ThumbOption option;
     if (Platform.isIOS || Platform.isMacOS) {
-      return thumbDataWithOption(
-        ThumbOption.ios(
-          width: width,
-          height: height,
-          format: format,
-          quality: quality,
-        ),
-        progressHandler: progressHandler,
-      );
-    }
-
-    return thumbDataWithOption(
-      ThumbOption(
+      option = ThumbOption.ios(
         width: width,
         height: height,
         format: format,
         quality: quality,
-      ),
-      progressHandler: progressHandler,
-    );
-  }
-
-  /// Use the method to load file.
-  Future<File?> loadFile({
-    bool isOrigin = true,
-    PMProgressHandler? progressHandler,
-  }) async {
-    return _getFile(
-      isOrigin: isOrigin,
-      progressHandler: progressHandler,
-    );
-  }
-
-  /// Get thumb with size of option.
-  Future<Uint8List?> thumbDataWithOption(
-    ThumbOption option, {
-    PMProgressHandler? progressHandler,
-  }) async {
+      );
+    } else {
+      option = ThumbOption(
+        width: width,
+        height: height,
+        format: format,
+        quality: quality,
+      );
+    }
     assert(() {
       option.checkAssert();
       return true;
     }());
-    // Return null if asset is audio or other type, because they don't have such a thing.
+
+    return thumbDataWithOption(option, progressHandler: progressHandler);
+  }
+
+  /// Obtain the thumbnail data with the given customized [ThumbOption].
+  ///
+  /// See also:
+  ///  * [thumbData] which obtain the thumbnail data with fixed size.
+  ///  * [thumbDataWithSize] which is a common method to obtain thumbnails.
+  Future<Uint8List?> thumbDataWithOption(
+    ThumbOption option, {
+    PMProgressHandler? progressHandler,
+  }) {
+    assert(() {
+      _checkThumbnailAssertion();
+      return true;
+    }());
+    // Return null if the asset is audio or others.
     if (type == AssetType.audio || type == AssetType.other) {
-      return null;
+      return Future.value(null);
     }
+    assert(() {
+      option.checkAssert();
+      return true;
+    }());
     return plugin.getThumb(
       id: id,
       option: option,
@@ -425,38 +446,54 @@ class AssetEntity {
     );
   }
 
-  /// if not video, duration is 0
+  void _checkThumbnailAssertion() {
+    assert(
+      type == AssetType.image || type == AssetType.video,
+      'Only images and videos can obtain thumbnails.',
+    );
+  }
+
+  /// The video duration in seconds.
+  ///
+  /// This getter will return [Duration.zero] if the asset if not video.
+  ///
+  /// See also:
+  ///  * [duration] which is the duration of the asset, but in different units.
   Duration get videoDuration => Duration(seconds: duration);
 
   /// The [Size] for the asset.
   Size get size => Size(width.toDouble(), height.toDouble());
 
-  /// unix timestamp second of asset
+  /// The create time in unix timestamp of the asset.
   int? createDtSecond;
 
-  /// create time of asset
+  /// The create time of the asset in [DateTime].
   DateTime get createDateTime {
-    final sec = (createDtSecond ?? 0);
-    return DateTime.fromMillisecondsSinceEpoch(sec * 1000);
+    final value = createDtSecond ?? 0;
+    return DateTime.fromMillisecondsSinceEpoch(value * 1000);
   }
 
-  /// unix time second of modified.
+  /// The modified time in unix timestamp of the asset.
   int? modifiedDateSecond;
 
+  /// The modified time of the asset in [DateTime].
   DateTime get modifiedDateTime {
-    final sec = modifiedDateSecond ?? 0;
-    return DateTime.fromMillisecondsSinceEpoch(sec * 1000);
+    final value = modifiedDateSecond ?? 0;
+    return DateTime.fromMillisecondsSinceEpoch(value * 1000);
   }
 
-  /// If the asset is deleted, return false.
+  /// Check whether the asset has been deleted.
   Future<bool> get exists => plugin.assetExistsWithId(id);
 
-  /// The url is provided to some video player.
-  /// Such as [flutter_ijkplayer](https://pub.dev/packages/flutter_ijkplayer)
+  /// Provide regular URL for players. Only available for audios and videos.
+  ///  * Android: Content URI, e.g.
+  ///    `content://media/external/video/media/894857`.
+  ///  * iOS/macOS: File URL. e.g.
+  ///    `file:///var/mobile/Media/DCIM/118APPLE/IMG_8371.MOV`.
   ///
-  /// It is such as `file:///var/mobile/Media/DCIM/118APPLE/IMG_8371.MOV` in iOS.
-  ///
-  /// Android: `content://media/external/video/media/894857`
+  /// See also:
+  ///  * https://developer.android.com/reference/android/content/ContentUris
+  ///  * https://developer.apple.com/documentation/avfoundation/avurlasset
   Future<String?> getMediaUrl() async {
     if (type == AssetType.video || type == AssetType.audio) {
       return plugin.getMediaUrl(this);
@@ -464,74 +501,79 @@ class AssetEntity {
     return null;
   }
 
+  bool get _platformMatched =>
+      Platform.isIOS || Platform.isMacOS || Platform.isAndroid;
+
   Future<File?> _getFile({
     bool isOrigin = false,
     PMProgressHandler? progressHandler,
   }) async {
-    if (Platform.isIOS || Platform.isMacOS || Platform.isAndroid) {
-      final path = await plugin.getFullFile(
-        id,
-        isOrigin: isOrigin,
-        progressHandler: progressHandler,
-      );
-      if (path == null) {
-        return null;
-      }
-      return File(path);
+    assert(
+      _platformMatched,
+      '${Platform.operatingSystem} does not support obtain file.',
+    );
+    if (!_platformMatched) {
+      return null;
     }
-    return null;
+    final path = await plugin.getFullFile(
+      id,
+      isOrigin: isOrigin,
+      progressHandler: progressHandler,
+    );
+    if (path == null) {
+      return null;
+    }
+    return File(path);
   }
 
   Future<Uint8List?> _getOriginBytes({
     PMProgressHandler? progressHandler,
   }) async {
-    assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
-    if (Platform.isAndroid) {
-      final String systemVersion = await plugin.getSystemVersion();
-      if (int.parse(systemVersion) >= 29) {
-        return plugin.getOriginBytes(
-          id,
-          progressHandler: progressHandler,
-        );
-      } else {
-        return (await originFile)?.readAsBytes();
-      }
-    } else if (Platform.isIOS || Platform.isMacOS) {
-      final file = await originFile;
-      return file?.readAsBytes();
+    assert(
+      _platformMatched,
+      '${Platform.operatingSystem} does not support obtain raw data.',
+    );
+    if (!_platformMatched) {
+      return null;
     }
-    return null;
+    if (Platform.isAndroid &&
+        int.parse(await plugin.getSystemVersion()) >= 29) {
+      return await plugin.getOriginBytes(id, progressHandler: progressHandler);
+    }
+    final file = await originFile;
+    return file?.readAsBytes();
   }
 
-  /// Orientation of android MediaStore. See [ORIENTATION](https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#ORIENTATION)
-  /// Example values for android: 0 90 180 270
+  /// The orientation of the asset.
+  ///  * Android: `MediaStore.MediaColumns.ORIENTATION`,
+  ///    could be 0, 90, 180, 270.
+  ///  * iOS/macOS: Always 0.
   ///
-  /// The value always 0 in iOS.
+  /// See also:
+  ///  * https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#ORIENTATION
   int orientation;
 
-  /// Android does not have this field, so it is always false.
+  /// Whether the asset is favorited on the device.
+  ///  * Android: Always false.
+  ///  * iOS/macOS: `PHAsset.isFavorite`.
   ///
-  /// In iOS, it is consistent with PHAsset.isFavorite. to change it, Use `PhotoManager.editor.iOS.favoriteAsset`, See [IosEditor.favoriteAsset]
+  /// See also:
+  ///  * [IosEditor.favoriteAsset] to update the favorite status.
   bool isFavorite;
 
-  /// In iOS, always null.
-  ///
-  /// In androidQ or higher: it is `MediaStore.MediaColumns.RELATIVE_PATH`.
-  ///
-  /// API 28 or lower: it is `MediaStore.MediaColumns.DATA` parent path.
+  /// The relative path abstraction of the asset.
+  ///  * Android 10 and above: `MediaStore.MediaColumns.RELATIVE_PATH`.
+  ///  * Android 9 and below: The parent path of `MediaStore.MediaColumns.DATA`.
+  ///  * iOS/macOS: Always null.
   String? relativePath;
 
-  /// MimeType of the asset.
+  /// The mime type of the asset.
+  ///  * Android: `MediaStore.MediaColumns.MIME_TYPE`.
+  ///  * iOS/macOS: Always null.
   ///
-  /// In Android, it reads the value in [MediaStore](https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#MIME_TYPE) without guarantee of accuracy.
-  ///
-  /// In iOS, it it always null.
+  /// See also:
+  ///  * https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#MIME_TYPE
   String? mimeType;
-
-  /// refreshProperties
-  Future<AssetEntity?> refreshProperties() async {
-    return PhotoManager.refreshAssetProperties(this.id);
-  }
 
   @override
   int get hashCode => hashValues(id, isFavorite);
@@ -548,13 +590,10 @@ class AssetEntity {
   String toString() => "AssetEntity(id: $id , type: $type)";
 }
 
-/// Longitude and latitude
+/// Longitude and latitude.
 class LatLng {
-  const LatLng({required this.latitude, required this.longitude});
+  const LatLng({this.latitude, this.longitude});
 
-  /// latitude
   final double? latitude;
-
-  /// longitude
   final double? longitude;
 }
