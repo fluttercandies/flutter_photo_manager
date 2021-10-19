@@ -411,7 +411,7 @@ class AssetEntity {
       );
     }
     assert(() {
-      option.checkAssert();
+      option.checkAssertions();
       return true;
     }());
 
@@ -436,7 +436,7 @@ class AssetEntity {
       return Future.value(null);
     }
     assert(() {
-      option.checkAssert();
+      option.checkAssertions();
       return true;
     }());
     return plugin.getThumb(
