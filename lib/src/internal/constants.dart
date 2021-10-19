@@ -7,6 +7,7 @@ class PMConstants {
 
   static const String channelPrefix = 'com.fluttercandies/photo_manager';
 
+  /// Keys for [MethodCall]s.
   static const String mRequestPermissionExtended = 'requestPermissionExtended';
   static const String mPresentLimited = 'presentLimited';
   static const String mGetGalleryList = 'getGalleryList';
@@ -46,4 +47,8 @@ class PMConstants {
   static const String mCreateFolder = 'createFolder';
   static const String mRemoveInAlbum = 'removeInAlbum';
   static const String mMoveAssetToPath = 'moveAssetToPath';
+
+  /// Constant value.
+  static const int vDefaultThumbnailSize = 150;
+  static const int vDefaultThumbnailQuality = 95;
 }
