@@ -13,8 +13,7 @@ import '../utils/convert_utils.dart';
 
 final Plugin plugin = Plugin();
 
-/// Any method of this class is not recommended to be called directly outside
-/// the library.
+/// The plugin class is shield and should not be use directly.
 class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   static late final Plugin _instance = Plugin._();
 
@@ -29,7 +28,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     required FilterOptionGroup optionGroup,
   }) async {
     final result = await _channel.invokeMethod('getGalleryList', {
-      'type': type,
+      'type': type.value,
       'hasAll': hasAll,
       'onlyAll': onlyAll,
       'option': optionGroup.toMap(),

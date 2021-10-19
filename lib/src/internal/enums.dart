@@ -15,7 +15,9 @@ enum AssetType {
   audio,
 }
 
-/// Generally support JPG and PNG.
+/// {%template photo_manager.ThumbnailFormat}
+/// Which format the thumbnail should be, generally support JPG and PNG.
+/// {%endtemplate}
 enum ThumbFormat { jpeg, png }
 
 /// The delivery mode enumeration for `PHImageRequestOptionsDeliveryMode`.
@@ -38,7 +40,9 @@ enum ResizeContentMode { fit, fill, def }
 
 enum OrderOptionType { createDate, updateDate }
 
+/// {@template photo_manager.PMRequestState}
 /// Indicate the current state when an asset is loading with [PMProgressHandler].
+/// {@endtemplate}
 enum PMRequestState { prepare, loading, success, failed }
 
 /// Information about your app’s authorization to access the user’s photo library.
