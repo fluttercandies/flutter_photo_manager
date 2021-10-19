@@ -196,7 +196,6 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     String? relativePath,
   }) async {
     title ??= 'image_${DateTime.now().millisecondsSinceEpoch / 1000}.jpg';
-
     final result = await _channel.invokeMethod(
       PMConstants.mSaveImage,
       {
@@ -275,7 +274,6 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
           PMConstants.mGetLatLngAndroidQ,
           {'id': assetEntity.id},
         );
-
         /// 将返回的数据传入map
         return LatLng(latitude: map?['lat'], longitude: map?['lng']);
       }
@@ -299,14 +297,12 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     if (Platform.isAndroid) {
       return assetEntity.title!;
     }
-
     if (Platform.isIOS || Platform.isMacOS) {
       return await _channel.invokeMethod(
         PMConstants.mGetTitleAsync,
         {'id': assetEntity.id},
       );
     }
-
     return '';
   }
 
@@ -326,9 +322,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
       'albumType': pathEntity.albumType,
       'option': pathEntity.filterOption.toMap(),
     });
-
     final items = result['list'];
-
     return ConvertUtils.convertPath(
       items,
       type: pathEntity.type,
@@ -347,16 +341,13 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
       );
       return null;
     }
-
     final result = await _channel.invokeMethod(PMConstants.mCopyAsset, {
       'assetId': asset.id,
       'galleryId': pathEntity.id,
     });
-
     if (result == null) {
       return null;
     }
-
     return ConvertUtils.convertToAsset(result);
   }
 
@@ -461,11 +452,9 @@ mixin IosPlugin on BasePlugin {
     if (result == null) {
       return null;
     }
-
     if (result['errorMsg'] != null) {
       return null;
     }
-
     return AssetPathEntity()
       ..id = result['id']
       ..name = name
@@ -490,11 +479,9 @@ mixin IosPlugin on BasePlugin {
     if (result == null) {
       return null;
     }
-
     if (result['errorMsg'] != null) {
       return null;
     }
-
     return AssetPathEntity()
       ..id = result['id']
       ..name = name
@@ -514,11 +501,9 @@ mixin IosPlugin on BasePlugin {
         'pathId': path.id,
       },
     );
-
     if (result['msg'] != null) {
       return false;
     }
-
     return true;
   }
 }

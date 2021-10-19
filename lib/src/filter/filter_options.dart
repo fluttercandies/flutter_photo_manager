@@ -82,10 +82,8 @@ class SizeConstraint {
   }) {
     minWidth ??= this.minWidth;
     maxWidth ??= this.maxHeight;
-
     minHeight ??= this.minHeight;
     maxHeight ??= this.maxHeight;
-
     ignoreSize ??= this.ignoreSize;
 
     return SizeConstraint(
@@ -130,12 +128,6 @@ class DurationConstraint {
 
 /// CreateDate
 class DateTimeCond {
-  static final DateTime zero = DateTime.fromMillisecondsSinceEpoch(0);
-
-  final DateTime min;
-  final DateTime max;
-  final bool ignore;
-
   const DateTimeCond({
     required this.min,
     required this.max,
@@ -143,11 +135,14 @@ class DateTimeCond {
   });
 
   factory DateTimeCond.def() {
-    return DateTimeCond(
-      min: zero,
-      max: DateTime.now(),
-    );
+    return DateTimeCond(min: zero, max: DateTime.now());
   }
+
+  final DateTime min;
+  final DateTime max;
+  final bool ignore;
+
+  static final DateTime zero = DateTime.fromMillisecondsSinceEpoch(0);
 
   DateTimeCond copyWith({
     DateTime? min,
