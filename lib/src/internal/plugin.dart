@@ -15,11 +15,11 @@ final Plugin plugin = Plugin();
 
 /// The plugin class is shield and should not be use directly.
 class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
-  static late final Plugin _instance = Plugin._();
+  Plugin._();
 
   factory Plugin() => _instance;
 
-  Plugin._();
+  static late final Plugin _instance = Plugin._();
 
   Future<List<AssetPathEntity>> getAllGalleryList({
     RequestType type = RequestType.all,
@@ -350,7 +350,6 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
       'type': path.albumType,
     });
     if (result['errorMsg'] != null) {
-      print(result['errorMsg']);
       return false;
     }
     return true;
@@ -368,7 +367,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     return (await _channel.invokeMethod('removeNoExistsAssets')) == true;
   }
 
-  Future<Map?> getPropertiesFromAssetEntity(String id) {
+  Future<Map<String, dynamic>?> getPropertiesFromAssetEntity(String id) {
     return _channel.invokeMethod('getPropertiesFromAssetEntity', {'id': id});
   }
 
@@ -376,13 +375,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     await _channel.invokeMethod('ignorePermissionCheck', {'ignore': ignore});
   }
 
-  Future clearFileCache() async {
-    await _channel.invokeMethod('clearFileCache');
-  }
+  Future clearFileCache() => _channel.invokeMethod('clearFileCache');
 
-  Future<void> cancelCacheRequests() async {
-    await _channel.invokeMethod('cancelCacheRequests');
-  }
+  Future<void> cancelCacheRequests() =>
+      _channel.invokeMethod('cancelCacheRequests');
 
   Future<void> requestCacheAssetsThumb(
     List<String> ids,
@@ -435,7 +431,6 @@ mixin IosPlugin on BasePlugin {
     }
 
     if (result['errorMsg'] != null) {
-      print('errorMsg');
       return null;
     }
 
@@ -468,7 +463,6 @@ mixin IosPlugin on BasePlugin {
     }
 
     if (result['errorMsg'] != null) {
-      print('errorMsg');
       return null;
     }
 
@@ -493,7 +487,6 @@ mixin IosPlugin on BasePlugin {
     );
 
     if (result['msg'] != null) {
-      print('cannot remove, cause by: ${result['msg']}');
       return false;
     }
 
@@ -510,9 +503,6 @@ mixin AndroidPlugin on BasePlugin {
       'assetId': entity.id,
       'albumId': target.id,
     });
-
-    print(result);
-
-    return true;
+    return result != null;
   }
 }
