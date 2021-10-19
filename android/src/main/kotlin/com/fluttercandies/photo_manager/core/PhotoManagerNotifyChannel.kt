@@ -32,7 +32,7 @@ class PhotoManagerNotifyChannel(
     private val videoUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
     private val audioUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
-    private val methodChannel = MethodChannel(messenger, "top.kikt/photo_manager/notify")
+    private val methodChannel = MethodChannel(messenger, "com.fluttercandies/photo_manager/notify")
 
     private val context
         get() = applicationContext

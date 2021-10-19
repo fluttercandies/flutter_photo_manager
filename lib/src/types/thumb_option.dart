@@ -1,3 +1,4 @@
+import '../internal/constants.dart';
 import '../internal/enums.dart';
 
 /// The thumbnail option when requesting assets.
@@ -6,7 +7,7 @@ class ThumbOption {
     required this.width,
     required this.height,
     this.format = ThumbFormat.jpeg,
-    this.quality = 95,
+    this.quality = PMConstants.vDefaultThumbnailQuality,
   });
 
   /// Construct thumbnail options only for iOS/macOS.
@@ -14,7 +15,7 @@ class ThumbOption {
     required int width,
     required int height,
     ThumbFormat format = ThumbFormat.jpeg,
-    int quality = 95,
+    int quality = PMConstants.vDefaultThumbnailQuality,
     DeliveryMode deliveryMode = DeliveryMode.opportunistic,
     ResizeMode resizeMode = ResizeMode.fast,
     ResizeContentMode resizeContentMode = ResizeContentMode.fit,
@@ -41,7 +42,8 @@ class ThumbOption {
 
   /// The quality value for the thumbnail.
   ///
-  /// Valid from 1 to 100. Defaults to 95.
+  /// Valid from 1 to 100.
+  /// Defaults to [PMConstants.vDefaultThumbnailQuality].
   final int quality;
 
   Map<String, dynamic> toMap() {
@@ -70,7 +72,7 @@ class _IosThumbOption extends ThumbOption {
     required int width,
     required int height,
     ThumbFormat format = ThumbFormat.jpeg,
-    int quality = 95,
+    int quality = PMConstants.vDefaultThumbnailQuality,
     required this.deliveryMode,
     required this.resizeMode,
     required this.resizeContentMode,

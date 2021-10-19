@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'constants.dart';
 import 'enums.dart';
 
 /// Handling assets loading progress when they need to download from cloud.
@@ -15,7 +16,7 @@ class PMProgressHandler {
       '$runtimeType should only used on iOS or macOS.',
     );
     _channel = OptionalMethodChannel(
-      'top.kikt/photo_manager/progress/$_channelIndex',
+      '${PMConstants.channelPrefix}/progress/$_channelIndex',
     );
     _channel.setMethodCallHandler(_onProgress);
     _incrementalIndex++;

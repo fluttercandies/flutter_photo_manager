@@ -1,3 +1,4 @@
+import '../internal/constants.dart';
 import '../internal/enums.dart';
 import '../internal/plugin.dart';
 import '../types/entity.dart';
@@ -12,8 +13,8 @@ class PhotoCachingManager {
   static late final PhotoCachingManager instance = PhotoCachingManager._();
 
   static const ThumbOption _defaultOption = ThumbOption(
-    width: 150,
-    height: 150,
+    width: PMConstants.vDefaultThumbnailSize,
+    height: PMConstants.vDefaultThumbnailSize,
     format: ThumbFormat.jpeg,
   );
 

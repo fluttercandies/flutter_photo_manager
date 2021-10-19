@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
+import '../internal/constants.dart';
 import '../internal/editor.dart';
 import '../filter/filter_option_group.dart';
 import '../internal/enums.dart';
@@ -360,8 +361,8 @@ class AssetEntity {
   /// Generally use this method only for images.
   Future<Uint8List?> get originBytes => _getOriginBytes();
 
-  /// Obtain the thumbnail data with fixed size 150x150 of the asset,
-  /// typically use it for preview displays.
+  /// Obtain the thumbnail data with [PMConstants.vDefaultThumbnailSize]
+  /// size of the asset, typically use it for preview displays.
   ///
   /// {@template photo_manager.thumbnailForVideos}
   /// Thumbnail data for videos are images, not compressed video.
@@ -370,7 +371,10 @@ class AssetEntity {
   /// See also:
   ///  * [thumbDataWithSize] which is a common method to obtain thumbnails.
   ///  * [thumbDataWithOption] which accepts customized [ThumbOption].
-  Future<Uint8List?> get thumbData => thumbDataWithSize(150, 150);
+  Future<Uint8List?> get thumbData => thumbDataWithSize(
+        PMConstants.vDefaultThumbnailSize,
+        PMConstants.vDefaultThumbnailSize,
+      );
 
   /// Obtain the thumbnail data with the given [width] and [height] of the asset.
   ///

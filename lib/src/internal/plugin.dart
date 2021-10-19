@@ -6,10 +6,11 @@ import 'package:flutter/services.dart';
 
 import '../filter/filter_option_group.dart';
 import '../types/entity.dart';
-import 'progress_handler.dart';
 import '../types/thumb_option.dart';
 import '../types/types.dart';
 import '../utils/convert_utils.dart';
+import 'constants.dart';
+import 'progress_handler.dart';
 
 final Plugin plugin = Plugin();
 
@@ -27,7 +28,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     bool onlyAll = false,
     required FilterOptionGroup optionGroup,
   }) async {
-    final result = await _channel.invokeMethod('getGalleryList', {
+    final result = await _channel.invokeMethod(PMConstants.mGetGalleryList, {
       'type': type.value,
       'hasAll': hasAll,
       'onlyAll': onlyAll,
@@ -47,7 +48,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     PermisstionRequestOption requestOption,
   ) async {
     return await _channel.invokeMethod(
-      'requestPermissionExtend',
+      PMConstants.mRequestPermissionExtended,
       requestOption.toMap(),
     );
   }
@@ -60,13 +61,16 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     RequestType type = RequestType.all,
     required FilterOptionGroup optionGroup,
   }) async {
-    final result = await _channel.invokeMethod('getAssetWithGalleryId', {
-      'id': id,
-      'page': page,
-      'pageCount': pageCount,
-      'type': type.value,
-      'option': optionGroup.toMap(),
-    });
+    final result = await _channel.invokeMethod(
+      PMConstants.mGetAssetWithGalleryId,
+      {
+        'id': id,
+        'page': page,
+        'pageCount': pageCount,
+        'type': type.value,
+        'option': optionGroup.toMap(),
+      },
+    );
 
     return ConvertUtils.convertToAssetList(result);
   }
@@ -79,13 +83,16 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     required int end,
     required FilterOptionGroup optionGroup,
   }) async {
-    final Map map = await _channel.invokeMethod('getAssetListWithRange', {
-      'galleryId': id,
-      'type': type.value,
-      'start': start,
-      'end': end,
-      'option': optionGroup.toMap(),
-    });
+    final Map map = await _channel.invokeMethod(
+      PMConstants.mGetAssetListWithRange,
+      {
+        'galleryId': id,
+        'type': type.value,
+        'start': start,
+        'end': end,
+        'option': optionGroup.toMap(),
+      },
+    );
 
     return ConvertUtils.convertToAssetList(map);
   }
@@ -107,7 +114,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
       'option': option.toMap(),
     };
     _injectParams(params, progressHandler);
-    return _channel.invokeMethod('getThumb', params);
+    return _channel.invokeMethod(PMConstants.mGetThumb, params);
   }
 
   Future<Uint8List?> getOriginBytes(
@@ -116,11 +123,11 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }) {
     final params = {'id': id};
     _injectParams(params, progressHandler);
-    return _channel.invokeMethod('getOriginBytes', params);
+    return _channel.invokeMethod(PMConstants.mGetOriginBytes, params);
   }
 
   Future<void> releaseCache() {
-    return _channel.invokeMethod('releaseMemCache');
+    return _channel.invokeMethod(PMConstants.mReleaseMemCache);
   }
 
   Future<String?> getFullFile(
@@ -130,15 +137,15 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }) async {
     final params = {'id': id, 'isOrigin': isOrigin};
     _injectParams(params, progressHandler);
-    return _channel.invokeMethod('getFullFile', params);
+    return _channel.invokeMethod(PMConstants.mGetFullFile, params);
   }
 
   Future<void> setLog(bool isLog) {
-    return _channel.invokeMethod('log', isLog);
+    return _channel.invokeMethod(PMConstants.mLog, isLog);
   }
 
   Future<void> openSetting() {
-    return _channel.invokeMethod('openSetting');
+    return _channel.invokeMethod(PMConstants.mOpenSetting);
   }
 
   /// Nullable
@@ -148,7 +155,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     FilterOptionGroup optionGroup,
   ) {
     return _channel.invokeMethod(
-      'fetchPathProperties',
+      PMConstants.mFetchPathProperties,
       {
         'id': id,
         'timestamp': 0,
@@ -159,11 +166,14 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   void notifyChange({required bool start}) {
-    _channel.invokeMethod('notify', {'notify': start});
+    _channel.invokeMethod(PMConstants.mNotify, {'notify': start});
   }
 
   Future<void> forceOldApi() async {
-    await _channel.invokeMethod('forceOldApi');
+    assert(Platform.isAndroid);
+    if (Platform.isAndroid) {
+      return await _channel.invokeMethod(PMConstants.mForceOldApi);
+    }
   }
 
   Future<bool> deleteWithId(String id) async {
@@ -172,8 +182,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<List<String>> deleteWithIds(List<String> ids) async {
-    final List<dynamic> deleted =
-        (await _channel.invokeMethod('deleteWithIds', {'ids': ids}));
+    final List<dynamic> deleted = await _channel.invokeMethod(
+      PMConstants.mDeleteWithIds,
+      {'ids': ids},
+    );
     return deleted.cast<String>();
   }
 
@@ -186,7 +198,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     title ??= 'image_${DateTime.now().millisecondsSinceEpoch / 1000}.jpg';
 
     final result = await _channel.invokeMethod(
-      'saveImage',
+      PMConstants.mSaveImage,
       {
         'image': data,
         'title': title,
@@ -213,7 +225,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     title ??= 'image_${DateTime.now().millisecondsSinceEpoch / 1000}.jpg';
 
     final result = await _channel.invokeMethod(
-      'saveImageWithPath',
+      PMConstants.mSaveImageWithPath,
       {
         'path': path,
         'title': title,
@@ -236,7 +248,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
       return null;
     }
     final result = await _channel.invokeMethod(
-      'saveVideo',
+      PMConstants.mSaveVideo,
       {
         'path': file.absolute.path,
         'title': title,
@@ -248,11 +260,11 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<bool> assetExistsWithId(String id) async {
-    return await _channel.invokeMethod('assetExists', {'id': id});
+    return await _channel.invokeMethod(PMConstants.mAssetExists, {'id': id});
   }
 
   Future<String> getSystemVersion() async {
-    return await _channel.invokeMethod('systemVersion');
+    return await _channel.invokeMethod(PMConstants.mSystemVersion);
   }
 
   Future<LatLng> getLatLngAsync(AssetEntity assetEntity) async {
@@ -260,7 +272,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
       final version = int.parse(await getSystemVersion());
       if (version >= 29) {
         final Map? map = await _channel.invokeMethod(
-          'getLatLngAndroidQ',
+          PMConstants.mGetLatLngAndroidQ,
           {'id': assetEntity.id},
         );
 
@@ -275,7 +287,11 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<bool> cacheOriginBytes(bool cache) async {
-    return (await _channel.invokeMethod("cacheOriginBytes", cache)) == true;
+    final bool result = await _channel.invokeMethod(
+      PMConstants.mCacheOriginBytes,
+      cache,
+    );
+    return result == true;
   }
 
   Future<String> getTitleAsync(AssetEntity assetEntity) async {
@@ -286,7 +302,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
 
     if (Platform.isIOS || Platform.isMacOS) {
       return await _channel.invokeMethod(
-        'getTitleAsync',
+        PMConstants.mGetTitleAsync,
         {'id': assetEntity.id},
       );
     }
@@ -295,7 +311,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<String?> getMediaUrl(AssetEntity assetEntity) {
-    return _channel.invokeMethod('getMediaUrl', {
+    return _channel.invokeMethod(PMConstants.mGetMediaUrl, {
       'id': assetEntity.id,
       'type': assetEntity.typeInt,
     });
@@ -304,7 +320,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   Future<List<AssetPathEntity>> getSubPathEntities(
     AssetPathEntity pathEntity,
   ) async {
-    final result = await _channel.invokeMethod('getSubPath', {
+    final result = await _channel.invokeMethod(PMConstants.mGetSubPath, {
       'id': pathEntity.id,
       'type': pathEntity.type.value,
       'albumType': pathEntity.albumType,
@@ -332,7 +348,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
       return null;
     }
 
-    final result = await _channel.invokeMethod('copyAsset', {
+    final result = await _channel.invokeMethod(PMConstants.mCopyAsset, {
       'assetId': asset.id,
       'galleryId': pathEntity.id,
     });
@@ -345,7 +361,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<bool> iosDeleteCollection(AssetPathEntity path) async {
-    final result = await _channel.invokeMethod('deleteAlbum', {
+    final result = await _channel.invokeMethod(PMConstants.mDeleteAlbum, {
       'id': path.id,
       'type': path.albumType,
     });
@@ -356,50 +372,63 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<bool> favoriteAsset(String id, bool favorite) async {
-    return (await _channel.invokeMethod(
-          'favoriteAsset',
-          {'id': id, 'favorite': favorite},
-        )) ==
-        true;
+    final bool result = await _channel.invokeMethod(
+      PMConstants.mFavoriteAsset,
+      {'id': id, 'favorite': favorite},
+    );
+    return result == true;
   }
 
   Future<bool> androidRemoveNoExistsAssets() async {
-    return (await _channel.invokeMethod('removeNoExistsAssets')) == true;
+    final bool result = await _channel.invokeMethod(
+      PMConstants.mRemoveNoExistsAssets,
+    );
+    return result == true;
   }
 
   Future<Map<String, dynamic>?> getPropertiesFromAssetEntity(String id) {
-    return _channel.invokeMethod('getPropertiesFromAssetEntity', {'id': id});
+    return _channel.invokeMethod(
+      PMConstants.mGetPropertiesFromAssetEntity,
+      {'id': id},
+    );
   }
 
   Future ignorePermissionCheck(bool ignore) async {
-    await _channel.invokeMethod('ignorePermissionCheck', {'ignore': ignore});
+    await _channel.invokeMethod(
+      PMConstants.mIgnorePermissionCheck,
+      {'ignore': ignore},
+    );
   }
 
-  Future clearFileCache() => _channel.invokeMethod('clearFileCache');
+  Future<void> clearFileCache() {
+    return _channel.invokeMethod(PMConstants.mClearFileCache);
+  }
 
-  Future<void> cancelCacheRequests() =>
-      _channel.invokeMethod('cancelCacheRequests');
+  Future<void> cancelCacheRequests() {
+    return _channel.invokeMethod(PMConstants.mCancelCacheRequests);
+  }
 
   Future<void> requestCacheAssetsThumb(
     List<String> ids,
     ThumbOption option,
   ) {
     assert(ids.isNotEmpty);
-    return _channel.invokeMethod('requestCacheAssetsThumb', {
+    return _channel.invokeMethod(PMConstants.mRequestCacheAssetsThumb, {
       'ids': ids,
       'option': option.toMap(),
     });
   }
 
   Future<void> presentLimited() async {
+    assert(Platform.isIOS);
     if (Platform.isIOS) {
-      await _channel.invokeMethod('presentLimited');
+      await _channel.invokeMethod(PMConstants.mPresentLimited);
     }
   }
 }
 
 mixin BasePlugin {
-  final MethodChannel _channel = MethodChannel('top.kikt/photo_manager');
+  final MethodChannel _channel = const MethodChannel(PMConstants.channelPrefix);
 }
 
 mixin IosPlugin on BasePlugin {
@@ -407,39 +436,10 @@ mixin IosPlugin on BasePlugin {
     if (Platform.isAndroid) {
       return true;
     }
-    return await _channel.invokeMethod('isLocallyAvailable', {'id': id});
-  }
-
-  Future<AssetPathEntity?> iosCreateFolder(
-    String name,
-    bool isRoot,
-    AssetPathEntity? parent,
-  ) async {
-    final map = {
-      'name': name,
-      'isRoot': isRoot,
-    };
-    if (!isRoot && parent != null) {
-      map['folderId'] = parent.id;
-    }
-    final result = await _channel.invokeMethod(
-      'createFolder',
-      map,
+    return await _channel.invokeMethod(
+      PMConstants.mIsLocallyAvailable,
+      {'id': id},
     );
-    if (result == null) {
-      return null;
-    }
-
-    if (result['errorMsg'] != null) {
-      return null;
-    }
-
-    return AssetPathEntity()
-      ..id = result['id']
-      ..name = name
-      ..isAll = false
-      ..assetCount = 0
-      ..albumType = 2;
   }
 
   Future<AssetPathEntity?> iosCreateAlbum(
@@ -455,7 +455,7 @@ mixin IosPlugin on BasePlugin {
       map['folderId'] = parent.id;
     }
     final result = await _channel.invokeMethod(
-      'createAlbum',
+      PMConstants.mCreateAlbum,
       map,
     );
     if (result == null) {
@@ -474,12 +474,41 @@ mixin IosPlugin on BasePlugin {
       ..albumType = 1;
   }
 
+  Future<AssetPathEntity?> iosCreateFolder(
+    String name,
+    bool isRoot,
+    AssetPathEntity? parent,
+  ) async {
+    final map = {'name': name, 'isRoot': isRoot};
+    if (!isRoot && parent != null) {
+      map['folderId'] = parent.id;
+    }
+    final result = await _channel.invokeMethod(
+      PMConstants.mCreateFolder,
+      map,
+    );
+    if (result == null) {
+      return null;
+    }
+
+    if (result['errorMsg'] != null) {
+      return null;
+    }
+
+    return AssetPathEntity()
+      ..id = result['id']
+      ..name = name
+      ..isAll = false
+      ..assetCount = 0
+      ..albumType = 2;
+  }
+
   Future<bool> iosRemoveInAlbum(
     List<AssetEntity> entities,
     AssetPathEntity path,
   ) async {
     final result = await _channel.invokeMethod(
-      'removeInAlbum',
+      PMConstants.mRemoveInAlbum,
       {
         'assetId': entities.map((e) => e.id).toList(),
         'pathId': path.id,
@@ -499,7 +528,7 @@ mixin AndroidPlugin on BasePlugin {
     AssetEntity entity,
     AssetPathEntity target,
   ) async {
-    final result = await _channel.invokeMethod('moveAssetToPath', {
+    final result = await _channel.invokeMethod(PMConstants.mMoveAssetToPath, {
       'assetId': entity.id,
       'albumId': target.id,
     });
