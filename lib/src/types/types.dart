@@ -1,46 +1,38 @@
 import '../internal/enums.dart';
-import '../internal/extensions.dart';
 
+/// The request type when requesting paths.
+///
+///  * [all] - Request paths that return all kind of assets.
+///  * [common] - Request paths that return images and videos.
+///  * [image] - Request paths that only return images.
+///  * [video] - Request paths that only return videos.
+///  * [audio] - Request paths that only return audios.
 class RequestType {
-  final int value;
+  const RequestType(this.value);
 
-  int get index => value;
+  final int value;
 
   static const _imageValue = 1;
   static const _videoValue = 1 << 1;
   static const _audioValue = 1 << 2;
 
+  static const all = RequestType(_imageValue | _videoValue | _audioValue);
+  static const common = RequestType(_imageValue | _videoValue);
   static const image = RequestType(_imageValue);
   static const video = RequestType(_videoValue);
   static const audio = RequestType(_audioValue);
-  static const all = RequestType(_imageValue | _videoValue | _audioValue);
-  static const common = RequestType(_imageValue | _videoValue);
 
-  const RequestType(this.value);
+  bool containsImage() => value & _imageValue == _imageValue;
 
-  bool containsImage() {
-    return value & _imageValue == _imageValue;
-  }
+  bool containsVideo() => value & _videoValue == _videoValue;
 
-  bool containsVideo() {
-    return value & _videoValue == _videoValue;
-  }
+  bool containsAudio() => value & _audioValue == _audioValue;
 
-  bool containsAudio() {
-    return value & _audioValue == _audioValue;
-  }
+  bool containsType(RequestType type) => value & type.value == type.value;
 
-  bool containsType(RequestType type) {
-    return this.value & type.value == type.value;
-  }
+  RequestType operator +(RequestType type) => this | type;
 
-  RequestType operator +(RequestType type) {
-    return this | type;
-  }
-
-  RequestType operator -(RequestType type) {
-    return this ^ type;
-  }
+  RequestType operator -(RequestType type) => this ^ type;
 
   RequestType operator |(RequestType type) {
     return RequestType(this.value | type.value);
@@ -59,22 +51,16 @@ class RequestType {
   }
 
   @override
-  String toString() {
-    return "Request type = $value";
-  }
+  String toString() => '$runtimeType($value)';
 }
 
 /// See [PermissionState].
 class PermisstionRequestOption {
-  final IosAccessLevel iosAccessLevel;
-
   const PermisstionRequestOption({
     this.iosAccessLevel = IosAccessLevel.readWrite,
   });
 
-  Map toMap() {
-    return {
-      'iosAccessLevel': iosAccessLevel.getValue(),
-    };
-  }
+  final IosAccessLevel iosAccessLevel;
+
+  Map<String, dynamic> toMap() => {'iosAccessLevel': iosAccessLevel.index + 1};
 }
