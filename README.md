@@ -1,10 +1,10 @@
 # photo_manager
 
-| English | 中文说明 (WIP) |
+| English | 中文说明 (🚧 WIP) |
 
 [![pub package](https://img.shields.io/pub/v/photo_manager.svg)][pub package]
-[![GitHub](https://img.shields.io/github/license/Caijinglong/flutter_photo_manager.svg)][repo]
-[![GitHub stars](https://img.shields.io/github/stars/Caijinglong/flutter_photo_manager.svg?style=social&label=Stars)][repo]
+[![GitHub](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager.svg)][repo]
+[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager.svg?style=social&label=Stars)][repo]
 
 A Flutter plugin that provides assets abstraction management APIs without UI integration,
 you can get assets (image/video/audio) on Android, iOS and macOS.
@@ -617,8 +617,8 @@ PhotoManager.editor.iOS.deletePath();
 
 
 [pub package]: https://pub.dev/packages/photo_manager
-[repo]: https://github.com/CaiJingLong/flutter_photo_manager
-[GitHub issues]: https://github.com/CaiJingLong/flutter_photo_manager/issues
+[repo]: https://github.com/fluttercandies/flutter_photo_manager
+[GitHub issues]: https://github.com/fluttercandies/flutter_photo_manager/issues
 
 [Glide]: https://bumptech.github.io/glide/
 [Generated API]: https://bumptech.github.io/glide/doc/generatedapi.html
