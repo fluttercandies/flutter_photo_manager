@@ -6,14 +6,3 @@ extension PermissionStateExt on PermissionState {
     return this == PermissionState.authorized;
   }
 }
-
-extension IosAccessLevelExt on IosAccessLevel {
-  int getValue() {
-    switch (this) {
-      case IosAccessLevel.addOnly:
-        return 1;
-      case IosAccessLevel.readWrite:
-        return 2;
-    }
-  }
-}

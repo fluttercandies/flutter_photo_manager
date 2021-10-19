@@ -1,5 +1,6 @@
 import '../internal/enums.dart';
 
+/// The thumbnail option when requesting assets.
 class ThumbOption {
   const ThumbOption({
     required this.width,
@@ -8,6 +9,7 @@ class ThumbOption {
     this.quality = 95,
   });
 
+  /// Construct thumbnail options only for iOS/macOS.
   factory ThumbOption.ios({
     required int width,
     required int height,
@@ -28,13 +30,22 @@ class ThumbOption {
     );
   }
 
+  /// The width pixels.
   final int width;
+
+  /// The height pixels.
   final int height;
+
+  /// {@macro photo_manager.ThumbnailFormat}
   final ThumbFormat format;
+
+  /// The quality value for the thumbnail.
+  ///
+  /// Valid from 1 to 100. Defaults to 95.
   final int quality;
 
-  Map<String, Object> toMap() {
-    return {
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
       'width': width,
       'height': height,
       'format': format.index,
@@ -42,9 +53,15 @@ class ThumbOption {
     };
   }
 
-  void checkAssert() {
-    assert(width > 0 && height > 0, "The width and height must better 0.");
-    assert(quality > 0 && quality <= 100, "The quality must between 0 and 100");
+  void checkAssertions() {
+    assert(
+      width > 0 && height > 0,
+      "The width and height must be greater than 0.",
+    );
+    assert(
+      quality > 0 && quality <= 100,
+      "The quality must between 1 and 100",
+    );
   }
 }
 
@@ -69,11 +86,12 @@ class _IosThumbOption extends ThumbOption {
   final ResizeContentMode resizeContentMode;
 
   @override
-  Map<String, Object> toMap() {
-    return <String, Object>{
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      ...super.toMap(),
       'deliveryMode': deliveryMode.index,
       'resizeMode': resizeMode.index,
       'resizeContentMode': resizeContentMode.index,
-    }..addAll(super.toMap());
+    };
   }
 }

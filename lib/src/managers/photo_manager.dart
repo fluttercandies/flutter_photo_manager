@@ -82,14 +82,16 @@ class PhotoManager {
     filterOption ??= FilterOptionGroup();
 
     assert(
-        type.index != 0, 'The request type must have video, image or audio.');
+      type != RequestType.all,
+      'The request type must have video, image or audio.',
+    );
 
-    if (type.index == 0) {
+    if (type == RequestType.all) {
       return [];
     }
 
     return plugin.getAllGalleryList(
-      type: type.index,
+      type: type,
       hasAll: hasAll,
       onlyAll: onlyAll,
       optionGroup: filterOption,
@@ -175,7 +177,7 @@ class PhotoManager {
   }) async {
     final result = await plugin.fetchPathProperties(
       entity.id,
-      entity.typeInt,
+      entity.type,
       entity.filterOption,
     );
     if (result == null) {
@@ -185,7 +187,7 @@ class PhotoManager {
     if (list is List && list.isNotEmpty) {
       return ConvertUtils.convertPath(
         result,
-        type: entity.typeInt,
+        type: entity.type,
         optionGroup: entity.filterOption,
       )[0];
     } else {

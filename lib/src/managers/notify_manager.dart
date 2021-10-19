@@ -5,47 +5,39 @@ import 'package:flutter/services.dart';
 
 import '../internal/plugin.dart';
 
-/// manage photo changes
-///
-/// 当相册发生变化时, 通知
+/// The notify manager when assets changed.
 class NotifyManager {
   static const MethodChannel _channel = MethodChannel(
     "top.kikt/photo_manager/notify",
   );
 
+  Stream<bool> get notifyStream => _controller.stream;
   final StreamController<bool> _controller = StreamController.broadcast();
 
-  /// When the notification status change, the listen of stream will be called.
-  Stream<bool> get notifyStream => _controller.stream;
+  final notifyCallback = <ValueChanged<MethodCall>>[];
 
-  /// callbacks
-  var notifyCallback = <ValueChanged<MethodCall>>[];
+  /// Add a callback.
+  void addCallback(ValueChanged<MethodCall> c) => notifyCallback.add(c);
 
-  /// add callback
-  void addCallback(ValueChanged<MethodCall> callback) =>
-      notifyCallback.add(callback);
+  /// Remove the callback
+  void removeCallback(ValueChanged<MethodCall> c) => notifyCallback.remove(c);
 
-  /// remove callback
-  void removeCallback(ValueChanged<MethodCall> callback) =>
-      notifyCallback.remove(callback);
-
-  /// start handle notify
+  /// Start to handle notify.
   void startHandleNotify() {
     _channel.setMethodCallHandler(_notify);
-    plugin.notifyChange(start: true);
     _controller.add(true);
+    plugin.notifyChange(start: true);
   }
 
-  /// stop handle notify
+  /// Stop to handle notify.
   void stopHandleNotify() {
     plugin.notifyChange(start: false);
-    _channel.setMethodCallHandler(null);
     _controller.add(false);
+    _channel.setMethodCallHandler(null);
   }
 
   Future<dynamic> _notify(MethodCall call) async {
     if (call.method == "change") {
-      print(call.arguments);
       _onChange(call);
     } else if (call.method == "setAndroidQExperimental") {
       // PhotoManager.androidQExperimental = call.arguments["open"];
@@ -53,7 +45,10 @@ class NotifyManager {
     return 1;
   }
 
-  Future<dynamic> _onChange(MethodCall methodCall) async {
-    notifyCallback.toList().forEach((callback) => callback.call(methodCall));
+  Future<dynamic> _onChange(MethodCall m) async {
+    notifyCallback.toList().forEach((c) => c.call(m));
   }
+
+  @override
+  String toString() => '$runtimeType(callbacks: ${notifyCallback.length})';
 }
