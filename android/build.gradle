@@ -1,4 +1,4 @@
-group 'top.kikt.photo_manager'
+group 'com.fluttercandies.photo_manager'
 version '1.0-SNAPSHOT'
 
 buildscript {
