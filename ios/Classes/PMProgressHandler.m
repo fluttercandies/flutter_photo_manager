@@ -24,7 +24,7 @@
 }
 
 - (void)register:(NSObject <FlutterPluginRegistrar> *)registrar channelIndex:(int)index {
-    NSString *name = [NSString stringWithFormat:@"top.kikt/photo_manager/progress/%d", index];
+    NSString *name = [NSString stringWithFormat:@"com.fluttercandies/photo_manager/progress/%d", index];
     channel = [FlutterMethodChannel methodChannelWithName:name binaryMessenger:registrar.messenger];
 }
 

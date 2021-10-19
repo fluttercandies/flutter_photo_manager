@@ -19,7 +19,7 @@ class PhotoManagerPlugin : FlutterPlugin, ActivityAware {
 
     companion object {
         fun register(plugin: InnerPhotoManagerPlugin, messenger: BinaryMessenger) {
-            val newChannel = MethodChannel(messenger, "top.kikt/photo_manager")
+            val newChannel = MethodChannel(messenger, "com.fluttercandies/photo_manager")
             newChannel.setMethodCallHandler(plugin)
         }
 

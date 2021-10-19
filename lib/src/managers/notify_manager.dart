@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import '../internal/constants.dart';
 import '../internal/plugin.dart';
 
 /// The notify manager when assets changed.
 class NotifyManager {
   static const MethodChannel _channel = MethodChannel(
-    "top.kikt/photo_manager/notify",
+    "${PMConstants.channelPrefix}/notify",
   );
 
   Stream<bool> get notifyStream => _controller.stream;

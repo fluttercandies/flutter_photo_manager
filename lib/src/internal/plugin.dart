@@ -6,10 +6,11 @@ import 'package:flutter/services.dart';
 
 import '../filter/filter_option_group.dart';
 import '../types/entity.dart';
-import 'progress_handler.dart';
 import '../types/thumb_option.dart';
 import '../types/types.dart';
 import '../utils/convert_utils.dart';
+import 'constants.dart';
+import 'progress_handler.dart';
 
 final Plugin plugin = Plugin();
 
@@ -399,7 +400,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
 }
 
 mixin BasePlugin {
-  final MethodChannel _channel = MethodChannel('top.kikt/photo_manager');
+  final MethodChannel _channel = MethodChannel(PMConstants.channelPrefix);
 }
 
 mixin IosPlugin on BasePlugin {

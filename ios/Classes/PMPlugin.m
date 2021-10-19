@@ -27,7 +27,7 @@
     [self initNotificationManager:registrar];
     
     FlutterMethodChannel *channel =
-    [FlutterMethodChannel methodChannelWithName:@"top.kikt/photo_manager"
+    [FlutterMethodChannel methodChannelWithName:@"com.fluttercandies/photo_manager"
                                 binaryMessenger:[registrar messenger]];
     PMManager *manager = [PMManager new];
     manager.converter = [PMConverter new];
