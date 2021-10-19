@@ -1,31 +1,39 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'enums.dart';
 
-/// Only works in iOS.
+/// Handling assets loading progress when they need to download from cloud.
+/// Typically for iCloud assets downloading.
 class PMProgressHandler {
-  /// Only works in iOS.
-  PMProgressHandler() {
-    final index = _index;
-    _index = _index + 1;
-    channelIndex = index;
-    _channel = OptionalMethodChannel('top.kikt/photo_manager/progress/$index');
-    _channel.setMethodCallHandler(this._onProgress);
+  PMProgressHandler() : _channelIndex = _incrementalIndex {
+    assert(
+      Platform.isIOS || Platform.isMacOS,
+      '$runtimeType should only used on iOS or macOS.',
+    );
+    _channel = OptionalMethodChannel(
+      'top.kikt/photo_manager/progress/$_channelIndex',
+    );
+    _channel.setMethodCallHandler(_onProgress);
+    _incrementalIndex++;
   }
 
-  static int _index = 0;
+  /// Increamental index that increase for each use.
+  static int _incrementalIndex = 0;
+
+  int get channelIndex => _channelIndex;
+  final int _channelIndex;
+
+  late final OptionalMethodChannel _channel;
 
   StreamController<PMProgressState> _controller = StreamController.broadcast();
 
-  /// Get the download progress and status of iCloud by monitoring the stream.
+  /// Obtain the download progress and status of the downloading asset
+  /// from the stream.
   Stream<PMProgressState> get stream => _controller.stream;
-
-  /// For internal use of SDK, users should not use it.
-  int channelIndex = 0;
-
-  late final OptionalMethodChannel _channel;
 
   Future<dynamic> _onProgress(MethodCall call) async {
     switch (call.method) {
@@ -40,13 +48,27 @@ class PMProgressHandler {
   }
 }
 
-/// Status of progress for [PMProgressHandler].
+/// A state class that contains [progress] of the current downloading
+/// and [state] to indicate the request state of the asset.
 class PMProgressState {
-  /// Values range from 0.0 to 1.0.
+  const PMProgressState(this.progress, this.state);
+
+  /// From 0.0 to 1.0.
   final double progress;
 
-  /// See [PMRequestState]
+  /// {@macro photo_manager.PMRequestState}
   final PMRequestState state;
 
-  PMProgressState(this.progress, this.state);
+  @override
+  bool operator ==(Object other) {
+    return other is PMProgressState &&
+        other.state == state &&
+        other.progress == progress;
+  }
+
+  @override
+  int get hashCode => hashValues(progress, state);
+
+  @override
+  String toString() => '$runtimeType($state, $progress)';
 }
