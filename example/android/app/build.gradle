@@ -52,7 +52,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "top.kikt.photo_manager_example"
+        applicationId "com.fluttercandies.photo_manager_example"
         minSdkVersion 16
         targetSdkVersion compileVersion.toInteger()
         versionCode flutterVersionCode.toInteger()
