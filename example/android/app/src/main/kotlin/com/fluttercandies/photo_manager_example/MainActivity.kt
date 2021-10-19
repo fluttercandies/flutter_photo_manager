@@ -1,4 +1,4 @@
-package top.kikt.photo_manager_example
+package com.fluttercandies.photo_manager_example
 
 import android.os.Bundle
 import io.flutter.embedding.android.FlutterActivity

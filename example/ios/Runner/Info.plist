@@ -11,7 +11,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>PhotoManagerExample</string>
+	<string>com.fluttercandies.photo_manager_example</string>
+	<key>CFBundleDisplayName</key>
+	<string>photo_manager Example</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

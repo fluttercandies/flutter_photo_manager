@@ -1,4 +1,4 @@
-package top.kikt.photo_manager_example
+package com.fluttercandies.photo_manager_example
 
 import com.bumptech.glide.module.AppGlideModule
 
