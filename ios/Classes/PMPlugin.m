@@ -155,6 +155,7 @@
                             details:nil]];
             return;
         }
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_15_0
         if (@available(iOS 15, *)) {
             [PHPhotoLibrary.sharedPhotoLibrary
              presentLimitedLibraryPickerFromViewController: controller
@@ -165,6 +166,10 @@
             [PHPhotoLibrary.sharedPhotoLibrary presentLimitedLibraryPickerFromViewController: controller];
             [handler reply:nil];
         }
+#else
+        [PHPhotoLibrary.sharedPhotoLibrary presentLimitedLibraryPickerFromViewController: controller];
+        [handler reply:nil];
+#endif
     }
 #endif
     [handler reply:nil];
