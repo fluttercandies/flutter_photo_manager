@@ -48,7 +48,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     PermisstionRequestOption requestOption,
   ) async {
     return await _channel.invokeMethod(
-      PMConstants.mRequestPermissionExtended,
+      PMConstants.mRequestPermissionExtend,
       requestOption.toMap(),
     );
   }
