@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.3.9
+Fixes:
+- Fix `presentLimited` issues on iOS 14 real devices. (#627)
+
 ## 1.3.8
 Improvements:
 - Improve sort orders on all platforms. (#623)
