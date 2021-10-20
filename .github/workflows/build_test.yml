@@ -1,6 +1,10 @@
 name: Build test
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   test_iOS:
@@ -21,6 +25,7 @@ jobs:
       - run: flutter pub get
       - run: flutter pub publish --dry-run
       - run: flutter analyze lib example/lib
+      - run: /usr/bin/xcodebuild -version
       - run: cd example ; flutter build ios --no-codesign
 
   test_macOS:
@@ -37,11 +42,12 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: stable
+      - run: flutter config --enable-macos-desktop
       - run: ./copy_on_publish.sh
       - run: flutter pub get
       - run: flutter pub publish --dry-run
       - run: flutter analyze lib example/lib
-      - run: flutter config --enable-macos-desktop
+      - run: /usr/bin/xcodebuild -version
       - run: cd example ; flutter build macos --debug
 
   test_android:
