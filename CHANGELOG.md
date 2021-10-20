@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.3.9+1
+Fixes:
+- Fix compile error on Xcode 12 for iOS 14. (#630)
+
 ## 1.3.9
 Fixes:
 - Fix `presentLimited` issues on iOS 14 real devices. (#627)

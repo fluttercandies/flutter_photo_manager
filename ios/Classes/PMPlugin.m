@@ -145,7 +145,7 @@
 }
 
 - (void)presentLimited:(ResultHandler*)handler {
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_14_0
+#if __IPHONE_14_0
     if (@available(iOS 14, *)) {
         UIViewController* controller = [self getCurrentViewController];
         if (!controller) {
@@ -155,7 +155,7 @@
                             details:nil]];
             return;
         }
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_15_0
+#if __IPHONE_15_0
         if (@available(iOS 15, *)) {
             [PHPhotoLibrary.sharedPhotoLibrary
              presentLimitedLibraryPickerFromViewController: controller
@@ -170,9 +170,11 @@
         [PHPhotoLibrary.sharedPhotoLibrary presentLimitedLibraryPickerFromViewController: controller];
         [handler reply:nil];
 #endif
+        return;
     }
-#endif
+#else
     [handler reply:nil];
+#endif
 }
 #endif
 
@@ -180,7 +182,7 @@
 - (void)handlePermission:(PMManager *)manager
                  handler:(ResultHandler*)handler
       requestAccessLevel:(int)requestAccessLevel {
-#if __MAC_OS_VERSION_MAX_ALLOWED >= __MAC_11_0
+#if __MAC_11_0
     if (@available(macOS 11.0, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
             [self replyPermssionResult:handler status:status];
@@ -199,7 +201,7 @@
 
 - (void)requestPermissionStatus:(int)requestAccessLevel
                 completeHandler:(void (^)(PHAuthorizationStatus status))completeHandler {
-#if __MAC_OS_VERSION_MAX_ALLOWED >= __MAC_11_0
+#if __MAC_11_0
     if (@available(macOS 11.0, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
             completeHandler(status);
