@@ -148,6 +148,16 @@
          completionHandler:^(NSArray<NSString *> * _Nonnull list) {
             [handler reply: list];
         }];
+    } else if (@available(iOS 14, *)) {
+        UIViewController* controller = [self getCurrentViewController];
+        if (!controller) {
+            [handler replyError:@"presentLimited require a valid UIViewController."];
+            return;
+        }
+        [PHPhotoLibrary.sharedPhotoLibrary presentLimitedLibraryPickerFromViewController: controller];
+        [handler reply:nil];
+    } else {
+        [handler reply:nil];
     }
 }
 
@@ -160,6 +170,8 @@
             return;
         }
         [PHPhotoLibrary.sharedPhotoLibrary presentLimitedLibraryPickerFromViewController: controller];
+        [handler reply:nil];
+    } else {
         [handler reply:nil];
     }
 }
