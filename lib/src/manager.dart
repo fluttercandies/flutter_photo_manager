@@ -6,7 +6,7 @@ Plugin _plugin = Plugin();
 ///
 /// 这个类是整个库的核心类
 class PhotoManager {
-  /// in android WRITE_EXTERNAL_STORAGE  READ_EXTERNAL_STORAGE
+  /// in android READ_EXTERNAL_STORAGE
   ///
   /// in ios request the photo permission
   ///
@@ -16,7 +16,7 @@ class PhotoManager {
     return (await requestPermissionExtend()).isAuth;
   }
 
-  /// Android: WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, MEDIA_LOCATION
+  /// Android: READ_EXTERNAL_STORAGE, MEDIA_LOCATION
   ///
   /// iOS: NSPhotoLibraryUsageDescription of info.plist
   ///
