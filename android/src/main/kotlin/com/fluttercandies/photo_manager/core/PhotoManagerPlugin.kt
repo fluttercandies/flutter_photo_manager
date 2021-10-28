@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
+import android.os.Looper
 import androidx.annotation.RequiresApi
 import com.bumptech.glide.Glide
 import io.flutter.plugin.common.BinaryMessenger
@@ -59,7 +60,11 @@ class PhotoManagerPlugin(
         var cacheOriginBytes = true
     }
 
-    private val notifyChannel = PhotoManagerNotifyChannel(applicationContext, messenger, Handler())
+    private val notifyChannel = PhotoManagerNotifyChannel(
+        applicationContext,
+        messenger,
+        Handler(Looper.getMainLooper())
+    )
 
     init {
         permissionsUtils.permissionsListener = object : PermissionsListener {
