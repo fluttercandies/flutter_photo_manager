@@ -285,6 +285,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<bool> cacheOriginBytes(bool cache) async {
+    assert(Platform.isAndroid, 'This method only supports Android.');
     final bool result = await _channel.invokeMethod(
       PMConstants.mCacheOriginBytes,
       cache,
