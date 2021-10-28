@@ -9,9 +9,7 @@ class ConvertUtils {
     FilterOptionGroup? optionGroup,
   }) {
     List<AssetPathEntity> result = [];
-
     List list = data["data"];
-
     for (final Map item in list) {
       final entity = AssetPathEntity()
         ..id = item["id"]
@@ -21,23 +19,18 @@ class ConvertUtils {
         ..assetCount = item["length"]
         ..albumType = (item["albumType"] ?? 1)
         ..filterOption = optionGroup ?? FilterOptionGroup();
-
       final int? modifiedDate = item['modified'];
-
       if (modifiedDate != null) {
         entity.lastModified =
             DateTime.fromMillisecondsSinceEpoch(modifiedDate * 1000);
       }
-
       result.add(entity);
     }
-
     return result;
   }
 
   static List<AssetEntity> convertToAssetList(Map data) {
     List<AssetEntity> result = [];
-
     List list = data["data"];
     for (final Map item in list) {
       final asset = _convertMapToAsset(item);
@@ -45,7 +38,6 @@ class ConvertUtils {
         result.add(asset);
       }
     }
-
     return result;
   }
 
@@ -54,7 +46,6 @@ class ConvertUtils {
     if (data == null) {
       return null;
     }
-
     return _convertMapToAsset(data);
   }
 
@@ -62,7 +53,6 @@ class ConvertUtils {
     if (data == null) {
       return null;
     }
-
     final result = AssetEntity(
       id: data['id'],
       typeInt: data['type'],
@@ -79,7 +69,6 @@ class ConvertUtils {
       longitude: data['lng'],
       mimeType: data['mimeType'],
     );
-
     return result;
   }
 }

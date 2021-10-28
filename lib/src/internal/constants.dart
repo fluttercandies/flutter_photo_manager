@@ -8,7 +8,7 @@ class PMConstants {
   static const String channelPrefix = 'com.fluttercandies/photo_manager';
 
   /// Keys for [MethodCall]s.
-  static const String mRequestPermissionExtended = 'requestPermissionExtended';
+  static const String mRequestPermissionExtend = 'requestPermissionExtend';
   static const String mPresentLimited = 'presentLimited';
   static const String mGetGalleryList = 'getGalleryList';
   static const String mGetAssetWithGalleryId = 'getAssetWithGalleryId';

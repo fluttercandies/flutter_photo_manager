@@ -1,23 +1,22 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import '../internal/editor.dart';
-import '../types/entity.dart';
 import '../filter/filter_option_group.dart';
-import 'notify_manager.dart';
+import '../internal/editor.dart';
 import '../internal/enums.dart';
 import '../internal/extensions.dart';
 import '../internal/plugin.dart';
+import '../types/entity.dart';
 import '../types/types.dart';
 import '../utils/convert_utils.dart';
+import 'notify_manager.dart';
 
-/// use the class method to help user load asset list and asset info.
-///
-/// 这个类是整个库的核心类
+/// The core manager of this plugin.
+/// Use various methods in this class to access & manage assets.
 class PhotoManager {
   @Deprecated(
     'Use requestPermissionExtend for better compatibility. '
-    'This feature was deprecated after v1.4.0.',
+    'This feature was deprecated after v2.0.0.',
   )
   static Future<bool> requestPermission() async {
     return (await requestPermissionExtend()).isAuth;
@@ -61,15 +60,16 @@ class PhotoManager {
 
   static Editor editor = Editor();
 
-  /// get gallery list
+  /// Obtain albums/folders list with couple filter options.
   ///
-  /// 获取相册"文件夹" 列表
+  /// To obtain albums list that contains the root album
+  /// (generally named "Recent"), set [hasAll] to true.
   ///
-  /// [hasAll] contains all path, such as "Camera Roll" on ios or "Recent" on android.
-  /// [hasAll] 包含所有项目的相册
+  /// To obtain only the root album in the list, set [onlyAll] to true.
   ///
-  /// [onlyAll] If true, Return only one album with all resources.
-  /// [onlyAll] 如果为真, 则只返回一个包含所有项目的相册
+  /// To request multiple assets type, set [type] accordingly.
+  ///
+  /// To filter assets with provided options, use [filterOption].
   static Future<List<AssetPathEntity>> getAssetPathList({
     bool hasAll = true,
     bool onlyAll = false,
@@ -80,97 +80,96 @@ class PhotoManager {
       assert(hasAll, "If only is true, then the hasAll must be not null.");
     }
     filterOption ??= FilterOptionGroup();
-
     assert(
       type != RequestType.all,
       'The request type must have video, image or audio.',
     );
-
     if (type == RequestType.all) {
       return [];
     }
-
     return plugin.getAllGalleryList(
-      type: type,
       hasAll: hasAll,
       onlyAll: onlyAll,
+      type: type,
       optionGroup: filterOption,
     );
   }
 
+  /// Whether the plugin should produce logs during the running process.
   static Future<void> setLog(bool isLog) => plugin.setLog(isLog);
 
-  /// Ignore permission checks at runtime, you can use third-party permission plugins to request permission. Default is false.
+  /// Whether to ignore all runtime permissions check.
   ///
-  /// For Android, a typical usage scenario may be to use it in Service, because Activity cannot be used in Service to detect runtime permissions, but it should be noted that deleting resources above android10 require activity to accept the result, so the delete system does not apply to this Attributes.
-  ///
-  /// For iOS, this feature is only added, please explore the specific application scenarios by yourself
+  /// ### Common scenarios on Android
+  /// Service and other background process are common use cases ignore checks.
+  /// Because permissions checks required a valid `Activity`.
+  /// Be aware that asset deletions above Android 10 required an `Activity`.
   static Future<void> setIgnorePermissionCheck(bool ignore) {
     return plugin.ignorePermissionCheck(ignore);
   }
 
-  /// get video asset
-  /// open setting page
+  /// Open the system settings page of the current app.
   static Future<void> openSetting() => plugin.openSetting();
 
-  /// Release all native(ios/android) caches, normally no calls are required.
+  /// Release native caches, there are no common use case for this method,
+  /// so this method is not recommended.
   ///
-  /// The main purpose is to help clean up problems where memory usage may be too large when there are too many pictures.
+  /// The main purpose is to help with issues when the memory usage
+  /// is too large with too many pictures.
   ///
-  /// Warning:
+  /// After this method is called, all existing [AssetEntity] and
+  /// [AssetPathEntity] are not able to call further methods.
+  /// In order to obtain new instances and their data,
+  /// call the [getAssetPathList] to start again.
   ///
-  ///   Once this method is invoked, unless you call the [getAssetPathList] method again, all the [AssetEntity] and [AssetPathEntity] methods/fields you have acquired will fail or produce unexpected results.
-  ///
-  ///   This method should only be invoked when you are sure you really want to do so.
-  ///
-  ///   This method is asynchronous, and calling [getAssetPathList] before the Future of this method returns causes an error.
-  ///
-  ///
-  /// 释放资源的方法,一般情况下不需要调用
-  ///
-  /// 主要目的是帮助清理当图片过多时,内存占用可能过大的问题
-  ///
-  /// 警告:
-  ///
-  /// 一旦调用这个方法,除非你重新调用  [getAssetPathList] 方法,否则你已经获取的所有[AssetEntity]/[AssetPathEntity]的所有字段都将失效或产生无法预期的效果
-  ///
-  /// 这个方法应当只在你确信你真的需要这么做的时候再调用
-  ///
-  /// 这个方法是异步的,在本方法的Future返回前调用getAssetPathList 可能会产生错误
-  static Future releaseCache() async {
-    await plugin.releaseCache();
-  }
+  /// Make sure callers of this method have `await`ed properly.
+  static Future<void> releaseCache() => plugin.releaseCache();
 
   /// Notification class for managing photo changes.
   static NotifyManager _notifyManager = NotifyManager();
 
-  /// see [NotifyManager]
+  /// Add a callback for assets changing.
   static void addChangeCallback(ValueChanged<MethodCall> callback) =>
       _notifyManager.addCallback(callback);
 
-  /// see [NotifyManager]
+  /// Remove the callback for assets changing.
   static void removeChangeCallback(ValueChanged<MethodCall> callback) =>
       _notifyManager.removeCallback(callback);
 
-  /// Whether to monitor the change of photo album.
+  /// Whether assets change event should be notified.
   static bool notifyingOfChange = false;
 
-  /// See [NotifyManager.notifyStream]
+  /// The notify enable flag in stream.
   static Stream<bool> get notifyStream => _notifyManager.notifyStream;
 
-  /// see [NotifyManager]
+  /// Enable notifications for assets changing.
+  ///
+  /// Make sure you've added a callback for changes.
   static void startChangeNotify() {
     _notifyManager.startHandleNotify();
     notifyingOfChange = true;
   }
 
-  /// see [NotifyManager]
+  /// Disable notifications for assets changing.
+  ///
+  /// Remember to remove callbacks for changes.
   static void stopChangeNotify() {
     _notifyManager.stopHandleNotify();
     notifyingOfChange = false;
   }
 
-  /// [AssetPathEntity.refreshPathProperties]
+  /// Refresh the property of [AssetPathEntity] from the given ID.
+  static Future<AssetEntity?> refreshAssetProperties(String id) async {
+    final Map? map = await plugin.getPropertiesFromAssetEntity(id);
+    final asset = ConvertUtils.convertToAsset(map);
+    if (asset == null) {
+      return null;
+    }
+    return asset;
+  }
+
+  /// Obtain a new [AssetPathEntity] from the given one
+  /// with refreshed properties.
   static Future<AssetPathEntity?> fetchPathProperties({
     required AssetPathEntity entity,
     required FilterOptionGroup filterOptionGroup,
@@ -189,41 +188,21 @@ class PhotoManager {
         result,
         type: entity.type,
         optionGroup: entity.filterOption,
-      )[0];
-    } else {
-      return null;
+      ).first;
     }
+    return null;
   }
 
-  /// Only valid for Android 29. The API of API 28 must be used with the property of `requestLegacyExternalStorage`.
-  static Future<void> forceOldApi() async {
-    await plugin.forceOldApi();
-  }
+  static Future<void> forceOldApi() => plugin.forceOldApi();
 
-  /// Get system version
-  static Future<String> systemVersion() async {
-    return plugin.getSystemVersion();
-  }
+  /// Get the system version.
+  static Future<String> systemVersion() => plugin.getSystemVersion();
 
-  /// Clear all file cache.
-  static Future<void> clearFileCache() async {
-    await plugin.clearFileCache();
-  }
+  /// Clear all file caches.
+  static Future<void> clearFileCache() => plugin.clearFileCache();
 
-  /// When set to true, origin bytes in Android Q will be cached as a file. When use again, the file will be read.
+  /// Cache files into sandbox on Android Q when set to true,
+  /// and cached files can be reused.
   static Future<bool> setCacheAtOriginBytes(bool cache) =>
       plugin.cacheOriginBytes(cache);
-
-  /// Refresh the property of asset.
-  static Future<AssetEntity?> refreshAssetProperties(String id) async {
-    final Map? map = await plugin.getPropertiesFromAssetEntity(id);
-
-    final asset = ConvertUtils.convertToAsset(map);
-
-    if (asset == null) {
-      return null;
-    }
-
-    return asset;
-  }
 }
