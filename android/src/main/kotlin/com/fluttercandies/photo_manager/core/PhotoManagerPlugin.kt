@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
+import android.os.Looper
 import androidx.annotation.RequiresApi
 import com.bumptech.glide.Glide
 import io.flutter.plugin.common.BinaryMessenger
@@ -22,7 +23,7 @@ import com.fluttercandies.photo_manager.permission.PermissionsListener
 import com.fluttercandies.photo_manager.permission.PermissionsUtils
 import com.fluttercandies.photo_manager.util.LogUtils
 import com.fluttercandies.photo_manager.util.ResultHandler
-import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
@@ -45,11 +46,11 @@ class PhotoManagerPlugin(
     companion object {
         private const val poolSize = 8
         private val threadPool: ThreadPoolExecutor = ThreadPoolExecutor(
-            poolSize + 3,
-            1000,
-            200,
+            poolSize,
+            Int.MAX_VALUE,
+            1,
             TimeUnit.MINUTES,
-            ArrayBlockingQueue(poolSize + 3)
+            LinkedBlockingQueue()
         )
 
         fun runOnBackground(runnable: () -> Unit) {
@@ -59,7 +60,11 @@ class PhotoManagerPlugin(
         var cacheOriginBytes = true
     }
 
-    private val notifyChannel = PhotoManagerNotifyChannel(applicationContext, messenger, Handler())
+    private val notifyChannel = PhotoManagerNotifyChannel(
+        applicationContext,
+        messenger,
+        Handler(Looper.getMainLooper())
+    )
 
     init {
         permissionsUtils.permissionsListener = object : PermissionsListener {
