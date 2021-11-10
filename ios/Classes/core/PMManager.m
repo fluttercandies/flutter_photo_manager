@@ -108,7 +108,7 @@
         return;
     }
     for (PHCollection *phCollection in collections) {
-        if ([phCollection isMemberOfClass:[PHAssetCollection class]]) {
+        if ([phCollection isKindOfClass:[PHAssetCollection class]]) {
             PHAssetCollection *collection = (PHAssetCollection *) phCollection;
             PHFetchResult<PHAsset *> *result = [PHAsset fetchKeyAssetsInAssetCollection:collection options:option];
             NSLog(@"collection name = %@, count = %ld", collection.localizedTitle, result.count);
@@ -150,7 +150,7 @@
                           hasAll:(BOOL)hasAll
               containsEmptyAlbum:(BOOL)containsEmptyAlbum {
     for (id collection in result) {
-        if (![collection isMemberOfClass:[PHAssetCollection class]]) {
+        if (![collection isKindOfClass:[PHAssetCollection class]]) {
             continue;
         }
         
