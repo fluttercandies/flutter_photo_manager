@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.3.10
+Improvements:
+- Allow all kinds of `PHAssetCollection` which should expand the support for shared albums. (#641)
+
 ## 1.3.9+1
 Fixes:
 - Fix compile error on Xcode 12 for iOS 14. (#630)
