@@ -2,7 +2,7 @@
 
 ## 1.3.10
 Improvements:
-- Allow all kinds of `PHAssetCollection` which should expand the support for shared albums. (#630)
+- Allow all kinds of `PHAssetCollection` which should expand the support for shared albums. (#641)
 
 ## 1.3.9+1
 Fixes:
