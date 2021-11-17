@@ -19,6 +19,7 @@
 
 @implementation PMManager {
     BOOL __isAuth;
+    ResultHandler *__requestingPermissionHandler;
     PMCacheContainer *cacheContainer;
     
     PHCachingImageManager *__cachingManager;
@@ -38,8 +39,16 @@
     return __isAuth;
 }
 
-- (void)setAuth:(BOOL)auth {
-    __isAuth = auth;
+- (void)setAuth:(BOOL)value {
+    __isAuth = value;
+}
+
+- (ResultHandler *)requestingPermissionHandler {
+    return __requestingPermissionHandler;
+}
+
+- (void)setRequestingPermissionHandler:(ResultHandler *)value {
+    __requestingPermissionHandler = value;
 }
 
 - (PHCachingImageManager *)cachingManager {

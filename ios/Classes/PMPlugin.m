@@ -45,6 +45,20 @@
 - (void)onMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
     ResultHandler *handler = [ResultHandler handlerWithResult:result];
     PMManager *manager = self.manager;
+    if (manager.requestingPermissionHandler != nil) {
+        PHAuthorizationStatus status;
+        if (@available(iOS 14, *)) {
+            status = [PHPhotoLibrary authorizationStatusForAccessLevel:PHAccessLevelReadWrite];
+        } else {
+            status = [PHPhotoLibrary authorizationStatus];
+        }
+        [self replyPermssionResult:manager.requestingPermissionHandler
+                            status:status];
+        if (status == PHAuthorizationStatusNotDetermined) {
+            [self presentLimited:nil];
+        }
+        return;
+    }
     
     if ([call.method isEqualToString:@"requestPermissionExtend"]) {
         int requestAccessLevel = [call.arguments[@"iosAccessLevel"] intValue];
@@ -85,6 +99,7 @@
     BOOL auth = PHAuthorizationStatusAuthorized == status;
     [self.manager setAuth:auth];
     [handler reply:@(status)];
+    [self.manager setRequestingPermissionHandler:nil];
 }
 
 #if TARGET_OS_IOS
@@ -108,9 +123,12 @@
 - (void)handlePermission:(PMManager *)manager
                  handler:(ResultHandler*)handler
       requestAccessLevel:(int)requestAccessLevel {
+    [manager setRequestingPermissionHandler:handler];
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_14_0
     if (@available(iOS 14, *)) {
-        [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
+        [PHPhotoLibrary
+         requestAuthorizationForAccessLevel:requestAccessLevel
+         handler:^(PHAuthorizationStatus status) {
             [self replyPermssionResult:handler status:status];
         }];
     } else {
@@ -129,7 +147,9 @@
                 completeHandler:(void (^)(PHAuthorizationStatus status))completeHandler {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_14_0
     if (@available(iOS 14, *)) {
-        [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
+        [PHPhotoLibrary
+         requestAuthorizationForAccessLevel:requestAccessLevel
+         handler:^(PHAuthorizationStatus status) {
             completeHandler(status);
         }];
     } else {
@@ -144,15 +164,17 @@
 #endif
 }
 
-- (void)presentLimited:(ResultHandler*)handler {
+- (void)presentLimited:(ResultHandler *)handler {
 #if __IPHONE_14_0
     if (@available(iOS 14, *)) {
         UIViewController* controller = [self getCurrentViewController];
         if (!controller) {
-            [handler reply:[FlutterError
-                            errorWithCode:@"UIViewController is nil"
-                            message:@"presentLimited require a valid UIViewController."
-                            details:nil]];
+            if (handler != nil) {
+                [handler reply:[FlutterError
+                                errorWithCode:@"UIViewController is nil"
+                                message:@"presentLimited require a valid UIViewController."
+                                details:nil]];
+            }
             return;
         }
 #if __IPHONE_15_0
@@ -160,20 +182,29 @@
             [PHPhotoLibrary.sharedPhotoLibrary
              presentLimitedLibraryPickerFromViewController: controller
              completionHandler:^(NSArray<NSString *> * _Nonnull list) {
-                [handler reply: list];
+                if (handler != nil) {
+                    [handler reply: list];
+                }
             }];
         } else {
-            [PHPhotoLibrary.sharedPhotoLibrary presentLimitedLibraryPickerFromViewController: controller];
-            [handler reply:nil];
+            [PHPhotoLibrary.sharedPhotoLibrary
+             presentLimitedLibraryPickerFromViewController: controller];
+            if (handler != nil) {
+                [handler reply: nil];
+            }
         }
 #else
         [PHPhotoLibrary.sharedPhotoLibrary presentLimitedLibraryPickerFromViewController: controller];
-        [handler reply:nil];
+        if (handler != nil) {
+            [handler reply: nil];
+        }
 #endif
         return;
     }
 #else
-    [handler reply:nil];
+    if (handler != nil) {
+        [handler reply: nil];
+    }
 #endif
 }
 #endif

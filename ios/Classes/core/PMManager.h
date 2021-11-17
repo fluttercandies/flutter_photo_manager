@@ -32,6 +32,10 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (void)setAuth:(BOOL)auth;
 
+- (ResultHandler *)requestingPermissionHandler;
+
+- (void)setRequestingPermissionHandler:(ResultHandler *)value;
+
 - (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(PMFilterOptionGroup *)option;
 
 - (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id type:(int)type page:(NSUInteger)page pageCount:(NSUInteger)pageCount filterOption:(PMFilterOptionGroup *)filterOption;
