@@ -6,39 +6,24 @@ typedef NotifyChangeInfoCallback = void Function(NotifyChangeInfo info);
 ///
 /// 当相册发生变化时, 通知
 class _NotifyManager {
-  static const MethodChannel _channel =
-      const MethodChannel("top.kikt/photo_manager/notify");
+  static const _channel = MethodChannel("top.kikt/photo_manager/notify");
 
-  StreamController<bool> _controller = StreamController.broadcast();
+  final _controller = StreamController<NotifyChangeInfo>.broadcast();
 
   /// When the notification status change, the listen of stream will be called.
-  Stream<bool> get notifyStream => _controller.stream;
+  Stream<NotifyChangeInfo> get onNotify => _controller.stream;
 
-  /// callbacks
-  final _notifyCallbacks = <NotifyChangeInfoCallback>[];
+  bool _active = false;
 
-  /// add callback
-  void addCallback(NotifyChangeInfoCallback callback) {
-    _notifyCallbacks.add(callback);
-  }
-
-  /// remove callback
-  void removeCallback(NotifyChangeInfoCallback callback) {
-    _notifyCallbacks.remove(callback);
-  }
-
-  /// start handle notify
-  void startHandleNotify() {
+  _NotifyManager() {
     _channel.setMethodCallHandler(_notify);
-    _plugin.notifyChange(start: true);
-    _controller.add(true);
-  }
 
-  /// stop handle notify
-  void stopHandleNotify() {
-    _plugin.notifyChange(start: false);
-    _channel.setMethodCallHandler(null);
-    _controller.add(false);
+    _controller.onListen = () {
+      if (!_active) {
+        _plugin.notifyChange(start: true);
+        _active = true;
+      }
+    };
   }
 
   Future<dynamic> _notify(MethodCall call) async {
@@ -54,7 +39,14 @@ class _NotifyManager {
   }
 
   void _onChange(NotifyChangeInfo info) {
-    _notifyCallbacks.toList().forEach((callback) => callback.call(info));
+    _controller.add(info);
+  }
+
+  void dispose() {
+    _controller.close();
+    _plugin.notifyChange(start: false);
+    _channel.setMethodCallHandler(null);
+    _active = false;
   }
 }
 
