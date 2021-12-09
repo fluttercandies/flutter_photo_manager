@@ -2,7 +2,22 @@ part of '../photo_manager.dart';
 
 typedef NotifyChangeInfoCallback = void Function(NotifyChangeInfo info);
 
-/// manage photo changes
+/// Manage photo changes. Basic usage:
+///
+/// ```dart
+/// final manager = NotifyManager();
+/// manager.onNotify.listen((info) {
+///   print(info);
+/// });
+/// ```
+///
+/// You can also use [PhotoManager]'s abstraction of this:
+///
+/// ```dart
+/// PhotoManager.onChangeNotify.listen((info) {
+///   print(info);
+/// });
+/// ```
 ///
 /// 当相册发生变化时, 通知
 class NotifyManager {
@@ -10,10 +25,15 @@ class NotifyManager {
 
   final _controller = StreamController<NotifyChangeInfo>.broadcast();
 
+  /// {@template notify.onNotify}
   /// When the notification status change, the listen of stream will be called.
+  /// {@end-template}
   Stream<NotifyChangeInfo> get onNotify => _controller.stream;
 
   bool _active = false;
+
+  /// Whether the listening is active or not. It's active when [onNotify] has
+  /// any listeners.
   bool get active => _active;
 
   NotifyManager() {
@@ -23,6 +43,13 @@ class NotifyManager {
       if (!_active) {
         _plugin.notifyChange(start: true);
         _active = true;
+      }
+    };
+
+    _controller.onCancel = () {
+      if (_controller.hasListener) {
+        _plugin.notifyChange(start: false);
+        _active = false;
       }
     };
   }
@@ -43,6 +70,9 @@ class NotifyManager {
     _controller.add(info);
   }
 
+  /// Dispose this instance to free up resources.
+  ///
+  /// Note that this can't be used once disposed
   void dispose() {
     _controller.close();
     _plugin.notifyChange(start: false);
@@ -52,12 +82,21 @@ class NotifyManager {
 }
 
 class NotifyChangeInfo {
+  /// The platform from where this comes from.
+  ///
+  /// It can be android, iOS or macOS
   final String platform;
+
+  /// The media path
   final Uri uri;
+
+  /// The type of the change
   final NotifyChangeType changeType;
+
+  /// The type of the media
   final AssetType mediaType;
 
-  const NotifyChangeInfo.raw({
+  const NotifyChangeInfo._raw({
     required this.platform,
     required this.uri,
     required this.changeType,
@@ -65,9 +104,14 @@ class NotifyChangeInfo {
   });
 
   factory NotifyChangeInfo.fromJson(Map<String, dynamic> map) {
-    return NotifyChangeInfo.raw(
-      platform: map['platform'],
-      uri: Uri.parse(map['uri']),
+    return NotifyChangeInfo._raw(
+      platform: map['platform'] ??
+          () {
+            if (Platform.isAndroid) return 'android';
+            if (Platform.isIOS) return 'iOS';
+            if (Platform.isMacOS) return 'macOS';
+          }(),
+      uri: Uri.parse(map['uri'] ?? ''),
       changeType: _parseNotifyChangeType(map['type']),
       mediaType: _parseTypeFromId(map['mediaType']),
     );

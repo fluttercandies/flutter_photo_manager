@@ -176,7 +176,7 @@ class PhotoManager {
   /// Notification class for managing photo changes.
   static NotifyManager notifyManager = NotifyManager();
 
-  /// see [_NotifyManager]
+  /// {@macro notify.onNotify}
   static Stream<NotifyChangeInfo> get onChangeNotify => notifyManager.onNotify;
 
   static Future<File?> _getFileWithId(

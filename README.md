@@ -41,7 +41,7 @@ you can get assets (image/video/audio) from Android, iOS and macOS.
       - [location info of android Q](#location-info-of-android-q)
       - [Origin description](#origin-description)
       - [Create with id](#create-with-id)
-    - [observer](#observer)
+    - [Observer](#observer)
     - [Clear file cache](#clear-file-cache)
     - [Experimental](#experimental)
       - [Preload thumb](#preload-thumb)
@@ -258,18 +258,14 @@ The user can store the id to any place if necessary, and next time use the [`Ass
 final asset = await AssetEntity.fromId(id);
 ```
 
-### observer
+### Observer
 
-use `addChangeCallback` to regiser observe.
-
-```dart
-PhotoManager.addChangeCallback(changeNotify);
-PhotoManager.startChangeNotify();
-```
+Use `PhotoManager.onChangeNotify` to listen to changes:
 
 ```dart
-PhotoManager.removeChangeCallback(changeNotify);
-PhotoManager.stopChangeNotify();
+PhotoManager.onChangeNotify.listen((info) {
+  print(info);
+});
 ```
 
 ### Clear file cache
