@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -19,11 +20,17 @@ class _NewHomePageState extends State<NewHomePage> {
 
   PhotoProvider get watchProvider => context.watch<PhotoProvider>();
 
+  StreamSubscription<NotifyChangeInfo>? onChangeSubscription;
+
+  void onChange() {
+    onChangeSubscription?.cancel();
+    onChangeSubscription = PhotoManager.onChangeNotify.listen((info) {});
+  }
+
   @override
-  void initState() {
-    super.initState();
-    PhotoManager.addChangeCallback(onChange);
-    PhotoManager.setLog(true);
+  void dispose() {
+    onChangeSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -171,19 +178,19 @@ class _NewHomePageState extends State<NewHomePage> {
 
   Widget _buildNotifyCheck() {
     return CheckboxListTile(
-        value: watchProvider.notifying,
-        title: Text("onChanged"),
-        onChanged: (value) {
-          readProvider.notifying = value;
-          if (value == true) {
-            PhotoManager.startChangeNotify();
-          } else {
-            PhotoManager.stopChangeNotify();
-          }
-        });
+      value: watchProvider.notifying,
+      title: Text("onChanged"),
+      onChanged: (value) {
+        readProvider.notifying = value;
+        if (value == true) {
+          onChange();
+        } else {
+          onChangeSubscription?.cancel();
+          onChangeSubscription = null;
+        }
+      },
+    );
   }
-
-  void onChange(call) {}
 
   Widget _buildFilterOption(PhotoProvider provider) {
     return ElevatedButton(

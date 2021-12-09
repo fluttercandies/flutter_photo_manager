@@ -5,7 +5,7 @@ typedef NotifyChangeInfoCallback = void Function(NotifyChangeInfo info);
 /// manage photo changes
 ///
 /// 当相册发生变化时, 通知
-class _NotifyManager {
+class NotifyManager {
   static const _channel = MethodChannel("top.kikt/photo_manager/notify");
 
   final _controller = StreamController<NotifyChangeInfo>.broadcast();
@@ -14,8 +14,9 @@ class _NotifyManager {
   Stream<NotifyChangeInfo> get onNotify => _controller.stream;
 
   bool _active = false;
+  bool get active => _active;
 
-  _NotifyManager() {
+  NotifyManager() {
     _channel.setMethodCallHandler(_notify);
 
     _controller.onListen = () {

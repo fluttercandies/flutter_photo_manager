@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class ChangeNotifyExample extends StatefulWidget {
@@ -12,13 +12,21 @@ class ChangeNotifyExample extends StatefulWidget {
 }
 
 class _ChangeNotifyExampleState extends State<ChangeNotifyExample> {
+  StreamSubscription<NotifyChangeInfo>? notifySubscription;
+
+  @override
   void initState() {
     super.initState();
-    PhotoManager.addChangeCallback(_onChange);
+    PhotoManager.onChangeNotify.listen((info) {
+      setState(() {
+        logs.add(info.toString());
+      });
+    });
   }
 
+  @override
   void dispose() {
-    PhotoManager.removeChangeCallback(_onChange);
+    notifySubscription?.cancel();
     super.dispose();
   }
 
@@ -33,7 +41,6 @@ class _ChangeNotifyExampleState extends State<ChangeNotifyExample> {
       body: Container(
         child: Column(
           children: [
-            _buildCheck(),
             if (Platform.isIOS)
               ElevatedButton(
                 onPressed: () {
@@ -58,31 +65,5 @@ class _ChangeNotifyExampleState extends State<ChangeNotifyExample> {
         ),
       ),
     );
-  }
-
-  Widget _buildCheck() {
-    return StreamBuilder<bool>(
-      builder: (context, snapshot) {
-        return CheckboxListTile(
-          title: Text('Current notify state'),
-          value: snapshot.data,
-          onChanged: (newValue) {
-            if (newValue == true) {
-              PhotoManager.startChangeNotify();
-            } else {
-              PhotoManager.stopChangeNotify();
-            }
-          },
-        );
-      },
-      initialData: PhotoManager.notifyingOfChange,
-      stream: PhotoManager.notifyStream,
-    );
-  }
-
-  void _onChange(MethodCall value) {
-    final log = '${value.method}: ${value.arguments}';
-    logs.add(log);
-    setState(() {});
   }
 }

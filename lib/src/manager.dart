@@ -174,10 +174,10 @@ class PhotoManager {
   }
 
   /// Notification class for managing photo changes.
-  static _NotifyManager _notifyManager = _NotifyManager();
+  static NotifyManager notifyManager = NotifyManager();
 
   /// see [_NotifyManager]
-  static Stream<NotifyChangeInfo> get onChangeNotify => _notifyManager.onNotify;
+  static Stream<NotifyChangeInfo> get onChangeNotify => notifyManager.onNotify;
 
   static Future<File?> _getFileWithId(
     String id, {

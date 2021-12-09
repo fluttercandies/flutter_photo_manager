@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -48,24 +47,6 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
     }
 
     return "$dir/$name.jpg";
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    PhotoManager.addChangeCallback(_onChange);
-    PhotoManager.startChangeNotify();
-  }
-
-  void _onChange(MethodCall call) {
-    print(call.arguments);
-  }
-
-  @override
-  void dispose() {
-    PhotoManager.stopChangeNotify();
-    PhotoManager.removeChangeCallback(_onChange);
-    super.dispose();
   }
 
   @override
