@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_manager_example/develop/upload_to_dev_serve.dart';
 import 'package:photo_manager_example/model/photo_provider.dart';
