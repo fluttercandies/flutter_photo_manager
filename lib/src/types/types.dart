@@ -51,6 +51,13 @@ class RequestType {
   }
 
   @override
+  bool operator ==(Object other) =>
+      other is RequestType && value == other.value;
+
+  @override
+  int get hashCode => value;
+
+  @override
   String toString() => '$runtimeType($value)';
 }
 
