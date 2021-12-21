@@ -47,6 +47,7 @@ jobs:
       - run: flutter pub get
       - run: flutter pub publish --dry-run
       - run: flutter analyze lib example/lib
+      - run: flutter test
       - run: /usr/bin/xcodebuild -version
       - run: cd example ; flutter build macos --debug
 
@@ -68,5 +69,6 @@ jobs:
       - run: flutter pub get
       - run: flutter pub publish --dry-run
       - run: flutter analyze lib example/lib
+      - run: flutter test
       - run: sudo echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "ndk;20.0.5594570"
       - run: cd example; flutter build apk --debug
