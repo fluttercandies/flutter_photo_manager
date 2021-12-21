@@ -30,8 +30,9 @@ object ThumbnailUtil {
         try {
             val resource = Glide.with(ctx)
                 .asBitmap()
-                .load(File(path))
                 .priority(Priority.IMMEDIATE)
+                .frame(0)
+                .load(File(path))
                 .submit(width, height).get()
             val bos = ByteArrayOutputStream()
             resource.compress(format, quality, bos)
@@ -53,8 +54,9 @@ object ThumbnailUtil {
         try {
             val resource = Glide.with(context)
                 .asBitmap()
-                .load(uri)
                 .priority(Priority.IMMEDIATE)
+                .frame(0)
+                .load(uri)
                 .submit(width, height).get()
             val bos = ByteArrayOutputStream()
             resource.compress(format, quality, bos)
@@ -72,6 +74,7 @@ object ThumbnailUtil {
         return Glide.with(context)
             .asBitmap()
             .priority(Priority.LOW)
+            .frame(0)
             .load(uri)
             .submit(thumbLoadOption.width, thumbLoadOption.height)
     }
@@ -84,6 +87,7 @@ object ThumbnailUtil {
         return Glide.with(context)
             .asBitmap()
             .priority(Priority.LOW)
+            .frame(0)
             .load(path)
             .submit(thumbLoadOption.width, thumbLoadOption.height)
     }
