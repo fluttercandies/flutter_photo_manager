@@ -8,6 +8,7 @@ class ThumbOption {
     required this.height,
     this.format = ThumbFormat.jpeg,
     this.quality = PMConstants.vDefaultThumbnailQuality,
+    this.frame = 0,
   });
 
   /// Construct thumbnail options only for iOS/macOS.
@@ -46,12 +47,18 @@ class ThumbOption {
   /// Defaults to [PMConstants.vDefaultThumbnailQuality].
   final int quality;
 
+  /// The frame when loading thumbnail for videos.
+  ///
+  /// Defaults to 0.
+  final int frame;
+
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'width': width,
       'height': height,
       'format': format.index,
       'quality': quality,
+      'frame': frame,
     };
   }
 
