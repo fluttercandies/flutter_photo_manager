@@ -15,7 +15,7 @@ data class ThumbLoadOption(
             val height = map["height"] as Int
             val format = map["format"] as Int
             val quality = map["quality"] as Int
-            val frame = map["frame"] as Long
+            val frame = (map["frame"] as Int).toLong()
 
             val compressFormat =
                 if (format == 0) {
