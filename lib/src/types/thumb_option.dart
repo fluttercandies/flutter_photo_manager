@@ -49,6 +49,9 @@ class ThumbOption {
 
   /// The frame when loading thumbnail for videos.
   ///
+  /// This field only works for Android, since Glide accept the frame option
+  /// in request options.
+  ///
   /// Defaults to 0.
   final int frame;
 
