@@ -148,6 +148,11 @@ object ConvertUtils {
     fun convertOrderByCondList(orders: List<*>): List<OrderByCond> {
         val list = ArrayList<OrderByCond>()
 
+        // Handle platform default sorting first.
+        if (orders.isEmpty()) {
+            // Use ID to sort by default.
+            return arrayListOf(OrderByCond(MediaStore.MediaColumns._ID, false))
+        }
         for (order in orders) {
             val map = order as Map<*, *>
             val keyIndex = map["type"] as Int
