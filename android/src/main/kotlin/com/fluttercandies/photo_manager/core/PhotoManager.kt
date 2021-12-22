@@ -97,6 +97,7 @@ class PhotoManager(private val context: Context) {
         val height = option.height
         val quality = option.quality
         val format = option.format
+        val frame = option.frame
         try {
             if (useFilePath()) {
                 val asset = dbUtils.getAssetEntity(context, id)
@@ -111,6 +112,7 @@ class PhotoManager(private val context: Context) {
                     option.height,
                     format,
                     quality,
+                    frame,
                     resultHandler.result
                 )
             } else {
@@ -119,7 +121,7 @@ class PhotoManager(private val context: Context) {
                 val type = asset?.type
                 val uri = dbUtils.getThumbUri(context, id, width, height, type)
                     ?: throw RuntimeException("Cannot load uri of $id.")
-                ThumbnailUtil.getThumbOfUri(context, uri, width, height, format, quality) {
+                ThumbnailUtil.getThumbOfUri(context, uri, width, height, format, quality, frame) {
                     resultHandler.reply(it)
                 }
             }
