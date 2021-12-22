@@ -32,6 +32,8 @@ apply plugin: 'kotlin-kapt'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
+    compileSdkVersion compileVersion.toInteger()
+
     signingConfigs {
         release {
             storeFile file("${rootDir.absolutePath}/photo-manager-keystore")
@@ -40,8 +42,6 @@ android {
             keyPassword '123456'
         }
     }
-
-    compileSdkVersion compileVersion.toInteger()
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -53,7 +53,7 @@ android {
 
     defaultConfig {
         applicationId "com.fluttercandies.photo_manager_example"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion compileVersion.toInteger()
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -61,10 +61,13 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
             signingConfig signingConfigs.release
         }
-        debug {
+        profile {
+            signingConfig signingConfigs.release
+        }
+        release {
             signingConfig signingConfigs.release
         }
     }
@@ -75,7 +78,6 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
     testImplementation 'junit:junit:4.13'
