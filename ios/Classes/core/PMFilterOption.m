@@ -8,7 +8,7 @@
 }
 
 - (NSArray<NSSortDescriptor *> *)sortCond {
-    if (self.sortArray.count == 0) {
+    if (self.sortArray == nil || self.sortArray.count == 0) {
         return nil;
     }
     return self.sortArray;
@@ -16,7 +16,14 @@
 
 - (void)injectSortArray:(NSArray *)array {
     NSMutableArray<NSSortDescriptor *> *result = [NSMutableArray new];
-
+    
+    // Handle platform default sorting first.
+    if (array.count == 0) {
+        // Set an empty sort array directly.
+        self.sortArray = nil;
+        return;
+    }
+    
     for (NSDictionary *dict in array) {
         int typeValue = [dict[@"type"] intValue];
         BOOL asc = [dict[@"asc"] boolValue];

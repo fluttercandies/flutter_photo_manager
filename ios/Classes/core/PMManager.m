@@ -200,11 +200,9 @@
     }
     
     PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:filterOption];
-    
     PHAssetCollection *collection = fetchResult.firstObject;
-    
-    PHFetchResult<PHAsset *> *assetArray =
-    [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
+    PHFetchResult<PHAsset *> *assetArray = [PHAsset fetchAssetsInAssetCollection:collection
+                                                                         options:assetOptions];
     
     if (assetArray.count == 0) {
         return result;
@@ -222,7 +220,11 @@
     BOOL videoNeedTitle = filterOption.videoOption.needTitle;
     
     for (NSUInteger i = startIndex; i <= endIndex; i++) {
-        PHAsset *asset = assetArray[i];
+        NSUInteger index = i;
+        if (assetOptions.sortDescriptors == nil) {
+            index = count - 1 - i;
+        }
+        PHAsset *asset = assetArray[index];
         BOOL needTitle = NO;
         if ([asset isVideo]) {
             needTitle = videoNeedTitle;
@@ -268,7 +270,11 @@
     }
     
     for (NSUInteger i = startIndex; i <= endIndex; i++) {
-        PHAsset *asset = assetArray[i];
+        NSUInteger index = i;
+        if (assetOptions.sortDescriptors == nil) {
+            index = count - 1 - i;
+        }
+        PHAsset *asset = assetArray[index];
         BOOL needTitle;
         if ([asset isVideo]) {
             needTitle = filterOption.videoOption.needTitle;
@@ -707,11 +713,14 @@
     }
     PHAssetCollection *collection = result[0];
     PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:filterOption];
-    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
-    
+    NSUInteger count = collection.estimatedAssetCount;
+    if (count == NSNotFound) {
+        PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
+        count = fetchResult.count;
+    }
     PMAssetPathEntity *entity = [PMAssetPathEntity entityWithId:id
                                                            name:collection.localizedTitle
-                                                     assetCount:(int) fetchResult.count];
+                                                     assetCount:count];
     entity.isAll = collection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumUserLibrary;
     return entity;
 }
