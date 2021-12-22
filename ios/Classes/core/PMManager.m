@@ -222,7 +222,7 @@
     for (NSUInteger i = startIndex; i <= endIndex; i++) {
         NSUInteger index = i;
         if (assetOptions.sortDescriptors == nil) {
-            index = count - 1 - i;
+            index = count - i - 1;
         }
         PHAsset *asset = assetArray[index];
         BOOL needTitle = NO;
@@ -272,7 +272,7 @@
     for (NSUInteger i = startIndex; i <= endIndex; i++) {
         NSUInteger index = i;
         if (assetOptions.sortDescriptors == nil) {
-            index = count - 1 - i;
+            index = count - i - 1;
         }
         PHAsset *asset = assetArray[index];
         BOOL needTitle;
