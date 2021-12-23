@@ -14,7 +14,7 @@ class FilterOptionGroup {
     bool containsPathModified = false,
     DateTimeCond? createTimeCond,
     DateTimeCond? updateTimeCond,
-    List<OrderOption> orders = const [OrderOption()],
+    List<OrderOption> orders = const [],
   }) {
     _map[AssetType.image] = imageOption;
     _map[AssetType.video] = videoOption;

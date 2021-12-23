@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/widgets.dart';
+
 import '../internal/enums.dart';
 
 /// A series of filter options for [AssetType] when querying assets.
@@ -10,7 +12,9 @@ class FilterOption {
     this.durationConstraint = const DurationConstraint(),
   });
 
-  /// This property affects performance on iOS. If not needed, please pass false, default is false.
+  /// This property affects performance on iOS.
+  ///
+  /// If not needed, please pass false, default is false.
   final bool needTitle;
 
   /// See [SizeConstraint]
@@ -166,18 +170,15 @@ class DateTimeCond {
 }
 
 class OrderOption {
-  final OrderOptionType type;
-  final bool asc;
-
   const OrderOption({
     this.type = OrderOptionType.createDate,
     this.asc = false,
   });
 
-  OrderOption copyWith({
-    OrderOptionType? type,
-    bool? asc,
-  }) {
+  final OrderOptionType type;
+  final bool asc;
+
+  OrderOption copyWith({OrderOptionType? type, bool? asc}) {
     return OrderOption(
       asc: asc ?? this.asc,
       type: type ?? this.type,
@@ -185,9 +186,14 @@ class OrderOption {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'type': type.index,
-      'asc': asc,
-    };
+    return {'type': type.index, 'asc': asc};
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is OrderOption && type == other.type && asc == other.asc;
+  }
+
+  @override
+  int get hashCode => hashValues(type, asc);
 }
