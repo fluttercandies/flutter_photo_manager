@@ -38,7 +38,7 @@ class Editor {
   /// The mimeType will either be formed from the title if you pass one, or guessed by the system, which does not always work.
   Future<AssetEntity?> saveImage(
     Uint8List data, {
-    String? title,
+    required String? title,
     String? desc,
     String? relativePath,
   }) {
@@ -58,7 +58,7 @@ class Editor {
   /// On Android 29 or above, you can use [relativePath] to specify a RELATIVE_PATH used in the MediaStore.
   Future<AssetEntity?> saveImageWithPath(
     String path, {
-    String? title,
+    required String? title,
     String? desc,
     String? relativePath,
   }) {
@@ -78,7 +78,7 @@ class Editor {
   /// On Android 29 or above, you can use [relativePath] to specify a RELATIVE_PATH used in the MediaStore.
   Future<AssetEntity?> saveVideo(
     File file, {
-    String? title,
+    required String title,
     String? desc,
     String? relativePath,
   }) {
