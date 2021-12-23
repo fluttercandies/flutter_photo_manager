@@ -141,6 +141,7 @@ class SizeConstraint {
 /// Constraints of duration.
 ///
 /// The Image type ignores this constraints.
+@immutable
 class DurationConstraint {
   const DurationConstraint({
     this.min = Duration.zero,
@@ -156,6 +157,14 @@ class DurationConstraint {
       'max': max.inMilliseconds,
     };
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is DurationConstraint && min == other.min && max == other.max;
+  }
+
+  @override
+  int get hashCode => hashValues(min, max);
 }
 
 @immutable

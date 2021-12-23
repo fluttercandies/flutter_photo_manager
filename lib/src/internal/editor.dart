@@ -5,8 +5,8 @@ import '../types/entity.dart';
 import 'plugin.dart';
 
 class Editor {
-  final IosEditor _iOS = IosEditor();
-  final AndroidEditor _android = AndroidEditor();
+  final IosEditor _iOS = const IosEditor();
+  final AndroidEditor _android = const AndroidEditor();
 
   IosEditor get iOS {
     if (Platform.isIOS) {
@@ -104,6 +104,8 @@ class Editor {
 
 /// For iOS
 class IosEditor {
+  const IosEditor();
+
   /// {@template photo_manager.EnsureParentIsRootOrFolder}
   /// Folders and albums can be only created under the root path or folders,
   /// so the [parent] should be null, the root path or accessible folders.
@@ -195,6 +197,8 @@ class IosEditor {
 }
 
 class AndroidEditor {
+  const AndroidEditor();
+
   Future<bool> moveAssetToAnother({
     required AssetEntity entity,
     required AssetPathEntity target,

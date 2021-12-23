@@ -600,9 +600,21 @@ class AssetEntity {
 }
 
 /// Longitude and latitude.
+@immutable
 class LatLng {
   const LatLng({this.latitude, this.longitude});
 
   final double? latitude;
   final double? longitude;
+
+  @override
+  int get hashCode => hashValues(latitude, longitude);
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! AssetEntity) {
+      return false;
+    }
+    return latitude == other.latitude && longitude == other.longitude;
+  }
 }
