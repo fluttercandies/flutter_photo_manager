@@ -11,9 +11,9 @@ class ConvertUtils {
     FilterOptionGroup? optionGroup,
   }) {
     final List<AssetPathEntity> result = <AssetPathEntity>[];
-    final List<Map<String, dynamic>> list =
-        data['data'] as List<Map<String, dynamic>>;
-    for (final Map<String, dynamic> item in list) {
+    final List<Map<dynamic, dynamic>> list =
+        (data['data'] as List<dynamic>).cast<Map<dynamic, dynamic>>();
+    for (final Map<dynamic, dynamic> item in list) {
       final AssetPathEntity entity = AssetPathEntity()
         ..id = item['id'] as String
         ..name = item['name'] as String
@@ -34,10 +34,12 @@ class ConvertUtils {
 
   static List<AssetEntity> convertToAssetList(Map<String, dynamic> data) {
     final List<AssetEntity> result = <AssetEntity>[];
-    final List<Map<String, dynamic>> list =
-        data['data'] as List<Map<String, dynamic>>;
-    for (final Map<String, dynamic> item in list) {
-      final AssetEntity? asset = _convertMapToAsset(item);
+    final List<Map<dynamic, dynamic>> list =
+        (data['data'] as List<dynamic>).cast<Map<dynamic, dynamic>>();
+    for (final Map<dynamic, dynamic> item in list) {
+      final AssetEntity? asset = _convertMapToAsset(
+        item.cast<String, dynamic>(),
+      );
       if (asset != null) {
         result.add(asset);
       }

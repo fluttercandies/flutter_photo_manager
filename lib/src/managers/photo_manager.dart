@@ -162,9 +162,11 @@ class PhotoManager {
 
   /// Refresh the property of [AssetPathEntity] from the given ID.
   static Future<AssetEntity?> refreshAssetProperties(String id) async {
-    final Map<String, dynamic>? map =
+    final Map<dynamic, dynamic>? map =
         await plugin.getPropertiesFromAssetEntity(id);
-    final AssetEntity? asset = ConvertUtils.convertToAsset(map);
+    final AssetEntity? asset = ConvertUtils.convertToAsset(
+      map?.cast<String, dynamic>(),
+    );
     if (asset == null) {
       return null;
     }
@@ -177,7 +179,7 @@ class PhotoManager {
     required AssetPathEntity entity,
     required FilterOptionGroup filterOptionGroup,
   }) async {
-    final Map<String, dynamic>? result = await plugin.fetchPathProperties(
+    final Map<dynamic, dynamic>? result = await plugin.fetchPathProperties(
       entity.id,
       entity.type,
       entity.filterOption,
@@ -188,7 +190,7 @@ class PhotoManager {
     final Object? list = result['data'];
     if (list is List && list.isNotEmpty) {
       return ConvertUtils.convertPath(
-        result,
+        result.cast<String, dynamic>(),
         type: entity.type,
         optionGroup: entity.filterOption,
       ).first;

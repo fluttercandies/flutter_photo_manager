@@ -38,8 +38,8 @@ class PMProgressHandler {
   Stream<PMProgressState> get stream => _controller.stream;
 
   Future<dynamic> _onProgress(MethodCall call) async {
-    final Map<String, dynamic>? arguments =
-        call.arguments as Map<String, dynamic>?;
+    final Map<dynamic, dynamic>? arguments =
+        call.arguments as Map<dynamic, dynamic>?;
     switch (call.method) {
       case 'notifyProgress':
         final double progress = arguments!['progress'] as double;
