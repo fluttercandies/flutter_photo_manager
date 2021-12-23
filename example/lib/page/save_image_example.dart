@@ -132,7 +132,10 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
   }
 
   void saveImage(Uint8List uint8List) async {
-    final asset = await PhotoManager.editor.saveImage(uint8List);
+    final asset = await PhotoManager.editor.saveImage(
+      uint8List,
+      title: '${DateTime.now().millisecondsSinceEpoch}.jpg',
+    );
     print("saved asset: $asset");
   }
 
@@ -147,7 +150,10 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
       file.writeAsBytesSync(data, mode: FileMode.append);
     }, onDone: () async {
       print("write image to file success: $file");
-      final asset = await PhotoManager.editor.saveImageWithPath(file.path);
+      final asset = await PhotoManager.editor.saveImageWithPath(
+        file.path,
+        title: '${DateTime.now().millisecondsSinceEpoch}.jpg',
+      );
       print("saved asset: $asset");
       client.close();
     });
