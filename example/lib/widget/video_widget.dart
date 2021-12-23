@@ -50,7 +50,7 @@ class _VideoWidgetState extends State<VideoWidget> {
         : Container();
   }
 
-  buildVideoPlayer() {
+  Stack buildVideoPlayer() {
     Widget contentWidget;
 
     if (!widget.isAudio) {
@@ -58,7 +58,7 @@ class _VideoWidgetState extends State<VideoWidget> {
     } else {
       contentWidget = Container(
         color: Colors.white,
-        child: Center(
+        child: const Center(
           child: Icon(
             Icons.audiotrack,
             size: 200,
@@ -68,7 +68,7 @@ class _VideoWidgetState extends State<VideoWidget> {
       );
     }
 
-    var children = <Widget>[contentWidget];
+    final List<Widget> children = <Widget>[contentWidget];
 
     if (!_controller.value.isPlaying) {
       children.add(
@@ -80,7 +80,7 @@ class _VideoWidgetState extends State<VideoWidget> {
               color: Colors.black38,
               borderRadius: BorderRadius.circular(30),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.play_arrow,
               color: Colors.white,
             ),

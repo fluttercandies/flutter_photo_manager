@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:photo_manager_example/model/photo_provider.dart';
-import 'package:photo_manager_example/widget/dialog/duration_picker.dart';
 import 'package:provider/provider.dart';
 
+import '../model/photo_provider.dart';
+import '../widget/dialog/duration_picker.dart';
+
 class FilterOptionPage extends StatefulWidget {
+  const FilterOptionPage({Key? key}) : super(key: key);
+
   @override
   _FilterOptionPageState createState() => _FilterOptionPageState();
 }
@@ -11,28 +14,28 @@ class FilterOptionPage extends StatefulWidget {
 class _FilterOptionPageState extends State<FilterOptionPage> {
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<PhotoProvider>();
+    final PhotoProvider provider = context.watch<PhotoProvider>();
     return Scaffold(
-      appBar: AppBar(title: Text('Filter Options.')),
+      appBar: AppBar(title: const Text('Filter Options.')),
       body: ListView(
         children: <Widget>[
-          buildInput(provider.minWidth, "minWidth", (value) {
+          buildInput(provider.minWidth, 'minWidth', (String value) {
             provider.minWidth = value;
           }),
-          buildInput(provider.maxWidth, "maxWidth", (value) {
+          buildInput(provider.maxWidth, 'maxWidth', (String value) {
             provider.maxWidth = value;
           }),
-          buildInput(provider.minHeight, "minHeight", (value) {
+          buildInput(provider.minHeight, 'minHeight', (String value) {
             provider.minHeight = value;
           }),
-          buildInput(provider.maxHeight, "maxHeight", (value) {
+          buildInput(provider.maxHeight, 'maxHeight', (String value) {
             provider.maxHeight = value;
           }),
           buildIgnoreSize(provider),
           buildNeedTitleCheck(provider),
           buildDurationWidget(
             provider,
-            "minDuration",
+            'minDuration',
             provider.minDuration,
             (Duration duration) {
               provider.minDuration = duration;
@@ -40,7 +43,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
           ),
           buildDurationWidget(
             provider,
-            "maxDuration",
+            'maxDuration',
             provider.maxDuration,
             (Duration duration) {
               provider.maxDuration = duration;
@@ -48,7 +51,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
           ),
           buildDateTimeWidget(
             provider,
-            "Start DateTime",
+            'Start DateTime',
             provider.startDt,
             (DateTime dateTime) {
               provider.startDt = dateTime;
@@ -56,7 +59,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
           ),
           buildDateTimeWidget(
             provider,
-            "End DateTime",
+            'End DateTime',
             provider.endDt,
             (DateTime dateTime) {
               if (provider.startDt.difference(dateTime) < Duration.zero) {
@@ -73,12 +76,12 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
   Widget buildInput(
     String initValue,
     String hintText,
-    void onChanged(String value),
+    void Function(String value) onChanged,
   ) {
     return TextFormField(
       decoration: InputDecoration(
         hintText: hintText,
-        contentPadding: EdgeInsets.all(8),
+        contentPadding: const EdgeInsets.all(8),
         labelText: hintText,
       ),
       onChanged: onChanged,
@@ -90,9 +93,9 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
   Widget buildNeedTitleCheck(PhotoProvider provider) {
     return AnimatedBuilder(
       animation: provider,
-      builder: (context, snapshot) {
+      builder: (BuildContext context, Widget? snapshot) {
         return CheckboxListTile(
-          title: Text('need title'),
+          title: const Text('need title'),
           onChanged: (bool? value) {
             provider.needTitle = value;
           },
@@ -105,9 +108,9 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
   Widget buildIgnoreSize(PhotoProvider provider) {
     return AnimatedBuilder(
       animation: provider,
-      builder: (context, snapshot) {
+      builder: (BuildContext context, Widget? snapshot) {
         return CheckboxListTile(
-          title: Text('Ignore size with image'),
+          title: const Text('Ignore size with image'),
           onChanged: (bool? value) {
             provider.ignoreSize = value;
           },
@@ -121,18 +124,18 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
       Duration value, void Function(Duration duration) onChanged) {
     return AnimatedBuilder(
       animation: listenable,
-      builder: (context, snapshot) {
+      builder: (BuildContext context, Widget? snapshot) {
         return ListTile(
           title: Text(title),
           subtitle: Text(
             "${value.inHours.toString().padLeft(2, '0')}h"
-            " : "
+            ' : '
             "${(value.inMinutes % 60).toString().padLeft(2, '0')}m"
-            " : "
+            ' : '
             "${(value.inSeconds % 60).toString().padLeft(2, '0')}s",
           ),
           onTap: () async {
-            final duration = await showCupertinoDurationPicker(
+            final Duration? duration = await showCupertinoDurationPicker(
                 context: context, initDuration: value);
 
             if (duration != null) {
@@ -163,13 +166,13 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
   ) {
     return ListTile(
       title: Text(title),
-      subtitle: Text("$startDt"),
+      subtitle: Text('$startDt'),
       onTap: () async {
-        final result = await showDatePicker(
+        final DateTime? result = await showDatePicker(
           context: context,
           initialDate: startDt,
           firstDate: DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
-          lastDate: DateTime.now().add(Duration(days: 1)),
+          lastDate: DateTime.now().add(const Duration(days: 1)),
         );
 
         if (result != null) {
@@ -177,7 +180,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
         }
       },
       trailing: ElevatedButton(
-        child: Text("Today"),
+        child: const Text('Today'),
         onPressed: () {
           onChange(DateTime.now());
         },
@@ -187,7 +190,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
 
   Widget buildDateAscCheck(PhotoProvider provider) {
     return CheckboxListTile(
-      title: Text("Date sort asc"),
+      title: const Text('Date sort asc'),
       value: provider.asc,
       onChanged: (bool? value) {
         provider.asc = value;

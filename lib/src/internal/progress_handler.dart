@@ -30,18 +30,21 @@ class PMProgressHandler {
 
   late final OptionalMethodChannel _channel;
 
-  StreamController<PMProgressState> _controller = StreamController.broadcast();
+  final StreamController<PMProgressState> _controller =
+      StreamController<PMProgressState>.broadcast();
 
   /// Obtain the download progress and status of the downloading asset
   /// from the stream.
   Stream<PMProgressState> get stream => _controller.stream;
 
   Future<dynamic> _onProgress(MethodCall call) async {
+    final Map<String, dynamic>? arguments =
+        call.arguments as Map<String, dynamic>?;
     switch (call.method) {
       case 'notifyProgress':
-        final double progress = call.arguments['progress'];
-        final int stateIndex = call.arguments['state'];
-        final state = PMRequestState.values[stateIndex];
+        final double progress = arguments!['progress'] as double;
+        final int stateIndex = arguments['state'] as int;
+        final PMRequestState state = PMRequestState.values[stateIndex];
         _controller.add(PMProgressState(progress, state));
         break;
     }
@@ -51,6 +54,7 @@ class PMProgressHandler {
 
 /// A state class that contains [progress] of the current downloading
 /// and [state] to indicate the request state of the asset.
+@immutable
 class PMProgressState {
   const PMProgressState(this.progress, this.state);
 

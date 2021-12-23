@@ -1,12 +1,13 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:photo_manager_example/core/lru_map.dart';
-import 'package:photo_manager_example/model/photo_provider.dart';
-import 'package:photo_manager_example/widget/change_notifier_builder.dart';
-import 'package:photo_manager_example/widget/loading_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
+
+import '../core/lru_map.dart';
+import '../model/photo_provider.dart';
+import 'change_notifier_builder.dart';
+import 'loading_widget.dart';
 
 class ImageItemWidget extends StatefulWidget {
   const ImageItemWidget({
@@ -25,28 +26,28 @@ class ImageItemWidget extends StatefulWidget {
 class _ImageItemWidgetState extends State<ImageItemWidget> {
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<PhotoProvider>(context);
-    return ChangeNotifierBuilder(
-      builder: (c, p) {
-        final format = provider.thumbFormat;
+    final PhotoProvider provider = Provider.of<PhotoProvider>(context);
+    return ChangeNotifierBuilder<PhotoProvider>(
+      value: provider,
+      builder: (BuildContext c, Object? p) {
+        final ThumbFormat format = provider.thumbFormat;
         return buildContent(format);
       },
-      value: provider,
     );
   }
 
   Widget buildContent(ThumbFormat format) {
     if (widget.entity.type == AssetType.audio) {
-      return Center(
+      return const Center(
         child: Icon(
           Icons.audiotrack,
           size: 30,
         ),
       );
     }
-    final item = widget.entity;
-    final size = widget.option.width;
-    final u8List = ImageLruCache.getData(item, size, format);
+    final AssetEntity item = widget.entity;
+    final int size = widget.option.width;
+    final Uint8List? u8List = ImageLruCache.getData(item, size, format);
 
     Widget image;
 
@@ -55,11 +56,11 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
     } else {
       image = FutureBuilder<Uint8List?>(
         future: item.thumbDataWithOption(widget.option),
-        builder: (context, snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
           Widget w;
           if (snapshot.hasError) {
             w = Center(
-              child: Text("load error, error: ${snapshot.error}"),
+              child: Text('load error, error: ${snapshot.error}'),
             );
           }
           if (snapshot.hasData) {

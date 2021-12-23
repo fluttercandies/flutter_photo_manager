@@ -10,17 +10,15 @@ class FilterOptionGroup {
     FilterOption imageOption = const FilterOption(),
     FilterOption videoOption = const FilterOption(),
     FilterOption audioOption = const FilterOption(),
-    bool containsEmptyAlbum = false,
-    bool containsPathModified = false,
+    this.containsEmptyAlbum = false,
+    this.containsPathModified = false,
     DateTimeCond? createTimeCond,
     DateTimeCond? updateTimeCond,
-    List<OrderOption> orders = const [],
+    List<OrderOption> orders = const <OrderOption>[],
   }) {
     _map[AssetType.image] = imageOption;
     _map[AssetType.video] = videoOption;
     _map[AssetType.audio] = audioOption;
-    this.containsEmptyAlbum = containsEmptyAlbum;
-    this.containsPathModified = containsPathModified;
     this.createTimeCond = createTimeCond ?? this.createTimeCond;
     this.updateTimeCond = updateTimeCond ?? this.updateTimeCond;
     this.orders.addAll(orders);
@@ -29,7 +27,7 @@ class FilterOptionGroup {
   /// Construct an empty options group.
   FilterOptionGroup.empty();
 
-  final Map<AssetType, FilterOption> _map = {};
+  final Map<AssetType, FilterOption> _map = <AssetType, FilterOption>{};
 
   /// Get the [FilterOption] according the specfic [AssetType].
   FilterOption getOption(AssetType type) => _map[type]!;
@@ -53,7 +51,7 @@ class FilterOptionGroup {
   DateTimeCond createTimeCond = DateTimeCond.def();
   DateTimeCond updateTimeCond = DateTimeCond.def().copyWith(ignore: true);
 
-  final orders = <OrderOption>[];
+  final List<OrderOption> orders = <OrderOption>[];
 
   void addOrderOption(OrderOption option) {
     orders.add(option);
@@ -63,17 +61,17 @@ class FilterOptionGroup {
     for (final AssetType type in _map.keys) {
       _map[type] = _map[type]!.merge(other.getOption(type));
     }
-    this.containsEmptyAlbum = other.containsEmptyAlbum;
-    this.containsPathModified = other.containsPathModified;
-    this.createTimeCond = other.createTimeCond;
-    this.updateTimeCond = other.updateTimeCond;
-    this.orders
+    containsEmptyAlbum = other.containsEmptyAlbum;
+    containsPathModified = other.containsPathModified;
+    createTimeCond = other.createTimeCond;
+    updateTimeCond = other.updateTimeCond;
+    orders
       ..clear()
       ..addAll(other.orders);
   }
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       if (_map.containsKey(AssetType.image))
         'image': getOption(AssetType.image).toMap(),
       if (_map.containsKey(AssetType.video))
@@ -84,7 +82,7 @@ class FilterOptionGroup {
       'containsPathModified': containsPathModified,
       'createDate': createTimeCond.toMap(),
       'updateDate': updateTimeCond.toMap(),
-      'orders': orders.map((e) => e.toMap()).toList(),
+      'orders': orders.map((OrderOption e) => e.toMap()).toList(),
     };
   }
 
@@ -107,7 +105,7 @@ class FilterOptionGroup {
     updateTimeCond ??= this.updateTimeCond;
     orders ??= this.orders;
 
-    final result = FilterOptionGroup()
+    final FilterOptionGroup result = FilterOptionGroup()
       ..setOption(AssetType.image, imageOption!)
       ..setOption(AssetType.video, videoOption!)
       ..setOption(AssetType.audio, audioOption!)

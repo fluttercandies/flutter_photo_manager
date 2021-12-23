@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../internal/enums.dart';
 
 /// The request type when requesting paths.
@@ -7,20 +9,23 @@ import '../internal/enums.dart';
 ///  * [image] - Request paths that only return images.
 ///  * [video] - Request paths that only return videos.
 ///  * [audio] - Request paths that only return audios.
+@immutable
 class RequestType {
   const RequestType(this.value);
 
   final int value;
 
-  static const _imageValue = 1;
-  static const _videoValue = 1 << 1;
-  static const _audioValue = 1 << 2;
+  static const int _imageValue = 1;
+  static const int _videoValue = 1 << 1;
+  static const int _audioValue = 1 << 2;
 
-  static const all = RequestType(_imageValue | _videoValue | _audioValue);
-  static const common = RequestType(_imageValue | _videoValue);
-  static const image = RequestType(_imageValue);
-  static const video = RequestType(_videoValue);
-  static const audio = RequestType(_audioValue);
+  static const RequestType all = RequestType(
+    _imageValue | _videoValue | _audioValue,
+  );
+  static const RequestType common = RequestType(_imageValue | _videoValue);
+  static const RequestType image = RequestType(_imageValue);
+  static const RequestType video = RequestType(_videoValue);
+  static const RequestType audio = RequestType(_audioValue);
 
   bool containsImage() => value & _imageValue == _imageValue;
 
@@ -35,19 +40,19 @@ class RequestType {
   RequestType operator -(RequestType type) => this ^ type;
 
   RequestType operator |(RequestType type) {
-    return RequestType(this.value | type.value);
+    return RequestType(value | type.value);
   }
 
   RequestType operator ^(RequestType type) {
-    return RequestType(this.value ^ type.value);
+    return RequestType(value ^ type.value);
   }
 
   RequestType operator >>(int bit) {
-    return RequestType(this.value >> bit);
+    return RequestType(value >> bit);
   }
 
   RequestType operator <<(int bit) {
-    return RequestType(this.value << bit);
+    return RequestType(value << bit);
   }
 
   @override
@@ -62,6 +67,7 @@ class RequestType {
 }
 
 /// See [PermissionState].
+@immutable
 class PermisstionRequestOption {
   const PermisstionRequestOption({
     this.iosAccessLevel = IosAccessLevel.readWrite,
@@ -69,5 +75,15 @@ class PermisstionRequestOption {
 
   final IosAccessLevel iosAccessLevel;
 
-  Map<String, dynamic> toMap() => {'iosAccessLevel': iosAccessLevel.index + 1};
+  Map<String, dynamic> toMap() => <String, dynamic>{
+        'iosAccessLevel': iosAccessLevel.index + 1,
+      };
+
+  @override
+  bool operator ==(Object other) =>
+      other is PermisstionRequestOption &&
+      iosAccessLevel == other.iosAccessLevel;
+
+  @override
+  int get hashCode => iosAccessLevel.hashCode;
 }

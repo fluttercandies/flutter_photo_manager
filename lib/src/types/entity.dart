@@ -1,20 +1,24 @@
+// ignore_for_file: must_be_immutable
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
+
+import '../filter/filter_option_group.dart';
 import '../internal/constants.dart';
 import '../internal/editor.dart';
-import '../filter/filter_option_group.dart';
 import '../internal/enums.dart';
 import '../internal/plugin.dart';
-import '../managers/photo_manager.dart';
 import '../internal/progress_handler.dart';
+import '../managers/photo_manager.dart';
 import 'thumb_option.dart';
 import 'types.dart';
 
 /// The abstraction of albums and folders.
 /// It represent a bucket in the `MediaStore` on Android,
 /// and the `PHAssetCollection` object on iOS/macOS.
+@immutable
 class AssetPathEntity {
   /// Obtain an entity from ID.
   ///
@@ -27,7 +31,7 @@ class AssetPathEntity {
     int albumType = 1,
   }) async {
     assert(albumType == 1 || Platform.isIOS || Platform.isMacOS);
-    final entity = AssetPathEntity()
+    final AssetPathEntity entity = AssetPathEntity()
       ..id = id
       ..albumType = albumType
       ..filterOption = filterOption ?? FilterOptionGroup()
@@ -104,17 +108,17 @@ class AssetPathEntity {
       );
     }
 
-    final result = await PhotoManager.fetchPathProperties(
+    final AssetPathEntity? result = await PhotoManager.fetchPathProperties(
       entity: this,
       filterOptionGroup: filterOption,
     );
     if (result != null) {
-      this.assetCount = result.assetCount;
-      this.name = result.name;
-      this.isAll = result.isAll;
-      this.type = result.type;
-      this.filterOption = filterOption;
-      this.lastModified = result.lastModified;
+      assetCount = result.assetCount;
+      name = result.name;
+      isAll = result.isAll;
+      type = result.type;
+      filterOption = filterOption;
+      lastModified = result.lastModified;
     }
   }
 
@@ -124,7 +128,7 @@ class AssetPathEntity {
   /// [pageSize] is item count of current [page].
   Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) {
     assert(albumType == 1, 'Only album can request for assets.');
-    assert(pageSize > 0, "The pageSize must be greater than 0.");
+    assert(pageSize > 0, 'The pageSize must be greater than 0.');
     return plugin.getAssetWithGalleryIdPaged(
       id,
       page: page,
@@ -169,13 +173,13 @@ class AssetPathEntity {
   /// An empty list will always be returned on Android.
   Future<List<AssetPathEntity>> getSubPathList() async {
     if (Platform.isIOS || Platform.isMacOS) {
-      return await plugin.getSubPathEntities(this);
+      return plugin.getSubPathEntities(this);
     }
     return <AssetPathEntity>[];
   }
 
   @override
-  bool operator ==(other) {
+  bool operator ==(Object other) {
     if (other is! AssetPathEntity) {
       return false;
     }
@@ -201,6 +205,7 @@ class AssetPathEntity {
 /// The abstraction of assets (images/videos/audios).
 /// It represent a series of fields with `MediaStore` on Android,
 /// and the `PHAsset` object on iOS/macOS.
+@immutable
 class AssetEntity {
   AssetEntity({
     required this.id,
@@ -234,7 +239,7 @@ class AssetEntity {
 
   /// Refresh properties for the current asset and return a new object.
   Future<AssetEntity?> refreshProperties() {
-    return PhotoManager.refreshAssetProperties(this.id);
+    return PhotoManager.refreshAssetProperties(id);
   }
 
   /// The ID of the asset.
@@ -298,7 +303,7 @@ class AssetEntity {
   ///  * https://developer.android.com/reference/android/provider/MediaStore.Images.ImageColumns#LATITUDE
   ///  * https://developer.apple.com/documentation/corelocation/cllocation?language=objc#declaration
   double? get latitude => _latitude;
-  double? _latitude;
+  final double? _latitude;
 
   /// Latitude value of the location when shooting.
   ///  * Android: `MediaStore.Images.ImageColumns.LONGITUDE`.
@@ -310,7 +315,7 @@ class AssetEntity {
   ///  * https://developer.android.com/reference/android/provider/MediaStore.Images.ImageColumns#LATITUDE
   ///  * https://developer.apple.com/documentation/corelocation/cllocation?language=objc#declaration
   double? get longitude => _longitude;
-  double? _longitude;
+  final double? _longitude;
 
   /// Whether this asset is locally available.
   ///  * Android: Always true.
@@ -396,7 +401,7 @@ class AssetEntity {
     }());
     // Return null if the asset is audio or others.
     if (type == AssetType.audio || type == AssetType.other) {
-      return Future.value(null);
+      return Future<Uint8List?>.value();
     }
     final ThumbOption option;
     if (Platform.isIOS || Platform.isMacOS) {
@@ -437,7 +442,7 @@ class AssetEntity {
     }());
     // Return null if the asset is audio or others.
     if (type == AssetType.audio || type == AssetType.other) {
-      return Future.value(null);
+      return Future<Uint8List?>.value();
     }
     assert(() {
       option.checkAssertions();
@@ -473,7 +478,7 @@ class AssetEntity {
 
   /// The create time of the asset in [DateTime].
   DateTime get createDateTime {
-    final value = createDtSecond ?? 0;
+    final int value = createDtSecond ?? 0;
     return DateTime.fromMillisecondsSinceEpoch(value * 1000);
   }
 
@@ -482,7 +487,7 @@ class AssetEntity {
 
   /// The modified time of the asset in [DateTime].
   DateTime get modifiedDateTime {
-    final value = modifiedDateSecond ?? 0;
+    final int value = modifiedDateSecond ?? 0;
     return DateTime.fromMillisecondsSinceEpoch(value * 1000);
   }
 
@@ -519,7 +524,7 @@ class AssetEntity {
     if (!_platformMatched) {
       return null;
     }
-    final path = await plugin.getFullFile(
+    final String? path = await plugin.getFullFile(
       id,
       isOrigin: isOrigin,
       progressHandler: progressHandler,
@@ -542,9 +547,9 @@ class AssetEntity {
     }
     if (Platform.isAndroid &&
         int.parse(await plugin.getSystemVersion()) >= 29) {
-      return await plugin.getOriginBytes(id, progressHandler: progressHandler);
+      return plugin.getOriginBytes(id, progressHandler: progressHandler);
     }
-    final file = await originFile;
+    final File? file = await originFile;
     return file?.readAsBytes();
   }
 
@@ -583,7 +588,7 @@ class AssetEntity {
   int get hashCode => hashValues(id, isFavorite);
 
   @override
-  bool operator ==(other) {
+  bool operator ==(Object other) {
     if (other is! AssetEntity) {
       return false;
     }
@@ -591,7 +596,7 @@ class AssetEntity {
   }
 
   @override
-  String toString() => "AssetEntity(id: $id , type: $type)";
+  String toString() => 'AssetEntity(id: $id , type: $type)';
 }
 
 /// Longitude and latitude.

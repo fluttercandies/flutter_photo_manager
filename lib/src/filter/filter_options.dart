@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import '../internal/enums.dart';
 
 /// A series of filter options for [AssetType] when querying assets.
+@immutable
 class FilterOption {
   const FilterOption({
     this.needTitle = false,
@@ -46,7 +47,7 @@ class FilterOption {
   }
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'title': needTitle,
       'size': sizeConstraint.toMap(),
       'duration': durationConstraint.toMap(),
@@ -57,18 +58,22 @@ class FilterOption {
   String toString() {
     return const JsonEncoder.withIndent('  ').convert(toMap());
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FilterOption &&
+        needTitle == other.needTitle &&
+        sizeConstraint == other.sizeConstraint &&
+        durationConstraint == other.durationConstraint;
+  }
+
+  @override
+  int get hashCode => hashValues(needTitle, sizeConstraint, durationConstraint);
 }
 
 /// Constraints of asset pixel width and height.
+@immutable
 class SizeConstraint {
-  final int minWidth;
-  final int maxWidth;
-  final int minHeight;
-  final int maxHeight;
-
-  /// When set to true, all constraints are ignored and all sizes of images are displayed.
-  final bool ignoreSize;
-
   const SizeConstraint({
     this.minWidth = 0,
     this.maxWidth = 100000,
@@ -76,6 +81,15 @@ class SizeConstraint {
     this.maxHeight = 100000,
     this.ignoreSize = false,
   });
+
+  final int minWidth;
+  final int maxWidth;
+  final int minHeight;
+  final int maxHeight;
+
+  /// When set to true, all constraints are ignored
+  /// and all sizes of images are displayed.
+  final bool ignoreSize;
 
   SizeConstraint copyWith({
     int? minWidth,
@@ -100,7 +114,7 @@ class SizeConstraint {
   }
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'minWidth': minWidth,
       'maxWidth': maxWidth,
       'minHeight': minHeight,
@@ -108,29 +122,43 @@ class SizeConstraint {
       'ignoreSize': ignoreSize,
     };
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SizeConstraint &&
+        minWidth == other.minWidth &&
+        maxWidth == other.maxWidth &&
+        minHeight == other.minHeight &&
+        maxHeight == other.maxHeight &&
+        ignoreSize == other.ignoreSize;
+  }
+
+  @override
+  int get hashCode =>
+      hashValues(minWidth, maxWidth, minHeight, maxHeight, ignoreSize);
 }
 
 /// Constraints of duration.
 ///
 /// The Image type ignores this constraints.
 class DurationConstraint {
-  final Duration min;
-  final Duration max;
-
   const DurationConstraint({
     this.min = Duration.zero,
     this.max = const Duration(days: 1),
   });
 
+  final Duration min;
+  final Duration max;
+
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'min': min.inMilliseconds,
       'max': max.inMilliseconds,
     };
   }
 }
 
-/// CreateDate
+@immutable
 class DateTimeCond {
   const DateTimeCond({
     required this.min,
@@ -161,14 +189,26 @@ class DateTimeCond {
   }
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'min': min.millisecondsSinceEpoch,
       'max': max.millisecondsSinceEpoch,
       'ignore': ignore,
     };
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is DateTimeCond &&
+        min == other.min &&
+        max == other.max &&
+        ignore == other.ignore;
+  }
+
+  @override
+  int get hashCode => hashValues(min, max, ignore);
 }
 
+@immutable
 class OrderOption {
   const OrderOption({
     this.type = OrderOptionType.createDate,
@@ -186,7 +226,7 @@ class OrderOption {
   }
 
   Map<String, dynamic> toMap() {
-    return {'type': type.index, 'asc': asc};
+    return <String, dynamic>{'type': type.index, 'asc': asc};
   }
 
   @override

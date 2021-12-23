@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:photo_manager_example/widget/gallery_item_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
+
+import '../widget/gallery_item_widget.dart';
 
 class SubFolderPage extends StatefulWidget {
   const SubFolderPage({
@@ -31,7 +32,7 @@ class _SubFolderPageState extends State<SubFolderPage> {
   }
 
   Widget _buildItem(BuildContext context, int index) {
-    final item = widget.pathList[index];
+    final AssetPathEntity item = widget.pathList[index];
     return GalleryItemWidget(
       path: item,
       setState: setState,

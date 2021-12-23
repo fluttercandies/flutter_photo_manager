@@ -68,11 +68,11 @@ class ThumbOption {
   void checkAssertions() {
     assert(
       width > 0 && height > 0,
-      "The width and height must be greater than 0.",
+      'The width and height must be greater than 0.',
     );
     assert(
       quality > 0 && quality <= 100,
-      "The quality must between 1 and 100",
+      'The quality must between 1 and 100',
     );
   }
 }
