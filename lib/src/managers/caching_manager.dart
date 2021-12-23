@@ -1,21 +1,19 @@
 import '../internal/constants.dart';
-import '../internal/enums.dart';
 import '../internal/plugin.dart';
 import '../types/entity.dart';
 import '../types/thumb_option.dart';
 
 /// The cache manager that helps to create/remove caches with specified assets.
 class PhotoCachingManager {
-  PhotoCachingManager._();
-
   factory PhotoCachingManager() => instance;
+
+  PhotoCachingManager._();
 
   static late final PhotoCachingManager instance = PhotoCachingManager._();
 
   static const ThumbOption _defaultOption = ThumbOption(
     width: PMConstants.vDefaultThumbnailSize,
     height: PMConstants.vDefaultThumbnailSize,
-    format: ThumbFormat.jpeg,
   );
 
   /// Request caching for assets.
@@ -25,7 +23,7 @@ class PhotoCachingManager {
   }) {
     assert(assets.isNotEmpty);
     return plugin.requestCacheAssetsThumb(
-      assets.map((e) => e.id).toList(),
+      assets.map((AssetEntity e) => e.id).toList(),
       option,
     );
   }

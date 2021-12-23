@@ -1,17 +1,17 @@
 import 'package:flutter/foundation.dart';
-import 'package:photo_manager_example/main.dart';
-
 import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 
+import '../main.dart';
+
 class PhotoProvider extends ChangeNotifier {
-  List<AssetPathEntity> list = [];
+  List<AssetPathEntity> list = <AssetPathEntity>[];
 
   RequestType type = RequestType.common;
 
-  var hasAll = true;
+  bool hasAll = true;
 
-  var onlyAll = false;
+  bool onlyAll = false;
 
   bool _notifying = false;
 
@@ -75,21 +75,21 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  var _thumbFormat = ThumbFormat.png;
+  ThumbFormat _thumbFormat = ThumbFormat.png;
 
   ThumbFormat get thumbFormat => _thumbFormat;
 
-  set thumbFormat(thumbFormat) {
+  set thumbFormat(ThumbFormat thumbFormat) {
     _thumbFormat = thumbFormat;
     notifyListeners();
   }
 
   bool get notifying => _notifying;
 
-  String minWidth = "0";
-  String maxWidth = "10000";
-  String minHeight = "0";
-  String maxHeight = "10000";
+  String minWidth = '0';
+  String maxWidth = '10000';
+  String minHeight = '0';
+  String maxHeight = '10000';
   bool _ignoreSize = true;
 
   bool get ignoreSize => _ignoreSize;
@@ -111,7 +111,7 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Duration _maxDuration = Duration(hours: 1);
+  Duration _maxDuration = const Duration(hours: 1);
 
   Duration get maxDuration => _maxDuration;
 
@@ -137,7 +137,7 @@ class PhotoProvider extends ChangeNotifier {
     if (value == null) {
       return;
     }
-    this.hasAll = value;
+    hasAll = value;
     notifyListeners();
   }
 
@@ -145,7 +145,7 @@ class PhotoProvider extends ChangeNotifier {
     if (value == null) {
       return;
     }
-    this.onlyAll = value;
+    onlyAll = value;
     notifyListeners();
   }
 
@@ -153,7 +153,7 @@ class PhotoProvider extends ChangeNotifier {
     if (value == null) {
       return;
     }
-    this.containsEmptyAlbum = value;
+    containsEmptyAlbum = value;
     notifyListeners();
   }
 
@@ -161,34 +161,35 @@ class PhotoProvider extends ChangeNotifier {
     if (value == null) {
       return;
     }
-    this.containsPathModified = value;
+    containsPathModified = value;
   }
 
   void reset() {
-    this.list.clear();
+    list.clear();
   }
 
   Future<void> refreshGalleryList() async {
-    final option = makeOption();
+    final FilterOptionGroup option = makeOption();
 
     reset();
-    var galleryList = await PhotoManager.getAssetPathList(
+    final List<AssetPathEntity> galleryList =
+        await PhotoManager.getAssetPathList(
       type: type,
       hasAll: hasAll,
       onlyAll: onlyAll,
       filterOption: option,
     );
 
-    galleryList.sort((s1, s2) {
+    galleryList.sort((AssetPathEntity s1, AssetPathEntity s2) {
       return s2.assetCount.compareTo(s1.assetCount);
     });
 
-    this.list.clear();
-    this.list.addAll(galleryList);
+    list.clear();
+    list.addAll(galleryList);
   }
 
   FilterOptionGroup makeOption() {
-    final option = FilterOption(
+    final FilterOption option = FilterOption(
       sizeConstraint: SizeConstraint(
         minWidth: int.tryParse(minWidth) ?? 0,
         maxWidth: int.tryParse(maxWidth) ?? 100000,
@@ -203,10 +204,9 @@ class PhotoProvider extends ChangeNotifier {
       needTitle: needTitle,
     );
 
-    final createDtCond = DateTimeCond(
+    final DateTimeCond createDtCond = DateTimeCond(
       min: startDt,
       max: endDt,
-      ignore: false,
     );
 
     return FilterOptionGroup()
@@ -219,7 +219,7 @@ class PhotoProvider extends ChangeNotifier {
   }
 
   Future<void> refreshAllGalleryProperties() async {
-    for (var gallery in list) {
+    for (final AssetPathEntity gallery in list) {
       await gallery.refreshPathProperties();
     }
     notifyListeners();
@@ -239,15 +239,15 @@ class AssetPathProvider extends ChangeNotifier {
     onRefresh();
   }
 
-  static const loadCount = 50;
+  static const int loadCount = 50;
 
   bool isInit = false;
 
   final AssetPathEntity path;
 
-  List<AssetEntity> list = [];
+  List<AssetEntity> list = <AssetEntity>[];
 
-  var page = 0;
+  int page = 0;
 
   int get showItemCount {
     if (list.length == path.assetCount) {
@@ -259,22 +259,20 @@ class AssetPathProvider extends ChangeNotifier {
 
   bool refreshing = false;
 
-  Future onRefresh() async {
+  Future<void> onRefresh() async {
     if (refreshing) {
       return;
     }
 
     refreshing = true;
-    await path.refreshPathProperties(
-      maxDateTimeToNow: false,
-    );
-    final list = await path.getAssetListPaged(0, loadCount);
+    await path.refreshPathProperties(maxDateTimeToNow: false);
+    final List<AssetEntity> list = await path.getAssetListPaged(0, loadCount);
     page = 0;
     this.list.clear();
     this.list.addAll(list);
     isInit = true;
     notifyListeners();
-    printListLength("onRefresh");
+    printListLength('onRefresh');
 
     refreshing = false;
   }
@@ -284,48 +282,59 @@ class AssetPathProvider extends ChangeNotifier {
       return;
     }
     if (showItemCount > path.assetCount) {
-      print("already max");
+      print('already max');
       return;
     }
-    final list = await path.getAssetListPaged(page + 1, loadCount);
+    final List<AssetEntity> list = await path.getAssetListPaged(
+      page + 1,
+      loadCount,
+    );
     page = page + 1;
     this.list.addAll(list);
     notifyListeners();
-    printListLength("loadmore");
+    printListLength('loadmore');
   }
 
-  void delete(AssetEntity entity) async {
-    final result = await PhotoManager.editor.deleteWithIds([entity.id]);
+  Future<void> delete(AssetEntity entity) async {
+    final List<String> result = await PhotoManager.editor.deleteWithIds(
+      <String>[entity.id],
+    );
     if (result.isNotEmpty) {
-      final rangeEnd = this.list.length;
+      final int rangeEnd = this.list.length;
       await provider.refreshAllGalleryProperties();
-      final list = await path.getAssetListRange(start: 0, end: rangeEnd);
+      final List<AssetEntity> list = await path.getAssetListRange(
+        start: 0,
+        end: rangeEnd,
+      );
       this.list.clear();
       this.list.addAll(list);
-      printListLength("deleted");
+      printListLength('deleted');
     }
   }
 
-  void deleteSelectedAssets(List<AssetEntity> entity) async {
-    final ids = entity.map((e) => e.id).toList();
+  Future<void> deleteSelectedAssets(List<AssetEntity> entity) async {
+    final List<String> ids = entity.map((AssetEntity e) => e.id).toList();
     await PhotoManager.editor.deleteWithIds(ids);
     await path.refreshPathProperties();
     showToast('The path ${path.name} asset count have :${path.assetCount}');
     notifyListeners();
   }
 
-  void removeInAlbum(AssetEntity entity) async {
+  Future<void> removeInAlbum(AssetEntity entity) async {
     if (await PhotoManager.editor.iOS.removeInAlbum(entity, path)) {
-      final rangeEnd = this.list.length;
+      final int rangeEnd = this.list.length;
       await provider.refreshAllGalleryProperties();
-      final list = await path.getAssetListRange(start: 0, end: rangeEnd);
+      final List<AssetEntity> list = await path.getAssetListRange(
+        start: 0,
+        end: rangeEnd,
+      );
       this.list.clear();
       this.list.addAll(list);
-      printListLength("removeInAlbum");
+      printListLength('removeInAlbum');
     }
   }
 
   void printListLength(String tag) {
-    print("$tag length : ${list.length}");
+    print('$tag length : ${list.length}');
   }
 }

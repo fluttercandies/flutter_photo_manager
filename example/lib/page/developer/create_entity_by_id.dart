@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:photo_manager_example/page/detail_page.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 
+import '../detail_page.dart';
+
 class CreateEntityById extends StatefulWidget {
+  const CreateEntityById({Key? key}) : super(key: key);
+
   @override
   _CreateEntityByIdState createState() => _CreateEntityByIdState();
 }
@@ -21,38 +24,41 @@ class _CreateEntityByIdState extends State<CreateEntityById> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create AssetEntity by id'),
+        title: const Text('Create AssetEntity by id'),
       ),
       body: Column(
         children: <Widget>[
           TextField(
             controller: controller,
-            decoration: InputDecoration(
-              hintText: "input asset id",
+            decoration: const InputDecoration(
+              hintText: 'input asset id',
             ),
           ),
           ElevatedButton(
-            child: Text('Create assetEntity'),
             onPressed: createAssetEntityAndShow,
+            child: const Text('Create assetEntity'),
           ),
         ],
       ),
     );
   }
 
-  void createAssetEntityAndShow() async {
-    final id = controller.text.trim();
-    final asset = await AssetEntity.fromId(id);
+  Future<void> createAssetEntityAndShow() async {
+    final String id = controller.text.trim();
+    final AssetEntity? asset = await AssetEntity.fromId(id);
     if (asset == null) {
-      showToast("Cannot create asset by $id");
+      showToast('Cannot create asset by $id');
       return;
     }
-    final mediaUrl = await asset.getMediaUrl();
+    final String? mediaUrl = await asset.getMediaUrl();
 
-    Navigator.push(
+    if (!mounted) {
+      return;
+    }
+    return Navigator.push<void>(
       context,
-      MaterialPageRoute(
-        builder: (c) => DetailPage(
+      MaterialPageRoute<void>(
+        builder: (BuildContext c) => DetailPage(
           entity: asset,
           mediaUrl: mediaUrl,
         ),

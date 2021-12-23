@@ -1,7 +1,11 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
+
 import '../internal/constants.dart';
 import '../internal/enums.dart';
 
 /// The thumbnail option when requesting assets.
+@immutable
 class ThumbOption {
   const ThumbOption({
     required this.width,
@@ -68,15 +72,31 @@ class ThumbOption {
   void checkAssertions() {
     assert(
       width > 0 && height > 0,
-      "The width and height must be greater than 0.",
+      'The width and height must be greater than 0.',
     );
     assert(
       quality > 0 && quality <= 100,
-      "The quality must between 1 and 100",
+      'The quality must between 1 and 100',
     );
+  }
+
+  @override
+  int get hashCode => hashValues(width, height, format, quality, frame);
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! ThumbOption) {
+      return false;
+    }
+    return width == other.width &&
+        height == other.height &&
+        format == other.format &&
+        quality == other.quality &&
+        frame == other.frame;
   }
 }
 
+@immutable
 class _IosThumbOption extends ThumbOption {
   const _IosThumbOption({
     required int width,
@@ -105,5 +125,24 @@ class _IosThumbOption extends ThumbOption {
       'resizeMode': resizeMode.index,
       'resizeContentMode': resizeContentMode.index,
     };
+  }
+
+  @override
+  int get hashCode =>
+      hashValues(super.hashCode, deliveryMode, resizeMode, resizeContentMode);
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! _IosThumbOption) {
+      return false;
+    }
+    return width == other.width &&
+        height == other.height &&
+        format == other.format &&
+        quality == other.quality &&
+        frame == other.frame &&
+        deliveryMode == other.deliveryMode &&
+        resizeMode == other.resizeMode &&
+        resizeContentMode == other.resizeContentMode;
   }
 }

@@ -14,6 +14,8 @@ import 'notify_manager.dart';
 /// The core manager of this plugin.
 /// Use various methods in this class to access & manage assets.
 class PhotoManager {
+  const PhotoManager._();
+
   @Deprecated(
     'Use requestPermissionExtend for better compatibility. '
     'This feature was deprecated after v2.0.0.',
@@ -77,7 +79,7 @@ class PhotoManager {
     FilterOptionGroup? filterOption,
   }) async {
     if (onlyAll) {
-      assert(hasAll, "If only is true, then the hasAll must be not null.");
+      assert(hasAll, 'If only is true, then the hasAll must be not null.');
     }
     filterOption ??= FilterOptionGroup();
     assert(
@@ -85,7 +87,7 @@ class PhotoManager {
       'The request type must have video, image or audio.',
     );
     if (type == RequestType.all) {
-      return [];
+      return <AssetPathEntity>[];
     }
     return plugin.getAllGalleryList(
       hasAll: hasAll,
@@ -126,7 +128,7 @@ class PhotoManager {
   static Future<void> releaseCache() => plugin.releaseCache();
 
   /// Notification class for managing photo changes.
-  static NotifyManager _notifyManager = NotifyManager();
+  static final NotifyManager _notifyManager = NotifyManager();
 
   /// Add a callback for assets changing.
   static void addChangeCallback(ValueChanged<MethodCall> callback) =>
@@ -160,8 +162,11 @@ class PhotoManager {
 
   /// Refresh the property of [AssetPathEntity] from the given ID.
   static Future<AssetEntity?> refreshAssetProperties(String id) async {
-    final Map? map = await plugin.getPropertiesFromAssetEntity(id);
-    final asset = ConvertUtils.convertToAsset(map);
+    final Map<dynamic, dynamic>? map =
+        await plugin.getPropertiesFromAssetEntity(id);
+    final AssetEntity? asset = ConvertUtils.convertToAsset(
+      map?.cast<String, dynamic>(),
+    );
     if (asset == null) {
       return null;
     }
@@ -174,7 +179,7 @@ class PhotoManager {
     required AssetPathEntity entity,
     required FilterOptionGroup filterOptionGroup,
   }) async {
-    final result = await plugin.fetchPathProperties(
+    final Map<dynamic, dynamic>? result = await plugin.fetchPathProperties(
       entity.id,
       entity.type,
       entity.filterOption,
@@ -182,10 +187,10 @@ class PhotoManager {
     if (result == null) {
       return null;
     }
-    final list = result["data"];
+    final Object? list = result['data'];
     if (list is List && list.isNotEmpty) {
       return ConvertUtils.convertPath(
-        result,
+        result.cast<String, dynamic>(),
         type: entity.type,
         optionGroup: entity.filterOption,
       ).first;

@@ -5,28 +5,28 @@ import '../types/entity.dart';
 import 'plugin.dart';
 
 class Editor {
-  final IosEditor _iOS = IosEditor();
-  final AndroidEditor _android = AndroidEditor();
+  final IosEditor _iOS = const IosEditor();
+  final AndroidEditor _android = const AndroidEditor();
 
   IosEditor get iOS {
     if (Platform.isIOS) {
       return _iOS;
     }
-    throw OSError("iOS Editor should only be use on iOS.");
+    throw const OSError('iOS Editor should only be use on iOS.');
   }
 
   AndroidEditor get android {
     if (Platform.isAndroid) {
       return _android;
     }
-    throw OSError("Android Editor should only be use on Android.");
+    throw const OSError('Android Editor should only be use on Android.');
   }
 
   /// Delete entities with specific IDs.
   ///
   /// Entities will be deleted no matter which album they're located at on iOS.
-  Future<List<String>> deleteWithIds(List<String> ids) async {
-    return await plugin.deleteWithIds(ids);
+  Future<List<String>> deleteWithIds(List<String> ids) {
+    return plugin.deleteWithIds(ids);
   }
 
   /// Save image to gallery.
@@ -58,7 +58,7 @@ class Editor {
   /// On Android 29 or above, you can use [relativePath] to specify a RELATIVE_PATH used in the MediaStore.
   Future<AssetEntity?> saveImageWithPath(
     String path, {
-    required String? title,
+    required String title,
     String? desc,
     String? relativePath,
   }) {
@@ -104,11 +104,13 @@ class Editor {
 
 /// For iOS
 class IosEditor {
+  const IosEditor();
+
   /// {@template photo_manager.EnsureParentIsRootOrFolder}
   /// Folders and albums can be only created under the root path or folders,
   /// so the [parent] should be null, the root path or accessible folders.
   /// {@endtemplate}
-  Never? _ensureParentIsRootOrFolder(AssetPathEntity? parent) {
+  void _ensureParentIsRootOrFolder(AssetPathEntity? parent) {
     if (parent != null && parent.albumType != 2 && !parent.isAll) {
       throw ArgumentError('Use a folder path or the root path.');
     }
@@ -118,7 +120,7 @@ class IosEditor {
   /// Entities' entry can be only removed from non-root albums,
   /// so the [parent] should be non-albums.
   /// {@endtemplate}
-  Never? _ensureParentIsNotRootOrFolder(AssetPathEntity parent) {
+  void _ensureParentIsNotRootOrFolder(AssetPathEntity parent) {
     if (parent.isAll) {
       throw ArgumentError('Use PhotoManager.editor.deleteWithIds instead.');
     }
@@ -136,7 +138,7 @@ class IosEditor {
     AssetPathEntity? parent,
   }) async {
     _ensureParentIsRootOrFolder(parent);
-    return await plugin.iosCreateFolder(
+    return plugin.iosCreateFolder(
       name,
       parent == null || parent.isAll,
       parent,
@@ -152,7 +154,7 @@ class IosEditor {
     AssetPathEntity? parent,
   }) async {
     _ensureParentIsRootOrFolder(parent);
-    return await plugin.iosCreateAlbum(
+    return plugin.iosCreateAlbum(
       name,
       parent == null || parent.isAll,
       parent,
@@ -162,7 +164,7 @@ class IosEditor {
   /// {@macro photo_manager.EnsureParentIsNotRootOrFolder}
   Future<bool> removeInAlbum(AssetEntity entity, AssetPathEntity parent) async {
     _ensureParentIsNotRootOrFolder(parent);
-    return await plugin.iosRemoveInAlbum([entity], parent);
+    return plugin.iosRemoveInAlbum(<AssetEntity>[entity], parent);
   }
 
   /// Remove [list]'s items from [parent] in batches.
@@ -174,19 +176,19 @@ class IosEditor {
       return false;
     }
     _ensureParentIsNotRootOrFolder(parent);
-    return await plugin.iosRemoveInAlbum(list, parent);
+    return plugin.iosRemoveInAlbum(list, parent);
   }
 
   /// Delete the [path].
-  Future<bool> deletePath(AssetPathEntity path) async {
-    return await plugin.iosDeleteCollection(path);
+  Future<bool> deletePath(AssetPathEntity path) {
+    return plugin.iosDeleteCollection(path);
   }
 
   Future<bool> favoriteAsset({
     required AssetEntity entity,
     required bool favorite,
   }) async {
-    final result = await plugin.favoriteAsset(entity.id, favorite);
+    final bool result = await plugin.favoriteAsset(entity.id, favorite);
     if (result) {
       entity.isFavorite = favorite;
     }
@@ -195,14 +197,16 @@ class IosEditor {
 }
 
 class AndroidEditor {
+  const AndroidEditor();
+
   Future<bool> moveAssetToAnother({
     required AssetEntity entity,
     required AssetPathEntity target,
-  }) async {
-    return await plugin.androidMoveAssetToPath(entity, target);
+  }) {
+    return plugin.androidMoveAssetToPath(entity, target);
   }
 
-  Future<bool> removeAllNoExistsAsset() async {
-    return await plugin.androidRemoveNoExistsAssets();
+  Future<bool> removeAllNoExistsAsset() {
+    return plugin.androidRemoveNoExistsAssets();
   }
 }

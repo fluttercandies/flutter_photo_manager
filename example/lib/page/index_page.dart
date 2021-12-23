@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:photo_manager_example/page/change_notify_page.dart';
-import 'package:photo_manager_example/page/home_page.dart';
 
+import 'change_notify_page.dart';
 import 'developer/develop_index_page.dart';
+import 'home_page.dart';
 import 'save_image_example.dart';
 
 class IndexPage extends StatefulWidget {
+  const IndexPage({Key? key}) : super(key: key);
+
   @override
   _IndexPageState createState() => _IndexPageState();
 }
@@ -15,14 +17,14 @@ class _IndexPageState extends State<IndexPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Example for photo manager."),
+        title: const Text('Example for photo manager.'),
       ),
       body: ListView(
         children: <Widget>[
-          routePage("gallery list", NewHomePage()),
-          routePage("save media example", SaveMediaExample()),
-          routePage("For Developer page", DeveloperIndexPage()),
-          routePage("Change notify example", ChangeNotifyExample()),
+          routePage('gallery list', const NewHomePage()),
+          routePage('save media example', const SaveMediaExample()),
+          routePage('For Developer page', const DeveloperIndexPage()),
+          routePage('Change notify example', const ChangeNotifyExample()),
         ],
       ),
     );
@@ -30,16 +32,10 @@ class _IndexPageState extends State<IndexPage> {
 
   Widget routePage(String title, Widget page) {
     return ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) {
-              return page;
-            },
-          ),
-        );
-      },
+      onPressed: () => Navigator.push<void>(
+        context,
+        MaterialPageRoute<void>(builder: (_) => page),
+      ),
       child: Text(title),
     );
   }

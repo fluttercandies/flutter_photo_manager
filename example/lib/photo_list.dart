@@ -1,10 +1,11 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class PhotoList extends StatefulWidget {
-  const PhotoList({required this.photos});
+  const PhotoList({Key? key, required this.photos}) : super(key: key);
 
   final List<AssetEntity> photos;
 
@@ -16,9 +17,8 @@ class _PhotoListState extends State<PhotoList> {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
-        childAspectRatio: 1.0,
       ),
       itemBuilder: _buildItem,
       itemCount: widget.photos.length,
@@ -26,7 +26,7 @@ class _PhotoListState extends State<PhotoList> {
   }
 
   Widget _buildItem(BuildContext context, int index) {
-    AssetEntity entity = widget.photos[index];
+    final AssetEntity entity = widget.photos[index];
     // print(
     //     "request index = $index , image id = ${entity.id} type = ${entity.type}");
 
@@ -43,7 +43,7 @@ class _PhotoListState extends State<PhotoList> {
 
     return FutureBuilder<Uint8List?>(
       future: entity.thumbDataWithSize(150, 150),
-      builder: (context, snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.data != null) {
           return InkWell(
@@ -61,7 +61,7 @@ class _PhotoListState extends State<PhotoList> {
                     alignment: Alignment.center,
                     child: Text(
                       '${entity.type}',
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
@@ -69,27 +69,27 @@ class _PhotoListState extends State<PhotoList> {
             ),
           );
         }
-        return Center(child: Text('loading...'));
+        return const Center(child: Text('loading...'));
       },
     );
   }
 
   Future<void> showInfo(AssetEntity entity) async {
     if (entity.type == AssetType.video) {
-      var file = await entity.file;
+      final File? file = await entity.file;
       if (file == null) {
         return;
       }
-      var length = file.lengthSync();
-      var size = entity.size;
+      final int length = file.lengthSync();
+      final Size size = entity.size;
       print(
-        "${entity.id} length = $length, "
-        "size = $size, "
-        "dateTime = ${entity.createDateTime}",
+        '${entity.id} length = $length, '
+        'size = $size, '
+        'dateTime = ${entity.createDateTime}',
       );
     } else {
       final Size size = entity.size;
-      print("${entity.id} size = $size, dateTime = ${entity.createDateTime}");
+      print('${entity.id} size = $size, dateTime = ${entity.createDateTime}');
     }
 
     /// copy log id , and create AssetEntity with id from main.dart

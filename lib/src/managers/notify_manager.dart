@@ -9,13 +9,14 @@ import '../internal/plugin.dart';
 /// The notify manager when assets changed.
 class NotifyManager {
   static const MethodChannel _channel = MethodChannel(
-    "${PMConstants.channelPrefix}/notify",
+    '${PMConstants.channelPrefix}/notify',
   );
 
   Stream<bool> get notifyStream => _controller.stream;
-  final StreamController<bool> _controller = StreamController.broadcast();
+  final StreamController<bool> _controller = StreamController<bool>.broadcast();
 
-  final notifyCallback = <ValueChanged<MethodCall>>[];
+  final List<ValueChanged<MethodCall>> notifyCallback =
+      <ValueChanged<MethodCall>>[];
 
   /// Add a callback.
   void addCallback(ValueChanged<MethodCall> c) => notifyCallback.add(c);
@@ -38,16 +39,16 @@ class NotifyManager {
   }
 
   Future<dynamic> _notify(MethodCall call) async {
-    if (call.method == "change") {
+    if (call.method == 'change') {
       _onChange(call);
-    } else if (call.method == "setAndroidQExperimental") {
+    } else if (call.method == 'setAndroidQExperimental') {
       // PhotoManager.androidQExperimental = call.arguments["open"];
     }
     return 1;
   }
 
   Future<dynamic> _onChange(MethodCall m) async {
-    notifyCallback.toList().forEach((c) => c.call(m));
+    notifyCallback.toList().forEach((ValueChanged<MethodCall> c) => c.call(m));
   }
 
   @override

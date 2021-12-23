@@ -1,9 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:photo_manager_example/model/photo_provider.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
+
+import '../model/photo_provider.dart';
 
 class CopyToAnotherGalleryPage extends StatefulWidget {
   const CopyToAnotherGalleryPage({
@@ -23,11 +24,12 @@ class _CopyToAnotherGalleryPageState extends State<CopyToAnotherGalleryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<PhotoProvider>(context, listen: false);
-    final list = provider.list;
+    final PhotoProvider provider =
+        Provider.of<PhotoProvider>(context, listen: false);
+    final List<AssetPathEntity> list = provider.list;
     return Scaffold(
       appBar: AppBar(
-        title: Text("move to another"),
+        title: const Text('move to another'),
       ),
       body: Column(
         children: <Widget>[
@@ -35,22 +37,24 @@ class _CopyToAnotherGalleryPageState extends State<CopyToAnotherGalleryPage> {
             aspectRatio: 1,
             child: FutureBuilder<Uint8List?>(
               future: widget.assetEntity.thumbDataWithSize(500, 500),
-              builder: (context, snapshot) {
+              builder:
+                  (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
                 if (snapshot.hasData) {
                   return Image.memory(snapshot.data!);
                 }
-                return Text("loading");
+                return const Text('loading');
               },
             ),
           ),
           DropdownButton<AssetPathEntity>(
-            onChanged: (value) {
-              this.targetGallery = value;
+            onChanged: (AssetPathEntity? value) {
+              targetGallery = value;
               setState(() {});
             },
             value: targetGallery,
-            hint: Text("Select target gallery"),
-            items: list.map<DropdownMenuItem<AssetPathEntity>>((item) {
+            hint: const Text('Select target gallery'),
+            items: list
+                .map<DropdownMenuItem<AssetPathEntity>>((AssetPathEntity item) {
               return _buildItem(item);
             }).toList(),
           ),
@@ -67,16 +71,16 @@ class _CopyToAnotherGalleryPageState extends State<CopyToAnotherGalleryPage> {
     );
   }
 
-  void _copy() async {
+  Future<void> _copy() async {
     if (targetGallery == null) {
-      return null;
+      return;
     }
-    final result = await PhotoManager.editor.copyAssetToPath(
+    final AssetEntity? result = await PhotoManager.editor.copyAssetToPath(
       asset: widget.assetEntity,
-      pathEntity: this.targetGallery!,
+      pathEntity: targetGallery!,
     );
 
-    print("copy result = $result");
+    print('copy result = $result');
   }
 
   Widget _buildCopyButton() {
@@ -84,8 +88,8 @@ class _CopyToAnotherGalleryPageState extends State<CopyToAnotherGalleryPage> {
       onPressed: _copy,
       child: Text(
         targetGallery == null
-            ? "Please select gallery"
-            : "copy to ${targetGallery!.name}",
+            ? 'Please select gallery'
+            : 'copy to ${targetGallery!.name}',
       ),
     );
   }

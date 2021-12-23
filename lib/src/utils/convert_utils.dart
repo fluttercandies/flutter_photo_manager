@@ -1,25 +1,28 @@
+import '../filter/filter_option_group.dart';
 import '../types/entity.dart';
 import '../types/types.dart';
-import '../filter/filter_option_group.dart';
 
 class ConvertUtils {
+  const ConvertUtils._();
+
   static List<AssetPathEntity> convertPath(
-    Map data, {
+    Map<String, dynamic> data, {
     RequestType type = RequestType.all,
     FilterOptionGroup? optionGroup,
   }) {
-    List<AssetPathEntity> result = [];
-    List list = data["data"];
-    for (final Map item in list) {
-      final entity = AssetPathEntity()
-        ..id = item["id"]
-        ..name = item["name"]
+    final List<AssetPathEntity> result = <AssetPathEntity>[];
+    final List<Map<dynamic, dynamic>> list =
+        (data['data'] as List<dynamic>).cast<Map<dynamic, dynamic>>();
+    for (final Map<dynamic, dynamic> item in list) {
+      final AssetPathEntity entity = AssetPathEntity()
+        ..id = item['id'] as String
+        ..name = item['name'] as String
         ..type = type
-        ..isAll = item["isAll"]
-        ..assetCount = item["length"]
-        ..albumType = (item["albumType"] ?? 1)
+        ..isAll = item['isAll'] as bool
+        ..assetCount = item['length'] as int
+        ..albumType = item['albumType'] as int? ?? 1
         ..filterOption = optionGroup ?? FilterOptionGroup();
-      final int? modifiedDate = item['modified'];
+      final int? modifiedDate = item['modified'] as int?;
       if (modifiedDate != null) {
         entity.lastModified =
             DateTime.fromMillisecondsSinceEpoch(modifiedDate * 1000);
@@ -29,11 +32,14 @@ class ConvertUtils {
     return result;
   }
 
-  static List<AssetEntity> convertToAssetList(Map data) {
-    List<AssetEntity> result = [];
-    List list = data["data"];
-    for (final Map item in list) {
-      final asset = _convertMapToAsset(item);
+  static List<AssetEntity> convertToAssetList(Map<String, dynamic> data) {
+    final List<AssetEntity> result = <AssetEntity>[];
+    final List<Map<dynamic, dynamic>> list =
+        (data['data'] as List<dynamic>).cast<Map<dynamic, dynamic>>();
+    for (final Map<dynamic, dynamic> item in list) {
+      final AssetEntity? asset = _convertMapToAsset(
+        item.cast<String, dynamic>(),
+      );
       if (asset != null) {
         result.add(asset);
       }
@@ -41,33 +47,32 @@ class ConvertUtils {
     return result;
   }
 
-  static AssetEntity? convertToAsset(Map? map) {
-    final Map? data = map?['data'];
-    if (data == null) {
-      return null;
+  static AssetEntity? convertToAsset(Map<String, dynamic>? map) {
+    if (map?['data'] is Map<String, dynamic>) {
+      return _convertMapToAsset(map!['data'] as Map<String, dynamic>);
     }
-    return _convertMapToAsset(data);
+    return null;
   }
 
-  static AssetEntity? _convertMapToAsset(Map? data) {
+  static AssetEntity? _convertMapToAsset(Map<String, dynamic>? data) {
     if (data == null) {
       return null;
     }
-    final result = AssetEntity(
-      id: data['id'],
-      typeInt: data['type'],
-      width: data['width'],
-      height: data['height'],
-      duration: data['duration'] ?? 0,
-      orientation: data['orientation'] ?? 0,
-      isFavorite: data['favorite'] ?? false,
-      title: data['title'],
-      createDtSecond: data['createDt'],
-      modifiedDateSecond: data['modifiedDt'],
-      relativePath: data['relativePath'],
-      latitude: data['lat'],
-      longitude: data['lng'],
-      mimeType: data['mimeType'],
+    final AssetEntity result = AssetEntity(
+      id: data['id'] as String,
+      typeInt: data['type'] as int,
+      width: data['width'] as int,
+      height: data['height'] as int,
+      duration: data['duration'] as int? ?? 0,
+      orientation: data['orientation'] as int? ?? 0,
+      isFavorite: data['favorite'] as bool? ?? false,
+      title: data['title'] as String?,
+      createDtSecond: data['createDt'] as int?,
+      modifiedDateSecond: data['modifiedDt'] as int?,
+      relativePath: data['relativePath'] as String?,
+      latitude: data['lat'] as double?,
+      longitude: data['lng'] as double?,
+      mimeType: data['mimeType'] as String?,
     );
     return result;
   }

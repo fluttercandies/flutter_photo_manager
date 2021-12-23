@@ -1,19 +1,20 @@
 import 'dart:collection';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:photo_manager/photo_manager.dart';
 
-typedef EvictionHandler<K, V>(K key, V value);
+typedef EvictionHandler<K, V> = Function(K key, V value);
 
 class LRUMap<K, V> {
+  LRUMap(this._maxSize, [this._handler]);
+
   final LinkedHashMap<K, V?> _map = LinkedHashMap<K, V?>();
   final int _maxSize;
   final EvictionHandler<K, V?>? _handler;
 
-  LRUMap(this._maxSize, [this._handler]);
-
   V? get(K key) {
-    V? value = _map.remove(key);
+    final V? value = _map.remove(key);
     if (value != null) {
       _map[key] = value;
     }
@@ -24,8 +25,8 @@ class LRUMap<K, V> {
     _map.remove(key);
     _map[key] = value;
     if (_map.length > _maxSize) {
-      K evictedKey = _map.keys.first;
-      V? evictedValue = _map.remove(evictedKey);
+      final K evictedKey = _map.keys.first;
+      final V? evictedValue = _map.remove(evictedKey);
       if (_handler != null) {
         _handler!(evictedKey, evictedValue);
       }
@@ -38,25 +39,36 @@ class LRUMap<K, V> {
 }
 
 class ImageLruCache {
-  static LRUMap<_ImageCacheEntity, Uint8List> _map = LRUMap(500);
+  const ImageLruCache._();
 
-  static Uint8List? getData(AssetEntity entity,
-      [int size = 64, ThumbFormat format = ThumbFormat.jpeg]) {
+  static final LRUMap<_ImageCacheEntity, Uint8List> _map =
+      LRUMap<_ImageCacheEntity, Uint8List>(500);
+
+  static Uint8List? getData(
+    AssetEntity entity, [
+    int size = 64,
+    ThumbFormat format = ThumbFormat.jpeg,
+  ]) {
     return _map.get(_ImageCacheEntity(entity, size, format));
   }
 
   static void setData(
-      AssetEntity entity, int size, ThumbFormat format, Uint8List list) {
+    AssetEntity entity,
+    int size,
+    ThumbFormat format,
+    Uint8List list,
+  ) {
     _map.put(_ImageCacheEntity(entity, size, format), list);
   }
 }
 
+@immutable
 class _ImageCacheEntity {
-  AssetEntity entity;
-  int size;
-  ThumbFormat format;
+  const _ImageCacheEntity(this.entity, this.size, this.format);
 
-  _ImageCacheEntity(this.entity, this.size, this.format);
+  final AssetEntity entity;
+  final int size;
+  final ThumbFormat format;
 
   @override
   bool operator ==(Object other) =>

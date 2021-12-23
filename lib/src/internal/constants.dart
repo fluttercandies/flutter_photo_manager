@@ -37,7 +37,8 @@ class PMConstants {
   static const String mDeleteAlbum = 'deleteAlbum';
   static const String mFavoriteAsset = 'favoriteAsset';
   static const String mRemoveNoExistsAssets = 'removeNoExistsAssets';
-  static const String mGetPropertiesFromAssetEntity = 'getPropertiesFromAssetEntity';
+  static const String mGetPropertiesFromAssetEntity =
+      'getPropertiesFromAssetEntity';
   static const String mIgnorePermissionCheck = 'ignorePermissionCheck';
   static const String mClearFileCache = 'clearFileCache';
   static const String mCancelCacheRequests = 'cancelCacheRequests';
