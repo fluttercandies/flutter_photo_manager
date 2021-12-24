@@ -23,10 +23,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   static late final Plugin _instance = Plugin._();
 
   Future<List<AssetPathEntity>> getAllGalleryList({
+    required FilterOptionGroup optionGroup,
     RequestType type = RequestType.all,
     bool hasAll = true,
     bool onlyAll = false,
-    required FilterOptionGroup optionGroup,
   }) async {
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mGetGalleryList,
@@ -60,10 +60,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   /// Use pagination to get album content.
   Future<List<AssetEntity>> getAssetWithGalleryIdPaged(
     String id, {
+    required FilterOptionGroup optionGroup,
     int page = 0,
     int pageCount = 15,
     RequestType type = RequestType.all,
-    required FilterOptionGroup optionGroup,
   }) async {
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod<Map<dynamic, dynamic>>(
@@ -159,7 +159,6 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     return _channel.invokeMethod(PMConstants.mOpenSetting);
   }
 
-  /// Nullable
   Future<Map<dynamic, dynamic>?> fetchPathProperties(
     String id,
     RequestType type,
@@ -205,11 +204,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
 
   Future<AssetEntity?> saveImage(
     Uint8List data, {
-    String? title,
+    required String? title,
     String? desc,
     String? relativePath,
   }) async {
-    title ??= 'image_${DateTime.now().millisecondsSinceEpoch / 1000}.jpg';
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mSaveImage,
       <String, dynamic>{
@@ -222,7 +220,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     if (result == null) {
       return null;
     }
-    return ConvertUtils.convertToAsset(result.cast<String, dynamic>());
+    return ConvertUtils.convertMapToAsset(
+      result.cast<String, dynamic>(),
+      title: title,
+    );
   }
 
   Future<AssetEntity?> saveImageWithPath(
@@ -248,7 +249,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     if (result == null) {
       return null;
     }
-    return ConvertUtils.convertToAsset(result.cast<String, dynamic>());
+    return ConvertUtils.convertMapToAsset(
+      result.cast<String, dynamic>(),
+      title: title,
+    );
   }
 
   Future<AssetEntity?> saveVideo(
@@ -273,7 +277,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     if (result == null) {
       return null;
     }
-    return ConvertUtils.convertToAsset(result.cast<String, dynamic>());
+    return ConvertUtils.convertMapToAsset(
+      result.cast<String, dynamic>(),
+      title: title,
+    );
   }
 
   Future<bool> assetExistsWithId(String id) {
@@ -377,7 +384,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     if (result == null) {
       return null;
     }
-    return ConvertUtils.convertToAsset(result.cast<String, dynamic>());
+    return ConvertUtils.convertMapToAsset(
+      result.cast<String, dynamic>(),
+      title: asset.title,
+    );
   }
 
   Future<bool> iosDeleteCollection(AssetPathEntity path) async {
@@ -428,10 +438,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     return _channel.invokeMethod(PMConstants.mCancelCacheRequests);
   }
 
-  Future<void> requestCacheAssetsThumb(
-    List<String> ids,
-    ThumbOption option,
-  ) {
+  Future<void> requestCacheAssetsThumb(List<String> ids, ThumbOption option) {
     assert(ids.isNotEmpty);
     return _channel.invokeMethod(
       PMConstants.mRequestCacheAssetsThumb,

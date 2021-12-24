@@ -167,13 +167,7 @@ class PhotoManager {
     if (result == null) {
       return null;
     }
-    final AssetEntity? asset = ConvertUtils.convertToAsset(
-      result.cast<String, dynamic>(),
-    );
-    if (asset == null) {
-      return null;
-    }
-    return asset;
+    return ConvertUtils.convertMapToAsset(result.cast<String, dynamic>());
   }
 
   /// Obtain a new [AssetPathEntity] from the given one
