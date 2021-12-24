@@ -497,11 +497,8 @@
 - (void)fetchFullSizeVideo:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     NSString *homePath = NSTemporaryDirectory();
     NSFileManager *manager = NSFileManager.defaultManager;
-    
     NSMutableString *path = [NSMutableString stringWithString:homePath];
-    
     NSString *filename = [asset valueForKey:[NSString stringWithFormat:@"filename"]];
-    
     NSString *dirPath = [NSString stringWithFormat:@"%@/%@", homePath, @".video"];
     [manager createDirectoryAtPath:dirPath
        withIntermediateDirectories:true
@@ -509,15 +506,17 @@
                              error:nil];
     
     [path appendFormat:@"%@/%@", @".video", filename];
-    PHVideoRequestOptions *options = [PHVideoRequestOptions new];
     if ([manager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance]
          info:[NSString stringWithFormat:@"read cache from %@", path]];
         [handler reply:path];
         return;
     }
-    
-    
+
+    PHVideoRequestOptions *options = [PHVideoRequestOptions new];
+    [options setDeliveryMode:PHVideoRequestOptionsDeliveryModeAutomatic];
+    [options setNetworkAccessAllowed:YES];
+    [options setVersion:PHVideoRequestOptionsVersionCurrent];
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
     [options setProgressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
         if (error) {
@@ -529,9 +528,7 @@
             [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
         }
     }];
-    
-    [options setNetworkAccessAllowed:YES];
-    
+
     [[PHImageManager defaultManager]
      requestAVAssetForVideo:asset
      options:options
