@@ -24,8 +24,9 @@ class ConvertUtils {
         ..filterOption = optionGroup ?? FilterOptionGroup();
       final int? modifiedDate = item['modified'] as int?;
       if (modifiedDate != null) {
-        entity.lastModified =
-            DateTime.fromMillisecondsSinceEpoch(modifiedDate * 1000);
+        entity.lastModified = DateTime.fromMillisecondsSinceEpoch(
+          modifiedDate * 1000,
+        );
       }
       result.add(entity);
     }
@@ -37,24 +38,15 @@ class ConvertUtils {
     final List<Map<dynamic, dynamic>> list =
         (data['data'] as List<dynamic>).cast<Map<dynamic, dynamic>>();
     for (final Map<dynamic, dynamic> item in list) {
-      final AssetEntity? asset = _convertMapToAsset(
-        item.cast<String, dynamic>(),
-      );
-      if (asset != null) {
-        result.add(asset);
-      }
+      result.add(convertMapToAsset(item.cast<String, dynamic>()));
     }
     return result;
   }
 
-  static AssetEntity? convertToAsset(Map<String, dynamic> map) {
-    return _convertMapToAsset(map);
-  }
-
-  static AssetEntity? _convertMapToAsset(Map<String, dynamic>? data) {
-    if (data == null) {
-      return null;
-    }
+  static AssetEntity convertMapToAsset(
+    Map<String, dynamic> data, {
+    String? title,
+  }) {
     final AssetEntity result = AssetEntity(
       id: data['id'] as String,
       typeInt: data['type'] as int,
@@ -63,7 +55,7 @@ class ConvertUtils {
       duration: data['duration'] as int? ?? 0,
       orientation: data['orientation'] as int? ?? 0,
       isFavorite: data['favorite'] as bool? ?? false,
-      title: data['title'] as String?,
+      title: data['title'] as String? ?? title,
       subType: data['subType'] as int? ?? 0,
       createDtSecond: data['createDt'] as int?,
       modifiedDateSecond: data['modifiedDt'] as int?,
