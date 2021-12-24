@@ -64,7 +64,6 @@ object ConvertUtils {
     }
 
     fun convertToAssetResult(entity: AssetEntity): Map<String, Any?> {
-
         val data = hashMapOf(
             "id" to entity.id,
             "duration" to entity.duration / 1000,
@@ -78,14 +77,10 @@ object ConvertUtils {
             "title" to entity.displayName,
             "relativePath" to entity.relativePath
         )
-
         if (entity.mimeType != null) {
             data["mimeType"] = entity.mimeType
         }
-
-        return mapOf(
-            "data" to data
-        )
+        return data
     }
 
     private fun getOptionWithKey(map: Map<*, *>, key: String): FilterCond {
