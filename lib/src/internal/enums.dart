@@ -75,3 +75,9 @@ enum PermissionState {
 /// See also:
 ///  * [Apple documentation](https://developer.apple.com/documentation/photokit/phaccesslevel)
 enum IosAccessLevel { addOnly, readWrite }
+
+/// Common file types for images.
+enum ImageFileType { jpg, png, gif, tiff, heic, other }
+
+/// Some special image types.
+enum SpecialImageType { gif, heic }
