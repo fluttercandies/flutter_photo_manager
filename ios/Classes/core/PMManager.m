@@ -439,19 +439,15 @@
     if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypeFullSizeVideo) {
         destinationResource = resources.lastObject;
     }
-    // Iterate to find full size video.
     if (!destinationResource) {
         for (PHAssetResource *r in resources) {
-            if (r.type == PHAssetResourceTypeFullSizeVideo) {
+            // Iterate to find full size video.
+            if (r.type == PHAssetResourceTypeVideo && !destinationResource) {
                 destinationResource = r;
-                break;
+                continue;
             }
-        }
-    }
-    // Iterate to find alternate video.
-    if (!destinationResource) {
-        for (PHAssetResource *r in resources) {
-            if (r.type == PHAssetResourceTypeVideo) {
+            // Iterate to find alternate video.
+            if (r.type == PHAssetResourceTypeFullSizeVideo) {
                 destinationResource = r;
                 break;
             }
@@ -584,12 +580,13 @@
 
 - (void)fetchFullSizeImageFile:(PHAsset *)asset resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PHImageManager *manager = PHImageManager.defaultManager;
+
     PHImageRequestOptions *options = [PHImageRequestOptions new];
-    options.synchronous = YES;
-    options.version = PHImageRequestOptionsVersionCurrent;
-    
-    
+    [options setDeliveryMode:PHImageRequestOptionsDeliveryModeOpportunistic];
     [options setNetworkAccessAllowed:YES];
+    [options setResizeMode:PHImageRequestOptionsResizeModeNone];
+    [options setSynchronous:YES];
+    [options setVersion:PHImageRequestOptionsVersionCurrent];
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
     [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
                                   NSDictionary *info) {
@@ -664,25 +661,19 @@
 
 - (void)fetchOriginImageFile:(PHAsset *)asset resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PHAssetResource *imageResource = [asset getAdjustResource];
-    
     if (!imageResource) {
         [handler reply:nil];
         return;
     }
     
     PHAssetResourceManager *manager = PHAssetResourceManager.defaultManager;
-    
     NSString *path = [self makeAssetOutputPath:asset isOrigin:YES];
     NSURL *fileUrl = [NSURL fileURLWithPath:path];
-    
     [PMFileHelper deleteFile:path];
     
     PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
     [options setNetworkAccessAllowed:YES];
-    
-    
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
-    
     [options setProgressHandler:^(double progress) {
         if (progress != 1) {
             [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
