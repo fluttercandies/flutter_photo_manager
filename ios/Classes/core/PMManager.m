@@ -432,22 +432,32 @@
 }
 
 - (void)fetchOriginVideoFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    NSArray<PHAssetResource *> *resources =
-    [PHAssetResource assetResourcesForAsset:asset];
-    // find asset
-    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset has %lu resources.", (unsigned long) resources.count] ];
-    PHAssetResource *dstResource;
-    if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypeVideo) {
-        dstResource = resources.lastObject;
-    } else {
-        for (PHAssetResource *resource in resources) {
-            if (resource.type == PHAssetResourceTypeVideo) {
-                dstResource = resource;
+    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:asset];
+    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset has %lu resources.", (unsigned long) resources.count]];
+    PHAssetResource *destinationResource;
+    // Return immediately if the last resource is full size video.
+    if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypeFullSizeVideo) {
+        destinationResource = resources.lastObject;
+    }
+    // Iterate to find full size video.
+    if (!destinationResource) {
+        for (PHAssetResource *r in resources) {
+            if (r.type == PHAssetResourceTypeFullSizeVideo) {
+                destinationResource = r;
                 break;
             }
         }
     }
-    if (!dstResource) {
+    // Iterate to find alternate video.
+    if (!destinationResource) {
+        for (PHAssetResource *r in resources) {
+            if (r.type == PHAssetResourceTypeVideo) {
+                destinationResource = r;
+                break;
+            }
+        }
+    }
+    if (!destinationResource) {
         [handler reply:nil];
         return;
     }
@@ -469,7 +479,7 @@
         }
     }];
     
-    [manager writeDataForAssetResource:dstResource
+    [manager writeDataForAssetResource:destinationResource
                                 toFile:fileUrl
                                options:options
                      completionHandler:^(NSError *_Nullable error) {
@@ -487,11 +497,8 @@
 - (void)fetchFullSizeVideo:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     NSString *homePath = NSTemporaryDirectory();
     NSFileManager *manager = NSFileManager.defaultManager;
-    
     NSMutableString *path = [NSMutableString stringWithString:homePath];
-    
     NSString *filename = [asset valueForKey:[NSString stringWithFormat:@"filename"]];
-    
     NSString *dirPath = [NSString stringWithFormat:@"%@/%@", homePath, @".video"];
     [manager createDirectoryAtPath:dirPath
        withIntermediateDirectories:true
@@ -499,15 +506,17 @@
                              error:nil];
     
     [path appendFormat:@"%@/%@", @".video", filename];
-    PHVideoRequestOptions *options = [PHVideoRequestOptions new];
     if ([manager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance]
          info:[NSString stringWithFormat:@"read cache from %@", path]];
         [handler reply:path];
         return;
     }
-    
-    
+
+    PHVideoRequestOptions *options = [PHVideoRequestOptions new];
+    [options setDeliveryMode:PHVideoRequestOptionsDeliveryModeAutomatic];
+    [options setNetworkAccessAllowed:YES];
+    [options setVersion:PHVideoRequestOptionsVersionCurrent];
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
     [options setProgressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
         if (error) {
@@ -519,9 +528,7 @@
             [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
         }
     }];
-    
-    [options setNetworkAccessAllowed:YES];
-    
+
     [[PHImageManager defaultManager]
      requestAVAssetForVideo:asset
      options:options
