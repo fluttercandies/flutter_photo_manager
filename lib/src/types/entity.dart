@@ -222,6 +222,7 @@ class AssetEntity {
     double? latitude,
     double? longitude,
     this.mimeType,
+    this.subType = 0,
   })  : _latitude = latitude,
         _longitude = longitude;
 
@@ -262,6 +263,15 @@ class AssetEntity {
 
   /// {@macro photo_manager.AssetType}
   AssetType get type => AssetType.values[typeInt];
+
+  /// The subtype of the asset.
+  ///
+  /// * Android: Always 0.
+  /// * iOS/macOS: https://developer.apple.com/documentation/photokit/phassetmediasubtype
+  final int subType;
+
+  /// Whether the asset is a live photo. Only valid on iOS/macOS.
+  bool get isLivePhoto => subType == 8;
 
   /// The type value of the [type].
   final int typeInt;
@@ -504,7 +514,7 @@ class AssetEntity {
   ///  * https://developer.android.com/reference/android/content/ContentUris
   ///  * https://developer.apple.com/documentation/avfoundation/avurlasset
   Future<String?> getMediaUrl() async {
-    if (type == AssetType.video || type == AssetType.audio) {
+    if (type == AssetType.video || type == AssetType.audio || isLivePhoto) {
       return plugin.getMediaUrl(this);
     }
     return null;
