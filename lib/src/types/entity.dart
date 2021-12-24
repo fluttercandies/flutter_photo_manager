@@ -222,6 +222,7 @@ class AssetEntity {
     double? latitude,
     double? longitude,
     this.mimeType,
+    this.subType = 0,
   })  : _latitude = latitude,
         _longitude = longitude;
 
@@ -262,6 +263,12 @@ class AssetEntity {
 
   /// {@macro photo_manager.AssetType}
   AssetType get type => AssetType.values[typeInt];
+
+  /// The subtype of the asset.
+  ///
+  /// * Android: Always 0.
+  /// * iOS/macOS: https://developer.apple.com/documentation/photokit/phassetmediasubtype
+  final int subType;
 
   /// The type value of the [type].
   final int typeInt;
