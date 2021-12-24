@@ -219,7 +219,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
         'relativePath': relativePath,
       },
     );
-    if (result == null) {
+    if (result is! Map) {
       return null;
     }
     return ConvertUtils.convertToAsset(result.cast<String, dynamic>());
@@ -245,7 +245,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
         'relativePath': relativePath,
       },
     );
-    if (result is! Map<String, dynamic>) {
+    if (result is! Map) {
       return null;
     }
     return ConvertUtils.convertToAsset(result.cast<String, dynamic>());
@@ -374,7 +374,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
       PMConstants.mCopyAsset,
       <String, dynamic>{'assetId': asset.id, 'galleryId': pathEntity.id},
     );
-    if (result is! Map<String, dynamic>) {
+    if (result is! Map) {
       return null;
     }
     return ConvertUtils.convertToAsset(result.cast<String, dynamic>());
