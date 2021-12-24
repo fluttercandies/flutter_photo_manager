@@ -271,7 +271,7 @@ class AssetEntity {
   final int subType;
 
   /// Whether the asset is a live photo. Only valid on iOS/macOS.
-  bool get _isLivePhoto => subType == 8;
+  bool get isLivePhoto => subType == 8;
 
   /// The type value of the [type].
   final int typeInt;
@@ -514,7 +514,7 @@ class AssetEntity {
   ///  * https://developer.android.com/reference/android/content/ContentUris
   ///  * https://developer.apple.com/documentation/avfoundation/avurlasset
   Future<String?> getMediaUrl() async {
-    if (type == AssetType.video || type == AssetType.audio || _isLivePhoto) {
+    if (type == AssetType.video || type == AssetType.audio || isLivePhoto) {
       return plugin.getMediaUrl(this);
     }
     return null;
