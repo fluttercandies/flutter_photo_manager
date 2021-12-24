@@ -346,11 +346,8 @@
                     [handler reply:nil];
                     return;
                 }
-                NSDictionary *resultData =
-                [PMConvertUtils convertPMAssetToMap:asset needTitle:NO];
-                [handler reply:@{@"data": resultData}];
+                [handler reply:[PMConvertUtils convertPMAssetToMap:asset needTitle:NO]];
             }];
-            
         } else if ([call.method isEqualToString:@"saveImageWithPath"]) {
             NSString *path = call.arguments[@"path"];
             NSString *title = call.arguments[@"title"];
@@ -364,11 +361,8 @@
                     [handler reply:nil];
                     return;
                 }
-                NSDictionary *resultData =
-                [PMConvertUtils convertPMAssetToMap:asset needTitle:NO];
-                [handler reply:@{@"data": resultData}];
+                [handler reply:[PMConvertUtils convertPMAssetToMap:asset needTitle:NO]];
             }];
-            
         } else if ([call.method isEqualToString:@"saveVideo"]) {
             NSString *videoPath = call.arguments[@"path"];
             NSString *title = call.arguments[@"title"];
@@ -382,9 +376,7 @@
                     [handler reply:nil];
                     return;
                 }
-                NSDictionary *resultData =
-                [PMConvertUtils convertPMAssetToMap:asset needTitle:NO];
-                [handler reply:@{@"data": resultData}];
+                [handler reply:[PMConvertUtils convertPMAssetToMap:asset needTitle:NO]];
             }];
         } else if ([call.method isEqualToString:@"assetExists"]) {
             NSString *assetId = call.arguments[@"id"];
@@ -407,8 +399,7 @@
                 [handler reply:nil];
                 return;
             }
-            NSDictionary *resultMap = [PMConvertUtils convertPMAssetToMap:entity needTitle:YES];
-            [handler reply:@{@"data": resultMap}];
+            [handler reply:[PMConvertUtils convertPMAssetToMap:entity needTitle:YES]];
         } else if ([@"getSubPath" isEqualToString:call.method]) {
             NSString *galleryId = call.arguments[@"id"];
             int type = [call.arguments[@"type"] intValue];

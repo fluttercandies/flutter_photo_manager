@@ -210,8 +210,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     String? relativePath,
   }) async {
     title ??= 'image_${DateTime.now().millisecondsSinceEpoch / 1000}.jpg';
-    final Map<dynamic, dynamic> result =
-        await _channel.invokeMethod<Map<dynamic, dynamic>>(
+    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mSaveImage,
       <String, dynamic>{
         'image': data,
@@ -219,8 +218,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
         'desc': desc ?? '',
         'relativePath': relativePath,
       },
-    ) as Map<dynamic, dynamic>;
-
+    );
+    if (result == null) {
+      return null;
+    }
     return ConvertUtils.convertToAsset(result.cast<String, dynamic>());
   }
 
@@ -235,8 +236,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
       assert(file.existsSync(), 'file must exists');
       return null;
     }
-    final Map<dynamic, dynamic> result =
-        await _channel.invokeMethod<Map<dynamic, dynamic>>(
+    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mSaveImageWithPath,
       <String, dynamic>{
         'path': path,
@@ -244,7 +244,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
         'desc': desc ?? '',
         'relativePath': relativePath,
       },
-    ) as Map<dynamic, dynamic>;
+    );
+    if (result == null) {
+      return null;
+    }
     return ConvertUtils.convertToAsset(result.cast<String, dynamic>());
   }
 
@@ -258,8 +261,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
       assert(file.existsSync(), 'file must exists');
       return null;
     }
-    final Map<dynamic, dynamic> result =
-        await _channel.invokeMethod<Map<dynamic, dynamic>>(
+    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mSaveVideo,
       <String, dynamic>{
         'path': file.absolute.path,
@@ -267,7 +269,10 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
         'desc': desc ?? '',
         'relativePath': relativePath,
       },
-    ) as Map<dynamic, dynamic>;
+    );
+    if (result == null) {
+      return null;
+    }
     return ConvertUtils.convertToAsset(result.cast<String, dynamic>());
   }
 
