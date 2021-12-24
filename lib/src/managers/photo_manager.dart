@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import '../filter/filter_option_group.dart';
 import '../internal/editor.dart';
 import '../internal/enums.dart';
-import '../internal/extensions.dart';
 import '../internal/plugin.dart';
 import '../types/entity.dart';
 import '../types/types.dart';
@@ -15,14 +14,6 @@ import 'notify_manager.dart';
 /// Use various methods in this class to access & manage assets.
 class PhotoManager {
   const PhotoManager._();
-
-  @Deprecated(
-    'Use requestPermissionExtend for better compatibility. '
-    'This feature was deprecated after v2.0.0.',
-  )
-  static Future<bool> requestPermission() async {
-    return (await requestPermissionExtend()).isAuth;
-  }
 
   /// ### Android (AndroidManifest.xml)
   ///  * WRITE_EXTERNAL_STORAGE

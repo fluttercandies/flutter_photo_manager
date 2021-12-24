@@ -74,20 +74,6 @@ class AssetPathEntity {
   /// this value is determined as final when user construct the album.
   late RequestType type;
 
-  @Deprecated(
-    'This is an internal field and should not being used anymore. '
-    'This feature was deprecated after v1.4.0.',
-  )
-  int get typeInt => type.value;
-
-  @Deprecated(
-    'This is an internal field and should not being used anymore. '
-    'This feature was deprecated after v1.4.0.',
-  )
-  set typeInt(int typeInt) {
-    type = RequestType(typeInt);
-  }
-
   /// Whether the album contains all assets.
   ///
   /// An album includes all assets is the default album in general.
@@ -161,12 +147,6 @@ class AssetPathEntity {
       optionGroup: filterOption,
     );
   }
-
-  @Deprecated(
-    'Use getAssetListPaged or getAssetListRange for better performance. '
-    'This feature was deprecated after v1.4.0.',
-  )
-  Future<List<AssetEntity>> get assetList => getAssetListPaged(0, assetCount);
 
   /// Request subpaths for the album.
   ///
