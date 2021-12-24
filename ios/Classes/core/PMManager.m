@@ -1098,7 +1098,6 @@
      performChangesAndWait:^{
         PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
         [request addAssets:asset];
-        //              [request insertAssets:asset atIndexes:[NSIndexSet indexSetWithIndex:0]];
         
     } error:&error];
     
