@@ -976,6 +976,14 @@
 
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler {
     PHAsset *phAsset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
+    if (@available(iOS 9.1, *)) {
+        if (phAsset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
+            PHAssetResource *resource = [PHAssetResource assetResourcesForAsset:phAsset].lastObject;
+            NSURL *fileUrl = [resource valueForKey:@"privateFileURL"];
+            [handler reply:fileUrl.absoluteString];
+            return;
+        }
+    }
     if (phAsset.isVideo) {
         [PHCachingImageManager.defaultManager requestAVAssetForVideo:phAsset options:nil resultHandler:^(AVAsset *asset, AVAudioMix *audioMix, NSDictionary *info) {
             if ([asset isKindOfClass:[AVURLAsset class]]) {
