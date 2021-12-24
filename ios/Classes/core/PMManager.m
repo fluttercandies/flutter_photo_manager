@@ -322,6 +322,7 @@
     entity.lng = asset.location.coordinate.longitude;
     entity.title = needTitle ? [asset title] : @"";
     entity.favorite = asset.isFavorite;
+    entity.subType = asset.mediaSubtypes;
     
     return entity;
 }

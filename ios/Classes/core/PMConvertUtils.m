@@ -87,6 +87,7 @@
         @"lng": @(asset.location.coordinate.longitude),
         @"lat": @(asset.location.coordinate.latitude),
         @"title": needTitle ? [asset title] : @"",
+        @"subType": @(asset.mediaSubtypes),
     };
 }
 
@@ -104,6 +105,7 @@
         @"lng": @(asset.lng),
         @"lat": @(asset.lat),
         @"title": needTitle ? asset.title : @"",
+        @"subType": @(asset.subType),
     };
 }
 
