@@ -164,7 +164,7 @@ class PhotoManager {
   static Future<AssetEntity?> refreshAssetProperties(String id) async {
     final Map<dynamic, dynamic>? result =
         await plugin.getPropertiesFromAssetEntity(id);
-    if (result is! Map<String, dynamic>) {
+    if (result == null) {
       return null;
     }
     final AssetEntity? asset = ConvertUtils.convertToAsset(
