@@ -432,22 +432,32 @@
 }
 
 - (void)fetchOriginVideoFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    NSArray<PHAssetResource *> *resources =
-    [PHAssetResource assetResourcesForAsset:asset];
-    // find asset
-    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset has %lu resources.", (unsigned long) resources.count] ];
-    PHAssetResource *dstResource;
-    if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypeVideo) {
-        dstResource = resources.lastObject;
-    } else {
-        for (PHAssetResource *resource in resources) {
-            if (resource.type == PHAssetResourceTypeVideo) {
-                dstResource = resource;
+    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:asset];
+    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset has %lu resources.", (unsigned long) resources.count]];
+    PHAssetResource *destinationResource;
+    // Return immediately if the last resource is full size video.
+    if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypeFullSizeVideo) {
+        destinationResource = resources.lastObject;
+    }
+    // Iterate to find full size video.
+    if (!destinationResource) {
+        for (PHAssetResource *r in resources) {
+            if (r.type == PHAssetResourceTypeFullSizeVideo) {
+                destinationResource = r;
                 break;
             }
         }
     }
-    if (!dstResource) {
+    // Iterate to find alternate video.
+    if (!destinationResource) {
+        for (PHAssetResource *r in resources) {
+            if (r.type == PHAssetResourceTypeVideo) {
+                destinationResource = r;
+                break;
+            }
+        }
+    }
+    if (!destinationResource) {
         [handler reply:nil];
         return;
     }
@@ -469,7 +479,7 @@
         }
     }];
     
-    [manager writeDataForAssetResource:dstResource
+    [manager writeDataForAssetResource:destinationResource
                                 toFile:fileUrl
                                options:options
                      completionHandler:^(NSError *_Nullable error) {
