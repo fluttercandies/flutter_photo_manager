@@ -270,6 +270,9 @@ class AssetEntity {
   /// * iOS/macOS: https://developer.apple.com/documentation/photokit/phassetmediasubtype
   final int subType;
 
+  /// Whether the asset is a live photo. Only valid on iOS/macOS.
+  bool get _isLivePhoto => subType == 8;
+
   /// The type value of the [type].
   final int typeInt;
 
