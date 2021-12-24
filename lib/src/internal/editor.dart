@@ -31,11 +31,12 @@ class Editor {
 
   /// Save image to gallery.
   ///
-  /// in iOS is Recent.
-  /// in Android is Picture.
-  /// On Android 28 or lower, if the file is located in the external storage, it's path will be used in the MediaStore.
-  /// On Android 29 or above, you can use [relativePath] to specify a RELATIVE_PATH used in the MediaStore.
-  /// The mimeType will either be formed from the title if you pass one, or guessed by the system, which does not always work.
+  /// {@template photo_manager.SavingAssets}
+  /// On Android 29 and above, you can use [relativePath] to specify the
+  /// `RELATIVE_PATH` used in the MediaStore.
+  /// The MIME type will either be formed from the title if you pass one,
+  /// or guessed by the system, which does not always work.
+  /// {@endtemplate}
   Future<AssetEntity?> saveImage(
     Uint8List data, {
     required String? title,
@@ -52,10 +53,7 @@ class Editor {
 
   /// Save image to gallery.
   ///
-  /// in iOS is Recent.
-  /// in Android is picture directory.
-  /// On Android 28 or lower, if the file is located in the external storage, it's path will be used in the MediaStore.
-  /// On Android 29 or above, you can use [relativePath] to specify a RELATIVE_PATH used in the MediaStore.
+  /// {@macro photo_manager.SavingAssets}
   Future<AssetEntity?> saveImageWithPath(
     String path, {
     required String title,
@@ -72,10 +70,7 @@ class Editor {
 
   /// Save video to gallery.
   ///
-  /// in iOS is Recent.
-  /// in Android is video directory.
-  /// On Android 28 or lower, if the file is located in the external storage, it's path will be used in the MediaStore.
-  /// On Android 29 or above, you can use [relativePath] to specify a RELATIVE_PATH used in the MediaStore.
+  /// {@macro photo_manager.SavingAssets}
   Future<AssetEntity?> saveVideo(
     File file, {
     required String title,
@@ -92,8 +87,8 @@ class Editor {
 
   /// Copy asset to another gallery.
   ///
-  /// In iOS, just something similar to a shortcut, it points to the same asset.
-  /// In android, the asset file will produce a copy.
+  /// - Android: Produce a copy of the original file.
+  /// - iOS/macOS: Make a soft link to the target file.
   Future<AssetEntity?> copyAssetToPath({
     required AssetEntity asset,
     required AssetPathEntity pathEntity,
@@ -102,7 +97,6 @@ class Editor {
   }
 }
 
-/// For iOS
 class IosEditor {
   const IosEditor();
 

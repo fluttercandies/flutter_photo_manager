@@ -20,19 +20,19 @@ enum AssetType {
 /// {%endtemplate}
 enum ThumbFormat { jpeg, png }
 
-/// The delivery mode enumeration for `PHImageRequestOptionsDeliveryMode`.
+/// Enumeration for `PHImageRequestOptionsDeliveryMode` on iOS/macOS.
 ///
 /// See also:
 ///  * [Apple documentation](https://developer.apple.com/documentation/photokit/phimagerequestoptionsdeliverymode)
 enum DeliveryMode { opportunistic, highQualityFormat, fastFormat }
 
-/// A mode that specifies how to resize the requested image on iOS/macOS.
+/// Specifies how to resize the requested image on iOS/macOS.
 ///
 /// See also:
 ///  * [Apple documentation](https://developer.apple.com/documentation/photokit/phimagerequestoptions/1616988-resizemode)
 enum ResizeMode { none, fast, exact }
 
-/// Options for fitting an image’s aspect ratio to a requested size.
+/// Fitting an image’s aspect ratio to a requested size on iOS/macOS.
 ///
 /// See also:
 ///  * [Apple documentation](https://developer.apple.com/documentation/photokit/phimagecontentmode)
@@ -45,7 +45,7 @@ enum OrderOptionType { createDate, updateDate }
 /// {@endtemplate}
 enum PMRequestState { prepare, loading, success, failed }
 
-/// Information about your app’s authorization to access the user’s photo library.
+/// Information about app’s authorization to access the user’s photo library.
 ///  * Android: Only [authorized] and [denied] are valid.
 ///  * iOS/macOS: All valid.
 ///

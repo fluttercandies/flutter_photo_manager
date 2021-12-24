@@ -14,6 +14,10 @@ import 'progress_handler.dart';
 
 final Plugin plugin = Plugin();
 
+mixin BasePlugin {
+  final MethodChannel _channel = const MethodChannel(PMConstants.channelPrefix);
+}
+
 /// The plugin class is shield and should not be use directly.
 class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   factory Plugin() => _instance;
@@ -457,10 +461,6 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 }
 
-mixin BasePlugin {
-  final MethodChannel _channel = const MethodChannel(PMConstants.channelPrefix);
-}
-
 mixin IosPlugin on BasePlugin {
   Future<bool> isLocallyAvailable(String id) async {
     if (Platform.isAndroid) {
@@ -553,7 +553,6 @@ mixin AndroidPlugin on BasePlugin {
     AssetEntity entity,
     AssetPathEntity target,
   ) async {
-    // Return an entity.
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mMoveAssetToPath,
       <String, dynamic>{'assetId': entity.id, 'albumId': target.id},
