@@ -47,11 +47,8 @@ class ConvertUtils {
     return result;
   }
 
-  static AssetEntity? convertToAsset(Map<String, dynamic>? map) {
-    if (map?['data'] is Map<String, dynamic>) {
-      return _convertMapToAsset(map!['data'] as Map<String, dynamic>);
-    }
-    return null;
+  static AssetEntity? convertToAsset(Map<String, dynamic> map) {
+    return _convertMapToAsset(map);
   }
 
   static AssetEntity? _convertMapToAsset(Map<String, dynamic>? data) {
