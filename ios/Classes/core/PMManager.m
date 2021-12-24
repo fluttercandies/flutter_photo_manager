@@ -664,25 +664,19 @@
 
 - (void)fetchOriginImageFile:(PHAsset *)asset resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PHAssetResource *imageResource = [asset getAdjustResource];
-    
     if (!imageResource) {
         [handler reply:nil];
         return;
     }
     
     PHAssetResourceManager *manager = PHAssetResourceManager.defaultManager;
-    
     NSString *path = [self makeAssetOutputPath:asset isOrigin:YES];
     NSURL *fileUrl = [NSURL fileURLWithPath:path];
-    
     [PMFileHelper deleteFile:path];
     
     PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
     [options setNetworkAccessAllowed:YES];
-    
-    
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
-    
     [options setProgressHandler:^(double progress) {
         if (progress != 1) {
             [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
