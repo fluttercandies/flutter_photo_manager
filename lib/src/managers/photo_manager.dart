@@ -77,6 +77,11 @@ class PhotoManager {
       type != RequestType.all,
       'The request type must have video, image or audio.',
     );
+    assert(
+      type == RequestType.image || !filterOption.onlyLivePhotos,
+      'Filtering only Live Photos is only supported '
+      'when the request type contains image.',
+    );
     if (type == RequestType.all) {
       return <AssetPathEntity>[];
     }
