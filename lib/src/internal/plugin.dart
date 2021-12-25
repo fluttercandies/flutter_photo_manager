@@ -295,9 +295,9 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<String> getSystemVersion() async {
-    return _channel.invokeMethod<String>(
+    return await _channel.invokeMethod<String>(
       PMConstants.mSystemVersion,
-    ) as Future<String>;
+    ) as String;
   }
 
   Future<LatLng> getLatLngAsync(AssetEntity entity) async {

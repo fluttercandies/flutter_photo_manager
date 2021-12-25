@@ -1,13 +1,9 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
-import '../core/lru_map.dart';
 import '../model/photo_provider.dart';
 import 'change_notifier_builder.dart';
-import 'loading_widget.dart';
 
 class ImageItemWidget extends StatefulWidget {
   const ImageItemWidget({
@@ -39,52 +35,19 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
   Widget buildContent(ThumbFormat format) {
     if (widget.entity.type == AssetType.audio) {
       return const Center(
-        child: Icon(
-          Icons.audiotrack,
-          size: 30,
-        ),
+        child: Icon(Icons.audiotrack, size: 30),
       );
     }
-    final AssetEntity item = widget.entity;
-    final int size = widget.option.width;
-    final Uint8List? u8List = ImageLruCache.getData(item, size, format);
-
-    Widget image;
-
-    if (u8List != null) {
-      return _buildImageWidget(item, u8List, size);
-    } else {
-      image = FutureBuilder<Uint8List?>(
-        future: item.thumbDataWithOption(widget.option),
-        builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
-          Widget w;
-          if (snapshot.hasError) {
-            w = Center(
-              child: Text('load error, error: ${snapshot.error}'),
-            );
-          }
-          if (snapshot.hasData) {
-            ImageLruCache.setData(item, size, format, snapshot.data!);
-            w = _buildImageWidget(item, snapshot.data!, size);
-          } else {
-            w = Center(
-              child: loadWidget,
-            );
-          }
-
-          return w;
-        },
-      );
-    }
-
-    return image;
+    return _buildImageWidget(widget.entity, widget.option);
   }
 
-  Widget _buildImageWidget(AssetEntity entity, Uint8List uint8list, num size) {
-    return Image.memory(
-      uint8list,
-      width: size.toDouble(),
-      height: size.toDouble(),
+  Widget _buildImageWidget(AssetEntity entity, ThumbOption option) {
+    return Image(
+      image: AssetEntityImageProvider(
+        entity,
+        thumbSize: <int>[option.width, option.height],
+        thumbFormat: option.format,
+      ),
       fit: BoxFit.cover,
     );
   }

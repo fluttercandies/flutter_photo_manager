@@ -5,6 +5,8 @@
 class PMConstants {
   const PMConstants._();
 
+  static const List<int> defaultGridThumbSizes = <int>[200, 200];
+
   static const String channelPrefix = 'com.fluttercandies/photo_manager';
 
   /// Keys for [MethodCall]s.

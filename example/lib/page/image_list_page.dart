@@ -235,10 +235,12 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       },
       child: Stack(
         children: <Widget>[
-          ImageItemWidget(
-            key: ValueKey<AssetEntity>(entity),
-            entity: entity,
-            option: thumbOption,
+          Positioned.fill(
+            child: ImageItemWidget(
+              key: ValueKey<AssetEntity>(entity),
+              entity: entity,
+              option: thumbOption,
+            ),
           ),
           Align(
             alignment: Alignment.topRight,

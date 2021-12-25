@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
@@ -71,19 +69,31 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget buildImage() {
-    return FutureBuilder<File?>(
-      future: useOrigin == true ? widget.entity.originFile : widget.entity.file,
-      builder: (_, AsyncSnapshot<File?> snapshot) {
-        if (snapshot.data == null) {
-          return const Center(
-            child: SizedBox(
-              width: 30,
-              height: 30,
-              child: CircularProgressIndicator(),
+    return Image(
+      image: AssetEntityImageProvider(
+        widget.entity,
+        isOriginal: useOrigin == true,
+      ),
+      loadingBuilder: (
+        BuildContext context,
+        Widget child,
+        ImageChunkEvent? progress,
+      ) {
+        if (progress != null) {
+          final double? value;
+          if (progress.expectedTotalBytes != null) {
+            value = progress.cumulativeBytesLoaded / progress.expectedTotalBytes!;
+          } else {
+            value = null;
+          }
+          return Center(
+            child: SizedBox.fromSize(
+              size: const Size.square(30),
+              child: CircularProgressIndicator(value: value),
             ),
           );
         }
-        return Image.file(snapshot.data!);
+        return child;
       },
     );
   }
