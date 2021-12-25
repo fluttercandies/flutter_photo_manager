@@ -202,7 +202,7 @@ class AssetEntity {
     double? latitude,
     double? longitude,
     this.mimeType,
-    this.subType = 0,
+    this.subtype = 0,
   })  : _latitude = latitude,
         _longitude = longitude;
 
@@ -248,10 +248,10 @@ class AssetEntity {
   ///
   /// * Android: Always 0.
   /// * iOS/macOS: https://developer.apple.com/documentation/photokit/phassetmediasubtype
-  final int subType;
+  final int subtype;
 
   /// Whether the asset is a live photo. Only valid on iOS/macOS.
-  bool get isLivePhoto => subType == 8;
+  bool get isLivePhoto => subtype == 8;
 
   /// The type value of the [type].
   final int typeInt;

@@ -241,8 +241,11 @@
             BOOL onlyAll = [call.arguments[@"onlyAll"] boolValue];
             PMFilterOptionGroup *option =
             [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
-            NSArray<PMAssetPathEntity *> *array = [manager getGalleryList:type hasAll:hasAll onlyAll:onlyAll option:option];
-            
+            NSArray<PMAssetPathEntity *> *array = [manager
+                                                   getGalleryList:type
+                                                   hasAll:hasAll
+                                                   onlyAll:onlyAll
+                                                   option:option];
             if (option.containsModified) {
                 for (PMAssetPathEntity *path in array) {
                     [manager injectModifyToDate:path];
@@ -261,20 +264,28 @@
             PMFilterOptionGroup *option =
             [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
             NSArray<PMAssetEntity *> *array =
-            [manager getAssetEntityListWithGalleryId:id type:type page:page pageCount:pageCount filterOption:option];
+            [manager getAssetEntityListWithGalleryId:id
+                                                type:type
+                                                page:page
+                                           pageCount:pageCount
+                                        filterOption:option];
             NSDictionary *dictionary =
             [PMConvertUtils convertAssetToMap:array optionGroup:option];
             [handler reply:dictionary];
             
         } else if ([call.method isEqualToString:@"getAssetListWithRange"]) {
             NSString *galleryId = call.arguments[@"galleryId"];
-            NSUInteger type = [call.arguments[@"type"] unsignedIntegerValue];
+            int type = [call.arguments[@"type"] intValue];
             NSUInteger start = [call.arguments[@"start"] unsignedIntegerValue];
             NSUInteger end = [call.arguments[@"end"] unsignedIntegerValue];
             PMFilterOptionGroup *option =
             [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
             NSArray<PMAssetEntity *> *array =
-            [manager getAssetEntityListWithRange:galleryId type:type start:start end:end filterOption:option];
+            [manager getAssetEntityListWithRange:galleryId
+                                            type:type
+                                           start:start
+                                             end:end
+                                    filterOption:option];
             NSDictionary *dictionary =
             [PMConvertUtils convertAssetToMap:array optionGroup:option];
             [handler reply:dictionary];

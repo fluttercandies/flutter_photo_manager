@@ -87,7 +87,7 @@
         @"lng": @(asset.location.coordinate.longitude),
         @"lat": @(asset.location.coordinate.latitude),
         @"title": needTitle ? [asset title] : @"",
-        @"subType": @(asset.mediaSubtypes),
+        @"subtype": @(asset.mediaSubtypes),
     };
 }
 
@@ -105,7 +105,7 @@
         @"lng": @(asset.lng),
         @"lat": @(asset.lat),
         @"title": needTitle ? asset.title : @"",
-        @"subType": @(asset.subType),
+        @"subtype": @(asset.subtype),
     };
 }
 
@@ -122,6 +122,8 @@
     container.updateOption = [self convertMapToPMDateOption:map[@"updateDate"]];
     container.containsEmptyAlbum = [map[@"containsEmptyAlbum"] boolValue];
     container.containsModified = [map[@"containsPathModified"] boolValue];
+    container.containsLivePhotos = [map[@"containsLivePhotos"] boolValue];
+    container.onlyLivePhotos = [map[@"onlyLivePhotos"] boolValue];
     
     NSArray *sortArray = map[@"orders"];
     [container injectSortArray: sortArray];

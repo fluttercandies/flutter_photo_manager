@@ -45,6 +45,24 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _containsLivePhotos = true;
+
+  bool get containsLivePhotos => _containsLivePhotos;
+
+  set containsLivePhotos(bool value) {
+    _containsLivePhotos = value;
+    notifyListeners();
+  }
+
+  bool _onlyLivePhotos = false;
+
+  bool get onlyLivePhotos => _onlyLivePhotos;
+
+  set onlyLivePhotos(bool value) {
+    _onlyLivePhotos = value;
+    notifyListeners();
+  }
+
   DateTime _startDt = DateTime(2005); // Default Before 8 years
 
   DateTime get startDt => _startDt;
@@ -215,7 +233,9 @@ class PhotoProvider extends ChangeNotifier {
       ..setOption(AssetType.audio, option)
       ..createTimeCond = createDtCond
       ..containsEmptyAlbum = _containsEmptyAlbum
-      ..containsPathModified = _containsPathModified;
+      ..containsPathModified = _containsPathModified
+      ..containsLivePhotos = _containsLivePhotos
+      ..onlyLivePhotos = onlyLivePhotos;
   }
 
   Future<void> refreshAllGalleryProperties() async {
