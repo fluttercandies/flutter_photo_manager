@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
@@ -35,14 +33,28 @@ class _CopyToAnotherGalleryPageState extends State<CopyToAnotherGalleryPage> {
         children: <Widget>[
           AspectRatio(
             aspectRatio: 1,
-            child: FutureBuilder<Uint8List?>(
-              future: widget.assetEntity.thumbDataWithSize(500, 500),
-              builder:
-                  (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
-                if (snapshot.hasData) {
-                  return Image.memory(snapshot.data!);
+            child: Image(
+              image: AssetEntityImageProvider(
+                widget.assetEntity,
+                thumbSize: const <int>[500, 500],
+              ),
+              loadingBuilder: (_, Widget child, ImageChunkEvent? progress) {
+                if (progress == null) {
+                  return child;
                 }
-                return const Text('loading');
+                final double? value;
+                if (progress.expectedTotalBytes != null) {
+                  value = progress.cumulativeBytesLoaded /
+                      progress.expectedTotalBytes!;
+                } else {
+                  value = null;
+                }
+                return Center(
+                  child: SizedBox.fromSize(
+                    size: const Size.square(40),
+                    child: CircularProgressIndicator(value: value),
+                  ),
+                );
               },
             ),
           ),
