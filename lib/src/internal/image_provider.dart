@@ -15,8 +15,9 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
   const AssetEntityImageProvider(
     this.entity, {
     this.scale = 1.0,
-    this.thumbSize = PMConstants.defaultGridThumbSizes,
     this.isOriginal = true,
+    this.thumbSize = PMConstants.defaultGridThumbSizes,
+    this.thumbFormat = ThumbFormat.jpeg,
   }) : assert(
           isOriginal || thumbSize?.length == 2,
           'thumbSize must contain and only contain two integers '
@@ -29,13 +30,16 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
   /// 缩放
   final double scale;
 
+  /// Choose if original data or thumb data should be loaded.
+  /// 选择载入原数据还是缩略图数据
+  final bool isOriginal;
+
   /// Size for thumb data.
   /// 缩略图的大小
   final List<int>? thumbSize;
 
-  /// Choose if original data or thumb data should be loaded.
-  /// 选择载入原数据还是缩略图数据
-  final bool isOriginal;
+  /// {@macro photo_manager.ThumbnailFormat}
+  final ThumbFormat thumbFormat;
 
   /// File type for the image asset, use it for some special type detection.
   /// 图片资源的类型，用于某些特殊类型的判断
@@ -119,9 +123,9 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
 
   ThumbOption _thumbOption(int width, int height) {
     if (Platform.isIOS || Platform.isMacOS) {
-      return ThumbOption.ios(width: width, height: height);
+      return ThumbOption.ios(width: width, height: height, format: thumbFormat);
     }
-    return ThumbOption(width: width, height: height);
+    return ThumbOption(width: width, height: height, format: thumbFormat);
   }
 
   /// Get image type by reading the file extension.
