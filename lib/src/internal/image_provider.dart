@@ -14,7 +14,6 @@ import 'enums.dart';
 class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
   const AssetEntityImageProvider(
     this.entity, {
-    this.scale = 1.0,
     this.isOriginal = true,
     this.thumbSize = PMConstants.defaultGridThumbSizes,
     this.thumbFormat = ThumbFormat.jpeg,
@@ -25,10 +24,6 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
         );
 
   final AssetEntity entity;
-
-  /// Scale for image provider.
-  /// 缩放
-  final double scale;
 
   /// Choose if original data or thumb data should be loaded.
   /// 选择载入原数据还是缩略图数据
@@ -52,7 +47,7 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
   ) {
     return MultiFrameImageStreamCompleter(
       codec: _loadAsync(key, decode),
-      scale: key.scale,
+      scale: 1.0,
       informationCollector: () {
         return <DiagnosticsNode>[
           DiagnosticsProperty<ImageProvider>('Image provider', this),
@@ -174,7 +169,6 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
       return true;
     }
     return entity == other.entity &&
-        scale == other.scale &&
         thumbSize == other.thumbSize &&
         isOriginal == other.isOriginal;
   }
@@ -183,7 +177,6 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
   int get hashCode {
     return hashValues(
       entity,
-      scale,
       thumbSize?.elementAt(0) ?? 0,
       thumbSize?.elementAt(1) ?? 0,
       isOriginal,
