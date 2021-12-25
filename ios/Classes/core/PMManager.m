@@ -750,6 +750,21 @@
             [cond appendString:sizeCond];
             [args addObjectsFromArray:sizeArgs];
         }
+        if (@available(iOS 9.1, *)) {
+            if (optionGroup.onlyLivePhotos) {
+                [cond appendString:@" AND "];
+                [cond appendString:[NSString
+                                    stringWithFormat:@"mediaSubtype == %lu",
+                                    (unsigned long)PHAssetMediaSubtypePhotoLive]
+                ];
+            } else if (!optionGroup.containsLivePhotos) {
+                [cond appendString:@" AND "];
+                [cond appendString:[NSString
+                                    stringWithFormat:@"mediaSubtype != %lu",
+                                    (unsigned long)PHAssetMediaSubtypePhotoLive]
+                ];
+            }
+        }
         
         [cond appendString:@" )"];
     }
@@ -771,6 +786,21 @@
         [cond appendString:@" AND "];
         [cond appendString:durationCond];
         [args addObjectsFromArray:durationArgs];
+        
+        if (@available(iOS 9.1, *)) {
+            if (!containsImage && optionGroup.containsLivePhotos) {
+                [cond appendString:@" )"];
+                [cond appendString:@" OR "];
+                [cond appendString:@"( "];
+                [cond appendString:@"mediaType == %d"];
+                [args addObject:@(PHAssetMediaTypeImage)];
+                [cond appendString:@" AND "];
+                [cond appendString:[NSString
+                                    stringWithFormat:@"mediaSubtype == %lu",
+                                    (unsigned long)PHAssetMediaSubtypePhotoLive]
+                ];
+            }
+        }
         
         [cond appendString:@" ) "];
     }
