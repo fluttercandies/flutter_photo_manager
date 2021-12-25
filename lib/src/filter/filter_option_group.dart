@@ -50,7 +50,14 @@ class FilterOptionGroup {
   ///  * [AssetPathEntity.lastModified].
   bool containsPathModified = false;
 
+  /// Whether to obtain live photos.
+  ///
+  /// This option only takes effects on iOS.
   bool containsLivePhotos = true;
+
+  /// Whether to obtain only live photos.
+  ///
+  /// This option only takes effects on iOS and when the request type is image.
   bool onlyLivePhotos = false;
 
   DateTimeCond createTimeCond = DateTimeCond.def();
