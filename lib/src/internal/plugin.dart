@@ -495,12 +495,7 @@ mixin IosPlugin on BasePlugin {
     if (result['errorMsg'] != null) {
       return null;
     }
-    return AssetPathEntity()
-      ..id = result['id'] as String
-      ..name = name
-      ..isAll = false
-      ..assetCount = 0
-      ..albumType = 1;
+    return AssetPathEntity.fromId(result['id'] as String);
   }
 
   Future<AssetPathEntity?> iosCreateFolder(
@@ -525,12 +520,7 @@ mixin IosPlugin on BasePlugin {
     if (result['errorMsg'] != null) {
       return null;
     }
-    return AssetPathEntity()
-      ..id = result['id'] as String
-      ..name = name
-      ..isAll = false
-      ..assetCount = 0
-      ..albumType = 2;
+    return AssetPathEntity.fromId(result['id'] as String, albumType: 2);
   }
 
   Future<bool> iosRemoveInAlbum(

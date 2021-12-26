@@ -7,7 +7,6 @@ import '../internal/enums.dart';
 import '../internal/plugin.dart';
 import '../types/entity.dart';
 import '../types/types.dart';
-import '../utils/convert_utils.dart';
 import 'notify_manager.dart';
 
 /// The core manager of this plugin.
@@ -158,41 +157,6 @@ class PhotoManager {
   static void stopChangeNotify() {
     _notifyManager.stopHandleNotify();
     notifyingOfChange = false;
-  }
-
-  /// Refresh the property of [AssetPathEntity] from the given ID.
-  static Future<AssetEntity?> refreshAssetProperties(String id) async {
-    final Map<dynamic, dynamic>? result =
-        await plugin.getPropertiesFromAssetEntity(id);
-    if (result == null) {
-      return null;
-    }
-    return ConvertUtils.convertMapToAsset(result.cast<String, dynamic>());
-  }
-
-  /// Obtain a new [AssetPathEntity] from the given one
-  /// with refreshed properties.
-  static Future<AssetPathEntity?> fetchPathProperties({
-    required AssetPathEntity entity,
-    required FilterOptionGroup filterOptionGroup,
-  }) async {
-    final Map<dynamic, dynamic>? result = await plugin.fetchPathProperties(
-      entity.id,
-      entity.type,
-      entity.filterOption,
-    );
-    if (result == null) {
-      return null;
-    }
-    final Object? list = result['data'];
-    if (list is List && list.isNotEmpty) {
-      return ConvertUtils.convertPath(
-        result.cast<String, dynamic>(),
-        type: entity.type,
-        optionGroup: entity.filterOption,
-      ).first;
-    }
-    return null;
   }
 
   static Future<void> forceOldApi() => plugin.forceOldApi();
