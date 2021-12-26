@@ -165,9 +165,9 @@ object DBUtils : IDBUtils {
     override fun getAssetFromGalleryId(
         context: Context,
         galleryId: String,
-        requestType: Int,
         page: Int,
         size: Int,
+        requestType: Int,
         option: FilterOption,
         cacheContainer: CacheContainer?
     ): List<AssetEntity> {

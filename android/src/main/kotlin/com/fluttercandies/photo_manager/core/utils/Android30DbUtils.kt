@@ -197,7 +197,7 @@ object Android30DbUtils : IDBUtils {
             "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
         }
 
-        val sortOrder = getSortOrder(page * pageSize, pageSize, option)
+        val sortOrder = getSortOrder(page * size, size, option)
 
         val cursor =
             context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
