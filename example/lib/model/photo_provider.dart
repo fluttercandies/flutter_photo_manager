@@ -93,7 +93,7 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  ThumbFormat _thumbFormat = ThumbFormat.png;
+  ThumbFormat _thumbFormat = ThumbFormat.jpeg;
 
   ThumbFormat get thumbFormat => _thumbFormat;
 

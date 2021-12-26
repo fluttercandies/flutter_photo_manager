@@ -45,6 +45,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
     return Image(
       image: AssetEntityImageProvider(
         entity,
+        isOriginal: false,
         thumbSize: <int>[option.width, option.height],
         thumbFormat: option.format,
       ),
