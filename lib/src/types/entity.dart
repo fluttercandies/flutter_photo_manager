@@ -115,6 +115,11 @@ class AssetPathEntity {
   Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) {
     assert(albumType == 1, 'Only album can request for assets.');
     assert(pageSize > 0, 'The pageSize must be greater than 0.');
+    assert(
+      type == RequestType.image || !filterOption.onlyLivePhotos,
+      'Filtering only Live Photos is only supported '
+      'when the request type contains image.',
+    );
     return plugin.getAssetWithGalleryIdPaged(
       id,
       page: page,
@@ -136,6 +141,11 @@ class AssetPathEntity {
     assert(albumType == 1, 'Only album can request for assets.');
     assert(start >= 0, 'The start must be greater than 0.');
     assert(end > start, 'The end must be greater than start.');
+    assert(
+      type == RequestType.image || !filterOption.onlyLivePhotos,
+      'Filtering only Live Photos is only supported '
+      'when the request type contains image.',
+    );
     if (end > assetCount) {
       end = assetCount;
     }
@@ -202,7 +212,7 @@ class AssetEntity {
     double? latitude,
     double? longitude,
     this.mimeType,
-    this.subType = 0,
+    this.subtype = 0,
   })  : _latitude = latitude,
         _longitude = longitude;
 
@@ -248,10 +258,10 @@ class AssetEntity {
   ///
   /// * Android: Always 0.
   /// * iOS/macOS: https://developer.apple.com/documentation/photokit/phassetmediasubtype
-  final int subType;
+  final int subtype;
 
   /// Whether the asset is a live photo. Only valid on iOS/macOS.
-  bool get isLivePhoto => subType == 8;
+  bool get isLivePhoto => subtype == 8;
 
   /// The type value of the [type].
   final int typeInt;

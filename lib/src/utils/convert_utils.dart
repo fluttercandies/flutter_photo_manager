@@ -56,7 +56,7 @@ class ConvertUtils {
       orientation: data['orientation'] as int? ?? 0,
       isFavorite: data['favorite'] as bool? ?? false,
       title: data['title'] as String? ?? title,
-      subType: data['subType'] as int? ?? 0,
+      subtype: data['subtype'] as int? ?? 0,
       createDtSecond: data['createDt'] as int?,
       modifiedDateSecond: data['modifiedDt'] as int?,
       relativePath: data['relativePath'] as String?,

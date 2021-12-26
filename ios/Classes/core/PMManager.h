@@ -36,6 +36,8 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id type:(int)type page:(NSUInteger)page pageCount:(NSUInteger)pageCount filterOption:(PMFilterOptionGroup *)filterOption;
 
+- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id type:(int)type start:(NSUInteger)start end:(NSUInteger)end filterOption:(PMFilterOptionGroup *)filterOption;
+
 - (PMAssetEntity *)getAssetEntity:(NSString *)assetId;
 
 - (void)clearCache;
@@ -47,8 +49,6 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type filterOption:(PMFilterOptionGroup *)filterOption;
 
 - (void)deleteWithIds:(NSArray<NSString *> *)ids changedBlock:(ChangeIds)block;
-
-- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id type:(NSUInteger)type start:(NSUInteger)start end:(NSUInteger)end filterOption:(PMFilterOptionGroup *)filterOption;
 
 - (void)saveImage:(NSData *)data
             title:(NSString *)title

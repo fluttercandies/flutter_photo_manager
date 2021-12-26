@@ -55,6 +55,8 @@ class _NewHomePageState extends State<NewHomePage> {
             _buildTypeChecks(watchProvider),
             _buildHasAllCheck(),
             _buildOnlyAllCheck(),
+            _buildContainsLivePhotos(),
+            _buildOnlyLivePhotos(),
             _buildContainsEmptyCheck(),
             _buildPathContainsModifiedDateCheck(),
             _buildPngCheck(),
@@ -150,6 +152,36 @@ class _NewHomePageState extends State<NewHomePage> {
         readProvider.changeOnlyAll(value);
       },
       title: const Text('onlyAll'),
+    );
+  }
+
+  Widget _buildContainsLivePhotos() {
+    if (Platform.isAndroid) {
+      return Container();
+    }
+    return CheckboxListTile(
+      value: watchProvider.containsLivePhotos,
+      onChanged: (bool? value) {
+        if (value != null) {
+          readProvider.containsLivePhotos = value;
+        }
+      },
+      title: const Text('Contains Live Photos'),
+    );
+  }
+
+  Widget _buildOnlyLivePhotos() {
+    if (Platform.isAndroid) {
+      return Container();
+    }
+    return CheckboxListTile(
+      value: watchProvider.onlyLivePhotos,
+      onChanged: (bool? value) {
+        if (value != null) {
+          readProvider.onlyLivePhotos = value;
+        }
+      },
+      title: const Text('Only Live Photos'),
     );
   }
 

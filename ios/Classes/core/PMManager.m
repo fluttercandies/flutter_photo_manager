@@ -111,7 +111,7 @@
         if ([phCollection isKindOfClass:[PHAssetCollection class]]) {
             PHAssetCollection *collection = (PHAssetCollection *) phCollection;
             PHFetchResult<PHAsset *> *result = [PHAsset fetchKeyAssetsInAssetCollection:collection options:option];
-            NSLog(@"collection name = %@, count = %ld", collection.localizedTitle, result.count);
+            NSLog(@"collection name = %@, count = %lu", collection.localizedTitle, (unsigned long)result.count);
         } else {
             NSLog(@"collection name = %@", phCollection.localizedTitle);
         }
@@ -199,8 +199,8 @@
         return result;
     }
     
-    PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:filterOption];
     PHAssetCollection *collection = fetchResult.firstObject;
+    PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:filterOption];
     PHFetchResult<PHAsset *> *assetArray = [PHAsset fetchAssetsInAssetCollection:collection
                                                                          options:assetOptions];
     
@@ -239,7 +239,7 @@
     return result;
 }
 
-- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id type:(NSUInteger)type start:(NSUInteger)start end:(NSUInteger)end filterOption:(PMFilterOptionGroup *)filterOption {
+- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id type:(int)type start:(NSUInteger)start end:(NSUInteger)end filterOption:(PMFilterOptionGroup *)filterOption {
     NSMutableArray<PMAssetEntity *> *result = [NSMutableArray new];
     
     PHFetchOptions *options = [PHFetchOptions new];
@@ -251,11 +251,10 @@
         return result;
     }
     
-    PHFetchOptions *assetOptions = [self getAssetOptions:(int) type filterOption:filterOption];
-    
     PHAssetCollection *collection = fetchResult.firstObject;
-    PHFetchResult<PHAsset *> *assetArray =
-    [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
+    PHFetchOptions *assetOptions = [self getAssetOptions:(int) type filterOption:filterOption];
+    PHFetchResult<PHAsset *> *assetArray = [PHAsset fetchAssetsInAssetCollection:collection
+                                                                         options:assetOptions];
     
     if (assetArray.count == 0) {
         return result;
@@ -322,7 +321,7 @@
     entity.lng = asset.location.coordinate.longitude;
     entity.title = needTitle ? [asset title] : @"";
     entity.favorite = asset.isFavorite;
-    entity.subType = asset.mediaSubtypes;
+    entity.subtype = asset.mediaSubtypes;
     
     return entity;
 }
@@ -736,7 +735,7 @@
     BOOL containsAudio = [PMRequestTypeUtils containsAudio:type];
     
     if (containsImage) {
-        [cond appendString:@"("];
+        [cond appendString:@" ( "];
         
         PMFilterOption *imageOption = optionGroup.imageOption;
         
@@ -751,13 +750,28 @@
             [cond appendString:sizeCond];
             [args addObjectsFromArray:sizeArgs];
         }
+        if (@available(iOS 9.1, *)) {
+            if (optionGroup.onlyLivePhotos) {
+                [cond appendString:@" AND "];
+                [cond appendString:[NSString
+                                    stringWithFormat:@"mediaSubtype == %lu",
+                                    (unsigned long)PHAssetMediaSubtypePhotoLive]
+                ];
+            } else if (!optionGroup.containsLivePhotos) {
+                [cond appendString:@" AND "];
+                [cond appendString:[NSString
+                                    stringWithFormat:@"mediaSubtype != %lu",
+                                    (unsigned long)PHAssetMediaSubtypePhotoLive]
+                ];
+            }
+        }
         
-        [cond appendString:@")"];
+        [cond appendString:@" )"];
     }
     
     if (containsVideo) {
         if (![cond isEmpty]) {
-            [cond appendString:@" OR "];
+            [cond appendString:@" OR"];
         }
         
         [cond appendString:@" ( "];
@@ -772,6 +786,21 @@
         [cond appendString:@" AND "];
         [cond appendString:durationCond];
         [args addObjectsFromArray:durationArgs];
+        
+        if (@available(iOS 9.1, *)) {
+            if (!containsImage && optionGroup.containsLivePhotos) {
+                [cond appendString:@" )"];
+                [cond appendString:@" OR "];
+                [cond appendString:@"( "];
+                [cond appendString:@"mediaType == %d"];
+                [args addObject:@(PHAssetMediaTypeImage)];
+                [cond appendString:@" AND "];
+                [cond appendString:[NSString
+                                    stringWithFormat:@"mediaSubtype == %lu",
+                                    (unsigned long)PHAssetMediaSubtypePhotoLive]
+                ];
+            }
+        }
         
         [cond appendString:@" ) "];
     }
@@ -878,7 +907,7 @@
             block:(AssetResult)block {
     __block NSString *assetId = nil;
     
-    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save image with data, length: %ld, title:%@, desc: %@", data.length, title, desc]];
+    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save image with data, length: %lu, title:%@, desc: %@", (unsigned long)data.length, title, desc]];
     
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{

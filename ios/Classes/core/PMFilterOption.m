@@ -79,13 +79,13 @@
 - (NSString *)dateCond:(NSString *)key {
     NSMutableString *str = [NSMutableString new];
     
-    [str appendString:@"AND "];
+    [str appendString:@" AND "];
     [str appendString:@"( "];
     
     // min
     
     [str appendString:key];
-    [str appendString:@" >= %@ "];
+    [str appendString:@" >= %@"];
     
     
     // and

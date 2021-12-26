@@ -12,6 +12,8 @@ class FilterOptionGroup {
     FilterOption audioOption = const FilterOption(),
     this.containsEmptyAlbum = false,
     this.containsPathModified = false,
+    this.containsLivePhotos = true,
+    this.onlyLivePhotos = false,
     DateTimeCond? createTimeCond,
     DateTimeCond? updateTimeCond,
     List<OrderOption> orders = const <OrderOption>[],
@@ -48,6 +50,16 @@ class FilterOptionGroup {
   ///  * [AssetPathEntity.lastModified].
   bool containsPathModified = false;
 
+  /// Whether to obtain live photos.
+  ///
+  /// This option only takes effects on iOS.
+  bool containsLivePhotos = true;
+
+  /// Whether to obtain only live photos.
+  ///
+  /// This option only takes effects on iOS and when the request type is image.
+  bool onlyLivePhotos = false;
+
   DateTimeCond createTimeCond = DateTimeCond.def();
   DateTimeCond updateTimeCond = DateTimeCond.def().copyWith(ignore: true);
 
@@ -63,6 +75,8 @@ class FilterOptionGroup {
     }
     containsEmptyAlbum = other.containsEmptyAlbum;
     containsPathModified = other.containsPathModified;
+    containsLivePhotos = other.containsLivePhotos;
+    onlyLivePhotos = other.onlyLivePhotos;
     createTimeCond = other.createTimeCond;
     updateTimeCond = other.updateTimeCond;
     orders
@@ -80,6 +94,8 @@ class FilterOptionGroup {
         'audio': getOption(AssetType.audio).toMap(),
       'containsEmptyAlbum': containsEmptyAlbum,
       'containsPathModified': containsPathModified,
+      'containsLivePhotos': containsLivePhotos,
+      'onlyLivePhotos': onlyLivePhotos,
       'createDate': createTimeCond.toMap(),
       'updateDate': updateTimeCond.toMap(),
       'orders': orders.map((OrderOption e) => e.toMap()).toList(),
@@ -90,10 +106,12 @@ class FilterOptionGroup {
     FilterOption? imageOption,
     FilterOption? videoOption,
     FilterOption? audioOption,
-    DateTimeCond? createTimeCond,
-    DateTimeCond? updateTimeCond,
     bool? containsEmptyAlbum,
     bool? containsPathModified,
+    bool? containsLivePhotos,
+    bool? onlyLivePhotos,
+    DateTimeCond? createTimeCond,
+    DateTimeCond? updateTimeCond,
     List<OrderOption>? orders,
   }) {
     imageOption ??= _map[AssetType.image];
@@ -101,6 +119,8 @@ class FilterOptionGroup {
     audioOption ??= _map[AssetType.audio];
     containsEmptyAlbum ??= this.containsEmptyAlbum;
     containsPathModified ??= this.containsPathModified;
+    containsLivePhotos ??= this.containsLivePhotos;
+    onlyLivePhotos ??= this.onlyLivePhotos;
     createTimeCond ??= this.createTimeCond;
     updateTimeCond ??= this.updateTimeCond;
     orders ??= this.orders;
@@ -109,10 +129,12 @@ class FilterOptionGroup {
       ..setOption(AssetType.image, imageOption!)
       ..setOption(AssetType.video, videoOption!)
       ..setOption(AssetType.audio, audioOption!)
-      ..createTimeCond = createTimeCond
-      ..updateTimeCond = updateTimeCond
       ..containsEmptyAlbum = containsEmptyAlbum
       ..containsPathModified = containsPathModified
+      ..containsLivePhotos = containsLivePhotos
+      ..onlyLivePhotos = onlyLivePhotos
+      ..createTimeCond = createTimeCond
+      ..updateTimeCond = updateTimeCond
       ..orders.addAll(orders);
 
     return result;
