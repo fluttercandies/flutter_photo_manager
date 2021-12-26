@@ -71,14 +71,14 @@ class PhotoManager(private val context: Context) {
     }
 
     fun getAssetList(
-        galleryId: String,
-        page: Int,
-        pageCount: Int,
+        id: String,
         typeInt: Int = 0,
+        page: Int,
+        size: Int,
         option: FilterOption
     ): List<AssetEntity> {
-        val gId = if (galleryId == ALL_ID) "" else galleryId
-        return dbUtils.getAssetFromGalleryId(context, gId, page, pageCount, typeInt, option)
+        val gId = if (id == ALL_ID) "" else id
+        return dbUtils.getAssetFromGalleryId(context, gId, page, size, typeInt, option)
     }
 
     fun getAssetListWithRange(

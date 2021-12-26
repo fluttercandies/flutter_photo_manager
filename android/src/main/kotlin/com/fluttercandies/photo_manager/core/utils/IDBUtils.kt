@@ -165,7 +165,7 @@ interface IDBUtils {
 
     fun getAssetFromGalleryIdRange(
         context: Context,
-        gId: String,
+        galleryId: String,
         start: Int,
         end: Int,
         requestType: Int,

@@ -286,7 +286,10 @@ class AssetPathProvider extends ChangeNotifier {
 
     refreshing = true;
     await path.refreshPathProperties(maxDateTimeToNow: false);
-    final List<AssetEntity> list = await path.getAssetListPaged(0, loadCount);
+    final List<AssetEntity> list = await path.getAssetListPaged(
+      page: 0,
+      size: loadCount,
+    );
     page = 0;
     this.list.clear();
     this.list.addAll(list);
@@ -306,8 +309,8 @@ class AssetPathProvider extends ChangeNotifier {
       return;
     }
     final List<AssetEntity> list = await path.getAssetListPaged(
-      page + 1,
-      loadCount,
+      page: page + 1,
+      size: loadCount,
     );
     page = page + 1;
     this.list.addAll(list);

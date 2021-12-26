@@ -66,7 +66,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     String id, {
     required FilterOptionGroup optionGroup,
     int page = 0,
-    int pageCount = 15,
+    int size = 15,
     RequestType type = RequestType.all,
   }) async {
     final Map<dynamic, dynamic> result =
@@ -74,9 +74,9 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
       PMConstants.mGetAssetWithGalleryId,
       <String, dynamic>{
         'id': id,
-        'page': page,
-        'pageCount': pageCount,
         'type': type.value,
+        'page': page,
+        'size': size,
         'option': optionGroup.toMap(),
       },
     ) as Map<dynamic, dynamic>;
@@ -95,7 +95,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
         await _channel.invokeMethod<Map<dynamic, dynamic>>(
       PMConstants.mGetAssetListWithRange,
       <String, dynamic>{
-        'galleryId': id,
+        'id': id,
         'type': type.value,
         'start': start,
         'end': end,

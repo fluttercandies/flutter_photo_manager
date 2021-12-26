@@ -260,14 +260,14 @@
             NSString *id = call.arguments[@"id"];
             int type = [call.arguments[@"type"] intValue];
             NSUInteger page = [call.arguments[@"page"] unsignedIntValue];
-            NSUInteger pageCount = [call.arguments[@"pageCount"] unsignedIntValue];
+            NSUInteger size = [call.arguments[@"size"] unsignedIntValue];
             PMFilterOptionGroup *option =
             [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
             NSArray<PMAssetEntity *> *array =
             [manager getAssetEntityListWithGalleryId:id
                                                 type:type
                                                 page:page
-                                           pageCount:pageCount
+                                                size:size
                                         filterOption:option];
             NSDictionary *dictionary =
             [PMConvertUtils convertAssetToMap:array optionGroup:option];

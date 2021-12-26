@@ -80,9 +80,7 @@ class AssetPathEntity {
   late bool isAll;
 
   /// Call this method to update the property
-  Future<void> refreshPathProperties({
-    bool maxDateTimeToNow = true,
-  }) async {
+  Future<void> refreshPathProperties({bool maxDateTimeToNow = true}) async {
     if (maxDateTimeToNow) {
       filterOption = filterOption.copyWith(
         createTimeCond: filterOption.createTimeCond.copyWith(
@@ -112,9 +110,12 @@ class AssetPathEntity {
   ///
   /// [page] should starts with and greater than 0.
   /// [pageSize] is item count of current [page].
-  Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) {
+  Future<List<AssetEntity>> getAssetListPaged({
+    required int page,
+    required int size,
+  }) {
     assert(albumType == 1, 'Only album can request for assets.');
-    assert(pageSize > 0, 'The pageSize must be greater than 0.');
+    assert(size > 0, 'Page size must be greater than 0.');
     assert(
       type == RequestType.image || !filterOption.onlyLivePhotos,
       'Filtering only Live Photos is only supported '
@@ -123,7 +124,7 @@ class AssetPathEntity {
     return plugin.getAssetWithGalleryIdPaged(
       id,
       page: page,
-      pageCount: pageSize,
+      size: size,
       type: type,
       optionGroup: filterOption,
     );

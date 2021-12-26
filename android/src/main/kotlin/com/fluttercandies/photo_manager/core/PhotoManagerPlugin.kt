@@ -266,11 +266,11 @@ class PhotoManagerPlugin(
             "getAssetWithGalleryId" -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
-                    val page = call.argument<Int>("page")!!
-                    val pageCount = call.argument<Int>("pageCount")!!
                     val type = call.argument<Int>("type")!!
+                    val page = call.argument<Int>("page")!!
+                    val size = call.argument<Int>("size")!!
                     val option = call.getOption()
-                    val list = photoManager.getAssetList(id, page, pageCount, type, option)
+                    val list = photoManager.getAssetList(id, type, page, size, option)
                     resultHandler.reply(ConvertUtils.convertToAssetResult(list))
                 }
             }

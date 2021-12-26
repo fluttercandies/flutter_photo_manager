@@ -165,9 +165,9 @@ object DBUtils : IDBUtils {
     override fun getAssetFromGalleryId(
         context: Context,
         galleryId: String,
-        page: Int,
-        pageSize: Int,
         requestType: Int,
+        page: Int,
+        size: Int,
         option: FilterOption,
         cacheContainer: CacheContainer?
     ): List<AssetEntity> {
@@ -196,7 +196,7 @@ object DBUtils : IDBUtils {
             "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
         }
 
-        val sortOrder = getSortOrder(page * pageSize, pageSize, option)
+        val sortOrder = getSortOrder(page * size, size, option)
         val cursor =
             context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
                 ?: return emptyList()
@@ -214,7 +214,7 @@ object DBUtils : IDBUtils {
 
     override fun getAssetFromGalleryIdRange(
         context: Context,
-        gId: String,
+        galleryId: String,
         start: Int,
         end: Int,
         requestType: Int,
@@ -222,14 +222,14 @@ object DBUtils : IDBUtils {
     ): List<AssetEntity> {
         val cache = cacheContainer
 
-        val isAll = gId.isEmpty()
+        val isAll = galleryId.isEmpty()
 
         val list = ArrayList<AssetEntity>()
         val uri = allUri
 
         val args = ArrayList<String>()
         if (!isAll) {
-            args.add(gId)
+            args.add(galleryId)
         }
         val typeSelection = getCondFromType(requestType, option, args)
 
