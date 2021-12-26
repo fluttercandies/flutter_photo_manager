@@ -203,7 +203,7 @@ object Android30DbUtils : IDBUtils {
             context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
                 ?: return emptyList()
 
-        cursorWithRange(cursor, page * pageSize, pageSize) {
+        cursorWithRange(cursor, page * size, size) {
             val asset = convertCursorToAssetEntity(cursor)
             list.add(asset)
         }
@@ -760,7 +760,7 @@ object Android30DbUtils : IDBUtils {
             val galleryID = cursor.getString(0)
             val path = cursor.getString(1)
 
-            return Pair(galleryID, File(path).parent)
+            return Pair(galleryID, File(path).parent!!)
         }
     }
 

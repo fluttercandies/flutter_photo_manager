@@ -731,7 +731,7 @@ object DBUtils : IDBUtils {
             val galleryID = cursor.getString(0)
             val path = cursor.getString(1)
 
-            return Pair(galleryID, File(path).parent)
+            return Pair(galleryID, File(path).parent!!)
         }
     }
 

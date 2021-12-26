@@ -99,7 +99,7 @@ interface IDBUtils {
         context: Context,
         galleryId: String,
         page: Int,
-        pageSize: Int,
+        size: Int,
         requestType: Int = 0,
         option: FilterOption,
         cacheContainer: CacheContainer? = null
