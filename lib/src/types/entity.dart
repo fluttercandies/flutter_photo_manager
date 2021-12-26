@@ -11,7 +11,7 @@ import '../internal/editor.dart';
 import '../internal/enums.dart';
 import '../internal/plugin.dart';
 import '../internal/progress_handler.dart';
-import '../managers/photo_manager.dart';
+import '../utils/convert_utils.dart';
 import 'thumb_option.dart';
 import 'types.dart';
 
@@ -20,6 +20,31 @@ import 'types.dart';
 /// and the `PHAssetCollection` object on iOS/macOS.
 @immutable
 class AssetPathEntity {
+  AssetPathEntity._();
+
+  /// A factory constructor for convertion between channels.
+  factory AssetPathEntity.fromJson(
+    Map<String, dynamic> json, {
+    RequestType type = RequestType.all,
+    FilterOptionGroup? optionGroup,
+  }) {
+    final AssetPathEntity _entity = AssetPathEntity._()
+      ..id = json['id'] as String
+      ..name = json['name'] as String
+      ..type = type
+      ..isAll = json['isAll'] as bool
+      ..assetCount = json['length'] as int
+      ..albumType = json['albumType'] as int? ?? 1
+      ..filterOption = optionGroup ?? FilterOptionGroup();
+    final int? modifiedDate = json['modified'] as int?;
+    if (modifiedDate != null) {
+      _entity.lastModified = DateTime.fromMillisecondsSinceEpoch(
+        modifiedDate * 1000,
+      );
+    }
+    return _entity;
+  }
+
   /// Obtain an entity from ID.
   ///
   /// This method is not recommend in general, since the correspoding folder
@@ -31,7 +56,7 @@ class AssetPathEntity {
     int albumType = 1,
   }) async {
     assert(albumType == 1 || Platform.isIOS || Platform.isMacOS);
-    final AssetPathEntity entity = AssetPathEntity()
+    final AssetPathEntity entity = AssetPathEntity._()
       ..id = id
       ..albumType = albumType
       ..filterOption = filterOption ?? FilterOptionGroup()
@@ -80,9 +105,7 @@ class AssetPathEntity {
   late bool isAll;
 
   /// Call this method to update the property
-  Future<void> refreshPathProperties({
-    bool maxDateTimeToNow = true,
-  }) async {
+  Future<void> refreshPathProperties({bool maxDateTimeToNow = true}) async {
     if (maxDateTimeToNow) {
       filterOption = filterOption.copyWith(
         createTimeCond: filterOption.createTimeCond.copyWith(
@@ -94,17 +117,27 @@ class AssetPathEntity {
       );
     }
 
-    final AssetPathEntity? result = await PhotoManager.fetchPathProperties(
-      entity: this,
-      filterOptionGroup: filterOption,
+    final Map<dynamic, dynamic>? result = await plugin.fetchPathProperties(
+      id,
+      type,
+      filterOption,
     );
-    if (result != null) {
-      assetCount = result.assetCount;
-      name = result.name;
-      isAll = result.isAll;
-      type = result.type;
+    if (result == null) {
+      return;
+    }
+    final Object? list = result['data'];
+    if (list is List && list.isNotEmpty) {
+      final AssetPathEntity entity = ConvertUtils.convertPath(
+        result.cast<String, dynamic>(),
+        type: type,
+        optionGroup: filterOption,
+      ).first;
+      assetCount = entity.assetCount;
+      name = entity.name;
+      isAll = entity.isAll;
+      type = entity.type;
       filterOption = filterOption;
-      lastModified = result.lastModified;
+      lastModified = entity.lastModified;
     }
   }
 
@@ -112,9 +145,12 @@ class AssetPathEntity {
   ///
   /// [page] should starts with and greater than 0.
   /// [pageSize] is item count of current [page].
-  Future<List<AssetEntity>> getAssetListPaged(int page, int pageSize) {
+  Future<List<AssetEntity>> getAssetListPaged({
+    required int page,
+    required int size,
+  }) {
     assert(albumType == 1, 'Only album can request for assets.');
-    assert(pageSize > 0, 'The pageSize must be greater than 0.');
+    assert(size > 0, 'Page size must be greater than 0.');
     assert(
       type == RequestType.image || !filterOption.onlyLivePhotos,
       'Filtering only Live Photos is only supported '
@@ -123,7 +159,7 @@ class AssetPathEntity {
     return plugin.getAssetWithGalleryIdPaged(
       id,
       page: page,
-      pageCount: pageSize,
+      size: size,
       type: type,
       optionGroup: filterOption,
     );
@@ -166,6 +202,30 @@ class AssetPathEntity {
       return plugin.getSubPathEntities(this);
     }
     return <AssetPathEntity>[];
+  }
+
+  /// Obtain a new [AssetPathEntity] from the current one
+  /// with refreshed properties.
+  Future<AssetPathEntity?> fetchPathProperties({
+    FilterOptionGroup? filterOptionGroup,
+  }) async {
+    final Map<dynamic, dynamic>? result = await plugin.fetchPathProperties(
+      id,
+      type,
+      filterOptionGroup ?? filterOption,
+    );
+    if (result == null) {
+      return null;
+    }
+    final Object? list = result['data'];
+    if (list is List && list.isNotEmpty) {
+      return ConvertUtils.convertPath(
+        result.cast<String, dynamic>(),
+        type: type,
+        optionGroup: filterOptionGroup ?? filterOption,
+      ).first;
+    }
+    return null;
   }
 
   @override
@@ -222,16 +282,24 @@ class AssetEntity {
   /// could be deleted in anytime, which will cause properties invalid.
   static Future<AssetEntity?> fromId(String id) async {
     try {
-      return await PhotoManager.refreshAssetProperties(id);
+      return await _refreshAssetProperties(id);
     } catch (e) {
       return null;
     }
   }
 
-  /// Refresh properties for the current asset and return a new object.
-  Future<AssetEntity?> refreshProperties() {
-    return PhotoManager.refreshAssetProperties(id);
+  /// Refresh the property of [AssetPathEntity] from the given ID.
+  static Future<AssetEntity?> _refreshAssetProperties(String id) async {
+    final Map<dynamic, dynamic>? result =
+        await plugin.getPropertiesFromAssetEntity(id);
+    if (result == null) {
+      return null;
+    }
+    return ConvertUtils.convertMapToAsset(result.cast<String, dynamic>());
   }
+
+  /// Refresh properties for the current asset and return a new object.
+  Future<AssetEntity?> refreshProperties() => _refreshAssetProperties(id);
 
   /// The ID of the asset.
   ///  * Android: `_id` column in `MediaStore` database.

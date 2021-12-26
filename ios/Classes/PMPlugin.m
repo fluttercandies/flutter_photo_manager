@@ -260,28 +260,28 @@
             NSString *id = call.arguments[@"id"];
             int type = [call.arguments[@"type"] intValue];
             NSUInteger page = [call.arguments[@"page"] unsignedIntValue];
-            NSUInteger pageCount = [call.arguments[@"pageCount"] unsignedIntValue];
+            NSUInteger size = [call.arguments[@"size"] unsignedIntValue];
             PMFilterOptionGroup *option =
             [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
             NSArray<PMAssetEntity *> *array =
             [manager getAssetEntityListWithGalleryId:id
                                                 type:type
                                                 page:page
-                                           pageCount:pageCount
+                                                size:size
                                         filterOption:option];
             NSDictionary *dictionary =
             [PMConvertUtils convertAssetToMap:array optionGroup:option];
             [handler reply:dictionary];
             
         } else if ([call.method isEqualToString:@"getAssetListWithRange"]) {
-            NSString *galleryId = call.arguments[@"galleryId"];
+            NSString *id = call.arguments[@"id"];
             int type = [call.arguments[@"type"] intValue];
             NSUInteger start = [call.arguments[@"start"] unsignedIntegerValue];
             NSUInteger end = [call.arguments[@"end"] unsignedIntegerValue];
             PMFilterOptionGroup *option =
             [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
             NSArray<PMAssetEntity *> *array =
-            [manager getAssetEntityListWithRange:galleryId
+            [manager getAssetEntityListWithRange:id
                                             type:type
                                            start:start
                                              end:end

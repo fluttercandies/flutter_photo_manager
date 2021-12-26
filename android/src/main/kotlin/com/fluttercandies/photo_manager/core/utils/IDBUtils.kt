@@ -99,7 +99,7 @@ interface IDBUtils {
         context: Context,
         galleryId: String,
         page: Int,
-        pageSize: Int,
+        size: Int,
         requestType: Int = 0,
         option: FilterOption,
         cacheContainer: CacheContainer? = null
@@ -165,7 +165,7 @@ interface IDBUtils {
 
     fun getAssetFromGalleryIdRange(
         context: Context,
-        gId: String,
+        galleryId: String,
         start: Int,
         end: Int,
         requestType: Int,

@@ -187,7 +187,7 @@
 
 #pragma clang diagnostic pop
 
-- (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id type:(int)type page:(NSUInteger)page pageCount:(NSUInteger)pageCount filterOption:(PMFilterOptionGroup *)filterOption {
+- (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id type:(int)type page:(NSUInteger)page size:(NSUInteger)size filterOption:(PMFilterOptionGroup *)filterOption {
     NSMutableArray<PMAssetEntity *> *result = [NSMutableArray new];
     
     PHFetchOptions *options = [PHFetchOptions new];
@@ -208,8 +208,8 @@
         return result;
     }
     
-    NSUInteger startIndex = page * pageCount;
-    NSUInteger endIndex = startIndex + pageCount - 1;
+    NSUInteger startIndex = page * size;
+    NSUInteger endIndex = startIndex + size - 1;
     
     NSUInteger count = assetArray.count;
     if (endIndex >= count) {

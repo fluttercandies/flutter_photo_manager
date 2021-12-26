@@ -7,13 +7,18 @@ import '../internal/enums.dart';
 import '../internal/plugin.dart';
 import '../types/entity.dart';
 import '../types/types.dart';
-import '../utils/convert_utils.dart';
 import 'notify_manager.dart';
 
 /// The core manager of this plugin.
 /// Use various methods in this class to access & manage assets.
 class PhotoManager {
   const PhotoManager._();
+
+  /// Editor instance for editing assets.
+  static final Editor editor = Editor();
+
+  /// Notify manager instance for managing photo changes.
+  static final NotifyManager _notifyManager = NotifyManager();
 
   /// ### Android (AndroidManifest.xml)
   ///  * WRITE_EXTERNAL_STORAGE
@@ -50,8 +55,6 @@ class PhotoManager {
   ///  * iOS 14: https://developer.apple.com/documentation/photokit/phphotolibrary/3616113-presentlimitedlibrarypickerfromv/
   ///  * iOS 15: https://developer.apple.com/documentation/photokit/phphotolibrary/3752108-presentlimitedlibrarypickerfromv/
   static Future<void> presentLimited() => plugin.presentLimited();
-
-  static Editor editor = Editor();
 
   /// Obtain albums/folders list with couple filter options.
   ///
@@ -127,9 +130,6 @@ class PhotoManager {
   /// Make sure callers of this method have `await`ed properly.
   static Future<void> releaseCache() => plugin.releaseCache();
 
-  /// Notification class for managing photo changes.
-  static final NotifyManager _notifyManager = NotifyManager();
-
   /// Add a callback for assets changing.
   static void addChangeCallback(ValueChanged<MethodCall> callback) =>
       _notifyManager.addCallback(callback);
@@ -139,7 +139,8 @@ class PhotoManager {
       _notifyManager.removeCallback(callback);
 
   /// Whether assets change event should be notified.
-  static bool notifyingOfChange = false;
+  static bool get notifyingOfChange => _notifyingOfChange;
+  static bool _notifyingOfChange = false;
 
   /// The notify enable flag in stream.
   static Stream<bool> get notifyStream => _notifyManager.notifyStream;
@@ -149,7 +150,7 @@ class PhotoManager {
   /// Make sure you've added a callback for changes.
   static void startChangeNotify() {
     _notifyManager.startHandleNotify();
-    notifyingOfChange = true;
+    _notifyingOfChange = true;
   }
 
   /// Disable notifications for assets changing.
@@ -157,42 +158,7 @@ class PhotoManager {
   /// Remember to remove callbacks for changes.
   static void stopChangeNotify() {
     _notifyManager.stopHandleNotify();
-    notifyingOfChange = false;
-  }
-
-  /// Refresh the property of [AssetPathEntity] from the given ID.
-  static Future<AssetEntity?> refreshAssetProperties(String id) async {
-    final Map<dynamic, dynamic>? result =
-        await plugin.getPropertiesFromAssetEntity(id);
-    if (result == null) {
-      return null;
-    }
-    return ConvertUtils.convertMapToAsset(result.cast<String, dynamic>());
-  }
-
-  /// Obtain a new [AssetPathEntity] from the given one
-  /// with refreshed properties.
-  static Future<AssetPathEntity?> fetchPathProperties({
-    required AssetPathEntity entity,
-    required FilterOptionGroup filterOptionGroup,
-  }) async {
-    final Map<dynamic, dynamic>? result = await plugin.fetchPathProperties(
-      entity.id,
-      entity.type,
-      entity.filterOption,
-    );
-    if (result == null) {
-      return null;
-    }
-    final Object? list = result['data'];
-    if (list is List && list.isNotEmpty) {
-      return ConvertUtils.convertPath(
-        result.cast<String, dynamic>(),
-        type: entity.type,
-        optionGroup: entity.filterOption,
-      ).first;
-    }
-    return null;
+    _notifyingOfChange = false;
   }
 
   static Future<void> forceOldApi() => plugin.forceOldApi();

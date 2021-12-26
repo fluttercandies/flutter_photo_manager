@@ -14,21 +14,13 @@ class ConvertUtils {
     final List<Map<dynamic, dynamic>> list =
         (data['data'] as List<dynamic>).cast<Map<dynamic, dynamic>>();
     for (final Map<dynamic, dynamic> item in list) {
-      final AssetPathEntity entity = AssetPathEntity()
-        ..id = item['id'] as String
-        ..name = item['name'] as String
-        ..type = type
-        ..isAll = item['isAll'] as bool
-        ..assetCount = item['length'] as int
-        ..albumType = item['albumType'] as int? ?? 1
-        ..filterOption = optionGroup ?? FilterOptionGroup();
-      final int? modifiedDate = item['modified'] as int?;
-      if (modifiedDate != null) {
-        entity.lastModified = DateTime.fromMillisecondsSinceEpoch(
-          modifiedDate * 1000,
-        );
-      }
-      result.add(entity);
+      result.add(
+        AssetPathEntity.fromJson(
+          item.cast<String, dynamic>(),
+          type: type,
+          optionGroup: optionGroup ?? FilterOptionGroup(),
+        ),
+      );
     }
     return result;
   }

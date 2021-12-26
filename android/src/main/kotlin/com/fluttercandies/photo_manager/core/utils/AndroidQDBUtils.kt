@@ -150,7 +150,7 @@ object AndroidQDBUtils : IDBUtils {
         context: Context,
         galleryId: String,
         page: Int,
-        pageSize: Int,
+        size: Int,
         requestType: Int,
         option: FilterOption,
         cacheContainer: CacheContainer?
@@ -179,7 +179,7 @@ object AndroidQDBUtils : IDBUtils {
             "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
         }
 
-        val sortOrder = getSortOrder(page * pageSize, pageSize, option)
+        val sortOrder = getSortOrder(page * size, size, option)
         val cursor =
             context.contentResolver.query(uri, keys, selection, args.toTypedArray(), sortOrder)
                 ?: return emptyList()
@@ -198,7 +198,7 @@ object AndroidQDBUtils : IDBUtils {
 
     override fun getAssetFromGalleryIdRange(
         context: Context,
-        gId: String,
+        galleryId: String,
         start: Int,
         end: Int,
         requestType: Int,
@@ -206,14 +206,14 @@ object AndroidQDBUtils : IDBUtils {
     ): List<AssetEntity> {
         val cache = cacheContainer
 
-        val isAll = gId.isEmpty()
+        val isAll = galleryId.isEmpty()
 
         val list = ArrayList<AssetEntity>()
         val uri = allUri
 
         val args = ArrayList<String>()
         if (!isAll) {
-            args.add(gId)
+            args.add(galleryId)
         }
         val typeSelection: String = getCondFromType(requestType, option, args)
 
@@ -757,7 +757,7 @@ object AndroidQDBUtils : IDBUtils {
             val galleryID = cursor.getString(0)
             val path = cursor.getString(1)
 
-            return Pair(galleryID, File(path).parent)
+            return Pair(galleryID, File(path).parent!!)
         }
     }
 
