@@ -5,6 +5,7 @@
 #import "PMManager.h"
 #import "PHAsset+PHAsset_checkType.h"
 #import "PHAsset+PHAsset_getTitle.h"
+#import "PHAssetResource+PHAssetResource_checkType.h"
 #import "PMAssetPathEntity.h"
 #import "PMCacheContainer.h"
 #import "PMConvertUtils.h"
@@ -321,7 +322,7 @@
     entity.lng = asset.location.coordinate.longitude;
     entity.title = needTitle ? [asset title] : @"";
     entity.favorite = asset.isFavorite;
-    entity.subtype = asset.mediaSubtypes;
+    entity.subtype = asset.unwrappedSubtype;
     
     return entity;
 }
@@ -412,6 +413,12 @@
     PMAssetEntity *entity = [self getAssetEntity:id];
     if (entity && entity.phAsset) {
         PHAsset *asset = entity.phAsset;
+        if (@available(iOS 9.1, *)) {
+            if (asset.isLivePhoto && subtype == PHAssetMediaSubtypePhotoLive) {
+                [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler];
+                return;
+            }
+        }
         if (asset.isVideo) {
             if (isOrigin) {
                 [self fetchOriginVideoFile:asset handler:handler progressHandler:progressHandler];
@@ -754,13 +761,13 @@
             if (optionGroup.onlyLivePhotos) {
                 [cond appendString:@" AND "];
                 [cond appendString:[NSString
-                                    stringWithFormat:@"mediaSubtype == %lu",
+                                    stringWithFormat:@"( ( mediaSubtype & %lu ) == 8 )",
                                     (unsigned long)PHAssetMediaSubtypePhotoLive]
                 ];
             } else if (!optionGroup.containsLivePhotos) {
                 [cond appendString:@" AND "];
                 [cond appendString:[NSString
-                                    stringWithFormat:@"mediaSubtype != %lu",
+                                    stringWithFormat:@"( ( mediaSubtype & %lu ) != 8 )",
                                     (unsigned long)PHAssetMediaSubtypePhotoLive]
                 ];
             }
@@ -796,7 +803,7 @@
                 [args addObject:@(PHAssetMediaTypeImage)];
                 [cond appendString:@" AND "];
                 [cond appendString:[NSString
-                                    stringWithFormat:@"mediaSubtype == %lu",
+                                    stringWithFormat:@"( mediaSubtype & %lu ) == 8",
                                     (unsigned long)PHAssetMediaSubtypePhotoLive]
                 ];
             }
@@ -1006,7 +1013,7 @@
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler {
     PHAsset *phAsset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
     if (@available(iOS 9.1, *)) {
-        if (phAsset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) {
+        if (phAsset.mediaSubtypes & PHAssetMediaSubtypePhotoLive) {
             PHAssetResource *resource = [PHAssetResource assetResourcesForAsset:phAsset].lastObject;
             NSURL *fileUrl = [resource valueForKey:@"privateFileURL"];
             [handler reply:fileUrl.absoluteString];
