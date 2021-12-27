@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 import '../util/common_util.dart';
+import '../widget/live_photos_widget.dart';
 import '../widget/video_widget.dart';
 
 class DetailPage extends StatefulWidget {
@@ -59,13 +60,19 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget _buildContent() {
-    if (widget.entity.type == AssetType.video) {
-      return buildVideo();
-    } else if (widget.entity.type == AssetType.audio) {
-      return buildVideo();
-    } else {
-      return buildImage();
+    if (widget.entity.isLivePhoto) {
+      return LivePhotosWidget(
+        entity: widget.entity,
+        mediaUrl: widget.mediaUrl!,
+        useOrigin: useOrigin == true,
+      );
     }
+    if (widget.entity.type == AssetType.video ||
+        widget.entity.type == AssetType.audio ||
+        widget.entity.isLivePhoto) {
+      return buildVideo();
+    }
+    return buildImage();
   }
 
   Widget buildImage() {
@@ -82,7 +89,8 @@ class _DetailPageState extends State<DetailPage> {
         if (progress != null) {
           final double? value;
           if (progress.expectedTotalBytes != null) {
-            value = progress.cumulativeBytesLoaded / progress.expectedTotalBytes!;
+            value =
+                progress.cumulativeBytesLoaded / progress.expectedTotalBytes!;
           } else {
             value = null;
           }

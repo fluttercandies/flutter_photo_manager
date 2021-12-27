@@ -9,11 +9,11 @@
 
 @interface PHAsset (PHAsset_checkType)
 
--(bool) isImage;
--(bool) isVideo;
-
+- (bool)isImage;
+- (bool)isVideo;
 - (bool)isAudio;
-
--(bool) isImageOrVideo;
+- (bool)isImageOrVideo;
+- (bool)isLivePhoto;
+- (int)unwrappedSubtype;
 
 @end

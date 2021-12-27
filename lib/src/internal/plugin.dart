@@ -146,10 +146,12 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     String id, {
     required bool isOrigin,
     PMProgressHandler? progressHandler,
+    int subtype = 0,
   }) async {
     final Map<String, dynamic> params = <String, dynamic>{
       'id': id,
       'isOrigin': isOrigin,
+      'subtype': subtype,
     };
     _injectParams(params, progressHandler);
     return _channel.invokeMethod(PMConstants.mGetFullFile, params);
