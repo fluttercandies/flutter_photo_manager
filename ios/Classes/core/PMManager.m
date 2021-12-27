@@ -1073,7 +1073,31 @@
     PHAsset *phAsset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
     if (@available(iOS 9.1, *)) {
         if (phAsset.mediaSubtypes & PHAssetMediaSubtypePhotoLive) {
-            PHAssetResource *resource = [PHAssetResource assetResourcesForAsset:phAsset].lastObject;
+            NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:phAsset];
+            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset has %lu resources.", (unsigned long) resources.count]];
+            PHAssetResource *resource;
+            // Return immediately if the last resource is paired video.
+            if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypePairedVideo) {
+                resource = resources.lastObject;
+            }
+            if (!resource) {
+                for (PHAssetResource *r in resources) {
+                    // Iterate to find full size video.
+                    if (r.type == PHAssetResourceTypeVideo && !resource) {
+                        resource = r;
+                        continue;
+                    }
+                    // Iterate to find paired video.
+                    if (r.type == PHAssetResourceTypePairedVideo) {
+                        resource = r;
+                        break;
+                    }
+                }
+            }
+            if (!resource) {
+                [handler reply:nil];
+                return;
+            }
             NSURL *fileUrl = [resource valueForKey:@"privateFileURL"];
             [handler reply:fileUrl.absoluteString];
             return;
