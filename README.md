@@ -38,6 +38,9 @@ see the [migration guile](MIGRATION_GUIDE.md) for detailed info.
     * [From AssetPathEntity](#from-assetpathentity)
     * [From ID](#from-id)
     * [From raw data](#from-raw-data)
+    * [Obtain "Live Photos"](#obtain-live-photos)
+      * [Filtering only "Live Photos"](#filtering-only-live-photos)
+      * [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
     * [Limitations](#limitations)
       * [Android 10 media location permission](#android-10-media-location-permission)
       * [Usage of the original data](#usage-of-the-original-data)
@@ -203,7 +206,7 @@ and the `PHAsset` object on iOS/macOS.
 
 You can use [the pagination method][`getAssetListPaged`]:
 ```dart
-final List<AssetEntity> entities = await path.getAssetListPaged(1, 80);
+final List<AssetEntity> entities = await path.getAssetListPaged(page: 0, size: 80);
 ```
 Or use [the range method][`getAssetListRange`]:
 ```dart
@@ -242,7 +245,7 @@ final Uint8List rawData = yourRawData;
 // Save an image to an entity from `Uint8List`.
 final AssetEntity? entity = await PhotoManager.editor.saveImage(
   rawData,
-  title: 'it_is_better_to_write_your_own_title.jpg', // Otherwise it might affects EXIF reading.
+  title: 'write_your_own_title.jpg', // Affects EXIF reading.
 );
 
 // Save an existed image to an entity from it's path.
@@ -252,15 +255,40 @@ final AssetEntity? imageEntityWithPath = await PhotoManager.editor.saveImageWith
 );
 
 // Save a video entity from `File`.
-final File videoFile = File('/path/to/your/video.mp4');
+final File videoFile = File('path/to/your/video.mp4');
 final AssetEntity? videoEntity = await PhotoManager.editor.saveVideo(
   videoFile, // You can check whether the file is exist for better test coverage.
+  title: 'write_your_own_title.mp4',
 );
 ```
 
 Be aware that the created asset might have
 limited access or got deleted in anytime,
 so the result might be null.
+
+#### Obtain "Live Photos"
+
+This plugin supports obtain live photos and filtering them:
+
+##### Filtering only "Live Photos"
+
+```dart
+final List<AssetPathEntity> paths = PhotoManager.getAssetPathList(
+  type: RequestType.image, // Supported when filtering only image.
+  filterOption: FilterOptionGroup(onlyLivePhotos: true),
+);
+```
+
+##### Obtain the video from "Live Photos"
+
+```dart
+final AssetEntity entity = livePhotoEntity;
+final String? mediaUrl = await entity.getMediaUrl();
+final File? imageFile = await entity.file;
+final File? videoFile = await entity.fileWithSubtype;
+final File? originImageFile = await entity.originFile;
+final File? originVideoFile = await entity.originFileWithSubtype;
+```
 
 #### Limitations
 
