@@ -1,6 +1,6 @@
 # photo_manager
 
-| English | 中文说明 (🚧 WIP) |
+English | [中文说明](#) (🚧 WIP)
 
 [![pub package](https://img.shields.io/pub/v/photo_manager.svg)][pub package]
 [![GitHub](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager.svg)][repo]
@@ -14,6 +14,11 @@ you can get assets (image/video/audio) on Android, iOS and macOS.
 | name                 | pub                                                                                                                    | github                                                                                                                                                                  |
 | :------------------- | :--------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | wechat_assets_picker | [![pub package](https://img.shields.io/pub/v/wechat_assets_picker.svg)](https://pub.dev/packages/wechat_assets_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker) |
+
+## Migration guide
+
+For versions upgrade across major versions,
+see the [migration guile](MIGRATION_GUIDE.md) for detailed info.
 
 ## Table of Contents
 * [Common issues](#common-issues)
