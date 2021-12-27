@@ -18,7 +18,7 @@ you can get assets (image/video/audio) on Android, iOS and macOS.
 ## Migration guide
 
 For versions upgrade across major versions,
-see the [migration guile](MIGRATION_GUIDE.md) for detailed info.
+see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
 
 ## Table of Contents
 * [Common issues](#common-issues)
