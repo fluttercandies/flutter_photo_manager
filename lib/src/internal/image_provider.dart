@@ -15,7 +15,7 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
   const AssetEntityImageProvider(
     this.entity, {
     this.isOriginal = true,
-    this.thumbSize = PMConstants.defaultGridThumbSizes,
+    this.thumbSize = PMConstants.vDefaultGridThumbSizes,
     this.thumbFormat = ThumbFormat.jpeg,
   }) : assert(
           isOriginal || thumbSize?.length == 2,
@@ -86,8 +86,8 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
         if (key.entity.type == AssetType.video) {
           data = await key.entity.thumbDataWithOption(
             _thumbOption(
-              PMConstants.defaultGridThumbSizes[0],
-              PMConstants.defaultGridThumbSizes[1],
+              PMConstants.vDefaultGridThumbSizes[0],
+              PMConstants.vDefaultGridThumbSizes[1],
             ),
           );
         } else if (_type == ImageFileType.heic) {
