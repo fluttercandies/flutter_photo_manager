@@ -2,11 +2,11 @@
 
 ## 2.0.0-dev.1
 
-A major version release for various of performance improvements, several new features,
-various of issues fixed, and breaking changes.
+A major version release for various performance improvements, several new features,
+various issues fixed and breaking changes.
 
 Features:
-- Add equality comparison for various of classes. (#657)
+- Add equality comparison for various classes. (#657)
 - Obtain the first frame for the video thumbnail on Android. (#658)
 - Support "Live Photos" with obtaining, filtering. (#667, #670, #673)
 - Introduce `AssetEntityImageProvider`. (#669)
@@ -17,9 +17,9 @@ Improvements:
 - Reorganized all internal structures.
 - Improved all documents and code formats. (#626, #660, #664, #671)
 - Improve thread pool on Android. (#637)
-- Run Glide on current thread on Android. (#656)
+- Run Glide on the current thread on Android. (#656)
 - Improve the default sort order on all platforms. (#659)
-- Provided a single page example. (#672)
+- Provided a single-page example. (#672)
 
 Fixes:
 - `PhotoManager.editor.copyAssetToPath` return `null` on iOS. (#619)
