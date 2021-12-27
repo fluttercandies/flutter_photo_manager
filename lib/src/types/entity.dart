@@ -401,9 +401,22 @@ class AssetEntity {
   /// Obtain the compressed file of the asset.
   ///
   /// See also:
+  ///  * [fileWithSubtype] which can obtain the compressed file with subtype.
   ///  * [originFile] which can obtain the origin file.
+  ///  * [originFileWithSubtype] which can obtain the origin file with subtype.
   ///  * [loadFile] which can obtain file with [PMProgressHandler].
   Future<File?> get file => _getFile();
+
+  /// Obtain the compressed file of the asset with subtype.
+  ///
+  /// This method only takes effect on iOS, which is typically for Live Photos.
+  ///
+  /// See also:
+  ///  * [file] which can obtain the compressed file.
+  ///  * [originFile] which can obtain the origin file.
+  ///  * [originFileWithSubtype] which can obtain the origin file with subtype.
+  ///  * [loadFile] which can obtain file with [PMProgressHandler].
+  Future<File?> get fileWithSubtype => _getFile(subtype: subtype);
 
   /// Obtain the original file that contain all EXIF informations.
   ///
@@ -413,8 +426,23 @@ class AssetEntity {
   ///
   /// See also:
   ///  * [file] which can obtain the compressed file.
+  ///  * [fileWithSubtype] which can obtain the compressed file with subtype.
+  ///  * [originFileWithSubtype] which can obtain the origin file with subtype.
   ///  * [loadFile] which can obtain file with [PMProgressHandler].
   Future<File?> get originFile => _getFile(isOrigin: true);
+
+  /// Obtain the origin file with subtype.
+  ///
+  /// This method only takes effect on iOS, which is typically for Live Photos.
+  ///
+  /// See also:
+  ///  * [file] which can obtain the compressed file.
+  ///  * [fileWithSubtype] which can obtain the compressed file with subtype.
+  ///  * [originFile] which can obtain the origin file.
+  ///  * [loadFile] which can obtain file with [PMProgressHandler].
+  Future<File?> get originFileWithSubtype {
+    return _getFile(isOrigin: true, subtype: subtype);
+  }
 
   /// Obtain file of the asset with a [PMProgressHandler].
   ///
@@ -584,6 +612,7 @@ class AssetEntity {
   Future<File?> _getFile({
     bool isOrigin = false,
     PMProgressHandler? progressHandler,
+    int subtype = 0,
   }) async {
     assert(
       _platformMatched,
@@ -596,6 +625,7 @@ class AssetEntity {
       id,
       isOrigin: isOrigin,
       progressHandler: progressHandler,
+      subtype: subtype,
     );
     if (path == null) {
       return null;

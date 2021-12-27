@@ -60,7 +60,7 @@
         ignoreCheckPermission = [call.arguments[@"ignore"] boolValue];
         [handler reply:@(ignoreCheckPermission)];
     } else if ([call.method isEqualToString:@"log"]) {
-        PMLogUtils.sharedInstance.isLog = (BOOL) call.arguments;
+        PMLogUtils.sharedInstance.isLog = [call.arguments boolValue];
         [handler reply:@1];
     } else if (manager.isAuth) {
         [self onAuth:call result:result];
@@ -296,15 +296,21 @@
             PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:call.arguments];
             PMThumbLoadOption *option = [PMThumbLoadOption optionDict:dict];
             
-            [manager getThumbWithId:id option:option resultHandler:handler progressHandler:progressHandler];
+            [manager getThumbWithId:id
+                             option:option
+                      resultHandler:handler
+                    progressHandler:progressHandler];
             
         } else if ([call.method isEqualToString:@"getFullFile"]) {
             NSString *id = call.arguments[@"id"];
             BOOL isOrigin = [call.arguments[@"isOrigin"] boolValue];
+            int subtype = [call.arguments[@"subtype"] intValue];
             PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:call.arguments];
-            
-            [manager getFullSizeFileWithId:id isOrigin:isOrigin resultHandler:handler progressHandler:progressHandler];
-            
+            [manager getFullSizeFileWithId:id
+                                  isOrigin:isOrigin
+                                   subtype:subtype
+                             resultHandler:handler
+                           progressHandler:progressHandler];
         } else if ([call.method isEqualToString:@"releaseMemCache"]) {
             [manager clearCache];
         } else if ([call.method isEqualToString:@"fetchPathProperties"]) {
@@ -424,8 +430,9 @@
             [handler reply:@{@"list": pathData}];
         } else if ([@"copyAsset" isEqualToString:call.method]) {
             NSString *assetId = call.arguments[@"assetId"];
+            int subtype = [call.arguments[@"subtype"] intValue];
             NSString *galleryId = call.arguments[@"galleryId"];
-            [manager copyAssetWithId:assetId toGallery:galleryId block:^(PMAssetEntity *entity, NSString *msg) {
+            [manager copyAssetWithId:assetId subtype:subtype toGallery:galleryId block:^(PMAssetEntity *entity, NSString *msg) {
                 if (msg) {
                     NSLog(@"copy asset error, cause by : %@", msg);
                     [handler reply:nil];

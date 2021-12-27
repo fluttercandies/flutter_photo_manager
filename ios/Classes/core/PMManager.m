@@ -348,8 +348,8 @@
     [cacheContainer clearCache];
 }
 
-- (void)getThumbWithId:(NSString *)id1 option:(PMThumbLoadOption *)option resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PMAssetEntity *entity = [self getAssetEntity:id1];
+- (void)getThumbWithId:(NSString *)id option:(PMThumbLoadOption *)option resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+    PMAssetEntity *entity = [self getAssetEntity:id];
     if (entity && entity.phAsset) {
         PHAsset *asset = entity.phAsset;
         [self fetchThumb:asset option:option resultHandler:handler progressHandler:progressHandler];
@@ -409,7 +409,7 @@
     
 }
 
-- (void)getFullSizeFileWithId:(NSString *)id isOrigin:(BOOL)isOrigin resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+- (void)getFullSizeFileWithId:(NSString *)id isOrigin:(BOOL)isOrigin subtype:(int)subtype resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PMAssetEntity *entity = [self getAssetEntity:id];
     if (entity && entity.phAsset) {
         PHAsset *asset = entity.phAsset;
@@ -426,16 +426,71 @@
                 [self fetchFullSizeVideo:asset handler:handler progressHandler:progressHandler];
             }
             return;
+        }
+        if (isOrigin) {
+            [self fetchOriginImageFile:asset resultHandler:handler progressHandler:progressHandler];
         } else {
-            if (isOrigin) {
-                [self fetchOriginImageFile:asset resultHandler:handler progressHandler:progressHandler];
-            } else {
-                [self fetchFullSizeImageFile:asset resultHandler:handler progressHandler:progressHandler];
+            [self fetchFullSizeImageFile:asset resultHandler:handler progressHandler:progressHandler];
+        }
+        return;
+    }
+    [handler replyError:@"asset is not found"];
+}
+
+- (void)fetchLivePhotosFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:asset];
+    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset has %lu resources.", (unsigned long) resources.count]];
+    PHAssetResource *destinationResource;
+    // Return immediately if the last resource is the paired video.
+    if (@available(iOS 9.1, *)) {
+        if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypePairedVideo) {
+            destinationResource = resources.lastObject;
+        }
+        if (!destinationResource) {
+            for (PHAssetResource *r in resources) {
+                // Iterate to find the paired video.
+                if (r.type == PHAssetResourceTypePairedVideo) {
+                    destinationResource = r;
+                    break;
+                }
             }
         }
-    } else {
-        [handler replyError:@"asset is not found"];
     }
+    if (!destinationResource) {
+        [handler reply:nil];
+        return;
+    }
+    
+    PHAssetResourceManager *manager = PHAssetResourceManager.defaultManager;
+    
+    NSString *path = [self makeAssetOutputPath:destinationResource isOrigin:YES];
+    NSURL *fileUrl = [NSURL fileURLWithPath:path];
+    
+    [PMFileHelper deleteFile:path];
+    
+    PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
+    [options setNetworkAccessAllowed:YES];
+    
+    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+    [options setProgressHandler:^(double progress) {
+        if (progress != 1) {
+            [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+        }
+    }];
+    
+    [manager writeDataForAssetResource:destinationResource
+                                toFile:fileUrl
+                               options:options
+                     completionHandler:^(NSError *_Nullable error) {
+        if (error) {
+            NSLog(@"error = %@", error);
+            [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
+            [handler reply:nil];
+        } else {
+            [handler reply:path];
+            [self notifySuccess:progressHandler];
+        }
+    }];
 }
 
 - (void)fetchOriginVideoFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
@@ -467,7 +522,7 @@
     
     PHAssetResourceManager *manager = PHAssetResourceManager.defaultManager;
     
-    NSString *path = [self makeAssetOutputPath:asset isOrigin:YES];
+    NSString *path = [self makeAssetOutputPath:destinationResource isOrigin:YES];
     NSURL *fileUrl = [NSURL fileURLWithPath:path];
     
     [PMFileHelper deleteFile:path];
@@ -568,9 +623,9 @@
     }];
 }
 
-- (NSString *)makeAssetOutputPath:(PHAsset *)asset isOrigin:(Boolean)isOrigin {
+- (NSString *)makeAssetOutputPath:(PHAssetResource *)resource isOrigin:(Boolean)isOrigin {
     NSString *homePath = NSTemporaryDirectory();
-    NSString *cachePath = asset.isVideo ? @".video" : @".image";
+    NSString *cachePath = resource.isVideo ? @".video" : @".image";
     NSString *dirPath = [NSString stringWithFormat:@"%@%@", homePath, cachePath];
     [NSFileManager.defaultManager createDirectoryAtPath:dirPath
                             withIntermediateDirectories:true
@@ -579,7 +634,9 @@
     
     [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"cache path = %@", dirPath]];
     
-    NSString *title = [asset title];
+    NSURL *url = [resource valueForKey:@"privateFileURL"];
+    NSString *urlString = url.absoluteString;
+    NSString *title = [urlString componentsSeparatedByString:@"/"].lastObject;
     NSMutableString *path = [NSMutableString stringWithString:dirPath];
     [path appendFormat:@"/%@", title];
     return path;
@@ -674,7 +731,7 @@
     }
     
     PHAssetResourceManager *manager = PHAssetResourceManager.defaultManager;
-    NSString *path = [self makeAssetOutputPath:asset isOrigin:YES];
+    NSString *path = [self makeAssetOutputPath:imageResource isOrigin:YES];
     NSURL *fileUrl = [NSURL fileURLWithPath:path];
     [PMFileHelper deleteFile:path];
     
@@ -830,7 +887,9 @@
         [cond appendString:durationCond];
         [args addObjectsFromArray:durationArgs];
         
-        [PMLogUtils.sharedInstance info: [NSString stringWithFormat: @"duration = %.2f ~ %.2f", [durationArgs[0] floatValue], [durationArgs[1] floatValue]]];
+        [PMLogUtils.sharedInstance info: [NSString stringWithFormat: @"duration = %.2f ~ %.2f",
+                                          [durationArgs[0] floatValue],
+                                          [durationArgs[1] floatValue]]];
         
         [cond appendString:@" ) "];
     }
