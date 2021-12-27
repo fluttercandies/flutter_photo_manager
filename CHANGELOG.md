@@ -1,30 +1,64 @@
 # CHANGELOG
 
+## 2.0.0-dev.1
+
+A major version release for various of performance improvements, several new features,
+various of issues fixed, and breaking changes.
+
+Features:
+- Add equality comparison for various of classes. (#657)
+- Obtain the first frame for the video thumbnail on Android. (#658)
+- Support "Live Photos" with obtaining, filtering. (#667, #670, #673)
+- Introduce `AssetEntityImageProvider`. (#669)
+
+Improvements:
+- `ImageScanner` -> `PhotoManager`. (#611)
+- Rename org to `com.fluttercandies`. (#624)
+- Reorganized all internal structures.
+- Improved all documents and code formats. (#626, #660, #664, #671)
+- Improve thread pool on Android. (#637)
+- Run Glide on current thread on Android. (#656)
+- Improve the default sort order on all platforms. (#659)
+- Provided a single page example. (#672)
+
+Fixes:
+- `PhotoManager.editor.copyAssetToPath` return `null` on iOS. (#619)
+- Sort order issues on iOS. (#603, #655)
+- `title` causes saving methods failed. (#619, #635)
+- Edited images/videos are not returned correctly on iOS. (#622, #636)
+
 ## 1.3.10
+
 Improvements:
 - Allow all kinds of `PHAssetCollection` which should expand the support for shared albums. (#641)
 
 ## 1.3.9+1
+
 Fixes:
 - Fix compile error on Xcode 12 for iOS 14. (#630)
 
 ## 1.3.9
+
 Fixes:
 - Fix `presentLimited` issues on iOS 14 real devices. (#627)
 
 ## 1.3.8
+
 Improvements:
 - Improve sort orders on all platforms. (#623)
 
 ## 1.3.7
+
 Improvements:
 - Improve sort orders on iOS. (#620)
 
 ## 1.3.6
+
 Improvements:
 - Prettify file name on iOS. (#615)
 
 ## 1.3.5
+
 Improvements:
 - Support `presentLimited` with the new API on iOS 15. (#609)
 

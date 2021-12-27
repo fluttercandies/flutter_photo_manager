@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'photo_manager'
-  s.version          = '1.0.0'
+  s.version          = '2.0.0'
   s.summary          = 'Photo management APIs for Flutter.'
   s.description      = <<-DESC
 A Flutter plugin that provides assets abstraction management APIs.
