@@ -3,7 +3,6 @@
     package="com.fluttercandies.photo_manager_example">
 
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" tools:node="remove" />
 
     <application
         android:label="photo_manager example"
