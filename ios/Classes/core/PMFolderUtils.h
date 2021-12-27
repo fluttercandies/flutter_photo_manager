@@ -1,7 +1,3 @@
-//
-// Created by Caijinglong on 2020/3/23.
-//
-
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
 

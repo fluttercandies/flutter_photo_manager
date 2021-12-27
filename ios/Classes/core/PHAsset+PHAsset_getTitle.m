@@ -2,8 +2,6 @@
 //  PHAsset+PHAsset_getTitle.m
 //  photo_manager
 //
-//  Created by Caijinglong on 2020/1/15.
-//
 
 #import "PHAsset+PHAsset_getTitle.h"
 #import "PHAsset+PHAsset_checkType.h"

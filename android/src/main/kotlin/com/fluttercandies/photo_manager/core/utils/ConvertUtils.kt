@@ -4,8 +4,6 @@ import android.provider.MediaStore
 import com.fluttercandies.photo_manager.core.AssetType
 import com.fluttercandies.photo_manager.core.entity.*
 
-/// create 2019-09-05 by cai
-
 object ConvertUtils {
     fun convertToGalleryResult(list: List<GalleryEntity>): Map<String, Any> {
         val data = ArrayList<Map<String, Any>>()

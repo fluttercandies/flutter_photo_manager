@@ -22,10 +22,6 @@ import androidx.core.app.ActivityCompat;
 
 import com.fluttercandies.photo_manager.util.LogUtils;
 
-/**
- * Created by Administrator on 2017/2/19.
- */
-
 public final class PermissionsUtils {
 
     /**

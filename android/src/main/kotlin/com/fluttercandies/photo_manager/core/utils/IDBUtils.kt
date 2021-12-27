@@ -18,7 +18,6 @@ import com.fluttercandies.photo_manager.core.entity.FilterOption
 import com.fluttercandies.photo_manager.core.entity.GalleryEntity
 import com.fluttercandies.photo_manager.util.LogUtils
 
-/// create 2019-09-11 by cai
 @Suppress("DEPRECATION")
 @SuppressLint("InlinedApi")
 interface IDBUtils {

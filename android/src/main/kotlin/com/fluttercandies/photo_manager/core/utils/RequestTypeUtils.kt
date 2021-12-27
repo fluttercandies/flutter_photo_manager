@@ -1,6 +1,5 @@
 package com.fluttercandies.photo_manager.core.utils
 
-/// create 2020-03-20 by cai
 object RequestTypeUtils {
 
     private const val typeImage = 1

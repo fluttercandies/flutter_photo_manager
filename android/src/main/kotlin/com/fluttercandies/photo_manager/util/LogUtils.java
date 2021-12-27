@@ -1,5 +1,4 @@
 package com.fluttercandies.photo_manager.util;
-/// create 2019-07-16 by cai
 
 import android.annotation.SuppressLint;
 import android.database.Cursor;

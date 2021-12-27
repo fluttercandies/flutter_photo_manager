@@ -1,7 +1,3 @@
-//
-// Created by Caijinglong on 2019-09-06.
-//
-
 #import "PMFileHelper.h"
 #import "PMImport.h"
 #import <Foundation/Foundation.h>

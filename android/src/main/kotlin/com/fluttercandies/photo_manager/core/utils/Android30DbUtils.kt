@@ -29,7 +29,6 @@ import java.net.URLConnection
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-/// create 2020-09-23 by cai
 @Suppress("DEPRECATION")
 @RequiresApi(Build.VERSION_CODES.R)
 @SuppressLint("Recycle")

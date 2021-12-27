@@ -3,8 +3,6 @@ package com.fluttercandies.photo_manager.thumb
 import android.graphics.Bitmap
 import com.bumptech.glide.request.transition.Transition
 
-/// create 2019-09-12 by cai
-
 abstract class BitmapTarget(width: Int, height: Int) : CustomTarget<Bitmap>(width, height) {
 
     private var bitmap: Bitmap? = null

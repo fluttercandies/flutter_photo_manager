@@ -13,9 +13,6 @@ import com.fluttercandies.photo_manager.util.ResultHandler
 import java.io.ByteArrayOutputStream
 import java.io.File
 
-/**
- * Created by debuggerx on 18-9-27 下午2:08
- */
 object ThumbnailUtil {
     fun getThumbnailByGlide(
         ctx: Context,

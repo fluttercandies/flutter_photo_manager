@@ -1,7 +1,3 @@
-//
-// Created by Caijinglong on 2020/1/17.
-//
-
 #import <Foundation/Foundation.h>
 
 @interface PMDateOption : NSObject

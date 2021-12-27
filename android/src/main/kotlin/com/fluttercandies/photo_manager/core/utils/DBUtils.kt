@@ -26,7 +26,6 @@ import java.net.URLConnection
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-/// create 2019-09-05 by cai
 /// Call the MediaStore API and get entity for the data.
 @Suppress("DEPRECATION")
 @SuppressLint("Recycle", "InlinedApi")

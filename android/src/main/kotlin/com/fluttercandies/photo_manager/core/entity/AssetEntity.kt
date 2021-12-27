@@ -5,7 +5,6 @@ import com.fluttercandies.photo_manager.core.utils.IDBUtils.Companion.isAndroidQ
 import com.fluttercandies.photo_manager.core.utils.MediaStoreUtils
 import java.io.File
 
-/// create 2019-09-05 by cai
 data class AssetEntity(
     val id: String,
     var path: String,

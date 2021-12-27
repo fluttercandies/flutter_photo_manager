@@ -2,8 +2,6 @@
 //  AssetEntity.h
 //  photo_manager
 //
-//  Created by Caijinglong on 2018/10/19.
-//
 
 #import <Foundation/Foundation.h>
 #import <Photos/PHAsset.h>

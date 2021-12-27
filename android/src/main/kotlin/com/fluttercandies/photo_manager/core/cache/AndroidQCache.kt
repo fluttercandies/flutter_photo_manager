@@ -11,8 +11,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.lang.Exception
 
-/// create 2019-09-10 by cai
-
 @RequiresApi(Build.VERSION_CODES.Q)
 class AndroidQCache {
 

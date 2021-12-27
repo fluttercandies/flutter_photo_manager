@@ -15,8 +15,6 @@ import io.flutter.plugin.common.MethodChannel
 import com.fluttercandies.photo_manager.core.utils.IDBUtils
 import com.fluttercandies.photo_manager.util.LogUtils
 
-/// create 2019-09-09 by cai
-
 class PhotoManagerNotifyChannel(
     val applicationContext: Context,
     messenger: BinaryMessenger,

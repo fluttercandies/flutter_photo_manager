@@ -27,8 +27,6 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
-/// create 2019-09-05 by cai
-
 class PhotoManagerPlugin(
     private val applicationContext: Context,
     messenger: BinaryMessenger,

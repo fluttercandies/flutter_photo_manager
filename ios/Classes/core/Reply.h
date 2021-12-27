@@ -1,9 +1,4 @@
-//
-// Created by cjl on 2018/11/3.
-//
-
 #import <Foundation/Foundation.h>
-
 
 @interface Reply : NSObject
 

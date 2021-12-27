@@ -1,7 +1,3 @@
-//
-// Created by Caijinglong on 2019-09-09.
-//
-
 #import "PMNotificationManager.h"
 #import "PMConvertUtils.h"
 #import "core/PMLogUtils.h"

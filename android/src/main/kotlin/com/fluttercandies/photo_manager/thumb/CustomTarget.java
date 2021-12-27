@@ -10,9 +10,6 @@ import com.bumptech.glide.util.Util;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-/**
- * Created by debuggerx on 18-9-27 下午1:40
- */
 public abstract class CustomTarget<T> implements Target<T> {
     private final int width;
     private final int height;

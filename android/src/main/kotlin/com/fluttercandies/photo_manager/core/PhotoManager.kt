@@ -19,8 +19,6 @@ import com.fluttercandies.photo_manager.util.ResultHandler
 import java.io.File
 import java.util.concurrent.Executors
 
-/// create 2019-09-05 by cai
-/// Do some business logic assembly
 @SuppressLint("LongLogTag")
 class PhotoManager(private val context: Context) {
     companion object {

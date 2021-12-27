@@ -1,7 +1,3 @@
-//
-// Created by Caijinglong on 2019-09-06.
-//
-
 #import "PMConvertUtils.h"
 #import "PHAsset+PHAsset_checkType.h"
 #import "PHAsset+PHAsset_getTitle.h"

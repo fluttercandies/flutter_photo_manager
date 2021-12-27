@@ -1,7 +1,3 @@
-//
-// Created by Caijinglong on 2019-09-06.
-//
-
 #import "PMPlugin.h"
 #import "PMConvertUtils.h"
 #import "PMAssetPathEntity.h"
