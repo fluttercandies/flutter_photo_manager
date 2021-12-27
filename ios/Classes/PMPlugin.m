@@ -430,9 +430,8 @@
             [handler reply:@{@"list": pathData}];
         } else if ([@"copyAsset" isEqualToString:call.method]) {
             NSString *assetId = call.arguments[@"assetId"];
-            int subtype = [call.arguments[@"subtype"] intValue];
             NSString *galleryId = call.arguments[@"galleryId"];
-            [manager copyAssetWithId:assetId subtype:subtype toGallery:galleryId block:^(PMAssetEntity *entity, NSString *msg) {
+            [manager copyAssetWithId:assetId toGallery:galleryId block:^(PMAssetEntity *entity, NSString *msg) {
                 if (msg) {
                     NSLog(@"copy asset error, cause by : %@", msg);
                     [handler reply:nil];
