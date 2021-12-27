@@ -1,9 +1,4 @@
-//
-// Created by Caijinglong on 2019-07-16.
-//
-
 #import "PMLogUtils.h"
-
 
 @implementation PMLogUtils {
     

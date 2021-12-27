@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
@@ -16,23 +14,25 @@ class MoveToAnotherExample extends StatefulWidget {
 }
 
 class _MoveToAnotherExampleState extends State<MoveToAnotherExample> {
-  List<AssetPathEntity> targetPathList = [];
+  List<AssetPathEntity> targetPathList = <AssetPathEntity>[];
   AssetPathEntity? target;
 
   @override
   void initState() {
     super.initState();
-    PhotoManager.getAssetPathList(hasAll: false).then((value) {
-      this.targetPathList = value;
-      setState(() {});
-    });
+    PhotoManager.getAssetPathList(hasAll: false).then(
+      (List<AssetPathEntity> value) {
+        targetPathList = value;
+        setState(() {});
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Move to another gallery"),
+        title: const Text('Move to another gallery'),
       ),
       body: Column(
         children: <Widget>[
@@ -52,17 +52,25 @@ class _MoveToAnotherExampleState extends State<MoveToAnotherExample> {
   }
 
   Widget _buildPreview() {
-    return FutureBuilder<Uint8List?>(
-      future: widget.entity.thumbDataWithSize(500, 500),
-      builder: (_, snapshot) {
-        if (snapshot.data != null) {
-          return Image.memory(snapshot.data!);
+    return Image(
+      image: AssetEntityImageProvider(
+        widget.entity,
+        thumbSize: const <int>[500, 500],
+      ),
+      loadingBuilder: (_, Widget child, ImageChunkEvent? progress) {
+        if (progress == null) {
+          return child;
+        }
+        final double? value;
+        if (progress.expectedTotalBytes != null) {
+          value = progress.cumulativeBytesLoaded / progress.expectedTotalBytes!;
+        } else {
+          value = null;
         }
         return Center(
-          child: SizedBox(
-            width: 40,
-            height: 40,
-            child: CircularProgressIndicator(),
+          child: SizedBox.fromSize(
+            size: const Size.square(40),
+            child: CircularProgressIndicator(value: value),
           ),
         );
       },
@@ -70,20 +78,20 @@ class _MoveToAnotherExampleState extends State<MoveToAnotherExample> {
   }
 
   Widget buildTarget() {
-    return DropdownButton(
-      items: targetPathList.map((v) => _buildItem(v)).toList(),
+    return DropdownButton<AssetPathEntity>(
+      items: targetPathList.map((AssetPathEntity v) => _buildItem(v)).toList(),
       value: target,
       onChanged: (AssetPathEntity? value) {
-        this.target = value;
+        target = value;
         setState(() {});
       },
     );
   }
 
   DropdownMenuItem<AssetPathEntity> _buildItem(AssetPathEntity v) {
-    return DropdownMenuItem(
-      child: Text(v.name),
+    return DropdownMenuItem<AssetPathEntity>(
       value: v,
+      child: Text(v.name),
     );
   }
 

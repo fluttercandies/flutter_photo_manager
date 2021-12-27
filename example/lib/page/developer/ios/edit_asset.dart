@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class EditAssetPage extends StatefulWidget {
+  const EditAssetPage({Key? key}) : super(key: key);
+
   @override
   _EditAssetPageState createState() => _EditAssetPageState();
 }
@@ -22,7 +24,7 @@ class _EditAssetPageState extends State<EditAssetPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Test edit asset.'),
+        title: const Text('Test edit asset.'),
       ),
       body: entity == null
           ? Container()
@@ -33,7 +35,7 @@ class _EditAssetPageState extends State<EditAssetPage> {
                     aspectRatio: 1,
                     child: FutureBuilder<Uint8List?>(
                       future: entity!.originBytes,
-                      builder: (_, s) {
+                      builder: (_, AsyncSnapshot<Uint8List?> s) {
                         if (!s.hasData) {
                           return Container();
                         }
@@ -45,7 +47,7 @@ class _EditAssetPageState extends State<EditAssetPage> {
                     aspectRatio: 1,
                     child: FutureBuilder<File?>(
                       future: entity!.file,
-                      builder: (_, s) {
+                      builder: (_, AsyncSnapshot<File?> s) {
                         if (!s.hasData) {
                           return Container();
                         }
@@ -71,15 +73,16 @@ class _EditAssetPageState extends State<EditAssetPage> {
     );
   }
 
-  void initData() async {
-    final pathList = await PhotoManager.getAssetPathList(
+  Future<void> initData() async {
+    final List<AssetPathEntity> pathList = await PhotoManager.getAssetPathList(
       type: RequestType.image,
       onlyAll: true,
     );
 
-    final list = await pathList[0].getAssetListRange(start: 0, end: 1);
-    final asset = list[0];
-    this.entity = asset;
+    final List<AssetEntity> list =
+        await pathList[0].getAssetListRange(start: 0, end: 1);
+    final AssetEntity asset = list[0];
+    entity = asset;
     setState(() {});
   }
 }

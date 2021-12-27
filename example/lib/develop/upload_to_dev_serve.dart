@@ -1,20 +1,22 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:photo_manager/photo_manager.dart';
 
 class UploadToDevServer {
   const UploadToDevServer._();
 
-  static void upload(AssetEntity entity) async {
-    final data = await entity.originBytes;
+  static Future<void> upload(AssetEntity entity) async {
+    final Uint8List? data = await entity.originBytes;
     if (data == null) {
       return;
     }
     print(data.length);
-    final client = HttpClient();
+    final HttpClient client = HttpClient();
 
-    final req =
-        await client.postUrl(Uri.parse("http://192.168.31.252:8090/upload"));
+    final HttpClientRequest req = await client.postUrl(
+      Uri.parse('http://192.168.31.252:8090/upload'),
+    );
     req.add(data);
     await req.close();
 

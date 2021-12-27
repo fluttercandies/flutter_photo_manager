@@ -2,8 +2,6 @@
 //  PHAsset+PHAsset_getTitle.m
 //  photo_manager
 //
-//  Created by Caijinglong on 2020/1/15.
-//
 
 #import "PHAsset+PHAsset_getTitle.h"
 #import "PHAsset+PHAsset_checkType.h"
@@ -91,15 +89,15 @@
     
     if (![self isAdjust]) {
         for (PHAssetResource *res in resources) {
-            if (self.mediaType == PHAssetMediaTypeImage ||
-                res.type == PHAssetResourceTypeFullSizePhoto ||
-                res.type == PHAssetResourceTypePhoto) {
+            if (self.mediaType == PHAssetMediaTypeImage &&
+                (res.type == PHAssetResourceTypeFullSizePhoto ||
+                 res.type == PHAssetResourceTypePhoto)) {
                 return res;
             }
             
-            if (self.mediaType == PHAssetMediaTypeVideo ||
-                res.type == PHAssetResourceTypeFullSizeVideo ||
-                res.type == PHAssetResourceTypeVideo) {
+            if (self.mediaType == PHAssetMediaTypeVideo &&
+                (res.type == PHAssetResourceTypeFullSizeVideo ||
+                 res.type == PHAssetResourceTypeVideo)) {
                 return res;
             }
         }
@@ -108,12 +106,12 @@
     }
     
     for (PHAssetResource *res in resources) {
-        if (self.mediaType == PHAssetMediaTypeImage ||
+        if (self.mediaType == PHAssetMediaTypeImage &&
             res.type == PHAssetResourceTypeFullSizePhoto) {
             return res;
         }
         
-        if (self.mediaType == PHAssetMediaTypeVideo ||
+        if (self.mediaType == PHAssetMediaTypeVideo &&
             res.type == PHAssetResourceTypeFullSizeVideo) {
             return res;
         }

@@ -1,10 +1,5 @@
-//
-// Created by Caijinglong on 2019-09-06.
-//
-
 #import <Photos/Photos.h>
 #import "PMAssetPathEntity.h"
-
 
 @implementation PMAssetPathEntity {
     

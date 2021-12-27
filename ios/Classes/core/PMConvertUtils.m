@@ -1,7 +1,3 @@
-//
-// Created by Caijinglong on 2019-09-06.
-//
-
 #import "PMConvertUtils.h"
 #import "PHAsset+PHAsset_checkType.h"
 #import "PHAsset+PHAsset_getTitle.h"
@@ -87,6 +83,7 @@
         @"lng": @(asset.location.coordinate.longitude),
         @"lat": @(asset.location.coordinate.latitude),
         @"title": needTitle ? [asset title] : @"",
+        @"subtype": @(asset.mediaSubtypes),
     };
 }
 
@@ -104,6 +101,7 @@
         @"lng": @(asset.lng),
         @"lat": @(asset.lat),
         @"title": needTitle ? asset.title : @"",
+        @"subtype": @(asset.subtype),
     };
 }
 
@@ -120,6 +118,8 @@
     container.updateOption = [self convertMapToPMDateOption:map[@"updateDate"]];
     container.containsEmptyAlbum = [map[@"containsEmptyAlbum"] boolValue];
     container.containsModified = [map[@"containsPathModified"] boolValue];
+    container.containsLivePhotos = [map[@"containsLivePhotos"] boolValue];
+    container.onlyLivePhotos = [map[@"onlyLivePhotos"] boolValue];
     
     NSArray *sortArray = map[@"orders"];
     [container injectSortArray: sortArray];
