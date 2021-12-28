@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Environment
 import android.os.Handler
 import androidx.annotation.RequiresApi
 import com.bumptech.glide.Glide
@@ -185,13 +186,7 @@ class PhotoManagerPlugin(
                         resultHandler.reply(PermissionResult.Denied.value)
                         return
                     }
-                    if (grantedPermissions.containsAll(
-                            arrayListOf(
-                                Manifest.permission.READ_EXTERNAL_STORAGE,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE
-                            )
-                        )
-                    ) {
+                    if (grantedPermissions.containsAll(storagePermissions)) {
                         LogUtils.info("onGranted call.method = ${call.method}")
                         onHandlePermissionResult(call, resultHandler, false)
                     } else {
@@ -206,10 +201,7 @@ class PhotoManagerPlugin(
             }
         }
 
-        val permissions = arrayListOf(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
+        val permissions = storagePermissions
 
         if (needLocationPermissions && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && haveManifestMediaLocation(
                 applicationContext
@@ -221,6 +213,17 @@ class PhotoManagerPlugin(
         utils.getPermissions(3001, permissions)
     }
 
+    private val storagePermissions: ArrayList<String>
+        get() {
+            val permissions = arrayListOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+                    || (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q
+                            && Environment.isExternalStorageLegacy())
+            ) {
+                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+            return permissions;
+        }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun haveManifestMediaLocation(context: Context): Boolean {

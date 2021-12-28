@@ -12,7 +12,6 @@ import android.os.Build;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
-import android.Manifest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -159,9 +158,6 @@ public final class PermissionsUtils {
 //                    this.tipList.clear();
             }
             for (int i = 0; i < permissions.length; i++) {
-                if (Build.VERSION.SDK_INT >= 30 && permissions[i].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    continue;
-                }
                 // 检查权限
                 if (mActivity.checkSelfPermission(permissions[i]) == PackageManager.PERMISSION_DENIED) {
                     needToRequestPermissionsList.add(permissions[i]);
