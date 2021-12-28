@@ -1,7 +1,3 @@
-//
-// Created by Caijinglong on 2019-09-06.
-//
-
 #import <Foundation/Foundation.h>
 
 #define PM_TYPE_ALBUM 1
@@ -36,6 +32,7 @@
 @property(nonatomic, assign) double lat;
 @property(nonatomic, assign) double lng;
 @property(nonatomic, copy) NSString *title;
+@property(nonatomic, assign) int subtype;
 @property(nonatomic, assign) BOOL favorite;
 @property(nonatomic, assign) BOOL isLocallyAvailable;
 

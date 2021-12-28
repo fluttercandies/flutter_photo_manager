@@ -1,83 +1,61 @@
-import 'package:photo_manager/photo_manager.dart';
+import '../filter/filter_option_group.dart';
+import '../types/entity.dart';
+import '../types/types.dart';
 
 class ConvertUtils {
+  const ConvertUtils._();
+
   static List<AssetPathEntity> convertPath(
-    Map data, {
-    int type = 0,
+    Map<String, dynamic> data, {
+    RequestType type = RequestType.all,
     FilterOptionGroup? optionGroup,
   }) {
-    List<AssetPathEntity> result = [];
-
-    List list = data["data"];
-
-    for (final Map item in list) {
-      final entity = AssetPathEntity()
-        ..id = item["id"]
-        ..name = item["name"]
-        ..typeInt = type
-        ..isAll = item["isAll"]
-        ..assetCount = item["length"]
-        ..albumType = (item["albumType"] ?? 1)
-        ..filterOption = optionGroup ?? FilterOptionGroup();
-
-      final int? modifiedDate = item['modified'];
-
-      if (modifiedDate != null) {
-        entity.lastModified =
-            DateTime.fromMillisecondsSinceEpoch(modifiedDate * 1000);
-      }
-
-      result.add(entity);
+    final List<AssetPathEntity> result = <AssetPathEntity>[];
+    final List<Map<dynamic, dynamic>> list =
+        (data['data'] as List<dynamic>).cast<Map<dynamic, dynamic>>();
+    for (final Map<dynamic, dynamic> item in list) {
+      result.add(
+        AssetPathEntity.fromJson(
+          item.cast<String, dynamic>(),
+          type: type,
+          optionGroup: optionGroup ?? FilterOptionGroup(),
+        ),
+      );
     }
-
     return result;
   }
 
-  static List<AssetEntity> convertToAssetList(Map data) {
-    List<AssetEntity> result = [];
-
-    List list = data["data"];
-    for (final Map item in list) {
-      final asset = _convertMapToAsset(item);
-      if (asset != null) {
-        result.add(asset);
-      }
+  static List<AssetEntity> convertToAssetList(Map<String, dynamic> data) {
+    final List<AssetEntity> result = <AssetEntity>[];
+    final List<Map<dynamic, dynamic>> list =
+        (data['data'] as List<dynamic>).cast<Map<dynamic, dynamic>>();
+    for (final Map<dynamic, dynamic> item in list) {
+      result.add(convertMapToAsset(item.cast<String, dynamic>()));
     }
-
     return result;
   }
 
-  static AssetEntity? convertToAsset(Map? map) {
-    final Map? data = map?['data'];
-    if (data == null) {
-      return null;
-    }
-
-    return _convertMapToAsset(data);
-  }
-
-  static AssetEntity? _convertMapToAsset(Map? data) {
-    if (data == null) {
-      return null;
-    }
-
-    final result = AssetEntity(
-      id: data['id'],
-      typeInt: data['type'],
-      width: data['width'],
-      height: data['height'],
-      duration: data['duration'] ?? 0,
-      orientation: data['orientation'] ?? 0,
-      isFavorite: data['favorite'] ?? false,
-      title: data['title'],
-      createDtSecond: data['createDt'],
-      modifiedDateSecond: data['modifiedDt'],
-      relativePath: data['relativePath'],
-      latitude: data['lat'],
-      longitude: data['lng'],
-      mimeType: data['mimeType'],
+  static AssetEntity convertMapToAsset(
+    Map<String, dynamic> data, {
+    String? title,
+  }) {
+    final AssetEntity result = AssetEntity(
+      id: data['id'] as String,
+      typeInt: data['type'] as int,
+      width: data['width'] as int,
+      height: data['height'] as int,
+      duration: data['duration'] as int? ?? 0,
+      orientation: data['orientation'] as int? ?? 0,
+      isFavorite: data['favorite'] as bool? ?? false,
+      title: data['title'] as String? ?? title,
+      subtype: data['subtype'] as int? ?? 0,
+      createDtSecond: data['createDt'] as int?,
+      modifiedDateSecond: data['modifiedDt'] as int?,
+      relativePath: data['relativePath'] as String?,
+      latitude: data['lat'] as double?,
+      longitude: data['lng'] as double?,
+      mimeType: data['mimeType'] as String?,
     );
-
     return result;
   }
 }

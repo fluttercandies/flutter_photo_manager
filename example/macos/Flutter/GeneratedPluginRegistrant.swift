@@ -10,5 +10,5 @@ import photo_manager
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   PathProviderPlugin.register(with: registry.registrar(forPlugin: "PathProviderPlugin"))
-  ImageScannerPlugin.register(with: registry.registrar(forPlugin: "ImageScannerPlugin"))
+  PhotoManagerPlugin.register(with: registry.registrar(forPlugin: "PhotoManagerPlugin"))
 }

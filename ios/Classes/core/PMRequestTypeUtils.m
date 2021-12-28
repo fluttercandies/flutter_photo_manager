@@ -1,7 +1,3 @@
-//
-// Created by Caijinglong on 2020/3/20.
-//
-
 #import "PMRequestTypeUtils.h"
 
 #define PM_TYPE_IMAGE 1

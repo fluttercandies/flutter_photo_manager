@@ -1,7 +1,3 @@
-//
-// Created by Caijinglong on 2018/9/11.
-//
-
 #import "MD5Utils.h"
 
 @implementation MD5Utils

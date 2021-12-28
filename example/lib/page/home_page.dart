@@ -1,15 +1,18 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:photo_manager_example/model/photo_provider.dart';
-import 'package:photo_manager_example/page/gallery_list_page.dart';
-import 'package:photo_manager_example/widget/change_notifier_builder.dart';
+import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
+import '../model/photo_provider.dart';
+import '../widget/change_notifier_builder.dart';
 import 'filter_option_page.dart';
+import 'gallery_list_page.dart';
 
 class NewHomePage extends StatefulWidget {
+  const NewHomePage({Key? key}) : super(key: key);
+
   @override
   _NewHomePageState createState() => _NewHomePageState();
 }
@@ -28,30 +31,32 @@ class _NewHomePageState extends State<NewHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierBuilder(
+    return ChangeNotifierBuilder<PhotoProvider>(
       value: watchProvider,
       builder: (_, __) => Scaffold(
         appBar: AppBar(
-          title: Text("photo manager example"),
+          title: const Text('photo manager example'),
         ),
         body: ListView(
           children: <Widget>[
-            buildButton("Get all gallery list", _scanGalleryList),
+            buildButton('Get all gallery list', _scanGalleryList),
             if (Platform.isIOS)
               buildButton(
-                "Change limited photos with PhotosUI",
+                'Change limited photos with PhotosUI',
                 _changeLimitPhotos,
               ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text("scan type"),
+                const Text('scan type'),
                 Container(width: 10),
               ],
             ),
             _buildTypeChecks(watchProvider),
             _buildHasAllCheck(),
             _buildOnlyAllCheck(),
+            _buildContainsLivePhotos(),
+            _buildOnlyLivePhotos(),
             _buildContainsEmptyCheck(),
             _buildPathContainsModifiedDateCheck(),
             _buildPngCheck(),
@@ -64,23 +69,23 @@ class _NewHomePageState extends State<NewHomePage> {
   }
 
   Widget _buildTypeChecks(PhotoProvider provider) {
-    final currentType = provider.type;
+    final RequestType currentType = provider.type;
     Widget buildType(RequestType type) {
       String typeText;
       if (type.containsImage()) {
-        typeText = "image";
+        typeText = 'image';
       } else if (type.containsVideo()) {
-        typeText = "video";
+        typeText = 'video';
       } else if (type.containsAudio()) {
-        typeText = "audio";
+        typeText = 'audio';
       } else {
-        typeText = "";
+        typeText = '';
       }
 
       return Expanded(
         child: CheckboxListTile(
           dense: true,
-          contentPadding: EdgeInsets.symmetric(horizontal: 6),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 6),
           title: Text(typeText),
           value: currentType.containsType(type),
           onChanged: (bool? value) {
@@ -94,7 +99,7 @@ class _NewHomePageState extends State<NewHomePage> {
       );
     }
 
-    return Container(
+    return SizedBox(
       height: 50,
       child: Row(
         children: <Widget>[
@@ -106,43 +111,77 @@ class _NewHomePageState extends State<NewHomePage> {
     );
   }
 
-  _scanGalleryList() async {
+  Future<void> _scanGalleryList() async {
     await readProvider.refreshGalleryList();
+    if (!mounted) {
+      return;
+    }
 
-    final page = GalleryListPage();
-
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (ctx) => page,
-    ));
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(
+        builder: (BuildContext ctx) => const GalleryListPage(),
+      ),
+    );
   }
 
   Widget _buildHasAllCheck() {
     return CheckboxListTile(
       value: watchProvider.hasAll,
-      onChanged: (value) {
+      onChanged: (bool? value) {
         readProvider.changeHasAll(value);
       },
-      title: Text("hasAll"),
+      title: const Text('hasAll'),
     );
   }
 
   Widget _buildPngCheck() {
     return CheckboxListTile(
       value: watchProvider.thumbFormat == ThumbFormat.png,
-      onChanged: (value) {
+      onChanged: (bool? value) {
         readProvider.changeThumbFormat();
       },
-      title: Text("thumb png"),
+      title: const Text('thumb png'),
     );
   }
 
   Widget _buildOnlyAllCheck() {
     return CheckboxListTile(
       value: watchProvider.onlyAll,
-      onChanged: (value) {
+      onChanged: (bool? value) {
         readProvider.changeOnlyAll(value);
       },
-      title: Text("onlyAll"),
+      title: const Text('onlyAll'),
+    );
+  }
+
+  Widget _buildContainsLivePhotos() {
+    if (Platform.isAndroid) {
+      return Container();
+    }
+    return CheckboxListTile(
+      value: watchProvider.containsLivePhotos,
+      onChanged: (bool? value) {
+        if (value != null) {
+          readProvider.containsLivePhotos = value;
+        }
+      },
+      title: const Text('Contains Live Photos'),
+    );
+  }
+
+  Widget _buildOnlyLivePhotos() {
+    if (Platform.isAndroid) {
+      return Container();
+    }
+    return CheckboxListTile(
+      value: watchProvider.onlyLivePhotos,
+      onChanged: (bool? value) {
+        if (value != null) {
+          readProvider.onlyLivePhotos = value;
+        }
+      },
+      title: const Text('Only Live Photos'),
     );
   }
 
@@ -152,28 +191,28 @@ class _NewHomePageState extends State<NewHomePage> {
     }
     return CheckboxListTile(
       value: watchProvider.containsEmptyAlbum,
-      onChanged: (value) {
+      onChanged: (bool? value) {
         readProvider.changeContainsEmptyAlbum(value);
       },
-      title: Text("contains empty album(only iOS)"),
+      title: const Text('contains empty album(only iOS)'),
     );
   }
 
   Widget _buildPathContainsModifiedDateCheck() {
     return CheckboxListTile(
       value: watchProvider.containsPathModified,
-      onChanged: (value) {
+      onChanged: (bool? value) {
         readProvider.changeContainsPathModified(value);
       },
-      title: Text("contains path modified date"),
+      title: const Text('contains path modified date'),
     );
   }
 
   Widget _buildNotifyCheck() {
     return CheckboxListTile(
         value: watchProvider.notifying,
-        title: Text("onChanged"),
-        onChanged: (value) {
+        title: const Text('onChanged'),
+        onChanged: (bool? value) {
           readProvider.notifying = value;
           if (value == true) {
             PhotoManager.startChangeNotify();
@@ -183,19 +222,15 @@ class _NewHomePageState extends State<NewHomePage> {
         });
   }
 
-  void onChange(call) {}
+  void onChange(MethodCall call) {}
 
   Widget _buildFilterOption(PhotoProvider provider) {
     return ElevatedButton(
-      child: Text("Change filter options."),
+      child: const Text('Change filter options.'),
       onPressed: () {
-        Navigator.push(
+        Navigator.push<void>(
           context,
-          MaterialPageRoute(
-            builder: (BuildContext context) {
-              return FilterOptionPage();
-            },
-          ),
+          MaterialPageRoute<void>(builder: (_) => const FilterOptionPage()),
         );
       },
     );
@@ -208,7 +243,7 @@ class _NewHomePageState extends State<NewHomePage> {
 
 Widget buildButton(String text, VoidCallback function) {
   return ElevatedButton(
-    child: Text(text),
     onPressed: function,
+    child: Text(text),
   );
 }

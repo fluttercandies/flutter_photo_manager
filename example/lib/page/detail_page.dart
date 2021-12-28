@@ -1,9 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:photo_manager_example/util/common_util.dart';
-import 'package:photo_manager_example/widget/video_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
+
+import '../util/common_util.dart';
+import '../widget/live_photos_widget.dart';
+import '../widget/video_widget.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({
@@ -24,15 +24,15 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final originCheckbox = CheckboxListTile(
-      title: Text("Use origin file."),
-      onChanged: (value) {
-        this.useOrigin = value;
+    final CheckboxListTile originCheckbox = CheckboxListTile(
+      title: const Text('Use origin file.'),
+      onChanged: (bool? value) {
+        useOrigin = value;
         setState(() {});
       },
       value: useOrigin,
     );
-    final children = <Widget>[
+    final List<Widget> children = <Widget>[
       Container(
         color: Colors.black,
         child: _buildContent(),
@@ -45,10 +45,10 @@ class _DetailPageState extends State<DetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Asset detail"),
+        title: const Text('Asset detail'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.info),
+            icon: const Icon(Icons.info),
             onPressed: _showInfo,
           ),
         ],
@@ -60,29 +60,48 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget _buildContent() {
-    if (widget.entity.type == AssetType.video) {
-      return buildVideo();
-    } else if (widget.entity.type == AssetType.audio) {
-      return buildVideo();
-    } else {
-      return buildImage();
+    if (widget.entity.isLivePhoto) {
+      return LivePhotosWidget(
+        entity: widget.entity,
+        mediaUrl: widget.mediaUrl!,
+        useOrigin: useOrigin == true,
+      );
     }
+    if (widget.entity.type == AssetType.video ||
+        widget.entity.type == AssetType.audio ||
+        widget.entity.isLivePhoto) {
+      return buildVideo();
+    }
+    return buildImage();
   }
 
   Widget buildImage() {
-    return FutureBuilder<File?>(
-      future: useOrigin == true ? widget.entity.originFile : widget.entity.file,
-      builder: (_, snapshot) {
-        if (snapshot.data == null) {
+    return Image(
+      image: AssetEntityImageProvider(
+        widget.entity,
+        isOriginal: useOrigin == true,
+      ),
+      loadingBuilder: (
+        BuildContext context,
+        Widget child,
+        ImageChunkEvent? progress,
+      ) {
+        if (progress != null) {
+          final double? value;
+          if (progress.expectedTotalBytes != null) {
+            value =
+                progress.cumulativeBytesLoaded / progress.expectedTotalBytes!;
+          } else {
+            value = null;
+          }
           return Center(
-            child: SizedBox(
-              width: 30,
-              height: 30,
-              child: CircularProgressIndicator(),
+            child: SizedBox.fromSize(
+              size: const Size.square(30),
+              child: CircularProgressIndicator(value: value),
             ),
           );
         }
-        return Image.file(snapshot.data!);
+        return child;
       },
     );
   }
@@ -97,15 +116,11 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  void _showInfo() async {
-    await CommonUtil.showInfoDialog(context, widget.entity);
+  Future<void> _showInfo() {
+    return CommonUtil.showInfoDialog(context, widget.entity);
   }
 
   Widget buildAudio() {
-    return Container(
-      child: Center(
-        child: Icon(Icons.audiotrack),
-      ),
-    );
+    return const Center(child: Icon(Icons.audiotrack));
   }
 }

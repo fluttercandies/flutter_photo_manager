@@ -1,7 +1,3 @@
-//
-// Created by Caijinglong on 2019-09-06.
-//
-
 #import "PMCacheContainer.h"
 #import "PMAssetPathEntity.h"
 #import <AVFoundation/AVAsset.h>

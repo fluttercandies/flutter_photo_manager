@@ -12,61 +12,61 @@ class ChangeNotifyExample extends StatefulWidget {
 }
 
 class _ChangeNotifyExampleState extends State<ChangeNotifyExample> {
+  @override
   void initState() {
     super.initState();
     PhotoManager.addChangeCallback(_onChange);
   }
 
+  @override
   void dispose() {
     PhotoManager.removeChangeCallback(_onChange);
     super.dispose();
   }
 
-  List<String> logs = [];
+  List<String> logs = <String>[];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ChangeNotifyExample'),
+        title: const Text('ChangeNotifyExample'),
       ),
-      body: Container(
-        child: Column(
-          children: [
-            _buildCheck(),
-            if (Platform.isIOS)
-              ElevatedButton(
-                onPressed: () {
-                  PhotoManager.presentLimited();
+      body: Column(
+        children: <Widget>[
+          _buildCheck(),
+          if (Platform.isIOS)
+            ElevatedButton(
+              onPressed: () {
+                PhotoManager.presentLimited();
+              },
+              child: const Text('Present limit'),
+            ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ListView.builder(
+                reverse: true,
+                itemBuilder: (BuildContext context, int index) {
+                  final String log = logs[index];
+                  return Text(log);
                 },
-                child: Text('Present limit'),
-              ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView.builder(
-                  reverse: true,
-                  itemBuilder: (BuildContext context, int index) {
-                    final log = logs[index];
-                    return Text(log);
-                  },
-                  itemCount: logs.length,
-                ),
+                itemCount: logs.length,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildCheck() {
     return StreamBuilder<bool>(
-      builder: (context, snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
         return CheckboxListTile(
-          title: Text('Current notify state'),
+          title: const Text('Current notify state'),
           value: snapshot.data,
-          onChanged: (newValue) {
+          onChanged: (bool? newValue) {
             if (newValue == true) {
               PhotoManager.startChangeNotify();
             } else {
@@ -81,7 +81,7 @@ class _ChangeNotifyExampleState extends State<ChangeNotifyExample> {
   }
 
   void _onChange(MethodCall value) {
-    final log = '${value.method}: ${value.arguments}';
+    final String log = '${value.method}: ${value.arguments}';
     logs.add(log);
     setState(() {});
   }

@@ -2,8 +2,6 @@
 //  PMFileHelper.h
 //  photo_manager
 //
-//  Created by Caijinglong on 2020/1/14.
-//
 
 #import <Foundation/Foundation.h>
 

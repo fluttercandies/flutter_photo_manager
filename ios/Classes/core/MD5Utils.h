@@ -1,6 +1,3 @@
-//
-// Created by Caijinglong on 2018/9/11.
-//
 #import <Foundation/Foundation.h>
 #import <CommonCrypto/CommonDigest.h>
 #define FileHashDefaultChunkSizeForReadingData 1024*8 // 8K
