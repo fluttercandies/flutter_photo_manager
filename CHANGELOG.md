@@ -1,14 +1,18 @@
 # CHANGELOG
 
+## 2.0.0-dev.2
+
+Improvements:
+- Request `WRITE_EXTERNAL_STORAGE` only when needed. (#675)
+
 ## 2.0.0-dev.1
 
-A major version release for various performance improvements, several new features,
-various issues fixed and breaking changes.
+A major version release for performance improvements, new features, issues fixed and breaking changes.
 
 Features:
 - Add equality comparison for various classes. (#657)
 - Obtain the first frame for the video thumbnail on Android. (#658)
-- Support "Live Photos" with obtaining, filtering. (#667, #670, #673)
+- Support "Live Photos" with obtaining and filtering. (#667, #670, #673)
 - Introduce `AssetEntityImageProvider`. (#669)
 
 Improvements:
