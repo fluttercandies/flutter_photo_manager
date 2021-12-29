@@ -272,9 +272,11 @@ This plugin supports obtain live photos and filtering them:
 
 ##### Filtering only "Live Photos"
 
+This is supported when filtering only image.
+
 ```dart
-final List<AssetPathEntity> paths = PhotoManager.getAssetPathList(
-  type: RequestType.image, // Supported when filtering only image.
+final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
+  type: RequestType.image,
   filterOption: FilterOptionGroup(onlyLivePhotos: true),
 );
 ```
