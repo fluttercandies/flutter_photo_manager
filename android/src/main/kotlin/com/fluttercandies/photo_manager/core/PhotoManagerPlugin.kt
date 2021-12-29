@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import androidx.annotation.RequiresApi
 import com.bumptech.glide.Glide
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
@@ -91,7 +90,8 @@ class PhotoManagerPlugin(
             return
         }
 
-        var needLocationPermissions = false
+        var needWritePermission = false
+        var needLocationPermission = false
 
         val handleResult = when (call.method) {
             "releaseMemCache" -> {
@@ -133,22 +133,23 @@ class PhotoManagerPlugin(
             }
             "getLatLngAndroidQ" -> {
                 /// 这里不拦截, 然后额外添加gps权限
-                needLocationPermissions = true
+                needLocationPermission = true
                 false
             }
             "copyAsset" -> {
-                needLocationPermissions = true
+                needWritePermission = true
+                needLocationPermission = true
                 false
             }
             "getFullFile" -> {
                 val isOrigin = call.argument<Boolean>("isOrigin")!!
                 if (isOrigin && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    needLocationPermissions = true
+                    needLocationPermission = true
                 }
                 false
             }
             "getOriginBytes" -> {
-                needLocationPermissions = true
+                needLocationPermission = true
                 false
             }
             "getMediaUrl" -> {
@@ -175,69 +176,66 @@ class PhotoManagerPlugin(
             return
         }
 
+        val permissions = arrayListOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        if (needWritePermission && Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q
+            && havePermissionInManifest(
+                applicationContext,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        ) {
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        if (needLocationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+            && havePermissionInManifest(
+                applicationContext,
+                Manifest.permission.ACCESS_MEDIA_LOCATION
+            )
+        ) {
+            permissions.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
+        }
+
         val utils = permissionsUtils.apply {
             withActivity(activity)
             permissionsListener = object : PermissionsListener {
-                override fun onDenied(
-                    deniedPermissions: MutableList<String>,
-                    grantedPermissions: MutableList<String>
-                ) {
+                override fun onGranted() {
+                    LogUtils.info("onGranted call.method = ${call.method}")
+                    onHandlePermissionResult(call, resultHandler, true)
+                }
+
+                override fun onDenied(denied: MutableList<String>, granted: MutableList<String>) {
                     LogUtils.info("onDenied call.method = ${call.method}")
                     if (call.method == "requestPermissionExtend") {
                         resultHandler.reply(PermissionResult.Denied.value)
                         return
                     }
-                    if (grantedPermissions.containsAll(
-                            arrayListOf(
-                                Manifest.permission.READ_EXTERNAL_STORAGE,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE
-                            )
-                        )
-                    ) {
+                    if (granted.containsAll(permissions)) {
                         LogUtils.info("onGranted call.method = ${call.method}")
                         onHandlePermissionResult(call, resultHandler, false)
                     } else {
                         replyPermissionError(resultHandler)
                     }
                 }
-
-                override fun onGranted() {
-                    LogUtils.info("onGranted call.method = ${call.method}")
-                    onHandlePermissionResult(call, resultHandler, true)
-                }
             }
-        }
-
-        val permissions = arrayListOf(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
-
-        if (needLocationPermissions && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && haveManifestMediaLocation(
-                applicationContext
-            )
-        ) {
-            permissions.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
         }
 
         utils.getPermissions(3001, permissions)
     }
 
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private fun haveManifestMediaLocation(context: Context): Boolean {
-//        Debug.waitForDebugger()
+    private fun havePermissionInManifest(context: Context, permission: String): Boolean {
         val applicationInfo = context.applicationInfo
         val packageInfo = context.packageManager.getPackageInfo(
             applicationInfo.packageName,
             PackageManager.GET_PERMISSIONS
         )
-        return packageInfo.requestedPermissions.contains(Manifest.permission.ACCESS_MEDIA_LOCATION)
+        return packageInfo.requestedPermissions.contains(permission)
     }
 
-
     private fun replyPermissionError(resultHandler: ResultHandler) {
-        resultHandler.replyError("Request for permission failed.", "User denied permission.", null)
+        resultHandler.replyError(
+            "Request for permission failed.",
+            "User denied permission.",
+            null
+        )
     }
 
     private fun onHandlePermissionResult(
