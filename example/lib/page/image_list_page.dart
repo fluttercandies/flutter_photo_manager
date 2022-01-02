@@ -40,8 +40,6 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   AssetPathProvider watchPathProvider(BuildContext c) =>
       c.watch<AssetPathProvider>();
 
-  List<AssetEntity> checked = <AssetEntity>[];
-
   @override
   void initState() {
     super.initState();
@@ -78,47 +76,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     return ChangeNotifierProvider<AssetPathProvider>(
       create: (_) => AssetPathProvider(widget.path),
       builder: (BuildContext context, _) => Scaffold(
-        appBar: AppBar(
-          title: Text(path.name),
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(
-                Icons.delete,
-              ),
-              tooltip: 'Delete selected ',
-              onPressed: () {
-                readPathProvider(context);
-              },
-            ),
-            AnimatedBuilder(
-              animation: photoProvider,
-              builder: (_, __) {
-                final ThumbFormat formatType =
-                    photoProvider.thumbFormat == ThumbFormat.jpeg
-                        ? ThumbFormat.png
-                        : ThumbFormat.jpeg;
-                return IconButton(
-                  icon: const Icon(Icons.swap_horiz),
-                  iconSize: 22,
-                  tooltip: 'Use another format.',
-                  onPressed: () {
-                    photoProvider.thumbFormat = formatType;
-                  },
-                );
-              },
-            ),
-            const Tooltip(
-              message: 'Long tap to delete item.',
-              child: Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Icon(
-                  Icons.info_outline,
-                  size: 22,
-                ),
-              ),
-            ),
-          ],
-        ),
+        appBar: AppBar(title: Text(path.name)),
         body: buildRefreshIndicator(context, path.assetCount),
       ),
     );
@@ -128,12 +86,31 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     return RefreshIndicator(
       onRefresh: () => _onRefresh(context),
       child: Scrollbar(
-        child: GridView.builder(
-          itemBuilder: _buildItem,
-          itemCount: watchPathProvider(context).showItemCount,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-          ),
+        child: CustomScrollView(
+          slivers: <Widget>[
+            Consumer<AssetPathProvider>(
+              builder: (BuildContext c, AssetPathProvider p, _) => SliverGrid(
+                delegate: SliverChildBuilderDelegate(
+                  (_, int index) => Builder(
+                    builder: (BuildContext c) => _buildItem(context, index),
+                  ),
+                  childCount: p.showItemCount,
+                  findChildIndexCallback: (Key? key) {
+                    if (key is ValueKey<String>) {
+                      return findChildIndexBuilder(
+                        id: key.value,
+                        assets: p.list,
+                      );
+                    }
+                    return null;
+                  },
+                ),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -152,23 +129,19 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
 
     final AssetEntity entity = list[index];
 
-    Widget previewOriginBytesWidget;
-
-    if (entity.type != AssetType.image) {
-      previewOriginBytesWidget = Container();
-    } else {
-      previewOriginBytesWidget = ElevatedButton(
-        child: const Text('Show origin bytes image in dialog'),
-        onPressed: () => showOriginBytes(entity),
-      );
-    }
-
-    return GestureDetector(
+    return _ImageListItem(
+      key: ValueKey<String>(entity.id),
+      entity: entity,
+      thumbOption: thumbOption,
       onTap: () => showDialog<void>(
         context: context,
         builder: (_) => ListDialog(
           children: <Widget>[
-            previewOriginBytesWidget,
+            if (entity.type == AssetType.image)
+              ElevatedButton(
+                child: const Text('Show origin bytes image in dialog'),
+                onPressed: () => showOriginBytes(entity),
+              ),
             ElevatedButton(
               child: const Text('isLocallyAvailable'),
               onPressed: () => entity.isLocallyAvailable.then(
@@ -225,40 +198,14 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
           ],
         ),
       ),
-      onLongPress: () {
-        if (checked.contains(entity)) {
-          checked.remove(entity);
-        } else {
-          checked.add(entity);
-        }
-        setState(() {});
-      },
-      child: Stack(
-        children: <Widget>[
-          Positioned.fill(
-            child: ImageItemWidget(
-              key: ValueKey<AssetEntity>(entity),
-              entity: entity,
-              option: thumbOption,
-            ),
-          ),
-          Align(
-            alignment: Alignment.topRight,
-            child: Checkbox(
-              value: checked.contains(entity),
-              onChanged: (bool? value) {
-                if (checked.contains(entity)) {
-                  checked.remove(entity);
-                } else {
-                  checked.add(entity);
-                }
-                setState(() {});
-              },
-            ),
-          ),
-        ],
-      ),
     );
+  }
+
+  int findChildIndexBuilder({
+    required String id,
+    required List<AssetEntity> assets,
+  }) {
+    return assets.indexWhere((AssetEntity e) => e.id == id);
   }
 
   Future<void> routeToDetailPage(AssetEntity entity) async {
@@ -485,5 +432,35 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
         );
       });
     }
+  }
+}
+
+class _ImageListItem extends StatefulWidget {
+  const _ImageListItem({
+    Key? key,
+    required this.entity,
+    required this.thumbOption,
+    required this.onTap,
+  }) : super(key: key);
+
+  final AssetEntity entity;
+  final ThumbOption thumbOption;
+  final GestureTapCallback onTap;
+
+  @override
+  State<_ImageListItem> createState() => _ImageListItemState();
+}
+
+class _ImageListItemState extends State<_ImageListItem> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: ImageItemWidget(
+        key: ValueKey<AssetEntity>(widget.entity),
+        entity: widget.entity,
+        option: widget.thumbOption,
+      ),
+    );
   }
 }

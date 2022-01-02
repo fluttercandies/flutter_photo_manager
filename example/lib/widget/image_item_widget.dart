@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:provider/provider.dart';
-
-import '../model/photo_provider.dart';
-import 'change_notifier_builder.dart';
 
 class ImageItemWidget extends StatefulWidget {
   const ImageItemWidget({
@@ -21,18 +17,14 @@ class ImageItemWidget extends StatefulWidget {
 
 class _ImageItemWidgetState extends State<ImageItemWidget> {
   @override
-  Widget build(BuildContext context) {
-    final PhotoProvider provider = Provider.of<PhotoProvider>(context);
-    return ChangeNotifierBuilder<PhotoProvider>(
-      value: provider,
-      builder: (BuildContext c, Object? p) {
-        final ThumbFormat format = provider.thumbFormat;
-        return buildContent(format);
-      },
-    );
+  void didUpdateWidget(ImageItemWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.entity.id != oldWidget.entity.id) {
+      setState(() {});
+    }
   }
 
-  Widget buildContent(ThumbFormat format) {
+  Widget buildContent(BuildContext context) {
     if (widget.entity.type == AssetType.audio) {
       return const Center(
         child: Icon(Icons.audiotrack, size: 30),
@@ -50,14 +42,12 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
         thumbFormat: option.format,
       ),
       fit: BoxFit.cover,
+      gaplessPlayback: true,
     );
   }
 
   @override
-  void didUpdateWidget(ImageItemWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.entity.id != oldWidget.entity.id) {
-      setState(() {});
-    }
+  Widget build(BuildContext context) {
+    return buildContent(context);
   }
 }
