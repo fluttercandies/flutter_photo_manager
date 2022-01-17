@@ -16,15 +16,10 @@ class VideoWidget extends StatefulWidget {
 }
 
 class _VideoWidgetState extends State<VideoWidget> {
-  late final VideoPlayerController _controller =
-      VideoPlayerController.network(widget.mediaUrl)
-        ..initialize().then((_) => setState(() {}));
-
-  @override
-  void initState() {
-    super.initState();
-    print(widget.isAudio);
-  }
+  late final VideoPlayerController _controller = VideoPlayerController.network(
+    widget.mediaUrl,
+    videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+  )..initialize().then((_) => setState(() {}));
 
   @override
   void dispose() {

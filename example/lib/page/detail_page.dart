@@ -24,25 +24,6 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final CheckboxListTile originCheckbox = CheckboxListTile(
-      title: const Text('Use origin file.'),
-      onChanged: (bool? value) {
-        useOrigin = value;
-        setState(() {});
-      },
-      value: useOrigin,
-    );
-    final List<Widget> children = <Widget>[
-      Container(
-        color: Colors.black,
-        child: _buildContent(),
-      ),
-    ];
-
-    if (widget.entity.type == AssetType.image) {
-      children.insert(0, originCheckbox);
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Asset detail'),
@@ -54,7 +35,21 @@ class _DetailPageState extends State<DetailPage> {
         ],
       ),
       body: ListView(
-        children: children,
+        children: <Widget>[
+          if (widget.entity.type == AssetType.image)
+            CheckboxListTile(
+              title: const Text('Use origin file.'),
+              onChanged: (bool? value) {
+                useOrigin = value;
+                setState(() {});
+              },
+              value: useOrigin,
+            ),
+          Container(
+            color: Colors.black,
+            child: _buildContent(),
+          ),
+        ],
       ),
     );
   }
@@ -81,27 +76,27 @@ class _DetailPageState extends State<DetailPage> {
         widget.entity,
         isOriginal: useOrigin == true,
       ),
+      fit: BoxFit.fill,
       loadingBuilder: (
         BuildContext context,
         Widget child,
         ImageChunkEvent? progress,
       ) {
-        if (progress != null) {
-          final double? value;
-          if (progress.expectedTotalBytes != null) {
-            value =
-                progress.cumulativeBytesLoaded / progress.expectedTotalBytes!;
-          } else {
-            value = null;
-          }
-          return Center(
-            child: SizedBox.fromSize(
-              size: const Size.square(30),
-              child: CircularProgressIndicator(value: value),
-            ),
-          );
+        if (progress == null) {
+          return child;
         }
-        return child;
+        final double? value;
+        if (progress.expectedTotalBytes != null) {
+          value = progress.cumulativeBytesLoaded / progress.expectedTotalBytes!;
+        } else {
+          value = null;
+        }
+        return Center(
+          child: SizedBox.fromSize(
+            size: const Size.square(30),
+            child: CircularProgressIndicator(value: value),
+          ),
+        );
       },
     );
   }

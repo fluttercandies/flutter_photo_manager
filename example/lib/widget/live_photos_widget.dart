@@ -23,14 +23,17 @@ class LivePhotosWidget extends StatefulWidget {
 }
 
 class _LivePhotosWidgetState extends State<LivePhotosWidget> {
-  late final VideoPlayerController _controller =
-      VideoPlayerController.network(widget.mediaUrl)
-        ..initialize().then((_) {
-          if (mounted) {
-            _controller.setVolume(0);
-            setState(() {});
-          }
-        });
+  late final VideoPlayerController _controller = VideoPlayerController.network(
+    widget.mediaUrl,
+    videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+  )..initialize().then(
+      (_) {
+        _controller.setVolume(0);
+        if (mounted) {
+          setState(() {});
+        }
+      },
+    );
 
   void _play() {
     _controller.play();
