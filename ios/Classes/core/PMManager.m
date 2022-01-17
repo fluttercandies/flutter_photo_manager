@@ -85,18 +85,18 @@
                            options:assetOptions
                             hasAll:hasAll
                 containsEmptyAlbum:option.containsEmptyAlbum];
-  
+    
     PHFetchResult<PHAssetCollection *> *albumResult = [PHAssetCollection
-                                                                fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum
-                                                                subtype:PHAssetCollectionSubtypeAny
-                                                                options:fetchCollectionOptions];
+                                                       fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum
+                                                       subtype:PHAssetCollectionSubtypeAny
+                                                       options:fetchCollectionOptions];
     [self logCollections:albumResult option:assetOptions];
     [self injectAssetPathIntoArray:array
                             result:albumResult
                            options:assetOptions
                             hasAll:hasAll
                 containsEmptyAlbum:option.containsEmptyAlbum];
-
+    
     return array;
 }
 
@@ -434,24 +434,7 @@
 }
 
 - (void)fetchLivePhotosFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:asset];
-    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset has %lu resources.", (unsigned long) resources.count]];
-    PHAssetResource *destinationResource;
-    // Return immediately if the last resource is the paired video.
-    if (@available(iOS 9.1, *)) {
-        if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypePairedVideo) {
-            destinationResource = resources.lastObject;
-        }
-        if (!destinationResource) {
-            for (PHAssetResource *r in resources) {
-                // Iterate to find the paired video.
-                if (r.type == PHAssetResourceTypePairedVideo) {
-                    destinationResource = r;
-                    break;
-                }
-            }
-        }
-    }
+    PHAssetResource *destinationResource = [asset getLivePhotosResource];
     if (!destinationResource) {
         [handler reply:nil];
         return;
@@ -490,27 +473,7 @@
 }
 
 - (void)fetchOriginVideoFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:asset];
-    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset has %lu resources.", (unsigned long) resources.count]];
-    PHAssetResource *destinationResource;
-    // Return immediately if the last resource is full size video.
-    if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypeFullSizeVideo) {
-        destinationResource = resources.lastObject;
-    }
-    if (!destinationResource) {
-        for (PHAssetResource *r in resources) {
-            // Iterate to find full size video.
-            if (r.type == PHAssetResourceTypeVideo && !destinationResource) {
-                destinationResource = r;
-                continue;
-            }
-            // Iterate to find alternate video.
-            if (r.type == PHAssetResourceTypeFullSizeVideo) {
-                destinationResource = r;
-                break;
-            }
-        }
-    }
+    PHAssetResource *destinationResource = [asset getAdjustResource];
     if (!destinationResource) {
         [handler reply:nil];
         return;
@@ -566,7 +529,7 @@
         [handler reply:path];
         return;
     }
-
+    
     PHVideoRequestOptions *options = [PHVideoRequestOptions new];
     [options setDeliveryMode:PHVideoRequestOptionsDeliveryModeAutomatic];
     [options setNetworkAccessAllowed:YES];
@@ -582,7 +545,7 @@
             [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
         }
     }];
-
+    
     [[PHImageManager defaultManager]
      requestAVAssetForVideo:asset
      options:options
@@ -636,57 +599,6 @@
     NSMutableString *path = [NSMutableString stringWithString:dirPath];
     [path appendFormat:@"/%@", title];
     return path;
-}
-
-- (void)fetchFullSizeImageFile:(PHAsset *)asset resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PHImageManager *manager = PHImageManager.defaultManager;
-
-    PHImageRequestOptions *options = [PHImageRequestOptions new];
-    [options setDeliveryMode:PHImageRequestOptionsDeliveryModeOpportunistic];
-    [options setNetworkAccessAllowed:YES];
-    [options setResizeMode:PHImageRequestOptionsResizeModeNone];
-    [options setSynchronous:YES];
-    [options setVersion:PHImageRequestOptionsVersionCurrent];
-    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
-    [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
-                                  NSDictionary *info) {
-        if (error) {
-            [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
-            [progressHandler deinit];
-            return;
-        }
-        if (progress != 1) {
-            [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
-        }
-    }];
-    
-    [manager requestImageForAsset:asset
-                       targetSize:PHImageManagerMaximumSize
-                      contentMode:PHImageContentModeDefault
-                          options:options
-                    resultHandler:^(PMImage *_Nullable image,
-                                    NSDictionary *_Nullable info) {
-        
-        BOOL downloadFinished = [PMManager isDownloadFinish:info];
-        if (!downloadFinished) {
-            return;
-        }
-        
-        if ([handler isReplied]) {
-            return;
-        }
-        
-        NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
-        
-        if (data) {
-            NSString *path = [self writeFullFileWithAssetId:asset imageData: data];
-            [handler reply:path];
-        } else {
-            [handler reply:nil];
-        }
-        
-        [self notifySuccess:progressHandler];
-    }];
 }
 
 - (NSString *)writeFullFileWithAssetId:(PHAsset *)asset imageData:(NSData *)imageData {
@@ -751,6 +663,57 @@
             [handler reply:path];
             [self notifySuccess:progressHandler];
         }
+    }];
+}
+
+- (void)fetchFullSizeImageFile:(PHAsset *)asset resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+    PHImageManager *manager = PHImageManager.defaultManager;
+    
+    PHImageRequestOptions *options = [PHImageRequestOptions new];
+    [options setDeliveryMode:PHImageRequestOptionsDeliveryModeOpportunistic];
+    [options setNetworkAccessAllowed:YES];
+    [options setResizeMode:PHImageRequestOptionsResizeModeNone];
+    [options setSynchronous:YES];
+    [options setVersion:PHImageRequestOptionsVersionCurrent];
+    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+    [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
+                                  NSDictionary *info) {
+        if (error) {
+            [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
+            [progressHandler deinit];
+            return;
+        }
+        if (progress != 1) {
+            [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+        }
+    }];
+    
+    [manager requestImageForAsset:asset
+                       targetSize:PHImageManagerMaximumSize
+                      contentMode:PHImageContentModeDefault
+                          options:options
+                    resultHandler:^(PMImage *_Nullable image,
+                                    NSDictionary *_Nullable info) {
+        
+        BOOL downloadFinished = [PMManager isDownloadFinish:info];
+        if (!downloadFinished) {
+            return;
+        }
+        
+        if ([handler isReplied]) {
+            return;
+        }
+        
+        NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
+        
+        if (data) {
+            NSString *path = [self writeFullFileWithAssetId:asset imageData: data];
+            [handler reply:path];
+        } else {
+            [handler reply:nil];
+        }
+        
+        [self notifySuccess:progressHandler];
     }];
 }
 

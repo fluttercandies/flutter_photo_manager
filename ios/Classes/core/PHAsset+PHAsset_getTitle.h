@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)requestAdjustedData:(void (^)(NSData *_Nullable result))block;
 
+- (PHAssetResource *)getLivePhotosResource;
+
 @end
 
 NS_ASSUME_NONNULL_END

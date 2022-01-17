@@ -45,7 +45,8 @@
     
     if (self.mediaType == PHAssetMediaTypeImage) {
         return [self imageIsAdjust:resources];
-    } else if (self.mediaType == PHAssetMediaTypeVideo) {
+    }
+    if (self.mediaType == PHAssetMediaTypeVideo) {
         return [self videoIsAdjust:resources];
     }
     
@@ -53,27 +54,21 @@
 }
 
 - (BOOL)imageIsAdjust:(NSArray<PHAssetResource *> *)resources {
-    int count = 0;
     for (PHAssetResource *res in resources) {
-        if (res.type == PHAssetResourceTypePhoto ||
-            res.type == PHAssetResourceTypeFullSizePhoto) {
-            count++;
+        if (res.type == PHAssetResourceTypeFullSizePhoto) {
+            return YES;
         }
     }
-    
-    return count > 1;
+    return NO;
 }
 
 - (BOOL)videoIsAdjust:(NSArray<PHAssetResource *> *)resources {
-    int count = 0;
     for (PHAssetResource *res in resources) {
-        if (res.type == PHAssetResourceTypeVideo ||
-            res.type == PHAssetResourceTypeFullSizeVideo) {
-            count++;
+        if (res.type == PHAssetResourceTypeFullSizeVideo) {
+            return YES;
         }
     }
-    
-    return count > 1;
+    return NO;
 }
 
 - (PHAssetResource *)getAdjustResource {
@@ -89,15 +84,13 @@
     
     if (![self isAdjust]) {
         for (PHAssetResource *res in resources) {
-            if (self.mediaType == PHAssetMediaTypeImage &&
-                (res.type == PHAssetResourceTypeFullSizePhoto ||
-                 res.type == PHAssetResourceTypePhoto)) {
+            if (self.mediaType == PHAssetMediaTypeImage
+                && res.type == PHAssetResourceTypePhoto) {
                 return res;
             }
             
-            if (self.mediaType == PHAssetMediaTypeVideo &&
-                (res.type == PHAssetResourceTypeFullSizeVideo ||
-                 res.type == PHAssetResourceTypeVideo)) {
+            if (self.mediaType == PHAssetMediaTypeVideo
+                && res.type == PHAssetResourceTypeVideo) {
                 return res;
             }
         }
@@ -116,7 +109,6 @@
             return res;
         }
     }
-    
     return nil;
 }
 
@@ -144,6 +136,35 @@
                        completionHandler:^(NSError *_Nullable error){
         
     }];
+}
+
+- (PHAssetResource *)getLivePhotosResource {
+    NSArray<PHAssetResource *> *resources =
+    [PHAssetResource assetResourcesForAsset:self];
+    if (resources.count == 0) {
+        return nil;
+    }
+    
+    if (resources.count == 1) {
+        return resources[0];
+    }
+    PHAssetResource *resource;
+    
+    if (@available(iOS 9.1, *)) {
+        if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypePairedVideo) {
+            resource = resources.lastObject;
+        }
+        if (!resource) {
+            for (PHAssetResource *r in resources) {
+                // Iterate to find the paired video.
+                if (r.type == PHAssetResourceTypePairedVideo) {
+                    resource = r;
+                    break;
+                }
+            }
+        }
+    }
+    return resource;
 }
 
 @end
