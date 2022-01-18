@@ -143,10 +143,9 @@
     option.sizeConstraint = sizeConstraint;
     
     PMDurationConstraint durationConstraint;
-    durationConstraint.minDuration =
-    [PMConvertUtils convertNSNumberToSecond:durationMap[@"min"]];
-    durationConstraint.maxDuration =
-    [PMConvertUtils convertNSNumberToSecond:durationMap[@"max"]];
+    durationConstraint.minDuration = [PMConvertUtils convertNSNumberToSecond:durationMap[@"min"]];
+    durationConstraint.maxDuration = [PMConvertUtils convertNSNumberToSecond:durationMap[@"max"]];
+    durationConstraint.allowNullable = [durationMap[@"allowNullable"] boolValue];
     option.durationConstraint = durationConstraint;
     
     

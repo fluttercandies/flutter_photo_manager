@@ -146,25 +146,33 @@ class DurationConstraint {
   const DurationConstraint({
     this.min = Duration.zero,
     this.max = const Duration(days: 1),
+    this.allowNullable = false,
   });
 
   final Duration min;
   final Duration max;
 
+  /// Whether `null` or `nil` duration is allowed when obtaining.
+  final bool allowNullable;
+
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'min': min.inMilliseconds,
       'max': max.inMilliseconds,
+      'allowNullable': allowNullable,
     };
   }
 
   @override
   bool operator ==(Object other) {
-    return other is DurationConstraint && min == other.min && max == other.max;
+    return other is DurationConstraint &&
+        min == other.min &&
+        max == other.max &&
+        allowNullable == other.allowNullable;
   }
 
   @override
-  int get hashCode => hashValues(min, max);
+  int get hashCode => hashValues(min, max, allowNullable);
 }
 
 @immutable

@@ -26,6 +26,7 @@ typedef struct PMDurationConstraint {
 
     double minDuration;
     double maxDuration;
+    BOOL allowNullable;
 
 } PMDurationConstraint;
 
