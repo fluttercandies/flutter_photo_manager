@@ -102,13 +102,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget buildVideo() {
-    if (widget.mediaUrl == null) {
-      return const SizedBox.shrink();
-    }
-    return VideoWidget(
-      isAudio: widget.entity.type == AssetType.audio,
-      mediaUrl: widget.mediaUrl!,
-    );
+    return VideoWidget(entity: widget.entity, mediaUrl: widget.mediaUrl);
   }
 
   Future<void> _showInfo() {
