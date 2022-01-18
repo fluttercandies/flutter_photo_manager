@@ -25,40 +25,45 @@ interface IDBUtils {
     companion object {
         @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.Q)
         val isAndroidQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+
         @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.R)
         val isAndroidR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
-        val storeImageKeys = arrayOf(
-            MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
-            MediaStore.MediaColumns.DATA, // 数据
-            MediaStore.MediaColumns._ID, // id
-            MediaStore.MediaColumns.TITLE, // id
-            MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
-            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
-            MediaStore.MediaColumns.WIDTH, // 宽
-            MediaStore.MediaColumns.HEIGHT, // 高
-            MediaStore.MediaColumns.ORIENTATION, // 角度
-            DATE_ADDED,
-            MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
-            MediaStore.MediaColumns.MIME_TYPE, // mime type
-            MediaStore.MediaColumns.DATE_TAKEN //日期
-        )
+        val storeImageKeys = mutableListOf(
+            DISPLAY_NAME, // 显示的名字
+            DATA, // 数据
+            _ID, // id
+            TITLE, // id
+            BUCKET_ID, // dir id 目录
+            BUCKET_DISPLAY_NAME, // dir name 目录名字
+            WIDTH, // 宽
+            HEIGHT, // 高
+            ORIENTATION, // 角度
+            DATE_ADDED, // 创建时间
+            DATE_MODIFIED, // 修改时间
+            MIME_TYPE, // mime type
+            DATE_TAKEN //日期
+        ).apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(DATE_TAKEN) // 拍摄时间
+        }
 
-        val storeVideoKeys = arrayOf(
-            MediaStore.MediaColumns.DISPLAY_NAME, // 显示的名字
-            MediaStore.MediaColumns.DATA, // 数据
-            MediaStore.MediaColumns._ID, // id
-            MediaStore.MediaColumns.TITLE, // id
-            MediaStore.MediaColumns.BUCKET_ID, // dir id 目录
-            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, // dir name 目录名字
-            MediaStore.MediaColumns.DATE_TAKEN, //日期
-            MediaStore.MediaColumns.WIDTH, // 宽
-            MediaStore.MediaColumns.HEIGHT, // 高
-            MediaStore.MediaColumns.ORIENTATION, // 角度
-            MediaStore.MediaColumns.DATE_MODIFIED, // 修改时间
-            MediaStore.MediaColumns.MIME_TYPE, // mime type
-            MediaStore.MediaColumns.DURATION //时长
-        )
+        val storeVideoKeys = mutableListOf(
+            DISPLAY_NAME, // 显示的名字
+            DATA, // 数据
+            _ID, // id
+            TITLE, // id
+            BUCKET_ID, // dir id 目录
+            BUCKET_DISPLAY_NAME, // dir name 目录名字
+            DATE_ADDED, // 创建时间
+            WIDTH, // 宽
+            HEIGHT, // 高
+            ORIENTATION, // 角度
+            DATE_MODIFIED, // 修改时间
+            MIME_TYPE, // mime type
+            DURATION //时长
+        ).apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(DATE_TAKEN) // 拍摄时间
+        }
 
         val typeKeys = arrayOf(
             MEDIA_TYPE,
@@ -244,7 +249,7 @@ interface IDBUtils {
             result = "$result OR ( $mediaType = $MEDIA_TYPE_AUDIO )"
         }
 
-        val size = "${MediaStore.MediaColumns.WIDTH} > 0 AND ${MediaStore.MediaColumns.HEIGHT} > 0"
+        val size = "$WIDTH > 0 AND $HEIGHT > 0"
 
         val imageCondString = "( $mediaType = $MEDIA_TYPE_IMAGE AND $size )"
 
@@ -552,8 +557,8 @@ interface IDBUtils {
 
     @SuppressLint("Recycle")
     fun getPathModifiedDate(context: Context, pathId: String): Long {
-        val columns = arrayOf(MediaStore.MediaColumns.DATE_MODIFIED)
-        val sortOrder = "${MediaStore.MediaColumns.DATE_MODIFIED} desc"
+        val columns = arrayOf(DATE_MODIFIED)
+        val sortOrder = "$DATE_MODIFIED desc"
         val cursor =
             if (pathId == PhotoManager.ALL_ID) {
                 context.contentResolver.query(allUri, columns, null, null, sortOrder)
@@ -561,7 +566,7 @@ interface IDBUtils {
                 context.contentResolver.query(
                     allUri,
                     columns,
-                    "${MediaStore.MediaColumns.BUCKET_ID} = ?",
+                    "$BUCKET_ID = ?",
                     arrayOf(pathId),
                     sortOrder
                 )
@@ -569,7 +574,7 @@ interface IDBUtils {
             }
         cursor?.use {
             if (cursor.moveToNext()) {
-                return cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
+                return cursor.getLong(DATE_MODIFIED)
             }
         }
         return 0

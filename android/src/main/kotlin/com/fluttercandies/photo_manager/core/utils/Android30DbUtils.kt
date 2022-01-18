@@ -278,13 +278,18 @@ object Android30DbUtils : IDBUtils {
     private fun convertCursorToAssetEntity(cursor: Cursor): AssetEntity {
         val id = cursor.getString(MediaStore.MediaColumns._ID)
         val path = cursor.getString(MediaStore.MediaColumns.DATA)
-        val date = cursor.getLong(MediaStore.Images.Media.DATE_ADDED)
+        var date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
+        if (date == 0L) {
+            date = cursor.getLong(MediaStore.Images.Media.DATE_ADDED)
+        } else {
+            date /= 1000
+        }
         val type = cursor.getInt(MEDIA_TYPE)
 
         val mimeType = cursor.getString(MIME_TYPE)
 
-        val duration =
-            if (type == MEDIA_TYPE_IMAGE) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
+        val duration = if (type == MEDIA_TYPE_IMAGE) 0
+        else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
         val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
         val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
         val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
@@ -475,20 +480,19 @@ object Android30DbUtils : IDBUtils {
         val values = ContentValues().apply {
             put(MEDIA_TYPE, MEDIA_TYPE_IMAGE)
 
-            put(MediaStore.MediaColumns.DISPLAY_NAME, title)
             put(MediaStore.Images.ImageColumns.MIME_TYPE, typeFromStream)
             put(MediaStore.Images.ImageColumns.TITLE, title)
             put(MediaStore.Images.ImageColumns.DESCRIPTION, desc)
             put(MediaStore.Images.ImageColumns.DATE_ADDED, timestamp)
-            put(MediaStore.Images.Media.DISPLAY_NAME, title)
             put(MediaStore.Images.ImageColumns.DATE_MODIFIED, timestamp)
+            put(MediaStore.Images.ImageColumns.DATE_TAKEN, timestamp * 1000)
             put(MediaStore.Images.ImageColumns.WIDTH, width)
             put(MediaStore.Images.ImageColumns.HEIGHT, height)
+            put(MediaStore.Images.Media.DISPLAY_NAME, title)
+            put(MediaStore.MediaColumns.DISPLAY_NAME, title)
+            if (relativePath != null)
+                put(MediaStore.Images.ImageColumns.RELATIVE_PATH, relativePath)
         }
-        if (relativePath != null) values.put(
-            MediaStore.Images.ImageColumns.RELATIVE_PATH,
-            relativePath
-        )
 
         val contentUri = cr.insert(uri, values) ?: return null
         val outputStream = cr.openOutputStream(contentUri)
