@@ -59,13 +59,18 @@ class FilterCond {
     }
 
     fun durationCond(): String {
-        return "$durationKey >=? AND $durationKey <=?"
+        val baseCond = "$durationKey >=? AND $durationKey <=?"
+        if (durationConstraint.allowNullable) {
+            return "( $durationKey IS NULL OR ( $baseCond ) )"
+        }
+        return baseCond
     }
 
     fun durationArgs(): Array<String> {
-        return arrayOf(durationConstraint.min, durationConstraint.max).toList().map {
-            it.toString()
-        }.toTypedArray()
+        return arrayOf(
+            durationConstraint.min,
+            durationConstraint.max
+        ).map { it.toString() }.toTypedArray()
     }
 
     class SizeConstraint {
@@ -79,7 +84,7 @@ class FilterCond {
     class DurationConstraint {
         var min: Long = 0
         var max: Long = 0
-
+        var allowNullable: Boolean = false
     }
 }
 

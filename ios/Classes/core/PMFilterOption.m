@@ -47,7 +47,7 @@
     
 }
 - (NSString *)sizeCond {
-    return @"pixelWidth >= %d AND pixelWidth <=%d AND pixelHeight >= %d AND pixelHeight <=%d";
+    return @"pixelWidth >=%d AND pixelWidth <=%d AND pixelHeight >=%d AND pixelHeight <=%d";
 }
 
 - (NSArray *)sizeArgs {
@@ -57,7 +57,11 @@
 
 
 - (NSString *)durationCond {
-    return @"duration >= %f AND duration <= %f";
+    NSString *baseCond = @"duration >= %f AND duration <= %f";
+    if (self.durationConstraint.allowNullable) {
+        return [NSString stringWithFormat:@"( duration == nil OR ( %@ ) )", baseCond];
+    }
+    return baseCond;
 }
 
 - (NSArray *)durationArgs {
