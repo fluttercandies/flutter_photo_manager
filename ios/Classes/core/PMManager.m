@@ -442,7 +442,7 @@
     
     PHAssetResourceManager *manager = PHAssetResourceManager.defaultManager;
     
-    NSString *path = [self makeAssetOutputPath:destinationResource isOrigin:YES];
+    NSString *path = [self makeResourceOutputPath:destinationResource isOrigin:YES];
     NSURL *fileUrl = [NSURL fileURLWithPath:path];
     
     [PMFileHelper deleteFile:path];
@@ -481,7 +481,7 @@
     
     PHAssetResourceManager *manager = PHAssetResourceManager.defaultManager;
     
-    NSString *path = [self makeAssetOutputPath:destinationResource isOrigin:YES];
+    NSString *path = [self makeResourceOutputPath:destinationResource isOrigin:YES];
     NSURL *fileUrl = [NSURL fileURLWithPath:path];
     
     [PMFileHelper deleteFile:path];
@@ -512,17 +512,8 @@
 }
 
 - (void)fetchFullSizeVideo:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    NSString *homePath = NSTemporaryDirectory();
     NSFileManager *manager = NSFileManager.defaultManager;
-    NSMutableString *path = [NSMutableString stringWithString:homePath];
-    NSString *filename = [asset valueForKey:[NSString stringWithFormat:@"filename"]];
-    NSString *dirPath = [NSString stringWithFormat:@"%@/%@", homePath, @".video"];
-    [manager createDirectoryAtPath:dirPath
-       withIntermediateDirectories:true
-                        attributes:@{}
-                             error:nil];
-    
-    [path appendFormat:@"%@/%@", @".video", filename];
+    NSString *path = [self makeAssetOutputPath:asset manager:manager];
     if ([manager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance]
          info:[NSString stringWithFormat:@"read cache from %@", path]];
@@ -582,22 +573,37 @@
     }];
 }
 
-- (NSString *)makeAssetOutputPath:(PHAssetResource *)resource isOrigin:(Boolean)isOrigin {
+- (NSString *)makeAssetOutputPath:(PHAsset *)asset manager:(NSFileManager *)manager {
     NSString *homePath = NSTemporaryDirectory();
-    NSString *cachePath = resource.isVideo ? @".video" : @".image";
+    NSMutableString *path = [NSMutableString stringWithString:homePath];
+    NSString *modifiedDate = [NSString stringWithFormat:@"%f", asset.modificationDate.timeIntervalSince1970];
+    NSString *filename = [NSString stringWithFormat:@"%@_%@", modifiedDate, [asset valueForKey:@"filename"]];
+    NSString *typeDirPath = asset.isImage ? @".image" : @".video";
+    NSString *dirPath = [NSString stringWithFormat:@"%@%@", homePath, typeDirPath];
+    [manager createDirectoryAtPath:dirPath
+       withIntermediateDirectories:true
+                        attributes:@{}
+                             error:nil];
+    [path appendFormat:@"%@/%@", typeDirPath, filename];
+    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"PHAsset cache path = %@", path]];
+    return path;
+}
+
+- (NSString *)makeResourceOutputPath:(PHAssetResource *)resource isOrigin:(Boolean)isOrigin {
+    NSString *homePath = NSTemporaryDirectory();
+    NSString *cachePath = resource.isImage ? @".image" : @".video";
     NSString *dirPath = [NSString stringWithFormat:@"%@%@", homePath, cachePath];
     [NSFileManager.defaultManager createDirectoryAtPath:dirPath
                             withIntermediateDirectories:true
                                              attributes:@{}
                                                   error:nil];
     
-    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"cache path = %@", dirPath]];
-    
     NSURL *url = [resource valueForKey:@"privateFileURL"];
     NSString *urlString = url.absoluteString;
     NSString *title = [urlString componentsSeparatedByString:@"/"].lastObject;
     NSMutableString *path = [NSMutableString stringWithString:dirPath];
     [path appendFormat:@"/%@", title];
+    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"PHAssetResource cache path = %@", path]];
     return path;
 }
 
@@ -639,7 +645,7 @@
     }
     
     PHAssetResourceManager *manager = PHAssetResourceManager.defaultManager;
-    NSString *path = [self makeAssetOutputPath:imageResource isOrigin:YES];
+    NSString *path = [self makeResourceOutputPath:imageResource isOrigin:YES];
     NSURL *fileUrl = [NSURL fileURLWithPath:path];
     [PMFileHelper deleteFile:path];
     
