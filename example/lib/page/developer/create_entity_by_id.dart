@@ -50,7 +50,6 @@ class _CreateEntityByIdState extends State<CreateEntityById> {
       showToast('Cannot create asset by $id');
       return;
     }
-    final String? mediaUrl = await asset.getMediaUrl();
 
     if (!mounted) {
       return;
@@ -58,10 +57,7 @@ class _CreateEntityByIdState extends State<CreateEntityById> {
     return Navigator.push<void>(
       context,
       MaterialPageRoute<void>(
-        builder: (BuildContext c) => DetailPage(
-          entity: asset,
-          mediaUrl: mediaUrl,
-        ),
+        builder: (BuildContext c) => DetailPage(entity: asset),
       ),
     );
   }

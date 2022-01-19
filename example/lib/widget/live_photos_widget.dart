@@ -10,12 +10,10 @@ class LivePhotosWidget extends StatefulWidget {
   const LivePhotosWidget({
     Key? key,
     required this.entity,
-    required this.mediaUrl,
     required this.useOrigin,
   }) : super(key: key);
 
   final AssetEntity entity;
-  final String mediaUrl;
   final bool useOrigin;
 
   @override
@@ -23,25 +21,29 @@ class LivePhotosWidget extends StatefulWidget {
 }
 
 class _LivePhotosWidgetState extends State<LivePhotosWidget> {
-  late final VideoPlayerController _controller = VideoPlayerController.network(
-    widget.mediaUrl,
-    videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
-  )..initialize().then(
-      (_) {
-        _controller.setVolume(0);
-        if (mounted) {
-          setState(() {});
-        }
-      },
-    );
+  VideoPlayerController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.entity.getMediaUrl().then((String? url) {
+      if (!mounted || url == null) {
+        return;
+      }
+      _controller = VideoPlayerController.network(url)
+        ..initialize()
+        ..addListener(() => setState(() {}));
+      setState(() {});
+    });
+  }
 
   void _play() {
-    _controller.play();
+    _controller?.play();
   }
 
   Future<void> _stop() async {
-    await _controller.pause();
-    await _controller.seekTo(Duration.zero);
+    await _controller?.pause();
+    await _controller?.seekTo(Duration.zero);
   }
 
   Widget _buildImage(BuildContext context) {
@@ -81,19 +83,20 @@ class _LivePhotosWidgetState extends State<LivePhotosWidget> {
         aspectRatio: widget.entity.size.aspectRatio,
         child: Stack(
           children: <Widget>[
-            if (_controller.value.isInitialized)
-              Positioned.fill(child: VideoPlayer(_controller)),
-            ValueListenableBuilder<VideoPlayerValue>(
-              valueListenable: _controller,
-              builder: (_, VideoPlayerValue value, Widget? child) {
-                return AnimatedOpacity(
-                  opacity: value.isPlaying ? 0 : 1,
-                  duration: kThemeAnimationDuration,
-                  child: child,
-                );
-              },
-              child: _buildImage(context),
-            ),
+            if (_controller?.value.isInitialized == true)
+              Positioned.fill(child: VideoPlayer(_controller!)),
+            if (_controller != null)
+              ValueListenableBuilder<VideoPlayerValue>(
+                valueListenable: _controller!,
+                builder: (_, VideoPlayerValue value, Widget? child) {
+                  return AnimatedOpacity(
+                    opacity: value.isPlaying ? 0 : 1,
+                    duration: kThemeAnimationDuration,
+                    child: child,
+                  );
+                },
+                child: _buildImage(context),
+              ),
           ],
         ),
       ),

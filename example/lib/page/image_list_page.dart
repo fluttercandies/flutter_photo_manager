@@ -209,16 +209,8 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   }
 
   Future<void> routeToDetailPage(AssetEntity entity) async {
-    final String? mediaUrl = await entity.getMediaUrl();
-    if (!mounted) {
-      return;
-    }
-    final DetailPage page = DetailPage(
-      entity: entity,
-      mediaUrl: mediaUrl,
-    );
     Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(builder: (_) => page),
+      MaterialPageRoute<void>(builder: (_) => DetailPage(entity: entity)),
     );
   }
 

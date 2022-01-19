@@ -1,18 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoWidget extends StatefulWidget {
-  const VideoWidget({
-    Key? key,
-    required this.entity,
-    this.mediaUrl,
-  }) : super(key: key);
+  const VideoWidget({Key? key, required this.entity}) : super(key: key);
 
   final AssetEntity entity;
-  final String? mediaUrl;
 
   @override
   _VideoWidgetState createState() => _VideoWidgetState();
@@ -26,21 +19,15 @@ class _VideoWidgetState extends State<VideoWidget> {
   @override
   void initState() {
     super.initState();
-    if (widget.mediaUrl != null) {
-      _controller = VideoPlayerController.network(widget.mediaUrl!)
+    widget.entity.getMediaUrl().then((String? url) {
+      if (!mounted || url == null) {
+        return;
+      }
+      _controller = VideoPlayerController.network(url)
         ..initialize()
         ..addListener(() => setState(() {}));
-    } else {
-      widget.entity.file.then((File? file) {
-        if (!mounted || file == null) {
-          return;
-        }
-        _controller = VideoPlayerController.file(file)
-          ..initialize()
-          ..addListener(() => setState(() {}));
-        setState(() {});
-      });
-    }
+      setState(() {});
+    });
   }
 
   @override

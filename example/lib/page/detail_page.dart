@@ -6,14 +6,9 @@ import '../widget/live_photos_widget.dart';
 import '../widget/video_widget.dart';
 
 class DetailPage extends StatefulWidget {
-  const DetailPage({
-    Key? key,
-    required this.entity,
-    this.mediaUrl,
-  }) : super(key: key);
+  const DetailPage({Key? key, required this.entity}) : super(key: key);
 
   final AssetEntity entity;
-  final String? mediaUrl;
 
   @override
   _DetailPageState createState() => _DetailPageState();
@@ -58,7 +53,6 @@ class _DetailPageState extends State<DetailPage> {
     if (widget.entity.isLivePhoto) {
       return LivePhotosWidget(
         entity: widget.entity,
-        mediaUrl: widget.mediaUrl!,
         useOrigin: useOrigin == true,
       );
     }
@@ -102,7 +96,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget buildVideo() {
-    return VideoWidget(entity: widget.entity, mediaUrl: widget.mediaUrl);
+    return VideoWidget(entity: widget.entity);
   }
 
   Future<void> _showInfo() {
