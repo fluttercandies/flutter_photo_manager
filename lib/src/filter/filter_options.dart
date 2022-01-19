@@ -153,6 +153,9 @@ class DurationConstraint {
   final Duration max;
 
   /// Whether `null` or `nil` duration is allowed when obtaining.
+  ///
+  /// Be aware, when it's true, the constraint with [min] and [max]
+  /// become optional conditions.
   final bool allowNullable;
 
   Map<String, dynamic> toMap() {
