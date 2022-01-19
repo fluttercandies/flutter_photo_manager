@@ -439,13 +439,13 @@
         [handler reply:nil];
         return;
     }
-    
-    PHAssetResourceManager *manager = PHAssetResourceManager.defaultManager;
-    
-    NSString *path = [self makeAssetOutputPath:destinationResource isOrigin:YES];
-    NSURL *fileUrl = [NSURL fileURLWithPath:path];
-    
-    [PMFileHelper deleteFile:path];
+    NSFileManager *fileManager = NSFileManager.defaultManager;
+    NSString *path = [self makeAssetOutputPath:asset isOrigin:YES manager:fileManager];
+    if ([fileManager fileExistsAtPath:path]) {
+        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
+        [handler reply:path];
+        return;
+    }
     
     PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
     [options setNetworkAccessAllowed:YES];
@@ -457,7 +457,9 @@
         }
     }];
     
-    [manager writeDataForAssetResource:destinationResource
+    PHAssetResourceManager *resourceManager = PHAssetResourceManager.defaultManager;
+    NSURL *fileUrl = [NSURL fileURLWithPath:path];
+    [resourceManager writeDataForAssetResource:destinationResource
                                 toFile:fileUrl
                                options:options
                      completionHandler:^(NSError *_Nullable error) {
@@ -478,13 +480,13 @@
         [handler reply:nil];
         return;
     }
-    
-    PHAssetResourceManager *manager = PHAssetResourceManager.defaultManager;
-    
-    NSString *path = [self makeAssetOutputPath:destinationResource isOrigin:YES];
-    NSURL *fileUrl = [NSURL fileURLWithPath:path];
-    
-    [PMFileHelper deleteFile:path];
+    NSFileManager *fileManager = NSFileManager.defaultManager;
+    NSString *path = [self makeAssetOutputPath:asset isOrigin:YES manager:fileManager];
+    if ([fileManager fileExistsAtPath:path]) {
+        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
+        [handler reply:path];
+        return;
+    }
     
     PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
     [options setNetworkAccessAllowed:YES];
@@ -496,7 +498,9 @@
         }
     }];
     
-    [manager writeDataForAssetResource:destinationResource
+    PHAssetResourceManager *resourceManager = PHAssetResourceManager.defaultManager;
+    NSURL *fileUrl = [NSURL fileURLWithPath:path];
+    [resourceManager writeDataForAssetResource:destinationResource
                                 toFile:fileUrl
                                options:options
                      completionHandler:^(NSError *_Nullable error) {
@@ -512,20 +516,10 @@
 }
 
 - (void)fetchFullSizeVideo:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    NSString *homePath = NSTemporaryDirectory();
     NSFileManager *manager = NSFileManager.defaultManager;
-    NSMutableString *path = [NSMutableString stringWithString:homePath];
-    NSString *filename = [asset valueForKey:[NSString stringWithFormat:@"filename"]];
-    NSString *dirPath = [NSString stringWithFormat:@"%@/%@", homePath, @".video"];
-    [manager createDirectoryAtPath:dirPath
-       withIntermediateDirectories:true
-                        attributes:@{}
-                             error:nil];
-    
-    [path appendFormat:@"%@/%@", @".video", filename];
+    NSString *path = [self makeAssetOutputPath:asset isOrigin:NO manager:manager];
     if ([manager fileExistsAtPath:path]) {
-        [[PMLogUtils sharedInstance]
-         info:[NSString stringWithFormat:@"read cache from %@", path]];
+        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
         [handler reply:path];
         return;
     }
@@ -582,47 +576,36 @@
     }];
 }
 
-- (NSString *)makeAssetOutputPath:(PHAssetResource *)resource isOrigin:(Boolean)isOrigin {
+- (NSString *)makeAssetOutputPath:(PHAsset *)asset isOrigin:(Boolean)isOrigin manager:(NSFileManager *)manager {
     NSString *homePath = NSTemporaryDirectory();
-    NSString *cachePath = resource.isVideo ? @".video" : @".image";
-    NSString *dirPath = [NSString stringWithFormat:@"%@%@", homePath, cachePath];
-    [NSFileManager.defaultManager createDirectoryAtPath:dirPath
-                            withIntermediateDirectories:true
-                                             attributes:@{}
-                                                  error:nil];
-    
-    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"cache path = %@", dirPath]];
-    
-    NSURL *url = [resource valueForKey:@"privateFileURL"];
-    NSString *urlString = url.absoluteString;
-    NSString *title = [urlString componentsSeparatedByString:@"/"].lastObject;
-    NSMutableString *path = [NSMutableString stringWithString:dirPath];
-    [path appendFormat:@"/%@", title];
+    NSMutableString *path = [NSMutableString stringWithString:homePath];
+    NSString *modifiedDate = [NSString stringWithFormat:@"%f", asset.modificationDate.timeIntervalSince1970];
+    NSString *filename = [NSString stringWithFormat:@"%@%@_%@", modifiedDate, isOrigin ? @"_o" : @"", [asset valueForKey:@"filename"]];
+    NSString *typeDirPath = asset.isImage ? @".image" : @".video";
+    NSString *dirPath = [NSString stringWithFormat:@"%@%@", homePath, typeDirPath];
+    if (manager == nil) {
+        manager = NSFileManager.defaultManager;
+    }
+    [manager createDirectoryAtPath:dirPath
+       withIntermediateDirectories:true
+                        attributes:@{}
+                             error:nil];
+    [path appendFormat:@"%@/%@", typeDirPath, filename];
+    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"PHAsset cache path = %@", path]];
     return path;
 }
 
 - (NSString *)writeFullFileWithAssetId:(PHAsset *)asset imageData:(NSData *)imageData {
-    
     NSString *homePath = NSTemporaryDirectory();
     NSFileManager *manager = NSFileManager.defaultManager;
-    
     NSMutableString *path = [NSMutableString stringWithString:homePath];
     [path appendString:@"flutter-images"];
-    
     NSError *error;
     [manager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:@{} error:&error];
-    
     [path appendString:@"/"];
     [path appendString:[MD5Utils getmd5WithString:asset.localIdentifier]];
-    
     [path appendString:@"_exif"];
-    
     [path appendString:@".jpg"];
-    
-    //  if ([manager fileExistsAtPath:path]) {
-    //    return path;
-    //  }
-    
     [manager createFileAtPath:path contents:imageData attributes:@{}];
     return path;
 }
@@ -637,11 +620,13 @@
         [handler reply:nil];
         return;
     }
-    
-    PHAssetResourceManager *manager = PHAssetResourceManager.defaultManager;
-    NSString *path = [self makeAssetOutputPath:imageResource isOrigin:YES];
-    NSURL *fileUrl = [NSURL fileURLWithPath:path];
-    [PMFileHelper deleteFile:path];
+    NSFileManager *fileManager = NSFileManager.defaultManager;
+    NSString *path = [self makeAssetOutputPath:asset isOrigin:YES manager:fileManager];
+    if ([fileManager fileExistsAtPath:path]) {
+        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
+        [handler reply:path];
+        return;
+    }
     
     PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
     [options setNetworkAccessAllowed:YES];
@@ -652,10 +637,12 @@
         }
     }];
     
-    [manager writeDataForAssetResource:imageResource
-                                toFile:fileUrl
-                               options:options
-                     completionHandler:^(NSError *_Nullable error) {
+    PHAssetResourceManager *resourceManager = PHAssetResourceManager.defaultManager;
+    NSURL *fileUrl = [NSURL fileURLWithPath:path];
+    [resourceManager writeDataForAssetResource:imageResource
+                                        toFile:fileUrl
+                                       options:options
+                             completionHandler:^(NSError *_Nullable error) {
         if (error) {
             NSLog(@"error = %@", error);
             [handler reply:nil];

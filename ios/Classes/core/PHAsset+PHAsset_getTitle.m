@@ -72,8 +72,7 @@
 }
 
 - (PHAssetResource *)getAdjustResource {
-    NSArray<PHAssetResource *> *resources =
-    [PHAssetResource assetResourcesForAsset:self];
+    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:self];
     if (resources.count == 0) {
         return nil;
     }
