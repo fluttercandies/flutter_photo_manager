@@ -1016,62 +1016,20 @@
 }
 
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler {
-    PHAsset *phAsset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
+    PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
+    PHAssetResource *resource;
     if (@available(iOS 9.1, *)) {
-        if (phAsset.mediaSubtypes & PHAssetMediaSubtypePhotoLive) {
-            NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:phAsset];
-            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset has %lu resources.", (unsigned long) resources.count]];
-            PHAssetResource *resource;
-            // Return immediately if the last resource is paired video.
-            if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypePairedVideo) {
-                resource = resources.lastObject;
-            }
-            if (!resource) {
-                for (PHAssetResource *r in resources) {
-                    // Iterate to find full size video.
-                    if (r.type == PHAssetResourceTypeVideo && !resource) {
-                        resource = r;
-                        continue;
-                    }
-                    // Iterate to find paired video.
-                    if (r.type == PHAssetResourceTypePairedVideo) {
-                        resource = r;
-                        break;
-                    }
-                }
-            }
-            if (!resource) {
-                [handler reply:nil];
-                return;
-            }
-            NSURL *fileUrl = [resource valueForKey:@"privateFileURL"];
-            [handler reply:fileUrl.absoluteString];
+        if (asset.mediaSubtypes & PHAssetMediaSubtypePhotoLive) {
+            resource = [asset getLivePhotosResource];
+            NSURL *url = [resource valueForKey:@"privateFileURL"];
+            [handler reply:url.absoluteString];
             return;
         }
     }
-    if (phAsset.isVideo) {
-        [PHCachingImageManager.defaultManager requestAVAssetForVideo:phAsset options:nil resultHandler:^(AVAsset *asset, AVAudioMix *audioMix, NSDictionary *info) {
-            if ([asset isKindOfClass:[AVURLAsset class]]) {
-                NSURL *url = ((AVURLAsset *) asset).URL;
-                [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset asset URL = %@", url]];
-                [handler reply:url.absoluteString];
-            } else if ([asset isKindOfClass:[AVComposition class]]) {
-                // Try to handle this asset as a slow motion video, and return an original video url.
-                PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
-                options.version = PHVideoRequestOptionsVersionOriginal;
-                [PHCachingImageManager.defaultManager requestAVAssetForVideo:phAsset options:options resultHandler:^(AVAsset *asset, AVAudioMix *audioMix, NSDictionary *info) {
-                    if ([asset isKindOfClass:[AVURLAsset class]]) {
-                        NSURL *url = ((AVURLAsset *) asset).URL;
-                        [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"The asset asset URL = %@", url]];
-                        [handler reply:url.absoluteString];
-                    } else {
-                        [handler replyError:@"Asset is not an AVURLAsset which does not include a media url."];
-                    }
-                }];
-            } else {
-                [handler replyError:@"Asset is not an AVURLAsset which does not include a media url."];
-            }
-        }];
+    if (asset.isVideo) {
+        PHAssetResource *resource = [asset getAdjustResource];
+        NSURL *url = [resource valueForKey:@"privateFileURL"];
+        [handler reply:url.absoluteString];
     } else {
         [handler replyError:@"Only video type of assets can get a media url."];
     }
