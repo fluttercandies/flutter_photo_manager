@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2.0.0-dev.3
+
+Features:
+- `DurationConstraint.allowNullable`. (#681)
+
+Improvements:
+- Improve adjusted resources fetching on iOS.
+- Obtain `DATE_TAKEN` for create date if possible on Android. (#682)
+- Improve cache path for `PHAsset` on iOS. (#683)
+- Improve imlementation of `getMediaUrl()` on iOS. (#684)
+
 ## 2.0.0-dev.2
 
 Improvements:
