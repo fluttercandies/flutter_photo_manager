@@ -18,10 +18,9 @@ import com.fluttercandies.photo_manager.core.entity.FilterOption
 import com.fluttercandies.photo_manager.core.entity.GalleryEntity
 import com.fluttercandies.photo_manager.util.LogUtils
 
-@Suppress("DEPRECATION")
+@Suppress("deprecation")
 @SuppressLint("InlinedApi")
 interface IDBUtils {
-
     companion object {
         @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.Q)
         val isAndroidQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
@@ -75,13 +74,8 @@ interface IDBUtils {
             MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
         )
 
-        //    fun galleryIdKey(@MediaTypeDef mediaType: Int) :String{
-//      if(mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO)
-//        return MediaStore.Audio.AudioColumns.ALBUM
-//    }
         val allUri: Uri
             get() = MediaStore.Files.getContentUri(VOLUME_EXTERNAL)
-
     }
 
     val idSelection: String
@@ -119,7 +113,6 @@ interface IDBUtils {
             else -> 0
         }
     }
-
 
     fun convertTypeToMediaType(type: Int): Int {
         return MediaStoreUtils.convertTypeToMediaType(type)
@@ -176,11 +169,6 @@ interface IDBUtils {
         option: FilterOption
     ): List<AssetEntity>
 
-    fun findDeleteUri(context: Context, id: String): Uri? {
-        val assetEntity = getAssetEntity(context, id) ?: return null
-        return assetEntity.getUri()
-    }
-
     fun saveImage(
         context: Context,
         image: ByteArray,
@@ -232,29 +220,20 @@ interface IDBUtils {
         if (option.imageOption.sizeConstraint.ignoreSize) {
             return ""
         }
-
         if (requestType == null || !typeUtils.containsImage(requestType)) {
             return ""
         }
         val mediaType = MEDIA_TYPE
-
-
         var result = ""
-
         if (typeUtils.containsVideo(requestType)) {
             result = "OR ( $mediaType = $MEDIA_TYPE_VIDEO )"
         }
-
         if (typeUtils.containsAudio(requestType)) {
             result = "$result OR ( $mediaType = $MEDIA_TYPE_AUDIO )"
         }
-
         val size = "$WIDTH > 0 AND $HEIGHT > 0"
-
         val imageCondString = "( $mediaType = $MEDIA_TYPE_IMAGE AND $size )"
-
         result = "AND ($imageCondString $result)"
-
         return result
     }
 
@@ -274,7 +253,6 @@ interface IDBUtils {
             val imageCond = filterOption.imageOption
             imageCondString = "$typeKey = ? "
             args.add(MEDIA_TYPE_IMAGE.toString())
-
             if (!imageCond.sizeConstraint.ignoreSize) {
                 val sizeCond = imageCond.sizeCond()
                 val sizeArgs = imageCond.sizeArgs()
@@ -309,16 +287,13 @@ interface IDBUtils {
             if (cond.isNotEmpty()) {
                 cond.append("OR ")
             }
-
             cond.append("( $videoCondString )")
         }
-
 
         if (haveAudio) {
             if (cond.isNotEmpty()) {
                 cond.append("OR ")
             }
-
             cond.append("( $audioCondString )")
         }
 
@@ -388,49 +363,45 @@ interface IDBUtils {
     fun getSomeInfo(context: Context, assetId: String): Pair<String, String>?
 
     fun getUri(id: String, type: Int, isOrigin: Boolean = false): Uri {
-        var uri =
-            when (type) {
-                1 -> Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-                2 -> Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
-                3 -> Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-                else -> return Uri.EMPTY
-            }
+        var uri = when (type) {
+            1 -> Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+            2 -> Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+            3 -> Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+            else -> return Uri.EMPTY
+        }
 
         if (isOrigin) {
             uri = MediaStore.setRequireOriginal(uri)
         }
         return uri
     }
-
 
     fun getUriFromMediaType(id: String, mediaType: Int, isOrigin: Boolean = false): Uri {
-        var uri =
-            when (mediaType) {
-                MEDIA_TYPE_IMAGE -> Uri.withAppendedPath(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    id
-                )
-                MEDIA_TYPE_VIDEO -> Uri.withAppendedPath(
-                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                    id
-                )
-                MEDIA_TYPE_AUDIO -> Uri.withAppendedPath(
-                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    id
-                )
-                MEDIA_TYPE_PLAYLIST -> Uri.withAppendedPath(
-                    MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                    id
-                )
-                else -> return Uri.EMPTY
-            }
+        var uri = when (mediaType) {
+            MEDIA_TYPE_IMAGE -> Uri.withAppendedPath(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                id
+            )
+            MEDIA_TYPE_VIDEO -> Uri.withAppendedPath(
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                id
+            )
+            MEDIA_TYPE_AUDIO -> Uri.withAppendedPath(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                id
+            )
+            MEDIA_TYPE_PLAYLIST -> Uri.withAppendedPath(
+                MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+                id
+            )
+            else -> return Uri.EMPTY
+        }
 
         if (isOrigin) {
             uri = MediaStore.setRequireOriginal(uri)
         }
         return uri
     }
-
 
     fun throwMsg(msg: String): Nothing {
         throw RuntimeException(msg)
@@ -440,18 +411,14 @@ interface IDBUtils {
 
     fun clearFileCache(context: Context) {}
 
-    @SuppressLint("Recycle")
     fun getAssetsUri(context: Context, ids: List<String>): List<Uri> {
         if (ids.count() > 500) {
             val result = ArrayList<Uri>()
-
             val total = ids.count()
             var count = total / 500
-
             if (total % 500 != 0) {
                 count++
             }
-
             for (i in 0 until count) {
                 val end = if (i == count - 1) {
                     ids.count()
@@ -459,24 +426,24 @@ interface IDBUtils {
                     (i + 1) * 500 - 1
                 }
                 val start = i * 500
-
                 val tmp = getAssetsUri(context, ids.subList(start, end))
                 result.addAll(tmp)
             }
-
             return result
         }
 
         val key = arrayOf(_ID, MEDIA_TYPE)
         val idSelection = ids.joinToString(",") { "?" }
         val selection = "$_ID in ($idSelection)"
-        val cursor = context.contentResolver.query(allUri, key, selection, ids.toTypedArray(), null)
-            ?: return emptyList()
-
+        val cursor = context.contentResolver.query(
+            allUri,
+            key,
+            selection,
+            ids.toTypedArray(),
+            null
+        ) ?: return emptyList()
         val list = ArrayList<Uri>()
-
         val map = HashMap<String, Uri>()
-
         cursor.use {
             while (it.moveToNext()) {
                 val id = it.getString(_ID)
@@ -484,30 +451,20 @@ interface IDBUtils {
                 map[id] = getUriFromMediaType(id, type)
             }
         }
-
-
         for (id in ids) {
-            map[id]?.let {
-                list.add(it)
-            }
+            map[id]?.let { list.add(it) }
         }
-
         return list
     }
 
-    @SuppressLint("Recycle")
     fun getAssetsPath(context: Context, ids: List<String>): List<String> {
-
         if (ids.count() > 500) {
             val result = ArrayList<String>()
-
             val total = ids.count()
             var count = total / 500
-
             if (total % 500 != 0) {
                 count++
             }
-
             for (i in 0 until count) {
                 val end = if (i == count - 1) {
                     ids.count()
@@ -519,20 +476,21 @@ interface IDBUtils {
                 val tmp = getAssetsPath(context, ids.subList(start, end))
                 result.addAll(tmp)
             }
-
             return result
         }
 
         val key = arrayOf(_ID, MEDIA_TYPE, DATA)
         val idSelection = ids.joinToString(",") { "?" }
         val selection = "$_ID in ($idSelection)"
-        val cursor = context.contentResolver.query(allUri, key, selection, ids.toTypedArray(), null)
-            ?: return emptyList()
-
+        val cursor = context.contentResolver.query(
+            allUri,
+            key,
+            selection,
+            ids.toTypedArray(),
+            null
+        ) ?: return emptyList()
         val list = ArrayList<String>()
-
         val map = HashMap<String, String>()
-
         cursor.use {
             while (it.moveToNext()) {
                 val id = it.getString(_ID)
@@ -540,13 +498,11 @@ interface IDBUtils {
                 map[id] = path
             }
         }
-
         for (id in ids) {
             map[id]?.let {
                 list.add(it)
             }
         }
-
         return list
     }
 
@@ -555,24 +511,21 @@ interface IDBUtils {
         entity.modifiedDate = modifiedDate
     }
 
-    @SuppressLint("Recycle")
     fun getPathModifiedDate(context: Context, pathId: String): Long {
         val columns = arrayOf(DATE_MODIFIED)
         val sortOrder = "$DATE_MODIFIED desc"
-        val cursor =
-            if (pathId == PhotoManager.ALL_ID) {
-                context.contentResolver.query(allUri, columns, null, null, sortOrder)
-            } else {
-                context.contentResolver.query(
-                    allUri,
-                    columns,
-                    "$BUCKET_ID = ?",
-                    arrayOf(pathId),
-                    sortOrder
-                )
-                    ?: return 0
-            }
-        cursor?.use {
+        val cursor = if (pathId == PhotoManager.ALL_ID) {
+            context.contentResolver.query(allUri, columns, null, null, sortOrder)
+        } else {
+            context.contentResolver.query(
+                allUri,
+                columns,
+                "$BUCKET_ID = ?",
+                arrayOf(pathId),
+                sortOrder
+            )
+        } ?: return 0
+        cursor.use {
             if (cursor.moveToNext()) {
                 return cursor.getLong(DATE_MODIFIED)
             }

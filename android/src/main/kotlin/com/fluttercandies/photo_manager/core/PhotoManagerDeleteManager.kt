@@ -109,7 +109,10 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
 
     fun deleteInApi28(ids: List<String>) {
         val where = ids.joinToString(",") { "?" }
-        cr.delete(IDBUtils.allUri, "${MediaStore.MediaColumns._ID} in ($where)", ids.toTypedArray())
+        cr.delete(
+            IDBUtils.allUri,
+            "${MediaStore.MediaColumns._ID} in ($where)",
+            ids.toTypedArray())
     }
 
     private var androidRHandler: ResultHandler? = null

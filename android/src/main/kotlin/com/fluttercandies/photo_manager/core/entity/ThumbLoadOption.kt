@@ -17,12 +17,11 @@ data class ThumbLoadOption(
             val quality = map["quality"] as Int
             val frame = (map["frame"] as Int).toLong()
 
-            val compressFormat =
-                if (format == 0) {
-                    Bitmap.CompressFormat.JPEG
-                } else {
-                    Bitmap.CompressFormat.PNG
-                }
+            val compressFormat = if (format == 0) {
+                Bitmap.CompressFormat.JPEG
+            } else {
+                Bitmap.CompressFormat.PNG
+            }
 
             return ThumbLoadOption(width, height, compressFormat, quality, frame)
         }

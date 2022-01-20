@@ -21,17 +21,13 @@ data class AssetEntity(
     val androidQRelativePath: String? = null,
     val mimeType: String? = null
 ) {
-
-    fun getUri(): Uri {
-        return MediaStoreUtils.getDeleteUri(id, MediaStoreUtils.convertTypeToMediaType(type))
-    }
+    fun getUri(): Uri =
+        MediaStoreUtils.getDeleteUri(id, MediaStoreUtils.convertTypeToMediaType(type))
 
     val relativePath: String?
-        get() {
-            return if (isAndroidQ) {
-                androidQRelativePath
-            } else {
-                File(path).parent
-            }
+        get() = if (isAndroidQ) {
+            androidQRelativePath
+        } else {
+            File(path).parent
         }
 }

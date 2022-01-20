@@ -67,7 +67,6 @@ class PhotoManagerPlugin : FlutterPlugin, ActivityAware {
         if (this.binding != null) {
             onRemoveRequestPermissionResultListener(this.binding!!)
         }
-
         this.binding = binding
         plugin?.bindActivity(binding.activity)
         addRequestPermissionsResultListener(binding)

@@ -23,6 +23,7 @@ import java.util.concurrent.Executors
 class PhotoManager(private val context: Context) {
     companion object {
         const val ALL_ID = "isAll"
+        const val ALL_ALBUM_NAME = "Recent"
 
         private val threadPool = Executors.newFixedThreadPool(5)
     }
@@ -49,20 +50,17 @@ class PhotoManager(private val context: Context) {
         if (onlyAll) {
             return dbUtils.getOnlyGalleryList(context, type, option)
         }
-
         val fromDb = dbUtils.getGalleryList(context, type, option)
-
         if (!hasAll) {
             return fromDb
         }
-
         // make is all to the gallery list
         val entity = fromDb.run {
             var count = 0
             for (item in this) {
                 count += item.length
             }
-            GalleryEntity(ALL_ID, "Recent", count, type, true)
+            GalleryEntity(ALL_ID, ALL_ALBUM_NAME, count, type, true)
         }
 
         return listOf(entity) + fromDb
@@ -114,7 +112,7 @@ class PhotoManager(private val context: Context) {
                     resultHandler.result
                 )
             } else {
-                // need use android Q  MediaStore thumbnail api
+                // Need use Android Q MediaStore thumbnail API.
                 val asset = dbUtils.getAssetEntity(context, id)
                 val type = asset?.type
                 val uri = dbUtils.getThumbUri(context, id, width, height, type)
@@ -137,7 +135,6 @@ class PhotoManager(private val context: Context) {
         resultHandler: ResultHandler
     ) {
         val asset = dbUtils.getAssetEntity(context, id)
-
         if (asset == null) {
             resultHandler.replyError("The asset not found")
             return
@@ -181,7 +178,7 @@ class PhotoManager(private val context: Context) {
                     for (item in this) {
                         count += item.length
                     }
-                    GalleryEntity(ALL_ID, "Recent", count, type, true).apply {
+                    GalleryEntity(ALL_ID, ALL_ALBUM_NAME, count, type, true).apply {
                         if (option.containsPathModified) {
                             dbUtils.injectModifiedDate(context, this)
                         }
@@ -304,9 +301,7 @@ class PhotoManager(private val context: Context) {
                 cacheFutures.add(future)
             }
         }
-
         resultHandler.reply(1)
-
         val needExecuteFutures = cacheFutures.toList()
         for (cacheFuture in needExecuteFutures) {
             threadPool.execute {
@@ -324,6 +319,5 @@ class PhotoManager(private val context: Context) {
         for (futureTarget in needCancelFutures) {
             Glide.with(context).clear(futureTarget)
         }
-
     }
 }
