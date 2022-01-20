@@ -1016,6 +1016,11 @@
 }
 
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler {
+    BOOL isLocallyAvailable = [self entityIsLocallyAvailable:assetId];
+    if (!isLocallyAvailable) {
+        [handler replyError:@"Media url is unavailable when the asset is not locally available."];
+        return;
+    }
     PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
     PHAssetResource *resource;
     if (@available(iOS 9.1, *)) {
