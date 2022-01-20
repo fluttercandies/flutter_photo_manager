@@ -55,8 +55,8 @@ class PhotoManagerPlugin(
             }
 
             override fun onDenied(
-                deniedPermissions: List<String>,
-                grantedPermissions: List<String>
+                deniedPermissions: MutableList<String>,
+                grantedPermissions: MutableList<String>
             ) {
             }
         }
@@ -198,8 +198,8 @@ class PhotoManagerPlugin(
                 }
 
                 override fun onDenied(
-                    deniedPermissions: List<String>,
-                    grantedPermissions: List<String>
+                    deniedPermissions: MutableList<String>,
+                    grantedPermissions: MutableList<String>
                 ) {
                     LogUtils.info("onDenied call.method = ${call.method}")
                     if (call.method == "requestPermissionExtend") {

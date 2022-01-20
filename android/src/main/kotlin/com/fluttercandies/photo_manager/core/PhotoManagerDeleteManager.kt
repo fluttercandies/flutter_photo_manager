@@ -112,7 +112,8 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
         cr.delete(
             IDBUtils.allUri,
             "${MediaStore.MediaColumns._ID} in ($where)",
-            ids.toTypedArray())
+            ids.toTypedArray()
+        )
     }
 
     private var androidRHandler: ResultHandler? = null
