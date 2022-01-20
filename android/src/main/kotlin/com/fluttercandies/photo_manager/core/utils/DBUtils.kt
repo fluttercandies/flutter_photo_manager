@@ -7,6 +7,7 @@ import android.content.Context
 import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.BaseColumns._ID
 import android.provider.MediaStore
@@ -270,17 +271,20 @@ object DBUtils : IDBUtils {
         val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
         val duration =
             if (requestType == 1) 0 else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
-        val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
-        val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
+        var width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
+        var height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
         val displayName = File(path).name
         val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
-
         val lat = cursor.getDouble(MediaStore.Images.ImageColumns.LATITUDE)
         val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
         val orientation: Int = cursor.getInt(MediaStore.MediaColumns.ORIENTATION)
-
         val mimeType = cursor.getString(MediaStore.Files.FileColumns.MIME_TYPE)
-
+        if ((width == 0 || height == 0) && path.isNotBlank()) {
+            ExifInterface(path).apply {
+                width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
+                height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+            }
+        }
         return AssetEntity(
             id,
             path,
@@ -414,13 +418,14 @@ object DBUtils : IDBUtils {
             put(MediaStore.Images.ImageColumns.DESCRIPTION, desc)
             put(MediaStore.Images.ImageColumns.DATE_ADDED, timestamp)
             put(MediaStore.Images.ImageColumns.DATE_MODIFIED, timestamp)
-            put(MediaStore.Images.ImageColumns.DATE_TAKEN, timestamp * 1000)
             put(MediaStore.Images.ImageColumns.DISPLAY_NAME, title)
             put(MediaStore.Images.ImageColumns.WIDTH, width)
             put(MediaStore.Images.ImageColumns.HEIGHT, height)
             put(MediaStore.Images.ImageColumns.LATITUDE, latLong[0])
             put(MediaStore.Images.ImageColumns.LONGITUDE, latLong[1])
             put(MediaStore.Images.ImageColumns.ORIENTATION, degrees)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                put(MediaStore.Images.ImageColumns.DATE_TAKEN, timestamp * 1000)
         }
 
         val insertUri =
@@ -499,12 +504,13 @@ object DBUtils : IDBUtils {
             put(MediaStore.Images.ImageColumns.DESCRIPTION, desc)
             put(MediaStore.Images.ImageColumns.DATE_ADDED, timestamp)
             put(MediaStore.Images.ImageColumns.DATE_MODIFIED, timestamp)
-            put(MediaStore.Images.ImageColumns.DATE_TAKEN, timestamp * 1000)
             put(MediaStore.Images.ImageColumns.DISPLAY_NAME, title)
             put(MediaStore.Images.ImageColumns.LATITUDE, latLong[0])
             put(MediaStore.Images.ImageColumns.LONGITUDE, latLong[1])
             put(MediaStore.Images.ImageColumns.WIDTH, width)
             put(MediaStore.Images.ImageColumns.HEIGHT, height)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                put(MediaStore.Images.ImageColumns.DATE_TAKEN, timestamp * 1000)
 
             if (savePath) {
                 put(MediaStore.Video.VideoColumns.DATA, path)
@@ -573,8 +579,10 @@ object DBUtils : IDBUtils {
             MediaStore.Video.VideoColumns.WIDTH,
             MediaStore.Video.VideoColumns.HEIGHT
         )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            copyKeys.add(MediaStore.Video.VideoColumns.DATE_TAKEN)
+        }
         val mediaType = convertTypeToMediaType(asset.type)
-
         if (mediaType != MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO) {
             copyKeys.add(MediaStore.Video.VideoColumns.DESCRIPTION)
         }

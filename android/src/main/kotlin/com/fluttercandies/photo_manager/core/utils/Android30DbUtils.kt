@@ -285,17 +285,21 @@ object Android30DbUtils : IDBUtils {
             date /= 1000
         }
         val type = cursor.getInt(MEDIA_TYPE)
-
         val mimeType = cursor.getString(MIME_TYPE)
-
         val duration = if (type == MEDIA_TYPE_IMAGE) 0
         else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
-        val width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
-        val height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
+        var width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
+        var height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
         val displayName = cursor.getString(MediaStore.Images.Media.DISPLAY_NAME)
         val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
         val orientation: Int = cursor.getInt(MediaStore.MediaColumns.ORIENTATION)
         val relativePath: String = cursor.getString(MediaStore.MediaColumns.RELATIVE_PATH)
+        if ((width == 0 || height == 0) && path.isNotBlank()) {
+            ExifInterface(path).apply {
+                width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
+                height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+            }
+        }
         return AssetEntity(
             id,
             path,
