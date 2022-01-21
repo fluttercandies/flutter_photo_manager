@@ -53,7 +53,6 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
   * [Android extra configs](#android-extra-configs)
     * [Android 10 extra configs](#android-10-extra-configs)
     * [Glide issues](#glide-issues)
-    * [Remove media location permission](#remove-media-location-permission)
   * [iOS extra configs](#ios-extra-configs)
     * [Localized system albums name](#localized-system-albums-name)
   * [Experimental features](#experimental-features)
@@ -301,9 +300,8 @@ it is necessary to grant the location permission
 to obtain the original data with the location info
 and the EXIF metadata.
 
-If you don't want to use the location permission,
-see [Remove media location permission](#remove-media-location-permission)
-for how to remove it in the manifest.
+If you want to use the location permission,
+add the `ACCESS_MEDIA_LOCATION` permission to your manifest.
 
 ##### Usage of the original data
 
@@ -462,22 +460,6 @@ rootProject.allprojects {
 
 See [ProGuard for Glide](https://github.com/bumptech/glide#proguard)
 if you want to know more about using ProGuard and Glide together.
-
-#### Remove media location permission
-
-The plugin vendored [`ACCESS_MEDIA_LOCATION`][]
-permission as a requirement.
-
-It's introduced and required from Android 10.
-If you don't need this permission, add the `android:node`
-to your app's `AndroidManifest.xml` to remove it.
-
-```xml
-<uses-permission
-  android:name="android.permission.ACCESS_MEDIA_LOCATION"
-  tools:node="remove"
-  />
-```
 
 ### iOS extra configs
 
