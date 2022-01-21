@@ -172,7 +172,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             ),
             ElevatedButton(
               child: const Text('Delete item'),
-              onPressed: () => _deleteCurrent(entity),
+              onPressed: () => _deleteCurrent(context, entity),
             ),
             ElevatedButton(
               child: const Text('Upload to my test server.'),
@@ -228,7 +228,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     await readPathProvider(context).onRefresh();
   }
 
-  Future<void> _deleteCurrent(AssetEntity entity) async {
+  Future<void> _deleteCurrent(BuildContext context, AssetEntity entity) async {
     if (Platform.isAndroid) {
       final AlertDialog dialog = AlertDialog(
         title: const Text('Delete the asset'),
@@ -447,6 +447,7 @@ class _ImageListItemState extends State<_ImageListItem> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: widget.onTap,
       child: ImageItemWidget(
         key: ValueKey<AssetEntity>(widget.entity),
