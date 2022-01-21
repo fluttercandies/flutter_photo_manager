@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.0.0-dev.4
+
+Improvements:
+- Retrieve width/height from ExifInterface for fallback. (#686)
+- Throw when obtain media URL that asset is not locally available on iOS.
+- Update README with media location permission and assets retrieving on iOS.
+
 ## 2.0.0-dev.3
 
 Features:
