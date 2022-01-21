@@ -118,18 +118,17 @@ class PhotoManagerNotifyChannel(
                 )
                 cursor?.use {
                     if (!cursor.moveToNext()) {
-                        // If the id not have item, I think the item was deleted.
+                        // If the ID not have item, make it as deleted.
                         onOuterChange(uri, "delete", id, null, type)
                         return
                     }
-                    // find date to know insert or update
+                    // Find date to determine insert or update.
                     val addTimestampSecond = cursor.getLong(cursor.getColumnIndex(DATE_ADDED))
                     val currentTimeMillis = System.currentTimeMillis()
 
                     val diffTime = currentTimeMillis / 1000 - addTimestampSecond
 
                     // Within 30s, it is considered to be inserted, if it is exceeded, it is considered to be changed
-
                     val typeString = if (diffTime < 30) {
                         "insert"
                     } else {
@@ -151,7 +150,6 @@ class PhotoManagerNotifyChannel(
                         return
                     }
                 }
-
                 onOuterChange(uri, "delete", null, null, type)
             }
         }
@@ -171,14 +169,15 @@ class PhotoManagerNotifyChannel(
                     )
                     cursor?.use {
                         if (cursor.moveToNext()) {
-                            val galleryId =
-                                cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.BUCKET_ID))
-                            val galleryName =
-                                cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME))
+                            val galleryId = cursor.getLong(
+                                cursor.getColumnIndex(MediaStore.MediaColumns.BUCKET_ID)
+                            )
+                            val galleryName = cursor.getString(
+                                cursor.getColumnIndex(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME)
+                            )
                             return Pair(galleryId, galleryName)
                         }
                     }
-
                 }
                 type == MEDIA_TYPE_AUDIO -> {
                     val cursor = cr.query(
@@ -193,10 +192,12 @@ class PhotoManagerNotifyChannel(
                     )
                     cursor?.use {
                         if (cursor.moveToNext()) {
-                            val galleryId =
-                                cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ID))
-                            val galleryName =
-                                cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM))
+                            val galleryId = cursor.getLong(
+                                cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ID)
+                            )
+                            val galleryName = cursor.getString(
+                                cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM)
+                            )
                             return Pair(galleryId, galleryName)
                         }
                     }

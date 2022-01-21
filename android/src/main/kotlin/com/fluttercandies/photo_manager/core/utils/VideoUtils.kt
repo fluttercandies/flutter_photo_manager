@@ -3,7 +3,6 @@ package com.fluttercandies.photo_manager.core.utils
 import android.media.MediaPlayer
 
 object VideoUtils {
-
     data class VideoInfo(var width: Int?, var height: Int?, var duration: Int?)
 
     fun getPropertiesUseMediaPlayer(path: String): VideoInfo {

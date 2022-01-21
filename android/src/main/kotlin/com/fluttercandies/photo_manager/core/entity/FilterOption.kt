@@ -11,22 +11,19 @@ class FilterOption(map: Map<*, *>) {
     val audioOption = ConvertUtils.getOptionFromType(map, AssetType.Audio)
     val createDateCond = ConvertUtils.convertToDateCond(map["createDate"] as Map<*, *>)
     val updateDateCond = ConvertUtils.convertToDateCond(map["updateDate"] as Map<*, *>)
+    val containsPathModified = map["containsPathModified"] as Boolean
 
     private val orderByCond: List<OrderByCond> =
         ConvertUtils.convertOrderByCondList(map["orders"] as List<*>)
-
-    val containsPathModified = map["containsPathModified"] as Boolean
 
     fun orderByCondString(): String? {
         if (orderByCond.isEmpty()) {
             return null
         }
-
         return orderByCond.joinToString(",") {
             it.getOrder()
         }
     }
-
 }
 
 class FilterCond {
@@ -42,10 +39,8 @@ class FilterCond {
         private const val durationKey = MediaStore.Video.VideoColumns.DURATION
     }
 
-    fun sizeCond(): String {
-
-        return "$widthKey >= ? AND $widthKey <= ? AND $heightKey >= ? AND $heightKey <=?"
-    }
+    fun sizeCond(): String =
+        "$widthKey >= ? AND $widthKey <= ? AND $heightKey >= ? AND $heightKey <=?"
 
     fun sizeArgs(): Array<String> {
         return arrayOf(

@@ -6,13 +6,13 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
 class ResultHandler(var result: MethodChannel.Result?, val call: MethodCall? = null) {
+    init {
+        handler.hasMessages(0) // just do it to init handler
+    }
+
     companion object {
         @JvmField
         val handler = Handler(Looper.getMainLooper())
-    }
-
-    init {
-        handler.hasMessages(0) // just do it to init handler
     }
 
     private var isReply = false

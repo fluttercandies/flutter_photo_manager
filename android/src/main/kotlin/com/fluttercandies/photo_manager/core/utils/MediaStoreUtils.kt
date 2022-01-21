@@ -4,7 +4,6 @@ import android.net.Uri
 import android.provider.MediaStore
 
 object MediaStoreUtils {
-
     fun getInsertUri(mediaType: Int): Uri {
         return when (mediaType) {
             MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI

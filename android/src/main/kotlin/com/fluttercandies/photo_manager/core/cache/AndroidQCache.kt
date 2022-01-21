@@ -13,14 +13,8 @@ import java.lang.Exception
 
 @RequiresApi(Build.VERSION_CODES.Q)
 class AndroidQCache {
-
     fun getCacheFile(context: Context, id: String, displayName: String, isOrigin: Boolean): File {
-        val originString =
-            if (isOrigin) {
-                "_origin"
-            } else {
-                ""
-            }
+        val originString = if (isOrigin) "_o" else ""
         val name = "$id${originString}_${displayName}"
         return File(context.cacheDir, name)
     }
@@ -33,13 +27,10 @@ class AndroidQCache {
         isOrigin: Boolean
     ): File? {
         val targetFile = getCacheFile(context, assetId, extName, isOrigin)
-
         if (targetFile.exists()) {
             return targetFile
         }
-
         val contentResolver = context.contentResolver
-
         val uri = AndroidQDBUtils.getUri(assetId, type, isOrigin)
         if (uri == Uri.EMPTY) {
             return null
@@ -68,19 +59,15 @@ class AndroidQCache {
             LogUtils.info("${asset.id} , isOrigin: $isOrigin, cache file exists, ignore save")
             return
         }
-
         if (file.parentFile?.exists() != true) {
             file.mkdirs()
         }
         file.writeBytes(byteArray)
-
         LogUtils.info("${asset.id} , isOrigin: $isOrigin, cached")
     }
 
     fun clearAllCache(context: Context) {
-        val files = context.cacheDir
-            ?.listFiles()
-            ?.filterNotNull() ?: return
+        val files = context.cacheDir?.listFiles()?.filterNotNull() ?: return
         for (file in files) {
             file.delete()
         }

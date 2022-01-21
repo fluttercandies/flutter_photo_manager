@@ -32,14 +32,6 @@ class PhotoManagerPlugin(
     private var activity: Activity?,
     private val permissionsUtils: PermissionsUtils
 ) : MethodChannel.MethodCallHandler {
-
-    val deleteManager = PhotoManagerDeleteManager(applicationContext, activity)
-
-    fun bindActivity(activity: Activity?) {
-        this.activity = activity
-        deleteManager.bindActivity(activity)
-    }
-
     companion object {
         private const val poolSize = 8
         private val threadPool: ThreadPoolExecutor = ThreadPoolExecutor(
@@ -57,24 +49,31 @@ class PhotoManagerPlugin(
         var cacheOriginBytes = true
     }
 
-    private val notifyChannel = PhotoManagerNotifyChannel(
-        applicationContext,
-        messenger,
-        Handler(Looper.getMainLooper())
-    )
-
     init {
         permissionsUtils.permissionsListener = object : PermissionsListener {
+            override fun onGranted() {
+            }
+
             override fun onDenied(
                 deniedPermissions: MutableList<String>,
                 grantedPermissions: MutableList<String>
             ) {
             }
-
-            override fun onGranted() {
-            }
         }
     }
+
+    val deleteManager = PhotoManagerDeleteManager(applicationContext, activity)
+
+    fun bindActivity(activity: Activity?) {
+        this.activity = activity
+        deleteManager.bindActivity(activity)
+    }
+
+    private val notifyChannel = PhotoManagerNotifyChannel(
+        applicationContext,
+        messenger,
+        Handler(Looper.getMainLooper())
+    )
 
     private val photoManager = PhotoManager(applicationContext)
 
@@ -152,21 +151,17 @@ class PhotoManagerPlugin(
                 needLocationPermission = true
                 false
             }
-            "getMediaUrl" -> {
-                false
-            }
+            "getMediaUrl" -> false
             else -> false
         }
 
         if (handleResult) {
             return
         }
-
         if (ignorePermissionCheck) {
             onHandlePermissionResult(call, resultHandler, true)
             return
         }
-
         if (permissionsUtils.isRequesting) {
             resultHandler.replyError(
                 "PERMISSION_REQUESTING",
@@ -202,13 +197,16 @@ class PhotoManagerPlugin(
                     onHandlePermissionResult(call, resultHandler, true)
                 }
 
-                override fun onDenied(denied: MutableList<String>, granted: MutableList<String>) {
+                override fun onDenied(
+                    deniedPermissions: MutableList<String>,
+                    grantedPermissions: MutableList<String>
+                ) {
                     LogUtils.info("onDenied call.method = ${call.method}")
                     if (call.method == "requestPermissionExtend") {
                         resultHandler.reply(PermissionResult.Denied.value)
                         return
                     }
-                    if (granted.containsAll(permissions)) {
+                    if (grantedPermissions.containsAll(permissions)) {
                         LogUtils.info("onGranted call.method = ${call.method}")
                         onHandlePermissionResult(call, resultHandler, false)
                     } else {
