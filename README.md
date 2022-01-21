@@ -44,6 +44,7 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
     * [Limitations](#limitations)
       * [Android 10 media location permission](#android-10-media-location-permission)
       * [Usage of the original data](#usage-of-the-original-data)
+      * [Long retrieving duration with file on iOS](#long-retrieving-duration-with-file-on-ios)
   * [Entities change notify](#entities-change-notify)
 * [Cache mechanism](#cache-mechanism)
   * [Cache on Android](#cache-on-android)
@@ -316,6 +317,24 @@ Here are some common cases:
 * Videos will only be obtained in the original format,
   not the exported/composited format, which might cause
   some behavior difference when playing videos.
+
+##### Long retrieving duration with file on iOS
+
+There are several I/O methods in this library targeting `AssetEntity`,
+typically they are:
+- All methods named with `file`.
+- `AssetEntity.originBytes`.
+
+File retrieving and caches are limited by the sandbox mechanisim on iOS.
+An existing `PHAsset` doesn't mean the file located on the device.
+In generall, a `PHAsset` will have three status:
+- `isLocallyAvailable` equals `true`, **also cached**: Available for obtain.
+- `isLocallyAvailable` equals `true`, **but not cached**: When you call I/O methods,
+  the resource will first cached into the sandbox, then available for obtain.
+- `isLocallyAvailable` equals `false`: Typically this means the asset exists,
+  but it's saved only on iCloud, or some videos that not exported yet.
+  In this case, the best practise is to use the `PMProgressHandler`
+  to provide a responsive user interface.
 
 ### Entities change notify
 
