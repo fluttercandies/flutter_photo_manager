@@ -38,6 +38,7 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
     * [From AssetPathEntity](#from-assetpathentity)
     * [From ID](#from-id)
     * [From raw data](#from-raw-data)
+    * [From iCloud](#from-icloud)
     * [Obtain "Live Photos"](#obtain-live-photos)
       * [Filtering only "Live Photos"](#filtering-only-live-photos)
       * [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
@@ -265,6 +266,18 @@ final AssetEntity? videoEntity = await PhotoManager.editor.saveVideo(
 Be aware that the created asset might have
 limited access or got deleted in anytime,
 so the result might be null.
+
+#### From iCloud
+
+Resources might be saved only on iCloud to save disk space.
+When retrieving file from iCloud, the speed is depend on the network condition,
+which might be very slow that makes users feel anxious.
+To provide a responsive user interface, you can use `PMProgressHandler`
+to retrieve the progress when load a file.
+
+The preferred implementation would be the [`LocallyAvailableBuilder`][]
+in the `wechat_asset_picker` package, which provides a progress indicator
+when the file is downloading.
 
 #### Obtain "Live Photos"
 
@@ -671,5 +684,7 @@ PhotoManager.editor.iOS.deletePath();
 [`getAssetListRange`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetPathEntity/getAssetListRange.html
 [`AssetEntity.fromId`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetEntity/fromId.html
 [`PhotoCachingManager.requestCacheAssets`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoCachingManager/requestCacheAssets.html
+
+[`LocallyAvailableBuilder`]: https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/2055adfa74370339d10e6f09adef72f2130d2380/lib/src/widget/builder/locally_available_builder.dart
 
 [flutter/flutter#20522]: https://github.com/flutter/flutter/issues/20522
