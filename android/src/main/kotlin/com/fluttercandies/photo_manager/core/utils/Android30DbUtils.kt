@@ -220,8 +220,7 @@ object Android30DbUtils : IDBUtils {
         ) ?: return emptyList()
         cursor.use {
             cursorWithRange(it, start, pageSize) {
-                val asset = convertCursorToAssetEntity(cursor)
-                list.add(asset)
+                list.add(convertCursorToAssetEntity(cursor))
             }
         }
         return list
@@ -276,14 +275,16 @@ object Android30DbUtils : IDBUtils {
         val keys = assetKeys().distinct().toTypedArray()
         val selection = "$_ID = ?"
         val args = arrayOf(id)
-        val cursor = context.contentResolver.query(allUri, keys, selection, args, null)
-        cursor?.use {
-            return if (it.moveToNext()) {
-                val dbAsset = convertCursorToAssetEntity(it)
-                dbAsset
-            } else null
+        val cursor = context.contentResolver.query(
+            allUri,
+            keys,
+            selection,
+            args,
+            null
+        ) ?: return null
+        cursor.use {
+            return if (it.moveToNext()) convertCursorToAssetEntity(it) else null
         }
-        return null
     }
 
     override fun getGalleryEntity(
@@ -315,14 +316,16 @@ object Android30DbUtils : IDBUtils {
             null
         ) ?: return null
         val name: String
+        val count: Int
         cursor.use {
             if (cursor.moveToNext()) {
                 name = cursor.getString(1) ?: ""
+                count = cursor.count
             } else {
                 return null
             }
         }
-        return GalleryEntity(galleryId, name, cursor.count, type, isAll)
+        return GalleryEntity(galleryId, name, count, type, isAll)
     }
 
     override fun getExif(context: Context, id: String): ExifInterface? {

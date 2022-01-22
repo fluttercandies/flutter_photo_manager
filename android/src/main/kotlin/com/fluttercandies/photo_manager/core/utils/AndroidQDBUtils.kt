@@ -314,14 +314,16 @@ object AndroidQDBUtils : IDBUtils {
             null
         ) ?: return null
         val name: String
+        val count: Int
         cursor.use {
             if (it.moveToNext()) {
                 name = it.getString(1) ?: ""
+                count = cursor.count
             } else {
                 return null
             }
         }
-        return GalleryEntity(galleryId, name, cursor.count, type, isAll)
+        return GalleryEntity(galleryId, name, count, type, isAll)
     }
 
     override fun getExif(context: Context, id: String): ExifInterface? {
