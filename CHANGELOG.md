@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2.0.0-dev.5
+
+Improvements:
+- Implement paging load more in the simple example.
+- Compile for API 31 on Android.
+- Remove unused dependencies on Android.
+
+Fixes:
+- Fix closed cursors access on Android.
+
 ## 2.0.0-dev.4
 
 Improvements:
