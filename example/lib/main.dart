@@ -38,17 +38,35 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
       sizeConstraint: SizeConstraint(ignoreSize: true),
     ),
   );
-  List<AssetPathEntity>? _paths;
+  final int _sizePerPage = 50;
+
+  AssetPathEntity? _path;
   List<AssetEntity>? _entities;
+  int _totalEntitiesCount = 0;
+
+  int _page = 0;
+  bool _isLoading = false;
+  bool _isLoadingMore = false;
+  bool _hasMoreToLoad = true;
 
   Future<void> _requestAssets() async {
-    // First, request permissions.
+    setState(() {
+      _isLoading = true;
+    });
+    // Request permissions.
     final PermissionState _ps = await PhotoManager.requestPermissionExtend();
     if (!mounted) {
       return;
     }
     // Further requests can be only procceed with authorized or limited.
-    if (_ps != PermissionState.authorized && _ps != PermissionState.limited) {}
+    if (_ps != PermissionState.authorized && _ps != PermissionState.limited) {
+      setState(() {
+        _isLoading = false;
+      });
+      showToast('Permission is not granted.');
+      return;
+    }
+    // Obtain assets using the path entity.
     final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
       onlyAll: true,
       filterOption: _filterOptionGroup,
@@ -56,50 +74,76 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
     if (!mounted) {
       return;
     }
-    setState(() {
-      _paths = paths;
-    });
-    if (_paths!.isEmpty) {
+    // Return if not paths found.
+    if (paths.isEmpty) {
+      setState(() {
+        _isLoading = false;
+      });
+      showToast('No paths found.');
       return;
     }
-    final List<AssetEntity> entities = await _paths!.first.getAssetListPaged(
+    setState(() {
+      _path = paths.first;
+    });
+    _totalEntitiesCount = _path!.assetCount;
+    final List<AssetEntity> entities = await _path!.getAssetListPaged(
       page: 0,
-      size: 50,
+      size: _sizePerPage,
     );
     if (!mounted) {
       return;
     }
     setState(() {
       _entities = entities;
+      _isLoading = false;
+      _hasMoreToLoad = _entities!.length < _totalEntitiesCount;
+    });
+  }
+
+  Future<void> _loadMoreAsset() async {
+    final List<AssetEntity> entities = await _path!.getAssetListPaged(
+      page: _page + 1,
+      size: _sizePerPage,
+    );
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _entities!.addAll(entities);
+      _page++;
+      _hasMoreToLoad = _entities!.length < _totalEntitiesCount;
+      _isLoadingMore = false;
     });
   }
 
   Widget _buildBody(BuildContext context) {
-    if (_paths == null) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator.adaptive());
+    }
+    if (_path == null) {
       return const Center(child: Text('Request paths first.'));
     }
-    if (_paths!.isEmpty) {
-      return const Center(child: Text('No paths found on this device.'));
+    if (_entities?.isNotEmpty != true) {
+      return const Center(child: Text('No assets found on this device.'));
     }
-    if (_entities != null) {
-      if (_entities!.isEmpty) {
-        return const Center(child: Text('No assets found on this device.'));
-      }
-      return GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-        ),
-        itemCount: _entities!.length,
-        itemBuilder: (BuildContext context, int index) {
-          final AssetEntity entity = _entities![index];
-          return Image(
-            image: AssetEntityImageProvider(entity, isOriginal: false),
-            fit: BoxFit.cover,
-          );
-        },
-      );
-    }
-    return const Center(child: CircularProgressIndicator.adaptive());
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+      ),
+      itemCount: _entities!.length,
+      itemBuilder: (BuildContext context, int index) {
+        if (index == _entities!.length - 8 &&
+            !_isLoadingMore &&
+            _hasMoreToLoad) {
+          _loadMoreAsset();
+        }
+        final AssetEntity entity = _entities![index];
+        return Image(
+          image: AssetEntityImageProvider(entity, isOriginal: false),
+          fit: BoxFit.cover,
+        );
+      },
+    );
   }
 
   @override
