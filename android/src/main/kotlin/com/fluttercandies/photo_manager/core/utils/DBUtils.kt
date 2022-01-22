@@ -1,6 +1,5 @@
 package com.fluttercandies.photo_manager.core.utils
 
-import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
@@ -28,8 +27,7 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /// Call the MediaStore API and get entity for the data.
-@Suppress("deprecation")
-@SuppressLint("InlinedApi")
+@Suppress("Deprecation", "InlinedApi")
 object DBUtils : IDBUtils {
     private val cacheContainer = CacheContainer()
 

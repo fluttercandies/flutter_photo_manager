@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 @RequiresApi(Build.VERSION_CODES.Q)
-@Suppress("deprecation")
+@Suppress("Deprecation")
 object AndroidQDBUtils : IDBUtils {
     private const val TAG = "PhotoManagerPlugin"
 

@@ -1,6 +1,5 @@
 package com.fluttercandies.photo_manager.core.utils
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
@@ -18,8 +17,7 @@ import com.fluttercandies.photo_manager.core.entity.FilterOption
 import com.fluttercandies.photo_manager.core.entity.GalleryEntity
 import com.fluttercandies.photo_manager.util.LogUtils
 
-@Suppress("deprecation")
-@SuppressLint("InlinedApi")
+@Suppress("Deprecation", "InlinedApi", "Range")
 interface IDBUtils {
     companion object {
         @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.Q)

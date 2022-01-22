@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 @RequiresApi(Build.VERSION_CODES.R)
-@Suppress("deprecation") // Suppress DATA field
+@Suppress("Deprecation") // Suppress DATA field
 object Android30DbUtils : IDBUtils {
     private const val TAG = "PhotoManagerPlugin"
 
