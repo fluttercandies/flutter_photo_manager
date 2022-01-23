@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.0.0-dev.6
+
+Improvements:
+- Enhance request types filtering.
+
 ## 2.0.0-dev.5
 
 Improvements:
