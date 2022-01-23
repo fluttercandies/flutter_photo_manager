@@ -76,22 +76,18 @@ class PhotoManager {
       assert(hasAll, 'If only is true, then the hasAll must be not null.');
     }
     filterOption ??= FilterOptionGroup();
-    assert(
-      type != RequestType.all,
-      'The request type must have video, image or audio.',
-    );
-    assert(
-      type != RequestType.audio || !filterOption.containsLivePhotos,
-      'Filtering Live Photos is not supported when the request type is audio.',
-    );
+    // Avoid filtering live photos when searching for audios.
+    if (type == RequestType.audio) {
+      filterOption = filterOption.copyWith(
+        containsLivePhotos: false,
+        onlyLivePhotos: false,
+      );
+    }
     assert(
       type == RequestType.image || !filterOption.onlyLivePhotos,
       'Filtering only Live Photos is only supported '
       'when the request type contains image.',
     );
-    if (type == RequestType.all) {
-      return <AssetPathEntity>[];
-    }
     return plugin.getAllGalleryList(
       hasAll: hasAll,
       onlyAll: onlyAll,
