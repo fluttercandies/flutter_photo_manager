@@ -309,10 +309,6 @@ object DBUtils : IDBUtils {
         TODO("not implemented")
     }
 
-    override fun cacheOriginFile(context: Context, asset: AssetEntity, byteArray: ByteArray) {
-        TODO("not implemented")
-    }
-
     override fun getExif(context: Context, id: String): ExifInterface? {
         val asset = getAssetEntity(context, id) ?: return null
         return ExifInterface(asset.path)

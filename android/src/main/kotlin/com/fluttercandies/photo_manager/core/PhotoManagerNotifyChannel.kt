@@ -15,6 +15,7 @@ import io.flutter.plugin.common.MethodChannel
 import com.fluttercandies.photo_manager.core.utils.IDBUtils
 import com.fluttercandies.photo_manager.util.LogUtils
 
+@Suppress("Range")
 class PhotoManagerNotifyChannel(
     val applicationContext: Context,
     messenger: BinaryMessenger,

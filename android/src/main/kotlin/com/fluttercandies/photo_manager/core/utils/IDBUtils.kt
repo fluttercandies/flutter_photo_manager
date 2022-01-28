@@ -22,9 +22,6 @@ interface IDBUtils {
         @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.Q)
         val isAndroidQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
-        @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.R)
-        val isAndroidR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
-
         val storeImageKeys = mutableListOf(
             DISPLAY_NAME, // 显示的名字
             DATA, // 数据
@@ -206,8 +203,6 @@ interface IDBUtils {
         asset: AssetEntity,
         haveLocationPermission: Boolean
     ): ByteArray
-
-    fun cacheOriginFile(context: Context, asset: AssetEntity, byteArray: ByteArray)
 
     /**
      * Just filter [MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE]

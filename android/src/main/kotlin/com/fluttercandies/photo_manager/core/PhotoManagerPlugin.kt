@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import com.bumptech.glide.Glide
@@ -16,8 +17,6 @@ import com.fluttercandies.photo_manager.core.entity.FilterOption
 import com.fluttercandies.photo_manager.core.entity.PermissionResult
 import com.fluttercandies.photo_manager.core.entity.ThumbLoadOption
 import com.fluttercandies.photo_manager.core.utils.ConvertUtils
-import com.fluttercandies.photo_manager.core.utils.IDBUtils
-import com.fluttercandies.photo_manager.core.utils.belowSdk
 import com.fluttercandies.photo_manager.permission.PermissionsListener
 import com.fluttercandies.photo_manager.permission.PermissionsUtils
 import com.fluttercandies.photo_manager.util.LogUtils
@@ -81,6 +80,14 @@ class PhotoManagerPlugin(
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result, call)
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q && !Environment.isExternalStorageLegacy()) {
+            resultHandler.replyError(
+                "STORAGE_NOT_LEGACY",
+                "Use `requestLegacyExternalStorage` when your project is targeting Android Q.",
+                null
+            )
+            return
+        }
 
         if (call.method == "ignorePermissionCheck") {
             val ignore = call.argument<Boolean>("ignore")!!
@@ -382,25 +389,12 @@ class PhotoManagerPlugin(
                 runOnBackground {
                     try {
                         val ids = call.argument<List<String>>("ids")!!
-                        if (belowSdk(29)) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            val uris = ids.map { photoManager.getUri(it) }.toList()
+                            deleteManager.deleteInApi30(uris, resultHandler)
+                        } else {
                             deleteManager.deleteInApi28(ids)
                             resultHandler.reply(ids)
-                        } else if (IDBUtils.isAndroidR) {
-                            val uris = ids.map {
-                                photoManager.getUri(it)
-                            }.toList()
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                                deleteManager.deleteInApi30(uris, resultHandler)
-                            }
-                        } else {
-                            val uris = ids.mapNotNull { photoManager.getUri(it) }
-                            //            for (id in ids) {
-                            //              val uri = photoManager.getUri(id)
-                            //              if (uri != null) {
-                            //                deleteManager.deleteWithUriInApi29(uri, false)
-                            //              }
-                            //            }
-                            deleteManager.deleteWithUriInApi29(ids, uris, resultHandler, false)
                         }
                     } catch (e: Exception) {
                         LogUtils.error("deleteWithIds failed", e)
