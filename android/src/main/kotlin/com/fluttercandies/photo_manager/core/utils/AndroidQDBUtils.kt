@@ -15,7 +15,6 @@ import androidx.annotation.RequiresApi
 import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.cache.AndroidQCache
-import com.fluttercandies.photo_manager.core.cache.CacheContainer
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.entity.FilterOption
 import com.fluttercandies.photo_manager.core.entity.GalleryEntity
@@ -150,8 +149,7 @@ object AndroidQDBUtils : IDBUtils {
         page: Int,
         size: Int,
         requestType: Int,
-        option: FilterOption,
-        cacheContainer: CacheContainer?
+        option: FilterOption
     ): List<AssetEntity> {
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -341,8 +339,6 @@ object AndroidQDBUtils : IDBUtils {
             null
         }
     }
-
-    override fun clearCache() {}
 
     override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
         val assetEntity = getAssetEntity(context, id) ?: return null

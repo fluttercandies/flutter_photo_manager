@@ -13,7 +13,6 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
-import com.fluttercandies.photo_manager.core.cache.CacheContainer
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.entity.FilterOption
 import com.fluttercandies.photo_manager.core.entity.GalleryEntity
@@ -29,8 +28,6 @@ import kotlin.concurrent.withLock
 /// Call the MediaStore API and get entity for the data.
 @Suppress("Deprecation", "InlinedApi")
 object DBUtils : IDBUtils {
-    private val cacheContainer = CacheContainer()
-
     private val locationKeys = arrayOf(
         MediaStore.Images.ImageColumns.LONGITUDE,
         MediaStore.Images.ImageColumns.LATITUDE
@@ -166,10 +163,8 @@ object DBUtils : IDBUtils {
         page: Int,
         size: Int,
         requestType: Int,
-        option: FilterOption,
-        cacheContainer: CacheContainer?
+        option: FilterOption
     ): List<AssetEntity> {
-        val cache = cacheContainer ?: this.cacheContainer
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
         val uri = allUri
@@ -197,9 +192,7 @@ object DBUtils : IDBUtils {
         ) ?: return emptyList()
         cursor.use {
             while (it.moveToNext()) {
-                val asset = convertCursorToAsset(it, requestType)
-                list.add(asset)
-                cache.putAsset(asset)
+                list.add(convertCursorToAsset(it, requestType))
             }
         }
         return list
@@ -213,7 +206,6 @@ object DBUtils : IDBUtils {
         requestType: Int,
         option: FilterOption
     ): List<AssetEntity> {
-        val cache = cacheContainer
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
         val uri = allUri
@@ -242,9 +234,7 @@ object DBUtils : IDBUtils {
         ) ?: return emptyList()
         cursor.use {
             while (cursor.moveToNext()) {
-                val asset = convertCursorToAsset(cursor, requestType)
-                list.add(asset)
-                cache.putAsset(asset)
+                list.add(convertCursorToAsset(cursor, requestType))
             }
         }
         return list
@@ -289,10 +279,6 @@ object DBUtils : IDBUtils {
     }
 
     override fun getAssetEntity(context: Context, id: String): AssetEntity? {
-        val asset = cacheContainer.getAsset(id)
-        if (asset != null) {
-            return asset
-        }
         val keys =
             (storeImageKeys + storeVideoKeys + locationKeys + typeKeys).distinct().toTypedArray()
         val selection = "${MediaStore.Files.FileColumns._ID} = ?"
@@ -308,9 +294,7 @@ object DBUtils : IDBUtils {
         cursor.use {
             return if (it.moveToNext()) {
                 val type = it.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
-                val dbAsset = convertCursorToAsset(it, type)
-                cacheContainer.putAsset(dbAsset)
-                dbAsset
+                convertCursorToAsset(it, type)
             } else {
                 null
             }
@@ -337,10 +321,6 @@ object DBUtils : IDBUtils {
     override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
         val assetEntity = getAssetEntity(context, id) ?: return null
         return assetEntity.path
-    }
-
-    override fun clearCache() {
-        cacheContainer.clearCache()
     }
 
     override fun saveImage(

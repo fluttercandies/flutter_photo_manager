@@ -10,7 +10,6 @@ import android.provider.MediaStore.VOLUME_EXTERNAL
 import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
-import com.fluttercandies.photo_manager.core.cache.CacheContainer
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.entity.DateCond
 import com.fluttercandies.photo_manager.core.entity.FilterOption
@@ -98,7 +97,6 @@ interface IDBUtils {
         size: Int,
         requestType: Int = 0,
         option: FilterOption,
-        cacheContainer: CacheContainer? = null
     ): List<AssetEntity>
 
     fun getAssetEntity(context: Context, id: String): AssetEntity?
@@ -152,7 +150,7 @@ interface IDBUtils {
         option: FilterOption
     ): GalleryEntity?
 
-    fun clearCache()
+    fun clearCache() {}
 
     fun getFilePath(context: Context, id: String, origin: Boolean): String?
 
