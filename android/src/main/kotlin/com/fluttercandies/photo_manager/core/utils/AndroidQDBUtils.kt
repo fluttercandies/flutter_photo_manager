@@ -29,11 +29,9 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 @RequiresApi(Build.VERSION_CODES.Q)
-@Suppress("Deprecation")
+@Suppress("Deprecation") // Suppress DATA field
 object AndroidQDBUtils : IDBUtils {
     private const val TAG = "PhotoManagerPlugin"
-
-    private val cacheContainer = CacheContainer()
 
     private var androidQCache = AndroidQCache()
 
@@ -62,30 +60,31 @@ object AndroidQDBUtils : IDBUtils {
             args.toTypedArray(),
             option.orderByCondString()
         ) ?: return list
+        val nameMap = HashMap<String, String>()
+        val countMap = HashMap<String, Int>()
         cursor.use {
-            LogUtils.logCursor(it)
-            val nameMap = HashMap<String, String>()
-            val countMap = HashMap<String, Int>()
+            LogUtils.logCursor(it, BUCKET_ID)
             while (it.moveToNext()) {
-                val galleryId = it.getString(0)
+                val galleryId = it.getString(MediaStore.Images.Media.BUCKET_ID)
                 if (nameMap.containsKey(galleryId)) {
                     countMap[galleryId] = countMap[galleryId]!! + 1
                     continue
                 }
-                val galleryName = it.getString(1) ?: ""
+                val galleryName = it.getString(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
                 nameMap[galleryId] = galleryName
                 countMap[galleryId] = 1
             }
-            nameMap.forEach { map ->
-                val id = map.key
-                val name = map.value
-                val count = countMap[id]!!
-                val entity = GalleryEntity(id, name, count, requestType, false)
-                if (option.containsPathModified) {
-                    injectModifiedDate(context, entity)
-                }
-                list.add(entity)
+        }
+
+        nameMap.forEach {
+            val id = it.key
+            val name = it.value
+            val count = countMap[id]!!
+            val entity = GalleryEntity(id, name, count, requestType, false)
+            if (option.containsPathModified) {
+                injectModifiedDate(context, entity)
             }
+            list.add(entity)
         }
         return list
     }
@@ -97,7 +96,7 @@ object AndroidQDBUtils : IDBUtils {
     ): List<GalleryEntity> {
         val list = ArrayList<GalleryEntity>()
         val args = ArrayList<String>()
-        val typeSelection: String = getCondFromType(requestType, option, args)
+        val typeSelection = getCondFromType(requestType, option, args)
         val dateSelection = getDateCond(args, option)
         val sizeWhere = sizeWhere(requestType, option)
         val selections =
@@ -111,7 +110,7 @@ object AndroidQDBUtils : IDBUtils {
             option.orderByCondString()
         ) ?: return list
         cursor.use {
-            val count = it.count
+            val count = cursor.count
             val galleryEntity = GalleryEntity(
                 PhotoManager.ALL_ID,
                 PhotoManager.ALL_ALBUM_NAME,
@@ -124,6 +123,27 @@ object AndroidQDBUtils : IDBUtils {
         return list
     }
 
+    override fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String? {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return filterOption.orderByCondString()
+        }
+        return super.getSortOrder(start, pageSize, filterOption)
+    }
+
+    private fun cursorWithRange(
+        cursor: Cursor,
+        start: Int,
+        pageSize: Int,
+        block: (cursor: Cursor) -> Unit
+    ) {
+        cursor.moveToPosition(start - 1)
+        for (i in 0 until pageSize) {
+            if (cursor.moveToNext()) {
+                block(cursor)
+            }
+        }
+    }
+
     override fun getAssetFromGalleryId(
         context: Context,
         galleryId: String,
@@ -133,7 +153,6 @@ object AndroidQDBUtils : IDBUtils {
         option: FilterOption,
         cacheContainer: CacheContainer?
     ): List<AssetEntity> {
-        val cache = cacheContainer ?: this.cacheContainer
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
         val uri = allUri
@@ -151,7 +170,6 @@ object AndroidQDBUtils : IDBUtils {
             "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
         }
         val sortOrder = getSortOrder(page * size, size, option)
-
         val cursor = context.contentResolver.query(
             uri,
             keys,
@@ -160,14 +178,14 @@ object AndroidQDBUtils : IDBUtils {
             sortOrder
         ) ?: return emptyList()
         cursor.use {
-            while (it.moveToNext()) {
-                val asset = convertCursorToAssetEntity(it)
+            cursorWithRange(it, page * size, size) {
+                val asset = convertCursorToAssetEntity(cursor)
                 list.add(asset)
-                cache.putAsset(asset)
             }
         }
         return list
     }
+
 
     override fun getAssetFromGalleryIdRange(
         context: Context,
@@ -177,7 +195,6 @@ object AndroidQDBUtils : IDBUtils {
         requestType: Int,
         option: FilterOption
     ): List<AssetEntity> {
-        val cache = cacheContainer
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
         val uri = allUri
@@ -196,7 +213,6 @@ object AndroidQDBUtils : IDBUtils {
         }
         val pageSize = end - start
         val sortOrder = getSortOrder(start, pageSize, option)
-
         val cursor = context.contentResolver.query(
             uri,
             keys,
@@ -205,10 +221,8 @@ object AndroidQDBUtils : IDBUtils {
             sortOrder
         ) ?: return emptyList()
         cursor.use {
-            while (it.moveToNext()) {
-                val asset = convertCursorToAssetEntity(it)
-                list.add(asset)
-                cache.putAsset(asset)
+            cursorWithRange(it, start, pageSize) {
+                list.add(convertCursorToAssetEntity(cursor))
             }
         }
         return list
@@ -238,9 +252,10 @@ object AndroidQDBUtils : IDBUtils {
         val orientation: Int = cursor.getInt(MediaStore.MediaColumns.ORIENTATION)
         val relativePath: String = cursor.getString(MediaStore.MediaColumns.RELATIVE_PATH)
         if ((width == 0 || height == 0) && path.isNotBlank()) {
-            val exifInterface = ExifInterface(path)
-            width = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
-            height = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+            ExifInterface(path).apply {
+                width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
+                height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+            }
         }
         return AssetEntity(
             id,
@@ -259,14 +274,9 @@ object AndroidQDBUtils : IDBUtils {
     }
 
     override fun getAssetEntity(context: Context, id: String): AssetEntity? {
-        val asset = cacheContainer.getAsset(id)
-        if (asset != null) {
-            return asset
-        }
         val keys = assetKeys().distinct().toTypedArray()
         val selection = "$_ID = ?"
         val args = arrayOf(id)
-
         val cursor = context.contentResolver.query(
             allUri,
             keys,
@@ -275,11 +285,7 @@ object AndroidQDBUtils : IDBUtils {
             null
         ) ?: return null
         cursor.use {
-            return if (it.moveToNext()) {
-                val dbAsset = convertCursorToAssetEntity(it)
-                cacheContainer.putAsset(dbAsset)
-                dbAsset
-            } else null
+            return if (it.moveToNext()) convertCursorToAssetEntity(it) else null
         }
     }
 
@@ -305,19 +311,17 @@ object AndroidQDBUtils : IDBUtils {
         val sizeWhere = sizeWhere(null, option)
         val selection =
             "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere"
-
         val cursor = context.contentResolver.query(
             uri,
             projection,
-            selection,
-            args.toTypedArray(),
+            selection, args.toTypedArray(),
             null
         ) ?: return null
         val name: String
         val count: Int
         cursor.use {
-            if (it.moveToNext()) {
-                name = it.getString(1) ?: ""
+            if (cursor.moveToNext()) {
+                name = cursor.getString(1) ?: ""
                 count = cursor.count
             } else {
                 return null
@@ -338,27 +342,11 @@ object AndroidQDBUtils : IDBUtils {
         }
     }
 
-    override fun clearCache() {
-        cacheContainer.clearCache()
-    }
-
-    override fun clearFileCache(context: Context) {
-        androidQCache.clearAllCache(context)
-    }
+    override fun clearCache() {}
 
     override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
         val assetEntity = getAssetEntity(context, id) ?: return null
-        if (useFilePath()) {
-            return assetEntity.path
-        }
-        val cacheFile = androidQCache.getCacheFile(
-            context,
-            id,
-            assetEntity.displayName,
-            assetEntity.type,
-            origin
-        ) ?: return null
-        return cacheFile.path
+        return assetEntity.path
     }
 
     override fun getThumbUri(
@@ -389,13 +377,10 @@ object AndroidQDBUtils : IDBUtils {
         }
         val uri = getUri(asset, haveLocationPermission)
         val inputStream = context.contentResolver.openInputStream(uri)
-
-        LogUtils.info("the cache file no exists, will read from MediaStore: $uri")
-
         val outputStream = ByteArrayOutputStream()
         outputStream.use { os ->
             inputStream?.use { os.write(it.readBytes()) }
-            val byteArray = os.toByteArray()
+            val byteArray = outputStream.toByteArray()
             if (LogUtils.isLog) {
                 LogUtils.info("The asset ${asset.id} origin byte length : ${byteArray.count()}")
             }
@@ -420,10 +405,9 @@ object AndroidQDBUtils : IDBUtils {
         } catch (e: Exception) {
             Pair(0, 0)
         }
-
         val inputStream = ByteArrayInputStream(image)
         val typeFromStream: String = if (title.contains(".")) {
-            // title contains file extension, form mimeType from it
+            // Title contains file extension.
             "image/${File(title).extension}"
         } else {
             URLConnection.guessContentTypeFromStream(inputStream) ?: "image/*"
@@ -432,7 +416,6 @@ object AndroidQDBUtils : IDBUtils {
         val timestamp = System.currentTimeMillis() / 1000
         val values = ContentValues().apply {
             put(MEDIA_TYPE, MEDIA_TYPE_IMAGE)
-            put(MediaStore.MediaColumns.DISPLAY_NAME, title)
             put(MediaStore.Images.ImageColumns.MIME_TYPE, typeFromStream)
             put(MediaStore.Images.ImageColumns.TITLE, title)
             put(MediaStore.Images.ImageColumns.DESCRIPTION, desc)
@@ -442,6 +425,7 @@ object AndroidQDBUtils : IDBUtils {
             put(MediaStore.Images.ImageColumns.WIDTH, width)
             put(MediaStore.Images.ImageColumns.HEIGHT, height)
             put(MediaStore.Images.Media.DISPLAY_NAME, title)
+            put(MediaStore.MediaColumns.DISPLAY_NAME, title)
             if (relativePath != null)
                 put(MediaStore.Images.ImageColumns.RELATIVE_PATH, relativePath)
         }
@@ -450,11 +434,7 @@ object AndroidQDBUtils : IDBUtils {
         val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val contentUri = cr.insert(uri, values) ?: return null
         val outputStream = cr.openOutputStream(contentUri)
-        outputStream?.use {
-            inputStream.use {
-                inputStream.copyTo(outputStream)
-            }
-        }
+        outputStream?.use { os -> inputStream.use { it.copyTo(os) } }
         cr.notifyChange(contentUri, null)
 
         val id = ContentUris.parseId(contentUri)
@@ -469,17 +449,17 @@ object AndroidQDBUtils : IDBUtils {
         relativePath: String?
     ): AssetEntity? {
         path.checkDirs()
+        val cr = context.contentResolver
+        val timestamp = System.currentTimeMillis() / 1000
         val inputStream = FileInputStream(path)
-        val typeFromStream =
-            URLConnection.guessContentTypeFromStream(inputStream) ?: "image/${File(path).extension}"
         val (width, height) = try {
             val bmp = BitmapFactory.decodeFile(path)
             Pair(bmp.width, bmp.height)
         } catch (e: Exception) {
             Pair(0, 0)
         }
-
-        val timestamp = System.currentTimeMillis() / 1000
+        val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
+            ?: "image/${File(path).extension}"
         val values = ContentValues().apply {
             put(MEDIA_TYPE, MEDIA_TYPE_IMAGE)
             put(MediaStore.MediaColumns.DISPLAY_NAME, title)
@@ -493,19 +473,16 @@ object AndroidQDBUtils : IDBUtils {
             put(MediaStore.Images.ImageColumns.DURATION, 0)
             put(MediaStore.Images.ImageColumns.WIDTH, width)
             put(MediaStore.Images.ImageColumns.HEIGHT, height)
-            if (relativePath != null)
-                put(MediaStore.Images.ImageColumns.RELATIVE_PATH, relativePath)
         }
+        if (relativePath != null) values.put(
+            MediaStore.Images.ImageColumns.RELATIVE_PATH,
+            relativePath
+        )
 
-        val cr = context.contentResolver
         val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val contentUri = cr.insert(uri, values) ?: return null
         val outputStream = cr.openOutputStream(contentUri)
-        outputStream?.use {
-            inputStream.use {
-                inputStream.copyTo(outputStream)
-            }
-        }
+        outputStream?.use { os -> inputStream.use { it.copyTo(os) } }
         cr.notifyChange(contentUri, null)
 
         val id = ContentUris.parseId(contentUri)
@@ -558,6 +535,7 @@ object AndroidQDBUtils : IDBUtils {
             put(MEDIA_TYPE, mediaType)
             put(RELATIVE_PATH, relativePath)
         }
+
         val insertedUri = cr.insert(insertUri, cv) ?: throwMsg("Cannot insert new asset.")
         val outputStream = cr.openOutputStream(insertedUri)
             ?: throwMsg("Cannot open output stream for $insertedUri.")
@@ -579,19 +557,17 @@ object AndroidQDBUtils : IDBUtils {
     override fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity? {
         val (currentGalleryId, _) = getSomeInfo(context, assetId)
             ?: throwMsg("Cannot get gallery id of $assetId")
+
         if (galleryId == currentGalleryId) {
             throwMsg("No move required, because the target gallery is the same as the current one.")
         }
+
+        val cr = context.contentResolver
         val targetPath = getRelativePath(context, galleryId)
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.RELATIVE_PATH, targetPath)
         }
-        val count = context.contentResolver.update(
-            allUri,
-            contentValues,
-            idSelection,
-            arrayOf(assetId)
-        )
+        val count = cr.update(allUri, contentValues, idSelection, arrayOf(assetId))
         if (count > 0) {
             return getAssetEntity(context, assetId)
         }
@@ -658,7 +634,8 @@ object AndroidQDBUtils : IDBUtils {
     }
 
     private fun getRelativePath(context: Context, galleryId: String): String? {
-        val cursor = context.contentResolver.query(
+        val cr = context.contentResolver
+        val cursor = cr.query(
             allUri,
             arrayOf(BUCKET_ID, RELATIVE_PATH),
             "$BUCKET_ID = ?",
@@ -666,15 +643,16 @@ object AndroidQDBUtils : IDBUtils {
             null
         ) ?: return null
         cursor.use {
-            if (!it.moveToNext()) {
+            if (!cursor.moveToNext()) {
                 return null
             }
-            return it.getString(1)
+            return cursor.getString(1)
         }
     }
 
     override fun getSomeInfo(context: Context, assetId: String): Pair<String, String?>? {
-        val cursor = context.contentResolver.query(
+        val cr = context.contentResolver
+        val cursor = cr.query(
             allUri,
             arrayOf(BUCKET_ID, RELATIVE_PATH),
             "$_ID = ?",
@@ -704,8 +682,8 @@ object AndroidQDBUtils : IDBUtils {
         val inputStream = FileInputStream(path)
         val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
             ?: "video/${File(path).extension}"
+        val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
         val info = VideoUtils.getPropertiesUseMediaPlayer(path)
-
         val values = ContentValues().apply {
             put(MEDIA_TYPE, MEDIA_TYPE_VIDEO)
             put(MediaStore.MediaColumns.DISPLAY_NAME, title)
@@ -723,14 +701,9 @@ object AndroidQDBUtils : IDBUtils {
                 put(MediaStore.Video.VideoColumns.RELATIVE_PATH, relativePath)
         }
 
-        val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
         val contentUri = cr.insert(uri, values) ?: return null
         val outputStream = cr.openOutputStream(contentUri)
-        outputStream?.use {
-            inputStream.use {
-                inputStream.copyTo(outputStream)
-            }
-        }
+        outputStream?.use { os -> inputStream.use { it.copyTo(os) } }
         cr.notifyChange(contentUri, null)
 
         val id = ContentUris.parseId(contentUri)

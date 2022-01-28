@@ -1,6 +1,5 @@
 package com.fluttercandies.photo_manager.core
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
@@ -19,7 +18,6 @@ import com.fluttercandies.photo_manager.util.ResultHandler
 import java.io.File
 import java.util.concurrent.Executors
 
-@SuppressLint("LongLogTag")
 class PhotoManager(private val context: Context) {
     companion object {
         const val ALL_ID = "isAll"
@@ -32,13 +30,8 @@ class PhotoManager(private val context: Context) {
 
     private val dbUtils: IDBUtils
         get() {
-            return if (IDBUtils.isAndroidR) {
-                Android30DbUtils
-            } else if (useOldApi || Build.VERSION.SDK_INT < 29) {
-                DBUtils
-            } else {
-                AndroidQDBUtils
-            }
+            return if (useOldApi || Build.VERSION.SDK_INT < 29) DBUtils
+            else AndroidQDBUtils
         }
 
     fun getGalleryList(
