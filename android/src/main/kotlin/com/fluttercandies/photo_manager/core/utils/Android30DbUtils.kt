@@ -653,7 +653,7 @@ object Android30DbUtils : IDBUtils {
         }
     }
 
-    override fun getSomeInfo(context: Context, assetId: String): Pair<String, String>? {
+    override fun getSomeInfo(context: Context, assetId: String): Pair<String, String?>? {
         val cr = context.contentResolver
         val cursor = cr.query(
             allUri,
@@ -668,7 +668,7 @@ object Android30DbUtils : IDBUtils {
             }
             val galleryID = cursor.getString(0)
             val path = cursor.getString(1)
-            return Pair(galleryID, File(path).parent!!)
+            return Pair(galleryID, File(path).parent)
         }
     }
 

@@ -358,7 +358,7 @@ interface IDBUtils {
 
     fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity?
 
-    fun getSomeInfo(context: Context, assetId: String): Pair<String, String>?
+    fun getSomeInfo(context: Context, assetId: String): Pair<String, String?>?
 
     fun getUri(id: String, type: Int, isOrigin: Boolean = false): Uri {
         var uri = when (type) {

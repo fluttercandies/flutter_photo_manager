@@ -673,7 +673,7 @@ object AndroidQDBUtils : IDBUtils {
         }
     }
 
-    override fun getSomeInfo(context: Context, assetId: String): Pair<String, String>? {
+    override fun getSomeInfo(context: Context, assetId: String): Pair<String, String?>? {
         val cursor = context.contentResolver.query(
             allUri,
             arrayOf(BUCKET_ID, RELATIVE_PATH),
@@ -687,7 +687,7 @@ object AndroidQDBUtils : IDBUtils {
             }
             val galleryID = cursor.getString(0)
             val path = cursor.getString(1)
-            return Pair(galleryID, File(path).parent!!)
+            return Pair(galleryID, File(path).parent)
         }
     }
 
