@@ -21,8 +21,8 @@ class PhotoManager {
   static final NotifyManager _notifyManager = NotifyManager();
 
   /// ### Android (AndroidManifest.xml)
+  ///  * READ_EXTERNAL_STORAGE (REQUIRED)
   ///  * WRITE_EXTERNAL_STORAGE
-  ///  * READ_EXTERNAL_STORAGE
   ///  * ACCESS_MEDIA_LOCATION
   ///
   /// ### iOS (Info.plist)
