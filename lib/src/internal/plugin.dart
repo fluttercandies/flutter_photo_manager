@@ -321,15 +321,6 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     return LatLng(latitude: entity.latitude, longitude: entity.longitude);
   }
 
-  Future<bool> cacheOriginBytes(bool cache) async {
-    assert(Platform.isAndroid, 'This method only supports Android.');
-    final bool result = await _channel.invokeMethod<bool>(
-      PMConstants.mCacheOriginBytes,
-      cache,
-    ) as bool;
-    return result == true;
-  }
-
   Future<String> getTitleAsync(AssetEntity entity) async {
     assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
     if (Platform.isAndroid) {

@@ -44,8 +44,6 @@ class PhotoManagerPlugin(
         fun runOnBackground(runnable: () -> Unit) {
             threadPool.execute(runnable)
         }
-
-        var cacheOriginBytes = true
     }
 
     init {
@@ -130,11 +128,6 @@ class PhotoManagerPlugin(
             }
             "systemVersion" -> {
                 resultHandler.reply(Build.VERSION.SDK_INT.toString())
-                true
-            }
-            "cacheOriginBytes" -> {
-                cacheOriginBytes = call.arguments()
-                resultHandler.reply(cacheOriginBytes)
                 true
             }
             "getLatLngAndroidQ" -> {
@@ -325,12 +318,7 @@ class PhotoManagerPlugin(
             "getOriginBytes" -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
-                    photoManager.getOriginBytes(
-                        id,
-                        cacheOriginBytes,
-                        haveLocationPermission,
-                        resultHandler
-                    )
+                    photoManager.getOriginBytes(id, resultHandler)
                 }
             }
             "getMediaUrl" -> {

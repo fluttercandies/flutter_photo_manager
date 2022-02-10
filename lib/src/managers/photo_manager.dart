@@ -164,9 +164,4 @@ class PhotoManager {
 
   /// Clear all file caches.
   static Future<void> clearFileCache() => plugin.clearFileCache();
-
-  /// Cache files into sandbox on Android Q when set to true,
-  /// and cached files can be reused.
-  static Future<bool> setCacheAtOriginBytes(bool cache) =>
-      plugin.cacheOriginBytes(cache);
 }

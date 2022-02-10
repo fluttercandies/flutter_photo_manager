@@ -25,7 +25,6 @@ class PMConstants {
   static const String mAssetExists = 'assetExists';
   static const String mSystemVersion = 'systemVersion';
   static const String mGetLatLngAndroidQ = 'getLatLngAndroidQ';
-  static const String mCacheOriginBytes = 'cacheOriginBytes';
   static const String mGetTitleAsync = 'getTitleAsync';
   static const String mGetMediaUrl = 'getMediaUrl';
   static const String mGetSubPath = 'getSubPath';

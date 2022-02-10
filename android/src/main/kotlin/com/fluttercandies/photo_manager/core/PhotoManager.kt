@@ -88,32 +88,21 @@ class PhotoManager(private val context: Context) {
         val format = option.format
         val frame = option.frame
         try {
-            if (useFilePath()) {
-                val asset = dbUtils.getAssetEntity(context, id)
-                if (asset == null) {
-                    resultHandler.replyError("The asset not found!")
-                    return
-                }
-                ThumbnailUtil.getThumbnailByGlide(
-                    context,
-                    asset.path,
-                    option.width,
-                    option.height,
-                    format,
-                    quality,
-                    frame,
-                    resultHandler.result
-                )
-            } else {
-                // Need use Android Q MediaStore thumbnail API.
-                val asset = dbUtils.getAssetEntity(context, id)
-                val type = asset?.type
-                val uri = dbUtils.getThumbUri(context, id, width, height, type)
-                    ?: throw RuntimeException("Cannot load uri of $id.")
-                ThumbnailUtil.getThumbOfUri(context, uri, width, height, format, quality, frame) {
-                    resultHandler.reply(it)
-                }
+            val asset = dbUtils.getAssetEntity(context, id)
+            if (asset == null) {
+                resultHandler.replyError("The asset not found!")
+                return
             }
+            ThumbnailUtil.getThumbnailByGlide(
+                context,
+                asset.path,
+                option.width,
+                option.height,
+                format,
+                quality,
+                frame,
+                resultHandler.result
+            )
         } catch (e: Exception) {
             Log.e(LogUtils.TAG, "get $id thumb error, width : $width, height: $height", e)
             dbUtils.logRowWithId(context, id)
@@ -121,28 +110,15 @@ class PhotoManager(private val context: Context) {
         }
     }
 
-    fun getOriginBytes(
-        id: String,
-        cacheOriginBytes: Boolean,
-        haveLocationPermission: Boolean,
-        resultHandler: ResultHandler
-    ) {
+    fun getOriginBytes(id: String, resultHandler: ResultHandler) {
         val asset = dbUtils.getAssetEntity(context, id)
         if (asset == null) {
             resultHandler.replyError("The asset not found")
             return
         }
         try {
-            if (useFilePath()) {
-                val byteArray = File(asset.path).readBytes()
-                resultHandler.reply(byteArray)
-            } else {
-                val byteArray = dbUtils.getOriginBytes(context, asset, haveLocationPermission)
-                resultHandler.reply(byteArray)
-                if (cacheOriginBytes) {
-                    dbUtils.cacheOriginFile(context, asset, byteArray)
-                }
-            }
+            val byteArray = File(asset.path).readBytes()
+            resultHandler.reply(byteArray)
         } catch (e: Exception) {
             dbUtils.logRowWithId(context, id)
             resultHandler.replyError("202", "get origin Bytes error", e)
@@ -281,18 +257,10 @@ class PhotoManager(private val context: Context) {
     private val cacheFutures = ArrayList<FutureTarget<Bitmap>>()
 
     fun requestCache(ids: List<String>, option: ThumbLoadOption, resultHandler: ResultHandler) {
-        if (useFilePath()) {
-            val pathList = dbUtils.getAssetsPath(context, ids)
-            for (s in pathList) {
-                val future = ThumbnailUtil.requestCacheThumb(context, s, option)
-                cacheFutures.add(future)
-            }
-        } else {
-            val uriList = dbUtils.getAssetsUri(context, ids)
-            for (uri in uriList) {
-                val future = ThumbnailUtil.requestCacheThumb(context, uri, option)
-                cacheFutures.add(future)
-            }
+        val pathList = dbUtils.getAssetsPath(context, ids)
+        for (s in pathList) {
+            val future = ThumbnailUtil.requestCacheThumb(context, s, option)
+            cacheFutures.add(future)
         }
         resultHandler.reply(1)
         val needExecuteFutures = cacheFutures.toList()
