@@ -21,8 +21,8 @@ class PhotoManager {
   static final NotifyManager _notifyManager = NotifyManager();
 
   /// ### Android (AndroidManifest.xml)
+  ///  * READ_EXTERNAL_STORAGE (REQUIRED)
   ///  * WRITE_EXTERNAL_STORAGE
-  ///  * READ_EXTERNAL_STORAGE
   ///  * ACCESS_MEDIA_LOCATION
   ///
   /// ### iOS (Info.plist)
@@ -164,9 +164,4 @@ class PhotoManager {
 
   /// Clear all file caches.
   static Future<void> clearFileCache() => plugin.clearFileCache();
-
-  /// Cache files into sandbox on Android Q when set to true,
-  /// and cached files can be reused.
-  static Future<bool> setCacheAtOriginBytes(bool cache) =>
-      plugin.cacheOriginBytes(cache);
 }

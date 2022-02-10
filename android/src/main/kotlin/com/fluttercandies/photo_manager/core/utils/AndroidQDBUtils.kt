@@ -14,8 +14,6 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
-import com.fluttercandies.photo_manager.core.cache.AndroidQCache
-import com.fluttercandies.photo_manager.core.cache.CacheContainer
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.entity.FilterOption
 import com.fluttercandies.photo_manager.core.entity.GalleryEntity
@@ -32,8 +30,6 @@ import kotlin.concurrent.withLock
 @Suppress("Deprecation") // Suppress DATA field
 object AndroidQDBUtils : IDBUtils {
     private const val TAG = "PhotoManagerPlugin"
-
-    private var androidQCache = AndroidQCache()
 
     private val galleryKeys = arrayOf(
         MediaStore.Images.Media.BUCKET_ID,
@@ -150,8 +146,7 @@ object AndroidQDBUtils : IDBUtils {
         page: Int,
         size: Int,
         requestType: Int,
-        option: FilterOption,
-        cacheContainer: CacheContainer?
+        option: FilterOption
     ): List<AssetEntity> {
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -342,8 +337,6 @@ object AndroidQDBUtils : IDBUtils {
         }
     }
 
-    override fun clearCache() {}
-
     override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
         val assetEntity = getAssetEntity(context, id) ?: return null
         return assetEntity.path
@@ -370,11 +363,6 @@ object AndroidQDBUtils : IDBUtils {
         asset: AssetEntity,
         haveLocationPermission: Boolean
     ): ByteArray {
-        val file = androidQCache.getCacheFile(context, asset.id, asset.displayName, true)
-        if (file.exists()) {
-            LogUtils.info("the origin bytes come from ${file.absolutePath}")
-            return file.readBytes()
-        }
         val uri = getUri(asset, haveLocationPermission)
         val inputStream = context.contentResolver.openInputStream(uri)
         val outputStream = ByteArrayOutputStream()
@@ -386,10 +374,6 @@ object AndroidQDBUtils : IDBUtils {
             }
             return byteArray
         }
-    }
-
-    override fun cacheOriginFile(context: Context, asset: AssetEntity, byteArray: ByteArray) {
-        androidQCache.saveAssetCache(context, asset, byteArray, true)
     }
 
     override fun saveImage(
