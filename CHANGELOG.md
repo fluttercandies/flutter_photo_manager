@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2.0.0-dev.7
+
+Improvements:
+- Combine DBUtils between SDK versions on Android. (#698)
+- Force legacy storage on Android Q. (#701)
+- LICENSE updated with the new author (FlutterCandies).
+
+Fixes:
+- Fix potential NPE when moving assets on Android.
+
 ## 2.0.0-dev.6
 
 Improvements:
@@ -8,9 +18,9 @@ Improvements:
 ## 2.0.0-dev.5
 
 Improvements:
-- Implement paging load more in the simple example.
-- Compile for API 31 on Android.
 - Remove unused dependencies on Android.
+- Compile for API 31 on Android.
+- Implement paging load more in the simple example.
 
 Fixes:
 - Fix closed cursors access on Android.
@@ -18,9 +28,9 @@ Fixes:
 ## 2.0.0-dev.4
 
 Improvements:
-- Retrieve width/height from ExifInterface for fallback. (#686)
-- Throw when obtain media URL that asset is not locally available on iOS.
 - Update README with media location permission and assets retrieving on iOS.
+- Throw when obtain media URL that asset is not locally available on iOS.
+- Retrieve width/height from ExifInterface for fallback. (#686)
 
 ## 2.0.0-dev.3
 
@@ -28,10 +38,10 @@ Features:
 - `DurationConstraint.allowNullable`. (#681)
 
 Improvements:
-- Improve adjusted resources fetching on iOS.
-- Obtain `DATE_TAKEN` for create date if possible on Android. (#682)
-- Improve cache path for `PHAsset` on iOS. (#683)
 - Improve imlementation of `getMediaUrl()` on iOS. (#684)
+- Improve cache path for `PHAsset` on iOS. (#683)
+- Obtain `DATE_TAKEN` for create date if possible on Android. (#682)
+- Improve adjusted resources fetching on iOS.
 
 ## 2.0.0-dev.2
 
@@ -43,26 +53,26 @@ Improvements:
 A major version release for performance improvements, new features, issues fixed and breaking changes.
 
 Features:
-- Add equality comparison for various classes. (#657)
-- Obtain the first frame for the video thumbnail on Android. (#658)
-- Support "Live Photos" with obtaining and filtering. (#667, #670, #673)
 - Introduce `AssetEntityImageProvider`. (#669)
+- Support "Live Photos" with obtaining and filtering. (#667, #670, #673)
+- Obtain the first frame for the video thumbnail on Android. (#658)
+- Add equality comparison for various classes. (#657)
 
 Improvements:
-- `ImageScanner` -> `PhotoManager`. (#611)
-- Rename org to `com.fluttercandies`. (#624)
-- Reorganized all internal structures.
-- Improved all documents and code formats. (#626, #660, #664, #671)
-- Improve thread pool on Android. (#637)
-- Run Glide on the current thread on Android. (#656)
-- Improve the default sort order on all platforms. (#659)
 - Provided a single-page example. (#672)
+- Improve the default sort order on all platforms. (#659)
+- Run Glide on the current thread on Android. (#656)
+- Improve thread pool on Android. (#637)
+- Improved all documents and code formats. (#626, #660, #664, #671)
+- Reorganized all internal structures.
+- Rename org to `com.fluttercandies`. (#624)
+- `ImageScanner` -> `PhotoManager`. (#611)
 
 Fixes:
+- Edited images/videos are not returned correctly on iOS. (#622, #636)
+- `title` causes saving methods failed. (#619, #635)
 - `PhotoManager.editor.copyAssetToPath` return `null` on iOS. (#619)
 - Sort order issues on iOS. (#603, #655)
-- `title` causes saving methods failed. (#619, #635)
-- Edited images/videos are not returned correctly on iOS. (#622, #636)
 
 ## 1.3.10
 
