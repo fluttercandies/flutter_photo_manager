@@ -29,7 +29,12 @@ class Editor {
     return plugin.deleteWithIds(ids);
   }
 
-  /// Save image to gallery.
+  /// Save image to gallery from the given [data].
+  ///
+  /// {@template photo_manager.TitleWhenSaving}
+  /// [title] typically means the filename of the saving entity, which can be
+  /// obtained by `basename(file.path)`.
+  /// {@endtemplate}
   ///
   /// {@template photo_manager.SavingAssets}
   /// On Android 29 and above, you can use [relativePath] to specify the
@@ -39,7 +44,7 @@ class Editor {
   /// {@endtemplate}
   Future<AssetEntity?> saveImage(
     Uint8List data, {
-    required String? title,
+    required String title,
     String? desc,
     String? relativePath,
   }) {
@@ -51,7 +56,9 @@ class Editor {
     );
   }
 
-  /// Save image to gallery.
+  /// Save image to gallery from the given [path].
+  ///
+  /// {@macro photo_manager.TitleWhenSaving}
   ///
   /// {@macro photo_manager.SavingAssets}
   Future<AssetEntity?> saveImageWithPath(
@@ -68,7 +75,9 @@ class Editor {
     );
   }
 
-  /// Save video to gallery.
+  /// Save video to gallery from the given [file].
+  ///
+  /// {@macro photo_manager.TitleWhenSaving}
   ///
   /// {@macro photo_manager.SavingAssets}
   Future<AssetEntity?> saveVideo(

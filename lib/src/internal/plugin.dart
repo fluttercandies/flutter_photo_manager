@@ -240,7 +240,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }) async {
     final File file = File(path);
     if (!file.existsSync()) {
-      assert(file.existsSync(), 'file must exists');
+      assert(false, 'File must exists.');
       return null;
     }
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
@@ -268,7 +268,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     String? relativePath,
   }) async {
     if (!file.existsSync()) {
-      assert(file.existsSync(), 'file must exists');
+      assert(false, 'File must exists.');
       return null;
     }
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
