@@ -6,6 +6,7 @@ export 'src/filter/filter_options.dart';
 export 'src/internal/enums.dart';
 export 'src/internal/extensions.dart';
 export 'src/internal/image_provider.dart';
+export 'src/internal/plugin.dart' show PhotoManagerPlugin;
 export 'src/internal/progress_handler.dart';
 
 export 'src/managers/caching_manager.dart';
