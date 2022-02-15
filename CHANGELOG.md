@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.0.0-dev.8
+
+Improvements:
+- Improve the performance when using the `file` getter on iOS. (#705)
+- Allow plugin to be mocked/overridden with tests. (#703)
+
 ## 2.0.0-dev.7
 
 Improvements:
