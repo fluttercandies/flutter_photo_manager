@@ -591,7 +591,7 @@
         // Export the asset eventually, typically for `AVComposition`s.
         AVAssetExportSession *exportSession = [AVAssetExportSession
                                                exportSessionWithAsset:asset
-                                               presetName:AVAssetExportPresetMediumQuality];
+                                               presetName:AVAssetExportPresetHighestQuality];
         if (exportSession) {
             NSString *extension = [[path pathExtension] lowercaseString];
             // Determine the output type.
