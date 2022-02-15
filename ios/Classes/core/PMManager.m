@@ -553,7 +553,7 @@
         
         NSURL *destination = [NSURL fileURLWithPath:path];
         // Check whether the asset is already an AVURLAsset,
-        // then copy the item into the sandbox instead of export.
+        // then copy the asset file into the sandbox instead of export.
         if ([asset isKindOfClass:[AVURLAsset class]]) {
             AVURLAsset *urlAsset = (AVURLAsset *) asset;
             NSURL *videoURL = urlAsset.URL;
@@ -575,11 +575,21 @@
         
         // Export the asset eventually.
         NSString *preset = AVAssetExportPresetMediumQuality;
-        AVAssetExportSession *exportSession =
-        [AVAssetExportSession exportSessionWithAsset:asset
-                                          presetName:preset];
+        AVAssetExportSession *exportSession = [AVAssetExportSession
+                                               exportSessionWithAsset:asset
+                                               presetName:preset];
         if (exportSession) {
-            exportSession.outputFileType = AVFileTypeQuickTimeMovie;
+            NSString *extension = [[path pathExtension] lowercaseString];
+            // Determine the output type.
+            AVFileType outputFileType;
+            if ([extension isEqualToString:@"mov"]) {
+                outputFileType = AVFileTypeQuickTimeMovie;
+            } else if ([extension isEqualToString:@"m4v"]) {
+                outputFileType = AVFileTypeAppleM4V;
+            } else {
+                outputFileType = AVFileTypeMPEG4;
+            }
+            exportSession.outputFileType = outputFileType;
             exportSession.outputURL = destination;
             [exportSession exportAsynchronouslyWithCompletionHandler:^{
                 if (exportSession.status == AVAssetExportSessionStatusCompleted) {
