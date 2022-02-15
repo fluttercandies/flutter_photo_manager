@@ -419,7 +419,7 @@
             if (isOrigin) {
                 [self fetchOriginVideoFile:asset handler:handler progressHandler:progressHandler];
             } else {
-                [self fetchFullSizeVideo:asset handler:handler progressHandler:progressHandler];
+                [self fetchFullSizeVideo:asset handler:handler progressHandler:progressHandler withScheme:NO];
             }
             return;
         }
@@ -515,12 +515,19 @@
     }];
 }
 
-- (void)fetchFullSizeVideo:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+- (void)fetchFullSizeVideo:(PHAsset *)asset
+                   handler:(NSObject <PMResultHandler> *)handler
+           progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
+                withScheme:(BOOL)withScheme {
     NSFileManager *manager = NSFileManager.defaultManager;
     NSString *path = [self makeAssetOutputPath:asset isOrigin:NO manager:manager];
     if ([manager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
-        [handler reply:path];
+        if (withScheme) {
+            [handler reply:[NSURL fileURLWithPath:path].absoluteString];
+        } else {
+            [handler reply:path];
+        }
         return;
     }
     
@@ -552,13 +559,17 @@
         }
         
         NSURL *destination = [NSURL fileURLWithPath:path];
-        // Check whether the asset is already an AVURLAsset,
+        // Check whether the asset is already an `AVURLAsset`,
         // then copy the asset file into the sandbox instead of export.
         if ([asset isKindOfClass:[AVURLAsset class]]) {
             AVURLAsset *urlAsset = (AVURLAsset *) asset;
             NSURL *videoURL = urlAsset.URL;
             if ([[videoURL path] isEqualToString:[destination path]]) {
-                [handler reply:[videoURL path]];
+                if (withScheme) {
+                    [handler reply:videoURL.absoluteString];
+                } else {
+                    [handler reply:[videoURL path]];
+                }
                 return;
             }
             NSError *error;
@@ -569,14 +580,18 @@
                 [handler replyError:@"Could not cache the video file."];
                 return;
             }
-            [handler reply:[destination path]];
+            if (withScheme) {
+                [handler reply:destination.absoluteString];
+            } else {
+                [handler reply:path];
+            }
             return;
         }
         
-        // Export the asset eventually.
+        // Export the asset eventually, typically for `AVComposition`s.
         AVAssetExportSession *exportSession = [AVAssetExportSession
                                                exportSessionWithAsset:asset
-                                               presetName:AVAssetExportPresetPassthrough];
+                                               presetName:AVAssetExportPresetMediumQuality];
         if (exportSession) {
             NSString *extension = [[path pathExtension] lowercaseString];
             // Determine the output type.
@@ -592,18 +607,22 @@
             exportSession.outputURL = destination;
             [exportSession exportAsynchronouslyWithCompletionHandler:^{
                 if (exportSession.status == AVAssetExportSessionStatusCompleted) {
-                    [handler reply:path];
+                    if (withScheme) {
+                        [handler reply:destination.absoluteString];
+                    } else {
+                        [handler reply:path];
+                    }
                     [self notifySuccess:progressHandler];
                 } else if (exportSession.status == AVAssetExportSessionStatusFailed ||
                            exportSession.status == AVAssetExportSessionStatusCancelled) {
-                    [handler reply:nil];
                     [self notifyProgress:progressHandler progress:1.0 state:PMProgressStateFailed];
                     [progressHandler deinit];
+                    [handler replyError:[NSString stringWithFormat:@"%@", exportSession.error]];
                 }
             }];
             return;
         }
-        [handler reply:nil];
+        [handler replyError:@"Unable to initialize an export session."];
     }];
 }
 
@@ -949,7 +968,6 @@
              desc:(NSString *)desc
             block:(AssetResult)block {
     __block NSString *assetId = nil;
-    
     [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save image with data, length: %lu, title:%@, desc: %@", (unsigned long)data.length, title, desc]];
     
     [[PHPhotoLibrary sharedPhotoLibrary]
@@ -976,7 +994,6 @@
 }
 
 - (void)saveImageWithPath:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(void (^)(PMAssetEntity *))block {
-    
     [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save image with path: %@ title:%@, desc: %@", path, title, desc]];
     
     __block NSString *assetId = nil;
@@ -1008,23 +1025,20 @@
             title:(NSString *)title
              desc:(NSString *)desc
             block:(AssetResult)block {
-    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save video with path: %@, title: %@, desc %@", path, title, desc]];
+    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save video with path: %@, title: %@, desc %@",
+                                     path, title, desc]];
     NSURL *fileURL = [NSURL fileURLWithPath:path];
     __block NSString *assetId = nil;
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
         PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromVideoAtFileURL:fileURL];
-        //              PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
-        //              [options setOriginalFilename:title];
-        
-        //              PHAssetCreationRequest *request = [PHAssetCreationRequest
-        //                      creationRequestForAssetFromVideoAtFileURL:fileURL];
-        //              PHAssetResourceCreationOptions *options =
-        //                      [PHAssetResourceCreationOptions new];
-        //              [options setOriginalFilename:title];
-        //              [request addResourceWithType:PHAssetResourceTypeVideo
-        //                                   fileURL:fileURL
-        //                                   options:options];
+//        PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
+//        [options setOriginalFilename:title];
+//
+//        PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAssetFromVideoAtFileURL:fileURL];
+//        PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
+//        [options setOriginalFilename:title];
+//        [request addResourceWithType:PHAssetResourceTypeVideo fileURL:fileURL options:options];
         assetId = request.placeholderForCreatedAsset.localIdentifier;
     }
      completionHandler:^(BOOL success, NSError *error) {
@@ -1063,9 +1077,8 @@
         }
     }
     if (asset.isVideo) {
-        PHAssetResource *resource = [asset getAdjustResource];
-        NSURL *url = [resource valueForKey:@"privateFileURL"];
-        [handler reply:url.absoluteString];
+        PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
+        [self fetchFullSizeVideo:asset handler:handler progressHandler:nil withScheme:YES];
     } else {
         [handler replyError:@"Only video type of assets can get a media url."];
     }
