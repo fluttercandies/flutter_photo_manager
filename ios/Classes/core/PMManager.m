@@ -574,10 +574,9 @@
         }
         
         // Export the asset eventually.
-        NSString *preset = AVAssetExportPresetMediumQuality;
         AVAssetExportSession *exportSession = [AVAssetExportSession
                                                exportSessionWithAsset:asset
-                                               presetName:preset];
+                                               presetName:AVAssetExportPresetPassthrough];
         if (exportSession) {
             NSString *extension = [[path pathExtension] lowercaseString];
             // Determine the output type.
