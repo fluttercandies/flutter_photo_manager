@@ -10,35 +10,46 @@ import '../types/thumb_option.dart';
 import '../types/types.dart';
 import '../utils/convert_utils.dart';
 import 'constants.dart';
+import 'enums.dart';
 import 'progress_handler.dart';
 
-final Plugin plugin = Plugin();
+PhotoManagerPlugin plugin = PhotoManagerPlugin();
 
 mixin BasePlugin {
   final MethodChannel _channel = const MethodChannel(PMConstants.channelPrefix);
 }
 
-/// The plugin class is shield and should not be use directly.
-class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
-  factory Plugin() => _instance;
-
-  Plugin._();
-
-  static late final Plugin _instance = Plugin._();
-
+/// The plugin class is the core class that call channel's methods.
+class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   Future<List<AssetPathEntity>> getAllGalleryList({
-    required FilterOptionGroup optionGroup,
-    RequestType type = RequestType.all,
     bool hasAll = true,
     bool onlyAll = false,
+    RequestType type = RequestType.common,
+    FilterOptionGroup? filterOption,
   }) async {
+    if (onlyAll) {
+      assert(hasAll, 'If only is true, then the hasAll must be not null.');
+    }
+    filterOption ??= FilterOptionGroup();
+    // Avoid filtering live photos when searching for audios.
+    if (type == RequestType.audio) {
+      filterOption = filterOption.copyWith(
+        containsLivePhotos: false,
+        onlyLivePhotos: false,
+      );
+    }
+    assert(
+      type == RequestType.image || !filterOption.onlyLivePhotos,
+      'Filtering only Live Photos is only supported '
+      'when the request type contains image.',
+    );
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mGetGalleryList,
       <String, dynamic>{
         'type': type.value,
         'hasAll': hasAll,
         'onlyAll': onlyAll,
-        'option': optionGroup.toMap(),
+        'option': filterOption.toMap(),
       },
     );
     if (result == null) {
@@ -47,18 +58,18 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     return ConvertUtils.convertPath(
       result.cast<String, dynamic>(),
       type: type,
-      optionGroup: optionGroup,
+      optionGroup: filterOption,
     );
   }
 
-  Future<int> requestPermissionExtend(
+  Future<PermissionState> requestPermissionExtend(
     PermisstionRequestOption requestOption,
   ) async {
     final int result = await _channel.invokeMethod<int>(
       PMConstants.mRequestPermissionExtend,
       requestOption.toMap(),
     ) as int;
-    return result;
+    return PermissionState.values[result];
   }
 
   /// Use pagination to get album content.

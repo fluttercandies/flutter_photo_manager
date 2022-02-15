@@ -12,7 +12,12 @@ import 'notify_manager.dart';
 /// The core manager of this plugin.
 /// Use various methods in this class to access & manage assets.
 class PhotoManager {
-  const PhotoManager._();
+  @visibleForTesting
+  PhotoManager.withPlugin([PhotoManagerPlugin? _plugin]) {
+    if (_plugin != null && _plugin != plugin) {
+      plugin = _plugin;
+    }
+  }
 
   /// Editor instance for editing assets.
   static final Editor editor = Editor();
@@ -38,9 +43,8 @@ class PhotoManager {
   ///    of the current application.
   static Future<PermissionState> requestPermissionExtend({
     PermisstionRequestOption requestOption = const PermisstionRequestOption(),
-  }) async {
-    final int resultIndex = await plugin.requestPermissionExtend(requestOption);
-    return PermissionState.values[resultIndex];
+  }) {
+    return plugin.requestPermissionExtend(requestOption);
   }
 
   /// Prompts the limited assets selection modal on iOS.
@@ -72,27 +76,11 @@ class PhotoManager {
     RequestType type = RequestType.common,
     FilterOptionGroup? filterOption,
   }) async {
-    if (onlyAll) {
-      assert(hasAll, 'If only is true, then the hasAll must be not null.');
-    }
-    filterOption ??= FilterOptionGroup();
-    // Avoid filtering live photos when searching for audios.
-    if (type == RequestType.audio) {
-      filterOption = filterOption.copyWith(
-        containsLivePhotos: false,
-        onlyLivePhotos: false,
-      );
-    }
-    assert(
-      type == RequestType.image || !filterOption.onlyLivePhotos,
-      'Filtering only Live Photos is only supported '
-      'when the request type contains image.',
-    );
     return plugin.getAllGalleryList(
       hasAll: hasAll,
       onlyAll: onlyAll,
       type: type,
-      optionGroup: filterOption,
+      filterOption: filterOption,
     );
   }
 
