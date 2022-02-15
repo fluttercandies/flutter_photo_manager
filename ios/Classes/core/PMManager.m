@@ -547,18 +547,40 @@
                      AVAudioMix *_Nullable audioMix,
                      NSDictionary *_Nullable info) {
         BOOL downloadFinish = [PMManager isDownloadFinish:info];
-        
         if (!downloadFinish) {
             return;
         }
         
-        NSString *preset = AVAssetExportPresetHighestQuality;
+        NSURL *destination = [NSURL fileURLWithPath:path];
+        // Check whether the asset is already an AVURLAsset,
+        // then copy the item into the sandbox instead of export.
+        if ([asset isKindOfClass:[AVURLAsset class]]) {
+            AVURLAsset *urlAsset = (AVURLAsset *) asset;
+            NSURL *videoURL = urlAsset.URL;
+            if ([[videoURL path] isEqualToString:[destination path]]) {
+                [handler reply:[videoURL path]];
+                return;
+            }
+            NSError *error;
+            [[NSFileManager defaultManager] copyItemAtURL:videoURL
+                                                    toURL:destination
+                                                    error:&error];
+            if (error) {
+                [handler replyError:@"Could not cache the video file."];
+                return;
+            }
+            [handler reply:[destination path]];
+            return;
+        }
+        
+        // Export the asset eventually.
+        NSString *preset = AVAssetExportPresetMediumQuality;
         AVAssetExportSession *exportSession =
         [AVAssetExportSession exportSessionWithAsset:asset
                                           presetName:preset];
         if (exportSession) {
-            exportSession.outputFileType = AVFileTypeMPEG4;
-            exportSession.outputURL = [NSURL fileURLWithPath:path];
+            exportSession.outputFileType = AVFileTypeQuickTimeMovie;
+            exportSession.outputURL = destination;
             [exportSession exportAsynchronouslyWithCompletionHandler:^{
                 if (exportSession.status == AVAssetExportSessionStatusCompleted) {
                     [handler reply:path];
@@ -570,9 +592,9 @@
                     [progressHandler deinit];
                 }
             }];
-        } else {
-            [handler reply:nil];
+            return;
         }
+        [handler reply:nil];
     }];
 }
 
