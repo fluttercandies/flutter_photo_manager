@@ -1,17 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoWidget extends StatefulWidget {
-  const VideoWidget({Key? key, required this.entity}) : super(key: key);
+  const VideoWidget({
+    Key? key,
+    required this.entity,
+    this.usingMediaUrl = true,
+  }) : super(key: key);
 
   final AssetEntity entity;
+  final bool usingMediaUrl;
 
   @override
   _VideoWidgetState createState() => _VideoWidgetState();
 }
 
 class _VideoWidgetState extends State<VideoWidget> {
+  final Stopwatch _stopwatch = Stopwatch();
   VideoPlayerController? _controller;
 
   bool get isAudio => widget.entity.type == AssetType.audio;
@@ -19,7 +27,38 @@ class _VideoWidgetState extends State<VideoWidget> {
   @override
   void initState() {
     super.initState();
+    _stopwatch.start();
+    if (widget.usingMediaUrl) {
+      _initVideoWithMediaUrl();
+    } else {
+      _initVideoWithFile();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  void _initVideoWithFile() {
+    widget.entity.file.then((File? file) {
+      _stopwatch.stop();
+      print('Elapsed time for `file`: ${_stopwatch.elapsed}');
+      if (!mounted || file == null) {
+        return;
+      }
+      _controller = VideoPlayerController.file(file)
+        ..initialize()
+        ..addListener(() => setState(() {}));
+      setState(() {});
+    });
+  }
+
+  void _initVideoWithMediaUrl() {
     widget.entity.getMediaUrl().then((String? url) {
+      _stopwatch.stop();
+      print('Elapsed time for `getMediaUrl`: ${_stopwatch.elapsed}');
       if (!mounted || url == null) {
         return;
       }
@@ -28,12 +67,6 @@ class _VideoWidgetState extends State<VideoWidget> {
         ..addListener(() => setState(() {}));
       setState(() {});
     });
-  }
-
-  @override
-  void dispose() {
-    _controller?.dispose();
-    super.dispose();
   }
 
   Widget buildVideoPlayer() {
