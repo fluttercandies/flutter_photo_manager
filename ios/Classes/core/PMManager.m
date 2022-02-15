@@ -1413,17 +1413,20 @@
 }
 
 - (void)clearFileCache {
-    NSString *videoPath = [self getCachePath:@".video"];
     NSString *imagePath = [self getCachePath:@".image"];
-    
-    NSFileManager *fm = NSFileManager.defaultManager;
+    NSString *videoPath = [self getCachePath:@".video"];
     
     NSError *err;
-    
-    [fm removeItemAtPath:imagePath error:&err];
-    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"remove cache file %@, error: %@", imagePath, err]];
-    [fm removeItemAtPath:videoPath error:&err];
-    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"remove cache file %@, error: %@", videoPath, err]];
+    [PMFileHelper deleteFile:imagePath isDirectory:YES error:err];
+    if (err) {
+        [PMLogUtils.sharedInstance
+         info:[NSString stringWithFormat:@"Remove .image cache %@, error: %@", imagePath, err]];
+    }
+    [PMFileHelper deleteFile:videoPath isDirectory:YES error:err];
+    if (err) {
+        [PMLogUtils.sharedInstance
+         info:[NSString stringWithFormat:@"Remove .video cache %@, error: %@", videoPath, err]];
+    }
 }
 
 #pragma mark cache thumb

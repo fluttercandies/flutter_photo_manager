@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///  Contains access file methods
 @interface PMFileHelper : NSObject
 
-+(void)deleteFile:(NSString *)path;
++(void)deleteFile:(NSString *)path isDirectory:(BOOL)isDirectory error:(NSError *)error;
 
 @end
 
