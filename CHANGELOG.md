@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.0.0-dev.9
+
+Improvements:
+- Make all entities immutable. (#708)
+
 ## 2.0.0-dev.8
 
 Improvements:
