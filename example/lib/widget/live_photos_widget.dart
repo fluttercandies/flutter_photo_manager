@@ -30,9 +30,17 @@ class _LivePhotosWidgetState extends State<LivePhotosWidget> {
       if (!mounted || url == null) {
         return;
       }
-      _controller = VideoPlayerController.network(url)
+      _controller = VideoPlayerController.network(
+        url,
+        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+      )
         ..initialize()
-        ..addListener(() => setState(() {}));
+        ..setVolume(0)
+        ..addListener(() {
+          if (mounted) {
+            setState(() {});
+          }
+        });
       setState(() {});
     });
   }
@@ -52,6 +60,7 @@ class _LivePhotosWidgetState extends State<LivePhotosWidget> {
         widget.entity,
         isOriginal: widget.useOrigin == true,
       ),
+      fit: BoxFit.contain,
       loadingBuilder: (_, Widget child, ImageChunkEvent? progress) {
         if (progress != null) {
           final double? value;
@@ -86,16 +95,18 @@ class _LivePhotosWidgetState extends State<LivePhotosWidget> {
             if (_controller?.value.isInitialized == true)
               Positioned.fill(child: VideoPlayer(_controller!)),
             if (_controller != null)
-              ValueListenableBuilder<VideoPlayerValue>(
-                valueListenable: _controller!,
-                builder: (_, VideoPlayerValue value, Widget? child) {
-                  return AnimatedOpacity(
-                    opacity: value.isPlaying ? 0 : 1,
-                    duration: kThemeAnimationDuration,
-                    child: child,
-                  );
-                },
-                child: _buildImage(context),
+              Positioned.fill(
+                child: ValueListenableBuilder<VideoPlayerValue>(
+                  valueListenable: _controller!,
+                  builder: (_, VideoPlayerValue value, Widget? child) {
+                    return AnimatedOpacity(
+                      opacity: value.isPlaying ? 0 : 1,
+                      duration: kThemeAnimationDuration,
+                      child: child,
+                    );
+                  },
+                  child: _buildImage(context),
+                ),
               ),
           ],
         ),

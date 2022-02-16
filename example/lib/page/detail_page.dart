@@ -29,7 +29,7 @@ class _DetailPageState extends State<DetailPage> {
           ),
         ],
       ),
-      body: ListView(
+      body: Column(
         children: <Widget>[
           if (widget.entity.type == AssetType.image)
             CheckboxListTile(
@@ -40,9 +40,12 @@ class _DetailPageState extends State<DetailPage> {
               },
               value: useOrigin,
             ),
-          Container(
-            color: Colors.black,
-            child: _buildContent(),
+          Expanded(
+            child: Container(
+              alignment: Alignment.center,
+              color: Colors.black,
+              child: _buildContent(),
+            ),
           ),
         ],
       ),

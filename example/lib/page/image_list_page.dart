@@ -30,9 +30,9 @@ class GalleryContentListPage extends StatefulWidget {
 }
 
 class _GalleryContentListPageState extends State<GalleryContentListPage> {
-  AssetPathEntity get path => widget.path;
+  late final PhotoProvider photoProvider = Provider.of<PhotoProvider>(context);
 
-  PhotoProvider get photoProvider => Provider.of<PhotoProvider>(context);
+  AssetPathEntity get path => widget.path;
 
   AssetPathProvider readPathProvider(BuildContext c) =>
       c.read<AssetPathProvider>();
@@ -66,8 +66,8 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   }
 
   ThumbOption get thumbOption => ThumbOption(
-        width: 130,
-        height: 130,
+        width: 200,
+        height: 200,
         format: photoProvider.thumbFormat,
       );
 
@@ -106,7 +106,9 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                   },
                 ),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  mainAxisSpacing: 2,
                   crossAxisCount: 4,
+                  crossAxisSpacing: 2,
                 ),
               ),
             ),
@@ -129,10 +131,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
 
     final AssetEntity entity = list[index];
 
-    return _ImageListItem(
+    return ImageItemWidget(
       key: ValueKey<String>(entity.id),
       entity: entity,
-      thumbOption: thumbOption,
+      option: thumbOption,
       onTap: () => showDialog<void>(
         context: context,
         builder: (_) => ListDialog(
@@ -424,36 +426,5 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
         );
       });
     }
-  }
-}
-
-class _ImageListItem extends StatefulWidget {
-  const _ImageListItem({
-    Key? key,
-    required this.entity,
-    required this.thumbOption,
-    required this.onTap,
-  }) : super(key: key);
-
-  final AssetEntity entity;
-  final ThumbOption thumbOption;
-  final GestureTapCallback onTap;
-
-  @override
-  State<_ImageListItem> createState() => _ImageListItemState();
-}
-
-class _ImageListItemState extends State<_ImageListItem> {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: widget.onTap,
-      child: ImageItemWidget(
-        key: ValueKey<AssetEntity>(widget.entity),
-        entity: widget.entity,
-        option: widget.thumbOption,
-      ),
-    );
   }
 }
