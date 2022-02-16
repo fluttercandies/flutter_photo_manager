@@ -233,6 +233,28 @@ class AssetPathEntity {
     return null;
   }
 
+  AssetPathEntity copyWith({
+    String? id,
+    String? name,
+    int? assetCount,
+    int? albumType = 1,
+    DateTime? lastModified,
+    RequestType? type,
+    bool? isAll,
+    FilterOptionGroup? filterOption,
+  }) {
+    return AssetPathEntity(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      assetCount: assetCount ?? this.assetCount,
+      albumType: albumType ?? this.albumType,
+      lastModified: lastModified ?? this.lastModified,
+      type: type ?? this.type,
+      isAll: isAll ?? this.isAll,
+      filterOption: filterOption ?? this.filterOption,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (other is! AssetPathEntity) {
