@@ -15,9 +15,9 @@ This version mainly covers all valid issues, API deprecations, and few new featu
 
 - The org name has been updated from `top.kikt` to `com.fluttercandies`.
 - The plugin name on native side has been updated from `ImageScanner` to `PhotoManager`.
+- `AssetPathEntity` and `AssetEntity` are now immutable.
 - `title` are required when using saving methods.
 - Arguments with `getAssetListPaged` are now required with name.
-- `AssetPathEntity` cannot be constructed with the default constructor.
 - `PhotoManager.notifyingOfChange` has no setter anymore.
 - `PhotoManager.refreshAssetProperties` and `PhotoManager.fetchPathProperties` have been moved to entities.
 - `containsLivePhotos` are `true` by default.
@@ -29,18 +29,21 @@ This version mainly covers all valid issues, API deprecations, and few new featu
 There are several APIs have been removed, since they can't provide precise meanings, or can be replaced by new APIs.
 If you've used these APIs, consider migrating them to the latest version.
 
-| Removed API                           | Migrate destination                                      |
-| :------------------------------------ | :------------------------------------------------------- |
-| `PhotoManager.getImageAsset`          | `PhotoManager.getAssetPathList(type: RequestType.image)` |
-| `PhotoManager.getVideoAsset`          | `PhotoManager.getAssetPathList(type: RequestType.video)` |
-| `PhotoManager.fetchPathProperties`    | `AssetPathEntity.fetchPathProperties`                    |
-| `PhotoManager.refreshAssetProperties` | `AssetEntity.refreshProperties`                          |
-| `PhotoManager.requestPermission`      | `PhotoManager.requestPermissionExtend`                   |
-| `AssetPathEntity.assetList`           | N/A, use pagination APIs instead                         |
-| `AssetEntity.fullData`                | `AssetEntity.originBytes`                                |
-| `FilterOptionGroup.dateTimeCond`      | `FilterOptionGroup.createTimeCond`                       |
+| Removed API/field                       | Migrate destination                                      |
+|:----------------------------------------|:---------------------------------------------------------|
+| `PhotoManager.getImageAsset`            | `PhotoManager.getAssetPathList(type: RequestType.image)` |
+| `PhotoManager.getVideoAsset`            | `PhotoManager.getAssetPathList(type: RequestType.video)` |
+| `PhotoManager.fetchPathProperties`      | `AssetPathEntity.fetchPathProperties`                    |
+| `PhotoManager.refreshAssetProperties`   | `AssetEntity.refreshProperties`                          |
+| `PhotoManager.requestPermission`        | `PhotoManager.requestPermissionExtend`                   |
+| `AssetPathEntity.assetList`             | N/A, use pagination APIs instead.                        |
+| `AssetPathEntity.refreshPathProperties` | `AssetPathEntity.obtainForNewProperties`                 |
+| `AssetEntity.createDtSecond`            | `AssetEntity.createDateSecond`                           |
+| `AssetEntity.fullData`                  | `AssetEntity.originBytes`                                |
+| `AssetEntity.refreshProperties`         | `AssetEntity.obtainForNewProperties`                     |
+| `FilterOptionGroup.dateTimeCond`        | `FilterOptionGroup.createTimeCond`                       |
 
-#### getAssetListPaged
+#### `getAssetListPaged`
 
 Before:
 ```dart
@@ -64,6 +67,25 @@ After:
 final List<AssetPathEntity> paths = PhotoManager.getAssetPathList(
   type: RequestType.video,
   filterOption: FilterOptionGroup(containsLivePhotos: false),
+);
+```
+
+#### iOS Editor favorite asset
+
+Before:
+```dart
+final bool isSucceed = await PhotoManager.editor.iOS.favoriteAsset(
+  entity: entity,
+  favorite: true,
+);
+```
+
+After:
+```dart
+/// If succeed, a new entity will be returned.
+final AssetEntity? newEntity = await PhotoManager.editor.iOS.favoriteAsset(
+  entity: entity,
+  favorite: true,
 );
 ```
 

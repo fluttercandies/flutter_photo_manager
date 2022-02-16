@@ -1,4 +1,3 @@
-// ignore_for_file: must_be_immutable
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -20,30 +19,16 @@ import 'types.dart';
 /// and the `PHAssetCollection` object on iOS/macOS.
 @immutable
 class AssetPathEntity {
-  AssetPathEntity._();
-
-  /// A factory constructor for convertion between channels.
-  factory AssetPathEntity.fromJson(
-    Map<String, dynamic> json, {
-    RequestType type = RequestType.all,
-    FilterOptionGroup? optionGroup,
-  }) {
-    final AssetPathEntity _entity = AssetPathEntity._()
-      ..id = json['id'] as String
-      ..name = json['name'] as String
-      ..type = type
-      ..isAll = json['isAll'] as bool
-      ..assetCount = json['length'] as int
-      ..albumType = json['albumType'] as int? ?? 1
-      ..filterOption = optionGroup ?? FilterOptionGroup();
-    final int? modifiedDate = json['modified'] as int?;
-    if (modifiedDate != null) {
-      _entity.lastModified = DateTime.fromMillisecondsSinceEpoch(
-        modifiedDate * 1000,
-      );
-    }
-    return _entity;
-  }
+  AssetPathEntity({
+    required this.id,
+    required this.name,
+    this.assetCount = 0,
+    this.albumType = 1,
+    this.lastModified,
+    this.type = RequestType.common,
+    this.isAll = false,
+    FilterOptionGroup? filterOption,
+  }) : filterOption = filterOption ??= FilterOptionGroup();
 
   /// Obtain an entity from ID.
   ///
@@ -56,89 +41,109 @@ class AssetPathEntity {
     int albumType = 1,
   }) async {
     assert(albumType == 1 || Platform.isIOS || Platform.isMacOS);
-    final AssetPathEntity entity = AssetPathEntity._()
-      ..id = id
-      ..albumType = albumType
-      ..filterOption = filterOption ?? FilterOptionGroup()
-      ..type = type;
-    await entity.refreshPathProperties();
+    final AssetPathEntity entity = await obtainPathFromProperties(
+      id: id,
+      albumType: albumType,
+      type: type,
+      optionGroup: filterOption ?? FilterOptionGroup(),
+    );
     return entity;
   }
 
   /// The ID of the album (asset collection).
   ///  * Android: `MediaStore.Images.Media.BUCKET_ID`.
   ///  * iOS/macOS: localIndentifier.
-  late final String id;
+  final String id;
 
   /// The name of the album.
   ///  * Android: Path name.
   ///  * iOS/macOS: Album/Folder name.
-  late String name;
+  final String name;
 
   /// Total assets count of the album.
-  late int assetCount;
+  final int assetCount;
 
   /// The type of the album.
   ///  * Android: Always be 1.
   ///  * iOS: 1 - Album, 2 - Folder.
-  late int albumType;
-
-  /// The collection of filter options of the album.
-  late FilterOptionGroup filterOption;
+  final int albumType;
 
   /// The latest modification date of the album.
   ///
   /// This field will only be included when
   /// [FilterOptionGroup.containsPathModified] is true.
-  DateTime? lastModified;
+  final DateTime? lastModified;
 
   /// The value used internally by the user.
   /// Used to indicate the value that should be available inside the path.
   /// The [RequestType] of the album.
   ///
   /// this value is determined as final when user construct the album.
-  late RequestType type;
+  final RequestType type;
 
   /// Whether the album contains all assets.
   ///
   /// An album includes all assets is the default album in general.
-  late bool isAll;
+  final bool isAll;
 
-  /// Call this method to update the property
-  Future<void> refreshPathProperties({bool maxDateTimeToNow = true}) async {
+  /// The collection of filter options of the album.
+  final FilterOptionGroup filterOption;
+
+  /// Call this method to obtain new path entity.
+  static Future<AssetPathEntity> obtainPathFromProperties({
+    required String id,
+    int albumType = 1,
+    RequestType type = RequestType.common,
+    FilterOptionGroup? optionGroup,
+    bool maxDateTimeToNow = true,
+  }) async {
+    optionGroup ??= FilterOptionGroup();
+    final StateError _error = StateError(
+      'Unable to fetch properties for path $id.',
+    );
+    final FilterOptionGroup? _optionGroup;
     if (maxDateTimeToNow) {
-      filterOption = filterOption.copyWith(
-        createTimeCond: filterOption.createTimeCond.copyWith(
+      _optionGroup = optionGroup.copyWith(
+        createTimeCond: optionGroup.createTimeCond.copyWith(
           max: DateTime.now(),
         ),
-        updateTimeCond: filterOption.updateTimeCond.copyWith(
+        updateTimeCond: optionGroup.updateTimeCond.copyWith(
           max: DateTime.now(),
         ),
       );
+    } else {
+      _optionGroup = optionGroup;
     }
 
     final Map<dynamic, dynamic>? result = await plugin.fetchPathProperties(
       id,
       type,
-      filterOption,
+      _optionGroup,
     );
     if (result == null) {
-      return;
+      throw _error;
     }
     final Object? list = result['data'];
     if (list is List && list.isNotEmpty) {
-      final AssetPathEntity entity = ConvertUtils.convertPath(
+      return ConvertUtils.convertToPathList(
         result.cast<String, dynamic>(),
         type: type,
-        optionGroup: filterOption,
+        optionGroup: _optionGroup,
       ).first;
-      assetCount = entity.assetCount;
-      name = entity.name;
-      isAll = entity.isAll;
-      type = entity.type;
-      filterOption = filterOption;
-      lastModified = entity.lastModified;
     }
+    throw _error;
+  }
+
+  /// Call this method to obtain new path entity.
+  Future<AssetPathEntity> obtainForNewProperties({
+    bool maxDateTimeToNow = true,
+  }) {
+    return AssetPathEntity.obtainPathFromProperties(
+      id: id,
+      albumType: albumType,
+      type: type,
+      optionGroup: filterOption,
+    );
   }
 
   /// Entity list with pagination support.
@@ -219,13 +224,35 @@ class AssetPathEntity {
     }
     final Object? list = result['data'];
     if (list is List && list.isNotEmpty) {
-      return ConvertUtils.convertPath(
+      return ConvertUtils.convertToPathList(
         result.cast<String, dynamic>(),
         type: type,
         optionGroup: filterOptionGroup ?? filterOption,
       ).first;
     }
     return null;
+  }
+
+  AssetPathEntity copyWith({
+    String? id,
+    String? name,
+    int? assetCount,
+    int? albumType = 1,
+    DateTime? lastModified,
+    RequestType? type,
+    bool? isAll,
+    FilterOptionGroup? filterOption,
+  }) {
+    return AssetPathEntity(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      assetCount: assetCount ?? this.assetCount,
+      albumType: albumType ?? this.albumType,
+      lastModified: lastModified ?? this.lastModified,
+      type: type ?? this.type,
+      isAll: isAll ?? this.isAll,
+      filterOption: filterOption ?? this.filterOption,
+    );
   }
 
   @override
@@ -253,11 +280,11 @@ class AssetPathEntity {
 }
 
 /// The abstraction of assets (images/videos/audios).
-/// It represent a series of fields with `MediaStore` on Android,
+/// It represents a series of fields `MediaStore` on Android
 /// and the `PHAsset` object on iOS/macOS.
 @immutable
 class AssetEntity {
-  AssetEntity({
+  const AssetEntity({
     required this.id,
     required this.typeInt,
     required this.width,
@@ -266,7 +293,7 @@ class AssetEntity {
     this.orientation = 0,
     this.isFavorite = false,
     this.title,
-    this.createDtSecond,
+    this.createDateSecond,
     this.modifiedDateSecond,
     this.relativePath,
     double? latitude,
@@ -282,14 +309,14 @@ class AssetEntity {
   /// could be deleted in anytime, which will cause properties invalid.
   static Future<AssetEntity?> fromId(String id) async {
     try {
-      return await _refreshAssetProperties(id);
+      return await _obtainAssetFromId(id);
     } catch (e) {
       return null;
     }
   }
 
   /// Refresh the property of [AssetPathEntity] from the given ID.
-  static Future<AssetEntity?> _refreshAssetProperties(String id) async {
+  static Future<AssetEntity?> _obtainAssetFromId(String id) async {
     final Map<dynamic, dynamic>? result =
         await plugin.getPropertiesFromAssetEntity(id);
     if (result == null) {
@@ -299,7 +326,7 @@ class AssetEntity {
   }
 
   /// Refresh properties for the current asset and return a new object.
-  Future<AssetEntity?> refreshProperties() => _refreshAssetProperties(id);
+  Future<AssetEntity?> obtainForNewProperties() => _obtainAssetFromId(id);
 
   /// The ID of the asset.
   ///  * Android: `_id` column in `MediaStore` database.
@@ -570,16 +597,16 @@ class AssetEntity {
   Size get size => Size(width.toDouble(), height.toDouble());
 
   /// The create time in unix timestamp of the asset.
-  int? createDtSecond;
+  final int? createDateSecond;
 
   /// The create time of the asset in [DateTime].
   DateTime get createDateTime {
-    final int value = createDtSecond ?? 0;
+    final int value = createDateSecond ?? 0;
     return DateTime.fromMillisecondsSinceEpoch(value * 1000);
   }
 
   /// The modified time in unix timestamp of the asset.
-  int? modifiedDateSecond;
+  final int? modifiedDateSecond;
 
   /// The modified time of the asset in [DateTime].
   DateTime get modifiedDateTime {
@@ -658,7 +685,7 @@ class AssetEntity {
   ///
   /// See also:
   ///  * https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#ORIENTATION
-  int orientation;
+  final int orientation;
 
   /// Whether the asset is favorited on the device.
   ///  * Android: Always false.
@@ -666,13 +693,13 @@ class AssetEntity {
   ///
   /// See also:
   ///  * [IosEditor.favoriteAsset] to update the favorite status.
-  bool isFavorite;
+  final bool isFavorite;
 
   /// The relative path abstraction of the asset.
   ///  * Android 10 and above: `MediaStore.MediaColumns.RELATIVE_PATH`.
   ///  * Android 9 and below: The parent path of `MediaStore.MediaColumns.DATA`.
   ///  * iOS/macOS: Always null.
-  String? relativePath;
+  final String? relativePath;
 
   /// The mime type of the asset.
   ///  * Android: `MediaStore.MediaColumns.MIME_TYPE`.
@@ -680,7 +707,43 @@ class AssetEntity {
   ///
   /// See also:
   ///  * https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#MIME_TYPE
-  String? mimeType;
+  final String? mimeType;
+
+  AssetEntity copyWith({
+    String? id,
+    int? typeInt,
+    int? width,
+    int? height,
+    int? duration,
+    int? orientation,
+    bool? isFavorite,
+    String? title,
+    int? createDateSecond,
+    int? modifiedDateSecond,
+    String? relativePath,
+    double? latitude,
+    double? longitude,
+    String? mimeType,
+    int? subtype,
+  }) {
+    return AssetEntity(
+      id: id ?? this.id,
+      typeInt: typeInt ?? this.typeInt,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      duration: duration ?? this.duration,
+      orientation: orientation ?? this.orientation,
+      isFavorite: isFavorite ?? this.isFavorite,
+      title: title ?? this.title,
+      createDateSecond: createDateSecond ?? this.createDateSecond,
+      modifiedDateSecond: modifiedDateSecond ?? this.modifiedDateSecond,
+      relativePath: relativePath ?? this.relativePath,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      mimeType: mimeType ?? this.mimeType,
+      subtype: subtype ?? this.subtype,
+    );
+  }
 
   @override
   int get hashCode => hashValues(id, isFavorite);
