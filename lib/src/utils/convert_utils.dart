@@ -5,7 +5,7 @@ import '../types/types.dart';
 class ConvertUtils {
   const ConvertUtils._();
 
-  static List<AssetPathEntity> convertPath(
+  static List<AssetPathEntity> convertToPathList(
     Map<String, dynamic> data, {
     RequestType type = RequestType.all,
     FilterOptionGroup? optionGroup,
@@ -15,7 +15,7 @@ class ConvertUtils {
         (data['data'] as List<dynamic>).cast<Map<dynamic, dynamic>>();
     for (final Map<dynamic, dynamic> item in list) {
       result.add(
-        AssetPathEntity.fromJson(
+        convertMapToPath(
           item.cast<String, dynamic>(),
           type: type,
           optionGroup: optionGroup ?? FilterOptionGroup(),
@@ -35,6 +35,28 @@ class ConvertUtils {
     return result;
   }
 
+  static AssetPathEntity convertMapToPath(
+    Map<String, dynamic> data, {
+    RequestType type = RequestType.common,
+    FilterOptionGroup? optionGroup,
+  }) {
+    final int? modified = data['modified'] as int?;
+    final DateTime? lastModified = modified != null
+        ? DateTime.fromMillisecondsSinceEpoch(modified * 1000)
+        : null;
+    final AssetPathEntity result = AssetPathEntity(
+      id: data['id'] as String,
+      name: data['name'] as String,
+      assetCount: data['length'] as int,
+      albumType: data['albumType'] as int? ?? 1,
+      filterOption: optionGroup ?? FilterOptionGroup(),
+      lastModified: lastModified,
+      type: type,
+      isAll: data['isAll'] as bool,
+    );
+    return result;
+  }
+
   static AssetEntity convertMapToAsset(
     Map<String, dynamic> data, {
     String? title,
@@ -49,7 +71,7 @@ class ConvertUtils {
       isFavorite: data['favorite'] as bool? ?? false,
       title: data['title'] as String? ?? title,
       subtype: data['subtype'] as int? ?? 0,
-      createDtSecond: data['createDt'] as int?,
+      createDateSecond: data['createDt'] as int?,
       modifiedDateSecond: data['modifiedDt'] as int?,
       relativePath: data['relativePath'] as String?,
       latitude: data['lat'] as double?,

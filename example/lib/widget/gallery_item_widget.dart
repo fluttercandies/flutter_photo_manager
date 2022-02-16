@@ -50,13 +50,6 @@ class GalleryItemWidget extends StatelessWidget {
           return ListDialog(
             children: <Widget>[
               ElevatedButton(
-                child: const Text('refresh properties'),
-                onPressed: () async {
-                  await item.refreshPathProperties();
-                  setState(() {});
-                },
-              ),
-              ElevatedButton(
                 child: Text('Delete self (${item.name})'),
                 onPressed: () async {
                   if (!(Platform.isIOS || Platform.isMacOS)) {

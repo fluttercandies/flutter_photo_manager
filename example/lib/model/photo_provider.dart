@@ -239,9 +239,19 @@ class PhotoProvider extends ChangeNotifier {
   }
 
   Future<void> refreshAllGalleryProperties() async {
-    for (final AssetPathEntity gallery in list) {
-      await gallery.refreshPathProperties();
-    }
+    await Future.wait(
+      List<Future<void>>.generate(list.length, (int i) async {
+        final AssetPathEntity gallery = list[i];
+        final AssetPathEntity newGallery =
+            await AssetPathEntity.obtainPathFromProperties(
+          id: gallery.id,
+          albumType: gallery.albumType,
+          type: gallery.type,
+          optionGroup: gallery.filterOption,
+        );
+        list[i] = newGallery;
+      }),
+    );
     notifyListeners();
   }
 
@@ -263,7 +273,7 @@ class AssetPathProvider extends ChangeNotifier {
 
   bool isInit = false;
 
-  final AssetPathEntity path;
+  AssetPathEntity path;
 
   List<AssetEntity> list = <AssetEntity>[];
 
@@ -285,7 +295,7 @@ class AssetPathProvider extends ChangeNotifier {
     }
 
     refreshing = true;
-    await path.refreshPathProperties(maxDateTimeToNow: false);
+    path = await path.obtainForNewProperties(maxDateTimeToNow: false);
     final List<AssetEntity> list = await path.getAssetListPaged(
       page: 0,
       size: loadCount,
@@ -338,7 +348,7 @@ class AssetPathProvider extends ChangeNotifier {
   Future<void> deleteSelectedAssets(List<AssetEntity> entity) async {
     final List<String> ids = entity.map((AssetEntity e) => e.id).toList();
     await PhotoManager.editor.deleteWithIds(ids);
-    await path.refreshPathProperties();
+    path = await path.obtainForNewProperties();
     showToast('The path ${path.name} asset count have :${path.assetCount}');
     notifyListeners();
   }

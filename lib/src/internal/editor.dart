@@ -187,15 +187,15 @@ class IosEditor {
     return plugin.iosDeleteCollection(path);
   }
 
-  Future<bool> favoriteAsset({
+  Future<AssetEntity?> favoriteAsset({
     required AssetEntity entity,
     required bool favorite,
   }) async {
     final bool result = await plugin.favoriteAsset(entity.id, favorite);
     if (result) {
-      entity.isFavorite = favorite;
+      return entity.copyWith(isFavorite: favorite);
     }
-    return result;
+    return null;
   }
 }
 

@@ -55,7 +55,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     if (result == null) {
       return <AssetPathEntity>[];
     }
-    return ConvertUtils.convertPath(
+    return ConvertUtils.convertToPathList(
       result.cast<String, dynamic>(),
       type: type,
       optionGroup: filterOption,
@@ -367,7 +367,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
       },
     ) as Map<dynamic, dynamic>;
     final Map<dynamic, dynamic> items = result['list'] as Map<dynamic, dynamic>;
-    return ConvertUtils.convertPath(
+    return ConvertUtils.convertToPathList(
       items.cast<String, dynamic>(),
       type: pathEntity.type,
       optionGroup: pathEntity.filterOption,
