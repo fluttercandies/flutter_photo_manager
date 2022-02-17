@@ -18,7 +18,7 @@ enum AssetType {
 /// {%template photo_manager.ThumbnailFormat}
 /// Which format the thumbnail should be, generally support JPG and PNG.
 /// {%endtemplate}
-enum ThumbFormat { jpeg, png }
+enum ThumbnailFormat { jpeg, png }
 
 /// Enumeration for `PHImageRequestOptionsDeliveryMode` on iOS/macOS.
 ///

@@ -55,7 +55,7 @@ class _MoveToAnotherExampleState extends State<MoveToAnotherExample> {
     return Image(
       image: AssetEntityImageProvider(
         widget.entity,
-        thumbSize: const <int>[500, 500],
+        thumbnailSize: const ThumbnailSize.square(500),
       ),
       loadingBuilder: (_, Widget child, ImageChunkEvent? progress) {
         if (progress == null) {

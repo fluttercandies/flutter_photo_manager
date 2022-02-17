@@ -10,7 +10,7 @@ class ImageItemWidget extends StatefulWidget {
   }) : super(key: key);
 
   final AssetEntity entity;
-  final ThumbOption option;
+  final ThumbnailOption option;
   final GestureTapCallback? onTap;
 
   @override
@@ -38,13 +38,13 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
     return _buildImageWidget(widget.entity, widget.option);
   }
 
-  Widget _buildImageWidget(AssetEntity entity, ThumbOption option) {
+  Widget _buildImageWidget(AssetEntity entity, ThumbnailOption option) {
     return Image(
       image: AssetEntityImageProvider(
         entity,
         isOriginal: false,
-        thumbSize: <int>[option.width, option.height],
-        thumbFormat: option.format,
+        thumbnailSize: option.size,
+        thumbnailFormat: option.format,
       ),
       fit: BoxFit.cover,
     );

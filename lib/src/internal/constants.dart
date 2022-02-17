@@ -1,3 +1,5 @@
+import '../types/thumbnail.dart';
+
 class PMConstants {
   const PMConstants._();
 
@@ -47,5 +49,6 @@ class PMConstants {
   /// Constant value.
   static const int vDefaultThumbnailSize = 150;
   static const int vDefaultThumbnailQuality = 95;
-  static const List<int> vDefaultGridThumbSizes = <int>[200, 200];
+  static const ThumbnailSize vDefaultGridThumbnailSize =
+      ThumbnailSize.square(200);
 }

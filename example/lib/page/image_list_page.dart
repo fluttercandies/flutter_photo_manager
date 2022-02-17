@@ -65,9 +65,8 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     super.dispose();
   }
 
-  ThumbOption get thumbOption => ThumbOption(
-        width: 200,
-        height: 200,
+  ThumbnailOption get thumbOption => ThumbnailOption(
+        size: const ThumbnailSize.square(200),
         format: photoProvider.thumbFormat,
       );
 
@@ -347,9 +346,8 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       builder: (_) {
         return FutureBuilder<Uint8List?>(
           future: entity.thumbDataWithOption(
-            ThumbOption.ios(
-              width: 500,
-              height: 500,
+            ThumbnailOption.ios(
+              size: const ThumbnailSize.square(500),
               // resizeContentMode: ResizeContentMode.fill,
             ),
           ),
@@ -413,7 +411,9 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       //   height: size,
       //   resizeMode: ResizeMode.exact,
       // ));
-      final Uint8List? data = await entity.thumbDataWithSize(size, size);
+      final Uint8List? data = await entity.thumbDataWithSize(
+        ThumbnailSize.square(size),
+      );
 
       if (data == null) {
         return;

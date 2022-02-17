@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import '../types/entity.dart';
-import '../types/thumb_option.dart';
+import '../types/thumbnail.dart';
 import 'constants.dart';
 import 'enums.dart';
 
@@ -15,12 +15,11 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
   const AssetEntityImageProvider(
     this.entity, {
     this.isOriginal = true,
-    this.thumbSize = PMConstants.vDefaultGridThumbSizes,
-    this.thumbFormat = ThumbFormat.jpeg,
+    this.thumbnailSize = PMConstants.vDefaultGridThumbnailSize,
+    this.thumbnailFormat = ThumbnailFormat.jpeg,
   }) : assert(
-          isOriginal || thumbSize?.length == 2,
-          'thumbSize must contain and only contain two integers '
-          "when it's not original",
+          isOriginal || thumbnailSize != null,
+          "thumbSize must not be null when it's not original",
         );
 
   final AssetEntity entity;
@@ -31,10 +30,10 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
 
   /// Size for thumb data.
   /// 缩略图的大小
-  final List<int>? thumbSize;
+  final ThumbnailSize? thumbnailSize;
 
   /// {@macro photo_manager.ThumbnailFormat}
-  final ThumbFormat thumbFormat;
+  final ThumbnailFormat thumbnailFormat;
 
   /// File type for the image asset, use it for some special type detection.
   /// 图片资源的类型，用于某些特殊类型的判断
@@ -85,10 +84,7 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
       if (isOriginal) {
         if (key.entity.type == AssetType.video) {
           data = await key.entity.thumbDataWithOption(
-            _thumbOption(
-              PMConstants.vDefaultGridThumbSizes[0],
-              PMConstants.vDefaultGridThumbSizes[1],
-            ),
+            _thumbOption(PMConstants.vDefaultGridThumbnailSize),
           );
         } else if (_type == ImageFileType.heic) {
           data = await (await key.entity.file)?.readAsBytes();
@@ -96,10 +92,8 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
           data = await key.entity.originBytes;
         }
       } else {
-        final List<int> _thumbSize = thumbSize!;
-        data = await key.entity.thumbDataWithOption(
-          _thumbOption(_thumbSize[0], _thumbSize[1]),
-        );
+        final ThumbnailSize _thumbSize = thumbnailSize!;
+        data = await key.entity.thumbDataWithOption(_thumbOption(_thumbSize));
       }
       if (data == null) {
         throw StateError('The data of the entity is null: $entity');
@@ -116,11 +110,11 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
     }
   }
 
-  ThumbOption _thumbOption(int width, int height) {
+  ThumbnailOption _thumbOption(ThumbnailSize size) {
     if (Platform.isIOS || Platform.isMacOS) {
-      return ThumbOption.ios(width: width, height: height, format: thumbFormat);
+      return ThumbnailOption.ios(size: size, format: thumbnailFormat);
     }
-    return ThumbOption(width: width, height: height, format: thumbFormat);
+    return ThumbnailOption(size: size, format: thumbnailFormat);
   }
 
   /// Get image type by reading the file extension.
@@ -169,17 +163,94 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
       return true;
     }
     return entity == other.entity &&
-        thumbSize == other.thumbSize &&
+        thumbnailSize == other.thumbnailSize &&
+        thumbnailFormat == other.thumbnailFormat &&
         isOriginal == other.isOriginal;
   }
 
   @override
-  int get hashCode {
-    return hashValues(
-      entity,
-      thumbSize?.elementAt(0) ?? 0,
-      thumbSize?.elementAt(1) ?? 0,
-      isOriginal,
+  int get hashCode => hashValues(
+        entity,
+        isOriginal,
+        thumbnailSize,
+        thumbnailFormat,
+      );
+}
+
+class AssetEntityImage extends Image {
+  AssetEntityImage(
+    this.entity, {
+    this.isOriginal = true,
+    this.thumbnailSize = PMConstants.vDefaultGridThumbnailSize,
+    this.thumbnailFormat = ThumbnailFormat.jpeg,
+    Key? key,
+    ImageFrameBuilder? frameBuilder,
+    ImageLoadingBuilder? loadingBuilder,
+    ImageErrorWidgetBuilder? errorBuilder,
+    String? semanticLabel,
+    bool excludeFromSemantics = false,
+    double? width,
+    double? height,
+    Color? color,
+    Animation<double>? opacity,
+    BlendMode? colorBlendMode,
+    BoxFit? fit,
+    AlignmentGeometry alignment = Alignment.center,
+    ImageRepeat repeat = ImageRepeat.noRepeat,
+    Rect? centerSlice,
+    bool matchTextDirection = false,
+    bool gaplessPlayback = false,
+    bool isAntiAlias = false,
+    FilterQuality filterQuality = FilterQuality.low,
+    int? cacheWidth,
+    int? cacheHeight,
+  }) : super(
+          key: key,
+          image: ResizeImage.resizeIfNeeded(
+            cacheWidth ?? (isOriginal ? null : thumbnailSize?.width),
+            cacheHeight ?? (isOriginal ? null : thumbnailSize?.height),
+            AssetEntityImageProvider(
+              entity,
+              isOriginal: isOriginal,
+              thumbnailSize: thumbnailSize,
+              thumbnailFormat: thumbnailFormat,
+            ),
+          ),
+          frameBuilder: frameBuilder,
+          loadingBuilder: loadingBuilder,
+          errorBuilder: errorBuilder,
+          semanticLabel: semanticLabel,
+          excludeFromSemantics: excludeFromSemantics,
+          width: width,
+          height: height,
+          color: color,
+          opacity: opacity,
+          colorBlendMode: colorBlendMode,
+          fit: fit,
+          alignment: alignment,
+          repeat: repeat,
+          centerSlice: centerSlice,
+          matchTextDirection: matchTextDirection,
+          gaplessPlayback: gaplessPlayback,
+          isAntiAlias: isAntiAlias,
+          filterQuality: filterQuality,
+        );
+
+  final AssetEntity entity;
+  final bool isOriginal;
+  final ThumbnailSize? thumbnailSize;
+  final ThumbnailFormat thumbnailFormat;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<AssetEntity>('entity', entity));
+    properties.add(DiagnosticsProperty<bool>('isOriginal', isOriginal));
+    properties.add(
+      DiagnosticsProperty<ThumbnailSize>('thumbnailSize', thumbnailSize),
+    );
+    properties.add(
+      DiagnosticsProperty<ThumbnailFormat>('thumbnailFormat', thumbnailFormat),
     );
   }
 }
