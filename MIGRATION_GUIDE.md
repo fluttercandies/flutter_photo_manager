@@ -29,7 +29,7 @@ This version mainly covers all valid issues, API deprecations, and few new featu
 There are several APIs have been removed, since they can't provide precise meanings, or can be replaced by new APIs.
 If you've used these APIs, consider migrating them to the latest version.
 
-| Removed API/field                       | Migrate destination                                      |
+| Removed API/class/field                 | Migrate destination                                      |
 |:----------------------------------------|:---------------------------------------------------------|
 | `PhotoManager.getImageAsset`            | `PhotoManager.getAssetPathList(type: RequestType.image)` |
 | `PhotoManager.getVideoAsset`            | `PhotoManager.getAssetPathList(type: RequestType.video)` |
@@ -42,6 +42,8 @@ If you've used these APIs, consider migrating them to the latest version.
 | `AssetEntity.fullData`                  | `AssetEntity.originBytes`                                |
 | `AssetEntity.refreshProperties`         | `AssetEntity.obtainForNewProperties`                     |
 | `FilterOptionGroup.dateTimeCond`        | `FilterOptionGroup.createTimeCond`                       |
+| `ThumbFormat`                           | `ThumbnailFormat`                                        |
+| `ThumbOption`                           | `ThumbnailOption`                                        |
 
 #### `getAssetListPaged`
 
