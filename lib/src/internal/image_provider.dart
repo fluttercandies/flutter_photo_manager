@@ -202,19 +202,13 @@ class AssetEntityImage extends Image {
     bool gaplessPlayback = false,
     bool isAntiAlias = false,
     FilterQuality filterQuality = FilterQuality.low,
-    int? cacheWidth,
-    int? cacheHeight,
   }) : super(
           key: key,
-          image: ResizeImage.resizeIfNeeded(
-            cacheWidth ?? (isOriginal ? null : thumbnailSize?.width),
-            cacheHeight ?? (isOriginal ? null : thumbnailSize?.height),
-            AssetEntityImageProvider(
-              entity,
-              isOriginal: isOriginal,
-              thumbnailSize: thumbnailSize,
-              thumbnailFormat: thumbnailFormat,
-            ),
+          image: AssetEntityImageProvider(
+            entity,
+            isOriginal: isOriginal,
+            thumbnailSize: thumbnailSize,
+            thumbnailFormat: thumbnailFormat,
           ),
           frameBuilder: frameBuilder,
           loadingBuilder: loadingBuilder,
