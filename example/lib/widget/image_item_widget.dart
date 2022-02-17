@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
-class ImageItemWidget extends StatefulWidget {
+class ImageItemWidget extends StatelessWidget {
   const ImageItemWidget({
     Key? key,
     required this.entity,
@@ -13,29 +13,13 @@ class ImageItemWidget extends StatefulWidget {
   final ThumbnailOption option;
   final GestureTapCallback? onTap;
 
-  @override
-  _ImageItemWidgetState createState() => _ImageItemWidgetState();
-}
-
-class _ImageItemWidgetState extends State<ImageItemWidget> {
-  Widget? _content;
-
-  @override
-  void didUpdateWidget(ImageItemWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.entity.id != oldWidget.entity.id) {
-      _content = buildContent(context);
-      setState(() {});
-    }
-  }
-
   Widget buildContent(BuildContext context) {
-    if (widget.entity.type == AssetType.audio) {
+    if (entity.type == AssetType.audio) {
       return const Center(
         child: Icon(Icons.audiotrack, size: 30),
       );
     }
-    return _buildImageWidget(widget.entity, widget.option);
+    return _buildImageWidget(entity, option);
   }
 
   Widget _buildImageWidget(AssetEntity entity, ThumbnailOption option) {
@@ -50,11 +34,10 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _content ??= buildContent(context);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: widget.onTap,
-      child: _content,
+      onTap: onTap,
+      child: buildContent(context),
     );
   }
 }
