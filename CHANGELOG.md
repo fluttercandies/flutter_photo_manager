@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.0.0-dev.10
+
+Features:
+- Add `AssetEntityImage` and `ThumbnailSize`. (#709)
+
+Improvements:
+- Improve the image provider. (#709)
+
 ## 2.0.0-dev.9
 
 Improvements:
