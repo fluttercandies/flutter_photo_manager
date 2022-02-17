@@ -55,11 +55,9 @@ class _LivePhotosWidgetState extends State<LivePhotosWidget> {
   }
 
   Widget _buildImage(BuildContext context) {
-    return Image(
-      image: AssetEntityImageProvider(
-        widget.entity,
-        isOriginal: widget.useOrigin == true,
-      ),
+    return AssetEntityImage(
+      widget.entity,
+      isOriginal: widget.useOrigin == true,
       fit: BoxFit.contain,
       loadingBuilder: (_, Widget child, ImageChunkEvent? progress) {
         if (progress != null) {

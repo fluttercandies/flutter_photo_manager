@@ -137,7 +137,7 @@ class _NewHomePageState extends State<NewHomePage> {
 
   Widget _buildPngCheck() {
     return CheckboxListTile(
-      value: watchProvider.thumbFormat == ThumbFormat.png,
+      value: watchProvider.thumbFormat == ThumbnailFormat.png,
       onChanged: (bool? value) {
         readProvider.changeThumbFormat();
       },

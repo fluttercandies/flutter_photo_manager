@@ -40,6 +40,7 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
     * [From ID](#from-id)
     * [From raw data](#from-raw-data)
     * [From iCloud](#from-icloud)
+    * [Display assets](#display-assets)
     * [Obtain "Live Photos"](#obtain-live-photos)
       * [Filtering only "Live Photos"](#filtering-only-live-photos)
       * [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
@@ -303,6 +304,29 @@ to retrieve the progress when load a file.
 The preferred implementation would be the [`LocallyAvailableBuilder`][]
 in the `wechat_asset_picker` package, which provides a progress indicator
 when the file is downloading.
+
+#### Display assets
+
+The plugin provided the `AssetEntityImage` widget and
+the `AssetEntityImageProvider` to display assets:
+
+```dart
+final Widget image = AssetEntityImage(
+  yourAssetEntity,
+  isOriginal: false, // Defaults to `true`.
+  thumbnailSize: const ThumbnailSize.square(200), // Preferred value.
+  thumbnailFormat: ThumbnailFormat.jpeg, // Defaults to `jpeg`.
+);
+
+final Widget imageFromProvider = Image(
+  image: AssetEntityImageProvider(
+    yourAssetEntity,
+    isOriginal: false,
+    thumbnailSize: const ThumbnailSize.square(200),
+    thumbnailFormat: ThumbnailFormat.jpeg,
+  ),
+);
+```
 
 #### Obtain "Live Photos"
 

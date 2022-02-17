@@ -93,11 +93,11 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  ThumbFormat _thumbFormat = ThumbFormat.jpeg;
+  ThumbnailFormat _thumbFormat = ThumbnailFormat.jpeg;
 
-  ThumbFormat get thumbFormat => _thumbFormat;
+  ThumbnailFormat get thumbFormat => _thumbFormat;
 
-  set thumbFormat(ThumbFormat thumbFormat) {
+  set thumbFormat(ThumbnailFormat thumbFormat) {
     _thumbFormat = thumbFormat;
     notifyListeners();
   }
@@ -256,10 +256,10 @@ class PhotoProvider extends ChangeNotifier {
   }
 
   void changeThumbFormat() {
-    if (thumbFormat == ThumbFormat.jpeg) {
-      thumbFormat = ThumbFormat.png;
+    if (thumbFormat == ThumbnailFormat.jpeg) {
+      thumbFormat = ThumbnailFormat.png;
     } else {
-      thumbFormat = ThumbFormat.jpeg;
+      thumbFormat = ThumbnailFormat.jpeg;
     }
   }
 }

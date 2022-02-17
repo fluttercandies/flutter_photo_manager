@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../filter/filter_option_group.dart';
 import '../types/entity.dart';
-import '../types/thumb_option.dart';
+import '../types/thumbnail.dart';
 import '../types/types.dart';
 import '../utils/convert_utils.dart';
 import 'constants.dart';
@@ -129,7 +129,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   /// Get thumb of asset id.
   Future<Uint8List?> getThumb({
     required String id,
-    required ThumbOption option,
+    required ThumbnailOption option,
     PMProgressHandler? progressHandler,
   }) {
     final Map<String, dynamic> params = <String, dynamic>{
@@ -446,7 +446,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return _channel.invokeMethod(PMConstants.mCancelCacheRequests);
   }
 
-  Future<void> requestCacheAssetsThumb(List<String> ids, ThumbOption option) {
+  Future<void> requestCacheAssetsThumb(List<String> ids, ThumbnailOption option) {
     assert(ids.isNotEmpty);
     return _channel.invokeMethod(
       PMConstants.mRequestCacheAssetsThumb,

@@ -4,30 +4,67 @@ import 'package:flutter/rendering.dart';
 import '../internal/constants.dart';
 import '../internal/enums.dart';
 
+@immutable
+class ThumbnailSize {
+  const ThumbnailSize(this.width, this.height);
+
+  /// Creates a square [ThumbnailSize] whose [width] and [height]
+  /// are the given dimension.
+  const ThumbnailSize.square(int dimension)
+      : width = dimension,
+        height = dimension;
+
+  /// The width pixels.
+  final int width;
+
+  /// The height pixels.
+  final int height;
+
+  /// Whether this size encloses a non-zero area.
+  ///
+  /// Negative areas are considered empty.
+  bool get isEmpty => width <= 0 || height <= 0;
+
+  /// A [ThumbnailSize] with the [width] and [height] swapped.
+  ThumbnailSize get flipped => ThumbnailSize(height, width);
+
+  /// Compares two Sizes for equality.
+  // We don't compare the runtimeType because of _DebugSize in the framework.
+  @override
+  bool operator ==(Object other) {
+    return other is ThumbnailSize &&
+        other.width == width &&
+        other.height == height;
+  }
+
+  @override
+  int get hashCode => hashValues(width, height);
+
+  @override
+  String toString() => 'ThumbnailSize($width, $height)';
+}
+
 /// The thumbnail option when requesting assets.
 @immutable
-class ThumbOption {
-  const ThumbOption({
-    required this.width,
-    required this.height,
-    this.format = ThumbFormat.jpeg,
+class ThumbnailOption {
+  const ThumbnailOption({
+    required this.size,
+    this.format = ThumbnailFormat.jpeg,
     this.quality = PMConstants.vDefaultThumbnailQuality,
     this.frame = 0,
   });
 
   /// Construct thumbnail options only for iOS/macOS.
-  factory ThumbOption.ios({
-    required int width,
-    required int height,
-    ThumbFormat format = ThumbFormat.jpeg,
+  factory ThumbnailOption.ios({
+    required ThumbnailSize size,
+    ThumbnailFormat format = ThumbnailFormat.jpeg,
     int quality = PMConstants.vDefaultThumbnailQuality,
     DeliveryMode deliveryMode = DeliveryMode.opportunistic,
     ResizeMode resizeMode = ResizeMode.fast,
     ResizeContentMode resizeContentMode = ResizeContentMode.fit,
   }) {
-    return _IosThumbOption(
-      width: width,
-      height: height,
+    return _IOSThumbnailOption(
+      size: size,
       format: format,
       quality: quality,
       deliveryMode: deliveryMode,
@@ -36,14 +73,11 @@ class ThumbOption {
     );
   }
 
-  /// The width pixels.
-  final int width;
-
-  /// The height pixels.
-  final int height;
+  /// The thumbnail size.
+  final ThumbnailSize size;
 
   /// {@macro photo_manager.ThumbnailFormat}
-  final ThumbFormat format;
+  final ThumbnailFormat format;
 
   /// The quality value for the thumbnail.
   ///
@@ -61,8 +95,8 @@ class ThumbOption {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'width': width,
-      'height': height,
+      'width': size.width,
+      'height': size.height,
       'format': format.index,
       'quality': quality,
       'frame': frame,
@@ -70,10 +104,7 @@ class ThumbOption {
   }
 
   void checkAssertions() {
-    assert(
-      width > 0 && height > 0,
-      'The width and height must be greater than 0.',
-    );
+    assert(!size.isEmpty, 'The size must not be empty.');
     assert(
       quality > 0 && quality <= 100,
       'The quality must between 1 and 100',
@@ -81,15 +112,14 @@ class ThumbOption {
   }
 
   @override
-  int get hashCode => hashValues(width, height, format, quality, frame);
+  int get hashCode => hashValues(size, format, quality, frame);
 
   @override
   bool operator ==(Object other) {
-    if (other is! ThumbOption) {
+    if (other is! ThumbnailOption) {
       return false;
     }
-    return width == other.width &&
-        height == other.height &&
+    return size == other.size &&
         format == other.format &&
         quality == other.quality &&
         frame == other.frame;
@@ -97,18 +127,16 @@ class ThumbOption {
 }
 
 @immutable
-class _IosThumbOption extends ThumbOption {
-  const _IosThumbOption({
-    required int width,
-    required int height,
-    ThumbFormat format = ThumbFormat.jpeg,
+class _IOSThumbnailOption extends ThumbnailOption {
+  const _IOSThumbnailOption({
+    required ThumbnailSize size,
+    ThumbnailFormat format = ThumbnailFormat.jpeg,
     int quality = PMConstants.vDefaultThumbnailQuality,
     required this.deliveryMode,
     required this.resizeMode,
     required this.resizeContentMode,
   }) : super(
-          width: width,
-          height: height,
+          size: size,
           format: format,
           quality: quality,
         );
@@ -133,11 +161,10 @@ class _IosThumbOption extends ThumbOption {
 
   @override
   bool operator ==(Object other) {
-    if (other is! _IosThumbOption) {
+    if (other is! _IOSThumbnailOption) {
       return false;
     }
-    return width == other.width &&
-        height == other.height &&
+    return size == other.size &&
         format == other.format &&
         quality == other.quality &&
         frame == other.frame &&

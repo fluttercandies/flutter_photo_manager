@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'model/photo_provider.dart';
 import 'page/index_page.dart';
+import 'widget/image_item_widget.dart';
 
 final PhotoProvider provider = PhotoProvider();
 
@@ -126,23 +127,32 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
     if (_entities?.isNotEmpty != true) {
       return const Center(child: Text('No assets found on this device.'));
     }
-    return GridView.builder(
+    return GridView.custom(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
       ),
-      itemCount: _entities!.length,
-      itemBuilder: (BuildContext context, int index) {
-        if (index == _entities!.length - 8 &&
-            !_isLoadingMore &&
-            _hasMoreToLoad) {
-          _loadMoreAsset();
-        }
-        final AssetEntity entity = _entities![index];
-        return Image(
-          image: AssetEntityImageProvider(entity, isOriginal: false),
-          fit: BoxFit.cover,
-        );
-      },
+      childrenDelegate: SliverChildBuilderDelegate(
+        (BuildContext context, int index) {
+          if (index == _entities!.length - 8 &&
+              !_isLoadingMore &&
+              _hasMoreToLoad) {
+            _loadMoreAsset();
+          }
+          final AssetEntity entity = _entities![index];
+          return ImageItemWidget(
+            key: ValueKey<int>(index),
+            entity: entity,
+            option: const ThumbnailOption(size: ThumbnailSize.square(200)),
+          );
+        },
+        childCount: _entities!.length,
+        findChildIndexCallback: (Key key) { // Re-use elements.
+          if (key is ValueKey<int>) {
+            return key.value;
+          }
+          return null;
+        },
+      ),
     );
   }
 

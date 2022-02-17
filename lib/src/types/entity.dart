@@ -11,7 +11,7 @@ import '../internal/enums.dart';
 import '../internal/plugin.dart';
 import '../internal/progress_handler.dart';
 import '../utils/convert_utils.dart';
-import 'thumb_option.dart';
+import 'thumbnail.dart';
 import 'types.dart';
 
 /// The abstraction of albums and folders.
@@ -498,10 +498,9 @@ class AssetEntity {
   ///
   /// See also:
   ///  * [thumbDataWithSize] which is a common method to obtain thumbnails.
-  ///  * [thumbDataWithOption] which accepts customized [ThumbOption].
+  ///  * [thumbDataWithOption] which accepts customized [ThumbnailOption].
   Future<Uint8List?> get thumbData => thumbDataWithSize(
-        PMConstants.vDefaultThumbnailSize,
-        PMConstants.vDefaultThumbnailSize,
+        const ThumbnailSize.square(PMConstants.vDefaultThumbnailSize),
       );
 
   /// Obtain the thumbnail data with the given [width] and [height] of the asset.
@@ -510,11 +509,10 @@ class AssetEntity {
   ///
   /// See also:
   ///  * [thumbData] which obtain the thumbnail data with fixed size.
-  ///  * [thumbDataWithOption] which accepts customized [ThumbOption].
+  ///  * [thumbDataWithOption] which accepts customized [ThumbnailOption].
   Future<Uint8List?> thumbDataWithSize(
-    int width,
-    int height, {
-    ThumbFormat format = ThumbFormat.jpeg,
+    ThumbnailSize size, {
+    ThumbnailFormat format = ThumbnailFormat.jpeg,
     int quality = 100,
     PMProgressHandler? progressHandler,
   }) {
@@ -526,18 +524,16 @@ class AssetEntity {
     if (type == AssetType.audio || type == AssetType.other) {
       return Future<Uint8List?>.value();
     }
-    final ThumbOption option;
+    final ThumbnailOption option;
     if (Platform.isIOS || Platform.isMacOS) {
-      option = ThumbOption.ios(
-        width: width,
-        height: height,
+      option = ThumbnailOption.ios(
+        size: size,
         format: format,
         quality: quality,
       );
     } else {
-      option = ThumbOption(
-        width: width,
-        height: height,
+      option = ThumbnailOption(
+        size: size,
         format: format,
         quality: quality,
       );
@@ -550,13 +546,13 @@ class AssetEntity {
     return thumbDataWithOption(option, progressHandler: progressHandler);
   }
 
-  /// Obtain the thumbnail data with the given customized [ThumbOption].
+  /// Obtain the thumbnail data with the given customized [ThumbnailOption].
   ///
   /// See also:
   ///  * [thumbData] which obtain the thumbnail data with fixed size.
   ///  * [thumbDataWithSize] which is a common method to obtain thumbnails.
   Future<Uint8List?> thumbDataWithOption(
-    ThumbOption option, {
+    ThumbnailOption option, {
     PMProgressHandler? progressHandler,
   }) {
     assert(() {
