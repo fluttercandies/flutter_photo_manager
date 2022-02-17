@@ -33,11 +33,9 @@ class _CopyToAnotherGalleryPageState extends State<CopyToAnotherGalleryPage> {
         children: <Widget>[
           AspectRatio(
             aspectRatio: 1,
-            child: Image(
-              image: AssetEntityImageProvider(
-                widget.assetEntity,
-                thumbnailSize: const ThumbnailSize.square(500),
-              ),
+            child: AssetEntityImage(
+              widget.assetEntity,
+              thumbnailSize: const ThumbnailSize.square(500),
               loadingBuilder: (_, Widget child, ImageChunkEvent? progress) {
                 if (progress == null) {
                   return child;

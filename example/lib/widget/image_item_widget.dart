@@ -39,13 +39,11 @@ class _ImageItemWidgetState extends State<ImageItemWidget> {
   }
 
   Widget _buildImageWidget(AssetEntity entity, ThumbnailOption option) {
-    return Image(
-      image: AssetEntityImageProvider(
-        entity,
-        isOriginal: false,
-        thumbnailSize: option.size,
-        thumbnailFormat: option.format,
-      ),
+    return AssetEntityImage(
+      entity,
+      isOriginal: false,
+      thumbnailSize: option.size,
+      thumbnailFormat: option.format,
       fit: BoxFit.cover,
     );
   }

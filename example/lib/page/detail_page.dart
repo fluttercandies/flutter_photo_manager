@@ -68,11 +68,9 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget buildImage() {
-    return Image(
-      image: AssetEntityImageProvider(
-        widget.entity,
-        isOriginal: useOrigin == true,
-      ),
+    return AssetEntityImage(
+      widget.entity,
+      isOriginal: useOrigin == true,
       fit: BoxFit.fill,
       loadingBuilder: (
         BuildContext context,

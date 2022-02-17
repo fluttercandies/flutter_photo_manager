@@ -137,9 +137,9 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
             _hasMoreToLoad) {
           _loadMoreAsset();
         }
-        final AssetEntity entity = _entities![index];
-        return Image(
-          image: AssetEntityImageProvider(entity, isOriginal: false),
+        return AssetEntityImage(
+          _entities![index],
+          isOriginal: false,
           fit: BoxFit.cover,
         );
       },
