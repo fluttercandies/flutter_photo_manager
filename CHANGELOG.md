@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.0.0-dev.11
+
+Improvements:
+- More naming refactor.
+
 ## 2.0.0-dev.10
 
 Features:
