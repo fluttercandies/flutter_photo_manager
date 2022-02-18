@@ -21,7 +21,7 @@ class PhotoCachingManager {
     ThumbnailOption option = _defaultOption,
   }) {
     assert(assets.isNotEmpty);
-    return plugin.requestCacheAssetsThumb(
+    return plugin.requestCacheAssetsThumbnail(
       assets.map((AssetEntity e) => e.id).toList(),
       option,
     );
@@ -33,7 +33,7 @@ class PhotoCachingManager {
     ThumbnailOption option = _defaultOption,
   }) {
     assert(assetIds.isNotEmpty);
-    return plugin.requestCacheAssetsThumb(assetIds, option);
+    return plugin.requestCacheAssetsThumbnail(assetIds, option);
   }
 
   /// Cancel all cache request.

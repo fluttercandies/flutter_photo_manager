@@ -345,7 +345,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       context: context,
       builder: (_) {
         return FutureBuilder<Uint8List?>(
-          future: entity.thumbDataWithOption(
+          future: entity.thumbnailDataWithOption(
             ThumbnailOption.ios(
               size: const ThumbnailSize.square(500),
               // resizeContentMode: ResizeContentMode.fill,
@@ -411,7 +411,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       //   height: size,
       //   resizeMode: ResizeMode.exact,
       // ));
-      final Uint8List? data = await entity.thumbDataWithSize(
+      final Uint8List? data = await entity.thumbnailDataWithSize(
         ThumbnailSize.square(size),
       );
 

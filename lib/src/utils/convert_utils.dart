@@ -7,7 +7,7 @@ class ConvertUtils {
 
   static List<AssetPathEntity> convertToPathList(
     Map<String, dynamic> data, {
-    RequestType type = RequestType.all,
+    required RequestType type,
     FilterOptionGroup? optionGroup,
   }) {
     final List<AssetPathEntity> result = <AssetPathEntity>[];
@@ -37,7 +37,7 @@ class ConvertUtils {
 
   static AssetPathEntity convertMapToPath(
     Map<String, dynamic> data, {
-    RequestType type = RequestType.common,
+    required RequestType type,
     FilterOptionGroup? optionGroup,
   }) {
     final int? modified = data['modified'] as int?;

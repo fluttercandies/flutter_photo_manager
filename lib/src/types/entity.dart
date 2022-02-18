@@ -497,9 +497,9 @@ class AssetEntity {
   /// {@endtemplate}
   ///
   /// See also:
-  ///  * [thumbDataWithSize] which is a common method to obtain thumbnails.
-  ///  * [thumbDataWithOption] which accepts customized [ThumbnailOption].
-  Future<Uint8List?> get thumbData => thumbDataWithSize(
+  ///  * [thumbnailDataWithSize] which is a common method to obtain thumbnails.
+  ///  * [thumbnailDataWithOption] which accepts customized [ThumbnailOption].
+  Future<Uint8List?> get thumbnailData => thumbnailDataWithSize(
         const ThumbnailSize.square(PMConstants.vDefaultThumbnailSize),
       );
 
@@ -508,9 +508,9 @@ class AssetEntity {
   /// {@macro photo_manager.thumbnailForVideos}
   ///
   /// See also:
-  ///  * [thumbData] which obtain the thumbnail data with fixed size.
-  ///  * [thumbDataWithOption] which accepts customized [ThumbnailOption].
-  Future<Uint8List?> thumbDataWithSize(
+  ///  * [thumbnailData] which obtain the thumbnail data with fixed size.
+  ///  * [thumbnailDataWithOption] which accepts customized [ThumbnailOption].
+  Future<Uint8List?> thumbnailDataWithSize(
     ThumbnailSize size, {
     ThumbnailFormat format = ThumbnailFormat.jpeg,
     int quality = 100,
@@ -543,15 +543,15 @@ class AssetEntity {
       return true;
     }());
 
-    return thumbDataWithOption(option, progressHandler: progressHandler);
+    return thumbnailDataWithOption(option, progressHandler: progressHandler);
   }
 
   /// Obtain the thumbnail data with the given customized [ThumbnailOption].
   ///
   /// See also:
-  ///  * [thumbData] which obtain the thumbnail data with fixed size.
-  ///  * [thumbDataWithSize] which is a common method to obtain thumbnails.
-  Future<Uint8List?> thumbDataWithOption(
+  ///  * [thumbnailData] which obtain the thumbnail data with fixed size.
+  ///  * [thumbnailDataWithSize] which is a common method to obtain thumbnails.
+  Future<Uint8List?> thumbnailDataWithOption(
     ThumbnailOption option, {
     PMProgressHandler? progressHandler,
   }) {
@@ -567,7 +567,7 @@ class AssetEntity {
       option.checkAssertions();
       return true;
     }());
-    return plugin.getThumb(
+    return plugin.getThumbnail(
       id: id,
       option: option,
       progressHandler: progressHandler,

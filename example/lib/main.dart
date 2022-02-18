@@ -146,7 +146,8 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
           );
         },
         childCount: _entities!.length,
-        findChildIndexCallback: (Key key) { // Re-use elements.
+        findChildIndexCallback: (Key key) {
+          // Re-use elements.
           if (key is ValueKey<int>) {
             return key.value;
           }

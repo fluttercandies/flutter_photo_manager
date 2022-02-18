@@ -78,7 +78,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     required FilterOptionGroup optionGroup,
     int page = 0,
     int size = 15,
-    RequestType type = RequestType.all,
+    RequestType type = RequestType.common,
   }) async {
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod<Map<dynamic, dynamic>>(
@@ -126,8 +126,8 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     }
   }
 
-  /// Get thumb of asset id.
-  Future<Uint8List?> getThumb({
+  /// Get thumbnail of asset id.
+  Future<Uint8List?> getThumbnail({
     required String id,
     required ThumbnailOption option,
     PMProgressHandler? progressHandler,
@@ -446,7 +446,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return _channel.invokeMethod(PMConstants.mCancelCacheRequests);
   }
 
-  Future<void> requestCacheAssetsThumb(List<String> ids, ThumbnailOption option) {
+  Future<void> requestCacheAssetsThumbnail(
+    List<String> ids,
+    ThumbnailOption option,
+  ) {
     assert(ids.isNotEmpty);
     return _channel.invokeMethod(
       PMConstants.mRequestCacheAssetsThumb,

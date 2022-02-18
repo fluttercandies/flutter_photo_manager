@@ -17,6 +17,7 @@ This version mainly covers all valid issues, API deprecations, and few new featu
 - The plugin name on native side has been updated from `ImageScanner` to `PhotoManager`.
 - `AssetPathEntity` and `AssetEntity` are now immutable.
 - `title` are required when using saving methods.
+- `RequestType.common` is the default type for all type request.
 - Arguments with `getAssetListPaged` are now required with name.
 - `PhotoManager.notifyingOfChange` has no setter anymore.
 - `PhotoManager.refreshAssetProperties` and `PhotoManager.fetchPathProperties` have been moved to entities.
@@ -40,6 +41,7 @@ If you've used these APIs, consider migrating them to the latest version.
 | `AssetPathEntity.refreshPathProperties` | `AssetPathEntity.obtainForNewProperties`                 |
 | `AssetEntity.createDtSecond`            | `AssetEntity.createDateSecond`                           |
 | `AssetEntity.fullData`                  | `AssetEntity.originBytes`                                |
+| `AssetEntity.thumbData`                 | `AssetEntity.thumbnailData`                              |
 | `AssetEntity.refreshProperties`         | `AssetEntity.obtainForNewProperties`                     |
 | `FilterOptionGroup.dateTimeCond`        | `FilterOptionGroup.createTimeCond`                       |
 | `ThumbFormat`                           | `ThumbnailFormat`                                        |

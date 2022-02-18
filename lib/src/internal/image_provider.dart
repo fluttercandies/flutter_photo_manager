@@ -83,7 +83,7 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
       }
       if (isOriginal) {
         if (key.entity.type == AssetType.video) {
-          data = await key.entity.thumbDataWithOption(
+          data = await key.entity.thumbnailDataWithOption(
             _thumbOption(PMConstants.vDefaultGridThumbnailSize),
           );
         } else if (_type == ImageFileType.heic) {
@@ -93,7 +93,8 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
         }
       } else {
         final ThumbnailSize _thumbSize = thumbnailSize!;
-        data = await key.entity.thumbDataWithOption(_thumbOption(_thumbSize));
+        data =
+            await key.entity.thumbnailDataWithOption(_thumbOption(_thumbSize));
       }
       if (data == null) {
         throw StateError('The data of the entity is null: $entity');
