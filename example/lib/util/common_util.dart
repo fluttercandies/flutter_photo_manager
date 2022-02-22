@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 
+import 'log.dart';
+
 class CommonUtil {
   const CommonUtil._();
 
@@ -79,4 +81,15 @@ class CommonUtil {
       },
     );
   }
+}
+
+Future<T> elapsedFuture<T>(
+  Future<T> future, {
+  String? prefix,
+}) async {
+  final Stopwatch stopwatch = Stopwatch()..start();
+  final T result = await future;
+  stopwatch.stop();
+  Log.d('${prefix != null ? '$prefix: ' : ''}${stopwatch.elapsed}');
+  return result;
 }

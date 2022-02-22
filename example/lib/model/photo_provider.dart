@@ -3,6 +3,7 @@ import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 import '../main.dart';
+import '../util/common_util.dart';
 
 class PhotoProvider extends ChangeNotifier {
   List<AssetPathEntity> list = <AssetPathEntity>[];
@@ -190,12 +191,14 @@ class PhotoProvider extends ChangeNotifier {
     final FilterOptionGroup option = makeOption();
 
     reset();
-    final List<AssetPathEntity> galleryList =
-        await PhotoManager.getAssetPathList(
-      type: type,
-      hasAll: hasAll,
-      onlyAll: onlyAll,
-      filterOption: option,
+    final List<AssetPathEntity> galleryList = await elapsedFuture(
+      PhotoManager.getAssetPathList(
+        type: type,
+        hasAll: hasAll,
+        onlyAll: onlyAll,
+        filterOption: option,
+      ),
+      prefix: 'Obtain path list duration',
     );
 
     galleryList.sort((AssetPathEntity s1, AssetPathEntity s2) {
@@ -242,12 +245,14 @@ class PhotoProvider extends ChangeNotifier {
     await Future.wait(
       List<Future<void>>.generate(list.length, (int i) async {
         final AssetPathEntity gallery = list[i];
-        final AssetPathEntity newGallery =
-            await AssetPathEntity.obtainPathFromProperties(
-          id: gallery.id,
-          albumType: gallery.albumType,
-          type: gallery.type,
-          optionGroup: gallery.filterOption,
+        final AssetPathEntity newGallery = await elapsedFuture(
+          AssetPathEntity.obtainPathFromProperties(
+            id: gallery.id,
+            albumType: gallery.albumType,
+            type: gallery.type,
+            optionGroup: gallery.filterOption,
+          ),
+          prefix: 'Refresh path entity ${gallery.id}',
         );
         list[i] = newGallery;
       }),
@@ -296,9 +301,9 @@ class AssetPathProvider extends ChangeNotifier {
 
     refreshing = true;
     path = await path.obtainForNewProperties(maxDateTimeToNow: false);
-    final List<AssetEntity> list = await path.getAssetListPaged(
-      page: 0,
-      size: loadCount,
+    final List<AssetEntity> list = await elapsedFuture(
+      path.getAssetListPaged(page: 0, size: loadCount),
+      prefix: 'Refresh assets list from path ${path.id}',
     );
     page = 0;
     this.list.clear();
@@ -318,9 +323,9 @@ class AssetPathProvider extends ChangeNotifier {
       print('already max');
       return;
     }
-    final List<AssetEntity> list = await path.getAssetListPaged(
-      page: page + 1,
-      size: loadCount,
+    final List<AssetEntity> list = await elapsedFuture(
+      path.getAssetListPaged(page: page + 1, size: loadCount),
+      prefix: 'Load more assets list from path ${path.id}',
     );
     page = page + 1;
     this.list.addAll(list);
@@ -335,9 +340,9 @@ class AssetPathProvider extends ChangeNotifier {
     if (result.isNotEmpty) {
       final int rangeEnd = this.list.length;
       await provider.refreshAllGalleryProperties();
-      final List<AssetEntity> list = await path.getAssetListRange(
-        start: 0,
-        end: rangeEnd,
+      final List<AssetEntity> list = await elapsedFuture(
+        path.getAssetListRange(start: 0, end: rangeEnd),
+        prefix: 'Refresh assets list from path ${path.id} after delete',
       );
       this.list.clear();
       this.list.addAll(list);
@@ -357,9 +362,9 @@ class AssetPathProvider extends ChangeNotifier {
     if (await PhotoManager.editor.iOS.removeInAlbum(entity, path)) {
       final int rangeEnd = this.list.length;
       await provider.refreshAllGalleryProperties();
-      final List<AssetEntity> list = await path.getAssetListRange(
-        start: 0,
-        end: rangeEnd,
+      final List<AssetEntity> list = await elapsedFuture(
+        path.getAssetListRange(start: 0, end: rangeEnd),
+        prefix: 'Refresh assets list from path ${path.id} when remove in album',
       );
       this.list.clear();
       this.list.addAll(list);
