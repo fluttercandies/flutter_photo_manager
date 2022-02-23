@@ -12,8 +12,8 @@
     
     for (PMAssetPathEntity *entity in array) {
         NSDictionary *item = @{
-            @"id": entity.id,
-            @"name": entity.name,
+            @"id": entity.id ?: @"",
+            @"name": entity.name ?: @"",
             @"length": @(entity.assetCount),
             @"isAll": @(entity.isAll),
             @"albumType": @(entity.type),
