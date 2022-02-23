@@ -84,6 +84,7 @@
                             result:smartAlbumResult
                            options:assetOptions
                             hasAll:hasAll
+                  containsModified:option.containsModified
                 containsEmptyAlbum:option.containsEmptyAlbum];
     
     PHFetchResult<PHAssetCollection *> *albumResult = [PHAssetCollection
@@ -95,6 +96,7 @@
                             result:albumResult
                            options:assetOptions
                             hasAll:hasAll
+                  containsModified:option.containsModified
                 containsEmptyAlbum:option.containsEmptyAlbum];
     
     return array;
@@ -145,6 +147,7 @@
                           result:(PHFetchResult *)result
                          options:(PHFetchOptions *)options
                           hasAll:(BOOL)hasAll
+                containsModified:(BOOL)containsModified
               containsEmptyAlbum:(BOOL)containsEmptyAlbum {
     for (id collection in result) {
         if (![collection isKindOfClass:[PHAssetCollection class]]) {
@@ -169,6 +172,11 @@
         
         entity.isAll = assetCollection.assetCollectionSubtype ==
         PHAssetCollectionSubtypeSmartAlbumUserLibrary;
+        
+        if (containsModified && fetchResult.count > 0) {
+            PHAsset *asset = fetchResult.firstObject;
+            entity.modifiedDate = (long) asset.modificationDate.timeIntervalSince1970;
+        }
         
         if (!hasAll && entity.isAll) {
             continue;
