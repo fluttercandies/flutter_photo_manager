@@ -5,9 +5,9 @@
 //  Created by Alex on 2022/2/24.
 //
 
-#import "PHAssetCollection+PHAssetCollection_obtainAssetCount.h"
+#import "PHAssetCollection+PM_COMMON.h"
 
-@implementation PHAssetCollection (PHAssetCollection_obtainAssetCount)
+@implementation PHAssetCollection (PM_COMMON)
 
 - (NSUInteger)obtainAssetCount:(PHFetchOptions *)options {
     NSUInteger count = self.estimatedAssetCount;

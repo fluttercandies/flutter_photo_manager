@@ -3,9 +3,9 @@
 //  photo_manager
 //
 
-#import "PHAssetResource+PHAssetResource_checkType.h"
+#import "PHAssetResource+PM_COMMON.h"
 
-@implementation PHAssetResource (PHAssetResource_checkType)
+@implementation PHAssetResource (PM_COMMON)
 
 - (bool)isImage{
     return [self type] == PHAssetResourceTypePhoto

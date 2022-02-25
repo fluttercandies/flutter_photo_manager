@@ -1,23 +1,26 @@
 //
-//  PHAsset+PHAsset_getTitle.h
+//  PHAsset+PHAsset_checkType.h
 //  photo_manager
 //
 
 #import <Photos/Photos.h>
+#import <PMLogUtils.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface PHAsset (PM_COMMON)
 
-@interface PHAsset (PHAsset_getTitle)
+- (bool)isImage;
+- (bool)isVideo;
+- (bool)isAudio;
+- (bool)isImageOrVideo;
+- (bool)isLivePhoto;
+- (int)unwrappedSubtype;
 
 - (NSString*)title;
-
 - (BOOL)isAdjust;
-
 - (PHAssetResource *)getAdjustResource;
-
 - (void)requestAdjustedData:(void (^)(NSData *_Nullable result))block;
-
 - (PHAssetResource *)getLivePhotosResource;
 
 @end

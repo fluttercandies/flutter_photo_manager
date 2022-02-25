@@ -7,7 +7,7 @@
 
 #import <Photos/Photos.h>
 
-@interface PHAssetCollection (PHAssetCollection_obtainAssetCount)
+@interface PHAssetCollection (PM_COMMON)
 
 - (NSUInteger)obtainAssetCount:(PHFetchOptions *)options;
 

@@ -1,6 +1,5 @@
 #import "PMConvertUtils.h"
-#import "PHAsset+PHAsset_checkType.h"
-#import "PHAsset+PHAsset_getTitle.h"
+#import "PHAsset+PM_COMMON.h"
 #import "PMAssetPathEntity.h"
 #import "PMFilterOption.h"
 

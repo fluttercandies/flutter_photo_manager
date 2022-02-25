@@ -5,7 +5,7 @@
 
 #import <Photos/Photos.h>
 
-@interface PHAssetResource (PHAssetResource_checkType)
+@interface PHAssetResource (PM_COMMON)
 
 - (bool)isImage;
 - (bool)isVideo;
