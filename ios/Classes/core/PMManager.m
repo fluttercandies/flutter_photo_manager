@@ -1,6 +1,7 @@
 #import "PMManager.h"
 #import "PHAsset+PHAsset_checkType.h"
 #import "PHAsset+PHAsset_getTitle.h"
+#import "PHAssetCollection+PHAssetCollection_obtainAssetCount.h"
 #import "PHAssetResource+PHAssetResource_checkType.h"
 #import "PMAssetPathEntity.h"
 #import "PMCacheContainer.h"
@@ -50,40 +51,35 @@
 - (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(PMFilterOptionGroup *)option {
     NSMutableArray<PMAssetPathEntity *> *array = [NSMutableArray new];
     PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:option];
-    
     PHFetchOptions *fetchCollectionOptions = [PHFetchOptions new];
     
-    
+    PHFetchResult<PHAssetCollection *> *smartAlbumResult = [PHAssetCollection
+                                                            fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
+                                                            subtype:PHAssetCollectionSubtypeAny
+                                                            options:fetchCollectionOptions];
     if (onlyAll) {
-        PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection
-                                                      fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
-                                                      subtype:PHAssetCollectionSubtypeAlbumRegular
-                                                      options:fetchCollectionOptions];
-        
-        if (result && result.count) {
-            for (PHAssetCollection *collection in result) {
+        if (smartAlbumResult && smartAlbumResult.count) {
+            for (PHAssetCollection *collection in smartAlbumResult) {
                 if (collection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumUserLibrary) {
-                    PHFetchResult<PHAsset *> *assetResult = [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
-                    PMAssetPathEntity *pathEntity = [PMAssetPathEntity entityWithId:collection.localIdentifier name:collection.localizedTitle assetCount:assetResult.count];
+                    NSUInteger count = [collection obtainAssetCount:assetOptions];
+                    PMAssetPathEntity *pathEntity = [PMAssetPathEntity
+                                                     entityWithId:collection.localIdentifier
+                                                     name:collection.localizedTitle
+                                                     assetCount:count];
                     pathEntity.isAll = YES;
                     [array addObject:pathEntity];
                     break;
                 }
             }
         }
-        
         return array;
     }
-    
-    PHFetchResult<PHAssetCollection *> *smartAlbumResult = [PHAssetCollection
-                                                            fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
-                                                            subtype:PHAssetCollectionSubtypeAlbumRegular
-                                                            options:fetchCollectionOptions];
     [self logCollections:smartAlbumResult option:assetOptions];
     [self injectAssetPathIntoArray:array
                             result:smartAlbumResult
                            options:assetOptions
                             hasAll:hasAll
+                  containsModified:option.containsModified
                 containsEmptyAlbum:option.containsEmptyAlbum];
     
     PHFetchResult<PHAssetCollection *> *albumResult = [PHAssetCollection
@@ -95,6 +91,7 @@
                             result:albumResult
                            options:assetOptions
                             hasAll:hasAll
+                  containsModified:option.containsModified
                 containsEmptyAlbum:option.containsEmptyAlbum];
     
     return array;
@@ -117,24 +114,19 @@
 
 - (BOOL)existsWithId:(NSString *)assetId {
     PHFetchResult<PHAsset *> *result =
-    [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId]
-                                     options:[PHFetchOptions new]];
-    if (!result) {
-        return NO;
-    }
-    return result.count >= 1;
+    [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[PHFetchOptions new]];
+    return result && result.count > 0;
 }
 
 - (BOOL)entityIsLocallyAvailable:(NSString *)assetId {
     PHFetchResult<PHAsset *> *result =
-    [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId]
-                                     options:[PHFetchOptions new]];
+    [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[PHFetchOptions new]];
     if (!result) {
         return NO;
     }
     PHAsset *asset = result.firstObject;
     NSArray *rArray = [PHAssetResource assetResourcesForAsset:asset];
-    // If this returns NO, then the asset is in iCloud and not saved locally yet.
+    // If this returns NO, then the asset is in iCloud or not saved locally yet.
     return [[rArray.firstObject valueForKey:@"locallyAvailable"] boolValue];
 }
 
@@ -145,6 +137,7 @@
                           result:(PHFetchResult *)result
                          options:(PHFetchOptions *)options
                           hasAll:(BOOL)hasAll
+                containsModified:(BOOL)containsModified
               containsEmptyAlbum:(BOOL)containsEmptyAlbum {
     for (id collection in result) {
         if (![collection isKindOfClass:[PHAssetCollection class]]) {
@@ -158,17 +151,32 @@
             continue;
         }
         
-        
-        PHFetchResult<PHAsset *> *fetchResult =
-        [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
+        BOOL fetched = NO;
+        PHFetchResult<PHAsset *> *fetchResult;
+        NSUInteger assetCount = assetCollection.estimatedAssetCount;
+        if (assetCount == NSNotFound) {
+            fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
+            assetCount = fetchResult.count;
+            fetched = YES;
+        }
         
         PMAssetPathEntity *entity =
         [PMAssetPathEntity entityWithId:assetCollection.localIdentifier
                                    name:assetCollection.localizedTitle
-                             assetCount:(int) fetchResult.count];
+                             assetCount:assetCount];
         
         entity.isAll = assetCollection.assetCollectionSubtype ==
         PHAssetCollectionSubtypeSmartAlbumUserLibrary;
+        
+        if (containsModified) {
+            if (!fetched) {
+                fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
+            }
+            if (fetchResult && fetchResult.count > 0) {
+                PHAsset *asset = fetchResult.firstObject;
+                entity.modifiedDate = (long) asset.modificationDate.timeIntervalSince1970;
+            }
+        }
         
         if (!hasAll && entity.isAll) {
             continue;
@@ -771,11 +779,7 @@
     }
     PHAssetCollection *collection = result[0];
     PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:filterOption];
-    NSUInteger count = collection.estimatedAssetCount;
-    if (count == NSNotFound) {
-        PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:collection options:assetOptions];
-        count = fetchResult.count;
-    }
+    NSUInteger count = [collection obtainAssetCount:assetOptions];
     PMAssetPathEntity *entity = [PMAssetPathEntity entityWithId:id
                                                            name:collection.localizedTitle
                                                      assetCount:count];

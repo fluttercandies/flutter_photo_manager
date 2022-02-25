@@ -231,7 +231,6 @@
     
     [self runInBackground:^{
         if ([call.method isEqualToString:@"getGalleryList"]) {
-            
             int type = [call.arguments[@"type"] intValue];
             BOOL hasAll = [call.arguments[@"hasAll"] boolValue];
             BOOL onlyAll = [call.arguments[@"onlyAll"] boolValue];
@@ -242,16 +241,8 @@
                                                    hasAll:hasAll
                                                    onlyAll:onlyAll
                                                    option:option];
-            if (option.containsModified) {
-                for (PMAssetPathEntity *path in array) {
-                    [manager injectModifyToDate:path];
-                }
-            }
-            
             NSDictionary *dictionary = [PMConvertUtils convertPathToMap:array];
             [handler reply:dictionary];
-            
-            
         } else if ([call.method isEqualToString:@"getAssetWithGalleryId"]) {
             NSString *id = call.arguments[@"id"];
             int type = [call.arguments[@"type"] intValue];
@@ -268,7 +259,6 @@
             NSDictionary *dictionary =
             [PMConvertUtils convertAssetToMap:array optionGroup:option];
             [handler reply:dictionary];
-            
         } else if ([call.method isEqualToString:@"getAssetListWithRange"]) {
             NSString *id = call.arguments[@"id"];
             int type = [call.arguments[@"type"] intValue];
@@ -285,7 +275,6 @@
             NSDictionary *dictionary =
             [PMConvertUtils convertAssetToMap:array optionGroup:option];
             [handler reply:dictionary];
-            
         } else if ([call.method isEqualToString:@"getThumb"]) {
             NSString *id = call.arguments[@"id"];
             NSDictionary *dict = call.arguments[@"option"];
@@ -334,7 +323,6 @@
             } else {
                 [notificationManager stopNotify];
             }
-            
         } else if ([call.method isEqualToString:@"isNotifying"]) {
             BOOL isNotifying = [notificationManager isNotifying];
             [handler reply:@(isNotifying)];
@@ -345,12 +333,10 @@
                       changedBlock:^(NSArray<NSString *> *array) {
                 [handler reply:array];
             }];
-            
         } else if ([call.method isEqualToString:@"saveImage"]) {
             NSData *data = [call.arguments[@"image"] data];
             NSString *title = call.arguments[@"title"];
             NSString *desc = call.arguments[@"desc"];
-            
             [manager saveImage:data
                          title:title
                           desc:desc
@@ -365,7 +351,6 @@
             NSString *path = call.arguments[@"path"];
             NSString *title = call.arguments[@"title"];
             NSString *desc = call.arguments[@"desc"];
-            
             [manager saveImageWithPath:path
                                  title:title
                                   desc:desc
@@ -380,7 +365,6 @@
             NSString *videoPath = call.arguments[@"path"];
             NSString *title = call.arguments[@"title"];
             NSString *desc = call.arguments[@"desc"];
-            
             [manager saveVideo:videoPath
                          title:title
                           desc:desc
@@ -435,7 +419,6 @@
                     [handler reply:[PMConvertUtils convertPMAssetToMap:entity needTitle:NO]];
                 }
             }];
-            
         } else if ([@"createFolder" isEqualToString:call.method]) {
             if (self->ignoreCheckPermission) {
                 [self createFolder:call manager:manager handler:handler];
@@ -477,7 +460,6 @@
                     [handler reply:@{@"success": @YES}];
                 }
             }];
-            
         } else if ([@"deleteAlbum" isEqualToString:call.method]) {
             NSString *id = call.arguments[@"id"];
             int type = [call.arguments[@"type"] intValue];
@@ -492,7 +474,6 @@
             NSString *id = call.arguments[@"id"];
             BOOL favorite = [call.arguments[@"type"] boolValue];
             BOOL favoriteResult = [manager favoriteWithId:id favorite:favorite];
-            
             [handler reply:@(favoriteResult)];
         } else if ([@"isAuth" isEqualToString:call.method]) {
             [handler reply:@YES];
@@ -508,7 +489,6 @@
             [handler notImplemented];
         }
     }];
-    
 }
 
 - (NSDictionary *)convertToResult:(NSString *)id errorMsg:(NSString *)errorMsg {

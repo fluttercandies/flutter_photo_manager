@@ -14,13 +14,13 @@ class PhotoManagerPlugin : FlutterPlugin, ActivityAware {
     private val permissionsUtils = PermissionsUtils()
 
     private var binding: ActivityPluginBinding? = null
-
     private var requestPermissionsResultListener: RequestPermissionsResultListener? = null
 
     companion object {
         fun register(plugin: InnerPhotoManagerPlugin, messenger: BinaryMessenger) {
-            val newChannel = MethodChannel(messenger, "com.fluttercandies/photo_manager")
-            newChannel.setMethodCallHandler(plugin)
+            MethodChannel(messenger, "com.fluttercandies/photo_manager").apply {
+                setMethodCallHandler(plugin)
+            }
         }
 
         fun createAddRequestPermissionsResultListener(permissionsUtils: PermissionsUtils): RequestPermissionsResultListener {
@@ -37,8 +37,9 @@ class PhotoManagerPlugin : FlutterPlugin, ActivityAware {
             binding.binaryMessenger,
             null,
             permissionsUtils
-        )
-        register(plugin!!, binding.binaryMessenger)
+        ).apply {
+            register(this, binding.binaryMessenger)
+        }
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -64,12 +65,14 @@ class PhotoManagerPlugin : FlutterPlugin, ActivityAware {
     }
 
     private fun activityAttached(binding: ActivityPluginBinding) {
-        if (this.binding != null) {
-            onRemoveRequestPermissionResultListener(this.binding!!)
+        this.binding?.apply {
+            onRemoveRequestPermissionResultListener(this)
         }
-        this.binding = binding
-        plugin?.bindActivity(binding.activity)
-        addRequestPermissionsResultListener(binding)
+        binding.apply {
+            this@PhotoManagerPlugin.binding = this
+            plugin?.bindActivity(activity)
+            addRequestPermissionsResultListener(this)
+        }
     }
 
     private fun addRequestPermissionsResultListener(binding: ActivityPluginBinding) {

@@ -498,11 +498,12 @@ interface IDBUtils {
     }
 
     fun injectModifiedDate(context: Context, entity: GalleryEntity) {
-        val modifiedDate = getPathModifiedDate(context, entity.id)
-        entity.modifiedDate = modifiedDate
+        getPathModifiedDate(context, entity.id)?.apply {
+            entity.modifiedDate = this
+        }
     }
 
-    fun getPathModifiedDate(context: Context, pathId: String): Long {
+    fun getPathModifiedDate(context: Context, pathId: String): Long? {
         val columns = arrayOf(DATE_MODIFIED)
         val sortOrder = "$DATE_MODIFIED desc"
         val cursor = if (pathId == PhotoManager.ALL_ID) {
@@ -515,12 +516,12 @@ interface IDBUtils {
                 arrayOf(pathId),
                 sortOrder
             )
-        } ?: return 0
+        } ?: return null
         cursor.use {
             if (cursor.moveToNext()) {
                 return cursor.getLong(DATE_MODIFIED)
             }
         }
-        return 0
+        return null
     }
 }
