@@ -2,8 +2,14 @@
 
 @implementation NSString (PM_COMMON)
 
-- (BOOL)isEmpty{
-    return [self isEqualToString:@""];
+- (BOOL)isEmpty {
+    if (self.length == 0) {
+        return YES;
+    }
+    if ([self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0) {
+        return YES;
+    }
+    return NO;
 }
 
 @end

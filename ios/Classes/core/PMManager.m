@@ -146,8 +146,16 @@
         
         PHAssetCollection *assetCollection = (PHAssetCollection *) collection;
         
+        // Check whether it's "Recently Deleted"
         if (assetCollection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumRecentlyAdded
-            || assetCollection.assetCollectionSubtype == 1000000201) {// Recently Deleted
+            || assetCollection.assetCollectionSubtype == 1000000201) {
+            continue;
+        }
+        
+        // Check nullable id and name
+        NSString *localIdentifier = assetCollection.localIdentifier;
+        NSString *localizedTitle = assetCollection.localizedTitle;
+        if (!localIdentifier || localIdentifier.isEmpty || !localizedTitle || localizedTitle.isEmpty) {
             continue;
         }
         
@@ -161,9 +169,7 @@
         }
         
         PMAssetPathEntity *entity =
-        [PMAssetPathEntity entityWithId:assetCollection.localIdentifier
-                                   name:assetCollection.localizedTitle
-                             assetCount:assetCount];
+        [PMAssetPathEntity entityWithId:localIdentifier name:localizedTitle assetCount:assetCount];
         
         entity.isAll = assetCollection.assetCollectionSubtype ==
         PHAssetCollectionSubtypeSmartAlbumUserLibrary;
@@ -778,10 +784,18 @@
         return nil;
     }
     PHAssetCollection *collection = result[0];
+    
+    // Check nullable id and name
+    NSString *localIdentifier = collection.localIdentifier;
+    NSString *localizedTitle = collection.localizedTitle;
+    if (!localIdentifier || localIdentifier.isEmpty || !localizedTitle || localizedTitle.isEmpty) {
+        return nil;
+    }
+    
     PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:filterOption];
     NSUInteger count = [collection obtainAssetCount:assetOptions];
-    PMAssetPathEntity *entity = [PMAssetPathEntity entityWithId:id
-                                                           name:collection.localizedTitle
+    PMAssetPathEntity *entity = [PMAssetPathEntity entityWithId:localIdentifier
+                                                           name:localizedTitle
                                                      assetCount:count];
     entity.isAll = collection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumUserLibrary;
     return entity;
