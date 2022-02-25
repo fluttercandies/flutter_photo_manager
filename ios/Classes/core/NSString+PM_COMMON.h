@@ -2,6 +2,6 @@
 
 @interface NSString (PM_COMMON)
 
--(BOOL) isEmpty;
+- (BOOL)isEmpty;
 
 @end
