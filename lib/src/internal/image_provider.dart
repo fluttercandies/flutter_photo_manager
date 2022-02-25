@@ -73,7 +73,8 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
           'Image data for the ${key.entity.type} is not supported.',
         );
       }
-      Uint8List? data;
+
+      // Define the image type.
       final ImageFileType _type;
       if (key.imageFileType == ImageFileType.other) {
         // Assume the title is invalid here, try again with the async getter.
@@ -81,6 +82,8 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
       } else {
         _type = key.imageFileType;
       }
+
+      Uint8List? data;
       if (isOriginal) {
         if (key.entity.type == AssetType.video) {
           data = await key.entity.thumbnailDataWithOption(
@@ -92,9 +95,9 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
           data = await key.entity.originBytes;
         }
       } else {
-        final ThumbnailSize _thumbSize = thumbnailSize!;
-        data =
-            await key.entity.thumbnailDataWithOption(_thumbOption(_thumbSize));
+        data = await key.entity.thumbnailDataWithOption(
+          _thumbOption(thumbnailSize!),
+        );
       }
       if (data == null) {
         throw StateError('The data of the entity is null: $entity');
