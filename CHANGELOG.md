@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2.0.0-dev.12
+
+Improvements:
+- Improve path modified injection and asset count fetching. (#712)
+- Improve code formats.
+
+Fixes:
+- Prevent nullable fields in `AssetPathEntity` on iOS. (#714)
+
 ## 2.0.0-dev.11
 
 Improvements:
