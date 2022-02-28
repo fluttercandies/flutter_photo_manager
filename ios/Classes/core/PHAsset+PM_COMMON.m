@@ -4,6 +4,11 @@
 //
 
 #import "PHAsset+PM_COMMON.h"
+#if TARGET_OS_IOS || TARGET_OS_WATCH || TARGET_OS_TV
+#import <MobileCoreServices/MobileCoreServices.h>
+#else
+#import <CoreServices/CoreServices.h>
+#endif
 
 @implementation PHAsset (PM_COMMON)
 
@@ -88,6 +93,15 @@
         
         return @"";
     }
+}
+
+- (NSString *)mimeType {
+    PHAssetResource *resource = [[PHAssetResource assetResourcesForAsset:self] firstObject];
+    if (resource) {
+        NSString *uti = resource.uniformTypeIdentifier;
+        return (__bridge_transfer NSString *)UTTypeCopyPreferredTagWithClass((__bridge CFStringRef)uti, kUTTagClassMIMEType);
+    }
+    return nil;
 }
 
 - (BOOL)isAdjust {

@@ -1077,6 +1077,15 @@
     return @"";
 }
 
+- (NSString *)getMimeTypeAsyncWithAssetId:(NSString *)assetId {
+    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil];
+    PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
+    if (asset) {
+        return [asset mimeType];
+    }
+    return nil;
+}
+
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler {
     BOOL isLocallyAvailable = [self entityIsLocallyAvailable:assetId];
     if (!isLocallyAvailable) {

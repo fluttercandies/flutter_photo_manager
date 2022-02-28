@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (int)unwrappedSubtype;
 
 - (NSString*)title;
+- (NSString*)mimeType;
 - (BOOL)isAdjust;
 - (PHAssetResource *)getAdjustResource;
 - (void)requestAdjustedData:(void (^)(NSData *_Nullable result))block;

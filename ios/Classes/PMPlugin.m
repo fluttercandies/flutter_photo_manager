@@ -387,6 +387,10 @@
             NSString *assetId = call.arguments[@"id"];
             NSString *title = [manager getTitleAsyncWithAssetId:assetId];
             [handler reply:title];
+        } else if ([call.method isEqualToString:@"getMimeTypeAsync"]) {
+            NSString *assetId = call.arguments[@"id"];
+            NSString *mimeType = [manager getMimeTypeAsyncWithAssetId:assetId];
+            [handler reply:mimeType];
         } else if ([@"getMediaUrl" isEqualToString:call.method]) {
             [manager getMediaUrl:call.arguments[@"id"] resultHandler:handler];
         } else if ([@"getPropertiesFromAssetEntity" isEqualToString:call.method]) {

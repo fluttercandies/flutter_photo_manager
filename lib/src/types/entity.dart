@@ -699,11 +699,19 @@ class AssetEntity {
 
   /// The mime type of the asset.
   ///  * Android: `MediaStore.MediaColumns.MIME_TYPE`.
-  ///  * iOS/macOS: Always null.
+  ///  * iOS/macOS: Always null. Use the async getter [mimeTypeAsync] instead.
   ///
   /// See also:
   ///  * https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#MIME_TYPE
   final String? mimeType;
+
+  /// Get the mime type async.
+  ///  * Android: `MediaStore.MediaColumns.MIME_TYPE`.
+  ///  * iOS/macOS: MIME type from `PHAssetResource.uniformTypeIdentifier`.
+  /// 
+  /// See also:
+  ///  * https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_conc/understand_utis_conc.html#//apple_ref/doc/uid/TP40001319-CH202-SW1
+  Future<String?> get mimeTypeAsync => plugin.getMimeTypeAsync(this);
 
   AssetEntity copyWith({
     String? id,
