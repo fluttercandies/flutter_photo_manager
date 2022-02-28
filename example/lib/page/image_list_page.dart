@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
-import '../develop/upload_to_dev_serve.dart';
 import '../model/photo_provider.dart';
 import '../util/common_util.dart';
 import '../widget/dialog/list_dialog.dart';
@@ -174,10 +173,6 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             ElevatedButton(
               child: const Text('Delete item'),
               onPressed: () => _deleteCurrent(context, entity),
-            ),
-            ElevatedButton(
-              child: const Text('Upload to my test server.'),
-              onPressed: () => UploadToDevServer.upload(entity),
             ),
             ElevatedButton(
               child: const Text('Copy to another path'),
