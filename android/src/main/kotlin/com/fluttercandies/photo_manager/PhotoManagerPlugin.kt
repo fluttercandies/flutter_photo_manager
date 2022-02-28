@@ -50,7 +50,7 @@ class PhotoManagerPlugin : FlutterPlugin, ActivityAware {
         binding?.let {
             onRemoveRequestPermissionResultListener(it)
         }
-        // release Activity instance reference on detached
+        // Release the Activity reference on detached.
         plugin?.bindActivity(null)
         binding = null
     }
