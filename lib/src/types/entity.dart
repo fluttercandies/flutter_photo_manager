@@ -702,6 +702,7 @@ class AssetEntity {
   ///  * iOS/macOS: Always null. Use the async getter [mimeTypeAsync] instead.
   ///
   /// See also:
+  ///  * [mimeTypeAsync] which is the asynchronized getter of the MIME type.
   ///  * https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#MIME_TYPE
   final String? mimeType;
 
