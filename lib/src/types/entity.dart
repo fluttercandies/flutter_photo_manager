@@ -710,7 +710,10 @@ class AssetEntity {
   ///  * Android: `MediaStore.MediaColumns.MIME_TYPE`.
   ///  * iOS/macOS: MIME type from `PHAssetResource.uniformTypeIdentifier`.
   /// 
+  /// For Live Photos on iOS/macOs, this returns a type representing its image file.
+  /// 
   /// See also:
+  ///  * [mimeType] the synchronized getter of the MIME type
   ///  * https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_conc/understand_utis_conc.html#//apple_ref/doc/uid/TP40001319-CH202-SW1
   Future<String?> get mimeTypeAsync => plugin.getMimeTypeAsync(this);
 
