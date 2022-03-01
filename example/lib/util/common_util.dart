@@ -44,6 +44,7 @@ class CommonUtil {
               _buildInfoItem('lat', lat.toString()),
               _buildInfoItem('lng', lng.toString()),
               _buildInfoItem('relative path', entity.relativePath ?? 'null'),
+              _buildInfoItemAsync('mimeType', entity.mimeTypeAsync),
             ],
           ),
         ),
@@ -70,10 +71,10 @@ class CommonUtil {
     );
   }
 
-  static Widget _buildInfoItemAsync(String title, Future<String> info) {
-    return FutureBuilder<String>(
+  static Widget _buildInfoItemAsync(String title, Future<String?> info) {
+    return FutureBuilder<String?>(
       future: info,
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
         if (!snapshot.hasData) {
           return _buildInfoItem(title, '');
         }

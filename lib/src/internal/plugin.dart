@@ -466,6 +466,20 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
       return _channel.invokeMethod(PMConstants.mPresentLimited);
     }
   }
+
+  Future<String?> getMimeTypeAsync(AssetEntity entity) async {
+    assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
+    if (Platform.isAndroid) {
+      return entity.mimeType;
+    }
+    if (Platform.isIOS || Platform.isMacOS) {
+      return _channel.invokeMethod<String>(
+        PMConstants.mGetMimeTypeAsync,
+        <String, dynamic>{'id': entity.id},
+      );
+    }
+    return null;
+  }
 }
 
 mixin IosPlugin on BasePlugin {
