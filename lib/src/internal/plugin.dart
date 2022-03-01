@@ -483,13 +483,13 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
 }
 
 mixin IosPlugin on BasePlugin {
-  Future<bool> isLocallyAvailable(String id) async {
+  Future<bool> isLocallyAvailable(String id, {bool isOrigin = false}) async {
     if (Platform.isAndroid) {
       return true;
     }
     final bool result = await _channel.invokeMethod<bool>(
       PMConstants.mIsLocallyAvailable,
-      <String, dynamic>{'id': id},
+      <String, dynamic>{'id': id, 'isOrigin': isOrigin},
     ) as bool;
     return result;
   }

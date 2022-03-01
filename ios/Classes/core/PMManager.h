@@ -58,7 +58,7 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (BOOL)existsWithId:(NSString *)assetId;
 
-- (BOOL)entityIsLocallyAvailable:(NSString *)assetId;
+- (BOOL)entityIsLocallyAvailable:(NSString *)assetId isOrigin:(BOOL)isOrigin;
 
 - (NSString*)getTitleAsyncWithAssetId: (NSString *) assetId;
 

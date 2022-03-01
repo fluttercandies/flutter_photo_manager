@@ -143,10 +143,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                 onPressed: () => showOriginBytes(entity),
               ),
             ElevatedButton(
-              child: const Text('isLocallyAvailable'),
-              onPressed: () => entity.isLocallyAvailable.then(
-                (bool r) => print('isLocallyAvailable: $r'),
-              ),
+              child: const Text('isLocallyAvailable (for .file)'),
+              onPressed: () => entity.isLocallyAvailable().then((bool r) {
+                print('isLocallyAvailable: $r');
+              }),
             ),
             ElevatedButton(
               child: const Text('getMediaUrl'),

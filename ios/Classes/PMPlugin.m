@@ -381,7 +381,8 @@
             [handler reply:@(exists)];
         } else if ([call.method isEqualToString:@"isLocallyAvailable"]) {
             NSString *assetId = call.arguments[@"id"];
-            BOOL exists = [manager entityIsLocallyAvailable:assetId];
+            BOOL isOrigin = [call.arguments[@"isOrigin"] boolValue];
+            BOOL exists = [manager entityIsLocallyAvailable:assetId isOrigin:isOrigin];
             [handler reply:@(exists)];
         } else if ([call.method isEqualToString:@"getTitleAsync"]) {
             NSString *assetId = call.arguments[@"id"];

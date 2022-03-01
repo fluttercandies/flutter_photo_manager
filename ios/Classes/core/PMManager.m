@@ -117,13 +117,22 @@
     return result && result.count > 0;
 }
 
-- (BOOL)entityIsLocallyAvailable:(NSString *)assetId {
+- (BOOL)entityIsLocallyAvailable:(NSString *)assetId isOrigin:(BOOL)isOrigin {
     PHFetchResult<PHAsset *> *result =
     [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[PHFetchOptions new]];
     if (!result) {
         return NO;
     }
     PHAsset *asset = result.firstObject;
+    NSFileManager *fileManager = NSFileManager.defaultManager;
+    NSString *path = [self makeAssetOutputPath:asset isOrigin:isOrigin manager:fileManager];
+    BOOL isExist = [fileManager fileExistsAtPath:path];
+    [[PMLogUtils sharedInstance] info:[NSString
+                                       stringWithFormat:@"Locally available for path %@: %hhd",
+                                       path, isExist]];
+    if (isExist) {
+        return YES;
+    }
     NSArray *rArray = [PHAssetResource assetResourcesForAsset:asset];
     // If this returns NO, then the asset is in iCloud or not saved locally yet.
     return [[rArray.firstObject valueForKey:@"locallyAvailable"] boolValue];
@@ -535,7 +544,7 @@
     NSFileManager *manager = NSFileManager.defaultManager;
     NSString *path = [self makeAssetOutputPath:asset isOrigin:NO manager:manager];
     if ([manager fileExistsAtPath:path]) {
-        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
+        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Read cache from %@", path]];
         if (withScheme) {
             [handler reply:[NSURL fileURLWithPath:path].absoluteString];
         } else {
@@ -607,7 +616,7 @@
                                                presetName:AVAssetExportPresetHighestQuality];
         if (exportSession) {
             NSString *extension = [[path pathExtension] lowercaseString];
-            // Determine the output type.
+            // Determine the output type for the fastest speed.
             AVFileType outputFileType;
             if ([extension isEqualToString:@"mov"]) {
                 outputFileType = AVFileTypeQuickTimeMovie;
@@ -654,7 +663,7 @@
                         attributes:@{}
                              error:nil];
     [path appendFormat:@"%@/%@", typeDirPath, filename];
-    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"PHAsset cache path = %@", path]];
+    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"PHAsset path = %@", path]];
     return path;
 }
 
@@ -1087,7 +1096,7 @@
 }
 
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler {
-    BOOL isLocallyAvailable = [self entityIsLocallyAvailable:assetId];
+    BOOL isLocallyAvailable = [self entityIsLocallyAvailable:assetId isOrigin:NO];
     if (!isLocallyAvailable) {
         [handler replyError:@"Media url is unavailable when the asset is not locally available."];
         return;
