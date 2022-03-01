@@ -94,7 +94,7 @@
         return @"";
     }
 }
-// UTI:  https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_intro/understand_utis_intro.html#//apple_ref/doc/uid/TP40001319
+// UTI: https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_intro/understand_utis_intro.html#//apple_ref/doc/uid/TP40001319
 - (NSString *)mimeType {
     PHAssetResource *resource = [[PHAssetResource assetResourcesForAsset:self] firstObject];
     if (resource) {
