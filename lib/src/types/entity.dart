@@ -415,8 +415,10 @@ class AssetEntity {
   /// Whether this asset is locally available.
   ///  * Android: Always true.
   ///  * iOS/macOS: Whether the asset has been uploaded to iCloud
-  ///    and locally exist.
-  Future<bool> get isLocallyAvailable => plugin.isLocallyAvailable(id);
+  ///    and locally exist (including cached or not).
+  Future<bool> isLocallyAvailable({bool isOrigin = false}) {
+    return plugin.isLocallyAvailable(id, isOrigin: isOrigin);
+  }
 
   /// Obtain latitude and longitude.
   ///  * Android: Obtain from `MediaStore` or EXIF (Android 10).

@@ -24,6 +24,7 @@ This version mainly covers all valid issues, API deprecations, and few new featu
 - `containsLivePhotos` are `true` by default.
   If you previously used `RequestType.video` to filter assets, they'll include live photos now.
   To keep to old behavior, you should explicitly set `containsLivePhotos` to `false` in this case.
+- `isLocallyAvailable` now passes `isOrigin`, so it's been changed to `isLocallyAvailable()`.
 
 ### API migrations
 
@@ -71,6 +72,24 @@ After:
 final List<AssetPathEntity> paths = PhotoManager.getAssetPathList(
   type: RequestType.video,
   filterOption: FilterOptionGroup(containsLivePhotos: false),
+);
+```
+
+#### `isLocallyAvailable`
+
+Before:
+```dart
+final bool isLocallyAvailable = await entity.isLocallyAvailable;
+```
+
+After:
+```dart
+// .file is locally available.
+final bool isFileLocallyAvailable = await entity.isLocallyAvailable();
+
+// .originFile is locally available.
+final bool isOriginFileLocallyAvailable = await entity.isLocallyAvailable(
+  isOrigin: true,
 );
 ```
 
