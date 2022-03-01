@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2.0.0-dev.13
+
+Improvements:
+- Add `mimeTypeAsync`. (#717)
+
+Fixes:
+- Fix `Activity` leaks when detached on Android. (#716)
+
+Breaking changes:
+- `isLocallyAvailble` passes `isOrigin`. (#718)
+
 ## 2.0.0-dev.12
 
 Improvements:
@@ -305,7 +316,7 @@ Fixes:
 
 ## 1.0.0
 
-Breaking change:
+Breaking changes:
 - Migrate to null safety.
 - Correct type in `PMRequestState` .
 
