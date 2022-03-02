@@ -125,7 +125,7 @@
     }
     PHAsset *asset = result.firstObject;
     NSFileManager *fileManager = NSFileManager.defaultManager;
-    NSString *path = [self makeAssetOutputPath:asset isOrigin:isOrigin manager:fileManager];
+    NSString *path = [self makeAssetOutputPath:asset resource:nil isOrigin:isOrigin manager:fileManager];
     BOOL isExist = [fileManager fileExistsAtPath:path];
     [[PMLogUtils sharedInstance] info:[NSString
                                        stringWithFormat:@"Locally available for path %@: %hhd",
@@ -452,17 +452,17 @@
         }
         return;
     }
-    [handler replyError:@"asset is not found"];
+    [handler replyError:@"Asset file cannot be obtained."];
 }
 
 - (void)fetchLivePhotosFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PHAssetResource *destinationResource = [asset getLivePhotosResource];
-    if (!destinationResource) {
+    PHAssetResource *resource = [asset getLivePhotosResource];
+    if (!resource) {
         [handler reply:nil];
         return;
     }
     NSFileManager *fileManager = NSFileManager.defaultManager;
-    NSString *path = [self makeAssetOutputPath:asset isOrigin:YES manager:fileManager];
+    NSString *path = [self makeAssetOutputPath:asset resource:resource isOrigin:YES manager:fileManager];
     if ([fileManager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
         [handler reply:path];
@@ -481,10 +481,10 @@
     
     PHAssetResourceManager *resourceManager = PHAssetResourceManager.defaultManager;
     NSURL *fileUrl = [NSURL fileURLWithPath:path];
-    [resourceManager writeDataForAssetResource:destinationResource
-                                toFile:fileUrl
-                               options:options
-                     completionHandler:^(NSError *_Nullable error) {
+    [resourceManager writeDataForAssetResource:resource
+                                        toFile:fileUrl
+                                       options:options
+                             completionHandler:^(NSError *_Nullable error) {
         if (error) {
             NSLog(@"error = %@", error);
             [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
@@ -497,13 +497,13 @@
 }
 
 - (void)fetchOriginVideoFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PHAssetResource *destinationResource = [asset getAdjustResource];
-    if (!destinationResource) {
+    PHAssetResource *resource = [asset getAdjustResource];
+    if (!resource) {
         [handler reply:nil];
         return;
     }
     NSFileManager *fileManager = NSFileManager.defaultManager;
-    NSString *path = [self makeAssetOutputPath:asset isOrigin:YES manager:fileManager];
+    NSString *path = [self makeAssetOutputPath:asset resource:resource isOrigin:YES manager:fileManager];
     if ([fileManager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
         [handler reply:path];
@@ -522,10 +522,10 @@
     
     PHAssetResourceManager *resourceManager = PHAssetResourceManager.defaultManager;
     NSURL *fileUrl = [NSURL fileURLWithPath:path];
-    [resourceManager writeDataForAssetResource:destinationResource
-                                toFile:fileUrl
-                               options:options
-                     completionHandler:^(NSError *_Nullable error) {
+    [resourceManager writeDataForAssetResource:resource
+                                        toFile:fileUrl
+                                       options:options
+                             completionHandler:^(NSError *_Nullable error) {
         if (error) {
             NSLog(@"error = %@", error);
             [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
@@ -542,7 +542,7 @@
            progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
                 withScheme:(BOOL)withScheme {
     NSFileManager *manager = NSFileManager.defaultManager;
-    NSString *path = [self makeAssetOutputPath:asset isOrigin:NO manager:manager];
+    NSString *path = [self makeAssetOutputPath:asset resource:nil isOrigin:NO manager:manager];
     if ([manager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Read cache from %@", path]];
         if (withScheme) {
@@ -648,20 +648,31 @@
     }];
 }
 
-- (NSString *)makeAssetOutputPath:(PHAsset *)asset isOrigin:(Boolean)isOrigin manager:(NSFileManager *)manager {
+- (NSString *)makeAssetOutputPath:(PHAsset *)asset
+                         resource:(PHAssetResource *)resource
+                         isOrigin:(Boolean)isOrigin
+                          manager:(NSFileManager *)manager {
+    NSString *modifiedDate = [NSString stringWithFormat:@"%f", asset.modificationDate.timeIntervalSince1970];
     NSString *homePath = NSTemporaryDirectory();
     NSMutableString *path = [NSMutableString stringWithString:homePath];
-    NSString *modifiedDate = [NSString stringWithFormat:@"%f", asset.modificationDate.timeIntervalSince1970];
-    NSString *filename = [NSString stringWithFormat:@"%@%@_%@", modifiedDate, isOrigin ? @"_o" : @"", [asset valueForKey:@"filename"]];
-    NSString *typeDirPath = asset.isImage ? @".image" : @".video";
+    NSString *filename;
+    if (resource) {
+        filename = resource.originalFilename;
+    } else {
+        filename = [asset valueForKey:@"filename"];
+    }
+    filename = [NSString stringWithFormat:@"%@%@_%@", modifiedDate, isOrigin ? @"_o" : @"", filename];
+    NSString *typeDirPath;
+    if (resource) {
+        typeDirPath = resource.isImage ? @".image" : @".video";
+    } else {
+        typeDirPath = asset.isImage ? @".image" : @".video";
+    }
     NSString *dirPath = [NSString stringWithFormat:@"%@%@", homePath, typeDirPath];
     if (manager == nil) {
         manager = NSFileManager.defaultManager;
     }
-    [manager createDirectoryAtPath:dirPath
-       withIntermediateDirectories:true
-                        attributes:@{}
-                             error:nil];
+    [manager createDirectoryAtPath:dirPath withIntermediateDirectories:true attributes:@{} error:nil];
     [path appendFormat:@"%@/%@", typeDirPath, filename];
     [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"PHAsset path = %@", path]];
     return path;
@@ -693,7 +704,10 @@
         return;
     }
     NSFileManager *fileManager = NSFileManager.defaultManager;
-    NSString *path = [self makeAssetOutputPath:asset isOrigin:YES manager:fileManager];
+    NSString *path = [self makeAssetOutputPath:asset
+                                      resource:imageResource
+                                      isOrigin:YES
+                                       manager:fileManager];
     if ([fileManager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
         [handler reply:path];
