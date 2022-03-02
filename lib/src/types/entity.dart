@@ -475,6 +475,8 @@ class AssetEntity {
 
   /// Obtain file of the asset with a [PMProgressHandler].
   ///
+  /// [withSubtype] only takes effect on iOS, typically for Live Photos.
+  ///
   /// See also:
   ///  * [file] which can obtain the compressed file.
   ///  * [fileWithSubtype] which can obtain the compressed file with subtype.
@@ -482,9 +484,14 @@ class AssetEntity {
   ///  * [originFileWithSubtype] which can obtain the origin file with subtype.
   Future<File?> loadFile({
     bool isOrigin = true,
+    bool withSubtype = false,
     PMProgressHandler? progressHandler,
   }) {
-    return _getFile(isOrigin: isOrigin, progressHandler: progressHandler);
+    return _getFile(
+      isOrigin: isOrigin,
+      subtype: withSubtype ? subtype : 0,
+      progressHandler: progressHandler,
+    );
   }
 
   /// Obtain the raw data of the asset.
