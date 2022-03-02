@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.0.0-dev.14
+
+Improvements:
+- Expand `withSubtype` for `loadFile`. (#719)
+
 ## 2.0.0-dev.13
 
 Improvements:
