@@ -438,7 +438,7 @@ class AssetEntity {
 
   /// Obtain the compressed file of the asset with subtype.
   ///
-  /// This method only takes effect on iOS, which is typically for Live Photos.
+  /// This method only takes effect on iOS, typically for Live Photos.
   ///
   /// See also:
   ///  * [file] which can obtain the compressed file.
@@ -462,7 +462,7 @@ class AssetEntity {
 
   /// Obtain the origin file with subtype.
   ///
-  /// This method only takes effect on iOS, which is typically for Live Photos.
+  /// This method only takes effect on iOS, typically for Live Photos.
   ///
   /// See also:
   ///  * [file] which can obtain the compressed file.
@@ -477,7 +477,9 @@ class AssetEntity {
   ///
   /// See also:
   ///  * [file] which can obtain the compressed file.
+  ///  * [fileWithSubtype] which can obtain the compressed file with subtype.
   ///  * [originFile] which can obtain the original file.
+  ///  * [originFileWithSubtype] which can obtain the origin file with subtype.
   Future<File?> loadFile({
     bool isOrigin = true,
     PMProgressHandler? progressHandler,
@@ -711,9 +713,10 @@ class AssetEntity {
   /// Get the mime type async.
   ///  * Android: `MediaStore.MediaColumns.MIME_TYPE`.
   ///  * iOS/macOS: MIME type from `PHAssetResource.uniformTypeIdentifier`.
-  /// 
-  /// For Live Photos on iOS/macOs, this returns a type representing its image file.
-  /// 
+  ///
+  /// For Live Photos on iOS, the getter returns
+  /// the paired image file's MIME type.
+  ///
   /// See also:
   ///  * [mimeType] which is the synchronized getter of the MIME type.
   ///  * https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_conc/understand_utis_conc.html#//apple_ref/doc/uid/TP40001319-CH202-SW1
