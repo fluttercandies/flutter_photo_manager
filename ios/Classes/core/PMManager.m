@@ -167,29 +167,16 @@
             continue;
         }
         
-        BOOL fetched = NO;
-        PHFetchResult<PHAsset *> *fetchResult;
-        NSUInteger assetCount = assetCollection.estimatedAssetCount;
-        if (assetCount == NSNotFound) {
-            fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
-            assetCount = fetchResult.count;
-            fetched = YES;
-        }
+        PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
+        NSUInteger assetCount = fetchResult.count;
         
-        PMAssetPathEntity *entity =
-        [PMAssetPathEntity entityWithId:localIdentifier name:localizedTitle assetCount:assetCount];
+        PMAssetPathEntity *entity = [PMAssetPathEntity entityWithId:localIdentifier name:localizedTitle assetCount:assetCount];
         
-        entity.isAll = assetCollection.assetCollectionSubtype ==
-        PHAssetCollectionSubtypeSmartAlbumUserLibrary;
+        entity.isAll = assetCollection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumUserLibrary;
         
-        if (containsModified) {
-            if (!fetched) {
-                fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
-            }
-            if (fetchResult && fetchResult.count > 0) {
-                PHAsset *asset = fetchResult.firstObject;
-                entity.modifiedDate = (long) asset.modificationDate.timeIntervalSince1970;
-            }
+        if (containsModified && fetchResult.count > 0) {
+            PHAsset *asset = fetchResult.firstObject;
+            entity.modifiedDate = (long) asset.modificationDate.timeIntervalSince1970;
         }
         
         if (!hasAll && entity.isAll) {
@@ -912,13 +899,13 @@
         
         [cond appendString:@" ( "];
         
-        PMFilterOption *videoOption = optionGroup.audioOption;
+        PMFilterOption *audioOption = optionGroup.audioOption;
         
         [cond appendString:@"mediaType == %d"];
         [args addObject:@(PHAssetMediaTypeAudio)];
         
-        NSString *durationCond = [videoOption durationCond];
-        NSArray *durationArgs = [videoOption durationArgs];
+        NSString *durationCond = [audioOption durationCond];
+        NSArray *durationArgs = [audioOption durationArgs];
         [cond appendString:@" AND "];
         [cond appendString:durationCond];
         [args addObjectsFromArray:durationArgs];

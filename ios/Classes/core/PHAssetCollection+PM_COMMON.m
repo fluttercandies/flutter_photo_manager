@@ -10,13 +10,9 @@
 @implementation PHAssetCollection (PM_COMMON)
 
 - (NSUInteger)obtainAssetCount:(PHFetchOptions *)options {
-    NSUInteger count = self.estimatedAssetCount;
-    if (count == NSNotFound) {
-        PHFetchResult<PHAsset *> *fetchResult =
-        [PHAsset fetchAssetsInAssetCollection:self
-                                      options:options];
-        count = fetchResult.count;
-    }
+    PHFetchResult<PHAsset *> *fetchResult =
+    [PHAsset fetchAssetsInAssetCollection:self options:options];
+    NSUInteger count = fetchResult.count;
     return count;
 }
 
