@@ -277,19 +277,15 @@ class AssetPathProvider extends ChangeNotifier {
   static const int loadCount = 50;
 
   bool isInit = false;
-
   AssetPathEntity path;
-
   List<AssetEntity> list = <AssetEntity>[];
-
   int page = 0;
 
   int get showItemCount {
     if (list.length == path.assetCount) {
       return path.assetCount;
-    } else {
-      return path.assetCount;
     }
+    return list.length;
   }
 
   bool refreshing = false;
