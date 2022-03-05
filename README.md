@@ -2,18 +2,25 @@
 
 English | [中文说明](#) (🚧 WIP)
 
-[![pub package](https://img.shields.io/pub/v/photo_manager.svg)][pub package]
-[![GitHub](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager.svg)][repo]
-[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager.svg?style=social&label=Stars)][repo]
+[![pub package](https://img.shields.io/pub/v/photo_manager?label=stable)][pub package]
+[![pub pre-release package](https://img.shields.io/pub/v/photo_manager?color=42a012&include_prereleases&label=dev)](https://pub.dev/packages/photo_manager)
+[![GitHub](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager)][repo]
+[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?style=social&label=Stars)][repo]
+<a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
 
 A Flutter plugin that provides assets abstraction management APIs without UI integration,
 you can get assets (image/video/audio) on Android, iOS and macOS.
 
 ## Projects using this plugin
 
-| name                 | pub                                                                                                                    | github                                                                                                                                                                  |
-| :------------------- | :--------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| wechat_assets_picker | [![pub package](https://img.shields.io/pub/v/wechat_assets_picker.svg)](https://pub.dev/packages/wechat_assets_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker) |
+| name                 | pub                                                                                                                | github                                                                                                                                                                  |
+|:---------------------|:-------------------------------------------------------------------------------------------------------------------| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| wechat_assets_picker | [![pub package](https://img.shields.io/pub/v/wechat_assets_picker)](https://pub.dev/packages/wechat_assets_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker) |
+| wechat_camera_picker | [![pub package](https://img.shields.io/pub/v/wechat_camera_picker)](https://pub.dev/packages/wechat_camera_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_camera_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_camera_picker) |
+
+## Articles about this plugin
+
+- [Hard to manage media with Flutter? Try photo_manager, the all-in-one solution](https://medium.flutter.cn/hard-to-manage-media-with-flutter-try-photo-manager-the-all-in-one-solution-5188599e4cf)
 
 ## Migration guide
 
@@ -602,6 +609,8 @@ The "Copy" means differently here on Android and iOS:
   - Some albums are smart albums, their content is automatically managed
     by the system and cannot inserted entities manually.
 
+(For Android 30+, this feature is blocked by system limitations currently.)
+
 #### Features for Android only
 
 ##### Move an entity to another album
@@ -615,6 +624,8 @@ await PhotoManager.editor.android.moveAssetToAnother(
   target: pathEntity,
 );
 ```
+
+(For Android 30+, this feature is blocked by system limitations currently.)
 
 ##### Remove all non-exist entities
 
