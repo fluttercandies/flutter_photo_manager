@@ -35,7 +35,7 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
   * [Configure native platforms](#configure-native-platforms)
     * [Android config preparation](#android-config-preparation)
       * [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
-      * [Android 10](#android-10-q-29)
+      * [Android 10+](#android-10-q-29)
       * [Glide](#glide)
     * [iOS config preparation](#ios-config-preparation)
 * [Usage](#usage)
@@ -129,15 +129,14 @@ More specifically:
 - Upgrade your Kotlin version (`ext.kotlin_version`)
   to `1.4.32` or the latest version.
 
-##### Android 10 (Q, 29)
+##### Android 10+ (Q, 29)
 
-_If you're compiling or targeting with Android version
-other than 29, you can skip this section._
+_If you're compiling or targeting with an Android version that belows 29, you can skip this section._
 
 On Android 10, **Scoped Storage** was introduced,
 which causes the origin resource file inaccessible.
 
-If your `compileSdkVersion` is 29, you must add
+If your `compileSdkVersion` is above 29, you must add
 `android:requestLegacyExternalStorage="true"` to your
 `AndroidManifest.xml` in order to obtain resources:
 
