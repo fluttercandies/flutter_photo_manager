@@ -1,115 +1,33 @@
 # CHANGELOG
 
-## 2.0.0-dev.14
+## 2.0.0
 
-Improvements:
-- Expand `withSubtype` for `loadFile`. (#719)
+A major version release for performance improvements, new features, issues fixed, and breaking changes.
+Also, the LICENSE has been updated with the new author [FlutterCandies](https://github.com/fluttercandies).
+To know more about breaking changes, see the [Migration Guide][].
 
-## 2.0.0-dev.13
-
-Improvements:
+Features:
 - Add `mimeTypeAsync`. (#717)
-
-Fixes:
-- Fix `Activity` leaks when detached on Android. (#716)
-
-Breaking changes:
-- `isLocallyAvailble` passes `isOrigin`. (#718)
-
-## 2.0.0-dev.12
+- Add `ThumbnailSize`. (#709)
+- Add `DurationConstraint.allowNullable`. (#681)
+- Introduce `AssetEntityImageProvider`. (#669, #709)
+- Support "Live Photos" with obtaining and filtering. (#667, #670, #673, #719)
+- Support to obtain the first frame for the video thumbnail on Android. (#658)
+- Allow plugin to be mocked/overridden with tests. (#703)
 
 Improvements:
 - Improve path modified injection and asset count fetching. (#712)
-- Improve code formats.
-
-Fixes:
-- Prevent nullable fields in `AssetPathEntity` on iOS. (#714)
-
-## 2.0.0-dev.11
-
-Improvements:
-- More naming refactor.
-
-## 2.0.0-dev.10
-
-Features:
-- Add `AssetEntityImage` and `ThumbnailSize`. (#709)
-
-Improvements:
-- Improve the image provider. (#709)
-
-## 2.0.0-dev.9
-
-Improvements:
 - Make all entities immutable. (#708)
-
-## 2.0.0-dev.8
-
-Improvements:
 - Improve the performance when using the `file` getter on iOS. (#705)
-- Allow plugin to be mocked/overridden with tests. (#703)
-
-## 2.0.0-dev.7
-
-Improvements:
-- Combine DBUtils between SDK versions on Android. (#698)
 - Force legacy storage on Android Q. (#701)
-- LICENSE updated with the new author (FlutterCandies).
-
-Fixes:
-- Fix potential NPE when moving assets on Android.
-
-## 2.0.0-dev.6
-
-Improvements:
 - Enhance request types filtering.
-
-## 2.0.0-dev.5
-
-Improvements:
-- Remove unused dependencies on Android.
 - Compile for API 31 on Android.
-- Implement paging load more in the simple example.
-
-Fixes:
-- Fix closed cursors access on Android.
-
-## 2.0.0-dev.4
-
-Improvements:
-- Update README with media location permission and assets retrieving on iOS.
-- Throw when obtain media URL that asset is not locally available on iOS.
-- Retrieve width/height from ExifInterface for fallback. (#686)
-
-## 2.0.0-dev.3
-
-Features:
-- `DurationConstraint.allowNullable`. (#681)
-
-Improvements:
-- Improve imlementation of `getMediaUrl()` on iOS. (#684)
-- Improve cache path for `PHAsset` on iOS. (#683)
-- Obtain `DATE_TAKEN` for create date if possible on Android. (#682)
-- Improve adjusted resources fetching on iOS.
-
-## 2.0.0-dev.2
-
-Improvements:
+- Throw when obtaining media URL that asset is not locally available on iOS.
+- Retrieve width/height from ExifInterface for fallback on Android. (#686)
 - Request `WRITE_EXTERNAL_STORAGE` only when needed. (#675)
-
-## 2.0.0-dev.1
-
-A major version release for performance improvements, new features, issues fixed and breaking changes.
-
-Features:
-- Introduce `AssetEntityImageProvider`. (#669)
-- Support "Live Photos" with obtaining and filtering. (#667, #670, #673)
-- Obtain the first frame for the video thumbnail on Android. (#658)
-- Add equality comparison for various classes. (#657)
-
-Improvements:
 - Provided a single-page example. (#672)
 - Improve the default sort order on all platforms. (#659)
+- Add equality comparison for various classes. (#657)
 - Run Glide on the current thread on Android. (#656)
 - Improve thread pool on Android. (#637)
 - Improved all documents and code formats. (#626, #660, #664, #671)
@@ -118,10 +36,12 @@ Improvements:
 - `ImageScanner` -> `PhotoManager`. (#611)
 
 Fixes:
-- Edited images/videos are not returned correctly on iOS. (#622, #636)
-- `title` causes saving methods failed. (#619, #635)
-- `PhotoManager.editor.copyAssetToPath` return `null` on iOS. (#619)
-- Sort order issues on iOS. (#603, #655)
+- Fix `Activity` leaks when detached on Android. (#716)
+- Fix potential NPE when moving assets on Android.
+- Fix edited images/videos are not returned correctly on iOS. (#622, #636)
+- Fix `title` argument causes saving methods failed. (#619, #635)
+- Fix `PhotoManager.editor.copyAssetToPath` returns `null`. (#619)
+- Fix sort order issues on iOS/macOS. (#603, #655)
 
 ## 1.3.10
 
@@ -611,3 +531,5 @@ Added:
 
 First version.
 - API for photo.
+
+[Migration Guide]: MIGRATION_GUIDE.md
