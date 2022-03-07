@@ -81,7 +81,7 @@ class PhotoManagerPlugin(
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q && !Environment.isExternalStorageLegacy()) {
             resultHandler.replyError(
                 "STORAGE_NOT_LEGACY",
-                "Use `requestLegacyExternalStorage` when your project is targeting Android Q.",
+                "Use `requestLegacyExternalStorage` when your project is targeting above Android Q.",
                 null
             )
             return
@@ -310,8 +310,7 @@ class PhotoManagerPlugin(
             "getFullFile" -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
-                    val isOrigin =
-                        if (!haveLocationPermission) false else call.argument<Boolean>("isOrigin")!!
+                    val isOrigin = if (!haveLocationPermission) false else call.argument<Boolean>("isOrigin")!!
                     photoManager.getFile(id, isOrigin, resultHandler)
                 }
             }
