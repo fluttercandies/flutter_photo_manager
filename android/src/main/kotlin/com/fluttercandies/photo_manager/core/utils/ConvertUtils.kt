@@ -1,7 +1,7 @@
 package com.fluttercandies.photo_manager.core.utils
 
 import android.provider.MediaStore
-import com.fluttercandies.photo_manager.core.AssetType
+import com.fluttercandies.photo_manager.constant.AssetType
 import com.fluttercandies.photo_manager.core.entity.*
 
 object ConvertUtils {
