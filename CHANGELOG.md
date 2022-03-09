@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 2.0.1
+
+Improvements:
+- Update legacy external storage exception on Android.
+
+Fixes:
+- Predicate more precise permissions requirements on Android <29. (#723)
+
 ## 2.0.0
 
 A major version release for performance improvements, new features, issues fixed, and breaking changes.
