@@ -9,6 +9,7 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import com.bumptech.glide.Glide
+import com.fluttercandies.photo_manager.constant.Methods
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -94,26 +95,23 @@ class PhotoManagerPlugin(
             return
         }
 
-        var needWritePermission = false
-        var needLocationPermission = false
-
         val handleResult = when (call.method) {
-            "releaseMemCache" -> {
+            Methods.releaseMemoryCache -> {
                 photoManager.clearCache()
                 resultHandler.reply(1)
                 true
             }
-            "log" -> {
+            Methods.log -> {
                 LogUtils.isLog = call.arguments()
                 resultHandler.reply(1)
                 true
             }
-            "openSetting" -> {
+            Methods.openSetting -> {
                 permissionsUtils.getAppDetailSettingIntent(activity)
                 resultHandler.reply(1)
                 true
             }
-            "clearFileCache" -> {
+            Methods.clearFileCache -> {
                 Glide.get(applicationContext).clearMemory()
                 runOnBackground {
                     photoManager.clearFileCache()
@@ -121,37 +119,15 @@ class PhotoManagerPlugin(
                 }
                 true
             }
-            "forceOldApi" -> {
+            Methods.forceOldAPI -> {
                 photoManager.useOldApi = true
                 resultHandler.reply(1)
                 true
             }
-            "systemVersion" -> {
+            Methods.systemVersion -> {
                 resultHandler.reply(Build.VERSION.SDK_INT.toString())
                 true
             }
-            "getLatLngAndroidQ" -> {
-                /// 这里不拦截, 然后额外添加gps权限
-                needLocationPermission = true
-                false
-            }
-            "copyAsset" -> {
-                needWritePermission = true
-                needLocationPermission = true
-                false
-            }
-            "getFullFile" -> {
-                val isOrigin = call.argument<Boolean>("isOrigin")!!
-                if (isOrigin && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    needLocationPermission = true
-                }
-                false
-            }
-            "getOriginBytes" -> {
-                needLocationPermission = true
-                false
-            }
-            "getMediaUrl" -> false
             else -> false
         }
 
@@ -171,6 +147,8 @@ class PhotoManagerPlugin(
             return
         }
 
+        val needWritePermission = permissionsUtils.needWriteExternalStorage(call)
+        val needLocationPermission = permissionsUtils.needAccessLocation(call)
         val permissions = arrayListOf(Manifest.permission.READ_EXTERNAL_STORAGE)
         if (needWritePermission && Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q
             && havePermissionInManifest(
@@ -202,7 +180,7 @@ class PhotoManagerPlugin(
                     grantedPermissions: MutableList<String>
                 ) {
                     LogUtils.info("onDenied call.method = ${call.method}")
-                    if (call.method == "requestPermissionExtend") {
+                    if (call.method == Methods.requestPermissionExtend) {
                         resultHandler.reply(PermissionResult.Denied.value)
                         return
                     }
@@ -242,8 +220,8 @@ class PhotoManagerPlugin(
         haveLocationPermission: Boolean
     ) {
         when (call.method) {
-            "requestPermissionExtend" -> resultHandler.reply(PermissionResult.Authorized.value)
-            "getGalleryList" -> {
+            Methods.requestPermissionExtend -> resultHandler.reply(PermissionResult.Authorized.value)
+            Methods.getAssetPathList -> {
                 if (Build.VERSION.SDK_INT >= 29) {
                     notifyChannel.setAndroidQExperimental(true)
                 }
@@ -257,7 +235,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(ConvertUtils.convertToGalleryResult(list))
                 }
             }
-            "getAssetWithGalleryId" -> {
+            Methods.getAssetWithGalleryId -> {
                 runOnBackground {
                     val galleryId = call.argument<String>("id")!!
                     val type = call.argument<Int>("type")!!
@@ -268,7 +246,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(ConvertUtils.convertToAssetResult(list))
                 }
             }
-            "getAssetListWithRange" -> {
+            Methods.getAssetListWithRange -> {
                 runOnBackground {
                     val galleryId = call.getString("id")
                     val type = call.getInt("type")
@@ -280,7 +258,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(ConvertUtils.convertToAssetResult(list))
                 }
             }
-            "getThumb" -> {
+            Methods.getThumbnail -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
                     val optionMap = call.argument<Map<*, *>>("option")!!
@@ -288,7 +266,7 @@ class PhotoManagerPlugin(
                     photoManager.getThumb(id, option, resultHandler)
                 }
             }
-            "requestCacheAssetsThumb" -> {
+            Methods.requestCacheAssetsThumbnail -> {
                 runOnBackground {
                     val ids = call.argument<List<String>>("ids")!!
                     val optionMap = call.argument<Map<*, *>>("option")!!
@@ -296,31 +274,32 @@ class PhotoManagerPlugin(
                     photoManager.requestCache(ids, option, resultHandler)
                 }
             }
-            "cancelCacheRequests" -> {
+            Methods.cancelCacheRequests -> {
                 runOnBackground {
                     photoManager.cancelCacheRequests()
                 }
             }
-            "assetExists" -> {
+            Methods.assetExists -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
                     photoManager.assetExists(id, resultHandler)
                 }
             }
-            "getFullFile" -> {
+            Methods.getFullFile -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
-                    val isOrigin = if (!haveLocationPermission) false else call.argument<Boolean>("isOrigin")!!
+                    val isOrigin =
+                        if (!haveLocationPermission) false else call.argument<Boolean>("isOrigin")!!
                     photoManager.getFile(id, isOrigin, resultHandler)
                 }
             }
-            "getOriginBytes" -> {
+            Methods.getOriginBytes -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
                     photoManager.getOriginBytes(id, resultHandler)
                 }
             }
-            "getMediaUrl" -> {
+            Methods.getMediaUrl -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
                     val type = call.argument<Int>("type")!!
@@ -328,7 +307,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(mediaUri)
                 }
             }
-            "getPropertiesFromAssetEntity" -> {
+            Methods.getPropertiesFromAssetEntity -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
                     val asset = photoManager.getAssetProperties(id)
@@ -340,7 +319,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(assetResult)
                 }
             }
-            "fetchPathProperties" -> {
+            Methods.fetchPathProperties -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
                     val type = call.argument<Int>("type")!!
@@ -354,7 +333,7 @@ class PhotoManagerPlugin(
                     }
                 }
             }
-            "getLatLngAndroidQ" -> {
+            Methods.getLatLng -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
                     // 读取id
@@ -362,7 +341,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(location)
                 }
             }
-            "notify" -> {
+            Methods.notify -> {
                 runOnBackground {
                     val notify = call.argument<Boolean>("notify")
                     if (notify == true) {
@@ -372,24 +351,7 @@ class PhotoManagerPlugin(
                     }
                 }
             }
-            "deleteWithIds" -> {
-                runOnBackground {
-                    try {
-                        val ids = call.argument<List<String>>("ids")!!
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            val uris = ids.map { photoManager.getUri(it) }.toList()
-                            deleteManager.deleteInApi30(uris, resultHandler)
-                        } else {
-                            deleteManager.deleteInApi28(ids)
-                            resultHandler.reply(ids)
-                        }
-                    } catch (e: Exception) {
-                        LogUtils.error("deleteWithIds failed", e)
-                        resultHandler.replyError("deleteWithIds failed")
-                    }
-                }
-            }
-            "saveImage" -> {
+            Methods.saveImage -> {
                 runOnBackground {
                     try {
                         val image = call.argument<ByteArray>("image")!!
@@ -409,7 +371,7 @@ class PhotoManagerPlugin(
                     }
                 }
             }
-            "saveImageWithPath" -> {
+            Methods.saveImageWithPath -> {
                 runOnBackground {
                     try {
                         val imagePath = call.argument<String>("path")!!
@@ -429,7 +391,7 @@ class PhotoManagerPlugin(
                     }
                 }
             }
-            "saveVideo" -> {
+            Methods.saveVideo -> {
                 runOnBackground {
                     try {
                         val videoPath = call.argument<String>("path")!!
@@ -449,21 +411,38 @@ class PhotoManagerPlugin(
                     }
                 }
             }
-            "copyAsset" -> {
+            Methods.copyAsset -> {
                 runOnBackground {
                     val assetId = call.argument<String>("assetId")!!
                     val galleryId = call.argument<String>("galleryId")!!
                     photoManager.copyToGallery(assetId, galleryId, resultHandler)
                 }
             }
-            "moveAssetToPath" -> {
+            Methods.moveAssetToPath -> {
                 runOnBackground {
                     val assetId = call.argument<String>("assetId")!!
                     val albumId = call.argument<String>("albumId")!!
                     photoManager.moveToGallery(assetId, albumId, resultHandler)
                 }
             }
-            "removeNoExistsAssets" -> {
+            Methods.deleteWithIds -> {
+                runOnBackground {
+                    try {
+                        val ids = call.argument<List<String>>("ids")!!
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            val uris = ids.map { photoManager.getUri(it) }.toList()
+                            deleteManager.deleteInApi30(uris, resultHandler)
+                        } else {
+                            deleteManager.deleteInApi28(ids)
+                            resultHandler.reply(ids)
+                        }
+                    } catch (e: Exception) {
+                        LogUtils.error("deleteWithIds failed", e)
+                        resultHandler.replyError("deleteWithIds failed")
+                    }
+                }
+            }
+            Methods.removeNoExistsAssets -> {
                 runOnBackground {
                     photoManager.removeAllExistsAssets(resultHandler)
                 }

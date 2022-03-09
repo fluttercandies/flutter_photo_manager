@@ -8,7 +8,9 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import androidx.core.app.ActivityCompat
+import com.fluttercandies.photo_manager.constant.Methods
 import com.fluttercandies.photo_manager.util.LogUtils
+import io.flutter.plugin.common.MethodCall
 import java.lang.NullPointerException
 import java.util.ArrayList
 
@@ -75,7 +77,10 @@ class PermissionsUtils {
      * @return 返回 [PermissionsUtils] 自身，进行链式调用
      */
     @TargetApi(23)
-    private fun getPermissionsWithTips(requestCode: Int, vararg permissions: String): PermissionsUtils {
+    private fun getPermissionsWithTips(
+        requestCode: Int,
+        vararg permissions: String
+    ): PermissionsUtils {
         if (mActivity == null) {
             throw NullPointerException("Activity for the permission request is not exist.")
         }
@@ -177,5 +182,28 @@ class PermissionsUtils {
         localIntent.action = "android.settings.APPLICATION_DETAILS_SETTINGS"
         localIntent.data = Uri.fromParts("package", context!!.packageName, null)
         context.startActivity(localIntent)
+    }
+
+    fun needWriteExternalStorage(call: MethodCall): Boolean {
+        return when (call.method) {
+            Methods.saveImage,
+            Methods.saveImageWithPath,
+            Methods.saveVideo,
+            Methods.copyAsset,
+            Methods.moveAssetToPath,
+            Methods.deleteWithIds,
+            Methods.removeNoExistsAssets -> true
+            else -> false
+        }
+    }
+
+    fun needAccessLocation(call: MethodCall): Boolean {
+        return when (call.method) {
+            Methods.copyAsset,
+            Methods.getLatLng,
+            Methods.getOriginBytes -> true
+            Methods.getFullFile -> call.argument<Boolean>("isOrigin")!! && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+            else -> false
+        }
     }
 }

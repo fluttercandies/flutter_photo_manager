@@ -2,7 +2,7 @@ package com.fluttercandies.photo_manager.core.entity
 
 import android.annotation.SuppressLint
 import android.provider.MediaStore
-import com.fluttercandies.photo_manager.core.AssetType
+import com.fluttercandies.photo_manager.constant.AssetType
 import com.fluttercandies.photo_manager.core.utils.ConvertUtils
 
 class FilterOption(map: Map<*, *>) {
