@@ -255,7 +255,7 @@ object DBUtils : IDBUtils {
         val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
         val orientation: Int = cursor.getInt(MediaStore.Images.ImageColumns.ORIENTATION)
         val mimeType = cursor.getString(MediaStore.Files.FileColumns.MIME_TYPE)
-        if ((width == 0 || height == 0) && path.isNotBlank()) {
+        if ((width == 0 || height == 0) && path.isNotBlank() && File(path).exists()) {
             ExifInterface(path).apply {
                 width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
                 height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
