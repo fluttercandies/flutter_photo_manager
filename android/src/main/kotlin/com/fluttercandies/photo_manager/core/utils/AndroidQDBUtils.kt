@@ -390,6 +390,11 @@ object AndroidQDBUtils : IDBUtils {
             Pair(0, 0)
         }
         val inputStream = ByteArrayInputStream(image)
+        val rotationDegrees = try {
+            ExifInterface(inputStream).rotationDegrees
+        } catch (ignored: Throwable) {
+            0
+        }
         val typeFromStream: String = if (title.contains(".")) {
             // Title contains file extension.
             "image/${File(title).extension}"
@@ -408,6 +413,7 @@ object AndroidQDBUtils : IDBUtils {
             put(MediaStore.Images.ImageColumns.DATE_TAKEN, timestamp * 1000)
             put(MediaStore.Images.ImageColumns.WIDTH, width)
             put(MediaStore.Images.ImageColumns.HEIGHT, height)
+            put(MediaStore.Images.ImageColumns.ORIENTATION, rotationDegrees)
             put(MediaStore.Images.Media.DISPLAY_NAME, title)
             put(MediaStore.MediaColumns.DISPLAY_NAME, title)
             if (relativePath != null)
@@ -442,6 +448,11 @@ object AndroidQDBUtils : IDBUtils {
         } catch (e: Exception) {
             Pair(0, 0)
         }
+        val rotationDegrees = try {
+            ExifInterface(inputStream).rotationDegrees
+        } catch (ignored: Throwable) {
+            0
+        }
         val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
             ?: "image/${File(path).extension}"
         val values = ContentValues().apply {
@@ -457,6 +468,7 @@ object AndroidQDBUtils : IDBUtils {
             put(MediaStore.Images.ImageColumns.DURATION, 0)
             put(MediaStore.Images.ImageColumns.WIDTH, width)
             put(MediaStore.Images.ImageColumns.HEIGHT, height)
+            put(MediaStore.Images.ImageColumns.ORIENTATION, rotationDegrees)
         }
         if (relativePath != null) values.put(
             MediaStore.Images.ImageColumns.RELATIVE_PATH,
