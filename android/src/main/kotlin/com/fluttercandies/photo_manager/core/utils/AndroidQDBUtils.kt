@@ -246,7 +246,7 @@ object AndroidQDBUtils : IDBUtils {
         val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
         val orientation: Int = cursor.getInt(MediaStore.MediaColumns.ORIENTATION)
         val relativePath: String = cursor.getString(MediaStore.MediaColumns.RELATIVE_PATH)
-        if ((width == 0 || height == 0) && path.isNotBlank()) {
+        if ((width == 0 || height == 0) && path.isNotBlank() && File(path).exists()) {
             ExifInterface(path).apply {
                 width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
                 height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
