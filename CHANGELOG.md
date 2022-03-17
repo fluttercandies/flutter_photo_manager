@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.0.2
+
+Fixes:
+- Ensure file exists before reading EXIF on Android. (#728)
+
 ## 2.0.1
 
 Improvements:
