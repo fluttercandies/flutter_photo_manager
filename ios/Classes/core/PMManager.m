@@ -117,7 +117,7 @@
     return result && result.count > 0;
 }
 
-- (BOOL)entityIsLocallyAvailable:(NSString *)assetId isOrigin:(BOOL)isOrigin {
+- (BOOL)entityIsLocallyAvailable:(NSString *)assetId resource:(PHAssetResource *)resource isOrigin:(BOOL)isOrigin {
     PHFetchResult<PHAsset *> *result =
     [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[PHFetchOptions new]];
     if (!result) {
@@ -1097,11 +1097,6 @@
 }
 
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler {
-    BOOL isLocallyAvailable = [self entityIsLocallyAvailable:assetId isOrigin:NO];
-    if (!isLocallyAvailable) {
-        [handler replyError:@"Media url is unavailable when the asset is not locally available."];
-        return;
-    }
     PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
     PHAssetResource *resource;
     if (@available(iOS 9.1, *)) {
@@ -1111,6 +1106,11 @@
             [handler reply:url.absoluteString];
             return;
         }
+    }
+    BOOL isLocallyAvailable = [self entityIsLocallyAvailable:assetId resource:resource isOrigin:NO];
+    if (!isLocallyAvailable) {
+        [handler replyError:@"Media url is unavailable when the asset is not locally available."];
+        return;
     }
     if (asset.isVideo) {
         PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;

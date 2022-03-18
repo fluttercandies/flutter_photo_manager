@@ -26,23 +26,33 @@ class _LivePhotosWidgetState extends State<LivePhotosWidget> {
   @override
   void initState() {
     super.initState();
-    widget.entity.getMediaUrl().then((String? url) {
-      if (!mounted || url == null) {
-        return;
+    _initializeController();
+  }
+
+  Future<void> _initializeController() async {
+    if (!await widget.entity.isLocallyAvailable()) {
+      if (widget.useOrigin) {
+        await widget.entity.originFileWithSubtype;
+      } else {
+        await widget.entity.fileWithSubtype;
       }
-      _controller = VideoPlayerController.network(
-        url,
-        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
-      )
-        ..initialize()
-        ..setVolume(0)
-        ..addListener(() {
-          if (mounted) {
-            setState(() {});
-          }
-        });
-      setState(() {});
-    });
+    }
+    final String? url = await widget.entity.getMediaUrl();
+    if (!mounted || url == null) {
+      return;
+    }
+    _controller = VideoPlayerController.network(
+      url,
+      videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+    )
+      ..initialize()
+      ..setVolume(0)
+      ..addListener(() {
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    setState(() {});
   }
 
   void _play() {
