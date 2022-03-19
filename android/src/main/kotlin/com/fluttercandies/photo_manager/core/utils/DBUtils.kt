@@ -334,19 +334,13 @@ object DBUtils : IDBUtils {
             inputStream = ByteArrayInputStream(image)
         }
 
-        val latLong = kotlin.run {
+        val (latLong, rotationDegrees) = kotlin.run {
             val exifInterface = try {
-                ExifInterface(ByteArrayInputStream(image))
+                ExifInterface(inputStream)
             } catch (e: Exception) {
-                return@run doubleArrayOf(0.0, 0.0)
+                return@run Pair(doubleArrayOf(0.0, 0.0), 0)
             }
-            exifInterface.latLong ?: doubleArrayOf(0.0, 0.0)
-        }
-        val degrees = try {
-            val exifInterface = ExifInterface(inputStream)
-            exifInterface.rotationDegrees
-        } catch (e: Exception) {
-            0
+            Pair(exifInterface.latLong ?: doubleArrayOf(0.0, 0.0), 0)
         }
         refreshInputStream()
         val bmp = BitmapFactory.decodeStream(inputStream)
@@ -377,9 +371,10 @@ object DBUtils : IDBUtils {
             put(MediaStore.Images.ImageColumns.HEIGHT, height)
             put(MediaStore.Images.ImageColumns.LATITUDE, latLong[0])
             put(MediaStore.Images.ImageColumns.LONGITUDE, latLong[1])
-            put(MediaStore.Images.ImageColumns.ORIENTATION, degrees)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.Images.ImageColumns.ORIENTATION, rotationDegrees)
                 put(MediaStore.Images.ImageColumns.DATE_TAKEN, timestamp * 1000)
+            }
         }
 
         val insertUri = cr.insert(
@@ -418,13 +413,13 @@ object DBUtils : IDBUtils {
         val inputStream = FileInputStream(path)
         val cr = context.contentResolver
         val timestamp = System.currentTimeMillis() / 1000
-        val latLong = kotlin.run {
+        val (latLong, rotationDegrees) = kotlin.run {
             val exifInterface = try {
                 ExifInterface(path)
             } catch (e: Exception) {
-                return@run doubleArrayOf(0.0, 0.0)
+                return@run Pair(doubleArrayOf(0.0, 0.0), 0)
             }
-            exifInterface.latLong ?: doubleArrayOf(0.0, 0.0)
+            Pair(exifInterface.latLong ?: doubleArrayOf(0.0, 0.0), 0)
         }
         val (width, height) = try {
             val bmp = BitmapFactory.decodeFile(path)
@@ -453,10 +448,13 @@ object DBUtils : IDBUtils {
             put(MediaStore.Images.ImageColumns.LONGITUDE, latLong[1])
             put(MediaStore.Images.ImageColumns.WIDTH, width)
             put(MediaStore.Images.ImageColumns.HEIGHT, height)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.Images.ImageColumns.ORIENTATION, rotationDegrees)
                 put(MediaStore.Images.ImageColumns.DATE_TAKEN, timestamp * 1000)
-            if (savePath)
+            }
+            if (savePath) {
                 put(MediaStore.Video.VideoColumns.DATA, path)
+            }
         }
 
         val contentUri = cr.insert(uri, values) ?: return null
