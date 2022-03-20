@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.0.3
+
+Improvements:
+- Improve `getMediaUrl` on iOS.
+- Read orientation when saving images on Android. (#730)
+- Improve generic type casts on Android. (#732)
+
 ## 2.0.2
 
 Fixes:
