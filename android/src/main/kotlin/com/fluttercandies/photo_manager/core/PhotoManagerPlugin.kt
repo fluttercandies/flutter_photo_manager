@@ -102,7 +102,7 @@ class PhotoManagerPlugin(
                 true
             }
             Methods.log -> {
-                LogUtils.isLog = call.arguments()
+                LogUtils.isLog = call.arguments() ?: false
                 resultHandler.reply(1)
                 true
             }
