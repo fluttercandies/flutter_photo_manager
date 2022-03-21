@@ -389,12 +389,14 @@ object AndroidQDBUtils : IDBUtils {
         } catch (e: Exception) {
             Pair(0, 0)
         }
-        val inputStream = ByteArrayInputStream(image)
-        val rotationDegrees = try {
-            ExifInterface(inputStream).rotationDegrees
-        } catch (ignored: Throwable) {
-            0
+        var inputStream = ByteArrayInputStream(image)
+        fun refreshInputStream() {
+            inputStream = ByteArrayInputStream(image)
         }
+
+        val rotationDegrees = inputStream.getOrientationDegrees()
+        refreshInputStream()
+
         val typeFromStream: String = if (title.contains(".")) {
             // Title contains file extension.
             "image/${File(title).extension}"
@@ -405,6 +407,7 @@ object AndroidQDBUtils : IDBUtils {
         val timestamp = System.currentTimeMillis() / 1000
         val values = ContentValues().apply {
             put(MEDIA_TYPE, MEDIA_TYPE_IMAGE)
+            put(MediaStore.MediaColumns.DISPLAY_NAME, title)
             put(MediaStore.Images.ImageColumns.MIME_TYPE, typeFromStream)
             put(MediaStore.Images.ImageColumns.TITLE, title)
             put(MediaStore.Images.ImageColumns.DESCRIPTION, desc)
@@ -414,10 +417,9 @@ object AndroidQDBUtils : IDBUtils {
             put(MediaStore.Images.ImageColumns.WIDTH, width)
             put(MediaStore.Images.ImageColumns.HEIGHT, height)
             put(MediaStore.Images.ImageColumns.ORIENTATION, rotationDegrees)
-            put(MediaStore.Images.Media.DISPLAY_NAME, title)
-            put(MediaStore.MediaColumns.DISPLAY_NAME, title)
-            if (relativePath != null)
+            if (relativePath != null) {
                 put(MediaStore.Images.ImageColumns.RELATIVE_PATH, relativePath)
+            }
         }
 
         val cr = context.contentResolver
@@ -441,18 +443,19 @@ object AndroidQDBUtils : IDBUtils {
         path.checkDirs()
         val cr = context.contentResolver
         val timestamp = System.currentTimeMillis() / 1000
-        val inputStream = FileInputStream(path)
+        var inputStream = FileInputStream(path)
+        fun refreshInputStream() {
+            inputStream = FileInputStream(path)
+        }
+
         val (width, height) = try {
             val bmp = BitmapFactory.decodeFile(path)
             Pair(bmp.width, bmp.height)
         } catch (e: Exception) {
             Pair(0, 0)
         }
-        val rotationDegrees = try {
-            ExifInterface(inputStream).rotationDegrees
-        } catch (ignored: Throwable) {
-            0
-        }
+        val rotationDegrees = inputStream.getOrientationDegrees()
+        refreshInputStream()
         val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
             ?: "image/${File(path).extension}"
         val values = ContentValues().apply {
@@ -469,11 +472,10 @@ object AndroidQDBUtils : IDBUtils {
             put(MediaStore.Images.ImageColumns.WIDTH, width)
             put(MediaStore.Images.ImageColumns.HEIGHT, height)
             put(MediaStore.Images.ImageColumns.ORIENTATION, rotationDegrees)
+            if (relativePath != null) {
+                put(MediaStore.Images.ImageColumns.RELATIVE_PATH, relativePath)
+            }
         }
-        if (relativePath != null) values.put(
-            MediaStore.Images.ImageColumns.RELATIVE_PATH,
-            relativePath
-        )
 
         val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val contentUri = cr.insert(uri, values) ?: return null
@@ -502,7 +504,8 @@ object AndroidQDBUtils : IDBUtils {
             MediaStore.Video.VideoColumns.DATE_TAKEN,
             MediaStore.Video.VideoColumns.DURATION,
             MediaStore.Video.VideoColumns.WIDTH,
-            MediaStore.Video.VideoColumns.HEIGHT
+            MediaStore.Video.VideoColumns.HEIGHT,
+            MediaStore.Video.VideoColumns.ORIENTATION
         )
 
         val mediaType = convertTypeToMediaType(asset.type)
@@ -675,7 +678,14 @@ object AndroidQDBUtils : IDBUtils {
         path.checkDirs()
         val cr = context.contentResolver
         val timestamp = System.currentTimeMillis() / 1000
-        val inputStream = FileInputStream(path)
+        var inputStream = FileInputStream(path)
+        fun refreshInputStream() {
+            inputStream = FileInputStream(path)
+        }
+
+        val rotationDegrees = inputStream.getOrientationDegrees()
+        refreshInputStream()
+
         val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
             ?: "video/${File(path).extension}"
         val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
@@ -693,8 +703,10 @@ object AndroidQDBUtils : IDBUtils {
             put(MediaStore.Video.VideoColumns.DURATION, info.duration)
             put(MediaStore.Video.VideoColumns.WIDTH, info.width)
             put(MediaStore.Video.VideoColumns.HEIGHT, info.height)
-            if (relativePath != null)
+            put(MediaStore.Video.VideoColumns.ORIENTATION, rotationDegrees)
+            if (relativePath != null) {
                 put(MediaStore.Video.VideoColumns.RELATIVE_PATH, relativePath)
+            }
         }
 
         val contentUri = cr.insert(uri, values) ?: return null
