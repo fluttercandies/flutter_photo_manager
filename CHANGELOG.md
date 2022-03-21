@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.0.4
+
+Fixes:
+- Fix invalid `InputStream` when saving images on Android. (#736)
+
 ## 2.0.3
 
 Improvements:
