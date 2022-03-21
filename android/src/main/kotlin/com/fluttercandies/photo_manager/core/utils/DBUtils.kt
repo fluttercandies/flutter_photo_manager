@@ -76,7 +76,7 @@ object DBUtils : IDBUtils {
     ): List<GalleryEntity> {
         val list = ArrayList<GalleryEntity>()
         val args = ArrayList<String>()
-        val typeSelection: String = AndroidQDBUtils.getCondFromType(requestType, option, args)
+        val typeSelection: String = getCondFromType(requestType, option, args)
         val projection = storeBucketKeys + arrayOf("count(1)")
         val dateSelection = getDateCond(args, option)
         val sizeWhere = sizeWhere(requestType, option)
@@ -329,25 +329,26 @@ object DBUtils : IDBUtils {
     ): AssetEntity? {
         val cr = context.contentResolver
         var inputStream = ByteArrayInputStream(image)
-
         fun refreshInputStream() {
             inputStream = ByteArrayInputStream(image)
         }
 
-        val (latLong, rotationDegrees) = kotlin.run {
+        val latLong = kotlin.run {
             val exifInterface = try {
                 ExifInterface(inputStream)
             } catch (e: Exception) {
-                return@run Pair(doubleArrayOf(0.0, 0.0), 0)
+                return@run doubleArrayOf(0.0, 0.0)
             }
-            Pair(exifInterface.latLong ?: doubleArrayOf(0.0, 0.0), 0)
+            exifInterface.latLong ?: doubleArrayOf(0.0, 0.0)
         }
         refreshInputStream()
+
         val bmp = BitmapFactory.decodeStream(inputStream)
         val width = bmp.width
         val height = bmp.height
         val timestamp = System.currentTimeMillis() / 1000
         refreshInputStream()
+
         val typeFromStream: String = if (title.contains(".")) {
             // title contains file extension, form mimeType from it
             "image/${File(title).extension}"
@@ -371,10 +372,6 @@ object DBUtils : IDBUtils {
             put(MediaStore.Images.ImageColumns.HEIGHT, height)
             put(MediaStore.Images.ImageColumns.LATITUDE, latLong[0])
             put(MediaStore.Images.ImageColumns.LONGITUDE, latLong[1])
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                put(MediaStore.Images.ImageColumns.ORIENTATION, rotationDegrees)
-                put(MediaStore.Images.ImageColumns.DATE_TAKEN, timestamp * 1000)
-            }
         }
 
         val insertUri = cr.insert(
@@ -410,28 +407,38 @@ object DBUtils : IDBUtils {
         desc: String,
         relativePath: String?
     ): AssetEntity? {
-        val inputStream = FileInputStream(path)
         val cr = context.contentResolver
-        val timestamp = System.currentTimeMillis() / 1000
-        val (latLong, rotationDegrees) = kotlin.run {
-            val exifInterface = try {
-                ExifInterface(path)
-            } catch (e: Exception) {
-                return@run Pair(doubleArrayOf(0.0, 0.0), 0)
-            }
-            Pair(exifInterface.latLong ?: doubleArrayOf(0.0, 0.0), 0)
+        val file = File(path)
+        var inputStream = FileInputStream(file)
+        fun refreshInputStream() {
+            inputStream = FileInputStream(file)
         }
+
+        val latLong = kotlin.run {
+            val exifInterface = try {
+                ExifInterface(inputStream)
+            } catch (e: Exception) {
+                return@run doubleArrayOf(0.0, 0.0)
+            }
+            exifInterface.latLong ?: doubleArrayOf(0.0, 0.0)
+        }
+        refreshInputStream()
+
         val (width, height) = try {
             val bmp = BitmapFactory.decodeFile(path)
             Pair(bmp.width, bmp.height)
         } catch (e: Exception) {
             Pair(0, 0)
         }
+        val timestamp = System.currentTimeMillis() / 1000
+
         val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
             ?: "image/${File(path).extension}"
+        refreshInputStream()
+
         val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val dir = Environment.getExternalStorageDirectory()
-        val savePath = File(path).absolutePath.startsWith(dir.path)
+        val savePath = file.absolutePath.startsWith(dir.path)
         val values = ContentValues().apply {
             put(
                 MediaStore.Files.FileColumns.MEDIA_TYPE,
@@ -448,10 +455,6 @@ object DBUtils : IDBUtils {
             put(MediaStore.Images.ImageColumns.LONGITUDE, latLong[1])
             put(MediaStore.Images.ImageColumns.WIDTH, width)
             put(MediaStore.Images.ImageColumns.HEIGHT, height)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                put(MediaStore.Images.ImageColumns.ORIENTATION, rotationDegrees)
-                put(MediaStore.Images.ImageColumns.DATE_TAKEN, timestamp * 1000)
-            }
             if (savePath) {
                 put(MediaStore.Video.VideoColumns.DATA, path)
             }
@@ -460,9 +463,7 @@ object DBUtils : IDBUtils {
         val contentUri = cr.insert(uri, values) ?: return null
         val id = ContentUris.parseId(contentUri)
         val assetEntity = getAssetEntity(context, id.toString())
-        if (savePath) {
-            inputStream.close()
-        } else {
+        if (!savePath) {
             val tmpPath = assetEntity?.path!!
             tmpPath.checkDirs()
             val tmpFile = File(tmpPath)
@@ -476,7 +477,6 @@ object DBUtils : IDBUtils {
                 put(MediaStore.Video.VideoColumns.DATA, targetPath)
             }
             cr.update(contentUri, updateDataValues, null, null)
-
             val outputStream = FileOutputStream(targetFile)
             outputStream.use { os -> inputStream.use { it.copyTo(os) } }
             assetEntity.path = targetPath
@@ -507,9 +507,6 @@ object DBUtils : IDBUtils {
             MediaStore.Video.VideoColumns.WIDTH,
             MediaStore.Video.VideoColumns.HEIGHT
         )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            copyKeys.add(MediaStore.Video.VideoColumns.DATE_TAKEN)
-        }
         val mediaType = convertTypeToMediaType(asset.type)
         if (mediaType != MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO) {
             copyKeys.add(MediaStore.Video.VideoColumns.DESCRIPTION)

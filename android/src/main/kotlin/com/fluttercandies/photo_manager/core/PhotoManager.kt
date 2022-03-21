@@ -30,7 +30,7 @@ class PhotoManager(private val context: Context) {
 
     private val dbUtils: IDBUtils
         get() {
-            return if (useOldApi || Build.VERSION.SDK_INT < 29) DBUtils
+            return if (useOldApi || Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) DBUtils
             else AndroidQDBUtils
         }
 
