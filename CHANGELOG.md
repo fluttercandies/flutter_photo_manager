@@ -2,9 +2,8 @@
 
 ## 2.0.5
 
-New behavior:
-
-- Modify the `titleAsync` of `AssetEntity` implementation on iOS. (#740)
+Improvements:
+- Improve `AssetEntity.titleAsync`'s implementation on iOS. (#740)
 
 ## 2.0.4
 
