@@ -285,7 +285,7 @@ class AssetPathProvider extends ChangeNotifier {
     if (list.length == path.assetCount) {
       return path.assetCount;
     }
-    return list.length;
+    return list.length + 1;
   }
 
   bool refreshing = false;
