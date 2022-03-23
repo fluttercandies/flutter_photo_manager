@@ -94,6 +94,26 @@
         return @"";
     }
 }
+
+- (NSString *)originalFileName {
+    NSArray *array = [PHAssetResource assetResourcesForAsset:self];
+    for (PHAssetResource *resource in array) {
+        if ([self isImage] && resource.type == PHAssetResourceTypePhoto) {
+            return resource.originalFilename;
+        } else if ([self isVideo] && resource.type == PHAssetResourceTypeVideo) {
+            return resource.originalFilename;
+        }
+    }
+    
+    PHAssetResource *firstRes = array.firstObject;
+    if (firstRes) {
+        return firstRes.originalFilename;
+    }
+    
+    return @"";
+}
+
+
 // UTI: https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_intro/understand_utis_intro.html#//apple_ref/doc/uid/TP40001319
 - (NSString *)mimeType {
     PHAssetResource *resource = [[PHAssetResource assetResourcesForAsset:self] firstObject];
