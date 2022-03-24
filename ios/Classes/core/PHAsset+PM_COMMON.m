@@ -95,37 +95,21 @@
     }
 }
 
-- (NSString *)originalFileNameWithSubtype:(int)subtype {
-    NSArray *array = [PHAssetResource assetResourcesForAsset:self];
-    for (PHAssetResource *resource in array) {
-        if (subtype == 8 && [self isLivePhoto]) {
-            if (@available(iOS 9.1, *)) {
-                if (resource.type == PHAssetResourceTypePairedVideo) {
-                    return resource.originalFilename;
-                }
-            } else if (@available(macOS 10.11, *)) {
-                if (resource.type == PHAssetResourceTypePairedVideo) {
-                    return resource.originalFilename;
-                }
-            } else if ([self isImage] && resource.type == PHAssetResourceTypePhoto) {
-                return resource.originalFilename;
-            } else if ([self isVideo] && resource.type == PHAssetResourceTypeVideo) {
-                return resource.originalFilename;
-            }
-        } else {
-            if ([self isImage] && resource.type == PHAssetResourceTypePhoto) {
-                return resource.originalFilename;
-            } else if ([self isVideo] && resource.type == PHAssetResourceTypeVideo) {
-                return resource.originalFilename;
-            }
+- (NSString *)originalFilenameWithSubtype:(int)subtype {
+    if (@available(iOS 9.1, *)) {
+        if ([self isLivePhoto] && subtype == PHAssetMediaSubtypePhotoLive) {
+            return [self getLivePhotosResource].originalFilename;
         }
     }
-    
-    PHAssetResource *firstRes = array.firstObject;
-    if (firstRes) {
-        return firstRes.originalFilename;
+    if (@available(macOS 10.11, *)) {
+        if ([self isLivePhoto] && subtype == PHAssetMediaSubtypePhotoLive) {
+            return [self getLivePhotosResource].originalFilename;
+        }
     }
-    
+    PHAssetResource *resource = [self getAdjustResource];
+    if (resource) {
+        return resource.originalFilename;
+    }
     return @"";
 }
 

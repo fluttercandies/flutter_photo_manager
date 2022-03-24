@@ -1082,7 +1082,7 @@
 - (NSString *)getTitleAsyncWithAssetId:(NSString *)assetId subtype:(int)subtype {
     PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
     if (asset) {
-        return [asset originalFileNameWithSubtype: subtype];
+        return [asset originalFilenameWithSubtype:subtype];
     }
     return @"";
 }
