@@ -350,7 +350,7 @@ class AssetEntity {
 
   /// {@macro photo_manager.AssetEntity.titleAsync}
   Future<String> get titleAsyncWithSubtype =>
-      plugin.getTitleAsync(this, subtype: subtype);
+      plugin.getTitleAsync(this, subtype: true);
 
   /// {@macro photo_manager.AssetType}
   AssetType get type => AssetType.values[typeInt];

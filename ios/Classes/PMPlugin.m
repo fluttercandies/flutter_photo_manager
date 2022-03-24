@@ -386,7 +386,7 @@
             [handler reply:@(exists)];
         } else if ([call.method isEqualToString:@"getTitleAsync"]) {
             NSString *assetId = call.arguments[@"id"];
-            int subtype = [call.arguments[@"subtype"] intValue];
+            BOOL subtype = [call.arguments[@"subtype"] boolValue];
             NSString *title = [manager getTitleAsyncWithAssetId:assetId subtype:subtype];
             [handler reply:title];
         } else if ([call.method isEqualToString:@"getMimeTypeAsync"]) {

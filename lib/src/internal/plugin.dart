@@ -332,7 +332,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return LatLng(latitude: entity.latitude, longitude: entity.longitude);
   }
 
-  Future<String> getTitleAsync(AssetEntity entity, {int subtype = 0}) async {
+  Future<String> getTitleAsync(
+    AssetEntity entity, {
+    bool subtype = false,
+  }) async {
     assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
     if (Platform.isAndroid) {
       return entity.title!;
