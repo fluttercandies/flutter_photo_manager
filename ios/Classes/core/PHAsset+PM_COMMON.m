@@ -98,7 +98,7 @@
 - (NSString *)originalFileNameWithSubtype:(int)subtype {
     NSArray *array = [PHAssetResource assetResourcesForAsset:self];
     for (PHAssetResource *resource in array) {
-        if ([self isLivePhoto]) {
+        if (subtype == 8 && [self isLivePhoto]) {
             if (@available(iOS 9.1, *)) {
                 if (resource.type == PHAssetResourceTypePairedVideo) {
                     return resource.originalFilename;
@@ -107,12 +107,17 @@
                 if (resource.type == PHAssetResourceTypePairedVideo) {
                     return resource.originalFilename;
                 }
+            } else if ([self isImage] && resource.type == PHAssetResourceTypePhoto) {
+                return resource.originalFilename;
+            } else if ([self isVideo] && resource.type == PHAssetResourceTypeVideo) {
+                return resource.originalFilename;
             }
-        }
-        if ([self isImage] && resource.type == PHAssetResourceTypePhoto) {
-            return resource.originalFilename;
-        } else if ([self isVideo] && resource.type == PHAssetResourceTypeVideo) {
-            return resource.originalFilename;
+        } else {
+            if ([self isImage] && resource.type == PHAssetResourceTypePhoto) {
+                return resource.originalFilename;
+            } else if ([self isVideo] && resource.type == PHAssetResourceTypeVideo) {
+                return resource.originalFilename;
+            }
         }
     }
     
