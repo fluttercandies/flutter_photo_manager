@@ -344,7 +344,7 @@ class AssetEntity {
 
   ///  {@template photo_manager.AssetEntity.titleAsync}
   ///  * Android: `MediaStore.MediaColumns.DISPLAY_NAME`.
-  ///  * iOS/macOS: [`PHAssetResource.originalFilename`](https://developer.apple.com/documentation/photokit/phassetresource/1623985-originalfilename?language=objc).
+  ///  * iOS/macOS: `PHAssetResource.originalFilename`.
   ///  {@endtemplate}
   Future<String> get titleAsync => plugin.getTitleAsync(this);
 
