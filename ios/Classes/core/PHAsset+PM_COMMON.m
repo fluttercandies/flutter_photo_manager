@@ -95,7 +95,7 @@
     }
 }
 
-- (NSString *)originalFileName {
+- (NSString *)getOriginalFileNameNoSubtype {
     NSArray *array = [PHAssetResource assetResourcesForAsset:self];
     for (PHAssetResource *resource in array) {
         if ([self isImage] && resource.type == PHAssetResourceTypePhoto) {
@@ -113,6 +113,28 @@
     return @"";
 }
 
+- (NSString *)originalFileNameWithSubtype:(int)subtype {
+    if (!subtype || ![self isLivePhoto]){
+        return [self getOriginalFileNameNoSubtype];
+    }
+    
+    
+    NSArray *array = [PHAssetResource assetResourcesForAsset:self];
+    for (PHAssetResource *resource in array) {
+        if (@available(iOS 9.1, *)) {
+            if(resource.type == PHAssetResourceTypePairedVideo){
+                return resource.originalFilename;
+            }
+        }
+    }
+    
+    PHAssetResource *firstRes = array.firstObject;
+    if (firstRes) {
+        return firstRes.originalFilename;
+    }
+    
+    return @"";
+}
 
 // UTI: https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_intro/understand_utis_intro.html#//apple_ref/doc/uid/TP40001319
 - (NSString *)mimeType {
