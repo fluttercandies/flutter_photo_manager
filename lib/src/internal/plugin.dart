@@ -334,7 +334,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
 
   Future<String> getTitleAsync(
     AssetEntity entity, {
-    bool subtype = false,
+    int subtype = 0,
   }) async {
     assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
     if (Platform.isAndroid) {

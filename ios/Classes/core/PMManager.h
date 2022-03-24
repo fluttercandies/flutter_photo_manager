@@ -60,7 +60,7 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (BOOL)entityIsLocallyAvailable:(NSString *)assetId resource:(PHAssetResource *)resource isOrigin:(BOOL)isOrigin;
 
-- (NSString*)getTitleAsyncWithAssetId:(NSString *)assetId subtype:(BOOL)subtype;
+- (NSString*)getTitleAsyncWithAssetId:(NSString *)assetId subtype:(int)subtype;
 
 - (NSString*)getMimeTypeAsyncWithAssetId: (NSString *) assetId;
 

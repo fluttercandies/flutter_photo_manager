@@ -95,10 +95,10 @@
     }
 }
 
-- (NSString *)originalFileNameWithSubtype:(BOOL)subtype {
+- (NSString *)originalFileNameWithSubtype:(int)subtype {
     NSArray *array = [PHAssetResource assetResourcesForAsset:self];
     for (PHAssetResource *resource in array) {
-        if (subtype && [self isLivePhoto]) {
+        if ([self isLivePhoto]) {
             if (@available(iOS 9.1, *)) {
                 if (resource.type == PHAssetResourceTypePairedVideo) {
                     return resource.originalFilename;

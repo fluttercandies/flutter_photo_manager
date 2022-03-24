@@ -1079,7 +1079,7 @@
     }];
 }
 
-- (NSString *)getTitleAsyncWithAssetId:(NSString *)assetId subtype:(BOOL)subtype {
+- (NSString *)getTitleAsyncWithAssetId:(NSString *)assetId subtype:(int)subtype {
     PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
     if (asset) {
         return [asset originalFileNameWithSubtype: subtype];
