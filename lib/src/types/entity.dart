@@ -342,9 +342,15 @@ class AssetEntity {
   /// or use the async getter [titleAsync].
   final String? title;
 
+  ///  {@template photo_manager.AssetEntity.titleAsync}
   ///  * Android: `MediaStore.MediaColumns.DISPLAY_NAME`.
-  ///  * iOS/macOS: `PHAssetResource.filename`.
+  ///  * iOS/macOS: `PHAssetResource.originalFilename`.
+  ///  {@endtemplate}
   Future<String> get titleAsync => plugin.getTitleAsync(this);
+
+  /// {@macro photo_manager.AssetEntity.titleAsync}
+  Future<String> get titleAsyncWithSubtype =>
+      plugin.getTitleAsync(this, subtype: subtype);
 
   /// {@macro photo_manager.AssetType}
   AssetType get type => AssetType.values[typeInt];

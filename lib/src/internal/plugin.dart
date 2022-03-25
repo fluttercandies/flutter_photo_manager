@@ -332,7 +332,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return LatLng(latitude: entity.latitude, longitude: entity.longitude);
   }
 
-  Future<String> getTitleAsync(AssetEntity entity) async {
+  Future<String> getTitleAsync(
+    AssetEntity entity, {
+    int subtype = 0,
+  }) async {
     assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
     if (Platform.isAndroid) {
       return entity.title!;
@@ -340,7 +343,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     if (Platform.isIOS || Platform.isMacOS) {
       return await _channel.invokeMethod<String>(
         PMConstants.mGetTitleAsync,
-        <String, dynamic>{'id': entity.id},
+        <String, dynamic>{
+          'id': entity.id,
+          'subtype': subtype,
+        },
       ) as String;
     }
     return '';

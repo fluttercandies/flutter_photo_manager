@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.0.5
+
+Improvements:
+- Improve `AssetEntity.titleAsync`'s implementation on iOS. (#740)
+
 ## 2.0.4
 
 Fixes:
