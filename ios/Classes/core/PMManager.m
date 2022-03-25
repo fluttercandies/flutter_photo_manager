@@ -651,9 +651,9 @@
     filename = [NSString stringWithFormat:@"%@%@_%@", modifiedDate, isOrigin ? @"_o" : @"", filename];
     NSString *typeDirPath;
     if (resource) {
-        typeDirPath = resource.isImage ? @".image" : @".video";
+        typeDirPath = resource.isImage ? PM_IMAGE_CACHE_PATH : PM_VIDEO_CACHE_PATH;
     } else {
-        typeDirPath = asset.isImage ? @".image" : @".video";
+        typeDirPath = asset.isImage ? PM_IMAGE_CACHE_PATH : PM_VIDEO_CACHE_PATH;
     }
     NSString *dirPath = [NSString stringWithFormat:@"%@%@", homePath, typeDirPath];
     if (manager == nil) {
@@ -666,10 +666,8 @@
 }
 
 - (NSString *)writeFullFileWithAssetId:(PHAsset *)asset imageData:(NSData *)imageData {
-    NSString *homePath = NSTemporaryDirectory();
     NSFileManager *manager = NSFileManager.defaultManager;
-    NSMutableString *path = [NSMutableString stringWithString:homePath];
-    [path appendString:@"flutter-images"];
+    NSMutableString *path = [NSMutableString stringWithString:[self getCachePath:PM_FULL_IMAGE_CACHE_PATH]];
     NSError *error;
     [manager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:@{} error:&error];
     [path appendString:@"/"];
@@ -1449,20 +1447,28 @@
 }
 
 - (void)clearFileCache {
-    NSString *imagePath = [self getCachePath:@".image"];
-    NSString *videoPath = [self getCachePath:@".video"];
-    
+    NSString *imagePath = [self getCachePath:PM_IMAGE_CACHE_PATH];
+    NSString *videoPath = [self getCachePath:PM_VIDEO_CACHE_PATH];
+    NSString *fullFilePath = [self getCachePath:PM_FULL_IMAGE_CACHE_PATH];
+
     NSError *err;
     [PMFileHelper deleteFile:imagePath isDirectory:YES error:err];
     if (err) {
         [PMLogUtils.sharedInstance
-         info:[NSString stringWithFormat:@"Remove .image cache %@, error: %@", imagePath, err]];
+            info:[NSString stringWithFormat:@"Remove .image cache %@, error: %@", imagePath, err]];
     }
     [PMFileHelper deleteFile:videoPath isDirectory:YES error:err];
     if (err) {
         [PMLogUtils.sharedInstance
-         info:[NSString stringWithFormat:@"Remove .video cache %@, error: %@", videoPath, err]];
+            info:[NSString stringWithFormat:@"Remove .video cache %@, error: %@", videoPath, err]];
     }
+
+    [PMFileHelper deleteFile:fullFilePath isDirectory:YES error:err];
+    if (err) {
+        [PMLogUtils.sharedInstance
+            info:[NSString stringWithFormat:@"Remove .full file cache %@, error: %@", fullFilePath, err]];
+    }
+
 }
 
 #pragma mark cache thumb

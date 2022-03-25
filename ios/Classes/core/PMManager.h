@@ -16,7 +16,12 @@ typedef void (^ChangeIds)(NSArray<NSString *> *);
 #import "PMResultHandler.h"
 #import "PMConvertProtocol.h"
 
+#define PM_VIDEO_CACHE_PATH @".video"
+#define PM_IMAGE_CACHE_PATH @".image"
+#define PM_FULL_IMAGE_CACHE_PATH @"flutter-images"
+
 typedef void (^AssetResult)(PMAssetEntity *);
+
 
 @interface PMManager : NSObject
 
