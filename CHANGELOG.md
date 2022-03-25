@@ -2,9 +2,9 @@
 
 ## 2.0.6
 
-Fixeds:
+Fixes:
 
-- Clear file cache on iOS. (#742)(#743)
+- Fix file caches clearing on iOS. (#743)
 
 ## 2.0.5
 
