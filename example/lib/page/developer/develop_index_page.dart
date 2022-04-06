@@ -10,6 +10,7 @@ import 'create_entity_by_id.dart';
 import 'dev_title_page.dart';
 import 'ios/create_folder_example.dart';
 import 'ios/edit_asset.dart';
+import 'issues_page/issue_index_page.dart';
 import 'remove_all_android_not_exists_example.dart';
 
 class DeveloperIndexPage extends StatefulWidget {
@@ -67,6 +68,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
           ElevatedButton(
             onPressed: _requestPermssionExtend,
             child: const Text('Request permission extend'),
+          ),
+          ElevatedButton(
+            onPressed: _openIssue,
+            child: const Text('Open issue page'),
           ),
           if (Platform.isIOS)
             ElevatedButton(
@@ -163,6 +168,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
       context,
       MaterialPageRoute<void>(builder: (_) => widget),
     );
+  }
+
+  void _openIssue() {
+    navToWidget(const IssuePage());
   }
 
   void _openSetting() {
