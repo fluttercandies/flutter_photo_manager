@@ -25,12 +25,12 @@ class IssuePage extends StatelessWidget {
 }
 
 class _NavColumn extends StatelessWidget {
-  final List<Widget> children;
-
   const _NavColumn({
     Key? key,
     required this.children,
   }) : super(key: key);
+
+  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +80,7 @@ mixin IssueBase<T extends StatefulWidget> on State<T> {
   PreferredSizeWidget buildAppBar() {
     return AppBar(
       title: Text('$issueNumber issue page'),
-      actions: [
+      actions: <Widget>[
         buildUrlButton(),
       ],
     );

@@ -20,7 +20,7 @@ class _Issue734PageState extends State<Issue734Page>
     return Scaffold(
       appBar: buildAppBar(),
       body: buildBody(
-        [
+        <Widget>[
           buildButton('Reproduct', _reproduct),
         ],
       ),
@@ -40,7 +40,7 @@ class _Issue734PageState extends State<Issue734Page>
     );
 
     final List<AssetPathEntity> pathList =
-        await PhotoManager.getAssetPathList(filterOption: group, hasAll: true);
+        await PhotoManager.getAssetPathList(filterOption: group);
 
     if (pathList.isEmpty) {
       print('The path list is empty');
@@ -48,6 +48,9 @@ class _Issue734PageState extends State<Issue734Page>
     }
 
     final AssetPathEntity recent = pathList[0];
+
+    print('recent.assetCount: ${recent.assetCount}');
+
     for (int i = 0; i < recent.assetCount; i++) {
       final List<AssetEntity> pageAssetList = await recent.getAssetListPaged(
         page: i,
@@ -55,16 +58,16 @@ class _Issue734PageState extends State<Issue734Page>
       );
 
       try {
-        print('asset count: ${pageAssetList.length}');
-        print('asset id: ${pageAssetList[0].id}');
+        print(' page($i, 1) list asset count: ${pageAssetList.length}');
+        print(' page($i, 1) list asset[0] id: ${pageAssetList[0].id}');
       } catch (e) {
         print(e);
       }
 
       final List<AssetEntity> rangeList = await recent.getAssetListRange(start: i, end: i + 1);
       try {
-        print('rangeList asset count: ${rangeList.length}');
-        print('rangeList asset[0] id: ${rangeList[0].id}');
+        print('range($i, ${i+1}) list asset count: ${rangeList.length}');
+        print('range($i, ${i+1}) list asset[0] id: ${rangeList[0].id}');
       } catch (e) {
         print(e);
       }

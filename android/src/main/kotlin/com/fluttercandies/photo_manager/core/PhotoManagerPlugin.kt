@@ -18,6 +18,7 @@ import com.fluttercandies.photo_manager.core.entity.FilterOption
 import com.fluttercandies.photo_manager.core.entity.PermissionResult
 import com.fluttercandies.photo_manager.core.entity.ThumbLoadOption
 import com.fluttercandies.photo_manager.core.utils.ConvertUtils
+import com.fluttercandies.photo_manager.core.utils.isUseLegacy
 import com.fluttercandies.photo_manager.permission.PermissionsListener
 import com.fluttercandies.photo_manager.permission.PermissionsUtils
 import com.fluttercandies.photo_manager.util.LogUtils

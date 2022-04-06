@@ -120,10 +120,10 @@ object AndroidQDBUtils : IDBUtils {
     }
 
     override fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String? {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            return filterOption.orderByCondString()
+        if (isUseLegacy()) {
+            return super.getSortOrder(start, pageSize, filterOption)
         }
-        return super.getSortOrder(start, pageSize, filterOption)
+        return filterOption.orderByCondString()
     }
 
     private fun cursorWithRange(
@@ -132,7 +132,10 @@ object AndroidQDBUtils : IDBUtils {
         pageSize: Int,
         block: (cursor: Cursor) -> Unit
     ) {
-        cursor.moveToPosition(start - 1)
+        if (!isUseLegacy()) {
+            cursor.moveToPosition(start - 1)
+        }
+
         for (i in 0 until pageSize) {
             if (cursor.moveToNext()) {
                 block(cursor)
