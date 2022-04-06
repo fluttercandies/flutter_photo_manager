@@ -120,7 +120,7 @@ object AndroidQDBUtils : IDBUtils {
     }
 
     override fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String? {
-        if (isUseLegacy()) {
+        if (isExternalStorageLegacy()) {
             return super.getSortOrder(start, pageSize, filterOption)
         }
         return filterOption.orderByCondString()
@@ -132,10 +132,9 @@ object AndroidQDBUtils : IDBUtils {
         pageSize: Int,
         block: (cursor: Cursor) -> Unit
     ) {
-        if (!isUseLegacy()) {
+        if (!isExternalStorageLegacy()) {
             cursor.moveToPosition(start - 1)
         }
-
         for (i in 0 until pageSize) {
             if (cursor.moveToNext()) {
                 block(cursor)

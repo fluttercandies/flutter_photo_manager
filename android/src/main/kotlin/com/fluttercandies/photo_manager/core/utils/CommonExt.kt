@@ -26,6 +26,6 @@ fun InputStream.getOrientationDegrees(): Int {
     }
 }
 
-fun isUseLegacy(): Boolean {
+fun isExternalStorageLegacy(): Boolean {
     return Build.VERSION.SDK_INT == Build.VERSION_CODES.Q && Environment.isExternalStorageLegacy()
 }
