@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.0.7
+
+Fixes:
+
+- Fix assets pagination issues on Android 29+. (#748)
+
 ## 2.0.6
 
 Fixes:
