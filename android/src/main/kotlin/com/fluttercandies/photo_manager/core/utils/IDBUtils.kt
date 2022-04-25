@@ -309,7 +309,7 @@ interface IDBUtils {
     }
 
     fun getMediaUri(context: Context, id: String, type: Int): String {
-        val uri = AndroidQDBUtils.getUri(id, type, false)
+        val uri = getUri(id, type, false)
         return uri.toString()
     }
 
