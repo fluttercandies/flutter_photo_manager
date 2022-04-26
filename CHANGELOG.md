@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.0.8
+
+Improvements:
+
+- Using `ContentResolver` as much as possible on Android. (#755)
+
 ## 2.0.7
 
 Fixes:
