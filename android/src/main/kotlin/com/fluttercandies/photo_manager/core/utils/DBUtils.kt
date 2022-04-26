@@ -147,16 +147,6 @@ object DBUtils : IDBUtils {
         }
     }
 
-    override fun getThumbUri(
-        context: Context,
-        id: String,
-        width: Int,
-        height: Int,
-        type: Int?
-    ): Uri? {
-        TODO("not implemented")
-    }
-
     override fun getAssetFromGalleryId(
         context: Context,
         galleryId: String,
@@ -306,7 +296,7 @@ object DBUtils : IDBUtils {
         asset: AssetEntity,
         haveLocationPermission: Boolean
     ): ByteArray {
-        TODO("not implemented")
+        return File(asset.path).readBytes()
     }
 
     override fun getExif(context: Context, id: String): ExifInterface? {

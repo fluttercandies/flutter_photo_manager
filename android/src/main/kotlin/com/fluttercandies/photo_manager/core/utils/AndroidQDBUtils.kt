@@ -176,7 +176,7 @@ object AndroidQDBUtils : IDBUtils {
         ) ?: return emptyList()
         cursor.use {
             cursorWithRange(it, page * size, size) {
-                val asset = convertCursorToAssetEntity(cursor)
+                val asset = convertCursorToAssetEntity(context, cursor)
                 list.add(asset)
             }
         }
@@ -219,7 +219,7 @@ object AndroidQDBUtils : IDBUtils {
         ) ?: return emptyList()
         cursor.use {
             cursorWithRange(it, start, pageSize) {
-                list.add(convertCursorToAssetEntity(cursor))
+                list.add(convertCursorToAssetEntity(context, cursor))
             }
         }
         return list
@@ -229,7 +229,7 @@ object AndroidQDBUtils : IDBUtils {
     private fun assetKeys() =
         IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + arrayOf(MediaStore.MediaColumns.RELATIVE_PATH)
 
-    private fun convertCursorToAssetEntity(cursor: Cursor): AssetEntity {
+    private fun convertCursorToAssetEntity(context: Context, cursor: Cursor): AssetEntity {
         val id = cursor.getString(MediaStore.MediaColumns._ID)
         val path = cursor.getString(MediaStore.MediaColumns.DATA)
         var date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
@@ -248,10 +248,17 @@ object AndroidQDBUtils : IDBUtils {
         val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
         val orientation: Int = cursor.getInt(MediaStore.MediaColumns.ORIENTATION)
         val relativePath: String = cursor.getString(MediaStore.MediaColumns.RELATIVE_PATH)
-        if ((width == 0 || height == 0) && path.isNotBlank() && File(path).exists()) {
-            ExifInterface(path).apply {
-                width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
-                height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+        if ((width == 0 || height == 0)
+            && path.isNotBlank()
+            && File(path).exists()
+            && !mimeType.contains("svg")
+        ) {
+            val uri = getUri(id, getMediaType(type))
+            context.contentResolver.openInputStream(uri)?.use {
+                ExifInterface(it).apply {
+                    width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
+                    height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+                }
             }
         }
         return AssetEntity(
@@ -282,7 +289,8 @@ object AndroidQDBUtils : IDBUtils {
             null
         ) ?: return null
         cursor.use {
-            return if (it.moveToNext()) convertCursorToAssetEntity(it) else null
+            return if (it.moveToNext()) convertCursorToAssetEntity(context, it)
+            else null
         }
     }
 
@@ -342,19 +350,6 @@ object AndroidQDBUtils : IDBUtils {
     override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
         val assetEntity = getAssetEntity(context, id) ?: return null
         return assetEntity.path
-    }
-
-    override fun getThumbUri(
-        context: Context,
-        id: String,
-        width: Int,
-        height: Int,
-        type: Int?
-    ): Uri? {
-        if (type == null) {
-            return null
-        }
-        return getUri(id, type)
     }
 
     private fun getUri(asset: AssetEntity, isOrigin: Boolean = false): Uri =

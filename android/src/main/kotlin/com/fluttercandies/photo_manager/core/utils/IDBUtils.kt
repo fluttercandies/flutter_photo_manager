@@ -151,8 +151,6 @@ interface IDBUtils {
 
     fun getFilePath(context: Context, id: String, origin: Boolean): String?
 
-    fun getThumbUri(context: Context, id: String, width: Int, height: Int, type: Int?): Uri?
-
     fun getAssetFromGalleryIdRange(
         context: Context,
         galleryId: String,
@@ -309,7 +307,7 @@ interface IDBUtils {
     }
 
     fun getMediaUri(context: Context, id: String, type: Int): String {
-        val uri = AndroidQDBUtils.getUri(id, type, false)
+        val uri = getUri(id, type, false)
         return uri.toString()
     }
 
