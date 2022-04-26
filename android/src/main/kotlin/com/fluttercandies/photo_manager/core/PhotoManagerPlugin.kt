@@ -288,8 +288,7 @@ class PhotoManagerPlugin(
             Methods.getFullFile -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
-                    val isOrigin =
-                        if (!haveLocationPermission) false else call.argument<Boolean>("isOrigin")!!
+                    val isOrigin = if (!haveLocationPermission) false else call.argument<Boolean>("isOrigin")!!
                     photoManager.getFile(id, isOrigin, resultHandler)
                 }
             }

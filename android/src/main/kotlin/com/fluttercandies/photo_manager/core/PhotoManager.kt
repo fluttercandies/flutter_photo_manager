@@ -93,9 +93,10 @@ class PhotoManager(private val context: Context) {
                 resultHandler.replyError("The asset not found!")
                 return
             }
-            ThumbnailUtil.getThumbnailByGlide(
+            val uri = asset.getUri()
+            ThumbnailUtil.getThumbnail(
                 context,
-                asset.path,
+                uri,
                 option.width,
                 option.height,
                 format,
@@ -104,7 +105,7 @@ class PhotoManager(private val context: Context) {
                 resultHandler.result
             )
         } catch (e: Exception) {
-            Log.e(LogUtils.TAG, "get $id thumb error, width : $width, height: $height", e)
+            Log.e(LogUtils.TAG, "get $id thumbnail error, width : $width, height: $height", e)
             dbUtils.logRowWithId(context, id)
             resultHandler.replyError("201", "get thumb error", e)
         }

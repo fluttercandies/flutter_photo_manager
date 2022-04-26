@@ -14,7 +14,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 
 object ThumbnailUtil {
-    fun getThumbnailByGlide(
+    fun getThumbnail(
         ctx: Context,
         path: String,
         width: Int,
@@ -40,7 +40,7 @@ object ThumbnailUtil {
         }
     }
 
-    fun getThumbOfUri(
+    fun getThumbnail(
         context: Context,
         uri: Uri,
         width: Int,
@@ -48,8 +48,10 @@ object ThumbnailUtil {
         format: Bitmap.CompressFormat,
         quality: Int,
         frame: Long,
-        callback: (ByteArray?) -> Unit
+        result: MethodChannel.Result?
     ) {
+        val resultHandler = ResultHandler(result)
+
         try {
             val resource = Glide.with(context)
                 .asBitmap()
@@ -58,9 +60,9 @@ object ThumbnailUtil {
                 .submit(width, height).get()
             val bos = ByteArrayOutputStream()
             resource.compress(format, quality, bos)
-            callback(bos.toByteArray())
+            resultHandler.reply(bos.toByteArray())
         } catch (e: Exception) {
-            callback(null)
+            resultHandler.reply(null)
         }
     }
 
