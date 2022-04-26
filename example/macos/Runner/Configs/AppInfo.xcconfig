@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = example
+PRODUCT_NAME = photo_manager Example
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = top.kikt.example
+PRODUCT_BUNDLE_IDENTIFIER = com.fluttercandies.photo-manager-example
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2021 top.kikt. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2021 FlutterCandies. All rights reserved.
