@@ -296,7 +296,7 @@ class PhotoManagerPlugin(
             Methods.getOriginBytes -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
-                    photoManager.getOriginBytes(id, resultHandler)
+                    photoManager.getOriginBytes(id, resultHandler, haveLocationPermission)
                 }
             }
             Methods.getMediaUrl -> {

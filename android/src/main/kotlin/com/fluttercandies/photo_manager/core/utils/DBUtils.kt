@@ -296,7 +296,7 @@ object DBUtils : IDBUtils {
         asset: AssetEntity,
         haveLocationPermission: Boolean
     ): ByteArray {
-        TODO("not implemented")
+        return File(asset.path).readBytes()
     }
 
     override fun getExif(context: Context, id: String): ExifInterface? {
