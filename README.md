@@ -125,9 +125,9 @@ please upgrade them to a newer version.
 
 More specifically:
 - Upgrade your Gradle version (`gradle-wrapper.properties`)
-  to `6.8.3` or the latest version but lower than `7.0.0`.
+  to `6.8.3` or the latest version.
 - Upgrade your Kotlin version (`ext.kotlin_version`)
-  to `1.4.32` or the latest version.
+  to `1.5.30` or the latest version.
 
 ##### Android 10+ (Q, 29)
 
@@ -142,7 +142,7 @@ If your `compileSdkVersion` is above 29, you must add
 
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="top.kikt.photo_manager_example">
+    package="com.fluttercandies.photo_manager_example">
 
     <application
         android:label="photo_manager_example"
