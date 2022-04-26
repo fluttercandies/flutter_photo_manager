@@ -254,7 +254,7 @@ object AndroidQDBUtils : IDBUtils {
             && !mimeType.contains("svg")
         ) {
 //            try {
-                val uri = getUri(id, getMediaType(type), true)
+                val uri = getUri(id, getMediaType(type))
                 context.contentResolver.openInputStream(uri)?.use {
                     ExifInterface(it).apply {
                         width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
