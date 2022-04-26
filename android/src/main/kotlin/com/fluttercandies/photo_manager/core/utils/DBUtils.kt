@@ -147,16 +147,6 @@ object DBUtils : IDBUtils {
         }
     }
 
-    override fun getThumbUri(
-        context: Context,
-        id: String,
-        width: Int,
-        height: Int,
-        type: Int?
-    ): Uri? {
-        TODO("not implemented")
-    }
-
     override fun getAssetFromGalleryId(
         context: Context,
         galleryId: String,

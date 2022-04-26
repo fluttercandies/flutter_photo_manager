@@ -151,8 +151,6 @@ interface IDBUtils {
 
     fun getFilePath(context: Context, id: String, origin: Boolean): String?
 
-    fun getThumbUri(context: Context, id: String, width: Int, height: Int, type: Int?): Uri?
-
     fun getAssetFromGalleryIdRange(
         context: Context,
         galleryId: String,

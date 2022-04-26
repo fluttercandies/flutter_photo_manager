@@ -355,19 +355,6 @@ object AndroidQDBUtils : IDBUtils {
         return assetEntity.path
     }
 
-    override fun getThumbUri(
-        context: Context,
-        id: String,
-        width: Int,
-        height: Int,
-        type: Int?
-    ): Uri? {
-        if (type == null) {
-            return null
-        }
-        return getUri(id, type)
-    }
-
     private fun getUri(asset: AssetEntity, isOrigin: Boolean = false): Uri =
         getUri(asset.id, asset.type, isOrigin)
 
