@@ -15,24 +15,37 @@ class NotifyManager {
   Stream<bool> get notifyStream => _controller.stream;
   final StreamController<bool> _controller = StreamController<bool>.broadcast();
 
-  final List<ValueChanged<MethodCall>> notifyCallback =
+  final List<ValueChanged<MethodCall>> _notifyCallback =
       <ValueChanged<MethodCall>>[];
 
-  /// Add a callback.
-  void addCallback(ValueChanged<MethodCall> c) => notifyCallback.add(c);
+  /// {@template photo_manager.NotifyManager.addChangeCallback}
+  /// Add a callback for assets changing.
+  /// {@endtemplate}
+  void addChangeCallback(ValueChanged<MethodCall> c) => _notifyCallback.add(c);
 
-  /// Remove the callback
-  void removeCallback(ValueChanged<MethodCall> c) => notifyCallback.remove(c);
+  /// {@template photo_manager.NotifyManager.removeChangeCallback}
+  /// Remove the callback for assets changing.
+  /// {@endtemplate}
+  void removeChangeCallback(ValueChanged<MethodCall> c) =>
+      _notifyCallback.remove(c);
 
-  /// Start to handle notify.
-  void startHandleNotify() {
+  /// {@template photo_manager.NotifyManager.startChangeNotify}
+  /// Enable notifications for assets changing.
+  ///
+  /// Make sure you've added a callback for changes.
+  /// {@endtemplate}
+  void startChangeNotify() {
     _channel.setMethodCallHandler(_notify);
     _controller.add(true);
     plugin.notifyChange(start: true);
   }
 
-  /// Stop to handle notify.
-  void stopHandleNotify() {
+  /// {@template photo_manager.NotifyManager.stopChangeNotify}
+  /// Disable notifications for assets changing.
+  ///
+  /// Remember to remove callbacks for changes.
+  /// {@endtemplate}
+  void stopChangeNotify() {
     plugin.notifyChange(start: false);
     _controller.add(false);
     _channel.setMethodCallHandler(null);
@@ -48,9 +61,9 @@ class NotifyManager {
   }
 
   Future<dynamic> _onChange(MethodCall m) async {
-    notifyCallback.toList().forEach((ValueChanged<MethodCall> c) => c.call(m));
+    _notifyCallback.toList().forEach((ValueChanged<MethodCall> c) => c.call(m));
   }
 
   @override
-  String toString() => '$runtimeType(callbacks: ${notifyCallback.length})';
+  String toString() => '$runtimeType(callbacks: ${_notifyCallback.length})';
 }

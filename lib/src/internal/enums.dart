@@ -1,23 +1,22 @@
 /// {@template photo_manager.AssetType}
 /// The type of the asset.
 ///
-/// Most of assets are [image] and [video],
-/// some assets might be [audio] on Android.
-/// The [other] type won't show in general.
+/// Most of assets are [AssetType.image] and [AssetType.video],
+/// some assets might be [AssetType.audio] on Android.
+/// The [AssetType.other] type won't show in general.
 /// {@endtemplate}
 ///
 /// **IMPORTANT FOR MAINTAINERS:** **DO NOT** change orders of values.
 enum AssetType {
-  /// Assets other than [image], [video] and [audio].
   other,
   image,
   video,
   audio,
 }
 
-/// {%template photo_manager.ThumbnailFormat}
+/// {@template photo_manager.ThumbnailFormat}
 /// Which format the thumbnail should be, generally support JPG and PNG.
-/// {%endtemplate}
+/// {@endtemplate}
 enum ThumbnailFormat { jpeg, png }
 
 /// Enumeration for `PHImageRequestOptionsDeliveryMode` on iOS/macOS.

@@ -149,7 +149,7 @@ class AssetPathEntity {
   /// Entity list with pagination support.
   ///
   /// [page] should starts with and greater than 0.
-  /// [pageSize] is item count of current [page].
+  /// [size] is item count of current [page].
   Future<List<AssetEntity>> getAssetListPaged({
     required int page,
     required int size,

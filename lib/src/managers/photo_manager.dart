@@ -114,13 +114,13 @@ class PhotoManager {
   /// Make sure callers of this method have `await`ed properly.
   static Future<void> releaseCache() => plugin.releaseCache();
 
-  /// Add a callback for assets changing.
+  /// {@macro photo_manager.NotifyManager.addChangeCallback}
   static void addChangeCallback(ValueChanged<MethodCall> callback) =>
-      _notifyManager.addCallback(callback);
+      _notifyManager.addChangeCallback(callback);
 
-  /// Remove the callback for assets changing.
+  /// {@macro photo_manager.NotifyManager.removeChangeCallback}
   static void removeChangeCallback(ValueChanged<MethodCall> callback) =>
-      _notifyManager.removeCallback(callback);
+      _notifyManager.removeChangeCallback(callback);
 
   /// Whether assets change event should be notified.
   static bool get notifyingOfChange => _notifyingOfChange;
@@ -129,19 +129,15 @@ class PhotoManager {
   /// The notify enable flag in stream.
   static Stream<bool> get notifyStream => _notifyManager.notifyStream;
 
-  /// Enable notifications for assets changing.
-  ///
-  /// Make sure you've added a callback for changes.
+  /// {@macro photo_manager.NotifyManager.startChangeNotify}
   static void startChangeNotify() {
-    _notifyManager.startHandleNotify();
+    _notifyManager.startChangeNotify();
     _notifyingOfChange = true;
   }
 
-  /// Disable notifications for assets changing.
-  ///
-  /// Remember to remove callbacks for changes.
+  /// {@macro photo_manager.NotifyManager.stopChangeNotify}
   static void stopChangeNotify() {
-    _notifyManager.stopHandleNotify();
+    _notifyManager.stopChangeNotify();
     _notifyingOfChange = false;
   }
 
