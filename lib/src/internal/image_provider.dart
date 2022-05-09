@@ -108,6 +108,7 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
       // have had a chance to track the key in the cache at all.
       // Schedule a microtask to give the cache a chance to add the key.
       Future<void>.microtask(() {
+        // ignore: invalid_null_aware_operator
         PaintingBinding.instance?.imageCache?.evict(key);
       });
       rethrow;
