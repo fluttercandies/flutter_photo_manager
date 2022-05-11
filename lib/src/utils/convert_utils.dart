@@ -1,3 +1,7 @@
+// Copyright 2018 The FlutterCandies author. All rights reserved.
+// Use of this source code is governed by an Apache license that can be found
+// in the LICENSE file.
+
 import '../filter/filter_option_group.dart';
 import '../types/entity.dart';
 import '../types/types.dart';
