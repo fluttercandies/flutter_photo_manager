@@ -1,0 +1,100 @@
+name: Runnable (stable)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  analyze:
+    name: Analyze on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11.x'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - name: Log Dart/Flutter versions
+        run: |
+          dart --version
+          flutter --version
+      - name: Prepare dependencies
+        run: flutter pub get
+      - name: Analyse the repo
+        run: flutter analyze lib example/lib
+      - name: Run tests
+        run: flutter test
+      - name: Generate docs
+        run: |
+          dart pub global activate dartdoc
+          dart pub global run dartdoc .
+
+  test_iOS:
+    needs: analyze
+    name: Test iOS build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-latest ]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11.x'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - run: dart --version
+      - run: flutter --version
+      - run: flutter pub get
+      - run: cd example; flutter build ios --no-codesign
+
+  test_macOS:
+    needs: analyze
+    name: Test macOS build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-latest ]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11.x'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - run: dart --version
+      - run: flutter --version
+      - run: flutter pub get
+      - run: cd example; flutter build macos --debug
+
+  test_Android:
+    needs: analyze
+    name: Test Android build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11.x'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - run: dart --version
+      - run: flutter --version
+      - run: flutter pub get
+      - run: sudo echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "ndk;20.0.5594570"
+      - run: cd example; flutter build apk --debug

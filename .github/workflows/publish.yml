@@ -1,23 +1,19 @@
-name: Publish to pub
+name: Publish
 
 on:
   release:
-    types:
-      - created
+    types: [ published ]
+  workflow_dispatch:
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      - name: Copy on publish
-        run: ./copy_on_publish.sh
       - name: Publish
-        uses: sakebook/actions-flutter-pub-publisher@v1.3.1
+        uses: k-paxian/dart-package-publisher@v1.3
         with:
-          credential: ${{ secrets.CREDENTIAL_JSON }}
-          flutter_package: false
-          skip_test: true
-          dry_run: false
+          credentialJson: ${{ secrets.CREDENTIAL_JSON }}
+          flutter: true
+          skipTests: true
