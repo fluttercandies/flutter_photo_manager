@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_manager/photo_manager.dart';
 
+import '../util/log.dart';
+
 class SaveMediaExample extends StatefulWidget {
   const SaveMediaExample({Key? key}) : super(key: key);
 
@@ -62,7 +64,7 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
   }
 
   void _onChange(MethodCall call) {
-    print(call.arguments);
+    Log.d(call.arguments);
   }
 
   @override
@@ -112,10 +114,10 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
     resp.listen((List<int> data) {
       file.writeAsBytesSync(data, mode: FileMode.append);
     }, onDone: () async {
-      print('file path = ${file.lengthSync()}');
+      Log.d('file path = ${file.lengthSync()}');
       final AssetEntity? asset =
           await PhotoManager.editor.saveVideo(file, title: name);
-      print('saved asset: $asset');
+      Log.d('saved asset: $asset');
       client.close();
     });
   }
@@ -139,7 +141,7 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
       uint8List,
       title: '${DateTime.now().millisecondsSinceEpoch}.jpg',
     );
-    print('saved asset: $asset');
+    Log.d('saved asset: $asset');
   }
 
   Future<void> saveImageWithPath() async {
@@ -152,12 +154,12 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
     resp.listen((List<int> data) {
       file.writeAsBytesSync(data, mode: FileMode.append);
     }, onDone: () async {
-      print('write image to file success: $file');
+      Log.d('write image to file success: $file');
       final AssetEntity? asset = await PhotoManager.editor.saveImageWithPath(
         file.path,
         title: '${DateTime.now().millisecondsSinceEpoch}.jpg',
       );
-      print('saved asset: $asset');
+      Log.d('saved asset: $asset');
       client.close();
     });
   }

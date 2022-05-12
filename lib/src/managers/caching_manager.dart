@@ -13,7 +13,7 @@ class PhotoCachingManager {
 
   PhotoCachingManager._();
 
-  static late final PhotoCachingManager instance = PhotoCachingManager._();
+  static final PhotoCachingManager instance = PhotoCachingManager._();
 
   static const ThumbnailOption _defaultOption = ThumbnailOption(
     size: ThumbnailSize.square(PMConstants.vDefaultThumbnailSize),

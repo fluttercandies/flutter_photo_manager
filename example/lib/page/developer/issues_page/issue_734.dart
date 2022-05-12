@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
+import '../../../util/log.dart';
 import 'issue_index_page.dart';
 
 class Issue734Page extends StatefulWidget {
@@ -43,13 +44,13 @@ class _Issue734PageState extends State<Issue734Page>
         await PhotoManager.getAssetPathList(filterOption: group);
 
     if (pathList.isEmpty) {
-      print('The path list is empty');
+      Log.d('The path list is empty');
       return;
     }
 
     final AssetPathEntity recent = pathList[0];
 
-    print('recent.assetCount: ${recent.assetCount}');
+    Log.d('recent.assetCount: ${recent.assetCount}');
 
     for (int i = 0; i < recent.assetCount; i++) {
       final List<AssetEntity> pageAssetList = await recent.getAssetListPaged(
@@ -58,18 +59,18 @@ class _Issue734PageState extends State<Issue734Page>
       );
 
       try {
-        print(' page($i, 1) list asset count: ${pageAssetList.length}');
-        print(' page($i, 1) list asset[0] id: ${pageAssetList[0].id}');
+        Log.d(' page($i, 1) list asset count: ${pageAssetList.length}');
+        Log.d(' page($i, 1) list asset[0] id: ${pageAssetList[0].id}');
       } catch (e) {
-        print(e);
+        Log.d(e);
       }
 
       final List<AssetEntity> rangeList = await recent.getAssetListRange(start: i, end: i + 1);
       try {
-        print('range($i, ${i+1}) list asset count: ${rangeList.length}');
-        print('range($i, ${i+1}) list asset[0] id: ${rangeList[0].id}');
+        Log.d('range($i, ${i+1}) list asset count: ${rangeList.length}');
+        Log.d('range($i, ${i+1}) list asset[0] id: ${rangeList[0].id}');
       } catch (e) {
-        print(e);
+        Log.d(e);
       }
     }
   }

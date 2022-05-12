@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../util/log.dart';
+
 class DurationPicker extends StatefulWidget {
   const DurationPicker({
     Key? key,
@@ -25,9 +27,9 @@ class _DurationPickerState extends State<DurationPicker> {
   void initState() {
     super.initState();
 
-    print(hours);
-    print(minutes);
-    print(seconds);
+    Log.d(hours);
+    Log.d(minutes);
+    Log.d(seconds);
   }
 
   @override

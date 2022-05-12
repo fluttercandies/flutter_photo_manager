@@ -102,12 +102,11 @@ class AssetPathEntity {
     bool maxDateTimeToNow = true,
   }) async {
     optionGroup ??= FilterOptionGroup();
-    final StateError _error = StateError(
+    final StateError error = StateError(
       'Unable to fetch properties for path $id.',
     );
-    final FilterOptionGroup? _optionGroup;
     if (maxDateTimeToNow) {
-      _optionGroup = optionGroup.copyWith(
+      optionGroup = optionGroup.copyWith(
         createTimeCond: optionGroup.createTimeCond.copyWith(
           max: DateTime.now(),
         ),
@@ -116,26 +115,26 @@ class AssetPathEntity {
         ),
       );
     } else {
-      _optionGroup = optionGroup;
+      optionGroup = optionGroup;
     }
 
     final Map<dynamic, dynamic>? result = await plugin.fetchPathProperties(
       id,
       type,
-      _optionGroup,
+      optionGroup,
     );
     if (result == null) {
-      throw _error;
+      throw error;
     }
     final Object? list = result['data'];
     if (list is List && list.isNotEmpty) {
       return ConvertUtils.convertToPathList(
         result.cast<String, dynamic>(),
         type: type,
-        optionGroup: _optionGroup,
+        optionGroup: optionGroup,
       ).first;
     }
-    throw _error;
+    throw error;
   }
 
   /// Call this method to obtain new path entity.

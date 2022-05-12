@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:photo_manager/photo_manager.dart';
 
+import '../../util/log.dart';
 import 'create_entity_by_id.dart';
 import 'dev_title_page.dart';
 import 'ios/create_folder_example.dart';
@@ -102,7 +103,7 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
       return;
     }
 
-    print('file length = ${file.lengthSync()}');
+    Log.d('file length = ${file.lengthSync()}');
 
     final http.Client client = http.Client();
     final http.MultipartRequest req = http.MultipartRequest(
@@ -117,7 +118,7 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
 
     final http.StreamedResponse response = await client.send(req);
     final String body = await utf8.decodeStream(response.stream);
-    print(body);
+    Log.d(body);
   }
 
   Future<void> _saveVideo() async {
@@ -140,13 +141,13 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
       f.writeAsBytesSync(data, mode: FileMode.append);
     }, onDone: () async {
       client.close();
-      print('the video file length = ${f.lengthSync()}');
+      Log.d('the video file length = ${f.lengthSync()}');
       final AssetEntity? result =
           await PhotoManager.editor.saveVideo(f, title: title);
       if (result != null) {
-        print('result : ${(await result.originFile)?.path}');
+        Log.d('result : ${(await result.originFile)?.path}');
       } else {
-        print('result is null');
+        Log.d('result is null');
       }
     });
   }
@@ -184,7 +185,7 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
 
   Future<void> _requestPermssionExtend() async {
     final PermissionState state = await PhotoManager.requestPermissionExtend();
-    print('result --- state: $state');
+    Log.d('result --- state: $state');
   }
 
   bool _isNotify = false;
@@ -203,7 +204,7 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
   }
 
   void _callback(MethodCall call) {
-    print('on change ${call.method} ${call.arguments}');
+    Log.d('on change ${call.method} ${call.arguments}');
     PhotoManager.removeChangeCallback(_callback);
     _isNotify = false;
   }

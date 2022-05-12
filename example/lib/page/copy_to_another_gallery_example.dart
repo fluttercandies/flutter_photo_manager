@@ -3,6 +3,7 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
 
 import '../model/photo_provider.dart';
+import '../util/log.dart';
 
 class CopyToAnotherGalleryPage extends StatefulWidget {
   const CopyToAnotherGalleryPage({
@@ -90,7 +91,7 @@ class _CopyToAnotherGalleryPageState extends State<CopyToAnotherGalleryPage> {
       pathEntity: targetGallery!,
     );
 
-    print('copy result = $result');
+    Log.d('copy result = $result');
   }
 
   Widget _buildCopyButton() {

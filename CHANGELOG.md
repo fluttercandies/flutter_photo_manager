@@ -4,12 +4,17 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.1.0
+
+Migrate to Flutter 3, drop supports for previous Flutter versions.
+
 ## 2.0.9
 
 Improvements:
 
-- Ignore the null-aware operator for `PaintingBinding`'s instance
-  in order to solve the coming lint issues with Flutter 2.13,
+- (Not working) Ignore the null-aware operator for
+  `PaintingBinding`'s instance in order to solve
+  the coming lint issues with Flutter 2.13,
   and keeps the compatibility of previous Flutter versions.
 - Fix dart docs generate issues.
 

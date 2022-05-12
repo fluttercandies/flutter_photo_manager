@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../model/photo_provider.dart';
 import '../util/common_util.dart';
+import '../util/log.dart';
 import '../widget/dialog/list_dialog.dart';
 import '../widget/image_item_widget.dart';
 import '../widget/loading_widget.dart';
@@ -145,7 +146,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             ElevatedButton(
               child: const Text('isLocallyAvailable (for .file)'),
               onPressed: () => entity.isLocallyAvailable().then((bool r) {
-                print('isLocallyAvailable: $r');
+                Log.d('isLocallyAvailable: $r');
               }),
             ),
             ElevatedButton(
@@ -154,8 +155,8 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                 final Stopwatch watch = Stopwatch()..start();
                 final String? url = await entity.getMediaUrl();
                 watch.stop();
-                print('Media URL: $url');
-                print(watch.elapsed);
+                Log.d('Media URL: $url');
+                Log.d(watch.elapsed);
               },
             ),
             ElevatedButton(
@@ -258,7 +259,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     } else {
       title = entity.title!;
     }
-    print('entity.title = $title');
+    Log.d('entity.title = $title');
     showDialog<void>(
       context: context,
       builder: (_) {
@@ -335,7 +336,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     } else {
       title = entity.title!;
     }
-    print('entity.title = $title');
+    Log.d('entity.title = $title');
     return showDialog(
       context: context,
       builder: (_) {
@@ -353,7 +354,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
             } else if (snapshot.hasData) {
               final Uint8List data = snapshot.data!;
               ui.decodeImageFromList(data, (ui.Image result) {
-                print('result size: ${result.width}x${result.height}');
+                Log.d('result size: ${result.width}x${result.height}');
                 // for 4288x2848
               });
               w = Image.memory(data);
@@ -380,10 +381,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     final PMProgressHandler progressHandler = PMProgressHandler();
     progressHandler.stream.listen((PMProgressState event) {
       final double progress = event.progress;
-      print('progress state onChange: ${event.state}, progress: $progress');
+      Log.d('progress state onChange: ${event.state}, progress: $progress');
     });
     // final file = await entity.loadFile(progressHandler: progressHandler);
-    // print('file = $file');
+    // Log.d('file = $file');
 
     // final thumb = await entity.thumbDataWithSize(
     //   300,
@@ -391,12 +392,12 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     //   progressHandler: progressHandler,
     // );
 
-    // print('thumb length = ${thumb.length}');
+    // Log.d('thumb length = ${thumb.length}');
 
     final File? file = await entity.loadFile(
       progressHandler: progressHandler,
     );
-    print('file = $file');
+    Log.d('file = $file');
   }
 
   Future<void> testThumbSize(AssetEntity entity, List<int> list) async {
@@ -414,7 +415,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
         return;
       }
       ui.decodeImageFromList(data, (ui.Image result) {
-        print(
+        Log.d(
           'size: $size, '
           'length: ${data.length}, '
           'width*height: ${result.width}x${result.height}',

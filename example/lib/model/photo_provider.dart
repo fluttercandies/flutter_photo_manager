@@ -4,6 +4,7 @@ import 'package:photo_manager/photo_manager.dart';
 
 import '../main.dart';
 import '../util/common_util.dart';
+import '../util/log.dart';
 
 class PhotoProvider extends ChangeNotifier {
   List<AssetPathEntity> list = <AssetPathEntity>[];
@@ -316,7 +317,7 @@ class AssetPathProvider extends ChangeNotifier {
       return;
     }
     if (showItemCount > path.assetCount) {
-      print('already max');
+      Log.d('already max');
       return;
     }
     final List<AssetEntity> list = await elapsedFuture(
@@ -369,6 +370,6 @@ class AssetPathProvider extends ChangeNotifier {
   }
 
   void printListLength(String tag) {
-    print('$tag length : ${list.length}');
+    Log.d('$tag length : ${list.length}');
   }
 }
