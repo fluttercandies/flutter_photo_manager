@@ -74,7 +74,6 @@ class GalleryItemWidget extends StatelessWidget {
       //       await item.getAssetListRange(start: 0, end: item.assetCount);
       //   for (var i = 0; i < list.length; i++) {
       //     final asset = list[i];
-      //     debugPrint("$i : ${asset.id}");
       //   }
       // },
     );

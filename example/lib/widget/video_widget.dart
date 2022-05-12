@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:video_player/video_player.dart';
 
+import '../util/log.dart';
+
 class VideoWidget extends StatefulWidget {
   const VideoWidget({
     Key? key,
@@ -44,7 +46,7 @@ class _VideoWidgetState extends State<VideoWidget> {
   void _initVideoWithFile() {
     widget.entity.file.then((File? file) {
       _stopwatch.stop();
-      print('Elapsed time for `file`: ${_stopwatch.elapsed}');
+      Log.d('Elapsed time for `file`: ${_stopwatch.elapsed}');
       if (!mounted || file == null) {
         return;
       }
@@ -58,7 +60,7 @@ class _VideoWidgetState extends State<VideoWidget> {
   void _initVideoWithMediaUrl() {
     widget.entity.getMediaUrl().then((String? url) {
       _stopwatch.stop();
-      print('Elapsed time for `getMediaUrl`: ${_stopwatch.elapsed}');
+      Log.d('Elapsed time for `getMediaUrl`: ${_stopwatch.elapsed}');
       if (!mounted || url == null) {
         return;
       }

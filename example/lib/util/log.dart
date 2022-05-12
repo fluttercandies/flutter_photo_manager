@@ -12,7 +12,7 @@ typedef LogFunction = void Function(
 class Log {
   const Log._();
 
-  static const String _TAG = 'PhotoManager';
+  static const String _tag = 'PhotoManager';
 
   static final ObserverList<LogFunction> _listeners =
       ObserverList<LogFunction>();
@@ -27,7 +27,7 @@ class Log {
 
   static void i(
     Object? message, {
-    String tag = _TAG,
+    String tag = _tag,
     StackTrace? stackTrace,
     bool report = false,
   }) {
@@ -41,7 +41,7 @@ class Log {
 
   static void d(
     Object? message, {
-    String tag = _TAG,
+    String tag = _tag,
     StackTrace? stackTrace,
     bool report = false,
   }) {
@@ -55,7 +55,7 @@ class Log {
 
   static void w(
     Object? message, {
-    String tag = _TAG,
+    String tag = _tag,
     StackTrace? stackTrace,
     bool report = false,
   }) {
@@ -69,7 +69,7 @@ class Log {
 
   static void e(
     Object? message, {
-    String tag = _TAG,
+    String tag = _tag,
     StackTrace? stackTrace,
     bool report = true,
   }) {
@@ -84,7 +84,7 @@ class Log {
 
   static void json(
     Object? message, {
-    String tag = _TAG,
+    String tag = _tag,
     StackTrace? stackTrace,
     bool report = false,
   }) {
@@ -106,7 +106,7 @@ class Log {
           FlutterErrorDetails(
             exception: message ?? 'NULL',
             stack: stackTrace,
-            library: tag == _TAG ? 'Framework' : tag,
+            library: tag == _tag ? 'Framework' : tag,
           ),
         );
       } else {
