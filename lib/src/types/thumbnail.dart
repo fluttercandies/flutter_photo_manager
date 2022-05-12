@@ -133,17 +133,13 @@ class ThumbnailOption {
 @immutable
 class _IOSThumbnailOption extends ThumbnailOption {
   const _IOSThumbnailOption({
-    required ThumbnailSize size,
-    ThumbnailFormat format = ThumbnailFormat.jpeg,
-    int quality = PMConstants.vDefaultThumbnailQuality,
+    required super.size,
+    super.format,
+    super.quality,
     required this.deliveryMode,
     required this.resizeMode,
     required this.resizeContentMode,
-  }) : super(
-          size: size,
-          format: format,
-          quality: quality,
-        );
+  });
 
   final DeliveryMode deliveryMode;
   final ResizeMode resizeMode;

@@ -79,12 +79,12 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
       }
 
       // Define the image type.
-      final ImageFileType _type;
+      final ImageFileType type;
       if (key.imageFileType == ImageFileType.other) {
         // Assume the title is invalid here, try again with the async getter.
-        _type = _getType(await key.entity.titleAsync);
+        type = _getType(await key.entity.titleAsync);
       } else {
-        _type = key.imageFileType;
+        type = key.imageFileType;
       }
 
       Uint8List? data;
@@ -93,7 +93,7 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
           data = await key.entity.thumbnailDataWithOption(
             _thumbOption(PMConstants.vDefaultGridThumbnailSize),
           );
-        } else if (_type == ImageFileType.heic) {
+        } else if (type == ImageFileType.heic) {
           data = await (await key.entity.file)?.readAsBytes();
         } else {
           data = await key.entity.originBytes;
@@ -192,51 +192,32 @@ class AssetEntityImage extends Image {
     this.isOriginal = true,
     this.thumbnailSize = PMConstants.vDefaultGridThumbnailSize,
     this.thumbnailFormat = ThumbnailFormat.jpeg,
-    Key? key,
-    ImageFrameBuilder? frameBuilder,
-    ImageLoadingBuilder? loadingBuilder,
-    ImageErrorWidgetBuilder? errorBuilder,
-    String? semanticLabel,
-    bool excludeFromSemantics = false,
-    double? width,
-    double? height,
-    Color? color,
-    Animation<double>? opacity,
-    BlendMode? colorBlendMode,
-    BoxFit? fit,
-    AlignmentGeometry alignment = Alignment.center,
-    ImageRepeat repeat = ImageRepeat.noRepeat,
-    Rect? centerSlice,
-    bool matchTextDirection = false,
-    bool gaplessPlayback = false,
-    bool isAntiAlias = false,
-    FilterQuality filterQuality = FilterQuality.low,
+    super.key,
+    super.frameBuilder,
+    super.loadingBuilder,
+    super.errorBuilder,
+    super.semanticLabel,
+    super.excludeFromSemantics,
+    super.width,
+    super.height,
+    super.color,
+    super.opacity,
+    super.colorBlendMode,
+    super.fit,
+    super.alignment,
+    super.repeat,
+    super.centerSlice,
+    super.matchTextDirection,
+    super.gaplessPlayback,
+    super.isAntiAlias,
+    super.filterQuality,
   }) : super(
-          key: key,
           image: AssetEntityImageProvider(
             entity,
             isOriginal: isOriginal,
             thumbnailSize: thumbnailSize,
             thumbnailFormat: thumbnailFormat,
           ),
-          frameBuilder: frameBuilder,
-          loadingBuilder: loadingBuilder,
-          errorBuilder: errorBuilder,
-          semanticLabel: semanticLabel,
-          excludeFromSemantics: excludeFromSemantics,
-          width: width,
-          height: height,
-          color: color,
-          opacity: opacity,
-          colorBlendMode: colorBlendMode,
-          fit: fit,
-          alignment: alignment,
-          repeat: repeat,
-          centerSlice: centerSlice,
-          matchTextDirection: matchTextDirection,
-          gaplessPlayback: gaplessPlayback,
-          isAntiAlias: isAntiAlias,
-          filterQuality: filterQuality,
         );
 
   final AssetEntity entity;
