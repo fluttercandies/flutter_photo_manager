@@ -10,17 +10,16 @@ on:
 
 jobs:
   dry_run:
-    name: Dry run publish on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ ubuntu-latest ]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      - uses: k-paxian/dart-package-publisher@v1.3
+      - name: Copy on publish
+        run: ./copy_on_publish.sh
+      - name: Publish
+        uses: sakebook/actions-flutter-pub-publisher@v1.3.1
         with:
-          credentialJson: ${{ secrets.CREDENTIAL_JSON }}
-          dryRunOnly: true
-          flutter: true
-          skipTests: true
+          credential: ${{ secrets.CREDENTIAL_JSON }}
+          flutter_package: true
+          skip_test: true
+          dry_run: true
