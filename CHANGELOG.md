@@ -4,7 +4,7 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
-## 2.1.0
+## 2.1.0+1
 
 Migrate to Flutter 3, drop supports for previous Flutter versions.
 
