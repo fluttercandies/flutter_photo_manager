@@ -5,8 +5,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.graphics.BitmapFactory
-import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.BaseColumns._ID
 import android.provider.MediaStore
@@ -182,7 +180,7 @@ object DBUtils : IDBUtils {
         ) ?: return emptyList()
         cursor.use {
             while (it.moveToNext()) {
-                list.add(convertCursorToAsset(it, requestType))
+                list.add(convertCursorToAsset(context, it, requestType))
             }
         }
         return list
@@ -224,13 +222,13 @@ object DBUtils : IDBUtils {
         ) ?: return emptyList()
         cursor.use {
             while (cursor.moveToNext()) {
-                list.add(convertCursorToAsset(cursor, requestType))
+                list.add(convertCursorToAsset(context, cursor, requestType))
             }
         }
         return list
     }
 
-    private fun convertCursorToAsset(cursor: Cursor, requestType: Int): AssetEntity {
+    private fun convertCursorToAsset(context: Context, cursor: Cursor, requestType: Int): AssetEntity {
         val id = cursor.getString(MediaStore.MediaColumns._ID)
         val path = cursor.getString(MediaStore.MediaColumns.DATA)
         val date = cursor.getLong(MediaStore.Images.Media.DATE_ADDED)
@@ -245,11 +243,20 @@ object DBUtils : IDBUtils {
         val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
         val orientation: Int = cursor.getInt(MediaStore.Images.ImageColumns.ORIENTATION)
         val mimeType = cursor.getString(MediaStore.Files.FileColumns.MIME_TYPE)
-        if ((width == 0 || height == 0) && path.isNotBlank() && File(path).exists()) {
-            ExifInterface(path).apply {
-                width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
-                height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
-            }
+        if ((width == 0 || height == 0)
+            && path.isNotBlank()
+            && File(path).exists()
+            && !mimeType.contains("svg")
+        ) {
+            try {
+                val uri = getUri(id, getMediaType(type))
+                context.contentResolver.openInputStream(uri)?.use {
+                    ExifInterface(it).apply {
+                        width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
+                        height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+                    }
+                }
+            } finally {}
         }
         return AssetEntity(
             id,
@@ -284,7 +291,7 @@ object DBUtils : IDBUtils {
         cursor.use {
             return if (it.moveToNext()) {
                 val type = it.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
-                convertCursorToAsset(it, type)
+                convertCursorToAsset(context, it, type)
             } else {
                 null
             }

@@ -1,6 +1,6 @@
 name: photo_manager_example
 description: Demonstrates how to use the image_scanner plugin.
-version: 2.1.0+7
+version: 2.1.1+8
 publish_to: none
 
 environment:
