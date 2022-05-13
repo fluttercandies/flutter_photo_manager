@@ -26,7 +26,7 @@ class GalleryContentListPage extends StatefulWidget {
   final AssetPathEntity path;
 
   @override
-  _GalleryContentListPageState createState() => _GalleryContentListPageState();
+  State<GalleryContentListPage> createState() => _GalleryContentListPageState();
 }
 
 class _GalleryContentListPageState extends State<GalleryContentListPage> {

@@ -16,7 +16,7 @@ class ChangeNotifierBuilder<T extends ChangeNotifier> extends StatefulWidget {
   final T value;
 
   @override
-  _ChangeNotifierBuilderState<T> createState() =>
+  State<ChangeNotifierBuilder<T>> createState() =>
       _ChangeNotifierBuilderState<T>();
 }
 

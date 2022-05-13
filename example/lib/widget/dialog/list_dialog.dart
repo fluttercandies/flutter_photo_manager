@@ -9,7 +9,7 @@ class ListDialog extends StatefulWidget {
   final List<Widget> children;
 
   @override
-  _ListDialogState createState() => _ListDialogState();
+  State<ListDialog> createState() => _ListDialogState();
 }
 
 class _ListDialogState extends State<ListDialog> {

@@ -8,7 +8,7 @@ class CreateEntityById extends StatefulWidget {
   const CreateEntityById({Key? key}) : super(key: key);
 
   @override
-  _CreateEntityByIdState createState() => _CreateEntityByIdState();
+  State<CreateEntityById> createState() => _CreateEntityByIdState();
 }
 
 class _CreateEntityByIdState extends State<CreateEntityById> {

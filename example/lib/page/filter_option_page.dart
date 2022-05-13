@@ -8,7 +8,7 @@ class FilterOptionPage extends StatefulWidget {
   const FilterOptionPage({Key? key}) : super(key: key);
 
   @override
-  _FilterOptionPageState createState() => _FilterOptionPageState();
+  State<FilterOptionPage> createState() => _FilterOptionPageState();
 }
 
 class _FilterOptionPageState extends State<FilterOptionPage> {

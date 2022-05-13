@@ -55,12 +55,12 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
       _isLoading = true;
     });
     // Request permissions.
-    final PermissionState _ps = await PhotoManager.requestPermissionExtend();
+    final PermissionState ps = await PhotoManager.requestPermissionExtend();
     if (!mounted) {
       return;
     }
     // Further requests can be only procceed with authorized or limited.
-    if (_ps != PermissionState.authorized && _ps != PermissionState.limited) {
+    if (ps != PermissionState.authorized && ps != PermissionState.limited) {
       setState(() {
         _isLoading = false;
       });

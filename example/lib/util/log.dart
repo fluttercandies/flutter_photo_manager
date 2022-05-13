@@ -1,4 +1,4 @@
-import 'dart:developer' as _dev;
+import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart';
 
@@ -98,8 +98,8 @@ class Log {
     bool isError = false,
     bool report = false,
   }) {
-    final DateTime _time = DateTime.now();
-    final String _timeString = _time.toIso8601String();
+    final DateTime time = DateTime.now();
+    final String timeString = time.toIso8601String();
     if (isError) {
       if (kDebugMode) {
         FlutterError.presentError(
@@ -110,18 +110,18 @@ class Log {
           ),
         );
       } else {
-        _dev.log(
-          '$_timeString - An error occurred.',
-          time: _time,
+        dev.log(
+          '$timeString - An error occurred.',
+          time: time,
           name: tag,
           error: message,
           stackTrace: stackTrace,
         );
       }
     } else {
-      _dev.log(
-        '$_timeString - $message',
-        time: _time,
+      dev.log(
+        '$timeString - $message',
+        time: time,
         name: tag,
         stackTrace: stackTrace,
       );
