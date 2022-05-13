@@ -7,7 +7,7 @@ class DevelopingExample extends StatefulWidget {
   const DevelopingExample({Key? key}) : super(key: key);
 
   @override
-  _DevelopingExampleState createState() => _DevelopingExampleState();
+  State<DevelopingExample> createState() => _DevelopingExampleState();
 }
 
 class _DevelopingExampleState extends State<DevelopingExample> {

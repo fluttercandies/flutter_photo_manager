@@ -9,7 +9,7 @@ class GalleryListPage extends StatefulWidget {
   const GalleryListPage({Key? key}) : super(key: key);
 
   @override
-  _GalleryListPageState createState() => _GalleryListPageState();
+  State<GalleryListPage> createState() => _GalleryListPageState();
 }
 
 class _GalleryListPageState extends State<GalleryListPage> {

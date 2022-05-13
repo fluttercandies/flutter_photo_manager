@@ -14,7 +14,7 @@ class CopyToAnotherGalleryPage extends StatefulWidget {
   final AssetEntity assetEntity;
 
   @override
-  _CopyToAnotherGalleryPageState createState() =>
+  State<CopyToAnotherGalleryPage> createState() =>
       _CopyToAnotherGalleryPageState();
 }
 

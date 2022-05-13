@@ -191,8 +191,8 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
   bool _isNotify = false;
 
   Future<void> _persentLimited() async {
-    final PermissionState _ps = await PhotoManager.requestPermissionExtend();
-    if (_ps == PermissionState.authorized) {
+    final PermissionState ps = await PhotoManager.requestPermissionExtend();
+    if (ps == PermissionState.authorized) {
       return;
     }
     if (!_isNotify) {

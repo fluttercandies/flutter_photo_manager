@@ -17,7 +17,7 @@ class LivePhotosWidget extends StatefulWidget {
   final bool useOrigin;
 
   @override
-  _LivePhotosWidgetState createState() => _LivePhotosWidgetState();
+  State<LivePhotosWidget> createState() => _LivePhotosWidgetState();
 }
 
 class _LivePhotosWidgetState extends State<LivePhotosWidget> {

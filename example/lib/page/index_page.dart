@@ -9,7 +9,7 @@ class IndexPage extends StatefulWidget {
   const IndexPage({Key? key}) : super(key: key);
 
   @override
-  _IndexPageState createState() => _IndexPageState();
+  State<IndexPage> createState() => _IndexPageState();
 }
 
 class _IndexPageState extends State<IndexPage> {

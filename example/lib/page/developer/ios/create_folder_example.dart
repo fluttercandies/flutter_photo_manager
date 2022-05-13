@@ -5,7 +5,7 @@ class CreateFolderExample extends StatefulWidget {
   const CreateFolderExample({Key? key}) : super(key: key);
 
   @override
-  _CreateFolderExampleState createState() => _CreateFolderExampleState();
+  State<CreateFolderExample> createState() => _CreateFolderExampleState();
 }
 
 class _CreateFolderExampleState extends State<CreateFolderExample> {

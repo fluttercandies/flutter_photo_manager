@@ -11,7 +11,7 @@ class DetailPage extends StatefulWidget {
   final AssetEntity entity;
 
   @override
-  _DetailPageState createState() => _DetailPageState();
+  State<DetailPage> createState() => _DetailPageState();
 }
 
 class _DetailPageState extends State<DetailPage> {

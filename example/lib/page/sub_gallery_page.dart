@@ -14,7 +14,7 @@ class SubFolderPage extends StatefulWidget {
   final String title;
 
   @override
-  _SubFolderPageState createState() => _SubFolderPageState();
+  State<SubFolderPage> createState() => _SubFolderPageState();
 }
 
 class _SubFolderPageState extends State<SubFolderPage> {

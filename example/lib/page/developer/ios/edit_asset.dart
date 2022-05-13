@@ -8,7 +8,7 @@ class EditAssetPage extends StatefulWidget {
   const EditAssetPage({Key? key}) : super(key: key);
 
   @override
-  _EditAssetPageState createState() => _EditAssetPageState();
+  State<EditAssetPage> createState() => _EditAssetPageState();
 }
 
 class _EditAssetPageState extends State<EditAssetPage> {

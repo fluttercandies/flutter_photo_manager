@@ -8,7 +8,7 @@ class ChangeNotifyExample extends StatefulWidget {
   const ChangeNotifyExample({Key? key}) : super(key: key);
 
   @override
-  _ChangeNotifyExampleState createState() => _ChangeNotifyExampleState();
+  State<ChangeNotifyExample> createState() => _ChangeNotifyExampleState();
 }
 
 class _ChangeNotifyExampleState extends State<ChangeNotifyExample> {

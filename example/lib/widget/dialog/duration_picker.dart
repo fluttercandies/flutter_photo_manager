@@ -12,7 +12,7 @@ class DurationPicker extends StatefulWidget {
   final Duration initDuration;
 
   @override
-  _DurationPickerState createState() => _DurationPickerState();
+  State<DurationPicker> createState() => _DurationPickerState();
 }
 
 class _DurationPickerState extends State<DurationPicker> {

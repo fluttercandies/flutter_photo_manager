@@ -17,7 +17,7 @@ class VideoWidget extends StatefulWidget {
   final bool usingMediaUrl;
 
   @override
-  _VideoWidgetState createState() => _VideoWidgetState();
+  State<VideoWidget> createState() => _VideoWidgetState();
 }
 
 class _VideoWidgetState extends State<VideoWidget> {

@@ -12,7 +12,7 @@ class SaveMediaExample extends StatefulWidget {
   const SaveMediaExample({Key? key}) : super(key: key);
 
   @override
-  _SaveMediaExampleState createState() => _SaveMediaExampleState();
+  State<SaveMediaExample> createState() => _SaveMediaExampleState();
 }
 
 class _SaveMediaExampleState extends State<SaveMediaExample> {

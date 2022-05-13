@@ -5,7 +5,7 @@ class RemoveAndroidNotExistsExample extends StatefulWidget {
   const RemoveAndroidNotExistsExample({Key? key}) : super(key: key);
 
   @override
-  _RemoveAndroidNotExistsExampleState createState() =>
+  State<RemoveAndroidNotExistsExample> createState() =>
       _RemoveAndroidNotExistsExampleState();
 }
 

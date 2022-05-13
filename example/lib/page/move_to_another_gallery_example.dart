@@ -10,7 +10,7 @@ class MoveToAnotherExample extends StatefulWidget {
   final AssetEntity entity;
 
   @override
-  _MoveToAnotherExampleState createState() => _MoveToAnotherExampleState();
+  State<MoveToAnotherExample> createState() => _MoveToAnotherExampleState();
 }
 
 class _MoveToAnotherExampleState extends State<MoveToAnotherExample> {
