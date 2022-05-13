@@ -111,9 +111,7 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
       // Depending on where the exception was thrown, the image cache may not
       // have had a chance to track the key in the cache at all.
       // Schedule a microtask to give the cache a chance to add the key.
-      Future<void>.microtask(() {
-        PaintingBinding.instance.imageCache.evict(key);
-      });
+      Future<void>.microtask(() => _evictCache(key));
       rethrow;
     }
   }
@@ -162,6 +160,12 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
     return type ?? ImageFileType.other;
   }
 
+  static void _evictCache(AssetEntityImageProvider key) {
+    // ignore: unnecessary_cast
+    ((PaintingBinding.instance as PaintingBinding).imageCache as ImageCache)
+        .evict(key);
+  }
+
   @override
   bool operator ==(Object other) {
     if (other is! AssetEntityImageProvider) {
@@ -191,32 +195,51 @@ class AssetEntityImage extends Image {
     this.isOriginal = true,
     this.thumbnailSize = PMConstants.vDefaultGridThumbnailSize,
     this.thumbnailFormat = ThumbnailFormat.jpeg,
-    super.key,
-    super.frameBuilder,
-    super.loadingBuilder,
-    super.errorBuilder,
-    super.semanticLabel,
-    super.excludeFromSemantics,
-    super.width,
-    super.height,
-    super.color,
-    super.opacity,
-    super.colorBlendMode,
-    super.fit,
-    super.alignment,
-    super.repeat,
-    super.centerSlice,
-    super.matchTextDirection,
-    super.gaplessPlayback,
-    super.isAntiAlias,
-    super.filterQuality,
+    Key? key,
+    ImageFrameBuilder? frameBuilder,
+    ImageLoadingBuilder? loadingBuilder,
+    ImageErrorWidgetBuilder? errorBuilder,
+    String? semanticLabel,
+    bool excludeFromSemantics = false,
+    double? width,
+    double? height,
+    Color? color,
+    Animation<double>? opacity,
+    BlendMode? colorBlendMode,
+    BoxFit? fit,
+    AlignmentGeometry alignment = Alignment.center,
+    ImageRepeat repeat = ImageRepeat.noRepeat,
+    Rect? centerSlice,
+    bool matchTextDirection = false,
+    bool gaplessPlayback = false,
+    bool isAntiAlias = false,
+    FilterQuality filterQuality = FilterQuality.low,
   }) : super(
+          key: key,
           image: AssetEntityImageProvider(
             entity,
             isOriginal: isOriginal,
             thumbnailSize: thumbnailSize,
             thumbnailFormat: thumbnailFormat,
           ),
+          frameBuilder: frameBuilder,
+          loadingBuilder: loadingBuilder,
+          errorBuilder: errorBuilder,
+          semanticLabel: semanticLabel,
+          excludeFromSemantics: excludeFromSemantics,
+          width: width,
+          height: height,
+          color: color,
+          opacity: opacity,
+          colorBlendMode: colorBlendMode,
+          fit: fit,
+          alignment: alignment,
+          repeat: repeat,
+          centerSlice: centerSlice,
+          matchTextDirection: matchTextDirection,
+          gaplessPlayback: gaplessPlayback,
+          isAntiAlias: isAntiAlias,
+          filterQuality: filterQuality,
         );
 
   final AssetEntity entity;

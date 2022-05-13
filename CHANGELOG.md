@@ -4,9 +4,11 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
-## 2.1.0+1
+## 2.1.0+2
 
-Migrate to Flutter 3, drop supports for previous Flutter versions.
+Improvements:
+
+- Support Flutter 3.
 
 ## 2.0.9
 
@@ -361,10 +363,10 @@ Feature
   but at the same time user have to bear the risks corresponding to the permission).
 - Support clean file cache.
 - Experimental
-  - Preload image (Use `PhotoCachingManager` api.)
+    - Preload image (Use `PhotoCachingManager` api.)
 - Add `OrderOption` as sort condition. The option default value is order by create date desc;
 - Support icloud asset progress.
-  
+
 Fixes:
 
 - #362
@@ -428,14 +430,14 @@ Feature:
 - Create AssetEntity with id.
 - Create AssetPathEntity from id.
 - Only iOS
-  - Create folder or album.
-  - Remove assets in album.
-  - Delete folder or album.
-  - Favorite asset.
+    - Create folder or album.
+    - Remove assets in album.
+    - Delete folder or album.
+    - Favorite asset.
 - Only android
-  - move asset to another path.
-  - Remove all non-existing rows.
-  - add `relativePath` for android.
+    - move asset to another path.
+    - Remove all non-existing rows.
+    - add `relativePath` for android.
 
 Fixes:
 
@@ -464,10 +466,11 @@ Feature:
 - Add `onlyAll` for `getAssetPathList`.
 - Support audio type(Only android, iOS Photos have no audio)
 - **Breaking change**, Add date condition to filter datetime
-  - Add class `DateTimeCond`
-  - Add `dateTimeCond` to `FilterOptionGroup`
-  - Remove `fetchDateTime` from `getAssetPathList`
-  - Remove param `dt` from `AssetPathEntity.refreshPathProperties`, and add `refreshPathProperties` params to the method.
+    - Add class `DateTimeCond`
+    - Add `dateTimeCond` to `FilterOptionGroup`
+    - Remove `fetchDateTime` from `getAssetPathList`
+    - Remove param `dt` from `AssetPathEntity.refreshPathProperties`, and add `refreshPathProperties` params to the
+      method.
 
 Update:
 
