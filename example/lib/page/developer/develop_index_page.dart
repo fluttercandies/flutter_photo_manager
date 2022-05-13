@@ -18,7 +18,7 @@ class DeveloperIndexPage extends StatefulWidget {
   const DeveloperIndexPage({Key? key}) : super(key: key);
 
   @override
-  _DeveloperIndexPageState createState() => _DeveloperIndexPageState();
+  State<DeveloperIndexPage> createState() => _DeveloperIndexPageState();
 }
 
 class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
