@@ -111,14 +111,14 @@ class PhotoManager(private val context: Context) {
         }
     }
 
-    fun getOriginBytes(id: String, resultHandler: ResultHandler, haveLocationPermission: Boolean) {
+    fun getOriginBytes(id: String, resultHandler: ResultHandler, needLocationPermission: Boolean) {
         val asset = dbUtils.getAssetEntity(context, id)
         if (asset == null) {
             resultHandler.replyError("The asset not found")
             return
         }
         try {
-            val byteArray = dbUtils.getOriginBytes(context, asset, haveLocationPermission)
+            val byteArray = dbUtils.getOriginBytes(context, asset, needLocationPermission)
             resultHandler.reply(byteArray)
         } catch (e: Exception) {
             dbUtils.logRowWithId(context, id)

@@ -360,9 +360,9 @@ object AndroidQDBUtils : IDBUtils {
     override fun getOriginBytes(
         context: Context,
         asset: AssetEntity,
-        haveLocationPermission: Boolean
+        needLocationPermission: Boolean
     ): ByteArray {
-        val uri = getUri(asset, haveLocationPermission)
+        val uri = getUri(asset, needLocationPermission)
         val inputStream = context.contentResolver.openInputStream(uri)
         val outputStream = ByteArrayOutputStream()
         outputStream.use { os ->
