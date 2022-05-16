@@ -107,7 +107,16 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
         throw StateError('The data of the entity is null: $entity');
       }
       return decode(data);
-    } catch (e) {
+    } catch (e, s) {
+      if (kDebugMode) {
+        FlutterError.presentError(
+          FlutterErrorDetails(
+            exception: e,
+            stack: s,
+            library: PMConstants.libraryName,
+          ),
+        );
+      }
       // Depending on where the exception was thrown, the image cache may not
       // have had a chance to track the key in the cache at all.
       // Schedule a microtask to give the cache a chance to add the key.
