@@ -199,7 +199,7 @@ interface IDBUtils {
     fun getOriginBytes(
         context: Context,
         asset: AssetEntity,
-        haveLocationPermission: Boolean
+        needLocationPermission: Boolean
     ): ByteArray
 
     /**

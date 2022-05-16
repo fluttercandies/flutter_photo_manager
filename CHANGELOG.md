@@ -10,6 +10,10 @@ Improvements:
 
 - Protect cursors convert on Android. (#761)
 
+Fixes:
+
+- Fix `ACCESS_MEDIA_LOCATION` checks on Android. (#765)
+
 ## 2.1.0+2
 
 Improvements:

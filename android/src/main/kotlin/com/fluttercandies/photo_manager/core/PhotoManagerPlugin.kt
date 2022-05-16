@@ -135,7 +135,15 @@ class PhotoManagerPlugin(
             return
         }
         if (ignorePermissionCheck) {
-            onHandlePermissionResult(call, resultHandler, true)
+            onHandlePermissionResult(
+                call,
+                resultHandler,
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+                        && havePermissionInManifest(
+                    applicationContext,
+                    Manifest.permission.ACCESS_MEDIA_LOCATION
+                )
+            )
             return
         }
         if (permissionsUtils.isRequesting) {
@@ -147,24 +155,28 @@ class PhotoManagerPlugin(
             return
         }
 
-        val needWritePermission = permissionsUtils.needWriteExternalStorage(call)
-        val needLocationPermission = permissionsUtils.needAccessLocation(call)
-        val permissions = arrayListOf(Manifest.permission.READ_EXTERNAL_STORAGE)
-        if (needWritePermission && Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q
-            && havePermissionInManifest(
+        val needWritePermission =
+            permissionsUtils.needWriteExternalStorage(call)
+                    && Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q
+                    && havePermissionInManifest(
                 applicationContext,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
-        ) {
-            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-        if (needLocationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-            && havePermissionInManifest(
+        val needLocationPermission =
+            permissionsUtils.needAccessLocation(call)
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+                    && havePermissionInManifest(
                 applicationContext,
                 Manifest.permission.ACCESS_MEDIA_LOCATION
             )
-        ) {
-            permissions.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
+        val permissions = arrayListOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        if (needWritePermission) {
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        if (needLocationPermission) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                permissions.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
+            }
         }
 
         val utils = permissionsUtils.apply {
@@ -172,7 +184,7 @@ class PhotoManagerPlugin(
             permissionsListener = object : PermissionsListener {
                 override fun onGranted() {
                     LogUtils.info("onGranted call.method = ${call.method}")
-                    onHandlePermissionResult(call, resultHandler, true)
+                    onHandlePermissionResult(call, resultHandler, needLocationPermission)
                 }
 
                 override fun onDenied(
@@ -186,7 +198,7 @@ class PhotoManagerPlugin(
                     }
                     if (grantedPermissions.containsAll(permissions)) {
                         LogUtils.info("onGranted call.method = ${call.method}")
-                        onHandlePermissionResult(call, resultHandler, false)
+                        onHandlePermissionResult(call, resultHandler, needLocationPermission)
                     } else {
                         replyPermissionError(resultHandler)
                     }
@@ -217,7 +229,7 @@ class PhotoManagerPlugin(
     private fun onHandlePermissionResult(
         call: MethodCall,
         resultHandler: ResultHandler,
-        haveLocationPermission: Boolean
+        needLocationPermission: Boolean
     ) {
         when (call.method) {
             Methods.requestPermissionExtend -> resultHandler.reply(PermissionResult.Authorized.value)
@@ -288,14 +300,14 @@ class PhotoManagerPlugin(
             Methods.getFullFile -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
-                    val isOrigin = if (!haveLocationPermission) false else call.argument<Boolean>("isOrigin")!!
+                    val isOrigin = if (!needLocationPermission) false else call.argument<Boolean>("isOrigin")!!
                     photoManager.getFile(id, isOrigin, resultHandler)
                 }
             }
             Methods.getOriginBytes -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
-                    photoManager.getOriginBytes(id, resultHandler, haveLocationPermission)
+                    photoManager.getOriginBytes(id, resultHandler, needLocationPermission)
                 }
             }
             Methods.getMediaUrl -> {
