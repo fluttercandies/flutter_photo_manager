@@ -9,6 +9,7 @@ that can be found in the LICENSE file. -->
 Improvements:
 
 - Protect cursors convert on Android. (#761)
+- Present exceptions in the image provider when debugging. (#766)
 
 Fixes:
 
