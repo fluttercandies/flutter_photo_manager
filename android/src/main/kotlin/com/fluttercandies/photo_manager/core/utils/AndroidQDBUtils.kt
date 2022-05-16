@@ -253,13 +253,15 @@ object AndroidQDBUtils : IDBUtils {
             && File(path).exists()
             && !mimeType.contains("svg")
         ) {
-            val uri = getUri(id, getMediaType(type))
-            context.contentResolver.openInputStream(uri)?.use {
-                ExifInterface(it).apply {
-                    width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
-                    height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+            try {
+                val uri = getUri(id, getMediaType(type))
+                context.contentResolver.openInputStream(uri)?.use {
+                    ExifInterface(it).apply {
+                        width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
+                        height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+                    }
                 }
-            }
+            } finally {}
         }
         return AssetEntity(
             id,

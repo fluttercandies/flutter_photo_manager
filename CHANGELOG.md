@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.1.1
+
+Improvements:
+
+- Protect cursors convert on Android. (#761)
+
 ## 2.1.0+2
 
 Improvements:
