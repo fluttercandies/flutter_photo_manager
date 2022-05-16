@@ -8,6 +8,7 @@ class PMConstants {
   const PMConstants._();
 
   static const String channelPrefix = 'com.fluttercandies/photo_manager';
+  static const String libraryName = 'photo_manager';
 
   /// Keys for [MethodCall]s.
   static const String mRequestPermissionExtend = 'requestPermissionExtend';
