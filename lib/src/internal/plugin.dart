@@ -67,7 +67,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<PermissionState> requestPermissionExtend(
-      PermissionRequestOption requestOption,
+    PermissionRequestOption requestOption,
   ) async {
     final int result = await _channel.invokeMethod<int>(
       PMConstants.mRequestPermissionExtend,
