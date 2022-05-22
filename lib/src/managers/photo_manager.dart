@@ -46,7 +46,7 @@ class PhotoManager {
   ///  * [PermissionState] which defines the permission state
   ///    of the current application.
   static Future<PermissionState> requestPermissionExtend({
-    PermisstionRequestOption requestOption = const PermisstionRequestOption(),
+    PermissionRequestOption requestOption = const PermissionRequestOption(),
   }) {
     return plugin.requestPermissionExtend(requestOption);
   }

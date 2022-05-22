@@ -70,10 +70,13 @@ class RequestType {
   String toString() => '$runtimeType($value)';
 }
 
+@Deprecated('Use PermissionRequestOption instead')
+typedef PermisstionRequestOption = PermissionRequestOption;
+
 /// See [PermissionState].
 @immutable
-class PermisstionRequestOption {
-  const PermisstionRequestOption({
+class PermissionRequestOption {
+  const PermissionRequestOption({
     this.iosAccessLevel = IosAccessLevel.readWrite,
   });
 
@@ -85,7 +88,7 @@ class PermisstionRequestOption {
 
   @override
   bool operator ==(Object other) =>
-      other is PermisstionRequestOption &&
+      other is PermissionRequestOption &&
       iosAccessLevel == other.iosAccessLevel;
 
   @override
