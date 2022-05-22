@@ -4,6 +4,13 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.1.2
+
+Improvements:
+
+- Correct `PermissionRequestOption` typo with a class type alias.
+  Which also raised the Dart SDK constraint to `2.13.0`.
+
 ## 2.1.1
 
 Improvements:
