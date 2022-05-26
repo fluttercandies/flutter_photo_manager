@@ -261,7 +261,9 @@ object AndroidQDBUtils : IDBUtils {
                         height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
                     }
                 }
-            } finally {}
+            } catch (e: Throwable) {
+                LogUtils.error(e)
+            }
         }
         return AssetEntity(
             id,
