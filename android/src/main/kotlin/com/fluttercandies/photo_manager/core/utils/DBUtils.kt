@@ -18,6 +18,7 @@ import com.fluttercandies.photo_manager.core.utils.IDBUtils.Companion.storeBucke
 import com.fluttercandies.photo_manager.core.utils.IDBUtils.Companion.storeImageKeys
 import com.fluttercandies.photo_manager.core.utils.IDBUtils.Companion.storeVideoKeys
 import com.fluttercandies.photo_manager.core.utils.IDBUtils.Companion.typeKeys
+import com.fluttercandies.photo_manager.util.LogUtils
 import java.io.*
 import java.net.URLConnection
 import java.util.concurrent.locks.ReentrantLock
@@ -256,7 +257,9 @@ object DBUtils : IDBUtils {
                         height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
                     }
                 }
-            } finally {}
+            } catch (e: Throwable) {
+                LogUtils.error(e)
+            }
         }
         return AssetEntity(
             id,
