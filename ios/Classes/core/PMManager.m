@@ -845,7 +845,7 @@
             } else if (!optionGroup.containsLivePhotos) {
                 [cond appendString:@" AND "];
                 [cond appendString:[NSString
-                                    stringWithFormat:@"( ( mediaSubtype & %lu ) != 8 )",
+                                    stringWithFormat:@"NOT ( ( mediaSubtype & %lu ) == 8 )",
                                     (unsigned long)PHAssetMediaSubtypePhotoLive]
                 ];
             }
