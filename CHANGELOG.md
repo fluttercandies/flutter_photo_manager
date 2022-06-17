@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.1.3
+
+Fixes:
+
+- Fix invalid type cast with `AssetEntity.exists`. (#777)
+
 ## 2.1.2
 
 Improvements:
