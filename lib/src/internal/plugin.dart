@@ -304,11 +304,12 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     );
   }
 
-  Future<bool> assetExistsWithId(String id) {
-    return _channel.invokeMethod<bool>(
+  Future<bool> assetExistsWithId(String id) async {
+    final bool? result = await _channel.invokeMethod(
       PMConstants.mAssetExists,
       <String, dynamic>{'id': id},
-    ) as Future<bool>;
+    );
+    return result ?? false;
   }
 
   Future<String> getSystemVersion() async {
