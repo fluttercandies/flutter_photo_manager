@@ -81,13 +81,13 @@ interface IDBUtils {
     private val typeUtils: RequestTypeUtils
         get() = RequestTypeUtils
 
-    fun getGalleryList(
+    fun getAssetPathList(
         context: Context,
         requestType: Int = 0,
         option: FilterOption
     ): List<GalleryEntity>
 
-    fun getAssetFromGalleryId(
+    fun getAssetListPaged(
         context: Context,
         galleryId: String,
         page: Int,
@@ -151,7 +151,7 @@ interface IDBUtils {
 
     fun getFilePath(context: Context, id: String, origin: Boolean): String?
 
-    fun getAssetFromGalleryIdRange(
+    fun getAssetListRange(
         context: Context,
         galleryId: String,
         start: Int,

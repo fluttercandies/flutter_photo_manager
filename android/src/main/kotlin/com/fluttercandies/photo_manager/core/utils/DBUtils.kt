@@ -32,7 +32,7 @@ object DBUtils : IDBUtils {
         MediaStore.Images.ImageColumns.LATITUDE
     )
 
-    override fun getGalleryList(
+    override fun getAssetPathList(
         context: Context,
         requestType: Int,
         option: FilterOption
@@ -146,7 +146,7 @@ object DBUtils : IDBUtils {
         }
     }
 
-    override fun getAssetFromGalleryId(
+    override fun getAssetListPaged(
         context: Context,
         galleryId: String,
         page: Int,
@@ -187,7 +187,7 @@ object DBUtils : IDBUtils {
         return list
     }
 
-    override fun getAssetFromGalleryIdRange(
+    override fun getAssetListRange(
         context: Context,
         galleryId: String,
         start: Int,

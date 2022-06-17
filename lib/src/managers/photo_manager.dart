@@ -80,7 +80,7 @@ class PhotoManager {
     RequestType type = RequestType.common,
     FilterOptionGroup? filterOption,
   }) async {
-    return plugin.getAllGalleryList(
+    return plugin.getAssetPathList(
       hasAll: hasAll,
       onlyAll: onlyAll,
       type: type,

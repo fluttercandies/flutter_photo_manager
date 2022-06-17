@@ -164,7 +164,7 @@ class AssetPathEntity {
       'Filtering only Live Photos is only supported '
       'when the request type contains image.',
     );
-    return plugin.getAssetWithGalleryIdPaged(
+    return plugin.getAssetListPaged(
       id,
       page: page,
       size: size,
@@ -193,7 +193,7 @@ class AssetPathEntity {
     if (end > assetCount) {
       end = assetCount;
     }
-    return plugin.getAssetWithRange(
+    return plugin.getAssetListRange(
       id,
       type: type,
       start: start,
@@ -321,7 +321,7 @@ class AssetEntity {
   /// Refresh the property of [AssetPathEntity] from the given ID.
   static Future<AssetEntity?> _obtainAssetFromId(String id) async {
     final Map<dynamic, dynamic>? result =
-        await plugin.getPropertiesFromAssetEntity(id);
+        await plugin.fetchEntityProperties(id);
     if (result == null) {
       return null;
     }

@@ -243,22 +243,22 @@ class PhotoManagerPlugin(
                     val option = call.getOption()
                     val onlyAll = call.argument<Boolean>("onlyAll")!!
 
-                    val list = photoManager.getGalleryList(type, hasAll, onlyAll, option)
+                    val list = photoManager.getAssetPathList(type, hasAll, onlyAll, option)
                     resultHandler.reply(ConvertUtils.convertToGalleryResult(list))
                 }
             }
-            Methods.getAssetWithGalleryId -> {
+            Methods.getAssetListPaged -> {
                 runOnBackground {
                     val galleryId = call.argument<String>("id")!!
                     val type = call.argument<Int>("type")!!
                     val page = call.argument<Int>("page")!!
                     val size = call.argument<Int>("size")!!
                     val option = call.getOption()
-                    val list = photoManager.getAssetList(galleryId, type, page, size, option)
+                    val list = photoManager.getAssetListPaged(galleryId, type, page, size, option)
                     resultHandler.reply(ConvertUtils.convertToAssetResult(list))
                 }
             }
-            Methods.getAssetListWithRange -> {
+            Methods.getAssetListRange -> {
                 runOnBackground {
                     val galleryId = call.getString("id")
                     val type = call.getInt("type")
@@ -266,7 +266,7 @@ class PhotoManagerPlugin(
                     val end = call.getInt("end")
                     val option = call.getOption()
                     val list: List<AssetEntity> =
-                        photoManager.getAssetListWithRange(galleryId, type, start, end, option)
+                        photoManager.getAssetListRange(galleryId, type, start, end, option)
                     resultHandler.reply(ConvertUtils.convertToAssetResult(list))
                 }
             }
@@ -318,10 +318,10 @@ class PhotoManagerPlugin(
                     resultHandler.reply(mediaUri)
                 }
             }
-            Methods.getPropertiesFromAssetEntity -> {
+            Methods.fetchEntityProperties -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
-                    val asset = photoManager.getAssetProperties(id)
+                    val asset = photoManager.fetchEntityProperties(id)
                     val assetResult = if (asset != null) {
                         ConvertUtils.convertToAssetResult(asset)
                     } else {
@@ -335,7 +335,7 @@ class PhotoManagerPlugin(
                     val id = call.argument<String>("id")!!
                     val type = call.argument<Int>("type")!!
                     val option = call.getOption()
-                    val pathEntity = photoManager.getPathEntity(id, type, option)
+                    val pathEntity = photoManager.fetchPathProperties(id, type, option)
                     if (pathEntity != null) {
                         val mapResult = ConvertUtils.convertToGalleryResult(listOf(pathEntity))
                         resultHandler.reply(mapResult)

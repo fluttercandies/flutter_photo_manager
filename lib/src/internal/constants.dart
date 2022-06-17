@@ -13,18 +13,19 @@ class PMConstants {
   /// Keys for [MethodCall]s.
   static const String mRequestPermissionExtend = 'requestPermissionExtend';
   static const String mPresentLimited = 'presentLimited';
-  static const String mGetGalleryList = 'getGalleryList';
-  static const String mGetAssetWithGalleryId = 'getAssetWithGalleryId';
-  static const String mGetAssetListWithRange = 'getAssetListWithRange';
+  static const String mFetchEntityProperties = 'fetchEntityProperties';
+  static const String mFetchPathProperties = 'fetchPathProperties';
+  static const String mGetAssetPathList = 'getAssetPathList';
+  static const String mGetAssetListPaged = 'getAssetListPaged';
+  static const String mGetAssetListRange = 'getAssetListRange';
   static const String mGetThumb = 'getThumb';
   static const String mGetOriginBytes = 'getOriginBytes';
   static const String mGetFullFile = 'getFullFile';
-  static const String mReleaseMemCache = 'releaseMemCache';
+  static const String mReleaseMemoryCache = 'releaseMemoryCache';
   static const String mLog = 'log';
   static const String mOpenSetting = 'openSetting';
-  static const String mFetchPathProperties = 'fetchPathProperties';
   static const String mNotify = 'notify';
-  static const String mForceOldApi = 'notify';
+  static const String mForceOldApi = 'forceOldApi';
   static const String mDeleteWithIds = 'deleteWithIds';
   static const String mSaveImage = 'saveImage';
   static const String mSaveImageWithPath = 'saveImageWithPath';
@@ -40,8 +41,6 @@ class PMConstants {
   static const String mDeleteAlbum = 'deleteAlbum';
   static const String mFavoriteAsset = 'favoriteAsset';
   static const String mRemoveNoExistsAssets = 'removeNoExistsAssets';
-  static const String mGetPropertiesFromAssetEntity =
-      'getPropertiesFromAssetEntity';
   static const String mIgnorePermissionCheck = 'ignorePermissionCheck';
   static const String mClearFileCache = 'clearFileCache';
   static const String mCancelCacheRequests = 'cancelCacheRequests';
