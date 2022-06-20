@@ -47,7 +47,7 @@
     return __cachingManager;
 }
 
-- (NSArray<PMAssetPathEntity *> *)getGalleryList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(PMFilterOptionGroup *)option {
+- (NSArray<PMAssetPathEntity *> *)getAssetPathList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(PMFilterOptionGroup *)option {
     NSMutableArray<PMAssetPathEntity *> *array = [NSMutableArray new];
     PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:option];
     PHFetchOptions *fetchCollectionOptions = [PHFetchOptions new];
@@ -193,7 +193,7 @@
 
 #pragma clang diagnostic pop
 
-- (NSArray<PMAssetEntity *> *)getAssetEntityListWithGalleryId:(NSString *)id type:(int)type page:(NSUInteger)page size:(NSUInteger)size filterOption:(PMFilterOptionGroup *)filterOption {
+- (NSArray<PMAssetEntity *> *)getAssetListPaged:(NSString *)id type:(int)type page:(NSUInteger)page size:(NSUInteger)size filterOption:(PMFilterOptionGroup *)filterOption {
     NSMutableArray<PMAssetEntity *> *result = [NSMutableArray new];
     
     PHFetchOptions *options = [PHFetchOptions new];
@@ -245,7 +245,7 @@
     return result;
 }
 
-- (NSArray<PMAssetEntity *> *)getAssetEntityListWithRange:(NSString *)id type:(int)type start:(NSUInteger)start end:(NSUInteger)end filterOption:(PMFilterOptionGroup *)filterOption {
+- (NSArray<PMAssetEntity *> *)getAssetListRange:(NSString *)id type:(int)type start:(NSUInteger)start end:(NSUInteger)end filterOption:(PMFilterOptionGroup *)filterOption {
     NSMutableArray<PMAssetEntity *> *result = [NSMutableArray new];
     
     PHFetchOptions *options = [PHFetchOptions new];
@@ -1425,17 +1425,19 @@
     
     NSError *error;
     
-    [PHPhotoLibrary.sharedPhotoLibrary
-     performChangesAndWait:^{
+    BOOL succeed = [PHPhotoLibrary.sharedPhotoLibrary
+                    performChangesAndWait:^{
         PHAssetChangeRequest *request = [PHAssetChangeRequest changeRequestForAsset:asset];
         request.favorite = favorite;
     } error:&error];
-    
+    if (!succeed) {
+        NSLog(@"favorite failed.");
+        return NO;
+    }
     if (error) {
         NSLog(@"favorite error: %@", error);
         return NO;
     }
-    
     return YES;
 }
 

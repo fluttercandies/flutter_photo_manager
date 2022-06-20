@@ -34,7 +34,7 @@ class PhotoManager(private val context: Context) {
             else AndroidQDBUtils
         }
 
-    fun getGalleryList(
+    fun getAssetPathList(
         type: Int,
         hasAll: Boolean,
         onlyAll: Boolean,
@@ -43,7 +43,7 @@ class PhotoManager(private val context: Context) {
         if (onlyAll) {
             return dbUtils.getOnlyGalleryList(context, type, option)
         }
-        val fromDb = dbUtils.getGalleryList(context, type, option)
+        val fromDb = dbUtils.getAssetPathList(context, type, option)
         if (!hasAll) {
             return fromDb
         }
@@ -59,7 +59,7 @@ class PhotoManager(private val context: Context) {
         return listOf(entity) + fromDb
     }
 
-    fun getAssetList(
+    fun getAssetListPaged(
         id: String,
         typeInt: Int = 0,
         page: Int,
@@ -67,10 +67,10 @@ class PhotoManager(private val context: Context) {
         option: FilterOption
     ): List<AssetEntity> {
         val gId = if (id == ALL_ID) "" else id
-        return dbUtils.getAssetFromGalleryId(context, gId, page, size, typeInt, option)
+        return dbUtils.getAssetListPaged(context, gId, page, size, typeInt, option)
     }
 
-    fun getAssetListWithRange(
+    fun getAssetListRange(
         galleryId: String,
         type: Int,
         start: Int,
@@ -78,7 +78,7 @@ class PhotoManager(private val context: Context) {
         option: FilterOption
     ): List<AssetEntity> {
         val gId = if (galleryId == ALL_ID) "" else galleryId
-        return dbUtils.getAssetFromGalleryIdRange(context, gId, start, end, type, option)
+        return dbUtils.getAssetListRange(context, gId, start, end, type, option)
     }
 
     fun getThumb(id: String, option: ThumbLoadOption, resultHandler: ResultHandler) {
@@ -136,9 +136,9 @@ class PhotoManager(private val context: Context) {
         dbUtils.clearFileCache(context)
     }
 
-    fun getPathEntity(id: String, type: Int, option: FilterOption): GalleryEntity? {
+    fun fetchPathProperties(id: String, type: Int, option: FilterOption): GalleryEntity? {
         if (id == ALL_ID) {
-            val allGalleryList = dbUtils.getGalleryList(context, type, option)
+            val allGalleryList = dbUtils.getAssetPathList(context, type, option)
             return if (allGalleryList.isEmpty()) {
                 null
             } else {
@@ -246,7 +246,7 @@ class PhotoManager(private val context: Context) {
         resultHandler.reply(result)
     }
 
-    fun getAssetProperties(id: String): AssetEntity? {
+    fun fetchEntityProperties(id: String): AssetEntity? {
         return dbUtils.getAssetEntity(context, id)
     }
 

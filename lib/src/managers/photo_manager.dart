@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import '../filter/filter_option_group.dart';
 import '../internal/editor.dart';
 import '../internal/enums.dart';
-import '../internal/plugin.dart';
+import '../internal/plugin.dart' as base;
 import '../types/entity.dart';
 import '../types/types.dart';
 import 'notify_manager.dart';
@@ -17,9 +17,9 @@ import 'notify_manager.dart';
 /// Use various methods in this class to access & manage assets.
 class PhotoManager {
   @visibleForTesting
-  PhotoManager.withPlugin([PhotoManagerPlugin? photoManagerPlugin]) {
-    if (photoManagerPlugin != null && photoManagerPlugin != plugin) {
-      plugin = photoManagerPlugin;
+  PhotoManager.withPlugin([base.PhotoManagerPlugin? photoManagerPlugin]) {
+    if (photoManagerPlugin != null && photoManagerPlugin != base.plugin) {
+      base.plugin = photoManagerPlugin;
     }
   }
 
@@ -28,6 +28,9 @@ class PhotoManager {
 
   /// Notify manager instance for managing photo changes.
   static final NotifyManager _notifyManager = NotifyManager();
+
+  /// The core class plugin that handles all methods in channels.
+  static base.PhotoManagerPlugin get plugin => base.plugin;
 
   /// ### Android (AndroidManifest.xml)
   ///  * READ_EXTERNAL_STORAGE (REQUIRED)
@@ -80,7 +83,7 @@ class PhotoManager {
     RequestType type = RequestType.common,
     FilterOptionGroup? filterOption,
   }) async {
-    return plugin.getAllGalleryList(
+    return plugin.getAssetPathList(
       hasAll: hasAll,
       onlyAll: onlyAll,
       type: type,

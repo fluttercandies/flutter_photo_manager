@@ -25,7 +25,7 @@ mixin BasePlugin {
 
 /// The plugin class is the core class that call channel's methods.
 class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
-  Future<List<AssetPathEntity>> getAllGalleryList({
+  Future<List<AssetPathEntity>> getAssetPathList({
     bool hasAll = true,
     bool onlyAll = false,
     RequestType type = RequestType.common,
@@ -48,7 +48,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
       'when the request type contains image.',
     );
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
-      PMConstants.mGetGalleryList,
+      PMConstants.mGetAssetPathList,
       <String, dynamic>{
         'type': type.value,
         'hasAll': hasAll,
@@ -77,7 +77,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   /// Use pagination to get album content.
-  Future<List<AssetEntity>> getAssetWithGalleryIdPaged(
+  Future<List<AssetEntity>> getAssetListPaged(
     String id, {
     required FilterOptionGroup optionGroup,
     int page = 0,
@@ -86,7 +86,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }) async {
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod<Map<dynamic, dynamic>>(
-      PMConstants.mGetAssetWithGalleryId,
+      PMConstants.mGetAssetListPaged,
       <String, dynamic>{
         'id': id,
         'type': type.value,
@@ -99,7 +99,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   /// Asset in the specified range.
-  Future<List<AssetEntity>> getAssetWithRange(
+  Future<List<AssetEntity>> getAssetListRange(
     String id, {
     required RequestType type,
     required int start,
@@ -108,7 +108,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }) async {
     final Map<dynamic, dynamic> map =
         await _channel.invokeMethod<Map<dynamic, dynamic>>(
-      PMConstants.mGetAssetListWithRange,
+      PMConstants.mGetAssetListRange,
       <String, dynamic>{
         'id': id,
         'type': type.value,
@@ -154,7 +154,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<void> releaseCache() {
-    return _channel.invokeMethod(PMConstants.mReleaseMemCache);
+    return _channel.invokeMethod(PMConstants.mReleaseMemoryCache);
   }
 
   Future<String?> getFullFile(
@@ -178,6 +178,13 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
 
   Future<void> openSetting() {
     return _channel.invokeMethod(PMConstants.mOpenSetting);
+  }
+
+  Future<Map<dynamic, dynamic>?> fetchEntityProperties(String id) {
+    return _channel.invokeMethod(
+      PMConstants.mFetchEntityProperties,
+      <String, dynamic>{'id': id},
+    );
   }
 
   Future<Map<dynamic, dynamic>?> fetchPathProperties(
@@ -304,6 +311,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     );
   }
 
+  /// Check whether the asset has been deleted.
   Future<bool> assetExistsWithId(String id) async {
     final bool? result = await _channel.invokeMethod(
       PMConstants.mAssetExists,
@@ -433,13 +441,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
       PMConstants.mRemoveNoExistsAssets,
     );
     return result == true;
-  }
-
-  Future<Map<dynamic, dynamic>?> getPropertiesFromAssetEntity(String id) {
-    return _channel.invokeMethod(
-      PMConstants.mGetPropertiesFromAssetEntity,
-      <String, dynamic>{'id': id},
-    );
   }
 
   Future<void> ignorePermissionCheck(bool ignore) {

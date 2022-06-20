@@ -36,7 +36,7 @@ object AndroidQDBUtils : IDBUtils {
         MediaStore.Images.Media.BUCKET_DISPLAY_NAME
     )
 
-    override fun getGalleryList(
+    override fun getAssetPathList(
         context: Context,
         requestType: Int,
         option: FilterOption
@@ -142,7 +142,7 @@ object AndroidQDBUtils : IDBUtils {
         }
     }
 
-    override fun getAssetFromGalleryId(
+    override fun getAssetListPaged(
         context: Context,
         galleryId: String,
         page: Int,
@@ -184,7 +184,7 @@ object AndroidQDBUtils : IDBUtils {
     }
 
 
-    override fun getAssetFromGalleryIdRange(
+    override fun getAssetListRange(
         context: Context,
         galleryId: String,
         start: Int,
