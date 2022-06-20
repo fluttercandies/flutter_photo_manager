@@ -6,8 +6,13 @@ that can be found in the LICENSE file. -->
 
 ## 2.1.3
 
+Improvements:
+
+- Expose `PhotoManager.plugin`. (#778)
+
 Fixes:
 
+- Fix `forceOldApi` not well-called. (#778)
 - Fix invalid type cast with `AssetEntity.exists`. (#777)
 
 ## 2.1.2
