@@ -192,6 +192,21 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                 <int>[500, 600, 700, 1000, 1500, 2000],
               ),
             ),
+            if (Platform.isIOS)
+              ElevatedButton(
+                child: const Text('Toggle isFavorite'),
+                onPressed: () async {
+                  final bool isFavorite = entity.isFavorite;
+                  print('Current isFavorite: $isFavorite');
+                  await PhotoManager.editor.iOS.favoriteAsset(
+                    entity: entity,
+                    favorite: isFavorite,
+                  );
+                  final AssetEntity? newEntity =
+                      await entity.obtainForNewProperties();
+                  print('New isFavorite: ${newEntity?.isFavorite}');
+                },
+              ),
           ],
         ),
       ),
