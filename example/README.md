@@ -1,6 +1,6 @@
-# image_scanner_example
+# photo_manager_example
 
-Demonstrates how to use the image_scanner plugin.
+Demonstrates how to use the photo_manager plugin.
 
 ## Getting Started
 

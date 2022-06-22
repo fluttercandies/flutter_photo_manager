@@ -4,6 +4,16 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.1.4
+
+Improvements:
+
+- [iOS] Check `canPerformEditOperation` before performing change requests. (#782)
+
+Fixes:
+
+- [Android] Fix `orientation` missing during conversions. (#783)
+
 ## 2.1.3
 
 Improvements:
