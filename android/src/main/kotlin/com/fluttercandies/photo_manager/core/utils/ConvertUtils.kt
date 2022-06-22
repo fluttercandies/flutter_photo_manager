@@ -27,24 +27,8 @@ object ConvertUtils {
     fun convertToAssetResult(list: List<AssetEntity>): Map<String, Any?> {
         val data = ArrayList<Map<String, Any?>>()
         for (entity in list) {
-            val element = hashMapOf(
-                "id" to entity.id,
-                "duration" to entity.duration / 1000,
-                "type" to entity.type,
-                "createDt" to entity.createDt,
-                "width" to entity.width,
-                "height" to entity.height,
-                "orientation" to entity.orientation,
-                "modifiedDt" to entity.modifiedDate,
-                "lat" to entity.lat,
-                "lng" to entity.lng,
-                "title" to entity.displayName,
-                "relativePath" to entity.relativePath
-            )
-            if (entity.mimeType != null) {
-                element["mimeType"] = entity.mimeType
-            }
-            data.add(element)
+            val result = convertToAssetResult(entity)
+            data.add(result)
         }
         return mapOf("data" to data)
     }
@@ -57,6 +41,7 @@ object ConvertUtils {
             "createDt" to entity.createDt,
             "width" to entity.width,
             "height" to entity.height,
+            "orientation" to entity.orientation,
             "modifiedDt" to entity.modifiedDate,
             "lat" to entity.lat,
             "lng" to entity.lng,
