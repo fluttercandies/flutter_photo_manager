@@ -1417,25 +1417,28 @@
 - (BOOL)favoriteWithId:(NSString *)id favorite:(BOOL)favorite {
     PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:nil];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
-    
     if (!asset) {
-        NSLog(@"Cannot find found: %@", id);
+        NSLog(@"Favoriting asset %@ failed: Asset not found.",id);
         return NO;
     }
     
     NSError *error;
-    
+    BOOL canPerformEditOperation = [asset canPerformEditOperation:PHAssetEditOperationProperties];
+    if (!canPerformEditOperation) {
+        NSLog(@"Favoriting asset %@ failed: Cannot perform edit operation.", id);
+        return NO;
+    }
     BOOL succeed = [PHPhotoLibrary.sharedPhotoLibrary
                     performChangesAndWait:^{
         PHAssetChangeRequest *request = [PHAssetChangeRequest changeRequestForAsset:asset];
         request.favorite = favorite;
     } error:&error];
     if (!succeed) {
-        NSLog(@"favorite failed.");
+        NSLog(@"Favoriting asset %@ failed: Request not succeed.", id);
         return NO;
     }
     if (error) {
-        NSLog(@"favorite error: %@", error);
+        NSLog(@"Favoriting asset %@ failed: %@.", id, error);
         return NO;
     }
     return YES;
