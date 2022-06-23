@@ -23,19 +23,26 @@ class GalleryItemWidget extends StatelessWidget {
     return GestureDetector(
       child: ListTile(
         title: Text(item.name),
-        subtitle: Text('count : ${item.assetCount}'),
+        subtitle: FutureBuilder<int>(
+          future: item.assetCountAsync,
+          builder: (_, AsyncSnapshot<int> data) {
+            if (data.hasData) {
+              return Text('count : ${data.data}');
+            }
+            return const SizedBox.shrink();
+          },
+        ),
         trailing: _buildSubButton(item),
       ),
-      onTap: () {
-        if (item.assetCount == 0) {
-          showToast('The asset count is 0.');
-          return;
-        }
+      onTap: () async {
         if (item.albumType == 2) {
           showToast("The folder can't get asset");
           return;
         }
-
+        if (await item.assetCountAsync == 0) {
+          showToast('The asset count is 0.');
+          return;
+        }
         Navigator.of(context).push<void>(
           MaterialPageRoute<void>(
             builder: (_) => GalleryContentListPage(

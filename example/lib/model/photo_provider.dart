@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 import '../main.dart';
@@ -201,11 +200,6 @@ class PhotoProvider extends ChangeNotifier {
       ),
       prefix: 'Obtain path list duration',
     );
-
-    galleryList.sort((AssetPathEntity s1, AssetPathEntity s2) {
-      return s2.assetCount.compareTo(s1.assetCount);
-    });
-
     list.clear();
     list.addAll(galleryList);
   }
@@ -282,9 +276,12 @@ class AssetPathProvider extends ChangeNotifier {
   List<AssetEntity> list = <AssetEntity>[];
   int page = 0;
 
+  int get assetCount => _assetCount!;
+  int? _assetCount;
+
   int get showItemCount {
-    if (list.length == path.assetCount) {
-      return path.assetCount;
+    if (_assetCount != null && list.length == _assetCount) {
+      return assetCount;
     }
     return list.length + 1;
   }
@@ -295,9 +292,9 @@ class AssetPathProvider extends ChangeNotifier {
     if (refreshing) {
       return;
     }
-
     refreshing = true;
     path = await path.obtainForNewProperties(maxDateTimeToNow: false);
+    _assetCount = await path.assetCountAsync;
     final List<AssetEntity> list = await elapsedFuture(
       path.getAssetListPaged(page: 0, size: loadCount),
       prefix: 'Refresh assets list from path ${path.id}',
@@ -316,7 +313,7 @@ class AssetPathProvider extends ChangeNotifier {
     if (refreshing) {
       return;
     }
-    if (showItemCount > path.assetCount) {
+    if (showItemCount > assetCount) {
       Log.d('already max');
       return;
     }
@@ -351,7 +348,6 @@ class AssetPathProvider extends ChangeNotifier {
     final List<String> ids = entity.map((AssetEntity e) => e.id).toList();
     await PhotoManager.editor.deleteWithIds(ids);
     path = await path.obtainForNewProperties();
-    showToast('The path ${path.name} asset count have :${path.assetCount}');
     notifyListeners();
   }
 

@@ -29,7 +29,7 @@ class _DevelopingExampleState extends State<DevelopingExample> {
             );
             for (final AssetPathEntity path in list) {
               imageList.addAll(
-                await path.getAssetListRange(start: 0, end: path.assetCount),
+                await path.getAssetListRange(start: 0, end: 1),
               );
             }
             if (imageList.isNotEmpty) {

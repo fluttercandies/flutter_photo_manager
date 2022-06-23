@@ -44,7 +44,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   void initState() {
     super.initState();
     path
-        .getAssetListRange(start: 0, end: path.assetCount)
+        .getAssetListRange(start: 0, end: 1)
         .then((List<AssetEntity> value) {
       if (value.isEmpty) {
         return;
@@ -76,12 +76,12 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       create: (_) => AssetPathProvider(widget.path),
       builder: (BuildContext context, _) => Scaffold(
         appBar: AppBar(title: Text(path.name)),
-        body: buildRefreshIndicator(context, path.assetCount),
+        body: buildRefreshIndicator(context),
       ),
     );
   }
 
-  Widget buildRefreshIndicator(BuildContext context, int length) {
+  Widget buildRefreshIndicator(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () => _onRefresh(context),
       child: Scrollbar(
