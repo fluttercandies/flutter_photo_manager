@@ -101,11 +101,6 @@
             return [self getLivePhotosResource].originalFilename;
         }
     }
-    if (@available(macOS 10.11, *)) {
-        if ([self isLivePhoto] && subtype == PHAssetMediaSubtypePhotoLive) {
-            return [self getLivePhotosResource].originalFilename;
-        }
-    }
     PHAssetResource *resource = [self getAdjustResource];
     if (resource) {
         return resource.originalFilename;

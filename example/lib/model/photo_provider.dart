@@ -28,15 +28,6 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool _containsEmptyAlbum = false;
-
-  bool get containsEmptyAlbum => _containsEmptyAlbum;
-
-  set containsEmptyAlbum(bool containsEmptyAlbum) {
-    _containsEmptyAlbum = containsEmptyAlbum;
-    notifyListeners();
-  }
-
   bool _containsPathModified = false;
 
   bool get containsPathModified => _containsPathModified;
@@ -168,14 +159,6 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeContainsEmptyAlbum(bool? value) {
-    if (value == null) {
-      return;
-    }
-    containsEmptyAlbum = value;
-    notifyListeners();
-  }
-
   void changeContainsPathModified(bool? value) {
     if (value == null) {
       return;
@@ -230,7 +213,6 @@ class PhotoProvider extends ChangeNotifier {
       ..setOption(AssetType.image, option)
       ..setOption(AssetType.audio, option)
       ..createTimeCond = createDtCond
-      ..containsEmptyAlbum = _containsEmptyAlbum
       ..containsPathModified = _containsPathModified
       ..containsLivePhotos = _containsLivePhotos
       ..onlyLivePhotos = onlyLivePhotos;

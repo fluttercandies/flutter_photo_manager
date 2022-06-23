@@ -13,7 +13,6 @@
         NSDictionary *item = @{
             @"id": entity.id,
             @"name": entity.name,
-            @"length": @(entity.assetCount),
             @"isAll": @(entity.isAll),
             @"albumType": @(entity.type),
         };
@@ -115,7 +114,6 @@
     container.audioOption = [self convertMapToPMFilterOption:audio];
     container.dateOption = [self convertMapToPMDateOption:map[@"createDate"]];
     container.updateOption = [self convertMapToPMDateOption:map[@"updateDate"]];
-    container.containsEmptyAlbum = [map[@"containsEmptyAlbum"] boolValue];
     container.containsModified = [map[@"containsPathModified"] boolValue];
     container.containsLivePhotos = [map[@"containsLivePhotos"] boolValue];
     container.onlyLivePhotos = [map[@"onlyLivePhotos"] boolValue];
