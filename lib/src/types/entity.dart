@@ -72,6 +72,9 @@ class AssetPathEntity {
   @Deprecated('Use assetCountAsync instead. This will be removed in 3.0.0.')
   final int assetCount;
 
+  /// Total assets count of the path with the asynchronized getter.
+  Future<int> get assetCountAsync => plugin.getAssetCountFromPath(this);
+
   /// The type of the album.
   ///  * Android: Always be 1.
   ///  * iOS: 1 - Album, 2 - Folder.
@@ -195,8 +198,9 @@ class AssetPathEntity {
       'Filtering only Live Photos is only supported '
       'when the request type contains image.',
     );
-    if (end > assetCount) {
-      end = assetCount;
+    final int count = await assetCountAsync;
+    if (end > count) {
+      end = count;
     }
     return plugin.getAssetListRange(
       id,
@@ -244,7 +248,6 @@ class AssetPathEntity {
   AssetPathEntity copyWith({
     String? id,
     String? name,
-    int? assetCount,
     int? albumType = 1,
     DateTime? lastModified,
     RequestType? type,
@@ -254,7 +257,6 @@ class AssetPathEntity {
     return AssetPathEntity(
       id: id ?? this.id,
       name: name ?? this.name,
-      assetCount: assetCount ?? this.assetCount,
       albumType: albumType ?? this.albumType,
       lastModified: lastModified ?? this.lastModified,
       type: type ?? this.type,
@@ -270,7 +272,6 @@ class AssetPathEntity {
     }
     return id == other.id &&
         name == other.name &&
-        assetCount == other.assetCount &&
         albumType == other.albumType &&
         type == other.type &&
         lastModified == other.lastModified &&
@@ -279,11 +280,11 @@ class AssetPathEntity {
 
   @override
   int get hashCode =>
-      hashValues(id, name, assetCount, albumType, type, lastModified, isAll);
+      hashValues(id, name, albumType, type, lastModified, isAll);
 
   @override
   String toString() {
-    return 'AssetPathEntity(id: $id, name: $name, assetCount: $assetCount)';
+    return 'AssetPathEntity(id: $id, name: $name)';
   }
 }
 
