@@ -96,6 +96,21 @@
     return array;
 }
 
+- (NSUInteger)getAssetCountFromPath:(NSString *)id type:(int)type filterOption:(PMFilterOptionGroup *)filterOption {
+    PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:filterOption];
+    PHFetchOptions *fetchCollectionOptions = [PHFetchOptions new];
+    PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection
+                                                  fetchAssetCollectionsWithLocalIdentifiers:@[id]
+                                                  options:fetchCollectionOptions];
+    
+    if (result == nil || result.count == 0) {
+        return 0;
+    }
+    PHAssetCollection *collection = result[0];
+    NSUInteger count = [collection obtainAssetCount:assetOptions];
+    return count;
+}
+
 - (void)logCollections:(PHFetchResult *)collections option:(PHFetchOptions *)option {
     if(!PMLogUtils.sharedInstance.isLog){
         return;

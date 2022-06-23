@@ -243,6 +243,15 @@
                                                    option:option];
             NSDictionary *dictionary = [PMConvertUtils convertPathToMap:array];
             [handler reply:dictionary];
+        } else if ([call.method isEqualToString:@"getAssetCountFromPath"]) {
+            NSString *id = call.arguments[@"id"];
+            int requestType = [call.arguments[@"type"] intValue];
+            PMFilterOptionGroup *option =
+            [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
+            NSUInteger result = [manager getAssetCountFromPath:id
+                                                          type:requestType
+                                                  filterOption:option];
+            [handler reply:@(result)];
         } else if ([call.method isEqualToString:@"getAssetListPaged"]) {
             NSString *id = call.arguments[@"id"];
             int type = [call.arguments[@"type"] intValue];
