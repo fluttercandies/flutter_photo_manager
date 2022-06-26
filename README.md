@@ -8,6 +8,7 @@ English | [中文说明](#) (🚧 WIP)
 
 [![pub package](https://img.shields.io/pub/v/photo_manager?label=stable)][pub package]
 [![pub pre-release package](https://img.shields.io/pub/v/photo_manager?color=42a012&include_prereleases&label=dev)](https://pub.dev/packages/photo_manager)
+[![Awesome Flutter](https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true)](https://github.com/Solido/awesome-flutter)
 [![GitHub](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager)][repo]
 [![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?style=social&label=Stars)][repo]
 <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
