@@ -69,7 +69,10 @@ class AssetPathEntity {
   ///
   /// The synchronized count will cause performance regression on iOS,
   /// here the asynchronized getter [assetCountAsync] is perferred.
-  @Deprecated('Use assetCountAsync instead. This will be removed in 3.0.0.')
+  @Deprecated(
+    'Always 0. Use assetCountAsync instead. '
+    'This will be removed in 3.0.0.',
+  )
   final int assetCount;
 
   /// Total assets count of the path with the asynchronized getter.
