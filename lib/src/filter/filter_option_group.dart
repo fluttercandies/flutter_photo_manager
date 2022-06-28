@@ -14,7 +14,6 @@ class FilterOptionGroup {
     FilterOption imageOption = const FilterOption(),
     FilterOption videoOption = const FilterOption(),
     FilterOption audioOption = const FilterOption(),
-    this.containsEmptyAlbum = false,
     this.containsPathModified = false,
     this.containsLivePhotos = true,
     this.onlyLivePhotos = false,
@@ -42,9 +41,6 @@ class FilterOptionGroup {
   void setOption(AssetType type, FilterOption option) {
     _map[type] = option;
   }
-
-  /// Whether to obtain empty albums.
-  bool containsEmptyAlbum = false;
 
   /// Whether the [AssetPathEntity]s will return with modified time.
   ///
@@ -77,7 +73,6 @@ class FilterOptionGroup {
     for (final AssetType type in _map.keys) {
       _map[type] = _map[type]!.merge(other.getOption(type));
     }
-    containsEmptyAlbum = other.containsEmptyAlbum;
     containsPathModified = other.containsPathModified;
     containsLivePhotos = other.containsLivePhotos;
     onlyLivePhotos = other.onlyLivePhotos;
@@ -96,7 +91,6 @@ class FilterOptionGroup {
         'video': getOption(AssetType.video).toMap(),
       if (_map.containsKey(AssetType.audio))
         'audio': getOption(AssetType.audio).toMap(),
-      'containsEmptyAlbum': containsEmptyAlbum,
       'containsPathModified': containsPathModified,
       'containsLivePhotos': containsLivePhotos,
       'onlyLivePhotos': onlyLivePhotos,
@@ -110,7 +104,6 @@ class FilterOptionGroup {
     FilterOption? imageOption,
     FilterOption? videoOption,
     FilterOption? audioOption,
-    bool? containsEmptyAlbum,
     bool? containsPathModified,
     bool? containsLivePhotos,
     bool? onlyLivePhotos,
@@ -121,7 +114,6 @@ class FilterOptionGroup {
     imageOption ??= _map[AssetType.image];
     videoOption ??= _map[AssetType.video];
     audioOption ??= _map[AssetType.audio];
-    containsEmptyAlbum ??= this.containsEmptyAlbum;
     containsPathModified ??= this.containsPathModified;
     containsLivePhotos ??= this.containsLivePhotos;
     onlyLivePhotos ??= this.onlyLivePhotos;
@@ -133,7 +125,6 @@ class FilterOptionGroup {
       ..setOption(AssetType.image, imageOption!)
       ..setOption(AssetType.video, videoOption!)
       ..setOption(AssetType.audio, audioOption!)
-      ..containsEmptyAlbum = containsEmptyAlbum
       ..containsPathModified = containsPathModified
       ..containsLivePhotos = containsLivePhotos
       ..onlyLivePhotos = onlyLivePhotos

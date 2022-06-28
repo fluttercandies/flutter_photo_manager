@@ -76,6 +76,24 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return PermissionState.values[result];
   }
 
+  Future<int> getAssetCountFromPath(AssetPathEntity path) async {
+    // Use `assetCount` for Android until we break the API
+    // and migrate to `InternalAssetPathEntity`.
+    if (Platform.isAndroid) {
+      // ignore: deprecated_member_use_from_same_package
+      return path.assetCount;
+    }
+    final int result = await _channel.invokeMethod<int>(
+      PMConstants.mGetAssetCountFromPath,
+      <String, dynamic>{
+        'id': path.id,
+        'type': path.type.value,
+        'option': path.filterOption.toMap(),
+      },
+    ) as int;
+    return result;
+  }
+
   /// Use pagination to get album content.
   Future<List<AssetEntity>> getAssetListPaged(
     String id, {

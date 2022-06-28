@@ -16,6 +16,7 @@ class PMConstants {
   static const String mFetchEntityProperties = 'fetchEntityProperties';
   static const String mFetchPathProperties = 'fetchPathProperties';
   static const String mGetAssetPathList = 'getAssetPathList';
+  static const String mGetAssetCountFromPath = 'getAssetCountFromPath';
   static const String mGetAssetListPaged = 'getAssetListPaged';
   static const String mGetAssetListRange = 'getAssetListRange';
   static const String mGetThumb = 'getThumb';

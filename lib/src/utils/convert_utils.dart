@@ -51,7 +51,8 @@ class ConvertUtils {
     final AssetPathEntity result = AssetPathEntity(
       id: data['id'] as String,
       name: data['name'] as String,
-      assetCount: data['length'] as int,
+      // ignore: deprecated_member_use_from_same_package
+      assetCount: data['length'] as int? ?? 0,
       albumType: data['albumType'] as int? ?? 1,
       filterOption: optionGroup ?? FilterOptionGroup(),
       lastModified: lastModified,

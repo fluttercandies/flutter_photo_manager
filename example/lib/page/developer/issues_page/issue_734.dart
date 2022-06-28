@@ -49,10 +49,10 @@ class _Issue734PageState extends State<Issue734Page>
     }
 
     final AssetPathEntity recent = pathList[0];
+    final int assetCount = await recent.assetCountAsync;
+    Log.d('recent.assetCount: $assetCount');
 
-    Log.d('recent.assetCount: ${recent.assetCount}');
-
-    for (int i = 0; i < recent.assetCount; i++) {
+    for (int i = 0; i < assetCount; i++) {
       final List<AssetEntity> pageAssetList = await recent.getAssetListPaged(
         page: i,
         size: 1,

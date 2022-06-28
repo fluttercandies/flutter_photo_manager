@@ -57,7 +57,6 @@ class _NewHomePageState extends State<NewHomePage> {
             _buildOnlyAllCheck(),
             _buildContainsLivePhotos(),
             _buildOnlyLivePhotos(),
-            _buildContainsEmptyCheck(),
             _buildPathContainsModifiedDateCheck(),
             _buildPngCheck(),
             _buildNotifyCheck(),
@@ -182,19 +181,6 @@ class _NewHomePageState extends State<NewHomePage> {
         }
       },
       title: const Text('Only Live Photos'),
-    );
-  }
-
-  Widget _buildContainsEmptyCheck() {
-    if (!Platform.isIOS) {
-      return Container();
-    }
-    return CheckboxListTile(
-      value: watchProvider.containsEmptyAlbum,
-      onChanged: (bool? value) {
-        readProvider.changeContainsEmptyAlbum(value);
-      },
-      title: const Text('contains empty album(only iOS)'),
     );
   }
 

@@ -8,14 +8,13 @@
 
 @property(nonatomic, copy) NSString *id;
 @property(nonatomic, copy) NSString *name;
-@property(nonatomic, assign) NSUInteger assetCount;
 @property(nonatomic, assign) BOOL isAll;
 @property(nonatomic, assign) int type;
 @property(nonatomic, assign) long modifiedDate;
 
-- (instancetype)initWithId:(NSString *)id name:(NSString *)name assetCount:(NSUInteger)assetCount;
+- (instancetype)initWithId:(NSString *)id name:(NSString *)name;
 
-+ (instancetype)entityWithId:(NSString *)id name:(NSString *)name assetCount:(NSUInteger)assetCount;
++ (instancetype)entityWithId:(NSString *)id name:(NSString *)name;
 
 @end
 
