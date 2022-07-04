@@ -94,9 +94,10 @@ interface IDBUtils {
         size: Int,
         requestType: Int = 0,
         option: FilterOption,
+        forceGetLocation: Boolean
     ): List<AssetEntity>
 
-    fun getAssetEntity(context: Context, id: String): AssetEntity?
+    fun getAssetEntity(context: Context, id: String,forceGetLocation: Boolean = false): AssetEntity?
 
     fun getMediaType(type: Int): Int {
         return when (type) {
@@ -157,7 +158,8 @@ interface IDBUtils {
         start: Int,
         end: Int,
         requestType: Int,
-        option: FilterOption
+        option: FilterOption,
+        forceGetLocation: Boolean
     ): List<AssetEntity>
 
     fun saveImage(

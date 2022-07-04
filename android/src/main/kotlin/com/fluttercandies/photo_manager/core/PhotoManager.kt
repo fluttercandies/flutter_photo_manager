@@ -64,10 +64,19 @@ class PhotoManager(private val context: Context) {
         typeInt: Int = 0,
         page: Int,
         size: Int,
-        option: FilterOption
+        option: FilterOption,
+        forceGetLocation: Boolean = false,
     ): List<AssetEntity> {
         val gId = if (id == ALL_ID) "" else id
-        return dbUtils.getAssetListPaged(context, gId, page, size, typeInt, option)
+        return dbUtils.getAssetListPaged(
+            context,
+            gId,
+            page,
+            size,
+            typeInt,
+            option,
+            forceGetLocation,
+        )
     }
 
     fun getAssetListRange(
@@ -75,10 +84,11 @@ class PhotoManager(private val context: Context) {
         type: Int,
         start: Int,
         end: Int,
-        option: FilterOption
+        option: FilterOption,
+        forceGetLocation: Boolean,
     ): List<AssetEntity> {
         val gId = if (galleryId == ALL_ID) "" else galleryId
-        return dbUtils.getAssetListRange(context, gId, start, end, type, option)
+        return dbUtils.getAssetListRange(context, gId, start, end, type, option, forceGetLocation)
     }
 
     fun getThumb(id: String, option: ThumbLoadOption, resultHandler: ResultHandler) {

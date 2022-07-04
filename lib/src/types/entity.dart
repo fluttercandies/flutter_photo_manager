@@ -167,6 +167,7 @@ class AssetPathEntity {
   Future<List<AssetEntity>> getAssetListPaged({
     required int page,
     required int size,
+    bool forceGetLocation = false,
   }) {
     assert(albumType == 1, 'Only album can request for assets.');
     assert(size > 0, 'Page size must be greater than 0.');
@@ -180,6 +181,7 @@ class AssetPathEntity {
       page: page,
       size: size,
       type: type,
+      forceGetLocation: forceGetLocation,
       optionGroup: filterOption,
     );
   }
@@ -192,6 +194,7 @@ class AssetPathEntity {
   Future<List<AssetEntity>> getAssetListRange({
     required int start,
     required int end,
+    bool forceGetLocation = false,
   }) async {
     assert(albumType == 1, 'Only album can request for assets.');
     assert(start >= 0, 'The start must be greater than 0.');
@@ -210,6 +213,7 @@ class AssetPathEntity {
       type: type,
       start: start,
       end: end,
+      forceGetLocation: forceGetLocation,
       optionGroup: filterOption,
     );
   }

@@ -152,7 +152,8 @@ object DBUtils : IDBUtils {
         page: Int,
         size: Int,
         requestType: Int,
-        option: FilterOption
+        option: FilterOption,
+        forceGetLocation: Boolean,
     ): List<AssetEntity> {
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -193,7 +194,8 @@ object DBUtils : IDBUtils {
         start: Int,
         end: Int,
         requestType: Int,
-        option: FilterOption
+        option: FilterOption,
+        forceGetLocation: Boolean,
     ): List<AssetEntity> {
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -229,7 +231,11 @@ object DBUtils : IDBUtils {
         return list
     }
 
-    private fun convertCursorToAsset(context: Context, cursor: Cursor, requestType: Int): AssetEntity {
+    private fun convertCursorToAsset(
+        context: Context,
+        cursor: Cursor,
+        requestType: Int
+    ): AssetEntity {
         val id = cursor.getString(MediaStore.MediaColumns._ID)
         val path = cursor.getString(MediaStore.MediaColumns.DATA)
         val date = cursor.getLong(MediaStore.Images.Media.DATE_ADDED)
@@ -278,7 +284,11 @@ object DBUtils : IDBUtils {
         )
     }
 
-    override fun getAssetEntity(context: Context, id: String): AssetEntity? {
+    override fun getAssetEntity(
+        context: Context,
+        id: String,
+        forceGetLocation: Boolean,
+    ): AssetEntity? {
         val keys =
             (storeImageKeys + storeVideoKeys + locationKeys + typeKeys).distinct().toTypedArray()
         val selection = "${MediaStore.Files.FileColumns._ID} = ?"

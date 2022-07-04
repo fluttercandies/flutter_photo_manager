@@ -148,7 +148,8 @@ object AndroidQDBUtils : IDBUtils {
         page: Int,
         size: Int,
         requestType: Int,
-        option: FilterOption
+        option: FilterOption,
+        forceGetLocation: Boolean
     ): List<AssetEntity> {
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -176,7 +177,7 @@ object AndroidQDBUtils : IDBUtils {
         ) ?: return emptyList()
         cursor.use {
             cursorWithRange(it, page * size, size) {
-                val asset = convertCursorToAssetEntity(context, cursor)
+                val asset = convertCursorToAssetEntity(context, cursor, forceGetLocation)
                 list.add(asset)
             }
         }
@@ -190,7 +191,8 @@ object AndroidQDBUtils : IDBUtils {
         start: Int,
         end: Int,
         requestType: Int,
-        option: FilterOption
+        option: FilterOption,
+        forceGetLocation: Boolean
     ): List<AssetEntity> {
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -219,7 +221,7 @@ object AndroidQDBUtils : IDBUtils {
         ) ?: return emptyList()
         cursor.use {
             cursorWithRange(it, start, pageSize) {
-                list.add(convertCursorToAssetEntity(context, cursor))
+                list.add(convertCursorToAssetEntity(context, cursor, forceGetLocation))
             }
         }
         return list
@@ -229,7 +231,11 @@ object AndroidQDBUtils : IDBUtils {
     private fun assetKeys() =
         IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + arrayOf(MediaStore.MediaColumns.RELATIVE_PATH)
 
-    private fun convertCursorToAssetEntity(context: Context, cursor: Cursor): AssetEntity {
+    private fun convertCursorToAssetEntity(
+        context: Context,
+        cursor: Cursor,
+        forceGetLocation: Boolean
+    ): AssetEntity {
         val id = cursor.getString(MediaStore.MediaColumns._ID)
         val path = cursor.getString(MediaStore.MediaColumns.DATA)
         var date = cursor.getLong(MediaStore.Images.Media.DATE_TAKEN)
@@ -248,7 +254,9 @@ object AndroidQDBUtils : IDBUtils {
         val modifiedDate = cursor.getLong(MediaStore.MediaColumns.DATE_MODIFIED)
         val orientation: Int = cursor.getInt(MediaStore.MediaColumns.ORIENTATION)
         val relativePath: String = cursor.getString(MediaStore.MediaColumns.RELATIVE_PATH)
-        if ((width == 0 || height == 0)
+        var lat = 0.0
+        var log = 0.0
+        if ((width == 0 || height == 0 || forceGetLocation)
             && path.isNotBlank()
             && File(path).exists()
             && !mimeType.contains("svg")
@@ -257,8 +265,16 @@ object AndroidQDBUtils : IDBUtils {
                 val uri = getUri(id, getMediaType(type))
                 context.contentResolver.openInputStream(uri)?.use {
                     ExifInterface(it).apply {
-                        width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
-                        height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+                        if (width == 0 || height == 0) {
+                            width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
+                            height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+                        }
+                        if (forceGetLocation) {
+                            latLong?.apply {
+                                lat = this[0]
+                                log = this[1]
+                            }
+                        }
                     }
                 }
             } catch (e: Throwable) {
@@ -276,12 +292,18 @@ object AndroidQDBUtils : IDBUtils {
             displayName,
             modifiedDate,
             orientation,
+            lat = lat,
+            lng = log,
             androidQRelativePath = relativePath,
             mimeType = mimeType
         )
     }
 
-    override fun getAssetEntity(context: Context, id: String): AssetEntity? {
+    override fun getAssetEntity(
+        context: Context,
+        id: String,
+        forceGetLocation: Boolean
+    ): AssetEntity? {
         val keys = assetKeys().distinct().toTypedArray()
         val selection = "$_ID = ?"
         val args = arrayOf(id)
@@ -293,7 +315,7 @@ object AndroidQDBUtils : IDBUtils {
             null
         ) ?: return null
         cursor.use {
-            return if (it.moveToNext()) convertCursorToAssetEntity(context, it)
+            return if (it.moveToNext()) convertCursorToAssetEntity(context, it, forceGetLocation)
             else null
         }
     }
