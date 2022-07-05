@@ -55,7 +55,7 @@ enum PMRequestState { prepare, loading, success, failed }
 /// See also:
 ///  * [Apple documentation](https://developer.apple.com/documentation/photokit/phauthorizationstatus)
 enum PermissionState {
-  /// The user hasn’t set the app’s authorization status.
+  /// The user has not set the app’s authorization status.
   notDetermined,
 
   /// The app isn’t authorized to access the photo library, and the user can’t grant such permission.

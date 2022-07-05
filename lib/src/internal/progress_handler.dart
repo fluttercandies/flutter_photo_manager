@@ -26,7 +26,7 @@ class PMProgressHandler {
     _incrementalIndex++;
   }
 
-  /// Increamental index that increase for each use.
+  /// Incremental index that increase for each use.
   static int _incrementalIndex = 0;
 
   int get channelIndex => _channelIndex;
