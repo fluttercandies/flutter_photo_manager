@@ -8,6 +8,8 @@ import 'package:flutter/rendering.dart';
 import '../internal/constants.dart';
 import '../internal/enums.dart';
 
+/// The [width] and [height] dimensions
+/// for the thumbnail data of an [AssetEntity].
 @immutable
 class ThumbnailSize {
   const ThumbnailSize(this.width, this.height);
@@ -32,13 +34,12 @@ class ThumbnailSize {
   /// A [ThumbnailSize] with the [width] and [height] swapped.
   ThumbnailSize get flipped => ThumbnailSize(height, width);
 
-  /// Compares two Sizes for equality.
-  // We don't compare the runtimeType because of _DebugSize in the framework.
   @override
   bool operator ==(Object other) {
-    return other is ThumbnailSize &&
-        other.width == width &&
-        other.height == height;
+    if (other is! ThumbnailSize) {
+      return false;
+    }
+    return other.width == width && other.height == height;
   }
 
   @override
