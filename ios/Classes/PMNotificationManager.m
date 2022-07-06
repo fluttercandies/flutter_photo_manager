@@ -111,6 +111,11 @@
 }
 
 - (PHFetchResult<PHAsset *> *)getLastAssets {
+    if (@available(iOS 14, *)) {
+        if (PHPhotoLibrary.authorizationStatus == PHAuthorizationStatusLimited) {
+            return [PHAsset fetchAssetsWithOptions:nil];
+        }
+    }
     if (PHPhotoLibrary.authorizationStatus == PHAuthorizationStatusAuthorized) {
         return [PHAsset fetchAssetsWithOptions:nil];
     }
