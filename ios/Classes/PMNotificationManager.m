@@ -48,16 +48,14 @@
     if (!result) {
         return;
     }
-    
-    PHFetchResultChangeDetails *details =
-    [changeInstance changeDetailsForFetchResult:result];
-    
-    NSMutableDictionary *detailResult =
-    [self convertChangeDetailsToNotifyDetail:details];
-    
+    PHFetchResultChangeDetails *details = [changeInstance changeDetailsForFetchResult:result];
     NSUInteger oldCount = result.count;
     [self refreshFetchResult];
+    if (!result) {
+        return;
+    }
     NSUInteger newCount = result.count;
+    NSMutableDictionary *detailResult = [self convertChangeDetailsToNotifyDetail:details];
     detailResult[@"oldCount"] = @(oldCount);
     detailResult[@"newCount"] = @(newCount);
     
