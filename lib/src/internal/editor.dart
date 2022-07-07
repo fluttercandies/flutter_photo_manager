@@ -40,6 +40,10 @@ class Editor {
   /// obtained by `basename(file.path)`.
   /// {@endtemplate}
   ///
+  /// {@template photo_manager.Editor.DescriptionWhenSaving}
+  /// [desc] is the description field that only works on Android.
+  /// {@endtemplate}
+  ///
   /// {@template photo_manager.Editor.SavingAssets}
   /// On Android 29 and above, you can use [relativePath] to specify the
   /// `RELATIVE_PATH` used in the MediaStore.
@@ -64,6 +68,8 @@ class Editor {
   ///
   /// {@macro photo_manager.Editor.TitleWhenSaving}
   ///
+  /// {@macro photo_manager.Editor.DescriptionWhenSaving}
+  ///
   /// {@macro photo_manager.Editor.SavingAssets}
   Future<AssetEntity?> saveImageWithPath(
     String path, {
@@ -82,6 +88,8 @@ class Editor {
   /// Save video to gallery from the given [file].
   ///
   /// {@macro photo_manager.Editor.TitleWhenSaving}
+  ///
+  /// {@macro photo_manager.Editor.DescriptionWhenSaving}
   ///
   /// {@macro photo_manager.Editor.SavingAssets}
   Future<AssetEntity?> saveVideo(
