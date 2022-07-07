@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -9,7 +11,12 @@ import 'widget/image_item_widget.dart';
 
 final PhotoProvider provider = PhotoProvider();
 
-void main() => runApp(const _SimpleExampleApp());
+void main() {
+  runZonedGuarded(
+    () => runApp(const _SimpleExampleApp()),
+    (Object e, StackTrace s) => showToast('$e\n$s', textAlign: TextAlign.start),
+  );
+}
 
 class _SimpleExampleApp extends StatelessWidget {
   const _SimpleExampleApp({Key? key}) : super(key: key);
@@ -19,7 +26,10 @@ class _SimpleExampleApp extends StatelessWidget {
     return OKToast(
       child: ChangeNotifierProvider<PhotoProvider>.value(
         value: provider, // This is for the advanced usages.
-        child: const MaterialApp(home: _SimpleExamplePage()),
+        child: const MaterialApp(
+          title: 'Photo Manager Example',
+          home: _SimpleExamplePage(),
+        ),
       ),
     );
   }
