@@ -203,6 +203,11 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                   final AssetEntity? newEntity =
                       await entity.obtainForNewProperties();
                   print('New isFavorite: ${newEntity?.isFavorite}');
+                  if (newEntity != null) {
+                    setState(() {
+                      list[index] = newEntity;
+                    });
+                  }
                 },
               ),
           ],
