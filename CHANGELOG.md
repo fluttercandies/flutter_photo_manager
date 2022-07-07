@@ -11,10 +11,12 @@ that can be found in the LICENSE file. -->
 - Improve assets change notify with better methods signature and checks. (#790)
 - Add `PermissionState.hasAccess` getter for better condition judgement. (#792)
 - Remove unnecessary assets fetch in `getMediaUrl` on iOS. (#793)
+- Improve `AssetEntity.obtainForNewProperties` on iOS. (#794)
 
 ### Fixes
 
 - Purpose video creation correctly on iOS. (#791)
+- Mark assets as favorite on iOS. (#794)
 
 ## 2.2.0-dev.1
 
