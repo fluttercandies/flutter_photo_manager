@@ -43,7 +43,7 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)assetId;
 
-- (PMAssetEntity *)getAssetEntity:(NSString *)assetId obtain:(BOOL) obtain;
+- (PMAssetEntity *)getAssetEntity:(NSString *)assetId withCache:(BOOL)withCache;
 
 - (void)clearCache;
 

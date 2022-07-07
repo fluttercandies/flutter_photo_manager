@@ -337,12 +337,12 @@
 }
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)assetId {
-    return [self getAssetEntity:assetId obtain:NO];
+    return [self getAssetEntity:assetId withCache:YES];
 }
 
-- (PMAssetEntity *)getAssetEntity:(NSString *)assetId obtain:(BOOL) obtain {
+- (PMAssetEntity *)getAssetEntity:(NSString *)assetId withCache:(BOOL)withCache {
     PMAssetEntity *entity;
-    if (!obtain){
+    if (withCache) {
         entity = [cacheContainer getAssetEntity:assetId];
         if (entity) {
             return entity;
