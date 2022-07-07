@@ -121,17 +121,12 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       onLoadMore(context);
       return loadWidget;
     }
-
     if (index > list.length) {
-      return Container();
+      return const SizedBox.shrink();
     }
-
     AssetEntity entity = list[index];
-
-    final hashcode = hashValues(entity.id, entity.isFavorite);
-
     return ImageItemWidget(
-      key: ValueKey<int>(hashcode),
+      key: ValueKey<int>(entity.hashCode),
       entity: entity,
       option: thumbOption,
       onTap: () => showDialog<void>(
@@ -205,9 +200,12 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                   final AssetEntity? newEntity =
                       await entity.obtainForNewProperties();
                   print('New isFavorite: ${newEntity?.isFavorite}');
+                  if (!mounted) {
+                    return;
+                  }
                   if (newEntity != null) {
                     entity = newEntity;
-                    list[index] = entity;
+                    readPathProvider(context).list[index] = newEntity;
                     setState(() {});
                   }
                 },

@@ -19,36 +19,45 @@ class ImageItemWidget extends StatelessWidget {
         child: Icon(Icons.audiotrack, size: 30),
       );
     }
-    return _buildImageWidget(entity, option);
+    return _buildImageWidget(context, entity, option);
   }
 
-  Widget _buildImageWidget(AssetEntity entity, ThumbnailOption option) {
-    final favoriteWidget = entity.isFavorite
-        ? const Icon(Icons.favorite, color: Colors.red, size: 15)
-        : const SizedBox();
-    return Stack(
-      children: [
-        Positioned(
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: 0,
-          child: AssetEntityImage(
-            entity,
-            isOriginal: false,
-            thumbnailSize: option.size,
-            thumbnailFormat: option.format,
-            fit: BoxFit.cover,
-          ),
-        ),
-        IgnorePointer(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: favoriteWidget,
-          ),
-        ),
-      ],
+  Widget _buildImageWidget(
+    BuildContext context,
+    AssetEntity entity,
+    ThumbnailOption option,
+  ) {
+    final Widget image = AssetEntityImage(
+      entity,
+      isOriginal: false,
+      thumbnailSize: option.size,
+      thumbnailFormat: option.format,
+      fit: BoxFit.cover,
     );
+    if (entity.isFavorite) {
+      return Stack(
+        children: <Widget>[
+          Positioned.fill(child: image),
+          PositionedDirectional(
+            bottom: 4,
+            start: 4,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.favorite,
+                color: Colors.redAccent,
+                size: 16,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+    return image;
   }
 
   @override
