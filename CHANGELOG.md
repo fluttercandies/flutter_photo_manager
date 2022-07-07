@@ -15,6 +15,7 @@ that can be found in the LICENSE file. -->
 ### Fixes
 
 - Purpose video creation correctly on iOS. (#791)
+- Mark assets as favorite on iOS. (#794)
 
 ## 2.2.0-dev.1
 
