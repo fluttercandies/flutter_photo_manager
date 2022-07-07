@@ -126,10 +126,12 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       return Container();
     }
 
-    final AssetEntity entity = list[index];
+    AssetEntity entity = list[index];
+
+    final hashcode = hashValues(entity.id, entity.isFavorite);
 
     return ImageItemWidget(
-      key: ValueKey<String>(entity.id),
+      key: ValueKey<int>(hashcode),
       entity: entity,
       option: thumbOption,
       onTap: () => showDialog<void>(
@@ -204,9 +206,9 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                       await entity.obtainForNewProperties();
                   print('New isFavorite: ${newEntity?.isFavorite}');
                   if (newEntity != null) {
-                    setState(() {
-                      list[index] = newEntity;
-                    });
+                    entity = newEntity;
+                    list[index] = entity;
+                    setState(() {});
                   }
                 },
               ),

@@ -23,12 +23,31 @@ class ImageItemWidget extends StatelessWidget {
   }
 
   Widget _buildImageWidget(AssetEntity entity, ThumbnailOption option) {
-    return AssetEntityImage(
-      entity,
-      isOriginal: false,
-      thumbnailSize: option.size,
-      thumbnailFormat: option.format,
-      fit: BoxFit.cover,
+    final favoriteWidget = entity.isFavorite
+        ? const Icon(Icons.favorite, color: Colors.red, size: 15)
+        : const SizedBox();
+    return Stack(
+      children: [
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          child: AssetEntityImage(
+            entity,
+            isOriginal: false,
+            thumbnailSize: option.size,
+            thumbnailFormat: option.format,
+            fit: BoxFit.cover,
+          ),
+        ),
+        IgnorePointer(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: favoriteWidget,
+          ),
+        ),
+      ],
     );
   }
 
