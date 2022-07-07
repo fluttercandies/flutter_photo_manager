@@ -10,6 +10,10 @@ that can be found in the LICENSE file. -->
 
 - Improve assets change notify with better methods signature and checks. (#790)
 
+### Fixes
+
+- Purpose video creation correctly on iOS. (#791)
+
 ## 2.2.0-dev.1
 
 ### Breaking changes
