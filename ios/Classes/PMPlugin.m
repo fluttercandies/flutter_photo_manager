@@ -477,7 +477,7 @@
             }];
         } else if ([@"favoriteAsset" isEqualToString:call.method]) {
             NSString *id = call.arguments[@"id"];
-            BOOL favorite = [call.arguments[@"type"] boolValue];
+            BOOL favorite = [call.arguments[@"favorite"] boolValue];
             BOOL favoriteResult = [manager favoriteWithId:id favorite:favorite];
             [handler reply:@(favoriteResult)];
         } else if ([@"isAuth" isEqualToString:call.method]) {

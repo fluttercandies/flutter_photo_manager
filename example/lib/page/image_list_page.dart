@@ -43,9 +43,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   @override
   void initState() {
     super.initState();
-    path
-        .getAssetListRange(start: 0, end: 1)
-        .then((List<AssetEntity> value) {
+    path.getAssetListRange(start: 0, end: 1).then((List<AssetEntity> value) {
       if (value.isEmpty) {
         return;
       }
@@ -200,7 +198,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                   print('Current isFavorite: $isFavorite');
                   await PhotoManager.editor.iOS.favoriteAsset(
                     entity: entity,
-                    favorite: isFavorite,
+                    favorite: !isFavorite,
                   );
                   final AssetEntity? newEntity =
                       await entity.obtainForNewProperties();
