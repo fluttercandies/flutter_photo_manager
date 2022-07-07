@@ -337,9 +337,16 @@
 }
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)assetId {
-    PMAssetEntity *entity = [cacheContainer getAssetEntity:assetId];
-    if (entity) {
-        return entity;
+    return [self getAssetEntity:assetId obtain:NO];
+}
+
+- (PMAssetEntity *)getAssetEntity:(NSString *)assetId obtain:(BOOL) obtain {
+    PMAssetEntity *entity;
+    if (!obtain){
+        entity = [cacheContainer getAssetEntity:assetId];
+        if (entity) {
+            return entity;
+        }
     }
     PHFetchResult<PHAsset *> *result =
     [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil];

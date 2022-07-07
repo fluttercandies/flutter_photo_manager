@@ -43,6 +43,8 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)assetId;
 
+- (PMAssetEntity *)getAssetEntity:(NSString *)assetId obtain:(BOOL) obtain;
+
 - (void)clearCache;
 
 - (void)getThumbWithId:(NSString *)id option:(PMThumbLoadOption *)option resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;

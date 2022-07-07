@@ -396,7 +396,7 @@
             [manager getMediaUrl:call.arguments[@"id"] resultHandler:handler];
         } else if ([@"fetchEntityProperties" isEqualToString:call.method]) {
             NSString *assetId = call.arguments[@"id"];
-            PMAssetEntity *entity = [manager getAssetEntity:assetId];
+            PMAssetEntity *entity = [manager getAssetEntity:assetId obtain:YES];
             if (entity == nil) {
                 [handler reply:nil];
                 return;
