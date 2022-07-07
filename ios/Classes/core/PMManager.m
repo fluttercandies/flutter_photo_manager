@@ -1111,7 +1111,6 @@
         return;
     }
     if (asset.isVideo) {
-        PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
         [self fetchFullSizeVideo:asset handler:handler progressHandler:nil withScheme:YES];
     } else {
         [handler replyError:@"Only video type of assets can get a media url."];
