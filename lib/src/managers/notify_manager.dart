@@ -38,10 +38,13 @@ class NotifyManager {
   ///
   /// Make sure you've added a callback for changes.
   /// {@endtemplate}
-  void startChangeNotify() {
-    _channel.setMethodCallHandler(_notify);
-    _controller.add(true);
-    plugin.notifyChange(start: true);
+  Future<bool> startChangeNotify() async {
+    final bool result = await plugin.notifyChange(start: true);
+    if (result) {
+      _channel.setMethodCallHandler(_notify);
+      _controller.add(true);
+    }
+    return result;
   }
 
   /// {@template photo_manager.NotifyManager.stopChangeNotify}
@@ -49,10 +52,13 @@ class NotifyManager {
   ///
   /// Remember to remove callbacks for changes.
   /// {@endtemplate}
-  void stopChangeNotify() {
-    plugin.notifyChange(start: false);
-    _controller.add(false);
-    _channel.setMethodCallHandler(null);
+  Future<bool> stopChangeNotify() async {
+    final bool result = await plugin.notifyChange(start: false);
+    if (result) {
+      _controller.add(false);
+      _channel.setMethodCallHandler(null);
+    }
+    return result;
   }
 
   Future<dynamic> _notify(MethodCall call) async {

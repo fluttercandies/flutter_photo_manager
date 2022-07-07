@@ -137,15 +137,17 @@ class PhotoManager {
   static Stream<bool> get notifyStream => _notifyManager.notifyStream;
 
   /// {@macro photo_manager.NotifyManager.startChangeNotify}
-  static void startChangeNotify() {
-    _notifyManager.startChangeNotify();
-    _notifyingOfChange = true;
+  static Future<void> startChangeNotify() async {
+    if (await _notifyManager.startChangeNotify()) {
+      _notifyingOfChange = true;
+    }
   }
 
   /// {@macro photo_manager.NotifyManager.stopChangeNotify}
-  static void stopChangeNotify() {
-    _notifyManager.stopChangeNotify();
-    _notifyingOfChange = false;
+  static Future<void> stopChangeNotify() async {
+    if (await _notifyManager.stopChangeNotify()) {
+      _notifyingOfChange = false;
+    }
   }
 
   static Future<void> forceOldApi() => plugin.forceOldApi();

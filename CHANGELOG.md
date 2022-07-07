@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.2.0-dev.2
+
+### Improvements
+
+- Improve assets change notify with better methods signature and checks. (#790)
+
 ## 2.2.0-dev.1
 
 ### Breaking changes
