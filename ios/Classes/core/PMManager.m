@@ -1056,14 +1056,10 @@
     __block NSString *assetId = nil;
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
-        PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromVideoAtFileURL:fileURL];
-//        PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
-//        [options setOriginalFilename:title];
-//
-//        PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAssetFromVideoAtFileURL:fileURL];
-//        PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
-//        [options setOriginalFilename:title];
-//        [request addResourceWithType:PHAssetResourceTypeVideo fileURL:fileURL options:options];
+        PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
+        PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
+        [options setOriginalFilename:title];
+        [request addResourceWithType:PHAssetResourceTypeVideo fileURL:fileURL options:options];
         assetId = request.placeholderForCreatedAsset.localIdentifier;
     }
      completionHandler:^(BOOL success, NSError *error) {
