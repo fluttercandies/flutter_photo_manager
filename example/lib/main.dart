@@ -59,12 +59,12 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
     if (!mounted) {
       return;
     }
-    // Further requests can be only procceed with authorized or limited.
-    if (ps != PermissionState.authorized && ps != PermissionState.limited) {
+    // Further requests can be only proceed with authorized or limited.
+    if (!ps.hasAccess) {
       setState(() {
         _isLoading = false;
       });
-      showToast('Permission is not granted.');
+      showToast('Permission is not accessible.');
       return;
     }
     // Obtain assets using the path entity.

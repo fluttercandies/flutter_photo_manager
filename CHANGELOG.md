@@ -9,6 +9,7 @@ that can be found in the LICENSE file. -->
 ### Improvements
 
 - Improve assets change notify with better methods signature and checks. (#790)
+- Add `PermissionState.hasAccess` getter for better condition judgement. (#792)
 
 ### Fixes
 
