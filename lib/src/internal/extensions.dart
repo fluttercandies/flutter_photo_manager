@@ -9,4 +9,10 @@ extension PermissionStateExt on PermissionState {
   bool get isAuth {
     return this == PermissionState.authorized;
   }
+
+  /// Whether the permission can access assets partially or fully,
+  bool get hasAccess {
+    return this == PermissionState.authorized ||
+        this == PermissionState.limited;
+  }
 }
