@@ -15,5 +15,3 @@ fvm
 doc/
 .env
 *.iml
-
-.fvm

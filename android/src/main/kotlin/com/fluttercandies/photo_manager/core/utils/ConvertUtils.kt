@@ -68,6 +68,7 @@ object ConvertUtils {
     private fun convertToOption(map: Map<*, *>): FilterCond {
         val filterOptions = FilterCond()
         filterOptions.isShowTitle = map["title"] as Boolean
+        filterOptions.isNeedGeo = map["geo"] as Boolean
 
         val sizeMap = map["size"] as Map<*, *>
         filterOptions.sizeConstraint = FilterCond.SizeConstraint().apply {

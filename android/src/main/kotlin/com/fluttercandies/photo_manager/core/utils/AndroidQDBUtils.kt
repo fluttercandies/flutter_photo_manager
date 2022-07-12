@@ -148,8 +148,7 @@ object AndroidQDBUtils : IDBUtils {
         page: Int,
         size: Int,
         requestType: Int,
-        option: FilterOption,
-        forceGetLocation: Boolean
+        option: FilterOption
     ): List<AssetEntity> {
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -175,9 +174,10 @@ object AndroidQDBUtils : IDBUtils {
             args.toTypedArray(),
             sortOrder
         ) ?: return emptyList()
+        val needGeo = if (requestType == 1) option.imageOption.isNeedGeo else false
         cursor.use {
             cursorWithRange(it, page * size, size) {
-                val asset = convertCursorToAssetEntity(context, cursor, forceGetLocation)
+                val asset = convertCursorToAssetEntity(context, cursor, needGeo)
                 list.add(asset)
             }
         }
@@ -191,8 +191,7 @@ object AndroidQDBUtils : IDBUtils {
         start: Int,
         end: Int,
         requestType: Int,
-        option: FilterOption,
-        forceGetLocation: Boolean
+        option: FilterOption
     ): List<AssetEntity> {
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -219,9 +218,10 @@ object AndroidQDBUtils : IDBUtils {
             args.toTypedArray(),
             sortOrder
         ) ?: return emptyList()
+        val needGeo = if (requestType == 1) option.imageOption.isNeedGeo else false
         cursor.use {
             cursorWithRange(it, start, pageSize) {
-                list.add(convertCursorToAssetEntity(context, cursor, forceGetLocation))
+                list.add(convertCursorToAssetEntity(context, cursor, needGeo))
             }
         }
         return list
@@ -234,7 +234,7 @@ object AndroidQDBUtils : IDBUtils {
     private fun convertCursorToAssetEntity(
         context: Context,
         cursor: Cursor,
-        forceGetLocation: Boolean
+        needGeo: Boolean
     ): AssetEntity {
         val id = cursor.getString(MediaStore.MediaColumns._ID)
         val path = cursor.getString(MediaStore.MediaColumns.DATA)
@@ -256,29 +256,30 @@ object AndroidQDBUtils : IDBUtils {
         val relativePath: String = cursor.getString(MediaStore.MediaColumns.RELATIVE_PATH)
         var lat = 0.0
         var log = 0.0
-        if ((width == 0 || height == 0 || forceGetLocation)
+        var getGeo = needGeo
+        if ((width == 0 || height == 0)
             && path.isNotBlank()
             && File(path).exists()
             && !mimeType.contains("svg")
         ) {
-            try {
-                val uri = getUri(id, getMediaType(type))
-                context.contentResolver.openInputStream(uri)?.use {
-                    ExifInterface(it).apply {
-                        if (width == 0 || height == 0) {
-                            width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
-                            height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
-                        }
-                        if (forceGetLocation) {
-                            latLong?.apply {
-                                lat = this[0]
-                                log = this[1]
-                            }
-                        }
+            openFileExifInterface(context, id, type) {
+                width = it.getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
+                height = it.getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+                if (getGeo) {
+                    it.latLong?.apply {
+                        lat = this[0]
+                        log = this[1]
                     }
+                    getGeo = false
                 }
-            } catch (e: Throwable) {
-                LogUtils.error(e)
+            }
+        }
+        if (getGeo) {
+            openFileExifInterface(context, id, type) {
+                it.latLong?.apply {
+                    lat = this[0]
+                    log = this[1]
+                }
             }
         }
         return AssetEntity(
@@ -299,11 +300,25 @@ object AndroidQDBUtils : IDBUtils {
         )
     }
 
-    override fun getAssetEntity(
+    private fun openFileExifInterface(
         context: Context,
         id: String,
-        forceGetLocation: Boolean
-    ): AssetEntity? {
+        type: Int,
+        function: (exif: ExifInterface) -> Unit
+    ) {
+        try {
+            val uri = getUri(id, getMediaType(type))
+            context.contentResolver.openInputStream(uri)?.use {
+                ExifInterface(it).apply {
+                    function(this)
+                }
+            }
+        } catch (e: Throwable) {
+            LogUtils.error(e)
+        }
+    }
+
+    override fun getAssetEntity(context: Context, id: String): AssetEntity? {
         val keys = assetKeys().distinct().toTypedArray()
         val selection = "$_ID = ?"
         val args = arrayOf(id)
@@ -315,7 +330,7 @@ object AndroidQDBUtils : IDBUtils {
             null
         ) ?: return null
         cursor.use {
-            return if (it.moveToNext()) convertCursorToAssetEntity(context, it, forceGetLocation)
+            return if (it.moveToNext()) convertCursorToAssetEntity(context, it, false)
             else null
         }
     }

@@ -253,7 +253,6 @@ class PhotoManagerPlugin(
                     val type = call.argument<Int>("type")!!
                     val page = call.argument<Int>("page")!!
                     val size = call.argument<Int>("size")!!
-                    val forceGetLocation = call.argument<Boolean>("forceGetLocation")!!
                     val option = call.getOption()
                     val list = photoManager.getAssetListPaged(
                         galleryId,
@@ -261,7 +260,6 @@ class PhotoManagerPlugin(
                         page,
                         size,
                         option,
-                        forceGetLocation
                     )
                     resultHandler.reply(ConvertUtils.convertToAssetResult(list))
                 }
@@ -273,15 +271,13 @@ class PhotoManagerPlugin(
                     val start = call.getInt("start")
                     val end = call.getInt("end")
                     val option = call.getOption()
-                    val forceGetLocation = call.argument<Boolean>("forceGetLocation")!!
                     val list: List<AssetEntity> =
                         photoManager.getAssetListRange(
                             galleryId,
                             type,
                             start,
                             end,
-                            option,
-                            forceGetLocation
+                            option
                         )
                     resultHandler.reply(ConvertUtils.convertToAssetResult(list))
                 }

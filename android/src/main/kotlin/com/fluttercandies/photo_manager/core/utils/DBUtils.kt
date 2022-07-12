@@ -152,8 +152,7 @@ object DBUtils : IDBUtils {
         page: Int,
         size: Int,
         requestType: Int,
-        option: FilterOption,
-        forceGetLocation: Boolean,
+        option: FilterOption
     ): List<AssetEntity> {
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -194,8 +193,7 @@ object DBUtils : IDBUtils {
         start: Int,
         end: Int,
         requestType: Int,
-        option: FilterOption,
-        forceGetLocation: Boolean,
+        option: FilterOption
     ): List<AssetEntity> {
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -284,11 +282,7 @@ object DBUtils : IDBUtils {
         )
     }
 
-    override fun getAssetEntity(
-        context: Context,
-        id: String,
-        forceGetLocation: Boolean,
-    ): AssetEntity? {
+    override fun getAssetEntity(context: Context, id: String): AssetEntity? {
         val keys =
             (storeImageKeys + storeVideoKeys + locationKeys + typeKeys).distinct().toTypedArray()
         val selection = "${MediaStore.Files.FileColumns._ID} = ?"

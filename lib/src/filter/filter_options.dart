@@ -13,6 +13,7 @@ import '../internal/enums.dart';
 class FilterOption {
   const FilterOption({
     this.needTitle = false,
+    this.needGeo = false,
     this.sizeConstraint = const SizeConstraint(),
     this.durationConstraint = const DurationConstraint(),
   });
@@ -28,14 +29,21 @@ class FilterOption {
   /// See [DurationConstraint], ignore in [AssetType.image].
   final DurationConstraint durationConstraint;
 
+  /// This property affects performance on higher versions of Android (Android Q+).
+  ///
+  /// If not needed, please pass false, default is false.
+  final bool needGeo;
+
   /// Create a new [FilterOption] with specific properties merging.
   FilterOption copyWith({
     bool? needTitle,
+    bool? needGeo,
     SizeConstraint? sizeConstraint,
     DurationConstraint? durationConstraint,
   }) {
     return FilterOption(
       needTitle: needTitle ?? this.needTitle,
+      needGeo: needGeo ?? this.needGeo,
       sizeConstraint: sizeConstraint ?? this.sizeConstraint,
       durationConstraint: durationConstraint ?? this.durationConstraint,
     );
@@ -45,6 +53,7 @@ class FilterOption {
   FilterOption merge(FilterOption other) {
     return FilterOption(
       needTitle: other.needTitle,
+      needGeo: other.needGeo,
       sizeConstraint: other.sizeConstraint,
       durationConstraint: other.durationConstraint,
     );
@@ -53,6 +62,7 @@ class FilterOption {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'title': needTitle,
+      'geo': needGeo,
       'size': sizeConstraint.toMap(),
       'duration': durationConstraint.toMap(),
     };

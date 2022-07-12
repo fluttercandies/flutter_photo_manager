@@ -30,6 +30,7 @@ class FilterCond {
     var isShowTitle = false
     lateinit var sizeConstraint: SizeConstraint
     lateinit var durationConstraint: DurationConstraint
+    var isNeedGeo = false
 
     companion object {
         private const val widthKey = MediaStore.Files.FileColumns.WIDTH

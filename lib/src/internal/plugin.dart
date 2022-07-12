@@ -100,7 +100,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     required FilterOptionGroup optionGroup,
     int page = 0,
     int size = 15,
-    bool forceGetLocation = false,
     RequestType type = RequestType.common,
   }) async {
     final Map<dynamic, dynamic> result =
@@ -111,7 +110,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
         'type': type.value,
         'page': page,
         'size': size,
-        'forceGetLocation': forceGetLocation,
         'option': optionGroup.toMap(),
       },
     ) as Map<dynamic, dynamic>;
