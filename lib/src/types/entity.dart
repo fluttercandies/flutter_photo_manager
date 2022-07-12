@@ -26,8 +26,8 @@ class AssetPathEntity {
   AssetPathEntity({
     required this.id,
     required this.name,
-    @Deprecated('Use assetCountAsync instead. This will be removed in 3.0.0.')
-    this.assetCount = 0,
+    @Deprecated('Use assetCountAsync instead. This will be removed in 3.0.0')
+        this.assetCount = 0,
     this.albumType = 1,
     this.lastModified,
     this.type = RequestType.common,
@@ -37,7 +37,7 @@ class AssetPathEntity {
 
   /// Obtain an entity from ID.
   ///
-  /// This method is not recommend in general, since the correspoding folder
+  /// This method is not recommend in general, since the corresponding folder
   /// could be deleted in anytime, which will cause properties invalid.
   static Future<AssetPathEntity> fromId(
     String id, {
@@ -57,7 +57,7 @@ class AssetPathEntity {
 
   /// The ID of the album (asset collection).
   ///  * Android: `MediaStore.Images.Media.BUCKET_ID`.
-  ///  * iOS/macOS: localIndentifier.
+  ///  * iOS/macOS: localIdentifier.
   final String id;
 
   /// The name of the album.
@@ -68,11 +68,8 @@ class AssetPathEntity {
   /// Total assets count of the album.
   ///
   /// The synchronized count will cause performance regression on iOS,
-  /// here the asynchronized getter [assetCountAsync] is perferred.
-  @Deprecated(
-    'Always 0. Use assetCountAsync instead. '
-    'This will be removed in 3.0.0.',
-  )
+  /// here the asynchronized getter [assetCountAsync] is preferred.
+  @Deprecated('Use assetCountAsync instead. This will be removed in 3.0.0')
   final int assetCount;
 
   /// Total assets count of the path with the asynchronized getter.
@@ -295,9 +292,11 @@ class AssetPathEntity {
   }
 }
 
+/// {@template photo_manager.AssetEntity}
 /// The abstraction of assets (images/videos/audios).
 /// It represents a series of fields `MediaStore` on Android
 /// and the `PHAsset` object on iOS/macOS.
+/// {@endtemplate}
 @immutable
 class AssetEntity {
   const AssetEntity({
@@ -321,7 +320,7 @@ class AssetEntity {
 
   /// Obtain an entity from ID.
   ///
-  /// This method is not recommend in general, since the correspoding asset
+  /// This method is not recommend in general, since the corresponding asset
   /// could be deleted in anytime, which will cause properties invalid.
   static Future<AssetEntity?> fromId(String id) async {
     try {
@@ -346,7 +345,7 @@ class AssetEntity {
 
   /// The ID of the asset.
   ///  * Android: `_id` column in `MediaStore` database.
-  ///  * iOS/macOS: `localIndentifier`.
+  ///  * iOS/macOS: `localIdentifier`.
   final String id;
 
   /// The title field of the asset.
@@ -384,9 +383,9 @@ class AssetEntity {
   final int typeInt;
 
   /// The duration of the asset, but in different units.
-  ///  * [AssetType.audio]: Milliseconds.
-  ///  * [AssetType.video]: Seconds.
-  ///  * [AssetType.image] and [AssetType.other]: Always 0.
+  ///  * [AssetType.audio] is in **milliseconds**.
+  ///  * [AssetType.video] is in **seconds**.
+  ///  * [AssetType.image] and [AssetType.other] are Always 0.
   ///
   /// See also:
   ///  * [videoDuration] which is a duration getter for videos.
@@ -469,7 +468,7 @@ class AssetEntity {
   ///  * [loadFile] which can obtain file with [PMProgressHandler].
   Future<File?> get fileWithSubtype => _getFile(subtype: subtype);
 
-  /// Obtain the original file that contain all EXIF informations.
+  /// Obtain the original file that contain all EXIF information.
   ///
   /// Be aware the original file is not always suit for all kinds of usages.
   /// Typically when you're using an [Image] to display a HEIC image on
@@ -716,7 +715,7 @@ class AssetEntity {
   ///  * https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#ORIENTATION
   final int orientation;
 
-  /// Whether the asset is favorited on the device.
+  /// Whether the asset is favorite on the device.
   ///  * Android: Always false.
   ///  * iOS/macOS: `PHAsset.isFavorite`.
   ///

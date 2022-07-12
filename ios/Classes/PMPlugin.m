@@ -396,7 +396,7 @@
             [manager getMediaUrl:call.arguments[@"id"] resultHandler:handler];
         } else if ([@"fetchEntityProperties" isEqualToString:call.method]) {
             NSString *assetId = call.arguments[@"id"];
-            PMAssetEntity *entity = [manager getAssetEntity:assetId];
+            PMAssetEntity *entity = [manager getAssetEntity:assetId withCache:NO];
             if (entity == nil) {
                 [handler reply:nil];
                 return;
@@ -477,7 +477,7 @@
             }];
         } else if ([@"favoriteAsset" isEqualToString:call.method]) {
             NSString *id = call.arguments[@"id"];
-            BOOL favorite = [call.arguments[@"type"] boolValue];
+            BOOL favorite = [call.arguments[@"favorite"] boolValue];
             BOOL favoriteResult = [manager favoriteWithId:id favorite:favorite];
             [handler reply:@(favoriteResult)];
         } else if ([@"isAuth" isEqualToString:call.method]) {

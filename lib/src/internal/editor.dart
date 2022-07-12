@@ -35,12 +35,16 @@ class Editor {
 
   /// Save image to gallery from the given [data].
   ///
-  /// {@template photo_manager.TitleWhenSaving}
+  /// {@template photo_manager.Editor.TitleWhenSaving}
   /// [title] typically means the filename of the saving entity, which can be
   /// obtained by `basename(file.path)`.
   /// {@endtemplate}
   ///
-  /// {@template photo_manager.SavingAssets}
+  /// {@template photo_manager.Editor.DescriptionWhenSaving}
+  /// [desc] is the description field that only works on Android.
+  /// {@endtemplate}
+  ///
+  /// {@template photo_manager.Editor.SavingAssets}
   /// On Android 29 and above, you can use [relativePath] to specify the
   /// `RELATIVE_PATH` used in the MediaStore.
   /// The MIME type will either be formed from the title if you pass one,
@@ -62,9 +66,11 @@ class Editor {
 
   /// Save image to gallery from the given [path].
   ///
-  /// {@macro photo_manager.TitleWhenSaving}
+  /// {@macro photo_manager.Editor.TitleWhenSaving}
   ///
-  /// {@macro photo_manager.SavingAssets}
+  /// {@macro photo_manager.Editor.DescriptionWhenSaving}
+  ///
+  /// {@macro photo_manager.Editor.SavingAssets}
   Future<AssetEntity?> saveImageWithPath(
     String path, {
     required String title,
@@ -81,9 +87,11 @@ class Editor {
 
   /// Save video to gallery from the given [file].
   ///
-  /// {@macro photo_manager.TitleWhenSaving}
+  /// {@macro photo_manager.Editor.TitleWhenSaving}
   ///
-  /// {@macro photo_manager.SavingAssets}
+  /// {@macro photo_manager.Editor.DescriptionWhenSaving}
+  ///
+  /// {@macro photo_manager.Editor.SavingAssets}
   Future<AssetEntity?> saveVideo(
     File file, {
     required String title,
@@ -113,7 +121,7 @@ class Editor {
 class IosEditor {
   const IosEditor();
 
-  /// {@template photo_manager.EnsureParentIsRootOrFolder}
+  /// {@template photo_manager.IosEditor.EnsureParentIsRootOrFolder}
   /// Folders and albums can be only created under the root path or folders,
   /// so the [parent] should be null, the root path or accessible folders.
   /// {@endtemplate}
@@ -123,7 +131,7 @@ class IosEditor {
     }
   }
 
-  /// {@template photo_manager.EnsureParentIsNotRootOrFolder}
+  /// {@template photo_manager.IosEditor.EnsureParentIsNotRootOrFolder}
   /// Entities' entry can be only removed from non-root albums,
   /// so the [parent] should be non-albums.
   /// {@endtemplate}
@@ -139,7 +147,7 @@ class IosEditor {
   /// Creates a folder under the root path or other folders.
   ///
   /// [name] Define the folder name.
-  /// {@macro photo_manager.EnsureParentIsRootOrFolder}
+  /// {@macro photo_manager.IosEditor.EnsureParentIsRootOrFolder}
   Future<AssetPathEntity?> createFolder(
     String name, {
     AssetPathEntity? parent,
@@ -155,7 +163,7 @@ class IosEditor {
   /// Creates an album under the root path or other folders.
   ///
   /// [name] Define the album name.
-  /// {@macro photo_manager.EnsureParentIsRootOrFolder}
+  /// {@macro photo_manager.IosEditor.EnsureParentIsRootOrFolder}
   Future<AssetPathEntity?> createAlbum(
     String name, {
     AssetPathEntity? parent,
@@ -168,13 +176,14 @@ class IosEditor {
     );
   }
 
-  /// {@macro photo_manager.EnsureParentIsNotRootOrFolder}
+  /// {@macro photo_manager.IosEditor.EnsureParentIsNotRootOrFolder}
   Future<bool> removeInAlbum(AssetEntity entity, AssetPathEntity parent) async {
     _ensureParentIsNotRootOrFolder(parent);
     return plugin.iosRemoveInAlbum(<AssetEntity>[entity], parent);
   }
 
   /// Remove [list]'s items from [parent] in batches.
+  /// {@macro photo_manager.IosEditor.EnsureParentIsNotRootOrFolder}
   Future<bool> removeAssetsInAlbum(
     List<AssetEntity> list,
     AssetPathEntity parent,

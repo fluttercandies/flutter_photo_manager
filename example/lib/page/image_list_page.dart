@@ -43,9 +43,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
   @override
   void initState() {
     super.initState();
-    path
-        .getAssetListRange(start: 0, end: 1)
-        .then((List<AssetEntity> value) {
+    path.getAssetListRange(start: 0, end: 1).then((List<AssetEntity> value) {
       if (value.isEmpty) {
         return;
       }
@@ -123,15 +121,12 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       onLoadMore(context);
       return loadWidget;
     }
-
     if (index > list.length) {
-      return Container();
+      return const SizedBox.shrink();
     }
-
-    final AssetEntity entity = list[index];
-
+    AssetEntity entity = list[index];
     return ImageItemWidget(
-      key: ValueKey<String>(entity.id),
+      key: ValueKey<int>(entity.hashCode),
       entity: entity,
       option: thumbOption,
       onTap: () => showDialog<void>(
@@ -200,11 +195,19 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                   print('Current isFavorite: $isFavorite');
                   await PhotoManager.editor.iOS.favoriteAsset(
                     entity: entity,
-                    favorite: isFavorite,
+                    favorite: !isFavorite,
                   );
                   final AssetEntity? newEntity =
                       await entity.obtainForNewProperties();
                   print('New isFavorite: ${newEntity?.isFavorite}');
+                  if (!mounted) {
+                    return;
+                  }
+                  if (newEntity != null) {
+                    entity = newEntity;
+                    readPathProvider(context).list[index] = newEntity;
+                    setState(() {});
+                  }
                 },
               ),
           ],

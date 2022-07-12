@@ -337,9 +337,16 @@
 }
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)assetId {
-    PMAssetEntity *entity = [cacheContainer getAssetEntity:assetId];
-    if (entity) {
-        return entity;
+    return [self getAssetEntity:assetId withCache:YES];
+}
+
+- (PMAssetEntity *)getAssetEntity:(NSString *)assetId withCache:(BOOL)withCache {
+    PMAssetEntity *entity;
+    if (withCache) {
+        entity = [cacheContainer getAssetEntity:assetId];
+        if (entity) {
+            return entity;
+        }
     }
     PHFetchResult<PHAsset *> *result =
     [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil];
@@ -1056,14 +1063,10 @@
     __block NSString *assetId = nil;
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
-        PHAssetChangeRequest *request = [PHAssetChangeRequest creationRequestForAssetFromVideoAtFileURL:fileURL];
-//        PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
-//        [options setOriginalFilename:title];
-//
-//        PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAssetFromVideoAtFileURL:fileURL];
-//        PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
-//        [options setOriginalFilename:title];
-//        [request addResourceWithType:PHAssetResourceTypeVideo fileURL:fileURL options:options];
+        PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
+        PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
+        [options setOriginalFilename:title];
+        [request addResourceWithType:PHAssetResourceTypeVideo fileURL:fileURL options:options];
         assetId = request.placeholderForCreatedAsset.localIdentifier;
     }
      completionHandler:^(BOOL success, NSError *error) {
@@ -1111,7 +1114,6 @@
         return;
     }
     if (asset.isVideo) {
-        PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
         [self fetchFullSizeVideo:asset handler:handler progressHandler:nil withScheme:YES];
     } else {
         [handler replyError:@"Only video type of assets can get a media url."];

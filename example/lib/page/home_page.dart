@@ -196,16 +196,17 @@ class _NewHomePageState extends State<NewHomePage> {
 
   Widget _buildNotifyCheck() {
     return CheckboxListTile(
-        value: watchProvider.notifying,
-        title: const Text('onChanged'),
-        onChanged: (bool? value) {
-          readProvider.notifying = value;
-          if (value == true) {
-            PhotoManager.startChangeNotify();
-          } else {
-            PhotoManager.stopChangeNotify();
-          }
-        });
+      value: watchProvider.notifying,
+      title: const Text('onChanged'),
+      onChanged: (bool? value) {
+        if (value == true) {
+          PhotoManager.startChangeNotify();
+        } else {
+          PhotoManager.stopChangeNotify();
+        }
+        readProvider.notifying = value;
+      },
+    );
   }
 
   void onChange(MethodCall call) {}

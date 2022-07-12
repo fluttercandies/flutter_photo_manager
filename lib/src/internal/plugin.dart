@@ -225,11 +225,13 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     );
   }
 
-  Future<void> notifyChange({required bool start}) {
-    return _channel.invokeMethod(
+  /// Return [true] if the invoke succeed.
+  Future<bool> notifyChange({required bool start}) async {
+    await _channel.invokeMethod(
       PMConstants.mNotify,
       <String, dynamic>{'notify': start},
     );
+    return true;
   }
 
   Future<void> forceOldApi() async {

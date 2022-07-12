@@ -34,17 +34,17 @@ class FilterOptionGroup {
 
   final Map<AssetType, FilterOption> _map = <AssetType, FilterOption>{};
 
-  /// Get the [FilterOption] according the specfic [AssetType].
+  /// Get the [FilterOption] according the specific [AssetType].
   FilterOption getOption(AssetType type) => _map[type]!;
 
-  /// Set the [FilterOption] according the specfic [AssetType].
+  /// Set the [FilterOption] according the specific [AssetType].
   void setOption(AssetType type, FilterOption option) {
     _map[type] = option;
   }
 
   /// Whether the [AssetPathEntity]s will return with modified time.
   ///
-  /// This option is performance-consuming. Use with cautius.
+  /// This option is performance-consuming. Use with cautious.
   ///
   /// See also:
   ///  * [AssetPathEntity.lastModified].

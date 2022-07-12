@@ -14,6 +14,17 @@ import '../types/thumbnail.dart';
 import 'constants.dart';
 import 'enums.dart';
 
+/// The [ImageProvider] that handles [AssetEntity].
+///
+/// Only support [AssetType.image] and [AssetType.video],
+/// others will throw errors during the resolving.
+///
+/// If [isOriginal] is true:
+///   * Fetch [AssetEntity.thumbnailData] for [AssetType.video].
+///   * Fetch [AssetEntity.file] and convert to bytes for HEIF(HEIC) images.
+///   * Fetch [AssetEntity.originBytes] for images.
+/// Else, fetch [AssetEntity.thumbnailDataWithOption] with the given
+/// [thumbnailSize] and the [thumbnailFormat].
 @immutable
 class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
   const AssetEntityImageProvider(
@@ -26,21 +37,22 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
           "thumbSize must not be null when it's not original",
         );
 
+  /// {@macro photo_manager.AssetEntity}
   final AssetEntity entity;
 
   /// Choose if original data or thumb data should be loaded.
-  /// 选择载入原数据还是缩略图数据
+  /// 选择载入原数据还是缩略图数据。
   final bool isOriginal;
 
   /// Size for thumb data.
-  /// 缩略图的大小
+  /// 缩略图的大小。
   final ThumbnailSize? thumbnailSize;
 
   /// {@macro photo_manager.ThumbnailFormat}
   final ThumbnailFormat thumbnailFormat;
 
   /// File type for the image asset, use it for some special type detection.
-  /// 图片资源的类型，用于某些特殊类型的判断
+  /// 图片资源的类型，用于某些特殊类型的判断。
   ImageFileType get imageFileType => _getType();
 
   @override
@@ -51,6 +63,10 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
     return MultiFrameImageStreamCompleter(
       codec: _loadAsync(key, decode),
       scale: 1.0,
+      debugLabel: '${key.entity.runtimeType}-'
+          '${key.entity.id}-'
+          '${isOriginal ? 'origin-' : ''}'
+          '${isOriginal ? '' : '$thumbnailFormat'}',
       informationCollector: () {
         return <DiagnosticsNode>[
           DiagnosticsProperty<ImageProvider>('Image provider', this),
@@ -90,9 +106,7 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
       Uint8List? data;
       if (isOriginal) {
         if (key.entity.type == AssetType.video) {
-          data = await key.entity.thumbnailDataWithOption(
-            _thumbOption(PMConstants.vDefaultGridThumbnailSize),
-          );
+          data = await key.entity.thumbnailData;
         } else if (type == ImageFileType.heic) {
           data = await (await key.entity.file)?.readAsBytes();
         } else {
@@ -137,7 +151,7 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
   ///
   /// ⚠ Not all the system version support read file name from the entity,
   /// so this method might not work sometime.
-  /// 并非所有的系统版本都支持读取文件名，所以该方法有时无法返回正确的type。
+  /// 并非所有的系统版本都支持读取文件名，所以该方法有时无法返回正确的类型。
   ImageFileType _getType([String? filename]) {
     ImageFileType? type;
     final String? extension = filename?.split('.').last ??
@@ -198,6 +212,9 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
       );
 }
 
+/// A widget that displays an [AssetEntity] image.
+///
+/// The widget uses [AssetEntityImageProvider] internally to resolve assets.
 class AssetEntityImage extends Image {
   AssetEntityImage(
     this.entity, {
