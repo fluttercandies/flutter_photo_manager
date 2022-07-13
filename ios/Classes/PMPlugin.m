@@ -297,6 +297,7 @@
                            progressHandler:progressHandler];
         } else if ([call.method isEqualToString:@"releaseMemoryCache"]) {
             [manager clearCache];
+            [handler reply:nil];
         } else if ([call.method isEqualToString:@"fetchPathProperties"]) {
             NSString *id = call.arguments[@"id"];
             int requestType = [call.arguments[@"type"] intValue];
@@ -322,6 +323,7 @@
             } else {
                 [notificationManager stopNotify];
             }
+            [handler reply:nil];
         } else if ([call.method isEqualToString:@"isNotifying"]) {
             BOOL isNotifying = [notificationManager isNotifying];
             [handler reply:@(isNotifying)];
@@ -480,8 +482,6 @@
             BOOL favorite = [call.arguments[@"favorite"] boolValue];
             BOOL favoriteResult = [manager favoriteWithId:id favorite:favorite];
             [handler reply:@(favoriteResult)];
-        } else if ([@"isAuth" isEqualToString:call.method]) {
-            [handler reply:@YES];
         } else if ([@"requestCacheAssetsThumb" isEqualToString:call.method]) {
             NSArray *ids = call.arguments[@"ids"];
             PMThumbLoadOption *option = [PMThumbLoadOption optionDict:call.arguments[@"option"]];
