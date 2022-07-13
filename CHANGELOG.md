@@ -6,6 +6,10 @@ that can be found in the LICENSE file. -->
 
 ## 2.2.0-dev.3
 
+### Improvements
+
+- Improve `MD5Utils` on iOS. (#802)
+
 ### Fixes
 
 - Fix not replied method calls (#800).
