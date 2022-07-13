@@ -1,26 +1,27 @@
-#import "MD5Utils.h"
+#import "PMMD5Utils.h"
 
-@implementation MD5Utils
+@implementation PMMD5Utils
+
 #define CC_MD5_DIGEST_LENGTH 16
 
-+ (NSString *)getmd5WithString:(NSString *)string {
++ (NSString *)getMD5FromString:(NSString *)string {
     const char *original_str = [string UTF8String];
-    unsigned char digist[CC_MD5_DIGEST_LENGTH]; // CC_MD5_DIGEST_LENGTH = 16
-    CC_MD5(original_str, (uint) strlen(original_str), digist);
+    unsigned char digest[CC_MD5_DIGEST_LENGTH]; // CC_MD5_DIGEST_LENGTH = 16
+    CC_MD5(original_str, (uint) strlen(original_str), digest);
     NSMutableString *outPutStr = [NSMutableString stringWithCapacity:10];
     for (int i = 0; i < CC_MD5_DIGEST_LENGTH; i++) {
-        [outPutStr appendFormat:@"%02x", digist[i]]; // 小写x表示输出的是小写MD5，大写X表示输出的是大写MD5
+        [outPutStr appendFormat:@"%02x", digest[i]]; // 小写x表示输出的是小写MD5，大写X表示输出的是大写MD5
     }
     return [outPutStr lowercaseString];
 }
 
-+ (NSString *)getMD5WithData:(NSData *)data {
++ (NSString *)getMD5FromData:(NSData *)data {
     const char *original_str = (const char *) [data bytes];
-    unsigned char digist[CC_MD5_DIGEST_LENGTH]; // CC_MD5_DIGEST_LENGTH = 16
-    CC_MD5(original_str, (uint) strlen(original_str), digist);
+    unsigned char digest[CC_MD5_DIGEST_LENGTH]; // CC_MD5_DIGEST_LENGTH = 16
+    CC_MD5(original_str, (uint) strlen(original_str), digest);
     NSMutableString *outPutStr = [NSMutableString stringWithCapacity:10];
     for (int i = 0; i < CC_MD5_DIGEST_LENGTH; i++) {
-        [outPutStr appendFormat:@"%02x", digist[i]];// 小写x表示输出的是小写MD5，大写X表示输出的是大写MD5
+        [outPutStr appendFormat:@"%02x", digest[i]];// 小写x表示输出的是小写MD5，大写X表示输出的是大写MD5
     }
     
     // 也可以定义一个字节数组来接收计算得到的MD5值
@@ -36,13 +37,12 @@
     
 }
 
-+ (NSString *)getFileMD5WithPath:(NSString *)path {
-    return (__bridge_transfer NSString *) FileMD5HashCreateWithPath((__bridge CFStringRef) path, FileHashDefaultChunkSizeForReadingData);
++ (NSString *)getMD5FromPath:(NSString *)path {
+    return (__bridge_transfer NSString *) PMMD5HashFromPath((__bridge CFStringRef) path, PMFileHashDefaultChunkSizeForReadingData);
 }
 
-CFStringRef FileMD5HashCreateWithPath(CFStringRef filePath,
-                                      size_t chunkSizeForReadingData) {
-    
+CFStringRef PMMD5HashFromPath(CFStringRef filePath, size_t chunkSizeForReadingData) {
+
     // Declare needed variables
     CFStringRef result = NULL;
     CFReadStreamRef readStream = NULL;
@@ -60,19 +60,19 @@ CFStringRef FileMD5HashCreateWithPath(CFStringRef filePath,
     
     if (!fileURL) goto done;
     
-    // Create and open the read stream
+    // Create and open the read stream.
     readStream = CFReadStreamCreateWithFile(kCFAllocatorDefault,
                                             (CFURLRef) fileURL);
     if (!readStream) goto done;
     didSucceed = (bool) CFReadStreamOpen(readStream);
     if (!didSucceed) goto done;
     
-    // Initialize the hash object
+    // Initialize the hash object.
     CC_MD5_Init(&hashObject);
     
-    // Make sure chunkSizeForReadingData is valid
+    // Make sure chunkSizeForReadingData is valid.
     if (!chunkSizeForReadingData) {
-        chunkSizeForReadingData = FileHashDefaultChunkSizeForReadingData;
+        chunkSizeForReadingData = PMFileHashDefaultChunkSizeForReadingData;
     }
     
     // Feed the data to the hash object
@@ -107,9 +107,8 @@ CFStringRef FileMD5HashCreateWithPath(CFStringRef filePath,
     result = CFStringCreateWithCString(kCFAllocatorDefault,
                                        (const char *) hash,
                                        kCFStringEncodingUTF8);
-    
+
 done:
-    
     if (readStream) {
         CFReadStreamClose(readStream);
         CFRelease(readStream);
