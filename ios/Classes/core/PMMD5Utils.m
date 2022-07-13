@@ -42,7 +42,6 @@
 }
 
 CFStringRef PMMD5HashFromPath(CFStringRef filePath, size_t chunkSizeForReadingData) {
-
     // Declare needed variables
     CFStringRef result = NULL;
     CFReadStreamRef readStream = NULL;
@@ -60,17 +59,17 @@ CFStringRef PMMD5HashFromPath(CFStringRef filePath, size_t chunkSizeForReadingDa
     
     if (!fileURL) goto done;
     
-    // Create and open the read stream.
+    // Create and open the read stream
     readStream = CFReadStreamCreateWithFile(kCFAllocatorDefault,
                                             (CFURLRef) fileURL);
     if (!readStream) goto done;
     didSucceed = (bool) CFReadStreamOpen(readStream);
     if (!didSucceed) goto done;
     
-    // Initialize the hash object.
+    // Initialize the hash object
     CC_MD5_Init(&hashObject);
     
-    // Make sure chunkSizeForReadingData is valid.
+    // Make sure chunkSizeForReadingData is valid
     if (!chunkSizeForReadingData) {
         chunkSizeForReadingData = PMFileHashDefaultChunkSizeForReadingData;
     }
