@@ -1,18 +1,18 @@
-#import "PMManager.h"
+#import "NSString+PM_COMMON.h"
 #import "PHAsset+PM_COMMON.h"
 #import "PHAssetCollection+PM_COMMON.h"
 #import "PHAssetResource+PM_COMMON.h"
 #import "PMAssetPathEntity.h"
 #import "PMCacheContainer.h"
 #import "PMConvertUtils.h"
-#import "PMFilterOption.h"
-#import "PMLogUtils.h"
-#import "PMRequestTypeUtils.h"
-#import "NSString+PM_COMMON.h"
 #import "PMFolderUtils.h"
-#import "MD5Utils.h"
-#import "PMThumbLoadOption.h"
+#import "PMFilterOption.h"
 #import "PMImageUtil.h"
+#import "PMLogUtils.h"
+#import "PMManager.h"
+#import "PMMD5Utils.h"
+#import "PMRequestTypeUtils.h"
+#import "PMThumbLoadOption.h"
 
 @implementation PMManager {
     BOOL __isAuth;
@@ -682,7 +682,7 @@
     NSError *error;
     [manager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:@{} error:&error];
     [path appendString:@"/"];
-    [path appendString:[MD5Utils getmd5WithString:asset.localIdentifier]];
+    [path appendString:[PMMD5Utils getMD5FromString:asset.localIdentifier]];
     [path appendString:@"_exif"];
     [path appendString:@".jpg"];
     [manager createFileAtPath:path contents:imageData attributes:@{}];
