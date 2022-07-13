@@ -322,6 +322,7 @@
             } else {
                 [notificationManager stopNotify];
             }
+            [handler reply:NULL];
         } else if ([call.method isEqualToString:@"isNotifying"]) {
             BOOL isNotifying = [notificationManager isNotifying];
             [handler reply:@(isNotifying)];
