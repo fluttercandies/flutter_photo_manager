@@ -289,6 +289,7 @@ class PhotoManagerPlugin(
             Methods.cancelCacheRequests -> {
                 runOnBackground {
                     photoManager.cancelCacheRequests()
+                    resultHandler.reply(null)
                 }
             }
             Methods.assetExists -> {
@@ -360,6 +361,7 @@ class PhotoManagerPlugin(
                     } else {
                         notifyChannel.stopNotify()
                     }
+                    resultHandler.reply(null)
                 }
             }
             Methods.saveImage -> {
