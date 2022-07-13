@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.2.0-dev.3
+
+### Fixes
+
+- Fix not replied method calls (#800).
+
 ## 2.2.0-dev.2
 
 ### Improvements
