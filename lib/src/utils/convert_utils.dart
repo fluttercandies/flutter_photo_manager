@@ -18,6 +18,10 @@ class ConvertUtils {
     final List<Map<dynamic, dynamic>> list =
         (data['data'] as List<dynamic>).cast<Map<dynamic, dynamic>>();
     for (final Map<dynamic, dynamic> item in list) {
+      // Skip paths with empty assets.
+      if (item['assetCount'] == 0) {
+        continue;
+      }
       result.add(
         convertMapToPath(
           item.cast<String, dynamic>(),

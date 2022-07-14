@@ -182,6 +182,7 @@
         
         if (containsModified) {
             PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsInAssetCollection:assetCollection options:options];
+            entity.assetCount = fetchResult.count;
             if (fetchResult.count > 0) {
                 PHAsset *asset = fetchResult.firstObject;
                 entity.modifiedDate = (long) asset.modificationDate.timeIntervalSince1970;

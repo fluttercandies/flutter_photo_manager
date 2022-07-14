@@ -8,6 +8,9 @@ object ConvertUtils {
     fun convertToGalleryResult(list: List<GalleryEntity>): Map<String, Any> {
         val data = ArrayList<Map<String, Any>>()
         for (entity in list) {
+            if (entity.assetCount == 0) {
+                continue
+            }
             val element = mutableMapOf<String, Any>(
                 "id" to entity.id,
                 "name" to entity.name,

@@ -20,6 +20,13 @@
         NSMutableDictionary *params = [NSMutableDictionary new];
         [params addEntriesFromDictionary:item];
         
+        NSUInteger assetCount = entity.assetCount;
+        if (assetCount == 0) {
+            continue;
+        }
+        if (assetCount != NSIntegerMax) {
+            params[@"assetCount"] = @(assetCount);
+        }
         if (entity.modifiedDate != 0) {
             params[@"modified"] = @(entity.modifiedDate);
         }
