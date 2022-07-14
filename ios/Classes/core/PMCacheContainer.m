@@ -16,9 +16,9 @@
 }
 
 - (void)putAssetEntity:(PMAssetEntity *)entity {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    @synchronized (map) {
         self->map[entity.id] = entity;
-    });
+    }
 }
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)id {
@@ -26,9 +26,9 @@
 }
 
 - (void)clearCache {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    @synchronized (map) {
         [self->map removeAllObjects];
-    });
+    }
 }
 
 @end
