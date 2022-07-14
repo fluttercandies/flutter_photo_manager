@@ -9,6 +9,7 @@ that can be found in the LICENSE file. -->
 ### Improvements
 
 - Improve `MD5Utils` on iOS. (#802)
+- Improve cache container mutations on iOS. (#803)
 
 ### Fixes
 
