@@ -13,7 +13,7 @@ import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.entity.FilterOption
-import com.fluttercandies.photo_manager.core.entity.GalleryEntity
+import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
 import com.fluttercandies.photo_manager.core.utils.IDBUtils.Companion.storeBucketKeys
 import com.fluttercandies.photo_manager.core.utils.IDBUtils.Companion.storeImageKeys
 import com.fluttercandies.photo_manager.core.utils.IDBUtils.Companion.storeVideoKeys
@@ -36,8 +36,8 @@ object DBUtils : IDBUtils {
         context: Context,
         requestType: Int,
         option: FilterOption
-    ): List<GalleryEntity> {
-        val list = ArrayList<GalleryEntity>()
+    ): List<AssetPathEntity> {
+        val list = ArrayList<AssetPathEntity>()
         val uri = allUri
         val projection = storeBucketKeys + arrayOf("count(1)")
         val args = ArrayList<String>()
@@ -45,7 +45,7 @@ object DBUtils : IDBUtils {
         val dateSelection = getDateCond(args, option)
         val sizeWhere = sizeWhere(requestType, option)
         val selection =
-            "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
+            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere) GROUP BY (${MediaStore.MediaColumns.BUCKET_ID}"
         val cursor = context.contentResolver.query(
             uri,
             projection,
@@ -57,8 +57,8 @@ object DBUtils : IDBUtils {
             while (it.moveToNext()) {
                 val id = it.getString(0)
                 val name = it.getString(1) ?: ""
-                val count = it.getInt(2)
-                val entity = GalleryEntity(id, name, count, 0)
+                val assetCount = it.getInt(2)
+                val entity = AssetPathEntity(id, name, assetCount, 0)
                 if (option.containsPathModified) {
                     injectModifiedDate(context, entity)
                 }
@@ -68,19 +68,19 @@ object DBUtils : IDBUtils {
         return list
     }
 
-    override fun getOnlyGalleryList(
+    override fun getMainAssetPathEntity(
         context: Context,
         requestType: Int,
         option: FilterOption
-    ): List<GalleryEntity> {
-        val list = ArrayList<GalleryEntity>()
+    ): List<AssetPathEntity> {
+        val list = ArrayList<AssetPathEntity>()
         val args = ArrayList<String>()
         val typeSelection: String = getCondFromType(requestType, option, args)
         val projection = storeBucketKeys + arrayOf("count(1)")
         val dateSelection = getDateCond(args, option)
         val sizeWhere = sizeWhere(requestType, option)
         val selections =
-            "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
+            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
 
         val cursor = context.contentResolver.query(
             allUri,
@@ -92,41 +92,41 @@ object DBUtils : IDBUtils {
         cursor.use {
             if (it.moveToNext()) {
                 val countIndex = projection.indexOf("count(1)")
-                val count = cursor.getInt(countIndex)
-                val galleryEntity = GalleryEntity(
+                val assetCount = cursor.getInt(countIndex)
+                val assetPathEntity = AssetPathEntity(
                     PhotoManager.ALL_ID,
                     PhotoManager.ALL_ALBUM_NAME,
-                    count,
+                    assetCount,
                     requestType,
                     true
                 )
-                list.add(galleryEntity)
+                list.add(assetPathEntity)
             }
         }
         return list
     }
 
-    override fun getGalleryEntity(
+    override fun getAssetPathEntityFromId(
         context: Context,
-        galleryId: String,
+        pathId: String,
         type: Int,
         option: FilterOption
-    ): GalleryEntity? {
+    ): AssetPathEntity? {
         val uri = allUri
         val projection = storeBucketKeys + arrayOf("count(1)")
         val args = ArrayList<String>()
         val typeSelection: String = getCondFromType(type, option, args)
         val dateSelection = getDateCond(args, option)
         val idSelection: String
-        if (galleryId == "") {
+        if (pathId == "") {
             idSelection = ""
         } else {
-            idSelection = "AND ${MediaStore.Images.Media.BUCKET_ID} = ?"
-            args.add(galleryId)
+            idSelection = "AND ${MediaStore.MediaColumns.BUCKET_ID} = ?"
+            args.add(pathId)
         }
         val sizeWhere = sizeWhere(null, option)
         val selection =
-            "${MediaStore.Images.Media.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere) GROUP BY (${MediaStore.Images.Media.BUCKET_ID}"
+            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere) GROUP BY (${MediaStore.MediaColumns.BUCKET_ID}"
         val cursor = context.contentResolver.query(
             uri,
             projection,
@@ -138,8 +138,8 @@ object DBUtils : IDBUtils {
             return if (it.moveToNext()) {
                 val id = it.getString(0)
                 val name = it.getString(1) ?: ""
-                val count = it.getInt(2)
-                GalleryEntity(id, name, count, 0)
+                val assetCount = it.getInt(2)
+                AssetPathEntity(id, name, assetCount, 0)
             } else {
                 null
             }
@@ -148,18 +148,18 @@ object DBUtils : IDBUtils {
 
     override fun getAssetListPaged(
         context: Context,
-        galleryId: String,
+        pathId: String,
         page: Int,
         size: Int,
         requestType: Int,
         option: FilterOption
     ): List<AssetEntity> {
-        val isAll = galleryId.isEmpty()
+        val isAll = pathId.isEmpty()
         val list = ArrayList<AssetEntity>()
         val uri = allUri
         val args = ArrayList<String>()
         if (!isAll) {
-            args.add(galleryId)
+            args.add(pathId)
         }
         val typeSelection = getCondFromType(requestType, option, args)
         val dateSelection = getDateCond(args, option)
@@ -167,9 +167,9 @@ object DBUtils : IDBUtils {
         val keys =
             (storeImageKeys + storeVideoKeys + typeKeys + locationKeys).distinct().toTypedArray()
         val selection = if (isAll) {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
+            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
         } else {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
+            "${MediaStore.MediaColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
         }
         val sortOrder = getSortOrder(page * size, size, option)
         val cursor = context.contentResolver.query(
@@ -181,7 +181,7 @@ object DBUtils : IDBUtils {
         ) ?: return emptyList()
         cursor.use {
             while (it.moveToNext()) {
-                list.add(convertCursorToAsset(context, it, requestType))
+                list.add(convertCursorToAsset(context, it))
             }
         }
         return list
@@ -208,9 +208,9 @@ object DBUtils : IDBUtils {
         val keys =
             (storeImageKeys + storeVideoKeys + typeKeys + locationKeys).distinct().toTypedArray()
         val selection = if (isAll) {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
+            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
         } else {
-            "${MediaStore.Images.ImageColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
+            "${MediaStore.MediaColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
         }
         val pageSize = end - start
         val sortOrder = getSortOrder(start, pageSize, option)
@@ -223,19 +223,19 @@ object DBUtils : IDBUtils {
         ) ?: return emptyList()
         cursor.use {
             while (cursor.moveToNext()) {
-                list.add(convertCursorToAsset(context, cursor, requestType))
+                list.add(convertCursorToAsset(context, cursor))
             }
         }
         return list
     }
 
-    private fun convertCursorToAsset(context: Context, cursor: Cursor, requestType: Int): AssetEntity {
+    private fun convertCursorToAsset(context: Context, cursor: Cursor): AssetEntity {
         val id = cursor.getString(MediaStore.MediaColumns._ID)
         val path = cursor.getString(MediaStore.MediaColumns.DATA)
-        val date = cursor.getLong(MediaStore.Images.Media.DATE_ADDED)
+        val date = cursor.getLong(MediaStore.MediaColumns.DATE_ADDED)
         val type = cursor.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
-        val duration = if (requestType == 1) 0
-        else cursor.getLong(MediaStore.Video.VideoColumns.DURATION)
+        val duration = if (type == 1) 0
+        else cursor.getLong(MediaStore.MediaColumns.DURATION)
         var width = cursor.getInt(MediaStore.MediaColumns.WIDTH)
         var height = cursor.getInt(MediaStore.MediaColumns.HEIGHT)
         val displayName = File(path).name
@@ -243,7 +243,7 @@ object DBUtils : IDBUtils {
         val lat = cursor.getDouble(MediaStore.Images.ImageColumns.LATITUDE)
         val lng = cursor.getDouble(MediaStore.Images.ImageColumns.LONGITUDE)
         val orientation: Int = cursor.getInt(MediaStore.Images.ImageColumns.ORIENTATION)
-        val mimeType = cursor.getString(MediaStore.Files.FileColumns.MIME_TYPE)
+        val mimeType = cursor.getString(MediaStore.MediaColumns.MIME_TYPE)
         if ((width == 0 || height == 0)
             && path.isNotBlank()
             && File(path).exists()
@@ -281,7 +281,7 @@ object DBUtils : IDBUtils {
     override fun getAssetEntity(context: Context, id: String): AssetEntity? {
         val keys =
             (storeImageKeys + storeVideoKeys + locationKeys + typeKeys).distinct().toTypedArray()
-        val selection = "${MediaStore.Files.FileColumns._ID} = ?"
+        val selection = "${MediaStore.MediaColumns._ID} = ?"
         val args = arrayOf(id)
 
         val cursor = context.contentResolver.query(
@@ -293,8 +293,7 @@ object DBUtils : IDBUtils {
         ) ?: return null
         cursor.use {
             return if (it.moveToNext()) {
-                val type = it.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
-                convertCursorToAsset(context, it, type)
+                convertCursorToAsset(context, it)
             } else {
                 null
             }
@@ -362,14 +361,14 @@ object DBUtils : IDBUtils {
                 MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
             )
             put(MediaStore.MediaColumns.DISPLAY_NAME, title)
-            put(MediaStore.Images.ImageColumns.MIME_TYPE, typeFromStream)
-            put(MediaStore.Images.ImageColumns.TITLE, title)
+            put(MediaStore.MediaColumns.MIME_TYPE, typeFromStream)
+            put(MediaStore.MediaColumns.TITLE, title)
             put(MediaStore.Images.ImageColumns.DESCRIPTION, desc)
-            put(MediaStore.Images.ImageColumns.DATE_ADDED, timestamp)
-            put(MediaStore.Images.ImageColumns.DATE_MODIFIED, timestamp)
-            put(MediaStore.Images.ImageColumns.DISPLAY_NAME, title)
-            put(MediaStore.Images.ImageColumns.WIDTH, width)
-            put(MediaStore.Images.ImageColumns.HEIGHT, height)
+            put(MediaStore.MediaColumns.DATE_ADDED, timestamp)
+            put(MediaStore.MediaColumns.DATE_MODIFIED, timestamp)
+            put(MediaStore.MediaColumns.DISPLAY_NAME, title)
+            put(MediaStore.MediaColumns.WIDTH, width)
+            put(MediaStore.MediaColumns.HEIGHT, height)
             put(MediaStore.Images.ImageColumns.LATITUDE, latLong[0])
             put(MediaStore.Images.ImageColumns.LONGITUDE, latLong[1])
         }
@@ -382,7 +381,7 @@ object DBUtils : IDBUtils {
         // Write bytes.
         val cursor = cr.query(
             insertUri,
-            arrayOf(MediaStore.Images.ImageColumns.DATA),
+            arrayOf(MediaStore.MediaColumns.DATA),
             null,
             null,
             null
@@ -445,18 +444,18 @@ object DBUtils : IDBUtils {
                 MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
             )
             put(MediaStore.MediaColumns.DISPLAY_NAME, title)
-            put(MediaStore.Images.ImageColumns.MIME_TYPE, typeFromStream)
-            put(MediaStore.Images.ImageColumns.TITLE, title)
+            put(MediaStore.MediaColumns.MIME_TYPE, typeFromStream)
+            put(MediaStore.MediaColumns.TITLE, title)
             put(MediaStore.Images.ImageColumns.DESCRIPTION, desc)
-            put(MediaStore.Images.ImageColumns.DATE_ADDED, timestamp)
-            put(MediaStore.Images.ImageColumns.DATE_MODIFIED, timestamp)
-            put(MediaStore.Images.ImageColumns.DISPLAY_NAME, title)
+            put(MediaStore.MediaColumns.DATE_ADDED, timestamp)
+            put(MediaStore.MediaColumns.DATE_MODIFIED, timestamp)
+            put(MediaStore.MediaColumns.DISPLAY_NAME, title)
             put(MediaStore.Images.ImageColumns.LATITUDE, latLong[0])
             put(MediaStore.Images.ImageColumns.LONGITUDE, latLong[1])
-            put(MediaStore.Images.ImageColumns.WIDTH, width)
-            put(MediaStore.Images.ImageColumns.HEIGHT, height)
+            put(MediaStore.MediaColumns.WIDTH, width)
+            put(MediaStore.MediaColumns.HEIGHT, height)
             if (savePath) {
-                put(MediaStore.Video.VideoColumns.DATA, path)
+                put(MediaStore.MediaColumns.DATA, path)
             }
         }
 
@@ -474,7 +473,7 @@ object DBUtils : IDBUtils {
             }
             tmpFile.renameTo(targetFile)
             val updateDataValues = ContentValues().apply {
-                put(MediaStore.Video.VideoColumns.DATA, targetPath)
+                put(MediaStore.MediaColumns.DATA, targetPath)
             }
             cr.update(contentUri, updateDataValues, null, null)
             val outputStream = FileOutputStream(targetFile)
@@ -497,15 +496,15 @@ object DBUtils : IDBUtils {
 
         val copyKeys = arrayListOf(
             MediaStore.MediaColumns.DISPLAY_NAME,
-            MediaStore.Video.VideoColumns.TITLE,
-            MediaStore.Video.VideoColumns.DATE_ADDED,
-            MediaStore.Video.VideoColumns.DATE_MODIFIED,
-            MediaStore.Video.VideoColumns.DATE_TAKEN,
-            MediaStore.Video.VideoColumns.DURATION,
+            MediaStore.MediaColumns.TITLE,
+            MediaStore.MediaColumns.DATE_ADDED,
+            MediaStore.MediaColumns.DATE_MODIFIED,
+            MediaStore.MediaColumns.DATE_TAKEN,
+            MediaStore.MediaColumns.DURATION,
             MediaStore.Video.VideoColumns.LONGITUDE,
             MediaStore.Video.VideoColumns.LATITUDE,
-            MediaStore.Video.VideoColumns.WIDTH,
-            MediaStore.Video.VideoColumns.HEIGHT
+            MediaStore.MediaColumns.WIDTH,
+            MediaStore.MediaColumns.HEIGHT
         )
         val mediaType = convertTypeToMediaType(asset.type)
         if (mediaType != MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO) {
@@ -514,7 +513,7 @@ object DBUtils : IDBUtils {
 
         val cursor = cr.query(
             allUri,
-            copyKeys.toTypedArray() + arrayOf(MediaStore.Video.VideoColumns.DATA),
+            copyKeys.toTypedArray() + arrayOf(MediaStore.MediaColumns.DATA),
             idSelection,
             arrayOf(assetId),
             null
@@ -530,7 +529,7 @@ object DBUtils : IDBUtils {
                 put(key, cursor.getString(key))
             }
             put(MediaStore.Files.FileColumns.MEDIA_TYPE, mediaType)
-            put(MediaStore.Files.FileColumns.DATA, outputPath)
+            put(MediaStore.MediaColumns.DATA, outputPath)
         }
 
         val insertedUri =
@@ -582,8 +581,8 @@ object DBUtils : IDBUtils {
 
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DATA, targetPath)
-            put(MediaStore.Files.FileColumns.BUCKET_ID, galleryId)
-            put(MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME, targetGalleryInfo.galleryName)
+            put(MediaStore.MediaColumns.BUCKET_ID, galleryId)
+            put(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, targetGalleryInfo.galleryName)
         }
 
         val count = cr.update(allUri, contentValues, idSelection, arrayOf(assetId))
@@ -639,8 +638,8 @@ object DBUtils : IDBUtils {
     override fun getSomeInfo(context: Context, assetId: String): Pair<String, String?>? {
         val cursor = context.contentResolver.query(
             allUri,
-            arrayOf(MediaStore.Files.FileColumns.BUCKET_ID, MediaStore.Files.FileColumns.DATA),
-            "${MediaStore.Files.FileColumns._ID} = ?",
+            arrayOf(MediaStore.MediaColumns.BUCKET_ID, MediaStore.MediaColumns.DATA),
+            "${MediaStore.MediaColumns._ID} = ?",
             arrayOf(assetId),
             null
         ) ?: return null
@@ -656,14 +655,14 @@ object DBUtils : IDBUtils {
 
     private fun getGalleryInfo(context: Context, galleryId: String): GalleryInfo? {
         val keys = arrayOf(
-            MediaStore.Files.FileColumns.BUCKET_ID,
-            MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME,
-            MediaStore.Files.FileColumns.DATA
+            MediaStore.MediaColumns.BUCKET_ID,
+            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME,
+            MediaStore.MediaColumns.DATA
         )
         val cursor = context.contentResolver.query(
             allUri,
             keys,
-            "${MediaStore.Files.FileColumns.BUCKET_ID} = ?",
+            "${MediaStore.MediaColumns.BUCKET_ID} = ?",
             arrayOf(galleryId),
             null
         ) ?: return null
@@ -671,8 +670,8 @@ object DBUtils : IDBUtils {
             if (!it.moveToNext()) {
                 return null
             }
-            val path = it.getStringOrNull(MediaStore.Files.FileColumns.DATA) ?: return null
-            val name = it.getStringOrNull(MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME)
+            val path = it.getStringOrNull(MediaStore.MediaColumns.DATA) ?: return null
+            val name = it.getStringOrNull(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME)
                 ?: return null
             val galleryPath = File(path).parentFile?.absolutePath ?: return null
             return GalleryInfo(galleryPath, galleryId, name)
@@ -696,19 +695,18 @@ object DBUtils : IDBUtils {
         val info = VideoUtils.getPropertiesUseMediaPlayer(path)
 
         val values = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, title)
-            put(MediaStore.Video.VideoColumns.MIME_TYPE, typeFromStream)
-            put(MediaStore.Video.VideoColumns.TITLE, title)
             put(MediaStore.Video.VideoColumns.DESCRIPTION, desc)
-            put(MediaStore.Video.VideoColumns.DATE_ADDED, timestamp)
-            put(MediaStore.Video.VideoColumns.DATE_MODIFIED, timestamp)
-            put(MediaStore.Video.VideoColumns.DATE_TAKEN, timestamp * 1000)
-            put(MediaStore.Video.VideoColumns.DISPLAY_NAME, title)
-            put(MediaStore.Video.VideoColumns.DURATION, info.duration)
-            put(MediaStore.Video.VideoColumns.WIDTH, info.width)
-            put(MediaStore.Video.VideoColumns.HEIGHT, info.height)
+            put(MediaStore.MediaColumns.TITLE, title)
+            put(MediaStore.MediaColumns.DISPLAY_NAME, title)
+            put(MediaStore.MediaColumns.MIME_TYPE, typeFromStream)
+            put(MediaStore.MediaColumns.DATE_ADDED, timestamp)
+            put(MediaStore.MediaColumns.DATE_MODIFIED, timestamp)
+            put(MediaStore.MediaColumns.DATE_TAKEN, timestamp * 1000)
+            put(MediaStore.MediaColumns.DURATION, info.duration)
+            put(MediaStore.MediaColumns.WIDTH, info.width)
+            put(MediaStore.MediaColumns.HEIGHT, info.height)
             if (savePath)
-                put(MediaStore.Video.VideoColumns.DATA, path)
+                put(MediaStore.MediaColumns.DATA, path)
         }
 
         val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
@@ -728,7 +726,7 @@ object DBUtils : IDBUtils {
             }
             tmpFile.renameTo(targetFile)
             val updateDataValues = ContentValues().apply {
-                put(MediaStore.Video.VideoColumns.DATA, targetPath)
+                put(MediaStore.MediaColumns.DATA, targetPath)
             }
             cr.update(contentUri, updateDataValues, null, null)
             val outputStream = FileOutputStream(targetFile)

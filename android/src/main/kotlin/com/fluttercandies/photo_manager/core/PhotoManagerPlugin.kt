@@ -234,9 +234,6 @@ class PhotoManagerPlugin(
         when (call.method) {
             Methods.requestPermissionExtend -> resultHandler.reply(PermissionResult.Authorized.value)
             Methods.getAssetPathList -> {
-                if (Build.VERSION.SDK_INT >= 29) {
-                    notifyChannel.setAndroidQExperimental(true)
-                }
                 runOnBackground {
                     val type = call.argument<Int>("type")!!
                     val hasAll = call.argument<Boolean>("hasAll")!!
@@ -244,7 +241,7 @@ class PhotoManagerPlugin(
                     val onlyAll = call.argument<Boolean>("onlyAll")!!
 
                     val list = photoManager.getAssetPathList(type, hasAll, onlyAll, option)
-                    resultHandler.reply(ConvertUtils.convertToGalleryResult(list))
+                    resultHandler.reply(ConvertUtils.convertPaths(list))
                 }
             }
             Methods.getAssetListPaged -> {
@@ -255,7 +252,7 @@ class PhotoManagerPlugin(
                     val size = call.argument<Int>("size")!!
                     val option = call.getOption()
                     val list = photoManager.getAssetListPaged(galleryId, type, page, size, option)
-                    resultHandler.reply(ConvertUtils.convertToAssetResult(list))
+                    resultHandler.reply(ConvertUtils.convertAssets(list))
                 }
             }
             Methods.getAssetListRange -> {
@@ -267,7 +264,7 @@ class PhotoManagerPlugin(
                     val option = call.getOption()
                     val list: List<AssetEntity> =
                         photoManager.getAssetListRange(galleryId, type, start, end, option)
-                    resultHandler.reply(ConvertUtils.convertToAssetResult(list))
+                    resultHandler.reply(ConvertUtils.convertAssets(list))
                 }
             }
             Methods.getThumbnail -> {
@@ -324,7 +321,7 @@ class PhotoManagerPlugin(
                     val id = call.argument<String>("id")!!
                     val asset = photoManager.fetchEntityProperties(id)
                     val assetResult = if (asset != null) {
-                        ConvertUtils.convertToAssetResult(asset)
+                        ConvertUtils.convertAsset(asset)
                     } else {
                         null
                     }
@@ -338,7 +335,7 @@ class PhotoManagerPlugin(
                     val option = call.getOption()
                     val pathEntity = photoManager.fetchPathProperties(id, type, option)
                     if (pathEntity != null) {
-                        val mapResult = ConvertUtils.convertToGalleryResult(listOf(pathEntity))
+                        val mapResult = ConvertUtils.convertPaths(listOf(pathEntity))
                         resultHandler.reply(mapResult)
                     } else {
                         resultHandler.reply(null)
@@ -376,7 +373,7 @@ class PhotoManagerPlugin(
                             resultHandler.reply(null)
                             return@runOnBackground
                         }
-                        val map = ConvertUtils.convertToAssetResult(entity)
+                        val map = ConvertUtils.convertAsset(entity)
                         resultHandler.reply(map)
                     } catch (e: Exception) {
                         LogUtils.error("save image error", e)
@@ -396,7 +393,7 @@ class PhotoManagerPlugin(
                             resultHandler.reply(null)
                             return@runOnBackground
                         }
-                        val map = ConvertUtils.convertToAssetResult(entity)
+                        val map = ConvertUtils.convertAsset(entity)
                         resultHandler.reply(map)
                     } catch (e: Exception) {
                         LogUtils.error("save image error", e)
@@ -416,7 +413,7 @@ class PhotoManagerPlugin(
                             resultHandler.reply(null)
                             return@runOnBackground
                         }
-                        val map = ConvertUtils.convertToAssetResult(entity)
+                        val map = ConvertUtils.convertAsset(entity)
                         resultHandler.reply(map)
                     } catch (e: Exception) {
                         LogUtils.error("save video error", e)
@@ -474,6 +471,6 @@ class PhotoManagerPlugin(
 
     private fun MethodCall.getOption(): FilterOption {
         val arguments = argument<Map<*, *>>("option")!!
-        return ConvertUtils.convertFilterOptionsFromMap(arguments)
+        return ConvertUtils.convertToFilterOptions(arguments)
     }
 }

@@ -5,7 +5,7 @@ import com.fluttercandies.photo_manager.constant.AssetType
 import com.fluttercandies.photo_manager.core.entity.*
 
 object ConvertUtils {
-    fun convertToGalleryResult(list: List<GalleryEntity>): Map<String, Any> {
+    fun convertPaths(list: List<AssetPathEntity>): Map<String, Any> {
         val data = ArrayList<Map<String, Any>>()
         for (entity in list) {
             if (entity.assetCount == 0) {
@@ -14,29 +14,27 @@ object ConvertUtils {
             val element = mutableMapOf<String, Any>(
                 "id" to entity.id,
                 "name" to entity.name,
-                "length" to entity.length,
+                "assetCount" to entity.assetCount,
                 "isAll" to entity.isAll
             )
             if (entity.modifiedDate != null) {
                 element["modified"] = entity.modifiedDate!!
             }
-            if (entity.length > 0) {
-                data.add(element)
-            }
+            data.add(element)
         }
         return mapOf("data" to data)
     }
 
-    fun convertToAssetResult(list: List<AssetEntity>): Map<String, Any?> {
+    fun convertAssets(list: List<AssetEntity>): Map<String, Any?> {
         val data = ArrayList<Map<String, Any?>>()
         for (entity in list) {
-            val result = convertToAssetResult(entity)
+            val result = convertAsset(entity)
             data.add(result)
         }
         return mapOf("data" to data)
     }
 
-    fun convertToAssetResult(entity: AssetEntity): Map<String, Any?> {
+    fun convertAsset(entity: AssetEntity): Map<String, Any?> {
         val data = hashMapOf(
             "id" to entity.id,
             "duration" to entity.duration / 1000,
@@ -98,11 +96,11 @@ object ConvertUtils {
         return DateCond(min, max, ignore)
     }
 
-    fun convertFilterOptionsFromMap(map: Map<*, *>): FilterOption {
+    fun convertToFilterOptions(map: Map<*, *>): FilterOption {
         return FilterOption(map)
     }
 
-    fun convertOrderByCondList(orders: List<*>): List<OrderByCond> {
+    fun convertToOrderByConds(orders: List<*>): List<OrderByCond> {
         val list = ArrayList<OrderByCond>()
         // Handle platform default sorting first.
         if (orders.isEmpty()) {

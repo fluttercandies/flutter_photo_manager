@@ -13,7 +13,7 @@ import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.entity.DateCond
 import com.fluttercandies.photo_manager.core.entity.FilterOption
-import com.fluttercandies.photo_manager.core.entity.GalleryEntity
+import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
 import com.fluttercandies.photo_manager.util.LogUtils
 
 @Suppress("Deprecation", "InlinedApi", "Range")
@@ -85,15 +85,24 @@ interface IDBUtils {
         context: Context,
         requestType: Int = 0,
         option: FilterOption
-    ): List<GalleryEntity>
+    ): List<AssetPathEntity>
 
     fun getAssetListPaged(
         context: Context,
-        galleryId: String,
+        pathId: String,
         page: Int,
         size: Int,
         requestType: Int = 0,
         option: FilterOption,
+    ): List<AssetEntity>
+
+    fun getAssetListRange(
+        context: Context,
+        galleryId: String,
+        start: Int,
+        end: Int,
+        requestType: Int,
+        option: FilterOption
     ): List<AssetEntity>
 
     fun getAssetEntity(context: Context, id: String): AssetEntity?
@@ -140,25 +149,16 @@ interface IDBUtils {
         return getDouble(getColumnIndex(columnName))
     }
 
-    fun getGalleryEntity(
+    fun getAssetPathEntityFromId(
         context: Context,
-        galleryId: String,
+        pathId: String,
         type: Int,
         option: FilterOption
-    ): GalleryEntity?
+    ): AssetPathEntity?
 
     fun clearCache() {}
 
     fun getFilePath(context: Context, id: String, origin: Boolean): String?
-
-    fun getAssetListRange(
-        context: Context,
-        galleryId: String,
-        start: Int,
-        end: Int,
-        requestType: Int,
-        option: FilterOption
-    ): List<AssetEntity>
 
     fun saveImage(
         context: Context,
@@ -311,11 +311,11 @@ interface IDBUtils {
         return uri.toString()
     }
 
-    fun getOnlyGalleryList(
+    fun getMainAssetPathEntity(
         context: Context,
         requestType: Int,
         option: FilterOption
-    ): List<GalleryEntity>
+    ): List<AssetPathEntity>
 
     fun getDateCond(args: ArrayList<String>, option: FilterOption): String {
         val createDateCond =
@@ -400,52 +400,6 @@ interface IDBUtils {
 
     fun clearFileCache(context: Context) {}
 
-    fun getAssetsUri(context: Context, ids: List<String>): List<Uri> {
-        if (ids.count() > 500) {
-            val result = ArrayList<Uri>()
-            val total = ids.count()
-            var count = total / 500
-            if (total % 500 != 0) {
-                count++
-            }
-            for (i in 0 until count) {
-                val end = if (i == count - 1) {
-                    ids.count()
-                } else {
-                    (i + 1) * 500 - 1
-                }
-                val start = i * 500
-                val tmp = getAssetsUri(context, ids.subList(start, end))
-                result.addAll(tmp)
-            }
-            return result
-        }
-
-        val key = arrayOf(_ID, MEDIA_TYPE)
-        val idSelection = ids.joinToString(",") { "?" }
-        val selection = "$_ID in ($idSelection)"
-        val cursor = context.contentResolver.query(
-            allUri,
-            key,
-            selection,
-            ids.toTypedArray(),
-            null
-        ) ?: return emptyList()
-        val list = ArrayList<Uri>()
-        val map = HashMap<String, Uri>()
-        cursor.use {
-            while (it.moveToNext()) {
-                val id = it.getString(_ID)
-                val type = it.getInt(MEDIA_TYPE)
-                map[id] = getUriFromMediaType(id, type)
-            }
-        }
-        for (id in ids) {
-            map[id]?.let { list.add(it) }
-        }
-        return list
-    }
-
     fun getAssetsPath(context: Context, ids: List<String>): List<String> {
         if (ids.count() > 500) {
             val result = ArrayList<String>()
@@ -495,7 +449,7 @@ interface IDBUtils {
         return list
     }
 
-    fun injectModifiedDate(context: Context, entity: GalleryEntity) {
+    fun injectModifiedDate(context: Context, entity: AssetPathEntity) {
         getPathModifiedDate(context, entity.id)?.apply {
             entity.modifiedDate = this
         }
