@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.2.0-dev.4
+
+### Improvements
+
+- Improve assets count assignments. (#804)
+
 ## 2.2.0-dev.3
 
 ### Improvements
