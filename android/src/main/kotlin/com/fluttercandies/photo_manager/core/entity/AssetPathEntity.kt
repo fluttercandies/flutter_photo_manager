@@ -1,9 +1,9 @@
 package com.fluttercandies.photo_manager.core.entity
 
-data class GalleryEntity(
+data class AssetPathEntity(
     val id: String,
     val name: String,
-    var length: Int,
+    var assetCount: Int,
     val typeInt: Int,
     var isAll: Boolean = false,
     var modifiedDate: Long? = null

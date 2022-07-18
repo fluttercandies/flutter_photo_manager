@@ -14,7 +14,7 @@ class FilterOption(map: Map<*, *>) {
     val containsPathModified = map["containsPathModified"] as Boolean
 
     private val orderByCond: List<OrderByCond> =
-        ConvertUtils.convertOrderByCondList(map["orders"] as List<*>)
+        ConvertUtils.convertToOrderByConds(map["orders"] as List<*>)
 
     fun orderByCondString(): String? {
         if (orderByCond.isEmpty()) {
