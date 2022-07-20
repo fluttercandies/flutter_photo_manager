@@ -84,7 +84,7 @@ object DBUtils : IDBUtils {
         cursor.use {
             if (it.moveToNext()) {
                 val countIndex = projection.indexOf("count(1)")
-                val assetCount = cursor.getInt(countIndex)
+                val assetCount = it.getInt(countIndex)
                 val assetPathEntity = AssetPathEntity(
                     PhotoManager.ALL_ID,
                     PhotoManager.ALL_ALBUM_NAME,
@@ -329,13 +329,13 @@ object DBUtils : IDBUtils {
             null,
             null
         ) ?: return null
-        cursor.use {
-            if (it.moveToNext()) {
-                val targetPath = it.getString(0)
+        cursor.use {cursor ->
+            if (cursor.moveToNext()) {
+                val targetPath = cursor.getString(0)
                 targetPath.checkDirs()
                 val outputStream = FileOutputStream(targetPath)
                 refreshInputStream()
-                outputStream.use { os -> inputStream.use { inputStream.copyTo(os) } }
+                outputStream.use { os -> inputStream.use { it.copyTo(os) } }
             }
         }
         val id = ContentUris.parseId(insertUri)
@@ -586,11 +586,11 @@ object DBUtils : IDBUtils {
             null
         ) ?: return null
         cursor.use {
-            if (!cursor.moveToNext()) {
+            if (!it.moveToNext()) {
                 return null
             }
-            val galleryID = cursor.getString(0)
-            val path = cursor.getString(1)
+            val galleryID = it.getString(0)
+            val path = it.getString(1)
             return Pair(galleryID, File(path).parent)
         }
     }

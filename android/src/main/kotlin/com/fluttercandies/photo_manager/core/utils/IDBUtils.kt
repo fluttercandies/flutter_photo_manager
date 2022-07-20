@@ -350,9 +350,9 @@ interface IDBUtils {
             val cursor = context.contentResolver.query(allUri, null, "$_ID = ?", arrayOf(id), null)
             cursor?.use {
                 val names = it.columnNames
-                if (cursor.moveToNext()) {
+                if (it.moveToNext()) {
                     for (i in 0 until names.count()) {
-                        LogUtils.info("${names[i]} : ${cursor.getString(i)}")
+                        LogUtils.info("${names[i]} : ${it.getString(i)}")
                     }
                 }
             }
@@ -524,8 +524,8 @@ interface IDBUtils {
             )
         } ?: return null
         cursor.use {
-            if (cursor.moveToNext()) {
-                return cursor.getLong(DATE_MODIFIED)
+            if (it.moveToNext()) {
+                return it.getLong(DATE_MODIFIED)
             }
         }
         return null

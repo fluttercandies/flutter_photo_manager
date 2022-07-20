@@ -102,7 +102,7 @@ object AndroidQDBUtils : IDBUtils {
             val assetPathEntity = AssetPathEntity(
                 PhotoManager.ALL_ID,
                 PhotoManager.ALL_ALBUM_NAME,
-                cursor.count,
+                it.count,
                 requestType,
                 true
             )
@@ -209,7 +209,7 @@ object AndroidQDBUtils : IDBUtils {
             sortOrder
         ) ?: return list
         cursor.use {
-            cursorWithRange(it, start, pageSize) {
+            cursorWithRange(it, start, pageSize) {cursor ->
                 cursor.toAssetEntity(context)?.apply {
                     list.add(this)
                 }
@@ -268,9 +268,9 @@ object AndroidQDBUtils : IDBUtils {
         val name: String
         val assetCount: Int
         cursor.use {
-            if (cursor.moveToNext()) {
-                name = cursor.getString(1) ?: ""
-                assetCount = cursor.count
+            if (it.moveToNext()) {
+                name = it.getString(1) ?: ""
+                assetCount = it.count
             } else {
                 return null
             }
@@ -308,7 +308,7 @@ object AndroidQDBUtils : IDBUtils {
         val outputStream = ByteArrayOutputStream()
         outputStream.use { os ->
             inputStream?.use { os.write(it.readBytes()) }
-            val byteArray = outputStream.toByteArray()
+            val byteArray = os.toByteArray()
             if (LogUtils.isLog) {
                 LogUtils.info("The asset ${asset.id} origin byte length : ${byteArray.count()}")
             }
