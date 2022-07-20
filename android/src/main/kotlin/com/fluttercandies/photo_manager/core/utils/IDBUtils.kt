@@ -15,6 +15,7 @@ import com.fluttercandies.photo_manager.core.entity.DateCond
 import com.fluttercandies.photo_manager.core.entity.FilterOption
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
 import com.fluttercandies.photo_manager.util.LogUtils
+import java.io.File
 
 @Suppress("Deprecation", "InlinedApi", "Range")
 interface IDBUtils {
@@ -64,8 +65,8 @@ interface IDBUtils {
         )
 
         val storeBucketKeys = arrayOf(
-            MediaStore.Images.Media.BUCKET_ID,
-            MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
+            MediaStore.MediaColumns.BUCKET_ID,
+            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME
         )
 
         val allUri: Uri
@@ -147,6 +148,59 @@ interface IDBUtils {
 
     fun Cursor.getDouble(columnName: String): Double {
         return getDouble(getColumnIndex(columnName))
+    }
+
+    fun Cursor.toAssetEntity(context: Context): AssetEntity? {
+        val path = getString(MediaStore.MediaColumns.DATA)
+        if (path.isNotBlank() && !File(path).exists()) {
+            return null
+        }
+
+        val id = getString(MediaStore.MediaColumns._ID)
+        var date = if (isAndroidQ) getLong(MediaStore.MediaColumns.DATE_TAKEN)
+        else getLong(MediaStore.MediaColumns.DATE_ADDED)
+        if (date == 0L) {
+            date = getLong(MediaStore.MediaColumns.DATE_ADDED)
+        } else {
+            date /= 1000
+        }
+        val type = getInt(MEDIA_TYPE)
+        val mimeType = getString(MediaStore.MediaColumns.MIME_TYPE)
+        val duration = if (type == MEDIA_TYPE_IMAGE) 0
+        else getLong(MediaStore.MediaColumns.DURATION)
+        var width = getInt(MediaStore.MediaColumns.WIDTH)
+        var height = getInt(MediaStore.MediaColumns.HEIGHT)
+        val displayName = getString(MediaStore.MediaColumns.DISPLAY_NAME)
+        val modifiedDate = getLong(MediaStore.MediaColumns.DATE_MODIFIED)
+        val orientation: Int = getInt(MediaStore.MediaColumns.ORIENTATION)
+        val relativePath: String = getString(MediaStore.MediaColumns.RELATIVE_PATH)
+        if ((width == 0 || height == 0) && !mimeType.contains("svg")) {
+            try {
+                val uri = getUri(id, getMediaType(type))
+                context.contentResolver.openInputStream(uri)?.use {
+                    ExifInterface(it).apply {
+                        width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
+                        height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+                    }
+                }
+            } catch (e: Throwable) {
+                LogUtils.error(e)
+            }
+        }
+        return AssetEntity(
+            id,
+            path,
+            duration,
+            date,
+            width,
+            height,
+            getMediaType(type),
+            displayName,
+            modifiedDate,
+            orientation,
+            androidQRelativePath = relativePath,
+            mimeType = mimeType
+        )
     }
 
     fun getAssetPathEntityFromId(
@@ -296,9 +350,9 @@ interface IDBUtils {
             val cursor = context.contentResolver.query(allUri, null, "$_ID = ?", arrayOf(id), null)
             cursor?.use {
                 val names = it.columnNames
-                if (cursor.moveToNext()) {
+                if (it.moveToNext()) {
                     for (i in 0 until names.count()) {
-                        LogUtils.info("${names[i]} : ${cursor.getString(i)}")
+                        LogUtils.info("${names[i]} : ${it.getString(i)}")
                     }
                 }
             }
@@ -470,8 +524,8 @@ interface IDBUtils {
             )
         } ?: return null
         cursor.use {
-            if (cursor.moveToNext()) {
-                return cursor.getLong(DATE_MODIFIED)
+            if (it.moveToNext()) {
+                return it.getLong(DATE_MODIFIED)
             }
         }
         return null

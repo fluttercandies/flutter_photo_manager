@@ -9,6 +9,7 @@ that can be found in the LICENSE file. -->
 ### Improvements
 
 - Improve assets count assignments. (#804)
+- Improve cursors conversion on Android. (#806)
 
 ## 2.2.0-dev.3
 
