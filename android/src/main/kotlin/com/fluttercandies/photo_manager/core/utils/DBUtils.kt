@@ -13,10 +13,6 @@ import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.entity.FilterOption
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
-import com.fluttercandies.photo_manager.core.utils.IDBUtils.Companion.storeBucketKeys
-import com.fluttercandies.photo_manager.core.utils.IDBUtils.Companion.storeImageKeys
-import com.fluttercandies.photo_manager.core.utils.IDBUtils.Companion.storeVideoKeys
-import com.fluttercandies.photo_manager.core.utils.IDBUtils.Companion.typeKeys
 import java.io.*
 import java.net.URLConnection
 import java.util.concurrent.locks.ReentrantLock
@@ -44,7 +40,7 @@ object DBUtils : IDBUtils {
             "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere) GROUP BY (${MediaStore.MediaColumns.BUCKET_ID}"
         val cursor = context.contentResolver.query(
             allUri,
-            storeBucketKeys + arrayOf("count(1)"),
+            IDBUtils.storeBucketKeys + arrayOf("count(1)"),
             selection,
             args.toTypedArray(),
             null
@@ -72,7 +68,7 @@ object DBUtils : IDBUtils {
         val list = ArrayList<AssetPathEntity>()
         val args = ArrayList<String>()
         val typeSelection: String = getCondFromType(requestType, option, args)
-        val projection = storeBucketKeys + arrayOf("count(1)")
+        val projection = IDBUtils.storeBucketKeys + arrayOf("count(1)")
         val dateSelection = getDateCond(args, option)
         val sizeWhere = sizeWhere(requestType, option)
         val selections =
@@ -123,7 +119,7 @@ object DBUtils : IDBUtils {
             "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere) GROUP BY (${MediaStore.MediaColumns.BUCKET_ID}"
         val cursor = context.contentResolver.query(
             allUri,
-            storeBucketKeys + arrayOf("count(1)"),
+            IDBUtils.storeBucketKeys + arrayOf("count(1)"),
             selection,
             args.toTypedArray(),
             null
@@ -158,7 +154,7 @@ object DBUtils : IDBUtils {
         val dateSelection = getDateCond(args, option)
         val sizeWhere = sizeWhere(requestType, option)
         val keys =
-            (storeImageKeys + storeVideoKeys + typeKeys + locationKeys).distinct().toTypedArray()
+            (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + locationKeys).distinct().toTypedArray()
         val selection = if (isAll) {
             "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
         } else {
@@ -200,7 +196,7 @@ object DBUtils : IDBUtils {
         val dateSelection = getDateCond(args, option)
         val sizeWhere = sizeWhere(requestType, option)
         val keys =
-            (storeImageKeys + storeVideoKeys + typeKeys + locationKeys).distinct().toTypedArray()
+            (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + locationKeys).distinct().toTypedArray()
         val selection = if (isAll) {
             "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
         } else {
@@ -227,7 +223,7 @@ object DBUtils : IDBUtils {
 
     override fun getAssetEntity(context: Context, id: String): AssetEntity? {
         val keys =
-            (storeImageKeys + storeVideoKeys + locationKeys + typeKeys).distinct().toTypedArray()
+            (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + locationKeys + IDBUtils.typeKeys).distinct().toTypedArray()
         val selection = "${MediaStore.MediaColumns._ID} = ?"
         val args = arrayOf(id)
 

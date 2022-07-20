@@ -16,7 +16,6 @@ import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.entity.FilterOption
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
-import com.fluttercandies.photo_manager.core.utils.IDBUtils.Companion.storeBucketKeys
 import com.fluttercandies.photo_manager.util.LogUtils
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -46,7 +45,7 @@ object AndroidQDBUtils : IDBUtils {
 
         val cursor = context.contentResolver.query(
             allUri,
-            storeBucketKeys,
+            IDBUtils.storeBucketKeys,
             selections,
             args.toTypedArray(),
             option.orderByCondString()
@@ -94,7 +93,7 @@ object AndroidQDBUtils : IDBUtils {
 
         val cursor = context.contentResolver.query(
             allUri,
-            storeBucketKeys,
+            IDBUtils.storeBucketKeys,
             selections,
             args.toTypedArray(),
             option.orderByCondString()
@@ -262,7 +261,7 @@ object AndroidQDBUtils : IDBUtils {
             "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere"
         val cursor = context.contentResolver.query(
             allUri,
-            storeBucketKeys,
+            IDBUtils.storeBucketKeys,
             selection, args.toTypedArray(),
             null
         ) ?: return null
