@@ -173,7 +173,7 @@ interface IDBUtils {
         val displayName = getString(MediaStore.MediaColumns.DISPLAY_NAME)
         val modifiedDate = getLong(MediaStore.MediaColumns.DATE_MODIFIED)
         val orientation: Int = getInt(MediaStore.MediaColumns.ORIENTATION)
-        val relativePath: String = getString(MediaStore.MediaColumns.RELATIVE_PATH)
+        val relativePath: String? = if (isAndroidQ) getString(MediaStore.MediaColumns.RELATIVE_PATH) else null
         if ((width == 0 || height == 0) && !mimeType.contains("svg")) {
             try {
                 val uri = getUri(id, getMediaType(type))
