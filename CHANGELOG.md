@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.2.0-dev.5
+
+### Fixes
+
+- Fix invalid `RELATIVE_PATH` obtains with cursors on Android Q-. (#810)
+
 ## 2.2.0-dev.4
 
 ### Improvements
