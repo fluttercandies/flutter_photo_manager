@@ -3,9 +3,35 @@
 The document only describes the equivalent changes to the API.
 If you want to see the new feature support, please refer to [readme][] and [change log][].
 
+- [2.x to 2.2](#2x-to-22)
 - [1.x to 2.0](#1x-to-20)
 - [0.6 to 1.0](#06-to-10)
 - [0.5 To 0.6](#05-to-06)
+
+## 2.x to 2.2
+
+### Overall
+
+- `AssetPathEntity.assetCount` has been deprecated, and added a new asynchronized getter `assetCountAsync`.
+- `FilterOptionGroup.containsEmptyAlbum` has been removed.
+
+#### `assetCount`
+
+Before you can easily access total count of a path:
+
+```dart
+int get count => path.assetCount;
+```
+
+Now you can only use the new getter:
+
+```dart
+int count = await path.assetCountAsync;
+```
+
+Be aware that the change is to improve when gathering info from paths,
+which means usages with the previous field should be migrated to
+separate requests to improve the performance.
 
 ## 1.x to 2.0
 
