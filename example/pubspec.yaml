@@ -1,6 +1,6 @@
 name: photo_manager_example
 description: Demonstrates how to use the photo_manager plugin.
-version: 2.2.0+12
+version: 2.2.0+13
 publish_to: none
 
 environment:
