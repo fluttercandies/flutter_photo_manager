@@ -4,45 +4,7 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
-## 2.2.0-dev.5
-
-### Fixes
-
-- Fix invalid `RELATIVE_PATH` obtains with cursors on Android Q-. (#810)
-
-## 2.2.0-dev.4
-
-### Improvements
-
-- Improve assets count assignments. (#804)
-- Improve cursors conversion on Android. (#806)
-
-## 2.2.0-dev.3
-
-### Improvements
-
-- Improve `MD5Utils` on iOS. (#802)
-- Improve cache container mutations on iOS. (#803)
-
-### Fixes
-
-- Fix not replied method calls (#800).
-
-## 2.2.0-dev.2
-
-### Improvements
-
-- Improve assets change notify with better methods signature and checks. (#790)
-- Add `PermissionState.hasAccess` getter for better condition judgement. (#792)
-- Remove unnecessary assets fetch in `getMediaUrl` on iOS. (#793)
-- Improve `AssetEntity.obtainForNewProperties` on iOS. (#794)
-
-### Fixes
-
-- Purpose video creation correctly on iOS. (#791)
-- Mark assets as favorite on iOS. (#794)
-
-## 2.2.0-dev.1
+## 2.2.0
 
 ### Breaking changes
 
@@ -50,6 +12,24 @@ that can be found in the LICENSE file. -->
   which improves the speed when loading paths mainly on iOS, also:
   - Deprecate `AssetPathEntity.assetCount`.
   - Remove `FilterOptionGroup.containsEmptyAlbum`.
+
+### Improvements
+
+- Improve assets change notify with better methods signature and checks. (#790)
+- Add `PermissionState.hasAccess` getter for better condition judgement. (#792)
+- Remove unnecessary assets fetch in `getMediaUrl` on iOS. (#793)
+- Improve `AssetEntity.obtainForNewProperties` on iOS. (#794)
+- Improve `MD5Utils` on iOS. (#802)
+- Improve cache container mutations on iOS. (#803)
+- Improve assets count assignments. (#804)
+- Improve cursors conversion on Android. (#806)
+
+### Fixes
+
+- Purpose video creation correctly on iOS. (#791)
+- Mark assets as favorite on iOS. (#794)
+- Fix not replied method calls (#800).
+- Fix invalid `RELATIVE_PATH` obtains with cursors on Android Q-. (#810)
 
 ## 2.1.4
 
