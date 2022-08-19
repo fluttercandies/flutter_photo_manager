@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.2.1
+
+### Fixes
+
+- Fix saving images with path on Android 29-. (#815)
+
 ## 2.2.0
 
 ### Breaking changes
