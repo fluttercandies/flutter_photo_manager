@@ -106,7 +106,7 @@ interface IDBUtils {
         option: FilterOption
     ): List<AssetEntity>
 
-    fun getAssetEntity(context: Context, id: String): AssetEntity?
+    fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean = true): AssetEntity?
 
     fun getMediaType(type: Int): Int {
         return when (type) {
@@ -150,9 +150,9 @@ interface IDBUtils {
         return getDouble(getColumnIndex(columnName))
     }
 
-    fun Cursor.toAssetEntity(context: Context): AssetEntity? {
+    fun Cursor.toAssetEntity(context: Context, checkIfExists: Boolean = true): AssetEntity? {
         val path = getString(MediaStore.MediaColumns.DATA)
-        if (path.isNotBlank() && !File(path).exists()) {
+        if (checkIfExists && path.isNotBlank() && !File(path).exists()) {
             return null
         }
 
