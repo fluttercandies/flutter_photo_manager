@@ -329,13 +329,13 @@ object DBUtils : IDBUtils {
             null,
             null
         ) ?: return null
-        cursor.use {cursor ->
-            if (cursor.moveToNext()) {
-                val targetPath = cursor.getString(0)
+        cursor.use {
+            if (it.moveToNext()) {
+                val targetPath = it.getString(0)
                 targetPath.checkDirs()
                 val outputStream = FileOutputStream(targetPath)
                 refreshInputStream()
-                outputStream.use { os -> inputStream.use { it.copyTo(os) } }
+                outputStream.use { os -> inputStream.use { iStream -> iStream.copyTo(os) } }
             }
         }
         val id = ContentUris.parseId(insertUri)
