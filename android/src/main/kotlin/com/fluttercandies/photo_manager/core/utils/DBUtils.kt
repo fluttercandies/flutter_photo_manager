@@ -221,7 +221,7 @@ object DBUtils : IDBUtils {
         return list
     }
 
-    override fun getAssetEntity(context: Context, id: String): AssetEntity? {
+    override fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean): AssetEntity? {
         val keys =
             (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + locationKeys + IDBUtils.typeKeys).distinct().toTypedArray()
         val selection = "${MediaStore.MediaColumns._ID} = ?"
@@ -236,7 +236,7 @@ object DBUtils : IDBUtils {
         ) ?: return null
         cursor.use {
             return if (it.moveToNext()) {
-                it.toAssetEntity(context)
+                it.toAssetEntity(context, checkIfExists)
             } else {
                 null
             }
@@ -329,13 +329,13 @@ object DBUtils : IDBUtils {
             null,
             null
         ) ?: return null
-        cursor.use {cursor ->
-            if (cursor.moveToNext()) {
-                val targetPath = cursor.getString(0)
+        cursor.use {
+            if (it.moveToNext()) {
+                val targetPath = it.getString(0)
                 targetPath.checkDirs()
                 val outputStream = FileOutputStream(targetPath)
                 refreshInputStream()
-                outputStream.use { os -> inputStream.use { it.copyTo(os) } }
+                outputStream.use { os -> inputStream.use { iStream -> iStream.copyTo(os) } }
             }
         }
         val id = ContentUris.parseId(insertUri)
@@ -404,7 +404,8 @@ object DBUtils : IDBUtils {
 
         val contentUri = cr.insert(uri, values) ?: return null
         val id = ContentUris.parseId(contentUri)
-        val assetEntity = getAssetEntity(context, id.toString())
+        // Ignore the existence of the file, it'll be exported later.
+        val assetEntity = getAssetEntity(context, id.toString(), checkIfExists = false)
         if (!savePath) {
             val tmpPath = assetEntity?.path!!
             tmpPath.checkDirs()

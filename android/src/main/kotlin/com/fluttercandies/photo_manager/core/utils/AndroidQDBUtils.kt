@@ -222,7 +222,7 @@ object AndroidQDBUtils : IDBUtils {
     private fun assetKeys() =
         IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + arrayOf(MediaStore.MediaColumns.RELATIVE_PATH)
 
-    override fun getAssetEntity(context: Context, id: String): AssetEntity? {
+    override fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean): AssetEntity? {
         val keys = assetKeys().distinct().toTypedArray()
         val selection = "${MediaStore.MediaColumns._ID} = ?"
         val args = arrayOf(id)
@@ -234,7 +234,7 @@ object AndroidQDBUtils : IDBUtils {
             null
         ) ?: return null
         cursor.use {
-            return if (it.moveToNext()) it.toAssetEntity(context)
+            return if (it.moveToNext()) it.toAssetEntity(context, checkIfExists)
             else null
         }
     }

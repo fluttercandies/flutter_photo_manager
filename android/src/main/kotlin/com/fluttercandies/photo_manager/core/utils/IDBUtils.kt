@@ -106,7 +106,7 @@ interface IDBUtils {
         option: FilterOption
     ): List<AssetEntity>
 
-    fun getAssetEntity(context: Context, id: String): AssetEntity?
+    fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean = true): AssetEntity?
 
     fun getMediaType(type: Int): Int {
         return when (type) {
@@ -146,13 +146,13 @@ interface IDBUtils {
         return getLong(getColumnIndex(columnName))
     }
 
-    fun Cursor.getDouble(columnName: String): Double {
-        return getDouble(getColumnIndex(columnName))
-    }
+//    fun Cursor.getDouble(columnName: String): Double {
+//        return getDouble(getColumnIndex(columnName))
+//    }
 
-    fun Cursor.toAssetEntity(context: Context): AssetEntity? {
+    fun Cursor.toAssetEntity(context: Context, checkIfExists: Boolean = true): AssetEntity? {
         val path = getString(MediaStore.MediaColumns.DATA)
-        if (path.isNotBlank() && !File(path).exists()) {
+        if (checkIfExists && path.isNotBlank() && !File(path).exists()) {
             return null
         }
 
@@ -410,33 +410,6 @@ interface IDBUtils {
             1 -> Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
             2 -> Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
             3 -> Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-            else -> return Uri.EMPTY
-        }
-
-        if (isOrigin) {
-            uri = MediaStore.setRequireOriginal(uri)
-        }
-        return uri
-    }
-
-    fun getUriFromMediaType(id: String, mediaType: Int, isOrigin: Boolean = false): Uri {
-        var uri = when (mediaType) {
-            MEDIA_TYPE_IMAGE -> Uri.withAppendedPath(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                id
-            )
-            MEDIA_TYPE_VIDEO -> Uri.withAppendedPath(
-                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                id
-            )
-            MEDIA_TYPE_AUDIO -> Uri.withAppendedPath(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                id
-            )
-            MEDIA_TYPE_PLAYLIST -> Uri.withAppendedPath(
-                MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                id
-            )
             else -> return Uri.EMPTY
         }
 
