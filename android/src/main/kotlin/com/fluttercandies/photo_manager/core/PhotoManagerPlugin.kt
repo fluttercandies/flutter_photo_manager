@@ -179,6 +179,8 @@ class PhotoManagerPlugin(
             }
         }
 
+        // TODO: permission for Android-13
+
         val utils = permissionsUtils.apply {
             withActivity(activity)
             permissionsListener = object : PermissionsListener {
