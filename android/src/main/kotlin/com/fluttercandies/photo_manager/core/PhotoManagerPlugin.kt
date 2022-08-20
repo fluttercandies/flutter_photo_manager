@@ -3,7 +3,6 @@ package com.fluttercandies.photo_manager.core
 import android.Manifest
 import android.app.Activity
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Environment
 import android.os.Handler
@@ -81,9 +80,9 @@ class PhotoManagerPlugin(
         val resultHandler = ResultHandler(result, call)
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q && !Environment.isExternalStorageLegacy()) {
             resultHandler.replyError(
-                "STORAGE_NOT_LEGACY",
-                "Use `requestLegacyExternalStorage` when your project is targeting above Android Q.",
-                null
+                    "STORAGE_NOT_LEGACY",
+                    "Use `requestLegacyExternalStorage` when your project is targeting above Android Q.",
+                    null
             )
             return
         }
@@ -136,39 +135,36 @@ class PhotoManagerPlugin(
         }
         if (ignorePermissionCheck) {
             onHandlePermissionResult(
-                call,
-                resultHandler,
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-                        && havePermissionInManifest(
-                    applicationContext,
-                    Manifest.permission.ACCESS_MEDIA_LOCATION
-                )
+                    call,
+                    resultHandler,
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+                            && permissionsUtils.havePermissionInManifest(applicationContext,
+                            Manifest.permission.ACCESS_MEDIA_LOCATION
+                    )
             )
             return
         }
         if (permissionsUtils.isRequesting) {
             resultHandler.replyError(
-                "PERMISSION_REQUESTING",
-                "Another permission request is still ongoing. Please request after the existing one is done.",
-                null
+                    "PERMISSION_REQUESTING",
+                    "Another permission request is still ongoing. Please request after the existing one is done.",
+                    null
             )
             return
         }
 
         val needWritePermission =
-            permissionsUtils.needWriteExternalStorage(call)
-                    && Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q
-                    && havePermissionInManifest(
-                applicationContext,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
+                permissionsUtils.needWriteExternalStorage(call)
+                        && Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q
+                        && permissionsUtils.havePermissionInManifest(applicationContext,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
         val needLocationPermission =
-            permissionsUtils.needAccessLocation(call)
-                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-                    && havePermissionInManifest(
-                applicationContext,
-                Manifest.permission.ACCESS_MEDIA_LOCATION
-            )
+                permissionsUtils.needAccessLocation(call)
+                        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+                        && permissionsUtils.havePermissionInManifest(applicationContext,
+                        Manifest.permission.ACCESS_MEDIA_LOCATION
+                )
         val permissions = arrayListOf(Manifest.permission.READ_EXTERNAL_STORAGE)
         if (needWritePermission) {
             permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -179,7 +175,9 @@ class PhotoManagerPlugin(
             }
         }
 
-        // TODO: permission for Android-13
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionsUtils.addManifestWithPermission33(applicationContext, permissions)
+        }
 
         val utils = permissionsUtils.apply {
             withActivity(activity)
@@ -190,8 +188,8 @@ class PhotoManagerPlugin(
                 }
 
                 override fun onDenied(
-                    deniedPermissions: MutableList<String>,
-                    grantedPermissions: MutableList<String>
+                        deniedPermissions: MutableList<String>,
+                        grantedPermissions: MutableList<String>
                 ) {
                     LogUtils.info("onDenied call.method = ${call.method}")
                     if (call.method == Methods.requestPermissionExtend) {
@@ -209,15 +207,6 @@ class PhotoManagerPlugin(
         }
 
         utils.getPermissions(3001, permissions)
-    }
-
-    private fun havePermissionInManifest(context: Context, permission: String): Boolean {
-        val applicationInfo = context.applicationInfo
-        val packageInfo = context.packageManager.getPackageInfo(
-            applicationInfo.packageName,
-            PackageManager.GET_PERMISSIONS
-        )
-        return packageInfo.requestedPermissions.contains(permission)
     }
 
     private fun replyPermissionError(resultHandler: ResultHandler) {

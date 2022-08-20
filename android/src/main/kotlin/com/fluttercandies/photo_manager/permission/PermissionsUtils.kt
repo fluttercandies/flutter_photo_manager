@@ -1,5 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.fluttercandies.photo_manager.permission
 
+import android.Manifest
 import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
@@ -7,6 +10,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.fluttercandies.photo_manager.constant.Methods
 import com.fluttercandies.photo_manager.util.LogUtils
@@ -205,5 +209,27 @@ class PermissionsUtils {
             Methods.getFullFile -> call.argument<Boolean>("isOrigin")!! && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
             else -> false
         }
+    }
+
+    @RequiresApi(33)
+    fun addManifestWithPermission33(context: Context, permissions: ArrayList<String>) {
+        arrayOf(
+                Manifest.permission.READ_MEDIA_AUDIO,
+                Manifest.permission.READ_MEDIA_VIDEO,
+                Manifest.permission.READ_MEDIA_IMAGES,
+        ).forEach {
+            if (havePermissionInManifest(context, it)) {
+                permissions.add(it)
+            }
+        }
+    }
+
+    fun havePermissionInManifest(context: Context, permission: String): Boolean {
+        val applicationInfo = context.applicationInfo
+        val packageInfo = context.packageManager.getPackageInfo(
+                applicationInfo.packageName,
+                PackageManager.GET_PERMISSIONS
+        )
+        return packageInfo.requestedPermissions.contains(permission)
     }
 }
