@@ -13,8 +13,12 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.fluttercandies.photo_manager.constant.Methods
+import com.fluttercandies.photo_manager.core.utils.RequestTypeUtils
 import com.fluttercandies.photo_manager.util.LogUtils
+import com.fluttercandies.photo_manager.util.ResultHandler
 import io.flutter.plugin.common.MethodCall
+import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
 import java.lang.NullPointerException
 import java.util.ArrayList
 
@@ -197,6 +201,7 @@ class PermissionsUtils {
             Methods.moveAssetToPath,
             Methods.deleteWithIds,
             Methods.removeNoExistsAssets -> true
+
             else -> false
         }
     }
@@ -206,29 +211,61 @@ class PermissionsUtils {
             Methods.copyAsset,
             Methods.getLatLng,
             Methods.getOriginBytes -> true
+
             Methods.getFullFile -> call.argument<Boolean>("isOrigin")!! && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
             else -> false
         }
     }
 
     @RequiresApi(33)
-    fun addManifestWithPermission33(context: Context, permissions: ArrayList<String>) {
-        arrayOf(
-                Manifest.permission.READ_MEDIA_AUDIO,
-                Manifest.permission.READ_MEDIA_VIDEO,
-                Manifest.permission.READ_MEDIA_IMAGES,
-        ).forEach {
-            if (havePermissionInManifest(context, it)) {
-                permissions.add(it)
-            }
+    fun addManifestWithPermission33(
+        context: Context,
+        permissions: ArrayList<String>,
+        call: MethodCall,
+        resultHandler: ResultHandler
+    ) {
+        val method = call.method
+        if (!Methods.android13PermissionMethods.contains(method)) {
+            return
         }
+
+        val type = call.argument<Int>("type")
+
+        if (type == null) {
+            resultHandler.replyError("The $method must pass the 'type' params")
+            return
+        }
+
+        val haveImage = RequestTypeUtils.containsImage(type)
+        val haveVideo = RequestTypeUtils.containsVideo(type)
+        val haveAudio = RequestTypeUtils.containsAudio(type)
+
+        fun checkAndAddPermission(requestHavePermission: Boolean, tag: String, manifestPermission: String) {
+            if (!requestHavePermission) {
+                return
+            }
+
+            if (!havePermissionInManifest(context, manifestPermission)) {
+                throw IllegalStateException("Request $tag must have $manifestPermission in manifest!")
+            }
+            permissions.add(manifestPermission)
+        }
+
+        try {
+            checkAndAddPermission(haveImage, "image", Manifest.permission.READ_MEDIA_IMAGES)
+            checkAndAddPermission(haveVideo, "video", Manifest.permission.READ_MEDIA_VIDEO)
+            checkAndAddPermission(haveAudio, "audio", Manifest.permission.READ_MEDIA_AUDIO)
+        } catch (e: IllegalStateException) {
+            resultHandler.replyError("The permission have error for android 33 or higher", e.message, e)
+        }
+
     }
 
     fun havePermissionInManifest(context: Context, permission: String): Boolean {
         val applicationInfo = context.applicationInfo
         val packageInfo = context.packageManager.getPackageInfo(
-                applicationInfo.packageName,
-                PackageManager.GET_PERMISSIONS
+            applicationInfo.packageName,
+            PackageManager.GET_PERMISSIONS
         )
         return packageInfo.requestedPermissions.contains(permission)
     }

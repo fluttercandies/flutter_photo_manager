@@ -80,9 +80,9 @@ class PhotoManagerPlugin(
         val resultHandler = ResultHandler(result, call)
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q && !Environment.isExternalStorageLegacy()) {
             resultHandler.replyError(
-                    "STORAGE_NOT_LEGACY",
-                    "Use `requestLegacyExternalStorage` when your project is targeting above Android Q.",
-                    null
+                "STORAGE_NOT_LEGACY",
+                "Use `requestLegacyExternalStorage` when your project is targeting above Android Q.",
+                null
             )
             return
         }
@@ -100,16 +100,19 @@ class PhotoManagerPlugin(
                 resultHandler.reply(1)
                 true
             }
+
             Methods.log -> {
                 LogUtils.isLog = call.arguments() ?: false
                 resultHandler.reply(1)
                 true
             }
+
             Methods.openSetting -> {
                 permissionsUtils.getAppDetailSettingIntent(activity)
                 resultHandler.reply(1)
                 true
             }
+
             Methods.clearFileCache -> {
                 Glide.get(applicationContext).clearMemory()
                 runOnBackground {
@@ -118,15 +121,18 @@ class PhotoManagerPlugin(
                 }
                 true
             }
+
             Methods.forceOldAPI -> {
                 photoManager.useOldApi = true
                 resultHandler.reply(1)
                 true
             }
+
             Methods.systemVersion -> {
                 resultHandler.reply(Build.VERSION.SDK_INT.toString())
                 true
             }
+
             else -> false
         }
 
@@ -135,37 +141,49 @@ class PhotoManagerPlugin(
         }
         if (ignorePermissionCheck) {
             onHandlePermissionResult(
-                    call,
-                    resultHandler,
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-                            && permissionsUtils.havePermissionInManifest(applicationContext,
-                            Manifest.permission.ACCESS_MEDIA_LOCATION
-                    )
+                call,
+                resultHandler,
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+                        && permissionsUtils.havePermissionInManifest(
+                    applicationContext,
+                    Manifest.permission.ACCESS_MEDIA_LOCATION
+                )
             )
             return
         }
         if (permissionsUtils.isRequesting) {
             resultHandler.replyError(
-                    "PERMISSION_REQUESTING",
-                    "Another permission request is still ongoing. Please request after the existing one is done.",
-                    null
+                "PERMISSION_REQUESTING",
+                "Another permission request is still ongoing. Please request after the existing one is done.",
+                null
             )
             return
         }
 
         val needWritePermission =
-                permissionsUtils.needWriteExternalStorage(call)
-                        && Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q
-                        && permissionsUtils.havePermissionInManifest(applicationContext,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                )
+            permissionsUtils.needWriteExternalStorage(call)
+                    && Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q
+                    && permissionsUtils.havePermissionInManifest(
+                applicationContext,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        val needReadPermission =
+            Build.VERSION.SDK_INT <= Build.VERSION_CODES.TIRAMISU
+                    && permissionsUtils.havePermissionInManifest(
+                applicationContext,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
         val needLocationPermission =
-                permissionsUtils.needAccessLocation(call)
-                        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-                        && permissionsUtils.havePermissionInManifest(applicationContext,
-                        Manifest.permission.ACCESS_MEDIA_LOCATION
-                )
-        val permissions = arrayListOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+            permissionsUtils.needAccessLocation(call)
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+                    && permissionsUtils.havePermissionInManifest(
+                applicationContext,
+                Manifest.permission.ACCESS_MEDIA_LOCATION
+            )
+        val permissions = arrayListOf<String>()
+        if (needReadPermission) {
+            permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
         if (needWritePermission) {
             permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
@@ -176,7 +194,10 @@ class PhotoManagerPlugin(
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionsUtils.addManifestWithPermission33(applicationContext, permissions)
+            permissionsUtils.addManifestWithPermission33(applicationContext, permissions, call, resultHandler)
+            if (resultHandler.isReplied()) {
+                return
+            }
         }
 
         val utils = permissionsUtils.apply {
@@ -188,8 +209,8 @@ class PhotoManagerPlugin(
                 }
 
                 override fun onDenied(
-                        deniedPermissions: MutableList<String>,
-                        grantedPermissions: MutableList<String>
+                    deniedPermissions: MutableList<String>,
+                    grantedPermissions: MutableList<String>
                 ) {
                     LogUtils.info("onDenied call.method = ${call.method}")
                     if (call.method == Methods.requestPermissionExtend) {
@@ -235,6 +256,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(ConvertUtils.convertPaths(list))
                 }
             }
+
             Methods.getAssetListPaged -> {
                 runOnBackground {
                     val galleryId = call.argument<String>("id")!!
@@ -246,6 +268,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(ConvertUtils.convertAssets(list))
                 }
             }
+
             Methods.getAssetListRange -> {
                 runOnBackground {
                     val galleryId = call.getString("id")
@@ -258,6 +281,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(ConvertUtils.convertAssets(list))
                 }
             }
+
             Methods.getThumbnail -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
@@ -266,6 +290,7 @@ class PhotoManagerPlugin(
                     photoManager.getThumb(id, option, resultHandler)
                 }
             }
+
             Methods.requestCacheAssetsThumbnail -> {
                 runOnBackground {
                     val ids = call.argument<List<String>>("ids")!!
@@ -274,18 +299,21 @@ class PhotoManagerPlugin(
                     photoManager.requestCache(ids, option, resultHandler)
                 }
             }
+
             Methods.cancelCacheRequests -> {
                 runOnBackground {
                     photoManager.cancelCacheRequests()
                     resultHandler.reply(null)
                 }
             }
+
             Methods.assetExists -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
                     photoManager.assetExists(id, resultHandler)
                 }
             }
+
             Methods.getFullFile -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
@@ -293,12 +321,14 @@ class PhotoManagerPlugin(
                     photoManager.getFile(id, isOrigin, resultHandler)
                 }
             }
+
             Methods.getOriginBytes -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
                     photoManager.getOriginBytes(id, resultHandler, needLocationPermission)
                 }
             }
+
             Methods.getMediaUrl -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
@@ -307,6 +337,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(mediaUri)
                 }
             }
+
             Methods.fetchEntityProperties -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
@@ -319,6 +350,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(assetResult)
                 }
             }
+
             Methods.fetchPathProperties -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
@@ -333,6 +365,7 @@ class PhotoManagerPlugin(
                     }
                 }
             }
+
             Methods.getLatLng -> {
                 runOnBackground {
                     val id = call.argument<String>("id")!!
@@ -341,6 +374,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(location)
                 }
             }
+
             Methods.notify -> {
                 runOnBackground {
                     val notify = call.argument<Boolean>("notify")
@@ -352,6 +386,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(null)
                 }
             }
+
             Methods.saveImage -> {
                 runOnBackground {
                     try {
@@ -372,6 +407,7 @@ class PhotoManagerPlugin(
                     }
                 }
             }
+
             Methods.saveImageWithPath -> {
                 runOnBackground {
                     try {
@@ -392,6 +428,7 @@ class PhotoManagerPlugin(
                     }
                 }
             }
+
             Methods.saveVideo -> {
                 runOnBackground {
                     try {
@@ -412,6 +449,7 @@ class PhotoManagerPlugin(
                     }
                 }
             }
+
             Methods.copyAsset -> {
                 runOnBackground {
                     val assetId = call.argument<String>("assetId")!!
@@ -419,6 +457,7 @@ class PhotoManagerPlugin(
                     photoManager.copyToGallery(assetId, galleryId, resultHandler)
                 }
             }
+
             Methods.moveAssetToPath -> {
                 runOnBackground {
                     val assetId = call.argument<String>("assetId")!!
@@ -426,6 +465,7 @@ class PhotoManagerPlugin(
                     photoManager.moveToGallery(assetId, albumId, resultHandler)
                 }
             }
+
             Methods.deleteWithIds -> {
                 runOnBackground {
                     try {
@@ -443,11 +483,13 @@ class PhotoManagerPlugin(
                     }
                 }
             }
+
             Methods.removeNoExistsAssets -> {
                 runOnBackground {
                     photoManager.removeAllExistsAssets(resultHandler)
                 }
             }
+
             else -> resultHandler.notImplemented()
         }
     }
