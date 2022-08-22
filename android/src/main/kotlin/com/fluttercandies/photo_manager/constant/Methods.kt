@@ -30,7 +30,7 @@ class Methods {
         const val moveAssetToPath = "moveAssetToPath"
         const val removeNoExistsAssets = "removeNoExistsAssets"
 
-        /// /// The 4 methods have [RequestType] params, for android-13, it will check permission.
+        /// Below methods have [RequestType] params, thus permissions are required for Android 13.
         const val fetchPathProperties = "fetchPathProperties"
         const val getAssetPathList = "getAssetPathList"
         const val getAssetListPaged = "getAssetListPaged"

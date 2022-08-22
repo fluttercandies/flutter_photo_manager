@@ -541,10 +541,10 @@ if you want to know more about using ProGuard and Glide together.
 
 #### Android 13 (Api33) extra configs
 
-When you are using Android 13 (API level 33), you need to add the following extra configs to your manifest:
+When targeting Android 13 (API level 33), the following extra configs needs to be added to the manifest:
 
 ```xml
-<manifest
+<manifest>
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" /> <!-- If you want to read images-->
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" /> <!-- If you want to read videos-->
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" /> <!-- If you want to read audio-->
