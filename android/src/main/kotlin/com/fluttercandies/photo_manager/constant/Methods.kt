@@ -10,9 +10,7 @@ class Methods {
         const val releaseMemoryCache = "releaseMemoryCache"
 
         const val requestPermissionExtend = "requestPermissionExtend"
-        const val getAssetPathList = "getAssetPathList"
-        const val getAssetListPaged = "getAssetListPaged"
-        const val getAssetListRange = "getAssetListRange"
+
         const val getThumbnail = "getThumb"
         const val requestCacheAssetsThumbnail = "requestCacheAssetsThumb"
         const val cancelCacheRequests = "cancelCacheRequests"
@@ -21,7 +19,7 @@ class Methods {
         const val getOriginBytes = "getOriginBytes"
         const val getMediaUrl = "getMediaUrl"
         const val fetchEntityProperties = "fetchEntityProperties"
-        const val fetchPathProperties = "fetchPathProperties"
+
         const val getLatLng = "getLatLngAndroidQ"
         const val notify = "notify"
         const val deleteWithIds = "deleteWithIds"
@@ -31,5 +29,19 @@ class Methods {
         const val copyAsset = "copyAsset"
         const val moveAssetToPath = "moveAssetToPath"
         const val removeNoExistsAssets = "removeNoExistsAssets"
+
+        /// Below methods have [RequestType] params, thus permissions are required for Android 13.
+        const val fetchPathProperties = "fetchPathProperties"
+        const val getAssetPathList = "getAssetPathList"
+        const val getAssetListPaged = "getAssetListPaged"
+        const val getAssetListRange = "getAssetListRange"
+
+        val android13PermissionMethods =
+            arrayOf(
+                fetchPathProperties,
+                getAssetPathList,
+                getAssetListPaged,
+                getAssetListRange,
+            )
     }
 }

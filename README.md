@@ -33,56 +33,62 @@ For versions upgrade across major versions,
 see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
 
 ## Table of Contents
-* [Common issues](#common-issues)
-* [Prepare for use](#prepare-for-use)
-  * [Add the plugin reference to pubspec.yaml](#add-the-plugin-reference-to-pubspecyaml)
-  * [Import in your projects](#import-in-your-projects)
-  * [Configure native platforms](#configure-native-platforms)
-    * [Android config preparation](#android-config-preparation)
-      * [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
-      * [Android 10+](#android-10-q-29)
-      * [Glide](#glide)
-    * [iOS config preparation](#ios-config-preparation)
-* [Usage](#usage)
-  * [Request for permission](#request-for-permission)
-    * [Limited entities access on iOS](#limited-entities-access-on-ios)
-  * [Get albums/folders (AssetPathEntity)](#get-albumsfolders-assetpathentity)
-  * [Get assets (AssetEntity)](#get-assets-assetentity)
-    * [From AssetPathEntity](#from-assetpathentity)
-    * [From ID](#from-id)
-    * [From raw data](#from-raw-data)
-    * [From iCloud](#from-icloud)
-    * [Display assets](#display-assets)
-    * [Obtain "Live Photos"](#obtain-live-photos)
-      * [Filtering only "Live Photos"](#filtering-only-live-photos)
-      * [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
-    * [Limitations](#limitations)
-      * [Android 10 media location permission](#android-10-media-location-permission)
-      * [Usage of the original data](#usage-of-the-original-data)
-      * [Long retrieving duration with file on iOS](#long-retrieving-duration-with-file-on-ios)
-  * [Entities change notify](#entities-change-notify)
-* [Cache mechanism](#cache-mechanism)
-  * [Cache on Android](#cache-on-android)
-  * [Cache on iOS](#cache-on-ios)
-  * [Clear caches](#clear-caches)
-* [Native extra configs](#native-extra-configs)
-  * [Android extra configs](#android-extra-configs)
-    * [Android 10 extra configs](#android-10-extra-configs)
-    * [Glide issues](#glide-issues)
-  * [iOS extra configs](#ios-extra-configs)
-    * [Localized system albums name](#localized-system-albums-name)
-  * [Experimental features](#experimental-features)
-    * [Preload thumbnails](#preload-thumbnails)
-    * [Delete entities](#delete-entities)
-    * [Copy an entity](#copy-an-entity)
-    * [Features for Android only](#features-for-android-only)
-      * [Move an entity to another album](#move-an-entity-to-another-album)
-      * [Remove all non-exist entities](#remove-all-non-exist-entities)
-    * [Features for iOS only](#features-for-ios-only)
-      * [Create a folder](#create-a-folder)
-      * [Create an album](#create-an-album)
-      * [Remove the entity entry from the album](#remove-the-entity-entry-from-the-album)
-      * [Delete a path entity](#delete-a-path-entity)
+
+- [photo_manager](#photo_manager)
+  - [Projects using this plugin](#projects-using-this-plugin)
+  - [Articles about this plugin](#articles-about-this-plugin)
+  - [Migration guide](#migration-guide)
+  - [Table of Contents](#table-of-contents)
+  - [Common issues](#common-issues)
+  - [Prepare for use](#prepare-for-use)
+    - [Add the plugin reference to pubspec.yaml](#add-the-plugin-reference-to-pubspecyaml)
+    - [Import in your projects](#import-in-your-projects)
+    - [Configure native platforms](#configure-native-platforms)
+      - [Android config preparation](#android-config-preparation)
+        - [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
+        - [Android 10+ (Q, 29)](#android-10-q-29)
+        - [Glide](#glide)
+      - [iOS config preparation](#ios-config-preparation)
+  - [Usage](#usage)
+    - [Request for permission](#request-for-permission)
+      - [Limited entities access on iOS](#limited-entities-access-on-ios)
+    - [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders-assetpathentity)
+    - [Get assets (`AssetEntity`)](#get-assets-assetentity)
+      - [From `AssetPathEntity`](#from-assetpathentity)
+      - [From ID](#from-id)
+      - [From raw data](#from-raw-data)
+      - [From iCloud](#from-icloud)
+      - [Display assets](#display-assets)
+      - [Obtain "Live Photos"](#obtain-live-photos)
+        - [Filtering only "Live Photos"](#filtering-only-live-photos)
+        - [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
+      - [Limitations](#limitations)
+        - [Android 10 media location permission](#android-10-media-location-permission)
+        - [Usage of the original data](#usage-of-the-original-data)
+        - [Long retrieving duration with file on iOS](#long-retrieving-duration-with-file-on-ios)
+    - [Entities change notify](#entities-change-notify)
+  - [Cache mechanism](#cache-mechanism)
+    - [Cache on Android](#cache-on-android)
+    - [Cache on iOS](#cache-on-ios)
+    - [Clear caches](#clear-caches)
+  - [Native extra configs](#native-extra-configs)
+    - [Android extra configs](#android-extra-configs)
+      - [Glide issues](#glide-issues)
+      - [Android 13 (Api 33) extra configs](#android-13-api-33-extra-configs)
+    - [iOS extra configs](#ios-extra-configs)
+      - [Localized system albums name](#localized-system-albums-name)
+    - [Experimental features](#experimental-features)
+      - [Preload thumbnails](#preload-thumbnails)
+      - [Delete entities](#delete-entities)
+      - [Copy an entity](#copy-an-entity)
+      - [Features for Android only](#features-for-android-only)
+        - [Move an entity to another album](#move-an-entity-to-another-album)
+        - [Remove all non-exist entities](#remove-all-non-exist-entities)
+      - [Features for iOS only](#features-for-ios-only)
+        - [Create a folder](#create-a-folder)
+        - [Create an album](#create-an-album)
+        - [Remove the entity entry from the album](#remove-the-entity-entry-from-the-album)
+        - [Delete a path entity](#delete-a-path-entity)
 
 ## Common issues
 
@@ -94,8 +100,10 @@ for build errors, runtime exceptions, etc.
 ### Add the plugin reference to pubspec.yaml
 
 Two ways to add the plugin to your pubspec:
-- **(Recommend)** Run `flutter pub add photo_manager`. 
+
+- **(Recommend)** Run `flutter pub add photo_manager`.
 - Add the plugin reference in your `pubspec.yaml`'s `dependencies` section:
+
 ```yaml
 dependencies:
   photo_manager: $latest_version
@@ -129,10 +137,13 @@ If your projects use a lower version of Kotlin/Gradle/AGP,
 please upgrade them to a newer version.
 
 More specifically:
+
 - Upgrade your Gradle version (`gradle-wrapper.properties`)
-  to `6.8.3` or the latest version.
+  to `7.5.1` or the latest version.
 - Upgrade your Kotlin version (`ext.kotlin_version`)
   to `1.5.30` or the latest version.
+- Upgrade your AGP version (`com.android.tools.build:gradle`)
+  to `7.2.2` or the latest version.
 
 ##### Android 10+ (Q, 29)
 
@@ -243,10 +254,13 @@ and the `PHAsset` object on iOS/macOS.
 #### From `AssetPathEntity`
 
 You can use [the pagination method][`getAssetListPaged`]:
+
 ```dart
 final List<AssetEntity> entities = await path.getAssetListPaged(page: 0, size: 80);
 ```
+
 Or use [the range method][`getAssetListRange`]:
+
 ```dart
 final List<AssetEntity> entities = await path.getAssetListRange(start: 0, end: 80);
 ```
@@ -254,8 +268,9 @@ final List<AssetEntity> entities = await path.getAssetListRange(start: 0, end: 8
 #### From ID
 
 The ID concept represents:
-* The ID field of the `MediaStore` on Android.
-* The `localIdentifier` field of the `PHAsset` on iOS.
+
+- The ID field of the `MediaStore` on Android.
+- The `localIdentifier` field of the `PHAsset` on iOS.
 
 You can store the ID if you want to implement features
 that's related to presistent selections.
@@ -383,11 +398,12 @@ The `originFile` and `originBytes` getter
 will return the original data of an entity.
 However, there are some cases that the original data is invalid in Flutter.
 Here are some common cases:
-* HEIC files are not fully supported across platforms. We suggest you to
+
+- HEIC files are not fully supported across platforms. We suggest you to
   upload the JPEG file (99% quality compressed thumbnail) in order to keep
   a consistent behavior between multiple platforms.
   See [flutter/flutter#20522][] for more detail.
-* Videos will only be obtained in the original format,
+- Videos will only be obtained in the original format,
   not the exported/composited format, which might cause
   some behavior difference when playing videos.
 
@@ -395,12 +411,14 @@ Here are some common cases:
 
 There are several I/O methods in this library targeting `AssetEntity`,
 typically they are:
+
 - All methods named with `file`.
 - `AssetEntity.originBytes`.
 
 File retrieving and caches are limited by the sandbox mechanisim on iOS.
 An existing `PHAsset` doesn't mean the file located on the device.
 In generall, a `PHAsset` will have three status:
+
 - `isLocallyAvailable` equals `true`, **also cached**: Available for obtain.
 - `isLocallyAvailable` equals `true`, **but not cached**: When you call I/O methods,
   the resource will first cached into the sandbox, then available for obtain.
@@ -525,6 +543,18 @@ rootProject.allprojects {
 See [ProGuard for Glide](https://github.com/bumptech/glide#proguard)
 if you want to know more about using ProGuard and Glide together.
 
+#### Android 13 (Api 33) extra configs
+
+When targeting Android 13 (API level 33), the following extra configs needs to be added to the manifest:
+
+```xml
+<manifest>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" /> <!-- If you want to read images-->
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" /> <!-- If you want to read videos-->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" /> <!-- If you want to read audio-->
+</manifest>
+```
+
 ### iOS extra configs
 
 #### Localized system albums name
@@ -533,15 +563,15 @@ By default, iOS will retrieve system album names only in English
 no matter what language has been set to devices.
 To change the default language, see the following steps:
 
-* Open your iOS project (Runner.xcworkspace) using Xcode.
+- Open your iOS project (Runner.xcworkspace) using Xcode.
 ![Edit localizations in Xcode 1](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterProjectEditinginXcode.png)
 
-* Select the project "Runner" and in the localizations table, click on the + icon.
+- Select the project "Runner" and in the localizations table, click on the + icon.
 ![Edit localizations in Xcode 2](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterAddLocalization.png)
 
-* Select the adequate language(s) you want to retrieve localized strings.
-* Validate the popup screen without any modification.
-* Rebuild your flutter project.
+- Select the adequate language(s) you want to retrieve localized strings.
+- Validate the popup screen without any modification.
+- Rebuild your flutter project.
 
 Now system albums label should display accordingly.
 
@@ -605,6 +635,7 @@ final AssetEntity? newEntity = await PhotoManager.editor.copyAssetToPath(
 ```
 
 The "Copy" means differently here on Android and iOS:
+
 - For Android, it inserts a copy of the source entity:
   - On platforms <=28, the method will copy most of the origin info.
   - On platforms >=29, some fields cannot be modified during the insertion,
@@ -699,7 +730,6 @@ Smart albums can't be deleted.
 ```dart
 PhotoManager.editor.iOS.deletePath();
 ```
-
 
 [pub package]: https://pub.dev/packages/photo_manager
 [repo]: https://github.com/fluttercandies/flutter_photo_manager

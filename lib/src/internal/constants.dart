@@ -3,6 +3,7 @@
 // in the LICENSE file.
 
 import '../types/thumbnail.dart';
+import '../types/types.dart';
 
 class PMConstants {
   const PMConstants._();
@@ -14,11 +15,14 @@ class PMConstants {
   static const String mRequestPermissionExtend = 'requestPermissionExtend';
   static const String mPresentLimited = 'presentLimited';
   static const String mFetchEntityProperties = 'fetchEntityProperties';
+  static const String mGetAssetCountFromPath = 'getAssetCountFromPath';
+
+  /// The 4 methods have [RequestType] params, for android-13
   static const String mFetchPathProperties = 'fetchPathProperties';
   static const String mGetAssetPathList = 'getAssetPathList';
-  static const String mGetAssetCountFromPath = 'getAssetCountFromPath';
   static const String mGetAssetListPaged = 'getAssetListPaged';
   static const String mGetAssetListRange = 'getAssetListRange';
+
   static const String mGetThumb = 'getThumb';
   static const String mGetOriginBytes = 'getOriginBytes';
   static const String mGetFullFile = 'getFullFile';

@@ -15,13 +15,13 @@ class ResultHandler(var result: MethodChannel.Result?, val call: MethodCall? = n
         val handler = Handler(Looper.getMainLooper())
     }
 
-    private var isReply = false
+    private var isReplied = false
 
     fun reply(any: Any?) {
-        if (isReply) {
+        if (isReplied) {
             return
         }
-        isReply = true
+        isReplied = true
         val result = this.result
         this.result = null
         handler.post {
@@ -34,10 +34,10 @@ class ResultHandler(var result: MethodChannel.Result?, val call: MethodCall? = n
     }
 
     fun replyError(code: String, message: String? = null, obj: Any? = null) {
-        if (isReply) {
+        if (isReplied) {
             return
         }
-        isReply = true
+        isReplied = true
         val result = this.result
         this.result = null
         handler.post {
@@ -46,14 +46,18 @@ class ResultHandler(var result: MethodChannel.Result?, val call: MethodCall? = n
     }
 
     fun notImplemented() {
-        if (isReply) {
+        if (isReplied) {
             return
         }
-        isReply = true
+        isReplied = true
         val result = this.result
         this.result = null
         handler.post {
             result?.notImplemented()
         }
+    }
+
+    fun isReplied(): Boolean {
+        return isReplied
     }
 }

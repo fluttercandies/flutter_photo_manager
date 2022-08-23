@@ -23,7 +23,7 @@ if (flutterVersionName == null) {
 
 def compileVersion = localProperties.getProperty('android.version')
 if (compileVersion == null) {
-    compileVersion = "31"
+    compileVersion = "33"
 }
 
 apply plugin: 'com.android.application'
