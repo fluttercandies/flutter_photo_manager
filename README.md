@@ -74,7 +74,7 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
   - [Native extra configs](#native-extra-configs)
     - [Android extra configs](#android-extra-configs)
       - [Glide issues](#glide-issues)
-      - [Android 13 (Api33) extra configs](#android-13-api33-extra-configs)
+      - [Android 13 (Api 33) extra configs](#android-13-api-33-extra-configs)
     - [iOS extra configs](#ios-extra-configs)
       - [Localized system albums name](#localized-system-albums-name)
     - [Experimental features](#experimental-features)
@@ -139,9 +139,11 @@ please upgrade them to a newer version.
 More specifically:
 
 - Upgrade your Gradle version (`gradle-wrapper.properties`)
-  to `6.8.3` or the latest version.
+  to `7.5.1` or the latest version.
 - Upgrade your Kotlin version (`ext.kotlin_version`)
   to `1.5.30` or the latest version.
+- Upgrade your AGP version (`com.android.tools.build:gradle`)
+  to `7.2.2` or the latest version.
 
 ##### Android 10+ (Q, 29)
 
@@ -266,6 +268,7 @@ final List<AssetEntity> entities = await path.getAssetListRange(start: 0, end: 8
 #### From ID
 
 The ID concept represents:
+
 - The ID field of the `MediaStore` on Android.
 - The `localIdentifier` field of the `PHAsset` on iOS.
 
@@ -395,6 +398,7 @@ The `originFile` and `originBytes` getter
 will return the original data of an entity.
 However, there are some cases that the original data is invalid in Flutter.
 Here are some common cases:
+
 - HEIC files are not fully supported across platforms. We suggest you to
   upload the JPEG file (99% quality compressed thumbnail) in order to keep
   a consistent behavior between multiple platforms.
@@ -539,7 +543,7 @@ rootProject.allprojects {
 See [ProGuard for Glide](https://github.com/bumptech/glide#proguard)
 if you want to know more about using ProGuard and Glide together.
 
-#### Android 13 (Api33) extra configs
+#### Android 13 (Api 33) extra configs
 
 When targeting Android 13 (API level 33), the following extra configs needs to be added to the manifest:
 
