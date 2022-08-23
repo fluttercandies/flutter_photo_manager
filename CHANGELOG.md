@@ -4,7 +4,7 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
-## 2.3.0
+## 2.3.0-dev.1
 
 - Support Android 13 (API 33) permissions.
 
