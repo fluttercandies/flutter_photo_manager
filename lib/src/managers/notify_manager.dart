@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/services.dart';
 
 import '../internal/constants.dart';
@@ -12,25 +12,23 @@ import '../internal/plugin.dart';
 
 /// The notify manager when assets changed.
 class NotifyManager {
-  static const MethodChannel _channel = MethodChannel(
-    '${PMConstants.channelPrefix}/notify',
-  );
+  static const _channel = MethodChannel('${PMConstants.channelPrefix}/notify');
 
   Stream<bool> get notifyStream => _controller.stream;
-  final StreamController<bool> _controller = StreamController<bool>.broadcast();
+  final _controller = StreamController<bool>.broadcast();
 
-  final List<ValueChanged<MethodCall>> _notifyCallback =
-      <ValueChanged<MethodCall>>[];
+  final _notifyCallback = <foundation.ValueChanged<MethodCall>>[];
 
   /// {@template photo_manager.NotifyManager.addChangeCallback}
   /// Add a callback for assets changing.
   /// {@endtemplate}
-  void addChangeCallback(ValueChanged<MethodCall> c) => _notifyCallback.add(c);
+  void addChangeCallback(foundation.ValueChanged<MethodCall> c) =>
+      _notifyCallback.add(c);
 
   /// {@template photo_manager.NotifyManager.removeChangeCallback}
   /// Remove the callback for assets changing.
   /// {@endtemplate}
-  void removeChangeCallback(ValueChanged<MethodCall> c) =>
+  void removeChangeCallback(foundation.ValueChanged<MethodCall> c) =>
       _notifyCallback.remove(c);
 
   /// {@template photo_manager.NotifyManager.startChangeNotify}
@@ -71,7 +69,7 @@ class NotifyManager {
   }
 
   Future<dynamic> _onChange(MethodCall m) async {
-    _notifyCallback.toList().forEach((ValueChanged<MethodCall> c) => c.call(m));
+    _notifyCallback.toList().forEach((c) => c.call(m));
   }
 
   @override

@@ -3,7 +3,6 @@
 // in the LICENSE file.
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/rendering.dart';
 
 import '../internal/constants.dart';
 import '../internal/enums.dart';
@@ -43,7 +42,7 @@ class ThumbnailSize {
   }
 
   @override
-  int get hashCode => hashValues(width, height);
+  int get hashCode => width.hashCode ^ height.hashCode;
 
   @override
   String toString() => 'ThumbnailSize($width, $height)';
@@ -117,7 +116,8 @@ class ThumbnailOption {
   }
 
   @override
-  int get hashCode => hashValues(size, format, quality, frame);
+  int get hashCode =>
+      size.hashCode ^ format.hashCode ^ quality.hashCode ^ frame.hashCode;
 
   @override
   bool operator ==(Object other) {
@@ -158,7 +158,10 @@ class _IOSThumbnailOption extends ThumbnailOption {
 
   @override
   int get hashCode =>
-      hashValues(super.hashCode, deliveryMode, resizeMode, resizeContentMode);
+      super.hashCode ^
+      deliveryMode.hashCode ^
+      resizeMode.hashCode ^
+      resizeContentMode.hashCode;
 
   @override
   bool operator ==(Object other) {

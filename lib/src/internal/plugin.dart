@@ -4,7 +4,7 @@
 
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
+import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/services.dart';
 
@@ -149,7 +149,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   /// Get thumbnail of asset id.
-  Future<Uint8List?> getThumbnail({
+  Future<typed_data.Uint8List?> getThumbnail({
     required String id,
     required ThumbnailOption option,
     PMProgressHandler? progressHandler,
@@ -162,7 +162,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return _channel.invokeMethod(PMConstants.mGetThumb, params);
   }
 
-  Future<Uint8List?> getOriginBytes(
+  Future<typed_data.Uint8List?> getOriginBytes(
     String id, {
     PMProgressHandler? progressHandler,
   }) {
@@ -251,7 +251,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<AssetEntity?> saveImage(
-    Uint8List data, {
+    typed_data.Uint8List data, {
     required String? title,
     String? desc,
     String? relativePath,

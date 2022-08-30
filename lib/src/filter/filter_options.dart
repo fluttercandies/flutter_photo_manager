@@ -72,7 +72,10 @@ class FilterOption {
   }
 
   @override
-  int get hashCode => hashValues(needTitle, sizeConstraint, durationConstraint);
+  int get hashCode =>
+      needTitle.hashCode ^
+      sizeConstraint.hashCode ^
+      durationConstraint.hashCode;
 }
 
 /// Constraints of asset pixel width and height.
@@ -139,7 +142,11 @@ class SizeConstraint {
 
   @override
   int get hashCode =>
-      hashValues(minWidth, maxWidth, minHeight, maxHeight, ignoreSize);
+      minWidth.hashCode ^
+      maxWidth.hashCode ^
+      minHeight.hashCode ^
+      maxHeight.hashCode ^
+      ignoreSize.hashCode;
 }
 
 /// Constraints of duration.
@@ -179,7 +186,7 @@ class DurationConstraint {
   }
 
   @override
-  int get hashCode => hashValues(min, max, allowNullable);
+  int get hashCode => min.hashCode ^ max.hashCode ^ allowNullable.hashCode;
 }
 
 @immutable
@@ -229,7 +236,7 @@ class DateTimeCond {
   }
 
   @override
-  int get hashCode => hashValues(min, max, ignore);
+  int get hashCode => min.hashCode ^ max.hashCode ^ ignore.hashCode;
 }
 
 @immutable
@@ -259,5 +266,5 @@ class OrderOption {
   }
 
   @override
-  int get hashCode => hashValues(type, asc);
+  int get hashCode => type.hashCode ^ asc.hashCode;
 }

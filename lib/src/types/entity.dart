@@ -3,7 +3,7 @@
 // in the LICENSE file.
 
 import 'dart:io';
-import 'dart:typed_data';
+import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
@@ -280,7 +280,12 @@ class AssetPathEntity {
 
   @override
   int get hashCode =>
-      hashValues(id, name, albumType, type, lastModified, isAll);
+      id.hashCode ^
+      name.hashCode ^
+      albumType.hashCode ^
+      type.hashCode ^
+      lastModified.hashCode ^
+      isAll.hashCode;
 
   @override
   String toString() {
@@ -515,7 +520,7 @@ class AssetEntity {
   ///
   /// **Use it with cautious** since the original data might be epic large.
   /// Generally use this method only for images.
-  Future<Uint8List?> get originBytes => _getOriginBytes();
+  Future<typed_data.Uint8List?> get originBytes => _getOriginBytes();
 
   /// Obtain the thumbnail data with [PMConstants.vDefaultThumbnailSize]
   /// size of the asset, typically use it for preview displays.
@@ -527,7 +532,7 @@ class AssetEntity {
   /// See also:
   ///  * [thumbnailDataWithSize] which is a common method to obtain thumbnails.
   ///  * [thumbnailDataWithOption] which accepts customized [ThumbnailOption].
-  Future<Uint8List?> get thumbnailData => thumbnailDataWithSize(
+  Future<typed_data.Uint8List?> get thumbnailData => thumbnailDataWithSize(
         const ThumbnailSize.square(PMConstants.vDefaultThumbnailSize),
       );
 
@@ -538,7 +543,7 @@ class AssetEntity {
   /// See also:
   ///  * [thumbnailData] which obtain the thumbnail data with fixed size.
   ///  * [thumbnailDataWithOption] which accepts customized [ThumbnailOption].
-  Future<Uint8List?> thumbnailDataWithSize(
+  Future<typed_data.Uint8List?> thumbnailDataWithSize(
     ThumbnailSize size, {
     ThumbnailFormat format = ThumbnailFormat.jpeg,
     int quality = 100,
@@ -550,7 +555,7 @@ class AssetEntity {
     }());
     // Return null if the asset is audio or others.
     if (type == AssetType.audio || type == AssetType.other) {
-      return Future<Uint8List?>.value();
+      return Future<typed_data.Uint8List?>.value();
     }
     final ThumbnailOption option;
     if (Platform.isIOS || Platform.isMacOS) {
@@ -579,7 +584,7 @@ class AssetEntity {
   /// See also:
   ///  * [thumbnailData] which obtain the thumbnail data with fixed size.
   ///  * [thumbnailDataWithSize] which is a common method to obtain thumbnails.
-  Future<Uint8List?> thumbnailDataWithOption(
+  Future<typed_data.Uint8List?> thumbnailDataWithOption(
     ThumbnailOption option, {
     PMProgressHandler? progressHandler,
   }) {
@@ -589,7 +594,7 @@ class AssetEntity {
     }());
     // Return null if the asset is audio or others.
     if (type == AssetType.audio || type == AssetType.other) {
-      return Future<Uint8List?>.value();
+      return Future<typed_data.Uint8List?>.value();
     }
     assert(() {
       option.checkAssertions();
@@ -684,7 +689,7 @@ class AssetEntity {
     return File(path);
   }
 
-  Future<Uint8List?> _getOriginBytes({
+  Future<typed_data.Uint8List?> _getOriginBytes({
     PMProgressHandler? progressHandler,
   }) async {
     assert(
@@ -783,7 +788,7 @@ class AssetEntity {
   }
 
   @override
-  int get hashCode => hashValues(id, isFavorite);
+  int get hashCode => id.hashCode ^ isFavorite.hashCode;
 
   @override
   bool operator ==(Object other) {
@@ -806,13 +811,13 @@ class LatLng {
   final double? longitude;
 
   @override
-  int get hashCode => hashValues(latitude, longitude);
-
-  @override
   bool operator ==(Object other) {
     if (other is! AssetEntity) {
       return false;
     }
     return latitude == other.latitude && longitude == other.longitude;
   }
+
+  @override
+  int get hashCode => latitude.hashCode ^ longitude.hashCode;
 }
