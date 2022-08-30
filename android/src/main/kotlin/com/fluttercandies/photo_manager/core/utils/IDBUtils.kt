@@ -2,6 +2,7 @@ package com.fluttercandies.photo_manager.core.utils
 
 import android.content.Context
 import android.database.Cursor
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -17,7 +18,7 @@ import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
 import com.fluttercandies.photo_manager.util.LogUtils
 import java.io.File
 
-@Suppress("Deprecation", "InlinedApi", "Range")
+@Suppress("InlinedApi", "Range")
 interface IDBUtils {
     companion object {
         @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.Q)
@@ -172,15 +173,26 @@ interface IDBUtils {
         var height = getInt(MediaStore.MediaColumns.HEIGHT)
         val displayName = getString(MediaStore.MediaColumns.DISPLAY_NAME)
         val modifiedDate = getLong(MediaStore.MediaColumns.DATE_MODIFIED)
-        val orientation: Int = getInt(MediaStore.MediaColumns.ORIENTATION)
+        var orientation: Int = getInt(MediaStore.MediaColumns.ORIENTATION)
         val relativePath: String? = if (isAndroidQ) getString(MediaStore.MediaColumns.RELATIVE_PATH) else null
-        if ((width == 0 || height == 0) && !mimeType.contains("svg")) {
+        if (width == 0 || height == 0) {
             try {
-                val uri = getUri(id, getMediaType(type))
-                context.contentResolver.openInputStream(uri)?.use {
-                    ExifInterface(it).apply {
-                        width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
-                        height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+                if (type == MEDIA_TYPE_IMAGE && !mimeType.contains("svg")) {
+                    val uri = getUri(id, getMediaType(type))
+                    context.contentResolver.openInputStream(uri)?.use {
+                        ExifInterface(it).apply {
+                            width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
+                            height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+                        }
+                    }
+                } else if (type == MEDIA_TYPE_VIDEO) {
+                    MediaMetadataRetriever().use { mmr ->
+                        mmr.setDataSource(path)
+                        width = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toInt() ?: 0
+                        height = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toInt() ?: 0
+                        orientation =
+                            mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toInt()
+                                ?: orientation
                     }
                 }
             } catch (e: Throwable) {
