@@ -4,7 +4,15 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.3.0-dev.2
+
+### Improvements
+
+- Retrieve metadata for videos when empty on Android. (#819)
+
 ## 2.3.0-dev.1
+
+### Features
 
 - Support Android 13 (API 33) permissions.
 
