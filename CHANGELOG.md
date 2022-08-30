@@ -8,6 +8,7 @@ that can be found in the LICENSE file. -->
 
 ### Improvements
 
+- Adapt Flutter 3.3. (#820)
 - Retrieve metadata for videos when empty on Android. (#819)
 
 ## 2.3.0-dev.1

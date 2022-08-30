@@ -76,7 +76,7 @@ class PMProgressState {
   }
 
   @override
-  int get hashCode => hashValues(progress, state);
+  int get hashCode => progress.hashCode ^ state.hashCode;
 
   @override
   String toString() => '$runtimeType($state, $progress)';

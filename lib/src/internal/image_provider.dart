@@ -3,7 +3,7 @@
 // in the LICENSE file.
 
 import 'dart:io';
-import 'dart:typed_data';
+import 'dart:typed_data' as typed_data;
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -58,7 +58,7 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
   @override
   ImageStreamCompleter load(
     AssetEntityImageProvider key,
-    DecoderCallback decode,
+    DecoderCallback decode, // ignore: deprecated_member_use
   ) {
     return MultiFrameImageStreamCompleter(
       codec: _loadAsync(key, decode),
@@ -83,7 +83,7 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
 
   Future<ui.Codec> _loadAsync(
     AssetEntityImageProvider key,
-    DecoderCallback decode,
+    DecoderCallback decode, // ignore: deprecated_member_use
   ) async {
     try {
       assert(key == this);
@@ -103,7 +103,7 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
         type = key.imageFileType;
       }
 
-      Uint8List? data;
+      typed_data.Uint8List? data;
       if (isOriginal) {
         if (key.entity.type == AssetType.video) {
           data = await key.entity.thumbnailData;
@@ -204,12 +204,11 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
   }
 
   @override
-  int get hashCode => hashValues(
-        entity,
-        isOriginal,
-        thumbnailSize,
-        thumbnailFormat,
-      );
+  int get hashCode =>
+      entity.hashCode ^
+      isOriginal.hashCode ^
+      thumbnailSize.hashCode ^
+      thumbnailFormat.hashCode;
 }
 
 /// A widget that displays an [AssetEntity] image.

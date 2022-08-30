@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'dart:typed_data';
+import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,7 +22,7 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
   final String haveExifUrl = 'http://172.16.100.7:2393/IMG_20200107_182905.jpg';
 
   final String videoUrl =
-      'http://img.ksbbs.com/asset/Mon_1703/05cacb4e02f9d9e.mp4';
+      'https://pic.app.kszhuangxiu.com/forum/20220423120218front2_1_788292_FhP_XBo24M5XuZzb4xPb-YPaC6Yq.mp4';
 
   // final videoUrl = "http://192.168.31.252:51781/out.mov";
   // final videoUrl = "http://192.168.31.252:51781/out.ogv";
@@ -130,13 +130,13 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
     resp.listen((List<int> data) {
       bytes.addAll(data);
     }, onDone: () {
-      final Uint8List image = Uint8List.fromList(bytes);
+      final image = typed_data.Uint8List.fromList(bytes);
       saveImage(image);
       client.close();
     });
   }
 
-  Future<void> saveImage(Uint8List uint8List) async {
+  Future<void> saveImage(typed_data.Uint8List uint8List) async {
     final AssetEntity? asset = await PhotoManager.editor.saveImage(
       uint8List,
       title: '${DateTime.now().millisecondsSinceEpoch}.jpg',
