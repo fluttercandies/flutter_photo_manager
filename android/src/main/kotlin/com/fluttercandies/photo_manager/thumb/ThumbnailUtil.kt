@@ -3,10 +3,10 @@ package com.fluttercandies.photo_manager.thumb
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.RequestOptions
+import com.fluttercandies.photo_manager.core.GlideApp
 import io.flutter.plugin.common.MethodChannel
 import com.fluttercandies.photo_manager.core.entity.ThumbLoadOption
 import com.fluttercandies.photo_manager.util.ResultHandler
@@ -27,7 +27,7 @@ object ThumbnailUtil {
         val resultHandler = ResultHandler(result)
 
         try {
-            val resource = Glide.with(ctx)
+            val resource = GlideApp.with(ctx)
                 .asBitmap()
                 .apply(RequestOptions().frame(frame).priority(Priority.IMMEDIATE))
                 .load(File(path))
@@ -53,7 +53,7 @@ object ThumbnailUtil {
         val resultHandler = ResultHandler(result)
 
         try {
-            val resource = Glide.with(context)
+            val resource = GlideApp.with(context)
                 .asBitmap()
                 .apply(RequestOptions().frame(frame).priority(Priority.IMMEDIATE))
                 .load(uri)
@@ -71,7 +71,7 @@ object ThumbnailUtil {
         uri: Uri,
         thumbLoadOption: ThumbLoadOption
     ): FutureTarget<Bitmap> {
-        return Glide.with(context)
+        return GlideApp.with(context)
             .asBitmap()
             .apply(RequestOptions().frame(thumbLoadOption.frame).priority(Priority.LOW))
             .load(uri)
@@ -83,7 +83,7 @@ object ThumbnailUtil {
         path: String,
         thumbLoadOption: ThumbLoadOption
     ): FutureTarget<Bitmap> {
-        return Glide.with(context)
+        return GlideApp.with(context)
             .asBitmap()
             .apply(RequestOptions().frame(thumbLoadOption.frame).priority(Priority.LOW))
             .load(path)
@@ -91,6 +91,6 @@ object ThumbnailUtil {
     }
 
     fun clearCache(context: Context) {
-        Glide.get(context).apply { clearDiskCache() }
+        GlideApp.get(context).apply { clearDiskCache() }
     }
 }
