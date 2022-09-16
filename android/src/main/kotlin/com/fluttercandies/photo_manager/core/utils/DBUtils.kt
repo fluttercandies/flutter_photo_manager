@@ -4,19 +4,24 @@ import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.os.Environment
 import android.provider.BaseColumns._ID
 import android.provider.MediaStore
+import android.text.TextUtils
 import android.util.Log
+import android.webkit.MimeTypeMap
 import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
-import com.fluttercandies.photo_manager.core.entity.FilterOption
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
+import com.fluttercandies.photo_manager.core.entity.FilterOption
 import java.io.*
 import java.net.URLConnection
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
+
 
 /// Call the MediaStore API and get entity for the data.
 @Suppress("Deprecation", "InlinedApi")
@@ -628,15 +633,19 @@ object DBUtils : IDBUtils {
         desc: String,
         relativePath: String?
     ): AssetEntity? {
-        path.checkDirs()
-        val inputStream = FileInputStream(path)
-        val cr = context.contentResolver
-        val timestamp = System.currentTimeMillis() / 1000
-        val dir = Environment.getExternalStorageDirectory()
-        val savePath = File(path).absolutePath.startsWith(dir.path)
 
-        val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
-            ?: "video/${File(path).extension}"
+        path.checkDirs()
+        val inputFile = File(path)
+        val inputStream: InputStream?
+        val outputStream: OutputStream?
+        val extension = MimeTypeMap.getFileExtensionFromUrl(inputFile.toString())
+        val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+        val directory = Environment.DIRECTORY_MOVIES
+        val albumDir = File(getAlbumFolderPath(relativePath, MediaType.video, false))
+        val videoFilePath = File(albumDir, inputFile.name).absolutePath
+
+        val timestamp = System.currentTimeMillis() / 1000
+
         val info = VideoUtils.getPropertiesUseMediaPlayer(path)
         val values = ContentValues().apply {
             put(
@@ -646,48 +655,103 @@ object DBUtils : IDBUtils {
             put(MediaStore.Video.VideoColumns.DESCRIPTION, desc)
             put(MediaStore.MediaColumns.TITLE, title)
             put(MediaStore.MediaColumns.DISPLAY_NAME, title)
-            put(MediaStore.MediaColumns.MIME_TYPE, typeFromStream)
+            put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
             put(MediaStore.MediaColumns.DATE_ADDED, timestamp)
             put(MediaStore.MediaColumns.DATE_MODIFIED, timestamp)
             put(MediaStore.MediaColumns.DATE_TAKEN, timestamp * 1000)
-            put(MediaStore.MediaColumns.DURATION, info.duration)
             put(MediaStore.MediaColumns.WIDTH, info.width)
             put(MediaStore.MediaColumns.HEIGHT, info.height)
-            if (savePath) {
-                put(MediaStore.MediaColumns.DATA, path)
-            }
-            if (relativePath != null) {
-                put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath)
-            }
+
         }
 
-        val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-        val contentUri = cr.insert(uri, values) ?: return null
-        val id = ContentUris.parseId(contentUri)
-        val assetEntity = getAssetEntity(context, id.toString())
-        if (savePath) {
-            inputStream.close()
+        if (android.os.Build.VERSION.SDK_INT < 29) {
+            try {
+                val r = MediaMetadataRetriever()
+                r.setDataSource(path)
+                val durString = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                val duration = durString!!.toInt()
+                values.put(MediaStore.Video.Media.DURATION, duration)
+                values.put(MediaStore.Video.VideoColumns.DATA, videoFilePath)
+            } catch (e: Exception) {
+            }
         } else {
-            val tmpPath = assetEntity?.path!!
-            tmpPath.checkDirs()
-            val tmpFile = File(tmpPath)
-            val targetPath = "${tmpFile.parent}/$title"
-            val targetFile = File(targetPath)
-            if (targetFile.exists()) {
-                throw IOException("Save target path is ")
-            }
-            tmpFile.renameTo(targetFile)
-            val updateDataValues = ContentValues().apply {
-                put(MediaStore.MediaColumns.DATA, targetPath)
-            }
-            cr.update(contentUri, updateDataValues, null, null)
-            val outputStream = FileOutputStream(targetFile)
-            outputStream.use { os -> inputStream.use { it.copyTo(os) } }
-            assetEntity.path = targetPath
+            values.put(
+                MediaStore.Video.Media.RELATIVE_PATH,
+                directory + File.separator + relativePath
+            )
         }
-        cr.notifyChange(contentUri, null)
-        return assetEntity
+        val cr = context.contentResolver
+
+        try {
+            val url = cr.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values)
+            inputStream = FileInputStream(inputFile)
+            if (url != null) {
+                outputStream = cr.openOutputStream(url)
+                val buffer = ByteArray(1024 * 1024 * 8)
+                inputStream.use {
+                    outputStream?.use {
+                        var len = inputStream.read(buffer)
+                        while (len != -1) {
+                            outputStream.write(buffer, 0, len)
+                            len = inputStream.read(buffer)
+                        }
+                    }
+                }
+                val id = ContentUris.parseId(url)
+                val assetEntity = getAssetEntity(context, id.toString())
+                cr.notifyChange(url, null)
+                return assetEntity
+            }
+        } catch (fnfE: FileNotFoundException) {
+            Log.e("Gllery Save Error", fnfE.message ?: fnfE.toString())
+            return null
+        } catch (e: Exception) {
+            Log.e("Gllery Save Error", e.message ?: e.toString())
+            return null
+        }
+        return null
+    }
+
+    private fun getAlbumFolderPath(
+        folderName: String?,
+        mediaType: MediaType,
+        toDcim: Boolean
+    ): String {
+        var albumFolderPath: String = Environment.getExternalStorageDirectory().path
+        if (toDcim && android.os.Build.VERSION.SDK_INT < 29) {
+            albumFolderPath += File.separator + Environment.DIRECTORY_DCIM;
+        }
+        albumFolderPath = if (TextUtils.isEmpty(folderName)) {
+            var baseFolderName = if (mediaType == MediaType.image)
+                Environment.DIRECTORY_PICTURES else
+                Environment.DIRECTORY_MOVIES
+            if (toDcim) {
+                baseFolderName = Environment.DIRECTORY_DCIM;
+            }
+            createDirIfNotExist(
+                Environment.getExternalStoragePublicDirectory(baseFolderName).path
+            ) ?: albumFolderPath
+        } else {
+            createDirIfNotExist(albumFolderPath + File.separator + folderName)
+                ?: albumFolderPath
+        }
+        return albumFolderPath
+    }
+
+    private fun createDirIfNotExist(dirPath: String): String? {
+        val dir = File(dirPath)
+        if (!dir.exists()) {
+            if (dir.mkdirs()) {
+                return dir.path
+            } else {
+                return null
+            }
+        } else {
+            return dir.path
+        }
     }
 
     private data class GalleryInfo(val path: String, val galleryId: String, val galleryName: String)
 }
+
+enum class MediaType { image, video }
