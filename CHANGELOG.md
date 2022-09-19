@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.3.0-dev.3
+
+### Fixes
+
+- Fix saving videos with path on Android 29-. (#829)
+
 ## 2.3.0-dev.2
 
 ### Improvements

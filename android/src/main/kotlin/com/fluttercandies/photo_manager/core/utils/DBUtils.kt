@@ -407,7 +407,7 @@ object DBUtils : IDBUtils {
         // Ignore the existence of the file, it'll be exported later.
         val assetEntity = getAssetEntity(context, id.toString(), checkIfExists = false)
         if (!savePath) {
-            val tmpPath = assetEntity?.path!!
+            val tmpPath = assetEntity!!.path
             tmpPath.checkDirs()
             val tmpFile = File(tmpPath)
             val targetPath = "${tmpFile.parent}/$title"
@@ -656,19 +656,16 @@ object DBUtils : IDBUtils {
             if (savePath) {
                 put(MediaStore.MediaColumns.DATA, path)
             }
-            if (relativePath != null) {
-                put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath)
-            }
         }
 
         val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
         val contentUri = cr.insert(uri, values) ?: return null
         val id = ContentUris.parseId(contentUri)
-        val assetEntity = getAssetEntity(context, id.toString())
+        val assetEntity = getAssetEntity(context, id.toString(), checkIfExists = false)
         if (savePath) {
             inputStream.close()
         } else {
-            val tmpPath = assetEntity?.path!!
+            val tmpPath = assetEntity!!.path
             tmpPath.checkDirs()
             val tmpFile = File(tmpPath)
             val targetPath = "${tmpFile.parent}/$title"
