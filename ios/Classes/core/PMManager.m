@@ -598,7 +598,7 @@
                                                     toURL:destination
                                                     error:&error];
             if (error) {
-                [handler replyError:@"Could not cache the video file."];
+                [handler replyError:[NSString stringWithFormat:@"Could not cache the video file: %@", error]];
                 return;
             }
             if (withScheme) {
