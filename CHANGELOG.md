@@ -4,24 +4,20 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
-## 2.3.0-dev.3
+## 2.3.0
 
-### Fixes
+### Features
 
-- Fix saving videos with path on Android 29-. (#829)
-
-## 2.3.0-dev.2
+- Support Android 13 (API 33) permissions.
 
 ### Improvements
 
 - Adapt Flutter 3.3. (#820)
 - Retrieve metadata for videos when empty on Android. (#819)
 
-## 2.3.0-dev.1
+### Fixes
 
-### Features
-
-- Support Android 13 (API 33) permissions.
+- Fix saving videos with path on Android 29-. (#829)
 
 ## 2.2.1
 
