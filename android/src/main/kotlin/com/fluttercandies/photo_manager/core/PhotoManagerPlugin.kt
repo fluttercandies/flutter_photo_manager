@@ -78,14 +78,6 @@ class PhotoManagerPlugin(
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result, call)
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q && !Environment.isExternalStorageLegacy()) {
-            resultHandler.replyError(
-                "STORAGE_NOT_LEGACY",
-                "Use `requestLegacyExternalStorage` when your project is targeting above Android Q.",
-                null
-            )
-            return
-        }
 
         if (call.method == "ignorePermissionCheck") {
             val ignore = call.argument<Boolean>("ignore")!!
