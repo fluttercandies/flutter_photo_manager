@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.os.Build
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import com.bumptech.glide.Glide
