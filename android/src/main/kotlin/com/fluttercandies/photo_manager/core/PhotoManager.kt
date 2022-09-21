@@ -126,11 +126,6 @@ class PhotoManager(private val context: Context) {
         }
     }
 
-    fun clearCache() {
-        dbUtils.clearCache()
-    }
-
-
     fun clearFileCache() {
         ThumbnailUtil.clearCache(context)
         dbUtils.clearFileCache(context)

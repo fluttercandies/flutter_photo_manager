@@ -87,7 +87,7 @@ class PhotoManagerPlugin(
 
         val handleResult = when (call.method) {
             Methods.releaseMemoryCache -> {
-                photoManager.clearCache()
+                // The plugin will not hold instances cache on Android.
                 resultHandler.reply(1)
                 true
             }

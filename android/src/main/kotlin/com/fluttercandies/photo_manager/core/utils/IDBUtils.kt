@@ -222,8 +222,6 @@ interface IDBUtils {
         option: FilterOption
     ): AssetPathEntity?
 
-    fun clearCache() {}
-
     fun getFilePath(context: Context, id: String, origin: Boolean): String?
 
     fun saveImage(
