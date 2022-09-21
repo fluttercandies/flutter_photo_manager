@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.4.0-dev.1
+
+### Features
+
+- Support both legacy and scoped storage on Android. (#833)
+
 ## 2.3.0
 
 ### Features
