@@ -7,12 +7,14 @@ import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.BaseColumns
 import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
+import com.fluttercandies.photo_manager.core.cache.ScopedCache
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.entity.FilterOption
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
@@ -26,9 +28,14 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 @RequiresApi(Build.VERSION_CODES.Q)
-@Suppress("Deprecation") // Suppress DATA field
 object AndroidQDBUtils : IDBUtils {
     private const val TAG = "PhotoManagerPlugin"
+
+    private val scopedCache = ScopedCache()
+    private val shouldUseScopedCache =
+        Build.VERSION.SDK_INT == Build.VERSION_CODES.Q && !Environment.isExternalStorageLegacy()
+    private val isQStorageLegacy =
+        Build.VERSION.SDK_INT == Build.VERSION_CODES.Q && Environment.isExternalStorageLegacy()
 
     override fun getAssetPathList(
         context: Context,
@@ -112,7 +119,7 @@ object AndroidQDBUtils : IDBUtils {
     }
 
     override fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String? {
-        if (isExternalStorageLegacy()) {
+        if (isQStorageLegacy) {
             return super.getSortOrder(start, pageSize, filterOption)
         }
         return filterOption.orderByCondString()
@@ -124,7 +131,7 @@ object AndroidQDBUtils : IDBUtils {
         pageSize: Int,
         block: (cursor: Cursor) -> Unit
     ) {
-        if (!isExternalStorageLegacy()) {
+        if (!isQStorageLegacy) {
             cursor.moveToPosition(start - 1)
         }
         for (i in 0 until pageSize) {
@@ -165,7 +172,7 @@ object AndroidQDBUtils : IDBUtils {
             args.toTypedArray(),
             sortOrder
         ) ?: return list
-        cursor.use { it ->
+        cursor.use {
             cursorWithRange(it, page * size, size) { cursor ->
                 cursor.toAssetEntity(context)?.apply {
                     list.add(this)
@@ -209,7 +216,7 @@ object AndroidQDBUtils : IDBUtils {
             sortOrder
         ) ?: return list
         cursor.use {
-            cursorWithRange(it, start, pageSize) {cursor ->
+            cursorWithRange(it, start, pageSize) { cursor ->
                 cursor.toAssetEntity(context)?.apply {
                     list.add(this)
                 }
@@ -222,7 +229,11 @@ object AndroidQDBUtils : IDBUtils {
     private fun assetKeys() =
         IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + arrayOf(MediaStore.MediaColumns.RELATIVE_PATH)
 
-    override fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean): AssetEntity? {
+    override fun getAssetEntity(
+        context: Context,
+        id: String,
+        checkIfExists: Boolean
+    ): AssetEntity? {
         val keys = assetKeys().distinct().toTypedArray()
         val selection = "${MediaStore.MediaColumns._ID} = ?"
         val args = arrayOf(id)
@@ -292,7 +303,14 @@ object AndroidQDBUtils : IDBUtils {
 
     override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
         val assetEntity = getAssetEntity(context, id) ?: return null
-        return assetEntity.path
+        val filePath =
+            if (shouldUseScopedCache) {
+                val file = scopedCache.getCacheFileFromEntity(context, assetEntity, origin)
+                file?.absolutePath
+            } else {
+                assetEntity.path
+            }
+        return filePath
     }
 
     private fun getUri(asset: AssetEntity, isOrigin: Boolean = false): Uri =
@@ -346,7 +364,10 @@ object AndroidQDBUtils : IDBUtils {
 
         val timestamp = System.currentTimeMillis() / 1000
         val values = ContentValues().apply {
-            put(MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
+            put(
+                MediaStore.Files.FileColumns.MEDIA_TYPE,
+                MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
+            )
             put(MediaStore.Images.ImageColumns.DESCRIPTION, desc)
             put(MediaStore.MediaColumns.DISPLAY_NAME, title)
             put(MediaStore.MediaColumns.MIME_TYPE, typeFromStream)
@@ -399,7 +420,10 @@ object AndroidQDBUtils : IDBUtils {
         val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
             ?: "image/${File(path).extension}"
         val values = ContentValues().apply {
-            put(MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
+            put(
+                MediaStore.Files.FileColumns.MEDIA_TYPE,
+                MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
+            )
             put(MediaStore.Images.ImageColumns.DESCRIPTION, desc)
             put(MediaStore.MediaColumns.MIME_TYPE, typeFromStream)
             put(MediaStore.MediaColumns.TITLE, title)
@@ -524,7 +548,11 @@ object AndroidQDBUtils : IDBUtils {
             val cr = context.contentResolver
             val cursor = cr.query(
                 allUri,
-                arrayOf(BaseColumns._ID, MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.MediaColumns.DATA),
+                arrayOf(
+                    BaseColumns._ID,
+                    MediaStore.Files.FileColumns.MEDIA_TYPE,
+                    MediaStore.MediaColumns.DATA
+                ),
                 "${MediaStore.Files.FileColumns.MEDIA_TYPE} in ( ?,?,? )",
                 arrayOf(
                     MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO,
@@ -661,5 +689,10 @@ object AndroidQDBUtils : IDBUtils {
 
         val id = ContentUris.parseId(contentUri)
         return getAssetEntity(context, id.toString())
+    }
+
+    override fun clearFileCache(context: Context) {
+        super.clearFileCache(context)
+        scopedCache.clearFileCache(context)
     }
 }

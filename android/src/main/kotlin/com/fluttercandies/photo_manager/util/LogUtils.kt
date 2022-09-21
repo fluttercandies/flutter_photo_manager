@@ -32,7 +32,9 @@ object LogUtils {
         if (!isLog) {
             return
         }
-        val msg: String = `object`?.toString() ?: "null"
+        val msg: String =
+            (if (`object` is Exception) `object`.localizedMessage else `object`?.toString())
+                ?: "null"
         Log.e(TAG, msg, error)
     }
 
@@ -41,7 +43,9 @@ object LogUtils {
         if (!isLog) {
             return
         }
-        val msg: String = `object`?.toString() ?: "null"
+        val msg: String =
+            (if (`object` is Exception) `object`.localizedMessage else `object`?.toString())
+                ?: "null"
         Log.e(TAG, msg)
     }
 

@@ -120,7 +120,7 @@ import 'package:photo_manager/photo_manager.dart';
 
 ### Configure native platforms
 
-Minumum platform versions:
+Minimum platform versions:
 **Android 16, iOS 9.0, macOS 10.15**.
 
 - Android: [Android config preparation](#android-config-preparation).
@@ -147,12 +147,13 @@ More specifically:
 
 ##### Android 10+ (Q, 29)
 
-_If you're compiling or targeting with an Android version that belows 29, you can skip this section._
+_If you're not compiling or targeting with 29, you can skip this section._
 
 On Android 10, **Scoped Storage** was introduced,
-which causes the origin resource file inaccessible.
+which causes the origin resource file not directly
+inaccessible through it file path.
 
-If your `compileSdkVersion` is above 29, you must add
+If your `compileSdkVersion` is `29`, you can consider adding
 `android:requestLegacyExternalStorage="true"` to your
 `AndroidManifest.xml` in order to obtain resources:
 
@@ -167,6 +168,10 @@ If your `compileSdkVersion` is above 29, you must add
     </application>
 </manifest>
 ```
+
+Noted that this is not a requirement, the plugin can still work with caching files.
+But you'll need to control caches on your own, the best practice is to clear file caches
+each time when you start your app by calling `PhotoManager.clearFileCache()`.
 
 ##### Glide
 
@@ -197,7 +202,7 @@ It's pretty much the same as the `NSPhotoLibraryUsageDescription`.
 
 ### Request for permission
 
-Most of APIs can only use with granted permission.
+Most of the APIs can only use with granted permission.
 
 ```dart
 final PermissionState _ps = await PhotoManager.requestPermissionExtend();
@@ -218,16 +223,14 @@ PhotoManager.setIgnorePermissionCheck(true);
 
 #### Limited entities access on iOS
 
-With iOS 14 released,
-Apple broughts a "Limited Photos Library" to iOS.
-So use the `PhotoManager.requestPermissionExtend()`
-to request permissions.
+With iOS 14 released, Apple brought a "Limited Photos Library" to iOS.
+So use the `PhotoManager.requestPermissionExtend()` to request permissions.
 The method will return `PermissionState`.
 See [PHAuthorizationStatus][] for more detail.
 
 To reselect accessible entites for the app,
 use `PhotoManager.presentLimited()` to call the modal of
-accessible entities management.
+accessible entities' management.
 This method only available for iOS 14+ and when the permission state
 is limited (`PermissionState.limited`),
 other platform won't make a valid call.
@@ -235,7 +238,7 @@ other platform won't make a valid call.
 ### Get albums/folders (`AssetPathEntity`)
 
 Albums or folders are abstracted as the [`AssetPathEntity`][] class.
-It represent a bucket in the `MediaStore` on Android,
+It represents a bucket in the `MediaStore` on Android,
 and the `PHAssetCollection` object on iOS/macOS.
 To get all of them:
 
@@ -273,7 +276,7 @@ The ID concept represents:
 - The `localIdentifier` field of the `PHAsset` on iOS.
 
 You can store the ID if you want to implement features
-that's related to presistent selections.
+that's related to persistent selections.
 Use [`AssetEntity.fromId`][] to retrieve the entity
 once you persist an ID.
 
@@ -289,7 +292,7 @@ so the result might be null.
 
 You can create your own entity from raw data,
 such as downloaded images, recorded videos, etc.
-The created entity will shown as a corresponing resource
+The created entity will show as a corresponding resource
 on your device's gallery app.
 
 ```dart
@@ -415,9 +418,9 @@ typically they are:
 - All methods named with `file`.
 - `AssetEntity.originBytes`.
 
-File retrieving and caches are limited by the sandbox mechanisim on iOS.
+File retrieving and caches are limited by the sandbox mechanism on iOS.
 An existing `PHAsset` doesn't mean the file located on the device.
-In generall, a `PHAsset` will have three status:
+In generally, a `PHAsset` will have three status:
 
 - `isLocallyAvailable` equals `true`, **also cached**: Available for obtain.
 - `isLocallyAvailable` equals `true`, **but not cached**: When you call I/O methods,
@@ -468,14 +471,12 @@ PhotoManager.stopChangeNotify();
 
 Because Android 10 restricts the ability to access the resource path directly,
 some large image caches will be generated during I/O processes.
-More specifically, when the `file`, `originFile`
-and any other I/O getters are called,
+More specifically, when the `file`, `originFile` and any other I/O getters are called,
 the plugin will save a file in the cache folder for further use.
 
 Fortunately, in Android 11, the resource path can be obtained directly again,
-but for Android 10, we can only use
-`requestLegacyExternalStorage` as a workaround.
-See [Android 10 extra configs](#android-10-extra-configs)
+but for Android 10, you can only use `requestLegacyExternalStorage` as a workaround.
+See [Android 10+ (Q, 29)](#android-10-q-29)
 for how to add the attribute.
 
 ### Cache on iOS
@@ -508,13 +509,13 @@ Future<void> useEntity(AssetEntity entity) async {
 
 You can use the `PhotoManager.clearFileCache()` method
 to clear all caches that generated by the plugin.
-Here are caches generatation on different'
-platforms, types and resolutions.
+Here are caches generation on different platforms,
+types and resolutions.
 
-| Platform  | Thumbnail | File / Origin File |
-|-----------| --------- | ------------------ |
-| Android   | Yes       | No                 |
-| iOS       | No        | Yes                |
+| Platform | Thumbnail | File / Origin File |
+|----------|-----------|--------------------|
+| Android  | Yes       | No                 |
+| iOS      | No        | Yes                |
 
 ## Native extra configs
 
@@ -582,12 +583,12 @@ since they involved with data modification.
 They can be modified/removed in any time,
 without following a proper version semantic.
 
-Some APIs will make irreversible modification/deletion to datas.
+Some APIs will make irreversible modification/deletion to data.
 **Please be careful and implement your own test mechanism when using them**.
 
 #### Preload thumbnails
 
-You can preload thumbnails for entites with specified thumbnail options
+You can preload thumbnails for entities with specified thumbnail options
 using [`PhotoCachingManager.requestCacheAssets`][]
 or `PhotoCachingManager.requestCacheAssetsWithIds`.
 
@@ -616,7 +617,7 @@ final List<String> result = await PhotoManager.editor.deleteWithIds(
 );
 ```
 
-After the delection, you can call the `refreshPathProperties` method
+After the deletion, you can call the `refreshPathProperties` method
 to refresh the corresponding `AssetPathEntity` in order to get latest fields.
 
 #### Copy an entity
@@ -642,7 +643,7 @@ The "Copy" means differently here on Android and iOS:
     e.g. [MediaColumns.RELATIVE_PATH][].
 - For iOS, it makes a shortcut thing rather than create a new physical entity.
   - Some albums are smart albums, their content is automatically managed
-    by the system and cannot inserted entities manually.
+    by the system and cannot insert entities manually.
 
 (For Android 30+, this feature is blocked by system limitations currently.)
 
@@ -678,7 +679,7 @@ await PhotoManager.editor.android.removeAllNoExistsAsset();
 
 Some operating systems will prompt confirmation dialogs
 for each entities' deletion, we have no way to avoid them.
-Make sure your customers accept repeatly confirmations.
+Make sure your customers accept repeatedly confirmations.
 
 #### Features for iOS only
 

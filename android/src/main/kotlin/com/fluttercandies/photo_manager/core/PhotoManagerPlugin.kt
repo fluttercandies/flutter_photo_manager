@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.os.Build
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import com.bumptech.glide.Glide
@@ -78,14 +77,6 @@ class PhotoManagerPlugin(
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result, call)
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q && !Environment.isExternalStorageLegacy()) {
-            resultHandler.replyError(
-                "STORAGE_NOT_LEGACY",
-                "Use `requestLegacyExternalStorage` when your project is targeting above Android Q.",
-                null
-            )
-            return
-        }
 
         if (call.method == "ignorePermissionCheck") {
             val ignore = call.argument<Boolean>("ignore")!!
@@ -96,7 +87,7 @@ class PhotoManagerPlugin(
 
         val handleResult = when (call.method) {
             Methods.releaseMemoryCache -> {
-                photoManager.clearCache()
+                // The plugin will not hold instances cache on Android.
                 resultHandler.reply(1)
                 true
             }

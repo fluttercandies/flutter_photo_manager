@@ -1,7 +1,5 @@
 package com.fluttercandies.photo_manager.core.utils
 
-import android.os.Build
-import android.os.Environment
 import androidx.exifinterface.media.ExifInterface
 import java.io.File
 import java.io.InputStream
@@ -24,8 +22,4 @@ fun InputStream.getOrientationDegrees(): Int {
     } catch (ignored: Throwable) {
         0
     }
-}
-
-fun isExternalStorageLegacy(): Boolean {
-    return Build.VERSION.SDK_INT == Build.VERSION_CODES.Q && Environment.isExternalStorageLegacy()
 }

@@ -38,6 +38,23 @@ class _VideoWidgetState extends State<VideoWidget> {
   }
 
   @override
+  void didUpdateWidget(VideoWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.entity == oldWidget.entity &&
+        widget.usingMediaUrl == oldWidget.usingMediaUrl) {
+      return;
+    }
+    _controller?.dispose();
+    _controller = null;
+    _stopwatch.start();
+    if (widget.usingMediaUrl) {
+      _initVideoWithMediaUrl();
+    } else {
+      _initVideoWithFile();
+    }
+  }
+
+  @override
   void dispose() {
     _controller?.dispose();
     super.dispose();
