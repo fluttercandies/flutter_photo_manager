@@ -27,17 +27,38 @@ class ImageItemWidget extends StatelessWidget {
     AssetEntity entity,
     ThumbnailOption option,
   ) {
-    final Widget image = AssetEntityImage(
-      entity,
-      isOriginal: false,
-      thumbnailSize: option.size,
-      thumbnailFormat: option.format,
-      fit: BoxFit.cover,
-    );
-    if (entity.isFavorite) {
-      return Stack(
-        children: <Widget>[
-          Positioned.fill(child: image),
+    return Stack(
+      children: <Widget>[
+        Positioned.fill(
+          child: AssetEntityImage(
+            entity,
+            isOriginal: false,
+            thumbnailSize: option.size,
+            thumbnailFormat: option.format,
+            fit: BoxFit.cover,
+          ),
+        ),
+        PositionedDirectional(
+          bottom: 4,
+          end: 4,
+          child: Icon(
+            () {
+              switch (entity.type) {
+                case AssetType.other:
+                  return Icons.abc;
+                case AssetType.image:
+                  return Icons.image;
+                case AssetType.video:
+                  return Icons.video_file;
+                case AssetType.audio:
+                  return Icons.audiotrack;
+              }
+            }(),
+            color: Colors.white,
+            size: 16,
+          ),
+        ),
+        if (entity.isFavorite)
           PositionedDirectional(
             bottom: 4,
             start: 4,
@@ -54,10 +75,8 @@ class ImageItemWidget extends StatelessWidget {
               ),
             ),
           ),
-        ],
-      );
-    }
-    return image;
+      ],
+    );
   }
 
   @override

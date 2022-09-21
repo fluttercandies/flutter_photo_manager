@@ -16,6 +16,7 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   bool? useOrigin = true;
+  bool? useMediaUrl = true;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +40,15 @@ class _DetailPageState extends State<DetailPage> {
                 setState(() {});
               },
               value: useOrigin,
+            ),
+          if (widget.entity.type == AssetType.video)
+            CheckboxListTile(
+              title: const Text('Use Media Url'),
+              value: useMediaUrl,
+              onChanged: (bool? value) {
+                useMediaUrl = value;
+                setState(() {});
+              },
             ),
           Expanded(
             child: Container(
@@ -97,7 +107,10 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget buildVideo() {
-    return VideoWidget(entity: widget.entity);
+    return VideoWidget(
+      entity: widget.entity,
+      usingMediaUrl: useMediaUrl ?? true,
+    );
   }
 
   Future<void> _showInfo() {
