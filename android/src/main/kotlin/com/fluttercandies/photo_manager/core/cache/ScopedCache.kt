@@ -33,6 +33,9 @@ class ScopedCache {
             return null
         }
         try {
+            LogUtils.info(
+                "Caching $assetId [origin: $isOrigin] into ${targetFile.absolutePath}"
+            )
             val inputStream = contentResolver.openInputStream(uri)
             val outputStream = FileOutputStream(targetFile)
             outputStream.use { os ->
