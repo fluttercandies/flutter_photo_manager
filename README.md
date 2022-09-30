@@ -147,7 +147,7 @@ More specifically:
 
 ##### Android 10+ (Q, 29)
 
-_If you're not compiling or targeting with 29, you can skip this section._
+_If you're not compiling or targeting with 29 and above, you can skip this section._
 
 On Android 10, **Scoped Storage** was introduced,
 which causes the origin resource file not directly
@@ -169,7 +169,9 @@ If your `compileSdkVersion` is `29`, you can consider adding
 </manifest>
 ```
 
-Noted that this is not a requirement, the plugin can still work with caching files.
+**Note: Apps that are using the flag will be rejected from the Google Play.**
+
+This is not a requirement, the plugin can still work with caching files.
 But you'll need to control caches on your own, the best practice is to clear file caches
 each time when you start your app by calling `PhotoManager.clearFileCache()`.
 
@@ -470,14 +472,14 @@ PhotoManager.stopChangeNotify();
 ### Cache on Android
 
 Because Android 10 restricts the ability to access the resource path directly,
-some large image caches will be generated during I/O processes.
+image caches will be generated during I/O processes.
 More specifically, when the `file`, `originFile` and any other I/O getters are called,
 the plugin will save a file in the cache folder for further use.
 
-Fortunately, in Android 11, the resource path can be obtained directly again,
-but for Android 10, you can only use `requestLegacyExternalStorage` as a workaround.
-See [Android 10+ (Q, 29)](#android-10-q-29)
-for how to add the attribute.
+Fortunately, on Android 11 and above, the resource path can be obtained directly again,
+but you can still use `requestLegacyExternalStorage`
+to access files in the storage without caching them.
+See [Android 10+ (Q, 29)](#android-10-q-29) for how to add the attribute.
 
 ### Cache on iOS
 
