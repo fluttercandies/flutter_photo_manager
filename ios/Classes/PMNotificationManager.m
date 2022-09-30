@@ -42,6 +42,13 @@
     _notifying = NO;
 }
 
+-(void)detachFromEngine {
+    if (_notifying) {
+        [self stopNotify];
+    }
+    [channel setMethodCallHandler:nil];
+}
+
 #pragma "photo library notify"
 
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {

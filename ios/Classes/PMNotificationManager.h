@@ -16,4 +16,6 @@
 
 - (BOOL)isNotifying;
 
+- (void)detachFromEngine;
+
 @end

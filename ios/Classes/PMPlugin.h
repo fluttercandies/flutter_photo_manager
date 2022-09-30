@@ -8,5 +8,6 @@
 @property(nonatomic, strong) PMManager *manager;
 @property(nonatomic, strong) PMNotificationManager *notificationManager;
 - (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar;
+- (void)detachFromEngine;
 
 @end

@@ -16,22 +16,38 @@
 @implementation PMPlugin {
     BOOL ignoreCheckPermission;
     NSObject <FlutterPluginRegistrar> *privateRegistrar;
+    FlutterMethodChannel* channel;
+    NSMutableArray* progressHandlerDisposeCallbacks;
 }
 
 - (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar {
     privateRegistrar = registrar;
     [self initNotificationManager:registrar];
     
-    FlutterMethodChannel *channel =
-    [FlutterMethodChannel methodChannelWithName:@"com.fluttercandies/photo_manager"
+    __weak PMPlugin* weakSelf = self;
+    
+    channel = [FlutterMethodChannel methodChannelWithName:@"com.fluttercandies/photo_manager"
                                 binaryMessenger:[registrar messenger]];
+    [channel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
+        if (weakSelf) {
+            __strong PMPlugin* strongSelf = weakSelf;
+            [strongSelf onMethodCall:call result:result];
+        }
+    }];
+    
     PMManager *manager = [PMManager new];
     manager.converter = [PMConverter new];
     [self setManager:manager];
-    [channel
-     setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
-        [self onMethodCall:call result:result];
-    }];
+    
+    progressHandlerDisposeCallbacks = [[NSMutableArray alloc] init];
+}
+
+- (void)detachFromEngine {
+    [channel setMethodCallHandler:nil];
+    [self.notificationManager detachFromEngine];
+    for(void (^callback)(void) in progressHandlerDisposeCallbacks) {
+        callback();
+    }
 }
 
 - (void)initNotificationManager:(NSObject <FlutterPluginRegistrar> *)registrar {
@@ -516,6 +532,13 @@
     }
     int index = [progressIndex intValue];
     PMProgressHandler *handler = [PMProgressHandler new];
+    __weak PMProgressHandler* weakHandler = handler;
+    [progressHandlerDisposeCallbacks addObject:^() {
+        if (weakHandler) {
+            __strong PMProgressHandler* _handler = weakHandler;
+            [_handler deinit];
+        }
+    }];
     [handler register:privateRegistrar channelIndex:index];
     
     return handler;

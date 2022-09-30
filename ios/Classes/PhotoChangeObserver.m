@@ -47,4 +47,9 @@
     }
     return nil;
 }
+
+- (void)detachFromEngine {
+    [PHPhotoLibrary.sharedPhotoLibrary unregisterChangeObserver:self];
+    [self.handler setMethodCallHandler:nil];
+}
 @end

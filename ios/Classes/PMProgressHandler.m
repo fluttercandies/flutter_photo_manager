@@ -27,7 +27,10 @@
 }
 
 - (void)deinit {
-    channel = nil;
+    if (channel) {
+        [channel setMethodCallHandler:nil];
+        channel = nil;
+    }
 }
 
 @end
