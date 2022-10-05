@@ -594,6 +594,17 @@
                 return;
             }
             NSError *error;
+            NSString *destinationPath = destination.path;
+            if ([manager fileExistsAtPath:destinationPath]) {
+                [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Reading cache from %@", destinationPath]];
+                if (withScheme) {
+                    [handler reply:destination.absoluteString];
+                } else {
+                    [handler reply:destinationPath];
+                }
+                return;
+            }
+            [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Caching the video to %@", destination]];
             [[NSFileManager defaultManager] copyItemAtURL:videoURL
                                                     toURL:destination
                                                     error:&error];

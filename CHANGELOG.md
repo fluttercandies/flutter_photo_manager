@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.4.0-dev.2
+
+### Fixes
+
+- Avoid duplicate `copyItemAtURL` for videos on iOS. (#840)
+
 ## 2.4.0-dev.1
 
 ### Features
