@@ -17,7 +17,6 @@ import com.fluttercandies.photo_manager.core.utils.RequestTypeUtils
 import com.fluttercandies.photo_manager.util.LogUtils
 import com.fluttercandies.photo_manager.util.ResultHandler
 import io.flutter.plugin.common.MethodCall
-import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.lang.NullPointerException
 import java.util.ArrayList
@@ -225,17 +224,27 @@ class PermissionsUtils {
         resultHandler: ResultHandler
     ) {
         val method = call.method
-        if (!Methods.android13PermissionMethods.contains(method)) {
+        if (method == Methods.requestPermissionExtend) {
+            // Check all permissions listed in the manifest, regardless the request type.
+            if (havePermissionInManifest(context, Manifest.permission.READ_MEDIA_IMAGES)) {
+                permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
+            }
+            if (havePermissionInManifest(context, Manifest.permission.READ_MEDIA_VIDEO)) {
+                permissions.add(Manifest.permission.READ_MEDIA_VIDEO)
+            }
+            if (havePermissionInManifest(context, Manifest.permission.READ_MEDIA_AUDIO)) {
+                permissions.add(Manifest.permission.READ_MEDIA_AUDIO)
+            }
+            return
+        } else if (!Methods.android13PermissionMethods.contains(method)) {
             return
         }
 
         val type = call.argument<Int>("type")
-
         if (type == null) {
             resultHandler.replyError("The $method must pass the 'type' params")
             return
         }
-
         val haveImage = RequestTypeUtils.containsImage(type)
         val haveVideo = RequestTypeUtils.containsVideo(type)
         val haveAudio = RequestTypeUtils.containsAudio(type)
@@ -246,7 +255,7 @@ class PermissionsUtils {
             }
 
             if (!havePermissionInManifest(context, manifestPermission)) {
-                throw IllegalStateException("Request $tag must have $manifestPermission in manifest!")
+                throw IllegalStateException("Request $tag must have $manifestPermission in manifest.")
             }
             permissions.add(manifestPermission)
         }
@@ -256,7 +265,7 @@ class PermissionsUtils {
             checkAndAddPermission(haveVideo, "video", Manifest.permission.READ_MEDIA_VIDEO)
             checkAndAddPermission(haveAudio, "audio", Manifest.permission.READ_MEDIA_AUDIO)
         } catch (e: IllegalStateException) {
-            resultHandler.replyError("The permission have error for android 33 or higher", e.message, e)
+            resultHandler.replyError("Permissions check error", e.message, e)
         }
 
     }

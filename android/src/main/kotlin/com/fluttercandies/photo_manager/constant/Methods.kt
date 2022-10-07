@@ -36,12 +36,11 @@ class Methods {
         const val getAssetListPaged = "getAssetListPaged"
         const val getAssetListRange = "getAssetListRange"
 
-        val android13PermissionMethods =
-            arrayOf(
-                fetchPathProperties,
-                getAssetPathList,
-                getAssetListPaged,
-                getAssetListRange,
-            )
+        val android13PermissionMethods = arrayOf(
+            fetchPathProperties,
+            getAssetPathList,
+            getAssetListPaged,
+            getAssetListRange,
+        )
     }
 }
