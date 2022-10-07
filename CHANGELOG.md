@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.4.0-dev.3
+
+### Fixes
+
+- Correct permission checks with `requestPermissionExtend` on Android 33. (#843)
+
 ## 2.4.0-dev.2
 
 ### Fixes
