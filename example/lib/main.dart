@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +16,12 @@ void main() {
   runZonedGuarded(
     () => runApp(const _SimpleExampleApp()),
     (Object e, StackTrace s) => showToast('$e\n$s', textAlign: TextAlign.start),
+  );
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+    ),
   );
 }
 
