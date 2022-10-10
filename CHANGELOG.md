@@ -4,23 +4,16 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
-## 2.4.0-dev.3
-
-### Fixes
-
-- Correct permission checks with `requestPermissionExtend` on Android 33. (#843)
-
-## 2.4.0-dev.2
-
-### Fixes
-
-- Avoid duplicate `copyItemAtURL` for videos on iOS. (#840)
-
-## 2.4.0-dev.1
+## 2.4.0
 
 ### Features
 
 - Support both legacy and scoped storage on Android. (#833)
+
+### Fixes
+
+- Avoid duplicate `copyItemAtURL` for videos on iOS. (#840)
+- Correct permission checks with `requestPermissionExtend` on Android 13. (#843)
 
 ## 2.3.0
 
