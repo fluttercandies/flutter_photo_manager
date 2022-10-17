@@ -7,6 +7,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.signature.ObjectKey
+import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import io.flutter.plugin.common.MethodChannel
 import com.fluttercandies.photo_manager.core.entity.ThumbLoadOption
 import com.fluttercandies.photo_manager.util.ResultHandler
@@ -42,7 +44,7 @@ object ThumbnailUtil {
 
     fun getThumbnail(
         context: Context,
-        uri: Uri,
+        entity: AssetEntity,
         width: Int,
         height: Int,
         format: Bitmap.CompressFormat,
@@ -56,7 +58,8 @@ object ThumbnailUtil {
             val resource = Glide.with(context)
                 .asBitmap()
                 .apply(RequestOptions().frame(frame).priority(Priority.IMMEDIATE))
-                .load(uri)
+                .load(entity.getUri())
+                .signature(ObjectKey(entity.modifiedDate))
                 .submit(width, height).get()
             val bos = ByteArrayOutputStream()
             resource.compress(format, quality, bos)

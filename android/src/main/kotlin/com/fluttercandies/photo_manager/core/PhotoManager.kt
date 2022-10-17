@@ -93,10 +93,9 @@ class PhotoManager(private val context: Context) {
                 resultHandler.replyError("The asset not found!")
                 return
             }
-            val uri = asset.getUri()
             ThumbnailUtil.getThumbnail(
                 context,
-                uri,
+                asset,
                 option.width,
                 option.height,
                 format,
