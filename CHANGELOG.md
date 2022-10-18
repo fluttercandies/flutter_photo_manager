@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.4.1
+
+### Improvements
+
+- Use last modified date for Glide caches key on Android. (#848)
+
 ## 2.4.0
 
 ### Features
