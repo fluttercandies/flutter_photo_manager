@@ -65,6 +65,12 @@ typedef void (^AssetResult)(PMAssetEntity *);
              desc:(NSString *)desc
             block:(AssetResult)block;
 
+- (void)saveLivePhoto:(NSString *)imagePath
+            videoPath:(NSString *)videoPath
+            title:(NSString *)title
+             desc:(NSString *)desc
+            block:(AssetResult)block;
+
 - (BOOL)existsWithId:(NSString *)assetId;
 
 - (BOOL)entityIsLocallyAvailable:(NSString *)assetId resource:(PHAssetResource *)resource isOrigin:(BOOL)isOrigin;

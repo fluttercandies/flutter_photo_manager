@@ -210,6 +210,29 @@ class IosEditor {
     }
     return null;
   }
+
+  /// Save Live photo to gallery from the given [imageFile] & [videoFile].
+  ///
+  /// {@macro photo_manager.Editor.TitleWhenSaving}
+  ///
+  /// {@macro photo_manager.Editor.DescriptionWhenSaving}
+  ///
+  /// {@macro photo_manager.Editor.SavingAssets}
+  Future<AssetEntity?> saveLivePhoto({
+    required File imageFile,
+    required File videoFile,
+    required String title,
+    String? desc,
+    String? relativePath,
+  }) {
+    return plugin.saveLivePhoto(
+      imageFile: imageFile,
+      videoFile: videoFile,
+      title: title,
+      desc: desc,
+      relativePath: relativePath,
+    );
+  }
 }
 
 class AndroidEditor {

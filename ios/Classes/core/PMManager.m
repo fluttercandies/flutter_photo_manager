@@ -1092,6 +1092,36 @@
     }];
 }
 
+- (void)saveLivePhoto:(NSString *)imagePath
+            videoPath:(NSString *)videoPath
+            title:(NSString *)title
+             desc:(NSString *)desc
+            block:(AssetResult)block {
+    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save LivePhoto with imagePath: %@, videoPath: %@, title: %@, desc %@",
+                                     imagePath, videoPath, title, desc]];
+    NSURL *fileURL = [NSURL fileURLWithPath:videoPath];
+    NSURL *imageURL = [NSURL fileURLWithPath:imagePath];
+    __block NSString *assetId = nil;
+    [[PHPhotoLibrary sharedPhotoLibrary]
+     performChanges:^{
+        PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
+        PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
+        [options setOriginalFilename:title];
+        [request addResourceWithType:PHAssetResourceTypePhoto fileURL:imageURL options:options];
+        [request addResourceWithType:PHAssetResourceTypePairedVideo fileURL:fileURL options:options];
+        assetId = request.placeholderForCreatedAsset.localIdentifier;
+    }
+     completionHandler:^(BOOL success, NSError *error) {
+        if (success) {
+            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"create asset : id = %@", assetId]];
+            block([self getAssetEntity:assetId]);
+        } else {
+            NSLog(@"create fail, error: %@", error);
+            block(nil);
+        }
+    }];
+}
+
 - (NSString *)getTitleAsyncWithAssetId:(NSString *)assetId subtype:(int)subtype {
     PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
     if (asset) {
