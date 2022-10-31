@@ -339,7 +339,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     String? relativePath,
   }) async {
     if (!imageFile.existsSync()) {
-      assert(false, 'imageFile must exists.');
+      assert(false, 'File of the image must exist.');
       return null;
     }
     if (!videoFile.existsSync()) {
