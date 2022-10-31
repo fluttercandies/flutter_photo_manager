@@ -382,7 +382,7 @@
             NSString *title = call.arguments[@"title"];
             NSString *desc = call.arguments[@"desc"];
             [manager saveLivePhoto:imagePath
-                         videoPath: videoPath
+                         videoPath:videoPath
                          title:title
                          desc:desc
                          block:^(PMAssetEntity *asset) {
