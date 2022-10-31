@@ -211,7 +211,7 @@ class IosEditor {
     return null;
   }
 
-  /// Save Live photo to gallery from the given [imageFile] & [videoFile].
+  /// Save Live Photo to the gallery from the given [imageFile] and [videoFile].
   ///
   /// {@macro photo_manager.Editor.TitleWhenSaving}
   ///
