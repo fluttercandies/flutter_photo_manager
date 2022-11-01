@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.4.2
+
+### Improvements
+
+- Expose `frame` for `AssetEntity.thumbnailDataWithSize`. (#850)
+
 ## 2.4.1
 
 ### Improvements

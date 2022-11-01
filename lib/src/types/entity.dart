@@ -548,6 +548,7 @@ class AssetEntity {
     ThumbnailFormat format = ThumbnailFormat.jpeg,
     int quality = 100,
     PMProgressHandler? progressHandler,
+    int frame = 0,
   }) {
     assert(() {
       _checkThumbnailAssertion();
@@ -569,6 +570,7 @@ class AssetEntity {
         size: size,
         format: format,
         quality: quality,
+        frame: frame,
       );
     }
     assert(() {
