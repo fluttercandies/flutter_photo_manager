@@ -318,6 +318,16 @@ final AssetEntity? videoEntity = await PhotoManager.editor.saveVideo(
   videoFile, // You can check whether the file is exist for better test coverage.
   title: 'write_your_own_title.mp4',
 );
+
+// [iOS only] Save a live photo from image and video `File`.
+// This only works when both image and video file were part of same live photo.
+final File imageFile = File('path/to/your/livephoto.heic');
+final File videoFile = File('path/to/your/livevideo.mp4');
+final AssetEntity? entity = await PhotoManager.editor.saveLivePhoto(
+  imageFile: imageFile,
+  videoFile: videoFile,
+  title: 'write_your_own_title.heic',
+);
 ```
 
 Be aware that the created asset might have
