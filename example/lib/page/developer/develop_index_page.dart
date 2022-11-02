@@ -22,6 +22,12 @@ class DeveloperIndexPage extends StatefulWidget {
 }
 
 class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
+  static const exampleMovUrl =
+      'https://cdn.jsdelivr.net/gh/ExampleAssets/ExampleAsset@master/preview_0.mov';
+
+  static const exampleHeicUrl =
+      'https://cdn.jsdelivr.net/gh/ExampleAssets/ExampleAsset@master/preview_0.heic';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,6 +56,11 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
             onPressed: _saveVideo,
             child: const Text('Save video to photos.'),
           ),
+          if (Platform.isIOS || Platform.isMacOS)
+            ElevatedButton(
+              onPressed: _saveLivePhoto,
+              child: const Text('Save live photo'),
+            ),
           ElevatedButton(
             onPressed: _navigatorSpeedOfTitle,
             child: const Text('Open test title page'),
@@ -150,6 +161,51 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
         Log.d('result is null');
       }
     });
+  }
+
+  Future<File?> _downloadFile(String url) async {
+    final HttpClient client = HttpClient();
+    final HttpClientRequest req = await client.getUrl(Uri.parse(url));
+    final extName = url.split('.').last;
+    final HttpClientResponse resp = await req.close();
+    final Directory tmp = Directory.systemTemp;
+    final String title = '${DateTime.now().millisecondsSinceEpoch}.$extName';
+    final File f = File('${tmp.absolute.path}/$title');
+    if (f.existsSync()) {
+      f.deleteSync();
+    }
+    f.createSync();
+
+    final IOSink sink = f.openWrite();
+    await sink.addStream(resp);
+    await sink.flush();
+    await sink.close();
+    return f;
+  }
+
+  Future<void> _saveLivePhoto() async {
+    final File? imgFile = await _downloadFile(exampleHeicUrl);
+    print(
+        'The image download to ${imgFile?.path}, length: ${imgFile?.lengthSync()}');
+    final File? videoFile = await _downloadFile(exampleMovUrl);
+    print(
+        'The video download to ${videoFile?.path}, length: ${videoFile?.lengthSync()}');
+
+    try {
+      if (imgFile == null || videoFile == null) {
+        return;
+      }
+      final assets = await PhotoManager.editor.iOS.saveLivePhoto(
+        imageFile: imgFile,
+        videoFile: videoFile,
+        title: 'preview_0',
+      );
+      print('save live photo result : ${assets?.id}');
+    } finally {
+      imgFile?.deleteSync();
+      videoFile?.deleteSync();
+      print('The temp file has been deleted.');
+    }
   }
 
   void _navigatorSpeedOfTitle() {
