@@ -13,9 +13,7 @@ class Editor {
   final DarwinEditor _darwin = const DarwinEditor();
   final AndroidEditor _android = const AndroidEditor();
 
-  @Deprecated('use [Editor.darwin] instead')
-
-  /// use [Editor.darwin] instead, the field will be removed in 3.0.0
+  @Deprecated('Use `Editor.darwin` instead. This will be removed in 3.0.0')
   IosEditor get iOS {
     if (Platform.isIOS || Platform.isMacOS) {
       return _ios;
@@ -28,7 +26,7 @@ class Editor {
     if (Platform.isIOS || Platform.isMacOS) {
       return _darwin;
     }
-    throw const OSError('darwin Editor should only be use on iOS or macOS.');
+    throw const OSError('Darwin Editor should only be use on iOS or macOS.');
   }
 
   AndroidEditor get android {
