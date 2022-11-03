@@ -20,6 +20,7 @@ class GalleryItemWidget extends StatelessWidget {
   final ValueSetter<VoidCallback> setState;
 
   Widget buildGalleryItemWidget(AssetPathEntity item, BuildContext context) {
+    final navigator = Navigator.of(context);
     return GestureDetector(
       child: ListTile(
         title: Text(item.name),
@@ -43,7 +44,7 @@ class GalleryItemWidget extends StatelessWidget {
           showToast('The asset count is 0.');
           return;
         }
-        Navigator.of(context).push<void>(
+        navigator.push<void>(
           MaterialPageRoute<void>(
             builder: (_) => GalleryContentListPage(
               path: item,
