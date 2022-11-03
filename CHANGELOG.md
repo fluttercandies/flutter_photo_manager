@@ -7,6 +7,7 @@ that can be found in the LICENSE file. -->
 ## 2.5.0
 
 - Introduce `DarwinEditor` to replace `IosEditor`. (#855)
+
 ## 2.4.2
 
 ### Improvements
