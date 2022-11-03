@@ -9,14 +9,26 @@ import '../types/entity.dart';
 import 'plugin.dart';
 
 class Editor {
-  final IosEditor _iOS = const IosEditor();
+  final IosEditor _ios = const IosEditor();
+  final DarwinEditor _darwin = const DarwinEditor();
   final AndroidEditor _android = const AndroidEditor();
 
+  @Deprecated('use [Editor.darwin] instead')
+
+  /// use [Editor.darwin] instead, the field will be removed in 3.0.0
   IosEditor get iOS {
-    if (Platform.isIOS) {
-      return _iOS;
+    if (Platform.isIOS || Platform.isMacOS) {
+      return _ios;
     }
     throw const OSError('iOS Editor should only be use on iOS.');
+  }
+
+  /// Support iOS and macOS.
+  DarwinEditor get darwin {
+    if (Platform.isIOS || Platform.isMacOS) {
+      return _darwin;
+    }
+    throw const OSError('darwin Editor should only be use on iOS or macOS.');
   }
 
   AndroidEditor get android {
@@ -118,8 +130,8 @@ class Editor {
   }
 }
 
-class IosEditor {
-  const IosEditor();
+class DarwinEditor {
+  const DarwinEditor();
 
   /// {@template photo_manager.IosEditor.EnsureParentIsRootOrFolder}
   /// Folders and albums can be only created under the root path or folders,
@@ -210,6 +222,10 @@ class IosEditor {
     }
     return null;
   }
+}
+
+class IosEditor extends DarwinEditor {
+  const IosEditor();
 }
 
 class AndroidEditor {

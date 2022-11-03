@@ -63,7 +63,7 @@ class GalleryItemWidget extends StatelessWidget {
                     showToast('The function only support iOS.');
                     return;
                   }
-                  PhotoManager.editor.iOS.deletePath(path);
+                  PhotoManager.editor.darwin.deletePath(path);
                 },
               ),
               ElevatedButton(
