@@ -77,11 +77,13 @@ If you've used these APIs, consider migrating them to the latest version.
 #### `getAssetListPaged`
 
 Before:
+
 ```dart
 AssetPathEntity.getAssetListPaged(0, 50);
 ```
 
 After:
+
 ```dart
 AssetPathEntity.getAssetListPaged(page: 0, size: 50);
 ```
@@ -89,11 +91,13 @@ AssetPathEntity.getAssetListPaged(page: 0, size: 50);
 #### Filtering only videos
 
 Before:
+
 ```dart
 final List<AssetPathEntity> paths = PhotoManager.getAssetPathList(type: RequestType.video);
 ```
 
 After:
+
 ```dart
 final List<AssetPathEntity> paths = PhotoManager.getAssetPathList(
   type: RequestType.video,
@@ -104,11 +108,13 @@ final List<AssetPathEntity> paths = PhotoManager.getAssetPathList(
 #### `isLocallyAvailable`
 
 Before:
+
 ```dart
 final bool isLocallyAvailable = await entity.isLocallyAvailable;
 ```
 
 After:
+
 ```dart
 // .file is locally available.
 final bool isFileLocallyAvailable = await entity.isLocallyAvailable();
@@ -122,17 +128,19 @@ final bool isOriginFileLocallyAvailable = await entity.isLocallyAvailable(
 #### iOS Editor favorite asset
 
 Before:
+
 ```dart
-final bool isSucceed = await PhotoManager.editor.iOS.favoriteAsset(
+final bool isSucceed = await PhotoManager.editor.darwin.favoriteAsset(
   entity: entity,
   favorite: true,
 );
 ```
 
 After:
+
 ```dart
 /// If succeed, a new entity will be returned.
-final AssetEntity? newEntity = await PhotoManager.editor.iOS.favoriteAsset(
+final AssetEntity? newEntity = await PhotoManager.editor.darwin.favoriteAsset(
   entity: entity,
   favorite: true,
 );
