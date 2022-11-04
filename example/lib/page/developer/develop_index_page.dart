@@ -195,7 +195,7 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
       if (imgFile == null || videoFile == null) {
         return;
       }
-      final assets = await PhotoManager.editor.iOS.saveLivePhoto(
+      final assets = await PhotoManager.editor.darwin.saveLivePhoto(
         imageFile: imgFile,
         videoFile: videoFile,
         title: 'preview_0',
