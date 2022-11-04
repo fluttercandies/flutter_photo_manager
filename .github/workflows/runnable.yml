@@ -55,11 +55,10 @@ jobs:
         run: flutter pub get
       - name: Copy before dry run
         run: ./copy_on_publish.sh
-      - run: echo ${{ github.repository }}
       - name: Publish dry run
         uses: k-paxian/dart-package-publisher@master
         with:
-          credentialJson: ''
+          credentialJson: 'MockCredentialJson'
           flutter: true
           dryRunOnly: true
 
