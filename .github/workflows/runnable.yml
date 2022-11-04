@@ -57,10 +57,9 @@ jobs:
         run: ./copy_on_publish.sh
       - run: echo ${{ github.repository }}
       - name: Publish dry run
-        if: github.repository == 'fluttercandies/flutter_photo_manager'
         uses: k-paxian/dart-package-publisher@master
         with:
-          credentialJson: ${{ secrets.CREDENTIAL_JSON }}
+          credentialJson: ''
           flutter: true
           dryRunOnly: true
 
@@ -105,5 +104,5 @@ jobs:
       - run: dart --version
       - run: flutter --version
       - run: flutter pub get
-      - run: cd example; flutter build ios --no-codesign --target=example/lib/main.dart
-      - run: cd example; flutter build macos --debug --target=example/lib/main.dart
+      - run: cd example; flutter build ios --no-codesign
+      - run: cd example; flutter build macos --debug
