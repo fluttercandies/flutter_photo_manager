@@ -323,7 +323,7 @@ final AssetEntity? videoEntity = await PhotoManager.editor.saveVideo(
 // This only works when both image and video file were part of same live photo.
 final File imageFile = File('path/to/your/livephoto.heic');
 final File videoFile = File('path/to/your/livevideo.mp4');
-final AssetEntity? entity = await PhotoManager.editor.saveLivePhoto(
+final AssetEntity? entity = await PhotoManager.editor.darwin.saveLivePhoto(
   imageFile: imageFile,
   videoFile: videoFile,
   title: 'write_your_own_title.heic',
