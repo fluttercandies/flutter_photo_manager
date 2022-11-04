@@ -58,7 +58,7 @@ class _CreateFolderExampleState extends State<CreateFolderExample> {
 
   void createFolder() {
     final String name = nameController.text;
-    PhotoManager.editor.iOS.createFolder(
+    PhotoManager.editor.darwin.createFolder(
       name,
       parent: parent,
     );
@@ -66,7 +66,7 @@ class _CreateFolderExampleState extends State<CreateFolderExample> {
 
   void createAlbum() {
     final String name = nameController.text;
-    PhotoManager.editor.iOS.createAlbum(
+    PhotoManager.editor.darwin.createAlbum(
       name,
       parent: parent,
     );

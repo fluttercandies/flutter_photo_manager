@@ -195,7 +195,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                 onPressed: () async {
                   final bool isFavorite = entity.isFavorite;
                   print('Current isFavorite: $isFavorite');
-                  await PhotoManager.editor.iOS.favoriteAsset(
+                  await PhotoManager.editor.darwin.favoriteAsset(
                     entity: entity,
                     favorite: !isFavorite,
                   );
