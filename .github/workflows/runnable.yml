@@ -104,6 +104,5 @@ jobs:
       - run: dart --version
       - run: flutter --version
       - run: flutter pub get
-      - run: cd example
-      - run: flutter build ios --no-codesign
-      - run: flutter build macos --debug
+      - run: flutter build ios --no-codesign --target=example/lib/main.dart
+      - run: flutter build macos --debug --target=example/lib/main.dart
