@@ -6,6 +6,7 @@ that can be found in the LICENSE file. -->
 
 ## 2.5.0
 
+- Support saving Live Photos on iOS and macOS. (#851)
 - Introduce `DarwinEditor` to replace `IosEditor`. (#855)
 
 ## 2.4.2
