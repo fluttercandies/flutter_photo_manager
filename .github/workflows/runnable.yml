@@ -37,6 +37,15 @@ jobs:
         run: |
           dart pub global activate dartdoc
           dart pub global run dartdoc .
+      - name: Copy before dry run
+        run: ./copy_on_publish.sh
+      - name: Publish dry run
+        if: github.repository == 'fluttercandies/flutter_photo_manager'
+        uses: k-paxian/dart-package-publisher@master
+        with:
+          credentialJson: ${{ secrets.CREDENTIAL_JSON }}
+          flutter: true
+          dryRunOnly: true
 
   test_iOS:
     needs: analyze
