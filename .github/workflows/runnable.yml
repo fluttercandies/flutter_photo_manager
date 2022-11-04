@@ -16,10 +16,11 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-java@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
         with:
-          java-version: '11.x'
+          distribution: 'adopt'
+          java-version: '11'
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
@@ -47,47 +48,31 @@ jobs:
           flutter: true
           dryRunOnly: true
 
-  test_iOS:
-    needs: analyze
-    name: Test iOS build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ macos-latest ]
+  publishable:
+    if: github.repository == 'fluttercandies/flutter_photo_manager'
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-java@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
         with:
-          java-version: '11.x'
+          distribution: 'adopt'
+          java-version: '11'
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-      - run: dart --version
-      - run: flutter --version
-      - run: flutter pub get
-      - run: cd example; flutter build ios --no-codesign
-
-  test_macOS:
-    needs: analyze
-    name: Test macOS build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ macos-latest ]
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-java@v1
+      - name: Prepare dependencies
+        run: flutter pub get
+      - name: Copy before dry run
+        run: ./copy_on_publish.sh
+      - name: Publish dry run
+        if: github.repository == 'fluttercandies/flutter_photo_manager'
+        uses: k-paxian/dart-package-publisher@master
         with:
-          java-version: '11.x'
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-      - run: dart --version
-      - run: flutter --version
-      - run: flutter pub get
-      - run: cd example; flutter build macos --debug
+          credentialJson: ${{ secrets.CREDENTIAL_JSON }}
+          flutter: true
+          dryRunOnly: true
 
-  test_Android:
+  test_android:
     needs: analyze
     name: Test Android build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -107,3 +92,27 @@ jobs:
       - run: flutter pub get
       - run: sudo echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager "ndk;20.0.5594570"
       - run: cd example; flutter build apk --debug
+
+  test_darwin:
+    needs: analyze
+    name: Test Darwin build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-latest ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          architecture: x64
+      - run: dart --version
+      - run: flutter --version
+      - run: flutter pub get
+      - run: cd example
+      - run: flutter build ios --no-codesign
+      - run: flutter build macos --debug
