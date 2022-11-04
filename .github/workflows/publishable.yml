@@ -10,6 +10,7 @@ on:
 
 jobs:
   dry_run:
+    if: github.repository == 'fluttercandies/flutter_photo_manager'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

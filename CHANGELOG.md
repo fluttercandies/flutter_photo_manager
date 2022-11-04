@@ -4,6 +4,16 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.5.0
+
+- Introduce `DarwinEditor` to replace `IosEditor`. (#855)
+
+## 2.4.2
+
+### Improvements
+
+- Expose `frame` for `AssetEntity.thumbnailDataWithSize`. (#850)
+
 ## 2.4.1
 
 ### Improvements
@@ -473,7 +483,7 @@ and applied multiple ### Fixes which make this plugin as the most solid ever.
   but at the same time user have to bear the risks corresponding to the permission).
 - Support clean file cache.
 - Experimental
-    - Preload image (Use `PhotoCachingManager` api.)
+  - Preload image (Use `PhotoCachingManager` api.)
 - Add `OrderOption` as sort condition. The option default value is order by create date desc;
 - Support icloud asset progress.
 
@@ -536,14 +546,14 @@ and applied multiple ### Fixes which make this plugin as the most solid ever.
 - Create AssetEntity with id.
 - Create AssetPathEntity from id.
 - Only iOS
-    - Create folder or album.
-    - Remove assets in album.
-    - Delete folder or album.
-    - Favorite asset.
+  - Create folder or album.
+  - Remove assets in album.
+  - Delete folder or album.
+  - Favorite asset.
 - Only android
-    - move asset to another path.
-    - Remove all non-existing rows.
-    - add `relativePath` for android.
+  - move asset to another path.
+  - Remove all non-existing rows.
+  - add `relativePath` for android.
 
 ### Improvements
 
@@ -565,6 +575,7 @@ and applied multiple ### Fixes which make this plugin as the most solid ever.
 ## 0.5.0
 
 ### Breaking changes
+
 - Add date condition to filter datetime
 - Add class `DateTimeCond`
 - Add `dateTimeCond` to `FilterOptionGroup`
