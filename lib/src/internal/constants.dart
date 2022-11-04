@@ -35,6 +35,7 @@ class PMConstants {
   static const String mSaveImage = 'saveImage';
   static const String mSaveImageWithPath = 'saveImageWithPath';
   static const String mSaveVideo = 'saveVideo';
+  static const String mSaveLivePhoto = 'saveLivePhoto';
   static const String mAssetExists = 'assetExists';
   static const String mSystemVersion = 'systemVersion';
   static const String mGetLatLngAndroidQ = 'getLatLngAndroidQ';

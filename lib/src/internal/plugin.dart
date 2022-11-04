@@ -331,6 +331,40 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     );
   }
 
+  Future<AssetEntity?> saveLivePhoto({
+    required File imageFile,
+    required File videoFile,
+    required String? title,
+    String? desc,
+    String? relativePath,
+  }) async {
+    if (!imageFile.existsSync()) {
+      assert(false, 'File of the image must exist.');
+      return null;
+    }
+    if (!videoFile.existsSync()) {
+      assert(false, 'videoFile must exists.');
+      return null;
+    }
+    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
+      PMConstants.mSaveLivePhoto,
+      <String, dynamic>{
+        'imagePath': imageFile.absolute.path,
+        'videoPath': videoFile.absolute.path,
+        'title': title,
+        'desc': desc ?? '',
+        'relativePath': relativePath,
+      },
+    );
+    if (result == null) {
+      return null;
+    }
+    return ConvertUtils.convertMapToAsset(
+      result.cast<String, dynamic>(),
+      title: title,
+    );
+  }
+
   /// Check whether the asset has been deleted.
   Future<bool> assetExistsWithId(String id) async {
     final bool? result = await _channel.invokeMethod(
