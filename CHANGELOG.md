@@ -4,7 +4,15 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.5.1
+
+### Improvements
+
+- Improve media subtype on iOS. (#863)
+
 ## 2.5.0
+
+### Features
 
 - Support saving Live Photos on iOS and macOS. (#851)
 - Introduce `DarwinEditor` to replace `IosEditor`. (#855)
