@@ -35,39 +35,6 @@
     return NO;
 }
 
-- (int)unwrappedSubtype {
-    PHAssetMediaSubtype subtype = [self mediaSubtypes];
-    if (subtype & PHAssetMediaSubtypePhotoPanorama) {
-        return 1;
-    }
-    if (subtype & PHAssetMediaSubtypePhotoHDR) {
-        return 2;
-    }
-    if (subtype & PHAssetMediaSubtypePhotoScreenshot) {
-        return 4;
-    }
-    if (@available(iOS 9.1, *)) {
-        if (subtype & PHAssetMediaSubtypePhotoLive) {
-            return 8;
-        }
-    }
-    if (@available(iOS 10.2, *)) {
-        if (subtype & PHAssetMediaSubtypePhotoDepthEffect) {
-            return 16;
-        }
-    }
-    if (subtype & PHAssetMediaSubtypeVideoStreamed) {
-        return 65536;
-    }
-    if (subtype & PHAssetMediaSubtypeVideoHighFrameRate) {
-        return 131072;
-    }
-    if (subtype & PHAssetMediaSubtypeVideoTimelapse) {
-        return 262144;
-    }
-    return 0;
-}
-
 - (NSString *)title {
     PMLogUtils *logger = [PMLogUtils sharedInstance];
     [logger info:@"get title start"];
