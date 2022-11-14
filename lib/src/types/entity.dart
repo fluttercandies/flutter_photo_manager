@@ -378,7 +378,7 @@ class AssetEntity {
   final int subtype;
 
   /// Whether the asset is a live photo. Only valid on iOS/macOS.
-  bool get isLivePhoto => subtype == 8;
+  bool get isLivePhoto => subtype & _livePhotosType == _livePhotosType;
 
   /// The type value of the [type].
   final int typeInt;
@@ -823,3 +823,6 @@ class LatLng {
   @override
   int get hashCode => latitude.hashCode ^ longitude.hashCode;
 }
+
+/// The subtype value for Live Photos.
+const int _livePhotosType = 1 << 3;

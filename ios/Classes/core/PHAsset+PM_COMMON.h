@@ -15,7 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (bool)isAudio;
 - (bool)isImageOrVideo;
 - (bool)isLivePhoto;
-- (int)unwrappedSubtype;
 
 - (NSString*)title;
 

@@ -40,41 +40,72 @@ class ImageItemWidget extends StatelessWidget {
         ),
         PositionedDirectional(
           bottom: 4,
-          end: 4,
-          child: Icon(
-            () {
-              switch (entity.type) {
-                case AssetType.other:
-                  return Icons.abc;
-                case AssetType.image:
-                  return Icons.image;
-                case AssetType.video:
-                  return Icons.video_file;
-                case AssetType.audio:
-                  return Icons.audiotrack;
-              }
-            }(),
-            color: Colors.white,
-            size: 16,
+          start: 0,
+          end: 0,
+          child: Row(
+            children: [
+              if (entity.isFavorite)
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.favorite,
+                    color: Colors.redAccent,
+                    size: 16,
+                  ),
+                ),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (entity.isLivePhoto)
+                      Container(
+                        margin: const EdgeInsetsDirectional.only(end: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 3,
+                          vertical: 1,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(4),
+                          ),
+                          color: Theme.of(context).cardColor,
+                        ),
+                        child: const Text(
+                          'LIVE',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            height: 1,
+                          ),
+                        ),
+                      ),
+                    Icon(
+                      () {
+                        switch (entity.type) {
+                          case AssetType.other:
+                            return Icons.abc;
+                          case AssetType.image:
+                            return Icons.image;
+                          case AssetType.video:
+                            return Icons.video_file;
+                          case AssetType.audio:
+                            return Icons.audiotrack;
+                        }
+                      }(),
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
-        if (entity.isFavorite)
-          PositionedDirectional(
-            bottom: 4,
-            start: 4,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.favorite,
-                color: Colors.redAccent,
-                size: 16,
-              ),
-            ),
-          ),
       ],
     );
   }
