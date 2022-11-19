@@ -333,7 +333,8 @@ object DBUtils : IDBUtils {
             if (it.moveToNext()) {
                 val targetPath = it.getString(0)
                 targetPath.checkDirs()
-                val outputStream = FileOutputStream(targetPath)
+                val outputStream = cr.openOutputStream(insertUri)
+                    ?: throw RuntimeException("Cannot open output stream for $insertUri.")
                 refreshInputStream()
                 outputStream.use { os -> inputStream.use { iStream -> iStream.copyTo(os) } }
             }
@@ -420,7 +421,8 @@ object DBUtils : IDBUtils {
                 put(MediaStore.MediaColumns.DATA, targetPath)
             }
             cr.update(contentUri, updateDataValues, null, null)
-            val outputStream = FileOutputStream(targetFile)
+            val outputStream = cr.openOutputStream(contentUri)
+                ?: throw RuntimeException("Cannot open output stream for $contentUri.")
             outputStream.use { os -> inputStream.use { it.copyTo(os) } }
             assetEntity.path = targetPath
         }
@@ -678,7 +680,8 @@ object DBUtils : IDBUtils {
                 put(MediaStore.MediaColumns.DATA, targetPath)
             }
             cr.update(contentUri, updateDataValues, null, null)
-            val outputStream = FileOutputStream(targetFile)
+            val outputStream = cr.openOutputStream(contentUri)
+                ?: throw RuntimeException("Cannot open output stream for $contentUri.")
             outputStream.use { os -> inputStream.use { it.copyTo(os) } }
             assetEntity.path = targetPath
         }
