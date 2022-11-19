@@ -331,8 +331,6 @@ object DBUtils : IDBUtils {
         ) ?: return null
         cursor.use {
             if (it.moveToNext()) {
-                val targetPath = it.getString(0)
-                targetPath.checkDirs()
                 val outputStream = cr.openOutputStream(insertUri)
                     ?: throw RuntimeException("Cannot open output stream for $insertUri.")
                 refreshInputStream()
@@ -414,7 +412,7 @@ object DBUtils : IDBUtils {
             val targetPath = "${tmpFile.parent}/$title"
             val targetFile = File(targetPath)
             if (targetFile.exists()) {
-                throw IOException("save target path is ")
+                throw IOException("Save target path is exists")
             }
             tmpFile.renameTo(targetFile)
             val updateDataValues = ContentValues().apply {
@@ -463,35 +461,36 @@ object DBUtils : IDBUtils {
             arrayOf(assetId),
             null
         ) ?: throw RuntimeException("Cannot find asset .")
-        if (!cursor.moveToNext()) {
-            throw RuntimeException("Cannot find asset .")
-        }
-        val insertUri = MediaStoreUtils.getInsertUri(mediaType)
-        val galleryInfo = getGalleryInfo(context, galleryId) ?: throwMsg("Cannot find gallery info")
-        val outputPath = "${galleryInfo.path}/${asset.displayName}"
-        val cv = ContentValues().apply {
-            for (key in copyKeys) {
-                put(key, cursor.getString(key))
+        cursor.use {
+            if (!it.moveToNext()) {
+                throw RuntimeException("Cannot find asset .")
             }
-            put(MediaStore.Files.FileColumns.MEDIA_TYPE, mediaType)
-            put(MediaStore.MediaColumns.DATA, outputPath)
+            val insertUri = MediaStoreUtils.getInsertUri(mediaType)
+            val galleryInfo = getGalleryInfo(context, galleryId) ?: throwMsg("Cannot find gallery info")
+            val outputPath = "${galleryInfo.path}/${asset.displayName}"
+            val cv = ContentValues().apply {
+                for (key in copyKeys) {
+                    put(key, cursor.getString(key))
+                }
+                put(MediaStore.Files.FileColumns.MEDIA_TYPE, mediaType)
+                put(MediaStore.MediaColumns.DATA, outputPath)
+            }
+
+            val insertedUri =
+                cr.insert(insertUri, cv) ?: throw RuntimeException("Cannot insert new asset.")
+            val outputStream = cr.openOutputStream(insertedUri)
+                ?: throw RuntimeException("Cannot open output stream for $insertedUri.")
+            val inputStream = File(asset.path).inputStream()
+            inputStream.use {
+                outputStream.use {
+                    inputStream.copyTo(outputStream)
+                }
+            }
+            val insertedId = insertedUri.lastPathSegment
+                ?: throw RuntimeException("Cannot resolve media id for $insertedUri.")
+            return getAssetEntity(context, insertedId)
         }
 
-        val insertedUri =
-            cr.insert(insertUri, cv) ?: throw RuntimeException("Cannot insert new asset.")
-        val outputStream = cr.openOutputStream(insertedUri)
-            ?: throw RuntimeException("Cannot open output stream for $insertedUri.")
-        val inputStream = File(asset.path).inputStream()
-        inputStream.use {
-            outputStream.use {
-                inputStream.copyTo(outputStream)
-            }
-        }
-
-        cursor.close()
-        val insertedId = insertedUri.lastPathSegment
-            ?: throw RuntimeException("Cannot open output stream for $insertedUri.")
-        return getAssetEntity(context, insertedId)
     }
 
     override fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity? {
@@ -673,7 +672,7 @@ object DBUtils : IDBUtils {
             val targetPath = "${tmpFile.parent}/$title"
             val targetFile = File(targetPath)
             if (targetFile.exists()) {
-                throw IOException("Save target path is ")
+                throw IOException("Save target path is exists")
             }
             tmpFile.renameTo(targetFile)
             val updateDataValues = ContentValues().apply {
