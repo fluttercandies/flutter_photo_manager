@@ -1,5 +1,6 @@
 package com.fluttercandies.photo_manager.core.utils
 
+import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
 import android.media.MediaMetadataRetriever
