@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.5.2
+
+### Improvements
+
+- Use `ContentUris` for retrieving Media URIs on Android. (#870)
+
 ## 2.5.1
 
 ### Improvements
