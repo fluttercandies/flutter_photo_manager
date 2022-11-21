@@ -36,7 +36,7 @@ object ConvertUtils {
 
     fun convertAsset(entity: AssetEntity): Map<String, Any?> {
         val data = hashMapOf(
-            "id" to entity.id,
+            "id" to entity.id.toString(),
             "duration" to entity.duration / 1000,
             "type" to entity.type,
             "createDt" to entity.createDt,

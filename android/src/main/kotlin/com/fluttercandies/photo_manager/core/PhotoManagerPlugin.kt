@@ -324,7 +324,7 @@ class PhotoManagerPlugin(
                 runOnBackground {
                     val id = call.argument<String>("id")!!
                     val type = call.argument<Int>("type")!!
-                    val mediaUri = photoManager.getMediaUri(id, type)
+                    val mediaUri = photoManager.getMediaUri(id.toLong(), type)
                     resultHandler.reply(mediaUri)
                 }
             }

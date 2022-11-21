@@ -203,7 +203,7 @@ class PhotoManager(private val context: Context) {
         }
     }
 
-    fun getMediaUri(id: String, type: Int): String {
+    fun getMediaUri(id: Long, type: Int): String {
         return dbUtils.getMediaUri(context, id, type)
     }
 

@@ -22,7 +22,7 @@ import java.io.File
 interface IDBUtils {
     companion object {
         @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.Q)
-        val isAndroidQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+        val isAboveAndroidQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
         val storeImageKeys = mutableListOf(
             DISPLAY_NAME, // 显示的名字
@@ -157,8 +157,8 @@ interface IDBUtils {
             return null
         }
 
-        val id = getString(MediaStore.MediaColumns._ID)
-        var date = if (isAndroidQ) getLong(MediaStore.MediaColumns.DATE_TAKEN)
+        val id = getLong(MediaStore.MediaColumns._ID)
+        var date = if (isAboveAndroidQ) getLong(MediaStore.MediaColumns.DATE_TAKEN)
         else getLong(MediaStore.MediaColumns.DATE_ADDED)
         if (date == 0L) {
             date = getLong(MediaStore.MediaColumns.DATE_ADDED)
@@ -174,7 +174,9 @@ interface IDBUtils {
         val displayName = getString(MediaStore.MediaColumns.DISPLAY_NAME)
         val modifiedDate = getLong(MediaStore.MediaColumns.DATE_MODIFIED)
         var orientation: Int = getInt(MediaStore.MediaColumns.ORIENTATION)
-        val relativePath: String? = if (isAndroidQ) getString(MediaStore.MediaColumns.RELATIVE_PATH) else null
+        val relativePath: String? = if (isAboveAndroidQ) {
+            getString(MediaStore.MediaColumns.RELATIVE_PATH)
+        } else null
         if (width == 0 || height == 0) {
             try {
                 if (type == MEDIA_TYPE_IMAGE && !mimeType.contains("svg")) {
@@ -370,7 +372,7 @@ interface IDBUtils {
         }
     }
 
-    fun getMediaUri(context: Context, id: String, type: Int): String {
+    fun getMediaUri(context: Context, id: Long, type: Int): String {
         val uri = getUri(id, type, false)
         return uri.toString()
     }
@@ -415,11 +417,11 @@ interface IDBUtils {
 
     fun getSomeInfo(context: Context, assetId: String): Pair<String, String?>?
 
-    fun getUri(id: String, type: Int, isOrigin: Boolean = false): Uri {
+    fun getUri(id: Long, type: Int, isOrigin: Boolean = false): Uri {
         var uri = when (type) {
-            1 -> Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-            2 -> Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
-            3 -> Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+            1 -> ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+            2 -> ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+            3 -> ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
             else -> return Uri.EMPTY
         }
 

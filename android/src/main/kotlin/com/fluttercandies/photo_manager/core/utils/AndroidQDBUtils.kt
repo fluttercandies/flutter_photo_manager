@@ -569,7 +569,7 @@ object AndroidQDBUtils : IDBUtils {
                     val mediaType = it.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
                     val path = it.getStringOrNull(MediaStore.MediaColumns.DATA)
                     val type = getTypeFromMediaType(mediaType)
-                    val uri = getUri(id, type)
+                    val uri = getUri(id.toLong(), type)
                     val exists = try {
                         cr.openInputStream(uri)?.close()
                         true
