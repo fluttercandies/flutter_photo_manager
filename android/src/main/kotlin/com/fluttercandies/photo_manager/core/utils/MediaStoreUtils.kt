@@ -1,5 +1,6 @@
 package com.fluttercandies.photo_manager.core.utils
 
+import android.content.ContentUris
 import android.net.Uri
 import android.provider.MediaStore
 
@@ -13,8 +14,8 @@ object MediaStoreUtils {
         }
     }
 
-    fun getDeleteUri(id: String, mediaType: Int): Uri {
-        return Uri.withAppendedPath(getInsertUri(mediaType), id)
+    fun getUri(id: Long, mediaType: Int): Uri {
+        return ContentUris.withAppendedId(getInsertUri(mediaType), id)
     }
 
     fun convertTypeToMediaType(type: Int): Int {
