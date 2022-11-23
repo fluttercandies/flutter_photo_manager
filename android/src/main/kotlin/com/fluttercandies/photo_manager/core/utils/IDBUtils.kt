@@ -292,7 +292,12 @@ interface IDBUtils {
             }
         }
 
-        return insertUri(context, inputStream, values)
+        return insertUri(
+            context,
+            inputStream,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            values,
+        )
     }
 
     fun saveImage(
@@ -367,7 +372,13 @@ interface IDBUtils {
             }
         }
 
-        return insertUri(context, inputStream, values, shouldKeepPath)
+        return insertUri(
+            context,
+            inputStream,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            values,
+            shouldKeepPath
+        )
     }
 
     fun saveVideo(
@@ -435,25 +446,31 @@ interface IDBUtils {
             }
         }
 
-        return insertUri(context, inputStream, values, shouldKeepPath)
+        return insertUri(
+            context,
+            inputStream,
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+            values,
+            shouldKeepPath
+        )
     }
 
     private fun insertUri(
         context: Context,
         inputStream: InputStream,
+        contentUri: Uri,
         values: ContentValues,
         shouldKeepPath: Boolean = false,
     ): AssetEntity? {
         val cr = context.contentResolver
-        val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        val contentUri = cr.insert(uri, values) ?: throw RuntimeException("Cannot insert the new asset.")
-        val id = ContentUris.parseId(contentUri)
+        val uri = cr.insert(contentUri, values) ?: throw RuntimeException("Cannot insert the new asset.")
+        val id = ContentUris.parseId(uri)
         if (!shouldKeepPath) {
-            val outputStream = cr.openOutputStream(contentUri)
-                ?: throw RuntimeException("Cannot open the output stream for $contentUri.")
+            val outputStream = cr.openOutputStream(uri)
+                ?: throw RuntimeException("Cannot open the output stream for $uri.")
             outputStream.use { os -> inputStream.use { it.copyTo(os) } }
         }
-        cr.notifyChange(contentUri, null)
+        cr.notifyChange(uri, null)
         return getAssetEntity(context, id.toString())
     }
 
