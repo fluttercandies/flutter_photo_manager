@@ -189,7 +189,7 @@ class PhotoManager(private val context: Context) {
     }
 
     fun assetExists(id: String, resultHandler: ResultHandler) {
-        val exists: Boolean = dbUtils.exists(context, id)
+        val exists: Boolean = dbUtils.assetExists(context, id)
         resultHandler.reply(exists)
     }
 
