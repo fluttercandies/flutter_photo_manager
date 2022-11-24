@@ -190,14 +190,13 @@ interface IDBUtils {
                         }
                     }
                 } else if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
-                    MediaMetadataRetriever().use { mmr ->
-                        mmr.setDataSource(path)
-                        width = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toInt() ?: 0
-                        height = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toInt() ?: 0
-                        orientation =
-                            mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toInt()
-                                ?: orientation
-                    }
+                    val mmr = MediaMetadataRetriever()
+                    mmr.setDataSource(path)
+                    width = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toInt() ?: 0
+                    height = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toInt() ?: 0
+                    orientation = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toInt()
+                        ?: orientation
+                    if (isAboveAndroidQ) mmr.close() else mmr.release()
                 }
             } catch (e: Throwable) {
                 LogUtils.error(e)
