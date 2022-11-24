@@ -426,7 +426,6 @@ interface IDBUtils {
             put(MIME_TYPE, typeFromStream)
             put(DATE_ADDED, timestamp)
             put(DATE_MODIFIED, timestamp)
-            put(DISPLAY_NAME, title)
             put(DURATION, info.duration)
             put(WIDTH, info.width)
             put(HEIGHT, info.height)
