@@ -248,10 +248,10 @@ interface IDBUtils {
         }
         val typeFromStream: String = if (title.contains(".")) {
             // Title contains file extension.
-            "image/${File(title).extension}"
+            URLConnection.guessContentTypeFromName(title)
         } else {
-            URLConnection.guessContentTypeFromStream(inputStream) ?: "image/*"
-        }
+            URLConnection.guessContentTypeFromStream(inputStream)
+        } ?: "image/*"
         val (rotationDegrees, latLong) = kotlin.run {
             try {
                 val exif = ExifInterface(inputStream)
@@ -322,10 +322,10 @@ interface IDBUtils {
         }
         val typeFromStream: String = if (title.contains(".")) {
             // Title contains file extension.
-            "image/${File(title).extension}"
+            URLConnection.guessContentTypeFromName(title)
         } else {
-            URLConnection.guessContentTypeFromStream(inputStream) ?: "image/*"
-        }
+            URLConnection.guessContentTypeFromStream(inputStream)
+        } ?: "image/*"
         val (rotationDegrees, latLong) = try {
             val exif = ExifInterface(inputStream)
             Pair(
@@ -396,8 +396,8 @@ interface IDBUtils {
 
         val timestamp = System.currentTimeMillis() / 1000
         val info = VideoUtils.getPropertiesUseMediaPlayer(fromPath)
-        val typeFromStream = URLConnection.guessContentTypeFromStream(inputStream)
-            ?: "video/${File(fromPath).extension}"
+        val typeFromStream = URLConnection.guessContentTypeFromName(fromPath)
+            ?: "video/*"
         val (rotationDegrees, latLong) = try {
             val exif = ExifInterface(inputStream)
             Pair(
