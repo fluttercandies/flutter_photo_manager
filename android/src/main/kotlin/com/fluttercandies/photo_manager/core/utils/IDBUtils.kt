@@ -160,13 +160,13 @@ interface IDBUtils {
         }
 
         val id = getLong(_ID)
-        var date = if (isAboveAndroidQ) getLong(DATE_TAKEN)
-        else getLong(DATE_ADDED)
-        if (date == 0L) {
-            date = getLong(DATE_ADDED)
-        } else {
-            date /= 1000
-        }
+        var date = if (isAboveAndroidQ) {
+            var tmpTime = getLong(DATE_TAKEN) / 1000
+            if (tmpTime == 0L) {
+                tmpTime = getLong(DATE_ADDED)
+            }
+            tmpTime
+        } else getLong(DATE_ADDED)
         val type = getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
         val mimeType = getString(MIME_TYPE)
         val duration = if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) 0
