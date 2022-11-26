@@ -8,6 +8,7 @@ that can be found in the LICENSE file. -->
 
 ### Improvements
 
+- Always declare `READ_EXTERNAL_STORAGE` permission on Android. (#874)
 - Upgrade Glide and Kotlin libraries version. (#872)
 - Avoid using file-based saving methods on Android. (#871)
 - Use `ContentUris` for retrieving Media URIs on Android. (#870)
