@@ -8,6 +8,7 @@ that can be found in the LICENSE file. -->
 
 ### Improvements
 
+- Avoid using file-based saving methods on Android. (#871)
 - Use `ContentUris` for retrieving Media URIs on Android. (#870)
 
 ## 2.5.1
