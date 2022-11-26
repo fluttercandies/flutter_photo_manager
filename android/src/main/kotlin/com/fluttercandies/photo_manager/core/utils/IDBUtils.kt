@@ -246,12 +246,9 @@ interface IDBUtils {
         } catch (e: Exception) {
             Pair(0, 0)
         }
-        val typeFromStream: String = if (title.contains(".")) {
-            // Title contains file extension.
-            URLConnection.guessContentTypeFromName(title)
-        } else {
-            URLConnection.guessContentTypeFromStream(inputStream)
-        } ?: "image/*"
+        val typeFromStream: String = URLConnection.guessContentTypeFromName(title)
+            ?: URLConnection.guessContentTypeFromStream(inputStream)
+            ?: "image/*"
         val (rotationDegrees, latLong) = kotlin.run {
             try {
                 val exif = ExifInterface(inputStream)
@@ -320,12 +317,10 @@ interface IDBUtils {
         } catch (e: Exception) {
             Pair(0, 0)
         }
-        val typeFromStream: String = if (title.contains(".")) {
-            // Title contains file extension.
-            URLConnection.guessContentTypeFromName(title)
-        } else {
-            URLConnection.guessContentTypeFromStream(inputStream)
-        } ?: "image/*"
+        val typeFromStream: String = URLConnection.guessContentTypeFromName(title)
+            ?: URLConnection.guessContentTypeFromName(fromPath)
+            ?: URLConnection.guessContentTypeFromStream(inputStream)
+            ?: "image/*"
         val (rotationDegrees, latLong) = try {
             val exif = ExifInterface(inputStream)
             Pair(
@@ -396,7 +391,8 @@ interface IDBUtils {
 
         val timestamp = System.currentTimeMillis() / 1000
         val info = VideoUtils.getPropertiesUseMediaPlayer(fromPath)
-        val typeFromStream = URLConnection.guessContentTypeFromName(fromPath)
+        val typeFromStream = URLConnection.guessContentTypeFromName(title)
+            ?: URLConnection.guessContentTypeFromName(fromPath)
             ?: "video/*"
         val (rotationDegrees, latLong) = try {
             val exif = ExifInterface(inputStream)
