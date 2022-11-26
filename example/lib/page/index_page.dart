@@ -20,6 +20,7 @@ class _IndexPageState extends State<IndexPage> {
         title: const Text('Example for photo manager.'),
       ),
       body: ListView(
+        padding: const EdgeInsets.all(8.0),
         children: <Widget>[
           routePage('gallery list', const NewHomePage()),
           routePage('save media example', const SaveMediaExample()),

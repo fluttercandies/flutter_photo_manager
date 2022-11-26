@@ -17,15 +17,19 @@ class _RemoveAndroidNotExistsExampleState
       appBar: AppBar(
         title: const Text('Remove android not exists assets.'),
       ),
-      body: Column(
-        children: <Widget>[
-          ElevatedButton(
-            child: const Text('Click and see android logcat log.'),
-            onPressed: () {
-              PhotoManager.editor.android.removeAllNoExistsAsset();
-            },
-          ),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            ElevatedButton(
+              child: const Text('Click and see android logcat log.'),
+              onPressed: () {
+                PhotoManager.editor.android.removeAllNoExistsAsset();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -132,6 +132,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       onTap: () => showDialog<void>(
         context: context,
         builder: (_) => ListDialog(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
           children: <Widget>[
             if (entity.type == AssetType.image)
               ElevatedButton(

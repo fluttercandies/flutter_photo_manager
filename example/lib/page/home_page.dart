@@ -38,6 +38,7 @@ class _NewHomePageState extends State<NewHomePage> {
           title: const Text('photo manager example'),
         ),
         body: ListView(
+          padding: const EdgeInsets.all(8.0),
           children: <Widget>[
             buildButton('Get all gallery list', _scanGalleryList),
             if (Platform.isIOS)
