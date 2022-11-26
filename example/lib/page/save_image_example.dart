@@ -80,21 +80,25 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
       appBar: AppBar(
         title: const Text('Save media page'),
       ),
-      body: Column(
-        children: <Widget>[
-          ElevatedButton(
-            onPressed: saveImageWithBytes,
-            child: const Text('Save image with bytes'),
-          ),
-          ElevatedButton(
-            onPressed: saveImageWithPath,
-            child: const Text('Save image with path'),
-          ),
-          ElevatedButton(
-            onPressed: saveVideo,
-            child: const Text('Save video'),
-          ),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            ElevatedButton(
+              onPressed: saveImageWithBytes,
+              child: const Text('Save image with bytes'),
+            ),
+            ElevatedButton(
+              onPressed: saveImageWithPath,
+              child: const Text('Save image with path'),
+            ),
+            ElevatedButton(
+              onPressed: saveVideo,
+              child: const Text('Save video'),
+            ),
+          ],
+        ),
       ),
     );
   }

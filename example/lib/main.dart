@@ -180,11 +180,14 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
       appBar: AppBar(title: const Text('photo_manager')),
       body: Column(
         children: <Widget>[
-          const Text(
-            'This page will only obtain the first page of assets '
-            'under the primary album (a.k.a. Recent). '
-            'If you want more filtering assets, '
-            'head over to "Advanced usages".',
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              'This page will only obtain the first page of assets '
+              'under the primary album (a.k.a. Recent). '
+              'If you want more filtering assets, '
+              'head over to "Advanced usages".',
+            ),
           ),
           Expanded(child: _buildBody(context)),
         ],

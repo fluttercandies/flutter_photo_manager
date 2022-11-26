@@ -26,19 +26,22 @@ class _CreateEntityByIdState extends State<CreateEntityById> {
       appBar: AppBar(
         title: const Text('Create AssetEntity by id'),
       ),
-      body: Column(
-        children: <Widget>[
-          TextField(
-            controller: controller,
-            decoration: const InputDecoration(
-              hintText: 'input asset id',
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: <Widget>[
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                hintText: 'input asset id',
+              ),
             ),
-          ),
-          ElevatedButton(
-            onPressed: createAssetEntityAndShow,
-            child: const Text('Create assetEntity'),
-          ),
-        ],
+            ElevatedButton(
+              onPressed: createAssetEntityAndShow,
+              child: const Text('Create assetEntity'),
+            ),
+          ],
+        ),
       ),
     );
   }

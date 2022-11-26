@@ -35,6 +35,7 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
         title: const Text('develop index'),
       ),
       body: ListView(
+        padding: const EdgeInsets.all(8.0),
         children: <Widget>[
           ElevatedButton(
             child: const Text('Show iOS create folder example.'),
