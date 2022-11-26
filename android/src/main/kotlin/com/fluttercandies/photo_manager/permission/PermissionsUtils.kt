@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.fluttercandies.photo_manager.permission
 
 import android.Manifest
@@ -120,14 +118,12 @@ class PermissionsUtils {
     private fun checkPermissions(vararg permissions: String): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             resetStatus()
-            for (i in permissions.indices) {
-                // 检查权限
-                if (mActivity!!.checkSelfPermission(permissions[i]) == PackageManager.PERMISSION_DENIED) {
-                    needToRequestPermissionsList.add(permissions[i])
+            for (p in permissions) {
+                if (mActivity!!.checkSelfPermission(p) == PackageManager.PERMISSION_DENIED) {
+                    return false
                 }
             }
-            // 全部权限获取成功返回 true，否则返回 false
-            return needToRequestPermissionsList.isEmpty()
+            return true
         }
         return true
     }
@@ -272,10 +268,18 @@ class PermissionsUtils {
 
     fun havePermissionInManifest(context: Context, permission: String): Boolean {
         val applicationInfo = context.applicationInfo
-        val packageInfo = context.packageManager.getPackageInfo(
-            applicationInfo.packageName,
-            PackageManager.GET_PERMISSIONS
-        )
+        val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.packageManager.getPackageInfo(
+                applicationInfo.packageName,
+                PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong())
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            context.packageManager.getPackageInfo(
+                applicationInfo.packageName,
+                PackageManager.GET_PERMISSIONS
+            )
+        }
         return packageInfo.requestedPermissions.contains(permission)
     }
 }
