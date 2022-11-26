@@ -8,6 +8,7 @@ that can be found in the LICENSE file. -->
 
 ### Improvements
 
+- Always declare `READ_EXTERNAL_STORAGE` permission on Android. (#874)
 - Use `ContentUris` for retrieving Media URIs on Android. (#870)
 
 ## 2.5.1
