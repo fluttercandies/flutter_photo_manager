@@ -153,9 +153,9 @@ On Android 10, **Scoped Storage** was introduced,
 which causes the origin resource file not directly
 inaccessible through it file path.
 
-If your `compileSdkVersion` is `29`, you can consider adding
-`android:requestLegacyExternalStorage="true"` to your
-`AndroidManifest.xml` in order to obtain resources:
+If your `compileSdkVersion` or `targetSdkVersion is `29`,
+you can consider adding `android:requestLegacyExternalStorage="true"`
+to your `AndroidManifest.xml` in order to obtain resources:
 
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
