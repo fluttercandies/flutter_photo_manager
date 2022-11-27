@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.5.1+1
+
+### Fixes
+
+- Fix pending permissions request on Android. (#879)
+
 ## 2.5.1
 
 ### Improvements

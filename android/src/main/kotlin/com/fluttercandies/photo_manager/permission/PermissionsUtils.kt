@@ -120,10 +120,11 @@ class PermissionsUtils {
             resetStatus()
             for (p in permissions) {
                 if (mActivity!!.checkSelfPermission(p) == PackageManager.PERMISSION_DENIED) {
-                    return false
+                    // Add the denied permission to the pending list.
+                    needToRequestPermissionsList.add(p)
                 }
             }
-            return true
+            return needToRequestPermissionsList.isEmpty()
         }
         return true
     }
