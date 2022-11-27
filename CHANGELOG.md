@@ -4,7 +4,7 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
-## 2.5.2
+## 2.5.1
 
 ### Improvements
 
@@ -12,11 +12,6 @@ that can be found in the LICENSE file. -->
 - Upgrade Glide and Kotlin libraries version. (#872)
 - Avoid using file-based saving methods on Android. (#871)
 - Use `ContentUris` for retrieving Media URIs on Android. (#870)
-
-## 2.5.1
-
-### Improvements
-
 - Improve media subtype on iOS. (#863)
 
 ## 2.5.0
