@@ -303,6 +303,10 @@ class AssetPathProvider extends ChangeNotifier {
       path.getAssetListPaged(page: page + 1, size: loadCount),
       prefix: 'Load more assets list from path ${path.id}',
     );
+    if (list.isEmpty) {
+      Log.e('load error');
+      return;
+    }
     page = page + 1;
     this.list.addAll(list);
     notifyListeners();
