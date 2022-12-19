@@ -17,32 +17,6 @@ import java.io.File
 
 object ThumbnailUtil {
     fun getThumbnail(
-        ctx: Context,
-        path: String,
-        width: Int,
-        height: Int,
-        format: Bitmap.CompressFormat,
-        quality: Int,
-        frame: Long,
-        result: MethodChannel.Result?
-    ) {
-        val resultHandler = ResultHandler(result)
-
-        try {
-            val resource = Glide.with(ctx)
-                .asBitmap()
-                .apply(RequestOptions().frame(frame).priority(Priority.IMMEDIATE))
-                .load(File(path))
-                .submit(width, height).get()
-            val bos = ByteArrayOutputStream()
-            resource.compress(format, quality, bos)
-            resultHandler.reply(bos.toByteArray())
-        } catch (e: Exception) {
-            resultHandler.reply(null)
-        }
-    }
-
-    fun getThumbnail(
         context: Context,
         entity: AssetEntity,
         width: Int,
@@ -65,7 +39,7 @@ object ThumbnailUtil {
             resource.compress(format, quality, bos)
             resultHandler.reply(bos.toByteArray())
         } catch (e: Exception) {
-            resultHandler.reply(null)
+            resultHandler.replyError("Thumbnail request error", e.toString())
         }
     }
 

@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.5.2
+
+### Improvements
+
+- Reply errors when thumbnails are failed to load on Android. (#883)
+
 ## 2.5.1+1
 
 ### Fixes
