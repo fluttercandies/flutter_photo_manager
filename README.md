@@ -7,10 +7,13 @@ that can be found in the LICENSE file. -->
 English | [中文说明](#) (🚧 WIP)
 
 [![pub package](https://img.shields.io/pub/v/photo_manager?label=stable)][pub package]
-[![pub pre-release package](https://img.shields.io/pub/v/photo_manager?color=42a012&include_prereleases&label=dev)](https://pub.dev/packages/photo_manager)
-[![Awesome Flutter](https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true)](https://github.com/Solido/awesome-flutter)
-[![GitHub](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager)][repo]
-[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?style=social&label=Stars)][repo]
+[![pub pre-release package](https://img.shields.io/pub/v/photo_manager?color=9d00ff&include_prereleases&label=dev)](https://pub.dev/packages/photo_manager)
+[![Build status](https://img.shields.io/github/actions/workflow/status/fluttercandies/flutter_photo_manager/runnable.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/actions/workflows/runnable.yml)
+[![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager)](https://github.com/fluttercandies/flutter_photo_manager/blob/main/LICENSE)
+
+[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?style=social&label=Stars)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/network)
+[![Awesome Flutter](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/Solido/awesome-flutter)
 <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
 
 A Flutter plugin that provides assets abstraction management APIs without UI integration,
@@ -32,63 +35,62 @@ you can get assets (image/video/audio) on Android, iOS and macOS.
 For versions upgrade across major versions,
 see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
 
-## Table of Contents
-
-- [photo_manager](#photo_manager)
-  - [Projects using this plugin](#projects-using-this-plugin)
-  - [Articles about this plugin](#articles-about-this-plugin)
-  - [Migration guide](#migration-guide)
-  - [Table of Contents](#table-of-contents)
-  - [Common issues](#common-issues)
-  - [Prepare for use](#prepare-for-use)
-    - [Add the plugin reference to pubspec.yaml](#add-the-plugin-reference-to-pubspecyaml)
-    - [Import in your projects](#import-in-your-projects)
-    - [Configure native platforms](#configure-native-platforms)
-      - [Android config preparation](#android-config-preparation)
-        - [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
-        - [Android 10+ (Q, 29)](#android-10-q-29)
-        - [Glide](#glide)
-      - [iOS config preparation](#ios-config-preparation)
-  - [Usage](#usage)
-    - [Request for permission](#request-for-permission)
-      - [Limited entities access on iOS](#limited-entities-access-on-ios)
-    - [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders-assetpathentity)
-    - [Get assets (`AssetEntity`)](#get-assets-assetentity)
-      - [From `AssetPathEntity`](#from-assetpathentity)
-      - [From ID](#from-id)
-      - [From raw data](#from-raw-data)
-      - [From iCloud](#from-icloud)
-      - [Display assets](#display-assets)
-      - [Obtain "Live Photos"](#obtain-live-photos)
-        - [Filtering only "Live Photos"](#filtering-only-live-photos)
-        - [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
-      - [Limitations](#limitations)
-        - [Android 10 media location permission](#android-10-media-location-permission)
-        - [Usage of the original data](#usage-of-the-original-data)
-        - [Long retrieving duration with file on iOS](#long-retrieving-duration-with-file-on-ios)
-    - [Entities change notify](#entities-change-notify)
-  - [Cache mechanism](#cache-mechanism)
-    - [Cache on Android](#cache-on-android)
-    - [Cache on iOS](#cache-on-ios)
-    - [Clear caches](#clear-caches)
-  - [Native extra configs](#native-extra-configs)
-    - [Android extra configs](#android-extra-configs)
-      - [Glide issues](#glide-issues)
-      - [Android 13 (Api 33) extra configs](#android-13-api-33-extra-configs)
-    - [iOS extra configs](#ios-extra-configs)
-      - [Localized system albums name](#localized-system-albums-name)
-    - [Experimental features](#experimental-features)
-      - [Preload thumbnails](#preload-thumbnails)
-      - [Delete entities](#delete-entities)
-      - [Copy an entity](#copy-an-entity)
-      - [Features for Android only](#features-for-android-only)
-        - [Move an entity to another album](#move-an-entity-to-another-album)
-        - [Remove all non-exist entities](#remove-all-non-exist-entities)
-      - [Features for iOS or macOS](#features-for-ios-or-macos)
-        - [Create a folder](#create-a-folder)
-        - [Create an album](#create-an-album)
-        - [Remove the entity entry from the album](#remove-the-entity-entry-from-the-album)
-        - [Delete a path entity](#delete-a-path-entity)
+<!-- TOC -->
+* [photo_manager](#photomanager)
+  * [Projects using this plugin](#projects-using-this-plugin)
+  * [Articles about this plugin](#articles-about-this-plugin)
+  * [Migration guide](#migration-guide)
+  * [Common issues](#common-issues)
+  * [Prepare for use](#prepare-for-use)
+    * [Add the plugin reference to pubspec.yaml](#add-the-plugin-reference-to-pubspecyaml)
+    * [Import in your projects](#import-in-your-projects)
+    * [Configure native platforms](#configure-native-platforms)
+      * [Android config preparation](#android-config-preparation)
+        * [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
+        * [Android 10+ (Q, 29)](#android-10--q-29-)
+        * [Glide](#glide)
+      * [iOS config preparation](#ios-config-preparation)
+  * [Usage](#usage)
+    * [Request for permission](#request-for-permission)
+      * [Limited entities access on iOS](#limited-entities-access-on-ios)
+    * [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders--assetpathentity-)
+    * [Get assets (`AssetEntity`)](#get-assets--assetentity-)
+      * [From `AssetPathEntity`](#from-assetpathentity)
+      * [From ID](#from-id)
+      * [From raw data](#from-raw-data)
+      * [From iCloud](#from-icloud)
+      * [Display assets](#display-assets)
+      * [Obtain "Live Photos"](#obtain--live-photos-)
+        * [Filtering only "Live Photos"](#filtering-only--live-photos-)
+        * [Obtain the video from "Live Photos"](#obtain-the-video-from--live-photos-)
+      * [Limitations](#limitations)
+        * [Android 10 media location permission](#android-10-media-location-permission)
+        * [Usage of the original data](#usage-of-the-original-data)
+        * [Long retrieving duration with file on iOS](#long-retrieving-duration-with-file-on-ios)
+    * [Entities change notify](#entities-change-notify)
+  * [Cache mechanism](#cache-mechanism)
+    * [Cache on Android](#cache-on-android)
+    * [Cache on iOS](#cache-on-ios)
+    * [Clear caches](#clear-caches)
+  * [Native extra configs](#native-extra-configs)
+    * [Android extra configs](#android-extra-configs)
+      * [Glide issues](#glide-issues)
+      * [Android 13 (Api 33) extra configs](#android-13--api-33--extra-configs)
+    * [iOS extra configs](#ios-extra-configs)
+      * [Localized system albums name](#localized-system-albums-name)
+    * [Experimental features](#experimental-features)
+      * [Preload thumbnails](#preload-thumbnails)
+      * [Delete entities](#delete-entities)
+      * [Copy an entity](#copy-an-entity)
+      * [Features for Android only](#features-for-android-only)
+        * [Move an entity to another album](#move-an-entity-to-another-album)
+        * [Remove all non-exist entities](#remove-all-non-exist-entities)
+      * [Features for iOS or macOS](#features-for-ios-or-macos)
+        * [Create a folder](#create-a-folder)
+        * [Create an album](#create-an-album)
+        * [Remove the entity entry from the album](#remove-the-entity-entry-from-the-album)
+        * [Delete a path entity](#delete-a-path-entity)
+<!-- TOC -->
 
 ## Common issues
 
@@ -188,7 +190,7 @@ See [Generated API][] for the implementation.
 Define the `NSPhotoLibraryUsageDescription`
 key-value in the `ios/Runner/Info.plist`:
 
-```xml
+```plist
 <key>NSPhotoLibraryUsageDescription</key>
 <string>In order to access your photo library</string>
 ```
@@ -489,7 +491,7 @@ the plugin will save a file in the cache folder for further use.
 Fortunately, on Android 11 and above, the resource path can be obtained directly again,
 but you can still use `requestLegacyExternalStorage`
 to access files in the storage without caching them.
-See [Android 10+ (Q, 29)](#android-10-q-29) for how to add the attribute.
+See [Android 10+ (Q, 29)](#android-10--q-29-) for how to add the attribute.
 
 ### Cache on iOS
 
