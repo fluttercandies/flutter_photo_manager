@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:oktoast/oktoast.dart';
@@ -15,7 +16,12 @@ final PhotoProvider provider = PhotoProvider();
 void main() {
   runZonedGuarded(
     () => runApp(const _SimpleExampleApp()),
-    (Object e, StackTrace s) => showToast('$e\n$s', textAlign: TextAlign.start),
+    (Object e, StackTrace s) {
+      if (kDebugMode) {
+        FlutterError.reportError(FlutterErrorDetails(exception: e, stack: s));
+      }
+      showToast('$e\n$s', textAlign: TextAlign.start);
+    },
   );
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
