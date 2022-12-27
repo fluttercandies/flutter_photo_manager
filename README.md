@@ -11,7 +11,7 @@ English | [中文说明](#) (🚧 WIP)
 [![Build status](https://img.shields.io/github/actions/workflow/status/fluttercandies/flutter_photo_manager/runnable.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/actions/workflows/runnable.yml)
 [![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager)](https://github.com/fluttercandies/flutter_photo_manager/blob/main/LICENSE)
 
-[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?style=social&label=Stars)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/network)
 [![Awesome Flutter](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/Solido/awesome-flutter)
 <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
