@@ -12,7 +12,7 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
-import com.fluttercandies.photo_manager.core.entity.FilterOption
+import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
 import com.fluttercandies.photo_manager.core.entity.PermissionResult
 import com.fluttercandies.photo_manager.core.entity.ThumbLoadOption
 import com.fluttercandies.photo_manager.core.utils.ConvertUtils

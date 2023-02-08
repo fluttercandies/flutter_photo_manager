@@ -5,22 +5,27 @@
 import 'dart:convert';
 
 import '../internal/enums.dart';
+import 'base_filter.dart';
 import 'filter_options.dart';
 
 /// The group class to obtain [FilterOption]s.
-class FilterOptionGroup {
+class FilterOptionGroup extends BaseFilter {
   /// Construct a default options group.
   FilterOptionGroup({
     FilterOption imageOption = const FilterOption(),
     FilterOption videoOption = const FilterOption(),
     FilterOption audioOption = const FilterOption(),
-    this.containsPathModified = false,
-    this.containsLivePhotos = true,
-    this.onlyLivePhotos = false,
+    bool containsPathModified = false,
+    bool containsLivePhotos = true,
+    bool onlyLivePhotos = false,
     DateTimeCond? createTimeCond,
     DateTimeCond? updateTimeCond,
     List<OrderOption> orders = const <OrderOption>[],
   }) {
+    super.containsPathModified = containsPathModified;
+    super.containsLivePhotos = containsLivePhotos;
+    super.onlyLivePhotos = onlyLivePhotos;
+
     _map[AssetType.image] = imageOption;
     _map[AssetType.video] = videoOption;
     _map[AssetType.audio] = audioOption;
@@ -41,24 +46,6 @@ class FilterOptionGroup {
   void setOption(AssetType type, FilterOption option) {
     _map[type] = option;
   }
-
-  /// Whether the [AssetPathEntity]s will return with modified time.
-  ///
-  /// This option is performance-consuming. Use with cautious.
-  ///
-  /// See also:
-  ///  * [AssetPathEntity.lastModified].
-  bool containsPathModified = false;
-
-  /// Whether to obtain live photos.
-  ///
-  /// This option only takes effects on iOS.
-  bool containsLivePhotos = true;
-
-  /// Whether to obtain only live photos.
-  ///
-  /// This option only takes effects on iOS and when the request type is image.
-  bool onlyLivePhotos = false;
 
   DateTimeCond createTimeCond = DateTimeCond.def();
   DateTimeCond updateTimeCond = DateTimeCond.def().copyWith(ignore: true);
@@ -83,7 +70,20 @@ class FilterOptionGroup {
       ..addAll(other.orders);
   }
 
-  Map<String, dynamic> toMap() {
+  @override
+  FilterOptionGroup updateDateToNow() {
+    return copyWith(
+      createTimeCond: createTimeCond.copyWith(
+        max: DateTime.now(),
+      ),
+      updateTimeCond: updateTimeCond.copyWith(
+        max: DateTime.now(),
+      ),
+    );
+  }
+
+  @override
+  Map<String, dynamic> childMap() {
     return <String, dynamic>{
       if (_map.containsKey(AssetType.image))
         'image': getOption(AssetType.image).toMap(),
@@ -91,9 +91,6 @@ class FilterOptionGroup {
         'video': getOption(AssetType.video).toMap(),
       if (_map.containsKey(AssetType.audio))
         'audio': getOption(AssetType.audio).toMap(),
-      'containsPathModified': containsPathModified,
-      'containsLivePhotos': containsLivePhotos,
-      'onlyLivePhotos': onlyLivePhotos,
       'createDate': createTimeCond.toMap(),
       'updateDate': updateTimeCond.toMap(),
       'orders': orders.map((OrderOption e) => e.toMap()).toList(),
@@ -139,4 +136,7 @@ class FilterOptionGroup {
   String toString() {
     return const JsonEncoder.withIndent('  ').convert(toMap());
   }
+
+  @override
+  BaseFilterType get type => BaseFilterType.classical;
 }

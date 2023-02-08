@@ -16,8 +16,7 @@ import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
-import com.fluttercandies.photo_manager.core.entity.DateCond
-import com.fluttercandies.photo_manager.core.entity.FilterOption
+import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
 import com.fluttercandies.photo_manager.util.LogUtils
 import java.io.*
@@ -81,9 +80,6 @@ interface IDBUtils {
 
     val allUri: Uri
         get() = IDBUtils.allUri
-
-    private val typeUtils: RequestTypeUtils
-        get() = RequestTypeUtils
 
     fun getAssetPathList(
         context: Context,
@@ -486,93 +482,6 @@ interface IDBUtils {
         needLocationPermission: Boolean
     ): ByteArray
 
-    /**
-     * Just filter [MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE]
-     */
-    fun sizeWhere(requestType: Int?, option: FilterOption): String {
-        if (option.imageOption.sizeConstraint.ignoreSize) {
-            return ""
-        }
-        if (requestType == null || !typeUtils.containsImage(requestType)) {
-            return ""
-        }
-        val mediaType = MediaStore.Files.FileColumns.MEDIA_TYPE
-        var result = ""
-        if (typeUtils.containsVideo(requestType)) {
-            result = "OR ( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO} )"
-        }
-        if (typeUtils.containsAudio(requestType)) {
-            result = "$result OR ( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO} )"
-        }
-        val size = "$WIDTH > 0 AND $HEIGHT > 0"
-        val imageCondString = "( $mediaType = ${MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE} AND $size )"
-        result = "AND ($imageCondString $result)"
-        return result
-    }
-
-    fun getCondFromType(type: Int, filterOption: FilterOption, args: ArrayList<String>): String {
-        val cond = StringBuilder()
-        val typeKey = MediaStore.Files.FileColumns.MEDIA_TYPE
-
-        val haveImage = RequestTypeUtils.containsImage(type)
-        val haveVideo = RequestTypeUtils.containsVideo(type)
-        val haveAudio = RequestTypeUtils.containsAudio(type)
-
-        var imageCondString = ""
-        var videoCondString = ""
-        var audioCondString = ""
-
-        if (haveImage) {
-            val imageCond = filterOption.imageOption
-            imageCondString = "$typeKey = ? "
-            args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString())
-            if (!imageCond.sizeConstraint.ignoreSize) {
-                val sizeCond = imageCond.sizeCond()
-                val sizeArgs = imageCond.sizeArgs()
-                imageCondString = "$imageCondString AND $sizeCond"
-                args.addAll(sizeArgs)
-            }
-        }
-
-        if (haveVideo) {
-            val videoCond = filterOption.videoOption
-            val durationCond = videoCond.durationCond()
-            val durationArgs = videoCond.durationArgs()
-            videoCondString = "$typeKey = ? AND $durationCond"
-            args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString())
-            args.addAll(durationArgs)
-        }
-
-        if (haveAudio) {
-            val audioCond = filterOption.audioOption
-            val durationCond = audioCond.durationCond()
-            val durationArgs = audioCond.durationArgs()
-            audioCondString = "$typeKey = ? AND $durationCond"
-            args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO.toString())
-            args.addAll(durationArgs)
-        }
-
-        if (haveImage) {
-            cond.append("( $imageCondString )")
-        }
-
-        if (haveVideo) {
-            if (cond.isNotEmpty()) {
-                cond.append("OR ")
-            }
-            cond.append("( $videoCondString )")
-        }
-
-        if (haveAudio) {
-            if (cond.isNotEmpty()) {
-                cond.append("OR ")
-            }
-            cond.append("( $audioCondString )")
-        }
-
-        return "AND ( $cond )"
-    }
-
     fun logRowWithId(context: Context, id: String) {
         if (LogUtils.isLog) {
             val splitter = "".padStart(40, '-')
@@ -600,29 +509,6 @@ interface IDBUtils {
         requestType: Int,
         option: FilterOption
     ): List<AssetPathEntity>
-
-    fun getDateCond(args: ArrayList<String>, option: FilterOption): String {
-        val createDateCond =
-            addDateCond(args, option.createDateCond, MediaStore.Images.Media.DATE_ADDED)
-        val updateDateCond =
-            addDateCond(args, option.updateDateCond, MediaStore.Images.Media.DATE_MODIFIED)
-        return "$createDateCond $updateDateCond"
-    }
-
-    private fun addDateCond(args: ArrayList<String>, dateCond: DateCond, dbKey: String): String {
-        if (dateCond.ignore) {
-            return ""
-        }
-
-        val minMs = dateCond.minMs
-        val maxMs = dateCond.maxMs
-
-        val dateSelection = "AND ( $dbKey >= ? AND $dbKey <= ? )"
-        args.add((minMs / 1000).toString())
-        args.add((maxMs / 1000).toString())
-
-        return dateSelection
-    }
 
     fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String? {
         val orderBy = filterOption.orderByCondString()

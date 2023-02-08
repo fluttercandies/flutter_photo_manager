@@ -4,14 +4,10 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:photo_manager/photo_manager.dart';
 
-import '../filter/filter_option_group.dart';
 import '../internal/editor.dart';
-import '../internal/enums.dart';
 import '../internal/plugin.dart' as base;
-import '../types/entity.dart';
-import '../types/types.dart';
-import 'notify_manager.dart';
 
 /// The core manager of this plugin.
 /// Use various methods in this class to access & manage assets.
@@ -81,7 +77,7 @@ class PhotoManager {
     bool hasAll = true,
     bool onlyAll = false,
     RequestType type = RequestType.common,
-    FilterOptionGroup? filterOption,
+    BaseFilter? filterOption,
   }) async {
     return plugin.getAssetPathList(
       hasAll: hasAll,

@@ -8,7 +8,7 @@ import android.util.Log
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.FutureTarget
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
-import com.fluttercandies.photo_manager.core.entity.FilterOption
+import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
 import com.fluttercandies.photo_manager.core.entity.ThumbLoadOption
 import com.fluttercandies.photo_manager.core.utils.*

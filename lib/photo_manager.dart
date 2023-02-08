@@ -7,8 +7,10 @@
 /// To use, import `package:photo_manager/photo_manager.dart`.
 library photo_manager;
 
+export 'src/filter/base_filter.dart';
 export 'src/filter/filter_option_group.dart';
 export 'src/filter/filter_options.dart';
+export 'src/filter/custom_filter.dart';
 
 export 'src/internal/enums.dart';
 export 'src/internal/extensions.dart';

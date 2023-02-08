@@ -3,6 +3,7 @@ package com.fluttercandies.photo_manager.core.utils
 import android.provider.MediaStore
 import com.fluttercandies.photo_manager.constant.AssetType
 import com.fluttercandies.photo_manager.core.entity.*
+import com.fluttercandies.photo_manager.core.entity.filter.*
 
 object ConvertUtils {
     fun convertPaths(list: List<AssetPathEntity>): Map<String, Any> {
@@ -97,7 +98,14 @@ object ConvertUtils {
     }
 
     fun convertToFilterOptions(map: Map<*, *>): FilterOption {
-        return FilterOption(map)
+        val type = map["type"] as Int
+        val childMap = map["child"] as Map<*, *>
+        if (type == 0) {
+            return CommonFilterOption(childMap)
+        } else if (type == 1) {
+            return CustomOption(map)
+        }
+        throw IllegalStateException("Unknown type $type for filter option.")
     }
 
     fun convertToOrderByConds(orders: List<*>): List<OrderByCond> {

@@ -7,15 +7,10 @@ import 'dart:io';
 import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/services.dart';
+import 'package:photo_manager/photo_manager.dart';
 
-import '../filter/filter_option_group.dart';
-import '../types/entity.dart';
-import '../types/thumbnail.dart';
-import '../types/types.dart';
 import '../utils/convert_utils.dart';
 import 'constants.dart';
-import 'enums.dart';
-import 'progress_handler.dart';
 
 PhotoManagerPlugin plugin = PhotoManagerPlugin();
 
@@ -29,7 +24,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     bool hasAll = true,
     bool onlyAll = false,
     RequestType type = RequestType.common,
-    FilterOptionGroup? filterOption,
+    BaseFilter? filterOption,
   }) async {
     if (onlyAll) {
       assert(hasAll, 'If only is true, then the hasAll must be not null.');
@@ -37,10 +32,8 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     filterOption ??= FilterOptionGroup();
     // Avoid filtering live photos when searching for audios.
     if (type == RequestType.audio) {
-      filterOption = filterOption.copyWith(
-        containsLivePhotos: false,
-        onlyLivePhotos: false,
-      );
+      filterOption.containsLivePhotos = false;
+      filterOption.onlyLivePhotos = false;
     }
     assert(
       type == RequestType.image || !filterOption.onlyLivePhotos,
@@ -97,7 +90,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   /// Use pagination to get album content.
   Future<List<AssetEntity>> getAssetListPaged(
     String id, {
-    required FilterOptionGroup optionGroup,
+    required BaseFilter optionGroup,
     int page = 0,
     int size = 15,
     RequestType type = RequestType.common,
@@ -122,7 +115,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     required RequestType type,
     required int start,
     required int end,
-    required FilterOptionGroup optionGroup,
+    required BaseFilter optionGroup,
   }) async {
     final Map<dynamic, dynamic> map =
         await _channel.invokeMethod<Map<dynamic, dynamic>>(
@@ -208,7 +201,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   Future<Map<dynamic, dynamic>?> fetchPathProperties(
     String id,
     RequestType type,
-    FilterOptionGroup optionGroup,
+    BaseFilter optionGroup,
   ) {
     return _channel.invokeMethod(
       PMConstants.mFetchPathProperties,

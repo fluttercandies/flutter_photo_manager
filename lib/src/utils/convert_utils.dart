@@ -2,9 +2,7 @@
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
 
-import '../filter/filter_option_group.dart';
-import '../types/entity.dart';
-import '../types/types.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 class ConvertUtils {
   const ConvertUtils._();
@@ -12,7 +10,7 @@ class ConvertUtils {
   static List<AssetPathEntity> convertToPathList(
     Map<String, dynamic> data, {
     required RequestType type,
-    FilterOptionGroup? optionGroup,
+    BaseFilter? optionGroup,
   }) {
     final List<AssetPathEntity> result = <AssetPathEntity>[];
     final List<Map<dynamic, dynamic>> list =
@@ -46,7 +44,7 @@ class ConvertUtils {
   static AssetPathEntity convertMapToPath(
     Map<String, dynamic> data, {
     required RequestType type,
-    FilterOptionGroup? optionGroup,
+    BaseFilter? optionGroup,
   }) {
     final int? modified = data['modified'] as int?;
     final DateTime? lastModified = modified != null
