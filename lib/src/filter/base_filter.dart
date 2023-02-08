@@ -44,8 +44,10 @@ abstract class BaseFilter {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'type': type.value,
-      'child': childMap(),
-      ..._paramMap(),
+      'child': {
+        ...childMap(),
+        ..._paramMap(),
+      },
     };
   }
 

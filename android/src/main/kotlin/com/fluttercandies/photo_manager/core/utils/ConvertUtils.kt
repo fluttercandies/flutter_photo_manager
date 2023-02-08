@@ -103,7 +103,7 @@ object ConvertUtils {
         if (type == 0) {
             return CommonFilterOption(childMap)
         } else if (type == 1) {
-            return CustomOption(map)
+            return CustomOption(childMap)
         }
         throw IllegalStateException("Unknown type $type for filter option.")
     }

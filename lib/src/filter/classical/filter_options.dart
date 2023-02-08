@@ -5,8 +5,7 @@
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
-
-import '../internal/enums.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 /// A series of filter options for [AssetType] when querying assets.
 @immutable

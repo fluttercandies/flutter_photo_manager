@@ -4,9 +4,7 @@
 
 import 'dart:convert';
 
-import '../internal/enums.dart';
-import 'base_filter.dart';
-import 'filter_options.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 /// The group class to obtain [FilterOption]s.
 class FilterOptionGroup extends BaseFilter {

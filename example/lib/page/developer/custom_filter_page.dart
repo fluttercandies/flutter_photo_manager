@@ -6,7 +6,7 @@ class CustomFilterPage extends StatefulWidget {
   const CustomFilterPage({Key? key}) : super(key: key);
 
   @override
-  _CustomFilterPageState createState() => _CustomFilterPageState();
+  State<CustomFilterPage> createState() => _CustomFilterPageState();
 }
 
 class _CustomFilterPageState extends State<CustomFilterPage> {
@@ -19,7 +19,8 @@ class _CustomFilterPageState extends State<CustomFilterPage> {
   }
 
   BaseFilter createCustomFilter() {
-    final CustomFilter filter = CustomFilter();
+    // final AdvancedCustomFilter filter = AdvancedCustomFilter();
+    final filter = CustomFilter.sql('200 < width AND width < 300', 'width');
     return filter;
   }
 
@@ -37,13 +38,28 @@ class _CustomFilterPageState extends State<CustomFilterPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Custom Filter'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _refresh,
+          ),
+        ],
       ),
       body: ListView.builder(
         itemBuilder: (BuildContext context, int index) {
-          final AssetPathEntity entity = _list[index];
+          final AssetPathEntity path = _list[index];
           return ListTile(
-            title: Text(entity.name),
-            subtitle: Text(entity.id),
+            title: Text(path.name),
+            subtitle: Text(path.id),
+            trailing: FutureBuilder<int>(
+              future: path.assetCountAsync,
+              builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                if (snapshot.hasData) {
+                  return Text(snapshot.data.toString());
+                }
+                return const SizedBox();
+              },
+            ),
             onTap: () {},
           );
         },

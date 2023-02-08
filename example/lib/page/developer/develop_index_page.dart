@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photo_manager_example/page/developer/custom_filter_page.dart';
 
 import '../../util/log.dart';
 import 'create_entity_by_id.dart';
@@ -37,6 +38,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
       body: ListView(
         padding: const EdgeInsets.all(8.0),
         children: <Widget>[
+          ElevatedButton(
+            onPressed: () => navToWidget(const CustomFilterPage()),
+            child: const Text('Custom filter'),
+          ),
           ElevatedButton(
             child: const Text('Show iOS create folder example.'),
             onPressed: () => navToWidget(const CreateFolderExample()),
