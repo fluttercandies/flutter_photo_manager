@@ -7,11 +7,16 @@ class CustomOption(private val map: Map<*, *>) : FilterOption() {
     override val containsPathModified: Boolean = map["containsPathModified"] as Boolean
 
     override fun orderByCondString(): String? {
-        val orderBy = map["orderBy"] as String?
-        if (orderBy != null && orderBy.trim().isEmpty()) {
+        val list = map["orderBy"] as? List<*>
+        if (list.isNullOrEmpty()) {
             return null
         }
-        return orderBy
+        return list.joinToString(",") {
+            val map = it as Map<*, *>
+            val column = map["column"] as String
+            val isAsc = map["isAsc"] as Boolean
+            "$column ${if (isAsc) "ASC" else "DESC"}"
+        }
     }
 
     override fun makeWhere(requestType: Int, args: ArrayList<String>, needAnd: Boolean): String {

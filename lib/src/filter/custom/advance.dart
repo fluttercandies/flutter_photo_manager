@@ -7,7 +7,7 @@ enum LogicalType {
 
 class AdvancedCustomFilter extends CustomFilter {
   final List<WhereConditionItem> _whereItemList = [];
-  final List<OrderByConditionItem> _orderByItemList = [];
+  final List<OrderByItem> _orderByItemList = [];
 
   AdvancedCustomFilter addWhereCondition(
     WhereConditionItem condition, {
@@ -15,6 +15,14 @@ class AdvancedCustomFilter extends CustomFilter {
   }) {
     condition.logicalType = type;
     _whereItemList.add(condition);
+    return this;
+  }
+
+  AdvancedCustomFilter addOrderBy({
+    required String column,
+    bool isAsc = true,
+  }) {
+    _orderByItemList.add(OrderByItem(column, isAsc));
     return this;
   }
 
@@ -31,15 +39,8 @@ class AdvancedCustomFilter extends CustomFilter {
   }
 
   @override
-  String makeOrderBy() {
-    final sb = StringBuffer();
-    for (final item in _orderByItemList) {
-      if (sb.isNotEmpty) {
-        sb.write(', ');
-      }
-      sb.write(item.text());
-    }
-    return sb.toString();
+  List<OrderByItem> makeOrderBy() {
+    return _orderByItemList;
   }
 }
 
@@ -105,18 +106,4 @@ class TextWhereCondition extends WhereConditionItem {
   final String text;
 
   TextWhereCondition(this.text);
-}
-
-class OrderByConditionItem {
-  final String column;
-  bool isDesc = false;
-
-  OrderByConditionItem(
-    this.column, {
-    this.isDesc = false,
-  });
-
-  String text() {
-    return '$column ${isDesc ? 'DESC' : 'ASC'}';
-  }
 }

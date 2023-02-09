@@ -114,6 +114,7 @@
     int type = [map[@"type"] intValue];
 
     if (type == 0) {
+        map = map[@"child"];
 
         PMFilterOptionGroup *container = [PMFilterOptionGroup alloc];
         NSDictionary *image = map[@"image"];
@@ -134,7 +135,11 @@
 
         return container;
     } else {
-        return nil;
+        PMCustomFilterOption *option = [PMCustomFilterOption new];
+
+        option.params = map[@"child"];
+
+        return option;
     }
 }
 

@@ -4,7 +4,10 @@ import 'package:photo_manager/src/filter/base_filter.dart';
 abstract class CustomFilter extends BaseFilter {
   CustomFilter();
 
-  factory CustomFilter.sql(String where, String orderBy) {
+  factory CustomFilter.sql({
+    required String where,
+    List<OrderByItem> orderBy = const [],
+  }) {
     return SqlCustomFilter(where, orderBy);
   }
 
@@ -15,7 +18,7 @@ abstract class CustomFilter extends BaseFilter {
   Map<String, dynamic> childMap() {
     return <String, dynamic>{
       'where': makeWhere(),
-      'orderBy': makeOrderBy(),
+      'orderBy': makeOrderBy().map((e) => e.toMap()).toList(),
     };
   }
 
@@ -26,12 +29,12 @@ abstract class CustomFilter extends BaseFilter {
 
   String makeWhere();
 
-  String makeOrderBy();
+  List<OrderByItem> makeOrderBy();
 }
 
 class SqlCustomFilter extends CustomFilter {
-  String where;
-  String orderBy;
+  final String where;
+  final List<OrderByItem> orderBy;
 
   SqlCustomFilter(this.where, this.orderBy);
 
@@ -41,7 +44,21 @@ class SqlCustomFilter extends CustomFilter {
   }
 
   @override
-  String makeOrderBy() {
+  List<OrderByItem> makeOrderBy() {
     return orderBy;
+  }
+}
+
+class OrderByItem {
+  final String column;
+  final bool isAsc;
+
+  OrderByItem(this.column, this.isAsc);
+
+  Map toMap() {
+    return {
+      'column': column,
+      'isAsc': isAsc,
+    };
   }
 }

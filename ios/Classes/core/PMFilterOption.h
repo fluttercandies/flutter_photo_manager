@@ -15,19 +15,19 @@
 
 typedef struct PMSizeConstraint {
 
-    unsigned int minWidth;
-    unsigned int maxWidth;
-    unsigned int minHeight;
-    unsigned int maxHeight;
-    BOOL ignoreSize;
+  unsigned int minWidth;
+  unsigned int maxWidth;
+  unsigned int minHeight;
+  unsigned int maxHeight;
+  BOOL ignoreSize;
 
 } PMSizeConstraint;
 
 typedef struct PMDurationConstraint {
 
-    double minDuration;
-    double maxDuration;
-    BOOL allowNullable;
+  double minDuration;
+  double maxDuration;
+  BOOL allowNullable;
 
 } PMDurationConstraint;
 
@@ -48,8 +48,7 @@ typedef struct PMDurationConstraint {
 @end
 
 
-
-@interface PMFilterOptionGroup : NSObject<PMBaseFilter>
+@interface PMFilterOptionGroup : NSObject <PMBaseFilter>
 
 @property(nonatomic, strong) PMFilterOption *imageOption;
 @property(nonatomic, strong) PMFilterOption *videoOption;
@@ -59,9 +58,14 @@ typedef struct PMDurationConstraint {
 @property(nonatomic, assign) BOOL containsLivePhotos;
 @property(nonatomic, assign) BOOL onlyLivePhotos;
 @property(nonatomic, assign) BOOL containsModified;
-@property(nonatomic, strong) NSArray<NSSortDescriptor*> *sortArray;
+@property(nonatomic, strong) NSArray<NSSortDescriptor *> *sortArray;
 
 - (NSArray<NSSortDescriptor *> *)sortCond;
 
 - (void)injectSortArray:(NSArray *)array;
+@end
+
+
+@interface PMCustomFilterOption : NSObject <PMBaseFilter>
+@property (nonatomic, strong) NSDictionary *params;
 @end

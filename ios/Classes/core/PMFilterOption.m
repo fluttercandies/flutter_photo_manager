@@ -5,6 +5,7 @@
 #import "PMLogUtils.h"
 
 @implementation PMFilterOptionGroup {
+
 }
 
 - (NSArray<NSSortDescriptor *> *)sortCond {
@@ -80,13 +81,13 @@
                 [cond appendString:@" AND "];
                 [cond appendString:[NSString
                     stringWithFormat:@"( ( mediaSubtype & %lu ) == 8 )",
-                                     (unsigned long)PHAssetMediaSubtypePhotoLive]
+                                     (unsigned long) PHAssetMediaSubtypePhotoLive]
                 ];
             } else if (!optionGroup.containsLivePhotos) {
                 [cond appendString:@" AND "];
                 [cond appendString:[NSString
                     stringWithFormat:@"NOT ( ( mediaSubtype & %lu ) == 8 )",
-                                     (unsigned long)PHAssetMediaSubtypePhotoLive]
+                                     (unsigned long) PHAssetMediaSubtypePhotoLive]
                 ];
             }
         }
@@ -122,7 +123,7 @@
                 [cond appendString:@" AND "];
                 [cond appendString:[NSString
                     stringWithFormat:@"( mediaSubtype & %lu ) == 8",
-                                     (unsigned long)PHAssetMediaSubtypePhotoLive]
+                                     (unsigned long) PHAssetMediaSubtypePhotoLive]
                 ];
             }
         }
@@ -148,9 +149,9 @@
         [cond appendString:durationCond];
         [args addObjectsFromArray:durationArgs];
 
-        [PMLogUtils.sharedInstance info: [NSString stringWithFormat: @"duration = %.2f ~ %.2f",
-                                                                     [durationArgs[0] floatValue],
-                                                                     [durationArgs[1] floatValue]]];
+        [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"duration = %.2f ~ %.2f",
+                                                                   [durationArgs[0] floatValue],
+                                                                   [durationArgs[1] floatValue]]];
 
         [cond appendString:@" ) "];
     }
@@ -174,6 +175,11 @@
 
     return options;
 }
+
+- (BOOL)needTitle {
+    return self.videoOption.needTitle || self.imageOption.needTitle;
+}
+
 
 @end
 
@@ -237,6 +243,51 @@
 
 - (NSArray *)dateArgs {
     return @[self.min, self.max];
+}
+
+@end
+
+@implementation PMCustomFilterOption {
+
+}
+
+- (NSString *)where {
+    return self.params[@"where"];
+}
+
+- (NSArray<NSSortDescriptor *> *)sortDescriptors {
+    NSMutableArray *sortDescriptors = [NSMutableArray new];
+    NSArray *array = self.params[@"orderBy"];
+
+    for (NSDictionary *dict in array) {
+        NSString *column = dict[@"column"];
+        BOOL ascending = [dict[@"isAsc"] boolValue];
+        [sortDescriptors addObject:[NSSortDescriptor sortDescriptorWithKey:column ascending:ascending]];
+    }
+
+    return sortDescriptors;
+}
+
+- (PHFetchOptions *)getFetchOptions:(int)type {
+    PHFetchOptions *options = [PHFetchOptions new];
+
+    NSString *where = [self where];
+    if (!where.isEmpty) {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:where];
+        options.predicate = predicate;
+    }
+
+    options.sortDescriptors = [self sortDescriptors];
+
+    return options;
+}
+
+- (BOOL)containsModified {
+    return [self.params[@"containsPathModified"] boolValue];
+}
+
+- (BOOL)needTitle {
+    return NO;
 }
 
 @end

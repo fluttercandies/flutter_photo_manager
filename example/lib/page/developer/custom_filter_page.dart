@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oktoast/oktoast.dart';
 
 import 'package:photo_manager/photo_manager.dart';
 
@@ -12,15 +13,29 @@ class CustomFilterPage extends StatefulWidget {
 class _CustomFilterPageState extends State<CustomFilterPage> {
   List<AssetPathEntity> _list = [];
 
+  final TextEditingController _sqlController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
+    _sqlController.text = 'width >= 1000';
     _refresh();
+  }
+
+  @override
+  void dispose() {
+    _sqlController.dispose();
+    super.dispose();
   }
 
   BaseFilter createCustomFilter() {
     // final AdvancedCustomFilter filter = AdvancedCustomFilter();
-    final filter = CustomFilter.sql('200 < width AND width < 300', 'width');
+    final filter = CustomFilter.sql(
+      where: _sqlController.text,
+      // orderBy: [
+      //   OrderByItem('width', true),
+      // ],
+    );
     return filter;
   }
 
@@ -45,25 +60,44 @@ class _CustomFilterPageState extends State<CustomFilterPage> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemBuilder: (BuildContext context, int index) {
-          final AssetPathEntity path = _list[index];
-          return ListTile(
-            title: Text(path.name),
-            subtitle: Text(path.id),
-            trailing: FutureBuilder<int>(
-              future: path.assetCountAsync,
-              builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-                if (snapshot.hasData) {
-                  return Text(snapshot.data.toString());
-                }
-                return const SizedBox();
-              },
+      body: Column(
+        children: [
+          TextField(
+            controller: _sqlController,
+            decoration: const InputDecoration(
+              labelText: 'SQL',
             ),
-            onTap: () {},
-          );
-        },
-        itemCount: _list.length,
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemBuilder: (BuildContext context, int index) {
+                final AssetPathEntity path = _list[index];
+                return ListTile(
+                  title: Text(path.name),
+                  subtitle: Text(path.id),
+                  trailing: FutureBuilder<int>(
+                    future: path.assetCountAsync,
+                    builder:
+                        (BuildContext context, AsyncSnapshot<int> snapshot) {
+                      if (snapshot.hasData) {
+                        return Text(snapshot.data.toString());
+                      }
+                      return const SizedBox();
+                    },
+                  ),
+                  onTap: () async {
+                    final count = await path.assetCountAsync;
+                    showToast(
+                      'Asset count: $count',
+                      position: ToastPosition.bottom,
+                    );
+                  },
+                );
+              },
+              itemCount: _list.length,
+            ),
+          ),
+        ],
       ),
     );
   }
