@@ -98,6 +98,23 @@ class CustomColumns {
       throw UnsupportedError('Unsupported platform with isFavorite');
     }
   }
+
+  List<String> getValues() {
+    return [
+      id,
+      mediaType,
+      width,
+      height,
+      duration,
+      createDate,
+      modifiedDate,
+      isFavorite,
+    ];
+  }
+
+  static List<String> values() {
+    return CustomColumns().getValues();
+  }
 }
 
 // columns: [instance_id, compilation, disc_number, duration, album_artist,
@@ -164,6 +181,56 @@ class AndroidMediaColumns extends CustomColumns {
   String get originalDocumentId => _getKey('original_document_id');
   String get bucketId => _getKey('bucket_id');
   String get relativePath => _getKey('relative_path');
+
+  List<String> getValues() {
+    return [
+      instanceId,
+      compilation,
+      discNumber,
+      albumArtist,
+      resolution,
+      orientation,
+      artist,
+      author,
+      format,
+      isDrm,
+      bucketDisplayName,
+      ownerPackageName,
+      parent,
+      volumeName,
+      writer,
+      dateExpires,
+      composer,
+      displayName,
+      dateTaken,
+      mimeType,
+      bitRate,
+      cdTrackNumber,
+      xmp,
+      year,
+      data,
+      size,
+      album,
+      genre,
+      title,
+      isTrashed,
+      groupId,
+      documentId,
+      generationAdded,
+      isDownload,
+      generationModified,
+      isPending,
+      captureFrameRate,
+      numTracks,
+      originalDocumentId,
+      bucketId,
+      relativePath,
+    ];
+  }
+
+  static List<String> values() {
+    return AndroidMediaColumns().getValues();
+  }
 }
 
 class DarwinColumns extends CustomColumns {
@@ -184,4 +251,37 @@ class DarwinColumns extends CustomColumns {
   String get hasAdjustments => _getKey('hasAdjustments');
   String get adjustmentFormatIdentifier =>
       _getKey('adjustmentFormatIdentifier');
+
+  List<String> getValues() {
+    return [
+      mediaSubtypes,
+      sourceType,
+      location,
+      hidden,
+      hasAdjustments,
+      adjustmentFormatIdentifier,
+    ];
+  }
+
+  static List<String> values() {
+    return DarwinColumns().getValues();
+  }
+}
+
+/// Where item class
+///
+/// If text() throws an exception, it will return an empty string.
+class WhereItem {
+  final String column;
+  final String condition;
+
+  WhereItem(this.column, this.condition);
+
+  String text() {
+    try {
+      return "$column $condition";
+    } on UnsupportedError {
+      return '';
+    }
+  }
 }

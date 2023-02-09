@@ -12,6 +12,7 @@ export 'src/filter/classical/filter_option_group.dart';
 export 'src/filter/classical/filter_options.dart';
 export 'src/filter/custom/custom_filter.dart';
 export 'src/filter/custom/advance.dart';
+export 'src/filter/custom/custom_columns.dart';
 
 export 'src/internal/enums.dart';
 export 'src/internal/extensions.dart';

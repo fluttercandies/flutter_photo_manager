@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:photo_manager_example/page/custom_filter_example_page.dart';
 
 import 'change_notify_page.dart';
 import 'developer/develop_index_page.dart';
@@ -26,6 +27,7 @@ class _IndexPageState extends State<IndexPage> {
           routePage('save media example', const SaveMediaExample()),
           routePage('For Developer page', const DeveloperIndexPage()),
           routePage('Change notify example', const ChangeNotifyExample()),
+          routePage('CustomFilterExamplePage', const CustomFilterExamplePage()),
         ],
       ),
     );
