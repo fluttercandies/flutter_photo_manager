@@ -1,7 +1,27 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
-class OrderByAction extends StatefulWidget {
+Future<void> changeOrderBy(
+  BuildContext context,
+  List<OrderByItem> items,
+  ValueChanged<List<OrderByItem>> onChanged,
+) async {
+  final result = await Navigator.push<List<OrderByItem>>(
+    context,
+    MaterialPageRoute<List<OrderByItem>>(
+      builder: (_) => OrderByActionPage(
+        items: items.toList(),
+      ),
+    ),
+  );
+  if (result != null) {
+    onChanged(result);
+  }
+}
+
+class OrderByAction extends StatelessWidget {
   const OrderByAction({
     Key? key,
     required this.items,
@@ -12,28 +32,163 @@ class OrderByAction extends StatefulWidget {
   final ValueChanged<List<OrderByItem>> onChanged;
 
   @override
-  State<OrderByAction> createState() => _OrderByActionState();
-}
-
-class _OrderByActionState extends State<OrderByAction> {
-  List<OrderByItem> _orderBy = [];
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return IconButton(
+      onPressed: () async {
+        await changeOrderBy(context, items, onChanged);
+      },
+      icon: const Icon(Icons.sort),
+    );
   }
 }
 
 class OrderByActionPage extends StatefulWidget {
-  const OrderByActionPage({Key? key}) : super(key: key);
+  const OrderByActionPage({
+    Key? key,
+    required this.items,
+  }) : super(key: key);
+
+  final List<OrderByItem> items;
 
   @override
   State<OrderByActionPage> createState() => _OrderByActionPageState();
 }
 
 class _OrderByActionPageState extends State<OrderByActionPage> {
+  final List<OrderByItem> _items = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _items.addAll(widget.items);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Order By'),
+        actions: [
+          IconButton(
+            onPressed: _addItem,
+            icon: const Icon(Icons.add),
+          ),
+        ],
+      ),
+      body: ListView.builder(
+        itemBuilder: _buildItem,
+        itemCount: _items.length,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pop(context, _items);
+        },
+        child: const Icon(Icons.check),
+      ),
+    );
+  }
+
+  Widget _buildItem(BuildContext context, int index) {
+    final item = _items[index];
+    return ListTile(
+      title: Text(item.column),
+      subtitle: Text(item.isAsc ? 'ASC' : 'DESC'),
+      trailing: IconButton(
+        onPressed: () {
+          setState(() {
+            _items.removeAt(index);
+          });
+        },
+        icon: const Icon(Icons.delete),
+      ),
+    );
+  }
+
+  Future<void> _addItem() async {
+    final result = await showDialog<OrderByItem>(
+      context: context,
+      builder: _buildDialog,
+    );
+    if (result != null) {
+      setState(() {
+        _items.add(result);
+      });
+    }
+  }
+
+  Widget _buildDialog(BuildContext context) {
+    final List<String> columns;
+    if (Platform.isAndroid) {
+      columns = AndroidMediaColumns.values();
+    } else if (Platform.isMacOS || Platform.isIOS) {
+      columns = DarwinColumns.values();
+    } else {
+      return const SizedBox.shrink();
+    }
+    String column = columns.first;
+    bool isAsc = true;
+    return AlertDialog(
+      title: const Text('Add Order By'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          DropdownButtonFormField<String>(
+            items: columns
+                .map(
+                  (e) => DropdownMenuItem(
+                    value: e,
+                    child: Text(e),
+                  ),
+                )
+                .toList(),
+            onChanged: (value) {
+              if (value != null) {
+                column = value;
+              }
+            },
+            decoration: const InputDecoration(
+              labelText: 'Column',
+            ),
+            value: columns.first,
+          ),
+          DropdownButtonFormField<bool>(
+            items: const [
+              DropdownMenuItem(
+                value: true,
+                child: Text('ASC'),
+              ),
+              DropdownMenuItem(
+                value: false,
+                child: Text('DESC'),
+              ),
+            ],
+            onChanged: (value) {
+              if (value != null) {
+                isAsc = value;
+              }
+            },
+            decoration: const InputDecoration(
+              labelText: 'Order',
+            ),
+            value: true,
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            final item = OrderByItem(column, isAsc);
+            Navigator.pop(context, item);
+          },
+          child: const Text('OK'),
+        ),
+      ],
+    );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager_example/page/custom_filter_example_page.dart';
+import 'package:photo_manager_example/widget/nav_button.dart';
 
 import 'change_notify_page.dart';
 import 'developer/develop_index_page.dart';
@@ -23,23 +24,17 @@ class _IndexPageState extends State<IndexPage> {
       body: ListView(
         padding: const EdgeInsets.all(8.0),
         children: <Widget>[
-          routePage('gallery list', const NewHomePage()),
-          routePage('save media example', const SaveMediaExample()),
-          routePage('For Developer page', const DeveloperIndexPage()),
+          routePage('Gallery list', const NewHomePage()),
+          routePage('Custom filter example', const CustomFilterExamplePage()),
+          routePage('Save media example', const SaveMediaExample()),
           routePage('Change notify example', const ChangeNotifyExample()),
-          routePage('CustomFilterExamplePage', const CustomFilterExamplePage()),
+          routePage('For Developer page', const DeveloperIndexPage()),
         ],
       ),
     );
   }
 
   Widget routePage(String title, Widget page) {
-    return ElevatedButton(
-      onPressed: () => Navigator.push<void>(
-        context,
-        MaterialPageRoute<void>(builder: (_) => page),
-      ),
-      child: Text(title),
-    );
+    return NavButton(title: title, page: page);
   }
 }

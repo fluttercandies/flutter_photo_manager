@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photo_manager_example/widget/nav_button.dart';
 import 'package:provider/provider.dart';
 
 import '../model/photo_provider.dart';
@@ -40,11 +41,14 @@ class _NewHomePageState extends State<NewHomePage> {
         body: ListView(
           padding: const EdgeInsets.all(8.0),
           children: <Widget>[
-            buildButton('Get all gallery list', _scanGalleryList),
+            CustomButton(
+              title: 'Get all gallery list',
+              onPressed: _scanGalleryList,
+            ),
             if (Platform.isIOS)
-              buildButton(
-                'Change limited photos with PhotosUI',
-                _changeLimitPhotos,
+              CustomButton(
+                title: 'Change limited photos with PhotosUI',
+                onPressed: _changeLimitPhotos,
               ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -213,8 +217,8 @@ class _NewHomePageState extends State<NewHomePage> {
   void onChange(MethodCall call) {}
 
   Widget _buildFilterOption(PhotoProvider provider) {
-    return ElevatedButton(
-      child: const Text('Change filter options.'),
+    return CustomButton(
+      title: 'Change filter options.',
       onPressed: () {
         Navigator.push<void>(
           context,

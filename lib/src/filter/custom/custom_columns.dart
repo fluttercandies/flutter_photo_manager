@@ -182,8 +182,10 @@ class AndroidMediaColumns extends CustomColumns {
   String get bucketId => _getKey('bucket_id');
   String get relativePath => _getKey('relative_path');
 
+  @override
   List<String> getValues() {
     return [
+      ...super.getValues(),
       instanceId,
       compilation,
       discNumber,
@@ -252,8 +254,10 @@ class DarwinColumns extends CustomColumns {
   String get adjustmentFormatIdentifier =>
       _getKey('adjustmentFormatIdentifier');
 
+  @override
   List<String> getValues() {
     return [
+      ...super.getValues(),
       mediaSubtypes,
       sourceType,
       location,

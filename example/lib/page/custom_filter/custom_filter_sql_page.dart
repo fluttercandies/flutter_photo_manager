@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -20,7 +22,15 @@ class _CustomFilterSqlPageState extends State<CustomFilterSqlPage> {
   @override
   void initState() {
     super.initState();
-    _whereController.text = 'width >= 1000';
+    if (Platform.isAndroid) {
+      final columns = AndroidMediaColumns();
+      _whereController.text =
+          '(${columns.width} is not null) OR ${columns.width} >= 250';
+    } else if (Platform.isIOS || Platform.isMacOS) {
+      final columns = DarwinColumns();
+      _whereController.text =
+          '${columns.width} <= 1000 AND ${columns.width} >= 250';
+    }
     _refresh();
   }
 
@@ -42,6 +52,7 @@ class _CustomFilterSqlPageState extends State<CustomFilterSqlPage> {
     final List<AssetPathEntity> list = await PhotoManager.getAssetPathList(
       filterOption: createCustomFilter(),
     );
+    showToast('Get ${list.length} path(s).');
     setState(() {
       _list = list;
     });
@@ -75,6 +86,19 @@ class _CustomFilterSqlPageState extends State<CustomFilterSqlPage> {
             decoration: const InputDecoration(
               labelText: 'Where',
             ),
+          ),
+          ListTile(
+            title: Text(
+                'Order By: ${_orderBy.map((e) => e.toString()).join(', ')}'),
+            subtitle: const Text('Click to edit'),
+            onTap: () {
+              changeOrderBy(context, _orderBy, (List<OrderByItem> value) {
+                setState(() {
+                  _orderBy.clear();
+                  _orderBy.addAll(value);
+                });
+              });
+            },
           ),
           Expanded(
             child: ListView.builder(
