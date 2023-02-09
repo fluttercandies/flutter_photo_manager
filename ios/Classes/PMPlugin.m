@@ -21,7 +21,7 @@
 - (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar {
     privateRegistrar = registrar;
     [self initNotificationManager:registrar];
-    
+
     FlutterMethodChannel *channel =
     [FlutterMethodChannel methodChannelWithName:@"com.fluttercandies/photo_manager"
                                 binaryMessenger:[registrar messenger]];
@@ -41,7 +41,7 @@
 - (void)onMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
     ResultHandler *handler = [ResultHandler handlerWithResult:result];
     PMManager *manager = self.manager;
-    
+
     if ([call.method isEqualToString:@"requestPermissionExtend"]) {
         int requestAccessLevel = [call.arguments[@"iosAccessLevel"] intValue];
         [self handlePermission:manager handler:handler requestAccessLevel:requestAccessLevel];
@@ -228,13 +228,13 @@
     ResultHandler *handler = [ResultHandler handlerWithResult:result];
     PMManager *manager = self.manager;
     __block PMNotificationManager *notificationManager = self.notificationManager;
-    
+
     [self runInBackground:^{
         if ([call.method isEqualToString:@"getAssetPathList"]) {
             int type = [call.arguments[@"type"] intValue];
             BOOL hasAll = [call.arguments[@"hasAll"] boolValue];
             BOOL onlyAll = [call.arguments[@"onlyAll"] boolValue];
-            PMFilterOptionGroup *option =
+            NSObject<PMBaseFilter> *option =
             [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
             NSArray<PMAssetPathEntity *> *array = [manager
                                                    getAssetPathList:type
@@ -246,7 +246,7 @@
         } else if ([call.method isEqualToString:@"getAssetCountFromPath"]) {
             NSString *id = call.arguments[@"id"];
             int requestType = [call.arguments[@"type"] intValue];
-            PMFilterOptionGroup *option =
+            NSObject<PMBaseFilter> *option =
             [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
             NSUInteger result = [manager getAssetCountFromPath:id
                                                           type:requestType
@@ -257,7 +257,7 @@
             int type = [call.arguments[@"type"] intValue];
             NSUInteger page = [call.arguments[@"page"] unsignedIntValue];
             NSUInteger size = [call.arguments[@"size"] unsignedIntValue];
-            PMFilterOptionGroup *option =
+            NSObject<PMBaseFilter> *option =
             [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
             NSArray<PMAssetEntity *> *array =
             [manager getAssetListPaged:id type:type page:page size:size filterOption:option];
@@ -269,7 +269,7 @@
             int type = [call.arguments[@"type"] intValue];
             NSUInteger start = [call.arguments[@"start"] unsignedIntegerValue];
             NSUInteger end = [call.arguments[@"end"] unsignedIntegerValue];
-            PMFilterOptionGroup *option =
+            NSObject<PMBaseFilter> *option =
             [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
             NSArray<PMAssetEntity *> *array =
             [manager getAssetListRange:id type:type start:start end:end filterOption:option];
@@ -301,7 +301,7 @@
         } else if ([call.method isEqualToString:@"fetchPathProperties"]) {
             NSString *id = call.arguments[@"id"];
             int requestType = [call.arguments[@"type"] intValue];
-            PMFilterOptionGroup *option =
+            NSObject<PMBaseFilter> *option =
             [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
             PMAssetPathEntity *pathEntity = [manager fetchPathProperties:id
                                                                     type:requestType
@@ -327,7 +327,7 @@
         } else if ([call.method isEqualToString:@"isNotifying"]) {
             BOOL isNotifying = [notificationManager isNotifying];
             [handler reply:@(isNotifying)];
-            
+
         } else if ([call.method isEqualToString:@"deleteWithIds"]) {
             NSArray<NSString *> *ids = call.arguments[@"ids"];
             [manager deleteWithIds:ids
@@ -426,10 +426,10 @@
             int albumType = [call.arguments[@"albumType"] intValue];
             NSDictionary *optionMap = call.arguments[@"option"];
             PMFilterOptionGroup *option = [PMConvertUtils convertMapToOptionContainer:optionMap];
-            
+
             NSArray<PMAssetPathEntity *> *array = [manager getSubPathWithId:galleryId type:type albumType:albumType option:option];
             NSDictionary *pathData = [PMConvertUtils convertPathToMap:array];
-            
+
             [handler reply:@{@"list": pathData}];
         } else if ([@"copyAsset" isEqualToString:call.method]) {
             NSString *assetId = call.arguments[@"assetId"];
@@ -475,7 +475,7 @@
         } else if ([@"removeInAlbum" isEqualToString:call.method]) {
             NSArray *assetId = call.arguments[@"assetId"];
             NSString *pathId = call.arguments[@"pathId"];
-            
+
             [manager removeInAlbumWithAssetId:assetId albumId:pathId block:^(NSString *msg) {
                 if (msg) {
                     [handler reply:@{@"msg": msg}];
@@ -517,11 +517,11 @@
     if (errorMsg) {
         mutableDictionary[@"errorMsg"] = errorMsg;
     }
-    
+
     if (id) {
         mutableDictionary[@"id"] = id;
     }
-    
+
     return mutableDictionary;
 }
 
@@ -533,7 +533,7 @@
     int index = [progressIndex intValue];
     PMProgressHandler *handler = [PMProgressHandler new];
     [handler register:privateRegistrar channelIndex:index];
-    
+
     return handler;
 }
 
@@ -541,11 +541,11 @@
     NSString *name = call.arguments[@"name"];
     BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
     NSString *parentId = call.arguments[@"folderId"];
-    
+
     if (isRoot) {
         parentId = nil;
     }
-    
+
     [manager createFolderWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
         [handler reply:[self convertToResult:id errorMsg:errorMsg]];
     }];
@@ -555,11 +555,11 @@
     NSString *name = call.arguments[@"name"];
     BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
     NSString *parentId = call.arguments[@"folderId"];
-    
+
     if (isRoot) {
         parentId = nil;
     }
-    
+
     [manager createAlbumWithName:name parentId:parentId block:^(NSString *id, NSString *errorMsg) {
         [handler reply:[self convertToResult:id errorMsg:errorMsg]];
     }];

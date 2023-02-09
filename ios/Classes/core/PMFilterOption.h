@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import "PMBaseFilter.h"
 
 @interface PMDateOption : NSObject
 
@@ -46,7 +47,9 @@ typedef struct PMDurationConstraint {
 
 @end
 
-@interface PMFilterOptionGroup : NSObject
+
+
+@interface PMFilterOptionGroup : NSObject<PMBaseFilter>
 
 @property(nonatomic, strong) PMFilterOption *imageOption;
 @property(nonatomic, strong) PMFilterOption *videoOption;

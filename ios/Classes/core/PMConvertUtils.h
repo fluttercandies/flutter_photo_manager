@@ -1,5 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
+#import "PMBaseFilter.h"
+
 @class PMAssetPathEntity;
 @class PMAssetEntity;
 @class PMFilterOption;
@@ -10,7 +12,7 @@
 + (NSDictionary *)convertPathToMap:(NSArray<PMAssetPathEntity *> *)array;
 
 + (NSDictionary *)convertAssetToMap:(NSArray<PMAssetEntity *> *)array
-                        optionGroup:(PMFilterOptionGroup *)optionGroup;
+                        optionGroup:(NSObject<PMBaseFilter> *)optionGroup;
 
 + (NSDictionary *)convertPHAssetToMap:(PHAsset *)asset
                             needTitle:(BOOL)needTitle;
@@ -20,5 +22,5 @@
 
 + (PMFilterOption *)convertMapToPMFilterOption:(NSDictionary *)map;
 
-+ (PMFilterOptionGroup *)convertMapToOptionContainer:(NSDictionary *)map;
++ (NSObject<PMBaseFilter> *)convertMapToOptionContainer:(NSDictionary *)map;
 @end
