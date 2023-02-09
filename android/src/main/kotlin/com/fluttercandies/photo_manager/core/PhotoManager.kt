@@ -276,4 +276,9 @@ class PhotoManager(private val context: Context) {
             Glide.with(context).clear(futureTarget)
         }
     }
+
+    fun getColumnNames(resultHandler: ResultHandler) {
+        val columnNames = dbUtils.getColumnNames(context)
+        resultHandler.reply(columnNames)
+    }
 }

@@ -471,6 +471,10 @@ class PhotoManagerPlugin(
                 photoManager.removeAllExistsAssets(resultHandler)
             }
 
+            Methods.getColumnNames -> {
+                photoManager.getColumnNames(resultHandler)
+            }
+
             else -> resultHandler.notImplemented()
         }
     }

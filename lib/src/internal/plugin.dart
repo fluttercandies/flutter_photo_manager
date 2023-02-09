@@ -629,4 +629,14 @@ mixin AndroidPlugin on BasePlugin {
     );
     return result != null;
   }
+
+  Future<List<String>> androidColumns() async {
+    final result = await _channel.invokeMethod(
+      PMConstants.mColumnNames,
+    );
+    if (result is List<dynamic>) {
+      return result.map((e) => e.toString()).toList();
+    }
+    return result ?? <String>[];
+  }
 }

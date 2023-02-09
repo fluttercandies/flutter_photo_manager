@@ -619,4 +619,12 @@ interface IDBUtils {
         }
         return null
     }
+
+    fun getColumnNames(context: Context): List<String> {
+        val cr = context.contentResolver
+        cr.query(allUri, null, null, null, null)?.use {
+            return it.columnNames.toList()
+        }
+        return emptyList()
+    }
 }

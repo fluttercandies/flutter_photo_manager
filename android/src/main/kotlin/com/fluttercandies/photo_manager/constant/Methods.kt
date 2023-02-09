@@ -29,6 +29,7 @@ class Methods {
         const val copyAsset = "copyAsset"
         const val moveAssetToPath = "moveAssetToPath"
         const val removeNoExistsAssets = "removeNoExistsAssets"
+        const val getColumnNames = "getColumnNames"
 
         /// Below methods have [RequestType] params, thus permissions are required for Android 13.
         const val fetchPathProperties = "fetchPathProperties"
