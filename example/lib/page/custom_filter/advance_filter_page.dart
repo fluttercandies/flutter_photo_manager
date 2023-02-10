@@ -204,11 +204,12 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
   }
 
   late String column = keys().first;
-  late String condition = WhereConditionItem.platformValues.first;
+  String? condition;
   TextEditingController inputController = TextEditingController();
 
   WhereConditionItem createItem() {
-    final value = '$column $condition ${inputController.text}';
+    final cond = condition ?? '';
+    final value = '$column $cond ${inputController.text}';
     final item = WhereConditionItem.text(value);
     return item;
   }
@@ -216,7 +217,9 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      content: Padding(
+      title: const Text('Create Where Condition'),
+      content: Container(
+        width: double.maxFinite,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -225,7 +228,7 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
               items: keys().map((e) {
                 return DropdownMenuItem(
                   value: e,
-                  child: Text(e),
+                  child: Text(e.padRight(40)),
                 );
               }).toList(),
               onChanged: (value) {
@@ -237,10 +240,11 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
               value: column,
             ),
             DropdownButton<String>(
+              hint: const Text('Condition'),
               items: WhereConditionItem.platformValues.map((e) {
                 return DropdownMenuItem(
                   value: e,
-                  child: Text(e),
+                  child: Text(e.padRight(40)),
                 );
               }).toList(),
               onChanged: (value) {
@@ -260,9 +264,15 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
                 setState(() {});
               },
             ),
+            const SizedBox(
+              height: 16,
+            ),
             Text(
               createItem().text,
-              style: Theme.of(context).textTheme.caption,
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontSize: 20,
+              ),
             ),
           ],
         ),

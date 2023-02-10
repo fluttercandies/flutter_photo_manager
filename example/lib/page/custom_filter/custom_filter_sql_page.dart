@@ -29,11 +29,11 @@ class _CustomFilterSqlPageState extends State<CustomFilterSqlPage> {
   void initState() {
     super.initState();
     if (Platform.isAndroid) {
-      final columns = AndroidMediaColumns();
+      const columns = CustomColumns.android;
       _whereController.text =
           '(${columns.width} is not null) OR ${columns.width} >= 250';
     } else if (Platform.isIOS || Platform.isMacOS) {
-      final columns = DarwinColumns();
+      const columns = CustomColumns.darwin;
       _whereController.text =
           '${columns.width} <= 1000 AND ${columns.width} >= 250';
     }

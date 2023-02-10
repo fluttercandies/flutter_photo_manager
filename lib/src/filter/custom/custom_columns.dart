@@ -285,7 +285,7 @@ class AndroidMediaColumns extends CustomColumns {
   }
 
   static List<String> values() {
-    return AndroidMediaColumns().getValues();
+    return const AndroidMediaColumns().getValues();
   }
 }
 
@@ -327,7 +327,7 @@ class DarwinColumns extends CustomColumns {
   }
 
   static List<String> values() {
-    return DarwinColumns().getValues();
+    return const DarwinColumns().getValues();
   }
 }
 
