@@ -127,9 +127,27 @@ class CustomColumns {
 
   /// The creation date column.
   ///
+  /// {@template date_column}
+  ///
   /// The value is unix timestamp seconds in android.
   ///
-  /// The value is NSDate in iOS/macOS. If you want to use the value in sql, use
+  /// The value is NSDate in iOS/macOS.
+  ///
+  /// Please use [ColumnUtils.convertDateTimeToSql] to convert date value.
+  ///
+  /// Simple use: [DateColumnWhereCondition].
+  ///
+  /// Exmaple:
+  /// ```dart
+  /// final date = DateTime(2015, 6, 15);
+  /// final condition = DateColumnWhereCondition(
+  //    column: CustomColumns.base.createDate,
+  //    operator: '<=',
+  //    value: date,
+  //  );
+  /// ```
+  ///
+  /// {@endtemplate}
   String get createDate {
     if (isAndroid) {
       return 'date_added';
@@ -140,6 +158,9 @@ class CustomColumns {
     }
   }
 
+  /// The modified date column.
+  ///
+  /// {@macro date_column}
   String get modifiedDate {
     if (isAndroid) {
       return 'date_modified';
@@ -150,6 +171,11 @@ class CustomColumns {
     }
   }
 
+  /// The favorite column.
+  ///
+  /// in darwin: 1 is favorite, 0 is not favorite.
+  ///
+  ///
   String get isFavorite {
     if (isAndroid) {
       return 'is_favorite';
@@ -216,6 +242,8 @@ class CustomColumns {
 // original_document_id, bucket_id, media_type, relative_path]
 
 /// A class that contains the names of the columns used in the custom filter.
+///
+/// About the values mean, please see document of android: https://developer.android.com/reference/android/provider/MediaStore
 class AndroidMediaColumns extends CustomColumns {
   const AndroidMediaColumns();
 
@@ -362,6 +390,9 @@ class AndroidMediaColumns extends CustomColumns {
   }
 }
 
+/// A class that contains the names of the columns of the iOS/macOS platform.
+///
+/// About the values mean, please see document of iOS: https://developer.apple.com/documentation/photokit/phasset
 class DarwinColumns extends CustomColumns {
   const DarwinColumns();
 

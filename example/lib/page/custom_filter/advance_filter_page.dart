@@ -176,7 +176,7 @@ class _WhereConditionPageState extends State<_WhereConditionPage> {
       itemBuilder: (context, index) {
         final item = _where[index];
         return ListTile(
-          title: Text(item.text),
+          title: Text(item.display()),
           trailing: IconButton(
             icon: const Icon(Icons.delete),
             onPressed: () {

@@ -106,6 +106,10 @@ abstract class WhereConditionItem {
     }
     throw UnsupportedError('Unsupported platform');
   }
+
+  String display() {
+    return text;
+  }
 }
 
 class WhereConditionGroup extends WhereConditionItem {
@@ -147,6 +151,19 @@ class WhereConditionGroup extends WhereConditionItem {
         sb.write(' ${item.logicalType == LogicalType.and ? 'AND' : 'OR'} ');
       }
       sb.write(item.text);
+    }
+
+    return '( $sb )';
+  }
+
+  @override
+  String display() {
+    final sb = StringBuffer();
+    for (final item in items) {
+      if (sb.isNotEmpty) {
+        sb.write(' ${item.logicalType == LogicalType.and ? 'AND' : 'OR'} ');
+      }
+      sb.write(item.display());
     }
 
     return '( $sb )';
@@ -243,6 +260,19 @@ class DateColumnWhereCondition extends WhereConditionItem {
       final sql =
           CustomColumns.utils.convertDateTimeToSql(value!, isSeconds: isSecond);
       sb.write(' $sql');
+    }
+    return sb.toString();
+  }
+
+  @override
+  String display() {
+    final sb = StringBuffer();
+    sb.write(column);
+    if (operator != null) {
+      sb.write(' ${operator!} ');
+    }
+    if (value != null) {
+      sb.write(' ${value!.toIso8601String()}');
     }
     return sb.toString();
   }
