@@ -1,5 +1,4 @@
 import 'package:photo_manager/photo_manager.dart';
-import 'package:photo_manager/src/filter/base_filter.dart';
 
 /// Full custom filter.
 ///
@@ -109,7 +108,6 @@ class SqlCustomFilter extends CustomFilter {
 ///
 /// {@endtemplate}
 class OrderByItem {
-
   /// The column name.
   final String column;
 
