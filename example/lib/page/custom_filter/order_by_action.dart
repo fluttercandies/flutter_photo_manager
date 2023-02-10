@@ -33,11 +33,39 @@ class OrderByAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: () async {
-        await changeOrderBy(context, items, onChanged);
-      },
-      icon: const Icon(Icons.sort),
+    return Stack(
+      children: [
+        Align(
+          alignment: Alignment.center,
+          child: IconButton(
+            onPressed: () async {
+              await changeOrderBy(context, items, onChanged);
+            },
+            icon: const Icon(Icons.sort),
+          ),
+        ),
+        Positioned(
+          right: 5,
+          top: 5,
+          child: Container(
+            width: 15,
+            height: 15,
+            decoration: const BoxDecoration(
+              color: Colors.red,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                items.length.toString(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 8,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

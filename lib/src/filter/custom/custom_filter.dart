@@ -53,7 +53,16 @@ class OrderByItem {
   final String column;
   final bool isAsc;
 
-  OrderByItem(this.column, this.isAsc);
+  const OrderByItem(this.column, this.isAsc);
+
+  const OrderByItem.desc(this.column) : isAsc = false;
+
+  const OrderByItem.asc(this.column) : isAsc = true;
+
+  const OrderByItem.named({
+    required this.column,
+    this.isAsc = true,
+  });
 
   Map toMap() {
     return {

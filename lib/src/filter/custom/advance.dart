@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:photo_manager/photo_manager.dart';
 
 enum LogicalType {
@@ -6,8 +8,14 @@ enum LogicalType {
 }
 
 class AdvancedCustomFilter extends CustomFilter {
-  final List<WhereConditionItem> _whereItemList = [];
-  final List<OrderByItem> _orderByItemList = [];
+  final List<WhereConditionItem> _whereItemList;
+  final List<OrderByItem> _orderByItemList;
+
+  AdvancedCustomFilter({
+    List<WhereConditionItem> where = const [],
+    List<OrderByItem> orderBy = const [],
+  })  : _whereItemList = where,
+        _orderByItemList = orderBy;
 
   AdvancedCustomFilter addWhereCondition(
     WhereConditionItem condition, {
@@ -53,6 +61,48 @@ abstract class WhereConditionItem {
 
   factory WhereConditionItem.text(String text) {
     return TextWhereCondition(text);
+  }
+
+  static final platformValues = _platformValues();
+
+  static List<String> _platformValues() {
+    if (Platform.isAndroid) {
+      return [
+        'is not null',
+        'is null',
+        '=',
+        '!=',
+        '>',
+        '>=',
+        '<',
+        '<=',
+        'like',
+        'not like',
+        'in',
+        'not in',
+        'between',
+        'not between',
+      ];
+    } else if (Platform.isIOS || Platform.isMacOS) {
+      // The NSPredicate syntax is used on iOS and macOS.
+      return [
+        '!= nil',
+        '== nil',
+        '==',
+        '!=',
+        '>',
+        '>=',
+        '<',
+        '<=',
+        'like',
+        'not like',
+        'in',
+        'not in',
+        'between',
+        'not between',
+      ];
+    }
+    throw UnsupportedError('Unsupported platform');
   }
 }
 

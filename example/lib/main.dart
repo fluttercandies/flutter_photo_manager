@@ -43,9 +43,9 @@ class _SimpleExampleApp extends StatelessWidget {
         builder: (context, child) {
           if (child == null) return const SizedBox.shrink();
           return Banner(
-            child: OKToast(child: child),
             message: 'Debug',
             location: BannerLocation.bottomStart,
+            child: OKToast(child: child),
           );
         },
         home: const _SimpleExamplePage(),

@@ -14,9 +14,14 @@ import 'dart:io';
 ///
 /// Special Columns to see [AndroidMediaColumns] and [DarwinColumns].
 class CustomColumns {
-  CustomColumns();
+  static const CustomColumns base = CustomColumns();
+  static const CustomColumns android = AndroidMediaColumns();
+  static const CustomColumns darwin = DarwinColumns();
+
+  const CustomColumns();
 
   bool get isAndroid => Platform.isAndroid;
+
   bool get isDarwin => Platform.isIOS || Platform.isMacOS;
 
   String get id {
@@ -113,7 +118,17 @@ class CustomColumns {
   }
 
   static List<String> values() {
-    return CustomColumns().getValues();
+    return const CustomColumns().getValues();
+  }
+
+  static List<String> platformValues() {
+    if (Platform.isAndroid) {
+      return const AndroidMediaColumns().getValues();
+    } else if (Platform.isIOS || Platform.isMacOS) {
+      return const DarwinColumns().getValues();
+    } else {
+      throw UnsupportedError('Unsupported platform with platformValues');
+    }
   }
 }
 
@@ -129,7 +144,7 @@ class CustomColumns {
 
 /// A class that contains the names of the columns used in the custom filter.
 class AndroidMediaColumns extends CustomColumns {
-  AndroidMediaColumns();
+  const AndroidMediaColumns();
 
   String _getKey(String value) {
     if (isAndroid) {
@@ -142,44 +157,83 @@ class AndroidMediaColumns extends CustomColumns {
   String get instanceId => _getKey('instance_id');
 
   String get compilation => _getKey('compilation');
+
   String get discNumber => _getKey('disc_number');
+
   String get albumArtist => _getKey('album_artist');
+
   String get resolution => _getKey('resolution');
+
   String get orientation => _getKey('orientation');
+
   String get artist => _getKey('artist');
+
   String get author => _getKey('author');
+
   String get format => _getKey('format');
+
   String get isDrm => _getKey('is_drm');
+
   String get bucketDisplayName => _getKey('bucket_display_name');
+
   String get ownerPackageName => _getKey('owner_package_name');
+
   String get parent => _getKey('parent');
+
   String get volumeName => _getKey('volume_name');
+
   String get writer => _getKey('writer');
+
   String get dateExpires => _getKey('date_expires');
+
   String get composer => _getKey('composer');
+
   String get displayName => _getKey('_display_name');
+
   String get dateTaken => _getKey('datetaken');
+
   String get mimeType => _getKey('mime_type');
+
   String get bitRate => _getKey('bitrate');
+
   String get cdTrackNumber => _getKey('cd_track_number');
+
   String get xmp => _getKey('xmp');
+
   String get year => _getKey('year');
+
   String get data => _getKey('_data');
+
   String get size => _getKey('_size');
+
   String get album => _getKey('album');
+
   String get genre => _getKey('genre');
+
   String get title => _getKey('title');
+
   String get isTrashed => _getKey('is_trashed');
+
   String get groupId => _getKey('group_id');
+
   String get documentId => _getKey('document_id');
+
   String get generationAdded => _getKey('generation_added');
+
   String get isDownload => _getKey('is_download');
+
   String get generationModified => _getKey('generation_modified');
+
   String get isPending => _getKey('is_pending');
+
   String get captureFrameRate => _getKey('capture_framerate');
+
   String get numTracks => _getKey('num_tracks');
+
   String get originalDocumentId => _getKey('original_document_id');
+
   String get bucketId => _getKey('bucket_id');
+
   String get relativePath => _getKey('relative_path');
 
   @override
@@ -236,7 +290,7 @@ class AndroidMediaColumns extends CustomColumns {
 }
 
 class DarwinColumns extends CustomColumns {
-  DarwinColumns();
+  const DarwinColumns();
 
   String _getKey(String value) {
     if (isDarwin) {
@@ -247,10 +301,15 @@ class DarwinColumns extends CustomColumns {
   }
 
   String get mediaSubtypes => _getKey('mediaSubtypes');
+
   String get sourceType => _getKey('sourceType');
+
   String get location => _getKey('location');
+
   String get hidden => _getKey('hidden');
+
   String get hasAdjustments => _getKey('hasAdjustments');
+
   String get adjustmentFormatIdentifier =>
       _getKey('adjustmentFormatIdentifier');
 

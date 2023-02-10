@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photo_manager_example/page/custom_filter/path_list.dart';
 
 import 'order_by_action.dart';
 
@@ -17,7 +18,12 @@ class _CustomFilterSqlPageState extends State<CustomFilterSqlPage> {
   List<AssetPathEntity> _list = [];
 
   final TextEditingController _whereController = TextEditingController();
-  final List<OrderByItem> _orderBy = [];
+  final List<OrderByItem> _orderBy = [
+    OrderByItem.named(
+      column: CustomColumns.base.createDate,
+      isAsc: false,
+    ),
+  ];
 
   @override
   void initState() {
@@ -101,32 +107,8 @@ class _CustomFilterSqlPageState extends State<CustomFilterSqlPage> {
             },
           ),
           Expanded(
-            child: ListView.builder(
-              itemBuilder: (BuildContext context, int index) {
-                final AssetPathEntity path = _list[index];
-                return ListTile(
-                  title: Text(path.name),
-                  subtitle: Text(path.id),
-                  trailing: FutureBuilder<int>(
-                    future: path.assetCountAsync,
-                    builder:
-                        (BuildContext context, AsyncSnapshot<int> snapshot) {
-                      if (snapshot.hasData) {
-                        return Text(snapshot.data.toString());
-                      }
-                      return const SizedBox();
-                    },
-                  ),
-                  onTap: () async {
-                    final count = await path.assetCountAsync;
-                    showToast(
-                      'Asset count: $count',
-                      position: ToastPosition.bottom,
-                    );
-                  },
-                );
-              },
-              itemCount: _list.length,
+            child: PathList(
+              list: _list,
             ),
           ),
         ],
