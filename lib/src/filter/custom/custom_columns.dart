@@ -1,5 +1,9 @@
 import 'dart:io';
 
+import 'package:photo_manager/photo_manager.dart';
+
+/// {@template custom_columns}
+///
 /// A class that contains the names of the columns used in the custom filter.
 ///
 /// The names of the columns are different on different platforms.
@@ -13,17 +17,36 @@ import 'dart:io';
 /// iOS: https://developer.apple.com/documentation/photokit/phasset
 ///
 /// Special Columns to see [AndroidMediaColumns] and [DarwinColumns].
+///
+/// Example:
+/// ```dart
+///  OrderByItem(CustomColumns.base.width, true);
+/// ```
+///
+/// {@endtemplate}
 class CustomColumns {
-  static const CustomColumns base = CustomColumns();
-  static const CustomColumns android = AndroidMediaColumns();
-  static const CustomColumns darwin = DarwinColumns();
 
+  /// The base columns, contains the common columns.
+  static const CustomColumns base = CustomColumns();
+
+  /// The android columns, contains the android specific columns.
+  static const AndroidMediaColumns android = AndroidMediaColumns();
+
+  /// The darwin columns, contains the ios and macos specific columns.
+  static const DarwinColumns darwin = DarwinColumns();
+
+  static const ColumnUtils utils = ColumnUtils.instance;
+
+  /// {@macro custom_columns}
   const CustomColumns();
 
+  /// Whether the current platform is android.
   bool get isAndroid => Platform.isAndroid;
 
+  /// Whether the current platform is ios or macos.
   bool get isDarwin => Platform.isIOS || Platform.isMacOS;
 
+  /// The id column.
   String get id {
     if (isAndroid) {
       return '_id';
@@ -34,6 +57,19 @@ class CustomColumns {
     }
   }
 
+  /// The media type column.
+  ///
+  /// The value is number,
+  ///
+  /// In android:
+  /// - 1: image
+  /// - 2: audio
+  /// - 3: video
+  ///
+  /// In iOS/macOS:
+  /// - 1: image
+  /// - 2: video
+  /// - 3: audio
   String get mediaType {
     if (isAndroid) {
       return 'media_type';
@@ -44,6 +80,11 @@ class CustomColumns {
     }
   }
 
+  /// The width column.
+  ///
+  /// In android, the value of this column maybe null.
+  ///
+  /// In iOS/macOS, the value of this column not null.
   String get width {
     if (isAndroid) {
       return 'width';
@@ -54,6 +95,11 @@ class CustomColumns {
     }
   }
 
+  /// The height column.
+  ///
+  /// In android, the value of this column maybe null.
+  ///
+  /// In iOS/macOS, the value of this column not null.
   String get height {
     if (isAndroid) {
       return 'height';
@@ -64,6 +110,11 @@ class CustomColumns {
     }
   }
 
+  /// The duration column.
+  ///
+  /// In android, the value of this column maybe null.
+  ///
+  /// In iOS/macOS, the value of this column is 0 when the media is image.
   String get duration {
     if (isAndroid) {
       return 'duration';
@@ -74,6 +125,11 @@ class CustomColumns {
     }
   }
 
+  /// The creation date column.
+  ///
+  /// The value is unix timestamp seconds in android.
+  ///
+  /// The value is NSDate in iOS/macOS. If you want to use the value in sql, use
   String get createDate {
     if (isAndroid) {
       return 'date_added';
@@ -120,6 +176,23 @@ class CustomColumns {
   static List<String> values() {
     return const CustomColumns().getValues();
   }
+
+  static List<String> dateColumns(){
+    if (Platform.isAndroid) {
+      const android = CustomColumns.android;
+      return [
+        android.createDate,
+        android.modifiedDate,
+        android.dateTaken,
+        android.dateExpires,
+      ];
+    } else if (Platform.isIOS || Platform.isMacOS) {
+      const darwin = CustomColumns.darwin;
+      return [darwin.createDate, darwin.modifiedDate];
+    }
+    return [];
+  }
+
 
   static List<String> platformValues() {
     if (Platform.isAndroid) {

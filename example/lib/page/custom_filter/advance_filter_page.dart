@@ -205,13 +205,29 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
 
   late String column = keys().first;
   String? condition;
-  TextEditingController inputController = TextEditingController();
+  TextEditingController textValueController = TextEditingController();
+
+  var _date = DateTime.now();
 
   WhereConditionItem createItem() {
     final cond = condition ?? '';
-    final value = '$column $cond ${inputController.text}';
+
+    if (isDateColumn()) {
+      return DateColumnWhereCondition(
+        column: column,
+        operator: condition,
+        value: _date,
+      );
+    }
+
+    final value = '$column $cond ${textValueController.text}';
     final item = WhereConditionItem.text(value);
     return item;
+  }
+
+  bool isDateColumn() {
+    final dateColumns = CustomColumns.dateColumns();
+    return dateColumns.contains(column);
   }
 
   @override
@@ -255,15 +271,18 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
               },
               value: condition,
             ),
-            TextField(
-              controller: inputController,
-              decoration: const InputDecoration(
-                hintText: 'Input condition',
-              ),
-              onChanged: (value) {
-                setState(() {});
-              },
-            ),
+            if (!isDateColumn())
+              TextField(
+                controller: textValueController,
+                decoration: const InputDecoration(
+                  hintText: 'Input condition',
+                ),
+                onChanged: (value) {
+                  setState(() {});
+                },
+              )
+            else
+              _datePicker(),
             const SizedBox(
               height: 16,
             ),
@@ -289,6 +308,28 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
             Navigator.of(context).pop(createItem());
           },
           child: const Text('OK'),
+        ),
+      ],
+    );
+  }
+
+  Widget _datePicker() {
+    return Column(
+      children: [
+        TextButton(
+          onPressed: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: _date,
+              firstDate: DateTime(1970),
+              lastDate: DateTime(2100),
+            );
+            if (date == null) return;
+            setState(() {
+              _date = date;
+            });
+          },
+          child: Text(_date.toIso8601String()),
         ),
       ],
     );

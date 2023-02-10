@@ -2,11 +2,13 @@ import 'dart:io';
 
 import 'package:photo_manager/photo_manager.dart';
 
+/// The logical operator used in the [CustomFilter].
 enum LogicalType {
   and,
   or,
 }
 
+///
 class AdvancedCustomFilter extends CustomFilter {
   final List<WhereConditionItem> _whereItemList;
   final List<OrderByItem> _orderByItemList;
@@ -148,6 +150,101 @@ class WhereConditionGroup extends WhereConditionItem {
     }
 
     return '( $sb )';
+  }
+}
+
+bool _checkDateColumn(String column) {
+  return CustomColumns.dateColumns().contains(column);
+}
+
+bool _checkOtherColumn(String column) {
+  if (Platform.isAndroid) {
+    const android = CustomColumns.android;
+    return android.getValues().contains(column);
+  } else if (Platform.isIOS || Platform.isMacOS) {
+    const darwin = CustomColumns.darwin;
+    return darwin.getValues().contains(column);
+  }
+  return false;
+}
+
+class ColumnWhereCondition extends WhereConditionItem {
+  final String column;
+  final String? operator;
+  final String? value;
+
+  final bool needCheck;
+
+  ColumnWhereCondition({
+    required this.column,
+    required this.operator,
+    required this.value,
+    this.needCheck = true,
+  }) : super();
+
+  @override
+  String get text {
+    if (needCheck && _checkDateColumn(column)) {
+      assert(needCheck && _checkDateColumn(column),
+          'The column: $column is date type, please use DateColumnWhereCondition');
+
+      return '';
+    }
+
+    if (needCheck && _checkOtherColumn(column)) {
+      assert(needCheck && _checkOtherColumn(column),
+          'The $column is not support the platform, please check.');
+      return '';
+    }
+
+    final sb = StringBuffer();
+    sb.write(column);
+    if (operator != null) {
+      sb.write(' ${operator!} ');
+    }
+    if (value != null) {
+      sb.write(value!);
+    }
+    return sb.toString();
+  }
+}
+
+class DateColumnWhereCondition extends WhereConditionItem {
+  final String column;
+  final String? operator;
+  final DateTime? value;
+  final bool checkColumn;
+
+  DateColumnWhereCondition({
+    required this.column,
+    this.operator,
+    this.value,
+    this.checkColumn = true,
+  }) : super();
+
+  @override
+  String get text {
+    if (checkColumn && !_checkDateColumn(column)) {
+      assert(checkColumn && !_checkDateColumn(column),
+          'The date column just support createDate, modifiedDate, dateTaken, dateExpires');
+      return '';
+    }
+    final sb = StringBuffer();
+    sb.write(column);
+    if (operator != null) {
+      sb.write(' ${operator!} ');
+    }
+    if (value != null) {
+      // special for date taken
+      var isSecond = true;
+      if (Platform.isAndroid) {
+        isSecond = column != CustomColumns.android.dateTaken;
+      }
+      final sql =
+          CustomColumns.utils.convertDateTimeToSql(value!, isSeconds: isSecond);
+      sb.write(' $sql');
+    }
+    return sb.toString();
   }
 }
 

@@ -27,3 +27,5 @@ export 'src/managers/photo_manager.dart';
 export 'src/types/entity.dart';
 export 'src/types/thumbnail.dart';
 export 'src/types/types.dart';
+
+export 'src/utils/column_utils.dart';
