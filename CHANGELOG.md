@@ -9,6 +9,9 @@ that can be found in the LICENSE file. -->
 Features:
 
 - Support `CustomFilter` for more filter options. (#901)
+- Add two new static methods for `PhotoManager`:
+  - `getAssetCount` for getting assets count.
+  - `getAssetListRange` for getting assets between start and end.
 
 ## 2.5.2
 
