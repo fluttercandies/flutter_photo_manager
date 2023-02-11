@@ -166,11 +166,16 @@ class AssetPathEntity {
   }) {
     assert(albumType == 1, 'Only album can request for assets.');
     assert(size > 0, 'Page size must be greater than 0.');
-    assert(
-      type == RequestType.image || !filterOption.onlyLivePhotos,
-      'Filtering only Live Photos is only supported '
-      'when the request type contains image.',
-    );
+
+    final filterOption = this.filterOption;
+
+    if (filterOption is FilterOptionGroup) {
+      assert(
+        type == RequestType.image || !filterOption.onlyLivePhotos,
+        'Filtering only Live Photos is only supported '
+        'when the request type contains image.',
+      );
+    }
     return plugin.getAssetListPaged(
       id,
       page: page,
@@ -192,11 +197,15 @@ class AssetPathEntity {
     assert(albumType == 1, 'Only album can request for assets.');
     assert(start >= 0, 'The start must be greater than 0.');
     assert(end > start, 'The end must be greater than start.');
-    assert(
-      type == RequestType.image || !filterOption.onlyLivePhotos,
-      'Filtering only Live Photos is only supported '
-      'when the request type contains image.',
-    );
+    final filterOption = this.filterOption;
+
+    if (filterOption is FilterOptionGroup) {
+      assert(
+        type == RequestType.image || !filterOption.onlyLivePhotos,
+        'Filtering only Live Photos is only supported '
+        'when the request type contains image.',
+      );
+    }
     final int count = await assetCountAsync;
     if (end > count) {
       end = count;
