@@ -85,14 +85,51 @@ class OrderByActionPage extends StatefulWidget {
 class _OrderByActionPageState extends State<OrderByActionPage> {
   final List<OrderByItem> _items = [];
 
+  bool isEdit = false;
+
   @override
   void initState() {
     super.initState();
     _items.addAll(widget.items);
   }
 
+  Future<bool> sureBack() {
+    if (isEdit) {
+      return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Are you sure?'),
+          content: const Text('You have not saved the changes.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Sure'),
+            ),
+          ],
+        ),
+      ).then((value) => value == true);
+    } else {
+      return Future.value(true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: sureBack,
+      child: _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Order By'),
@@ -124,6 +161,7 @@ class _OrderByActionPageState extends State<OrderByActionPage> {
       trailing: IconButton(
         onPressed: () {
           setState(() {
+            isEdit = true;
             _items.removeAt(index);
           });
         },
@@ -139,6 +177,7 @@ class _OrderByActionPageState extends State<OrderByActionPage> {
     );
     if (result != null) {
       setState(() {
+        isEdit = true;
         _items.add(result);
       });
     }

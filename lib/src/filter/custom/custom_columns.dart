@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 /// {@template custom_columns}
@@ -25,7 +26,6 @@ import 'package:photo_manager/photo_manager.dart';
 ///
 /// {@endtemplate}
 class CustomColumns {
-
   /// The base columns, contains the common columns.
   static const CustomColumns base = CustomColumns();
 
@@ -203,7 +203,7 @@ class CustomColumns {
     return const CustomColumns().getValues();
   }
 
-  static List<String> dateColumns(){
+  static List<String> dateColumns() {
     if (Platform.isAndroid) {
       const android = CustomColumns.android;
       return [
@@ -218,7 +218,6 @@ class CustomColumns {
     }
     return [];
   }
-
 
   static List<String> platformValues() {
     if (Platform.isAndroid) {
@@ -439,14 +438,15 @@ class DarwinColumns extends CustomColumns {
 ///
 /// If text() throws an exception, it will return an empty string.
 class WhereItem {
-  final String column;
-  final String condition;
+  final ValueGetter<String> column;
+
+  final ValueGetter<String> condition;
 
   WhereItem(this.column, this.condition);
 
   String text() {
     try {
-      return "$column $condition";
+      return "${column()} ${condition()}";
     } on UnsupportedError {
       return '';
     }

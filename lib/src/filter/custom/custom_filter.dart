@@ -136,4 +136,9 @@ class OrderByItem {
       'isAsc': isAsc,
     };
   }
+
+  @override
+  String toString() {
+    return 'OrderByItem{column: $column, isAsc: $isAsc}';
+  }
 }

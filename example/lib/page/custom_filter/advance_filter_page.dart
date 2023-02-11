@@ -22,23 +22,44 @@ class _AdvancedCustomFilterPageState extends State<AdvancedCustomFilterPage> {
 
   final List<WhereConditionItem> _where = [];
 
+  final _columns = CustomColumns.base;
+
+  late AdvancedCustomFilter filter;
+
   @override
   void initState() {
     super.initState();
+    resetToDefault();
     _refresh();
   }
 
   void _refresh() {
-    final filter = AdvancedCustomFilter(
-      orderBy: _orderBy,
-      where: _where,
-    );
     PhotoManager.getAssetPathList(filterOption: filter).then((value) {
       setState(() {
         _pathList.clear();
         _pathList.addAll(value);
       });
     });
+  }
+
+  AdvancedCustomFilter _createFilter() {
+    final filter = AdvancedCustomFilter(
+      orderBy: _orderBy,
+      where: _where,
+    );
+    return filter;
+  }
+
+  void resetToDefault() {
+    filter = AdvancedCustomFilter()
+        .addWhereCondition(
+          ColumnWhereCondition(
+            column: _columns.width,
+            operator: '>=',
+            value: '200',
+          ),
+        )
+        .addOrderBy(column: _columns.createDate, isAsc: false);
   }
 
   @override
@@ -257,7 +278,7 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
             ),
             DropdownButton<String>(
               hint: const Text('Condition'),
-              items: WhereConditionItem.platformValues.map((e) {
+              items: WhereConditionItem.platformConditions.map((e) {
                 return DropdownMenuItem(
                   value: e,
                   child: Text(e.padRight(40)),
