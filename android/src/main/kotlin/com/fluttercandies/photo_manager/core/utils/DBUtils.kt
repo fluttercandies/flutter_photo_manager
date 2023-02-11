@@ -18,14 +18,18 @@ import kotlin.concurrent.withLock
 @Suppress("Deprecation", "InlinedApi")
 object DBUtils : IDBUtils {
     private val locationKeys = arrayOf(
-        MediaStore.Images.ImageColumns.LONGITUDE,
-        MediaStore.Images.ImageColumns.LATITUDE
+            MediaStore.Images.ImageColumns.LONGITUDE,
+            MediaStore.Images.ImageColumns.LATITUDE
     )
 
+    override fun keys(): Array<String> =
+            (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + locationKeys).distinct()
+                    .toTypedArray()
+
     override fun getAssetPathList(
-        context: Context,
-        requestType: Int,
-        option: FilterOption
+            context: Context,
+            requestType: Int,
+            option: FilterOption
     ): List<AssetPathEntity> {
         val list = ArrayList<AssetPathEntity>()
         val args = ArrayList<String>()
@@ -143,9 +147,7 @@ object DBUtils : IDBUtils {
             args.add(pathId)
         }
         val where = option.makeWhere(requestType, args)
-        val keys =
-            (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + locationKeys).distinct()
-                .toTypedArray()
+        val keys = keys()
         val selection = if (isAll) {
             "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $where"
         } else {
@@ -184,9 +186,8 @@ object DBUtils : IDBUtils {
             args.add(galleryId)
         }
         val where = option.makeWhere(requestType, args)
-        val keys =
-            (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + locationKeys).distinct()
-                .toTypedArray()
+        val keys = keys()
+
         val selection = if (isAll) {
             "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $where"
         } else {
@@ -195,8 +196,8 @@ object DBUtils : IDBUtils {
         val pageSize = end - start
         val sortOrder = getSortOrder(start, pageSize, option)
         val cursor = context.contentResolver.query(
-            allUri,
-            keys,
+                allUri,
+                keys,
             selection,
             args.toTypedArray(),
             sortOrder

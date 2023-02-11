@@ -1,22 +1,23 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:photo_manager_example/page/custom_filter/path_list.dart';
 
 import 'order_by_action.dart';
 
 class CustomFilterSqlPage extends StatefulWidget {
-  const CustomFilterSqlPage({Key? key}) : super(key: key);
+  const CustomFilterSqlPage({
+    Key? key,
+    required this.builder,
+  }) : super(key: key);
+
+  final Widget Function(BuildContext context, CustomFilter filter) builder;
 
   @override
   State<CustomFilterSqlPage> createState() => _CustomFilterSqlPageState();
 }
 
 class _CustomFilterSqlPageState extends State<CustomFilterSqlPage> {
-  List<AssetPathEntity> _list = [];
-
   final TextEditingController _whereController = TextEditingController();
   final List<OrderByItem> _orderBy = [
     OrderByItem.named(
@@ -24,6 +25,8 @@ class _CustomFilterSqlPageState extends State<CustomFilterSqlPage> {
       isAsc: false,
     ),
   ];
+
+  late CustomFilter filter;
 
   @override
   void initState() {
@@ -37,7 +40,8 @@ class _CustomFilterSqlPageState extends State<CustomFilterSqlPage> {
       _whereController.text =
           '${columns.width} <= 1000 AND ${columns.width} >= 250';
     }
-    _refresh();
+
+    filter = createCustomFilter();
   }
 
   @override
@@ -46,22 +50,18 @@ class _CustomFilterSqlPageState extends State<CustomFilterSqlPage> {
     super.dispose();
   }
 
-  BaseFilter createCustomFilter() {
+  void refresh() {
+    setState(() {
+      filter = createCustomFilter();
+    });
+  }
+
+  CustomFilter createCustomFilter() {
     final filter = CustomFilter.sql(
       where: _whereController.text,
       orderBy: _orderBy,
     );
     return filter;
-  }
-
-  Future<void> _refresh() async {
-    final List<AssetPathEntity> list = await PhotoManager.getAssetPathList(
-      filterOption: createCustomFilter(),
-    );
-    showToast('Get ${list.length} path(s).');
-    setState(() {
-      _list = list;
-    });
   }
 
   @override
@@ -70,17 +70,12 @@ class _CustomFilterSqlPageState extends State<CustomFilterSqlPage> {
       appBar: AppBar(
         title: const Text('Custom Filter'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _refresh,
-          ),
           OrderByAction(
             items: _orderBy,
             onChanged: (List<OrderByItem> value) {
-              setState(() {
-                _orderBy.clear();
-                _orderBy.addAll(value);
-              });
+              _orderBy.clear();
+              _orderBy.addAll(value);
+              refresh();
             },
           ),
         ],
@@ -92,6 +87,12 @@ class _CustomFilterSqlPageState extends State<CustomFilterSqlPage> {
             decoration: const InputDecoration(
               labelText: 'Where',
             ),
+            onSubmitted: (value) {
+              refresh();
+            },
+            onEditingComplete: () {
+              refresh();
+            },
           ),
           ListTile(
             title: Text(
@@ -99,17 +100,14 @@ class _CustomFilterSqlPageState extends State<CustomFilterSqlPage> {
             subtitle: const Text('Click to edit'),
             onTap: () {
               changeOrderBy(context, _orderBy, (List<OrderByItem> value) {
-                setState(() {
-                  _orderBy.clear();
-                  _orderBy.addAll(value);
-                });
+                _orderBy.clear();
+                _orderBy.addAll(value);
+                refresh();
               });
             },
           ),
           Expanded(
-            child: PathList(
-              list: _list,
-            ),
+            child: widget.builder(context, filter),
           ),
         ],
       ),

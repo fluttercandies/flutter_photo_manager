@@ -475,6 +475,20 @@ class PhotoManagerPlugin(
                 photoManager.getColumnNames(resultHandler)
             }
 
+            Methods.getAssetCount -> {
+                val option = call.getOption()
+                val type = call.getInt("type")
+                photoManager.getAssetCount(resultHandler, option, type)
+            }
+
+            Methods.getAssetsByRange -> {
+                val option = call.getOption()
+                val start = call.getInt("start")
+                val end = call.getInt("end")
+                val type = call.getInt("type")
+                photoManager.getAssetsByRange(resultHandler, option, start, end, type)
+            }
+
             else -> resultHandler.notImplemented()
         }
     }

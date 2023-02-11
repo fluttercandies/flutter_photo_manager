@@ -16,10 +16,13 @@ import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
-import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
+import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
 import com.fluttercandies.photo_manager.util.LogUtils
-import java.io.*
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStream
 import java.net.URLConnection
 
 @Suppress("Deprecation", "InlinedApi", "Range")
@@ -65,15 +68,18 @@ interface IDBUtils {
         }
 
         val typeKeys = arrayOf(
-            MediaStore.Files.FileColumns.MEDIA_TYPE,
-            MediaStore.Images.Media.DISPLAY_NAME
+                MediaStore.Files.FileColumns.MEDIA_TYPE,
+                MediaStore.Images.Media.DISPLAY_NAME
         )
 
         val storeBucketKeys = arrayOf(BUCKET_ID, BUCKET_DISPLAY_NAME)
 
         val allUri: Uri
             get() = MediaStore.Files.getContentUri(VOLUME_EXTERNAL)
+
     }
+
+    fun keys(): Array<String>
 
     val idSelection: String
         get() = "${MediaStore.Images.Media._ID} = ?"
@@ -82,9 +88,9 @@ interface IDBUtils {
         get() = IDBUtils.allUri
 
     fun getAssetPathList(
-        context: Context,
-        requestType: Int = 0,
-        option: FilterOption
+            context: Context,
+            requestType: Int = 0,
+            option: FilterOption
     ): List<AssetPathEntity>
 
     fun getAssetListPaged(
@@ -626,5 +632,36 @@ interface IDBUtils {
             return it.columnNames.toList()
         }
         return emptyList()
+    }
+
+    fun getAssetCount(context: Context, option: FilterOption, requestType: Int): Int {
+        val cr = context.contentResolver
+        val args = ArrayList<String>()
+        val where = option.makeWhere(requestType, args, false)
+        val order = option.orderByCondString()
+        cr.query(allUri, arrayOf(_ID), where, args.toTypedArray(), order).use {
+            return it?.count ?: 0
+        }
+    }
+
+    fun getAssetsByRange(context: Context, option: FilterOption, start: Int, end: Int, requestType: Int): List<AssetEntity> {
+        val cr = context.contentResolver
+        val args = ArrayList<String>()
+        val where = option.makeWhere(requestType, args, false)
+        val order = option.orderByCondString()
+        cr.query(allUri, keys(), where, args.toTypedArray(), order)?.use {
+            val result = ArrayList<AssetEntity>()
+            it.moveToPosition(start - 1)
+            while (it.moveToNext()) {
+                val asset = it.toAssetEntity(context, false) ?: continue
+                result.add(asset)
+
+                if (result.count() == end - start) {
+                    break
+                }
+            }
+
+            return result
+        } ?: return emptyList()
     }
 }

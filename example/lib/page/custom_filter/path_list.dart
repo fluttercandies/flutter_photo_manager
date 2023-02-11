@@ -3,6 +3,30 @@ import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_example/page/custom_filter/path_page.dart';
 
+class FilterPathList extends StatelessWidget {
+  final CustomFilter filter;
+
+  const FilterPathList({Key? key, required this.filter}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<AssetPathEntity>>(
+      future: PhotoManager.getAssetPathList(
+        filterOption: filter,
+      ),
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<List<AssetPathEntity>> snapshot,
+      ) {
+        if (snapshot.hasData) {
+          return PathList(list: snapshot.data!);
+        }
+        return const SizedBox();
+      },
+    );
+  }
+}
+
 class PathList extends StatelessWidget {
   const PathList({
     Key? key,

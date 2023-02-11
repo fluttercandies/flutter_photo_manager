@@ -148,7 +148,6 @@ object AndroidQDBUtils : IDBUtils {
             args.add(pathId)
         }
         val where = option.makeWhere(requestType, args)
-        val keys = (assetKeys()).distinct().toTypedArray()
         val selection = if (isAll) {
             "$BUCKET_ID IS NOT NULL $where"
         } else {
@@ -156,11 +155,11 @@ object AndroidQDBUtils : IDBUtils {
         }
         val sortOrder = getSortOrder(page * size, size, option)
         val cursor = context.contentResolver.query(
-            allUri,
-            keys,
-            selection,
-            args.toTypedArray(),
-            sortOrder
+                allUri,
+                keys(),
+                selection,
+                args.toTypedArray(),
+                sortOrder
         ) ?: return list
         cursor.use {
             cursorWithRange(it, page * size, size) { cursor ->
@@ -188,7 +187,6 @@ object AndroidQDBUtils : IDBUtils {
             args.add(galleryId)
         }
         val where = option.makeWhere(requestType, args)
-        val keys = assetKeys().distinct().toTypedArray()
         val selection = if (isAll) {
             "$BUCKET_ID IS NOT NULL $where"
         } else {
@@ -198,7 +196,7 @@ object AndroidQDBUtils : IDBUtils {
         val sortOrder = getSortOrder(start, pageSize, option)
         val cursor = context.contentResolver.query(
             allUri,
-            keys,
+            keys(),
             selection,
             args.toTypedArray(),
             sortOrder
@@ -214,25 +212,26 @@ object AndroidQDBUtils : IDBUtils {
 
     }
 
-    private fun assetKeys() =
-        IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + arrayOf(
-            RELATIVE_PATH
-        )
+
+    override fun keys(): Array<String> {
+        return (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + arrayOf(
+                RELATIVE_PATH
+        )).distinct().toTypedArray()
+    }
 
     override fun getAssetEntity(
-        context: Context,
-        id: String,
-        checkIfExists: Boolean
+            context: Context,
+            id: String,
+            checkIfExists: Boolean
     ): AssetEntity? {
-        val keys = assetKeys().distinct().toTypedArray()
         val selection = "$_ID = ?"
         val args = arrayOf(id)
         val cursor = context.contentResolver.query(
-            allUri,
-            keys,
-            selection,
-            args,
-            null
+                allUri,
+                keys(),
+                selection,
+                args,
+                null
         ) ?: return null
         cursor.use {
             return if (it.moveToNext()) it.toAssetEntity(context, checkIfExists)

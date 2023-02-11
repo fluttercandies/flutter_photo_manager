@@ -281,4 +281,14 @@ class PhotoManager(private val context: Context) {
         val columnNames = dbUtils.getColumnNames(context)
         resultHandler.reply(columnNames)
     }
+
+    fun getAssetCount(resultHandler: ResultHandler, option: FilterOption, requestType: Int) {
+        val assetCount = dbUtils.getAssetCount(context, option, requestType)
+        resultHandler.reply(assetCount)
+    }
+
+    fun getAssetsByRange(resultHandler: ResultHandler, option: FilterOption, start: Int, end: Int, requestType: Int) {
+        val list = dbUtils.getAssetsByRange(context, option, start, end, requestType)
+        resultHandler.reply(ConvertUtils.convertAssets(list))
+    }
 }

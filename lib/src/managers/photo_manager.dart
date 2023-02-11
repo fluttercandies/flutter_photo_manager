@@ -153,4 +153,27 @@ class PhotoManager {
 
   /// Clear all file caches.
   static Future<void> clearFileCache() => plugin.clearFileCache();
+
+  /// Get the asset count
+  static Future<int> getAssetCount({
+    BaseFilter? filterOption,
+    RequestType type = RequestType.common,
+  }) {
+    return plugin.getAssetCount(filterOption: filterOption, type: type);
+  }
+
+  /// Get the asset list with range.
+  static Future<List<AssetEntity>> getAssetListWithRange({
+    required int start,
+    required int end,
+    BaseFilter? filterOption,
+    RequestType type = RequestType.common,
+  }) async {
+    return plugin.getAssetListWithRange(
+      start: start,
+      end: end,
+      filterOption: filterOption,
+      type: type,
+    );
+  }
 }

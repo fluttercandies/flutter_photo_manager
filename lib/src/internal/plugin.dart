@@ -539,6 +539,38 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     }
     return null;
   }
+
+  Future<int> getAssetCount({
+    BaseFilter? filterOption,
+    RequestType type = RequestType.common,
+  }) {
+    final filter = filterOption ?? BaseFilter.defaultValue();
+
+    return _channel.invokeMethod<int>(PMConstants.mGetAssetCount, {
+      'type': type.value,
+      'option': filter.toMap(),
+    }).then((v) => v ?? 0);
+  }
+
+  Future<List<AssetEntity>> getAssetListWithRange({
+    required int start,
+    required int end,
+    RequestType type = RequestType.common,
+    BaseFilter? filterOption,
+  }) {
+    final filter = filterOption ?? BaseFilter.defaultValue();
+    return _channel.invokeMethod<Map>(PMConstants.mGetAssetsByRange, {
+      'type': type.value,
+      'start': start,
+      'end': end,
+      'option': filter.toMap(),
+    }).then((value) {
+      if (value == null) return [];
+      return ConvertUtils.convertToAssetList(
+        value.cast<String, dynamic>(),
+      );
+    });
+  }
 }
 
 mixin IosPlugin on BasePlugin {

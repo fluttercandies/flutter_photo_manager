@@ -1,3 +1,5 @@
+import 'package:photo_manager/photo_manager.dart';
+
 enum BaseFilterType {
   classical,
   custom,
@@ -16,6 +18,22 @@ extension BaseFilterTypeExtension on BaseFilterType {
 
 abstract class BaseFilter {
   BaseFilter();
+
+  factory BaseFilter.defaultValue({
+    bool containsPathModified = false,
+    bool containsLivePhotos = true,
+    bool onlyLivePhotos = false,
+  }) {
+    return CustomFilter.sql(
+      where: '',
+      orderBy: [
+        OrderByItem.named(
+          column: CustomColumns.base.createDate,
+          isAsc: false,
+        ),
+      ],
+    );
+  }
 
   /// Whether the [AssetPathEntity]s will return with modified time.
   ///

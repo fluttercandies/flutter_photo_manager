@@ -58,6 +58,9 @@ class PMConstants {
   static const String mMoveAssetToPath = 'moveAssetToPath';
   static const String mColumnNames = 'getColumnNames';
 
+  static const String mGetAssetCount = 'getAssetCount';
+  static const String mGetAssetsByRange = 'getAssetsByRange';
+
   /// Constant value.
   static const int vDefaultThumbnailSize = 150;
   static const int vDefaultThumbnailQuality = 95;

@@ -110,7 +110,7 @@ abstract class WhereConditionItem {
       return [
         'is not null',
         'is null',
-        '=',
+        '==',
         '!=',
         '>',
         '>=',

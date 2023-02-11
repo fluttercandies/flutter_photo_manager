@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_example/page/custom_filter/order_by_action.dart';
-import 'package:photo_manager_example/page/custom_filter/path_list.dart';
 
 class AdvancedCustomFilterPage extends StatefulWidget {
-  const AdvancedCustomFilterPage({Key? key}) : super(key: key);
+  const AdvancedCustomFilterPage({
+    Key? key,
+    required this.builder,
+  }) : super(key: key);
+
+  final Widget Function(BuildContext context, CustomFilter filter) builder;
 
   @override
   State<AdvancedCustomFilterPage> createState() =>
@@ -12,7 +16,6 @@ class AdvancedCustomFilterPage extends StatefulWidget {
 }
 
 class _AdvancedCustomFilterPageState extends State<AdvancedCustomFilterPage> {
-  final List<AssetPathEntity> _pathList = [];
   final List<OrderByItem> _orderBy = [
     OrderByItem.named(
       column: CustomColumns.base.createDate,
@@ -22,21 +25,12 @@ class _AdvancedCustomFilterPageState extends State<AdvancedCustomFilterPage> {
 
   final List<WhereConditionItem> _where = [];
 
+  late CustomFilter filter;
+
   @override
   void initState() {
     super.initState();
-    _refresh();
-  }
-
-  void _refresh() {
-    PhotoManager.getAssetPathList(
-      filterOption: _createFilter(),
-    ).then((value) {
-      setState(() {
-        _pathList.clear();
-        _pathList.addAll(value);
-      });
-    });
+    filter = _createFilter();
   }
 
   AdvancedCustomFilter _createFilter() {
@@ -53,13 +47,10 @@ class _AdvancedCustomFilterPageState extends State<AdvancedCustomFilterPage> {
       appBar: AppBar(
         title: const Text('Advanced Custom Filter Example'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _refresh,
-          ),
           WhereAction(
             where: _where,
             onChanged: (value) {
+              if (!mounted) return;
               setState(() {
                 _where.clear();
                 _where.addAll(value);
@@ -81,7 +72,7 @@ class _AdvancedCustomFilterPageState extends State<AdvancedCustomFilterPage> {
       body: Column(
         children: [
           Expanded(
-            child: PathList(list: _pathList),
+            child: widget.builder(context, filter),
           ),
         ],
       ),
@@ -105,11 +96,12 @@ class WhereAction extends StatelessWidget {
     return IconButton(
       icon: const Icon(Icons.filter_alt),
       onPressed: () {
-        Navigator.of(context)
-            .push<List<WhereConditionItem>>(MaterialPageRoute(
-          builder: (context) => _WhereConditionPage(where: where),
-        ))
-            .then((value) {
+        Navigator.push<List<WhereConditionItem>>(
+          context,
+          MaterialPageRoute(
+            builder: (context) => _WhereConditionPage(where: where),
+          ),
+        ).then((value) {
           if (value != null) {
             onChanged(value);
           }
@@ -134,30 +126,64 @@ class _WhereConditionPage extends StatefulWidget {
 class _WhereConditionPageState extends State<_WhereConditionPage> {
   final List<WhereConditionItem> _where = [];
 
+  bool isChanged = false;
+
   @override
   void initState() {
     super.initState();
     _where.addAll(widget.where);
   }
 
+  Future<bool> _onWillPop() {
+    if (!isChanged) {
+      return Future.value(true);
+    }
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Are you sure?'),
+          content: const Text('Do you want to leave without saving?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    ).then((value) => value == true);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Where Condition'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _createNew,
-          ),
-        ],
-      ),
-      body: buildList(context),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.done),
-        onPressed: () {
-          Navigator.of(context).pop(_where);
-        },
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Where Condition'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: _createNew,
+            ),
+          ],
+        ),
+        body: buildList(context),
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.done),
+          onPressed: () {
+            Navigator.of(context).pop(_where);
+          },
+        ),
       ),
     );
   }
@@ -171,6 +197,7 @@ class _WhereConditionPageState extends State<_WhereConditionPage> {
     );
     if (result != null) {
       setState(() {
+        isChanged = true;
         _where.add(result);
       });
     }
@@ -187,6 +214,7 @@ class _WhereConditionPageState extends State<_WhereConditionPage> {
             icon: const Icon(Icons.delete),
             onPressed: () {
               setState(() {
+                isChanged = true;
                 _where.removeAt(index);
               });
             },
@@ -250,7 +278,7 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
               items: keys().map((e) {
                 return DropdownMenuItem(
                   value: e,
-                  child: Text(e.padRight(40)),
+                  child: Text(e),
                 );
               }).toList(),
               onChanged: (value) {
@@ -266,7 +294,7 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
               items: WhereConditionItem.platformConditions.map((e) {
                 return DropdownMenuItem(
                   value: e,
-                  child: Text(e.padRight(40)),
+                  child: Text(e),
                 );
               }).toList(),
               onChanged: (value) {
