@@ -493,6 +493,21 @@
               [handler reply:@{@"success": @YES}];
           }
         }];
+    } else if ([@"getAssetCount" isEqualToString:call.method]) {
+        int type = [call.arguments[@"type"] intValue];
+        NSObject <PMBaseFilter> *option =
+        [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
+        NSUInteger count = [manager getAssetCountWithType:type option:option];
+        [handler reply:@(count)];
+    } else if ([@"getAssetsByRange" isEqualToString:call.method]) {
+        int type = [call.arguments[@"type"] intValue];
+        int start = [call.arguments[@"start"] intValue];
+        int end = [call.arguments[@"end"] intValue];
+        NSObject <PMBaseFilter> *option =
+        [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
+        NSArray<PMAssetEntity*> *array= [manager getAssetsWithType:type option: option start:start end:end];
+        NSDictionary *resultDict = [PMConvertUtils convertAssetToMap:array optionGroup:option];
+        [handler reply:resultDict];
     } else if ([@"deleteAlbum" isEqualToString:call.method]) {
         NSString *id = call.arguments[@"id"];
         int type = [call.arguments[@"type"] intValue];

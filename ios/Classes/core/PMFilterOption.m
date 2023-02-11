@@ -270,10 +270,41 @@
 
 - (PHFetchOptions *)getFetchOptions:(int)type {
     PHFetchOptions *options = [PHFetchOptions new];
+    
+    BOOL containsImage = [PMRequestTypeUtils containsImage:type];
+    BOOL containsVideo = [PMRequestTypeUtils containsVideo:type];
+    BOOL containsAudio = [PMRequestTypeUtils containsAudio:type];
+    
+    NSMutableString *typeWhere = [NSMutableString new];
+    
+    if (containsImage) {
+        if (!typeWhere.isEmpty) {
+            [typeWhere appendString:@" OR "];
+        }
+        
+        [typeWhere appendFormat:@"mediaType == %ld", PHAssetMediaTypeImage];
+    }
+    if (containsVideo) {
+        if (!typeWhere.isEmpty) {
+            [typeWhere appendString:@" OR "];
+        }
+        
+        [typeWhere appendFormat:@"mediaType == %ld", PHAssetMediaTypeVideo];
+    }
+    if (containsAudio) {
+        if (!typeWhere.isEmpty) {
+            [typeWhere appendString:@" OR "];
+        }
+        
+        [typeWhere appendFormat:@"mediaType == %ld", PHAssetMediaTypeAudio];
+    }
 
     NSString *where = [self where];
     if (!where.isEmpty) {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:where];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat: @"%@ AND ( %@ )", where, typeWhere];
+        options.predicate = predicate;
+    } else {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat: typeWhere];
         options.predicate = predicate;
     }
 

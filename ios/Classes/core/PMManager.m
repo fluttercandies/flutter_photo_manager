@@ -122,6 +122,32 @@
     }
 }
 
+- (NSUInteger)getAssetCountWithType:(int)type option:(NSObject<PMBaseFilter> *)filter {
+    PHFetchOptions *options = [filter getFetchOptions:type];
+    PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithOptions:options];
+    return result.count;
+}
+
+- (NSArray<PMAssetEntity *> *)getAssetListRange:(NSString *)id type:(int)type start:(NSUInteger)start end:(NSUInteger)end filterOption:(NSObject<PMBaseFilter> *)filterOption {
+    PHFetchOptions *options = [filter getFetchOptions:type];
+    PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithOptions:options];
+    
+    NSUInteger endOffset = end;
+    if (endOffset < result.count) {
+        endOffset = result.count;
+    }
+    
+    NSMutableArray<PMAssetEntity*>* array = [NSMutableArray new];
+    
+    for (NSUInteger i = start; i< endOffset; i++){
+        PHAsset *asset = result[i];
+        PMAssetEntity *pmAsset = [self convertPHAssetToAssetEntity:asset needTitle:[filterOption needTitle]];
+        [array addObject:PMAssetEntity];
+    }
+    
+    return array;
+}
+
 - (BOOL)existsWithId:(NSString *)assetId {
     PHFetchResult<PHAsset *> *result =
     [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[PHFetchOptions new]];

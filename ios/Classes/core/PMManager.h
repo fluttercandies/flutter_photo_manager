@@ -104,4 +104,9 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (void)cancelCacheRequests;
 
 - (void)injectModifyToDate:(PMAssetPathEntity *)path;
+
+- (NSUInteger) getAssetCountWithType:(int)type option:(NSObject<PMBaseFilter> *) filter;
+
+- (NSArray<PMAssetEntity*>*) getAssetsWithType:(int)type option:(NSObject<PMBaseFilter> *)option start:(int)start end:(int)end;
+
 @end
