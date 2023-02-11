@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.6.0
+
+Features:
+
+- Support `CustomFilter` for more filter options. (#901)
+
 ## 2.5.2
 
 ### Improvements
@@ -816,4 +822,4 @@ First version.
 
 - API for photo.
 
-[Migration Guide]: MIGRATION_GUIDE.md
+[migration guide]: MIGRATION_GUIDE.md
