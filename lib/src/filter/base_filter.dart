@@ -1,11 +1,17 @@
 import 'package:photo_manager/photo_manager.dart';
 
+/// The type of the filter.
 enum BaseFilterType {
+  /// The classical filter.
   classical,
+
+  /// The custom filter.
   custom,
 }
 
+/// The extension of [BaseFilterType].
 extension BaseFilterTypeExtension on BaseFilterType {
+  /// The value of the [BaseFilterType].
   int get value {
     switch (this) {
       case BaseFilterType.classical:
@@ -16,9 +22,14 @@ extension BaseFilterTypeExtension on BaseFilterType {
   }
 }
 
+/// The base class of all the filters.
+///
+/// See also:
 abstract class BaseFilter {
+  /// Construct a default filter.
   BaseFilter();
 
+  /// Construct a default filter.
   factory BaseFilter.defaultValue({
     bool containsPathModified = false,
   }) {
@@ -41,12 +52,18 @@ abstract class BaseFilter {
   ///  * [AssetPathEntity.lastModified].
   bool containsPathModified = false;
 
+  /// The type of the filter.
   BaseFilterType get type;
 
+  /// The child map of the filter.
+  ///
+  /// The subclass should override this method to make params.
   Map<String, dynamic> childMap();
 
+  /// The method only support for [FilterOptionGroup].
   BaseFilter updateDateToNow();
 
+  /// Convert the filter to a map for channel.
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'type': type.value,

@@ -8,6 +8,17 @@ enum LogicalType {
   or,
 }
 
+extension LogicalTypeExtension on LogicalType {
+  int get value {
+    switch (this) {
+      case LogicalType.and:
+        return 0;
+      case LogicalType.or:
+        return 1;
+    }
+  }
+}
+
 /// {@template PM.AdvancedCustomFilter}
 ///
 /// The advanced custom filter.
