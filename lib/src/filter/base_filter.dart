@@ -21,8 +21,6 @@ abstract class BaseFilter {
 
   factory BaseFilter.defaultValue({
     bool containsPathModified = false,
-    bool containsLivePhotos = true,
-    bool onlyLivePhotos = false,
   }) {
     return CustomFilter.sql(
       where: '',
@@ -43,16 +41,6 @@ abstract class BaseFilter {
   ///  * [AssetPathEntity.lastModified].
   bool containsPathModified = false;
 
-  /// Whether to obtain live photos.
-  ///
-  /// This option only takes effects on iOS.
-  bool containsLivePhotos = true;
-
-  /// Whether to obtain only live photos.
-  ///
-  /// This option only takes effects on iOS and when the request type is image.
-  bool onlyLivePhotos = false;
-
   BaseFilterType get type;
 
   Map<String, dynamic> childMap();
@@ -72,8 +60,6 @@ abstract class BaseFilter {
   Map<String, dynamic> _paramMap() {
     return <String, dynamic>{
       'containsPathModified': containsPathModified,
-      'containsLivePhotos': containsLivePhotos,
-      'onlyLivePhotos': onlyLivePhotos,
     };
   }
 }

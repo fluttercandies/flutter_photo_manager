@@ -8,8 +8,8 @@
 
 - (PHFetchOptions *)getFetchOptions:(int)type;
 
--(BOOL)containsModified;
+- (BOOL) containsModified;
 
--(BOOL) needTitle;
+- (BOOL) needTitle;
 
 @end

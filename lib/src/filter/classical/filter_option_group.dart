@@ -14,16 +14,13 @@ class FilterOptionGroup extends BaseFilter {
     FilterOption videoOption = const FilterOption(),
     FilterOption audioOption = const FilterOption(),
     bool containsPathModified = false,
-    bool containsLivePhotos = true,
-    bool onlyLivePhotos = false,
+    this.containsLivePhotos = true,
+    this.onlyLivePhotos = false,
     DateTimeCond? createTimeCond,
     DateTimeCond? updateTimeCond,
     List<OrderOption> orders = const <OrderOption>[],
   }) {
     super.containsPathModified = containsPathModified;
-    super.containsLivePhotos = containsLivePhotos;
-    super.onlyLivePhotos = onlyLivePhotos;
-
     _map[AssetType.image] = imageOption;
     _map[AssetType.video] = videoOption;
     _map[AssetType.audio] = audioOption;
@@ -34,6 +31,16 @@ class FilterOptionGroup extends BaseFilter {
 
   /// Construct an empty options group.
   FilterOptionGroup.empty();
+
+  /// Whether to obtain only live photos.
+  ///
+  /// This option only takes effects on iOS and when the request type is image.
+  bool onlyLivePhotos = false;
+
+  /// Whether to obtain live photos.
+  ///
+  /// This option only takes effects on iOS.
+  bool containsLivePhotos = true;
 
   final Map<AssetType, FilterOption> _map = <AssetType, FilterOption>{};
 
@@ -92,6 +99,8 @@ class FilterOptionGroup extends BaseFilter {
       'createDate': createTimeCond.toMap(),
       'updateDate': updateTimeCond.toMap(),
       'orders': orders.map((OrderOption e) => e.toMap()).toList(),
+      'containsLivePhotos': containsLivePhotos,
+      'onlyLivePhotos': onlyLivePhotos,
     };
   }
 
