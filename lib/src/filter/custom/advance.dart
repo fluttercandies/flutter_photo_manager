@@ -394,6 +394,8 @@ class DateColumnWhereCondition extends WhereConditionItem {
   }
 }
 
+/// {@template PM.text_where_condition}
+///
 /// The where condition item for text.
 ///
 /// It is recommended to use
@@ -404,10 +406,13 @@ class DateColumnWhereCondition extends WhereConditionItem {
 /// please understand the following:
 /// - Android: How to write where with `ContentReslover`.
 /// - iOS/macOS: How to format `NSPredicate`.
+///
+/// {@endtemplate}
 class TextWhereCondition extends WhereConditionItem {
   @override
   final String text;
 
+  /// {@macro PM.text_where_condition}
   TextWhereCondition(
     this.text, {
     LogicalType type = LogicalType.and,
