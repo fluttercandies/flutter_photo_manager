@@ -163,7 +163,7 @@ class PhotoManager {
   }
 
   /// Get the asset list with range.
-  static Future<List<AssetEntity>> getAssetListWithRange({
+  static Future<List<AssetEntity>> getAssetListRange({
     required int start,
     required int end,
     BaseFilter? filterOption,

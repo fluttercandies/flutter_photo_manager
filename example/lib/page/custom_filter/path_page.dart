@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:photo_manager_example/widget/image_item_widget.dart';
+import 'package:photo_manager_example/page/custom_filter/image_list.dart';
 
 class PathPage extends StatefulWidget {
   const PathPage({Key? key, required this.path}) : super(key: key);
@@ -55,22 +55,6 @@ class _GalleryWidgetState extends State<GalleryWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 5,
-        mainAxisSpacing: 2,
-        crossAxisSpacing: 2,
-      ),
-      itemBuilder: (context, index) {
-        final entity = _list[index];
-        return ImageItemWidget(
-          entity: entity,
-          option: ThumbnailOption.ios(
-            size: const ThumbnailSize.square(500),
-          ),
-        );
-      },
-      itemCount: _list.length,
-    );
+    return ImageList(list: _list);
   }
 }
