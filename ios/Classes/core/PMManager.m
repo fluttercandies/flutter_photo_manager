@@ -128,8 +128,8 @@
     return result.count;
 }
 
-- (NSArray<PMAssetEntity *> *)getAssetListRange:(NSString *)id type:(int)type start:(NSUInteger)start end:(NSUInteger)end filterOption:(NSObject<PMBaseFilter> *)filterOption {
-    PHFetchOptions *options = [filter getFetchOptions:type];
+- (NSArray<PMAssetEntity *> *)getAssetsWithType:(int)type option:(NSObject<PMBaseFilter> *)option start:(int)start end:(int)end {
+    PHFetchOptions *options = [option getFetchOptions:type];
     PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithOptions:options];
     
     NSUInteger endOffset = end;
@@ -141,8 +141,8 @@
     
     for (NSUInteger i = start; i< endOffset; i++){
         PHAsset *asset = result[i];
-        PMAssetEntity *pmAsset = [self convertPHAssetToAssetEntity:asset needTitle:[filterOption needTitle]];
-        [array addObject:PMAssetEntity];
+        PMAssetEntity *pmAsset = [self convertPHAssetToAssetEntity:asset needTitle:[option needTitle]];
+        [array addObject: pmAsset];
     }
     
     return array;
