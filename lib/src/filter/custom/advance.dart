@@ -279,13 +279,32 @@ bool _checkOtherColumn(String column) {
   return false;
 }
 
+/// {@template PM.column_where_condition}
+///
+/// The where condition item.
+///
+/// The [operator] is the operator of the condition.
+///
+/// The [value] is the value of the condition.
+///
+/// {@endtemplate}
 class ColumnWhereCondition extends WhereConditionItem {
+  ///   - Android: the column name in the MediaStore database.
+  ///   - iOS/macOS: the field with the PHAsset.
   final String column;
+
+  /// such as: `=`, `>`, `>=`, `!=`, `like`, `in`, `between`, `is null`, `is not null`.
   final String? operator;
+
+  /// The value of the condition.
   final String? value;
 
+  /// Check the column when the [text] is called. Default is true.
+  ///
+  /// If false, don't check the column.
   final bool needCheck;
 
+  /// {@macro PM.column_where_condition}
   ColumnWhereCondition({
     required this.column,
     required this.operator,
@@ -320,16 +339,28 @@ class ColumnWhereCondition extends WhereConditionItem {
   }
 }
 
+/// {@template PM.date_column_where_condition}
+///
+/// The where condition item for date type.
+///
+/// Because the date type is different between Android and iOS/macOS.
+///
+/// {@endtemplate}
 class DateColumnWhereCondition extends WhereConditionItem {
+  /// The column name of the date type.
   final String column;
-  final String? operator;
-  final DateTime? value;
+
+  /// such as: `=`, `>`, `>=`, `!=`, `like`, `in`, `between`, `is null`, `is not null`.
+  final String operator;
+
+  /// The value of the condition.
+  final DateTime value;
   final bool checkColumn;
 
   DateColumnWhereCondition({
     required this.column,
-    this.operator,
-    this.value,
+    required this.operator,
+    required this.value,
     this.checkColumn = true,
   }) : super();
 
@@ -342,19 +373,14 @@ class DateColumnWhereCondition extends WhereConditionItem {
     }
     final sb = StringBuffer();
     sb.write(column);
-    if (operator != null) {
-      sb.write(' ${operator!} ');
+    sb.write(' $operator ');
+    var isSecond = true;
+    if (Platform.isAndroid) {
+      isSecond = column != CustomColumns.android.dateTaken;
     }
-    if (value != null) {
-      // special for date taken
-      var isSecond = true;
-      if (Platform.isAndroid) {
-        isSecond = column != CustomColumns.android.dateTaken;
-      }
-      final sql =
-          CustomColumns.utils.convertDateTimeToSql(value!, isSeconds: isSecond);
-      sb.write(' $sql');
-    }
+    final sql =
+        CustomColumns.utils.convertDateTimeToSql(value, isSeconds: isSecond);
+    sb.write(' $sql');
     return sb.toString();
   }
 
@@ -362,20 +388,28 @@ class DateColumnWhereCondition extends WhereConditionItem {
   String display() {
     final sb = StringBuffer();
     sb.write(column);
-    if (operator != null) {
-      sb.write(' ${operator!} ');
-    }
-    if (value != null) {
-      sb.write(' ${value!.toIso8601String()}');
-    }
+    sb.write(' $operator ');
+    sb.write(' ${value.toIso8601String()}');
     return sb.toString();
   }
 }
 
+/// The where condition item for text.
+///
+/// It is recommended to use
+/// [DateColumnWhereCondition] or [ColumnWhereCondition] instead of this one,
+/// because different platforms may have different syntax.
+///
+/// If you are an advanced user and insist on using it,
+/// please understand the following:
+/// - Android: How to write where with `ContentReslover`.
+/// - iOS/macOS: How to format `NSPredicate`.
 class TextWhereCondition extends WhereConditionItem {
   @override
   final String text;
 
-  TextWhereCondition(this.text, {LogicalType type = LogicalType.and})
-      : super(logicalType: type);
+  TextWhereCondition(
+    this.text, {
+    LogicalType type = LogicalType.and,
+  }) : super(logicalType: type);
 }

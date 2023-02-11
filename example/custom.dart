@@ -12,4 +12,8 @@ void main(List<String> args) {
           WhereConditionGroup().andText('width < 500').andText('height < 500'),
         ),
   );
+
+  PhotoManager.getAssetPathList(filterOption: filter).then((value) {
+    print(value);
+  });
 }

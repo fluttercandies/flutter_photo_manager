@@ -22,19 +22,16 @@ class _AdvancedCustomFilterPageState extends State<AdvancedCustomFilterPage> {
 
   final List<WhereConditionItem> _where = [];
 
-  final _columns = CustomColumns.base;
-
-  late AdvancedCustomFilter filter;
-
   @override
   void initState() {
     super.initState();
-    resetToDefault();
     _refresh();
   }
 
   void _refresh() {
-    PhotoManager.getAssetPathList(filterOption: filter).then((value) {
+    PhotoManager.getAssetPathList(
+      filterOption: _createFilter(),
+    ).then((value) {
       setState(() {
         _pathList.clear();
         _pathList.addAll(value);
@@ -48,18 +45,6 @@ class _AdvancedCustomFilterPageState extends State<AdvancedCustomFilterPage> {
       where: _where,
     );
     return filter;
-  }
-
-  void resetToDefault() {
-    filter = AdvancedCustomFilter()
-        .addWhereCondition(
-          ColumnWhereCondition(
-            column: _columns.width,
-            operator: '>=',
-            value: '200',
-          ),
-        )
-        .addOrderBy(column: _columns.createDate, isAsc: false);
   }
 
   @override
@@ -225,13 +210,13 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
   }
 
   late String column = keys().first;
-  String? condition;
+  String condition = '==';
   TextEditingController textValueController = TextEditingController();
 
   var _date = DateTime.now();
 
   WhereConditionItem createItem() {
-    final cond = condition ?? '';
+    final cond = condition;
 
     if (isDateColumn()) {
       return DateColumnWhereCondition(
