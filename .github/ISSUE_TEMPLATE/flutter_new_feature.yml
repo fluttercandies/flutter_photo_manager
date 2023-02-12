@@ -7,7 +7,7 @@ body:
       value: |
         Thanks for taking the time to fill out this feature request!
         Before submitting, make sure you read the document and search the issue list.
-        If you are not sure, you can run the example code 
+        If you are not sure, you can run the example code
         first to understand the example that may be your requirement.
   - type: dropdown
     id: platforms
@@ -45,5 +45,5 @@ body:
   - type: markdown
     attributes:
       value: |
-        Add as many or as many reasons as possible, 
+        Add as many or as many reasons as possible,
         which will give priority to feature request

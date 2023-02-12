@@ -8,7 +8,7 @@ body:
         Thanks for taking the time to fill out this issue!
         You need read document before you ask question.
         If you can, search the issue list
-        or [StackOverflow](https://stackoverflow.com/questions/tagged/flutter) 
+        or [StackOverflow](https://stackoverflow.com/questions/tagged/flutter)
         to see if someone has asked the same question.
   - type: dropdown
     id: platforms

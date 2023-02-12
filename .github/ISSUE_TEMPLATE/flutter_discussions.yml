@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        First check whether the project has Discussions enabled. 
+        First check whether the project has Discussions enabled.
         If so, it is recommended to use Discussions to create discussions.
-        The discussions is here: 
+        The discussions is here:
         [Discussions](https://github.com/FlutterCandies/flutter_photo_manager/discussions)
