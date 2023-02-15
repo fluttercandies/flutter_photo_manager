@@ -331,10 +331,14 @@ It is up to you to decide which fields to use for filtering and sorting
 The column name of iOS or android is different, so you need to use the `CustomColumns.base`、`CustomColumns.android` or `CustomColumns.darwin` to get the column name.
 
 ```dart
-final CustomFilter filterOption = CustomFilter.sql(
-  where: '${CustomColumns.base.width} > 100 AND ${CustomColumns.base.height} > 200',
-  orderBy: OrderByItem.desc(CustomColumns.base.createDate),
-);
+PMFilter createFilter() {
+  final CustomFilter filterOption = CustomFilter.sql(
+    where: '${CustomColumns.base.width} > 100 AND ${CustomColumns.base.height} > 200',
+    orderBy: [OrderByItem.desc(CustomColumns.base.createDate)],
+  );
+
+  return filterOption;
+}
 ```
 
 ** Advanced ** filter
@@ -344,17 +348,31 @@ final CustomFilter filterOption = CustomFilter.sql(
 The `AdvancedCustomFilter` is a subclass of `CustomFilter`, The have builder methods to help make a filter.
 
 ```dart
-final group = WhereConditionGroup()
-  .and(
-    ColumnWhereCondition(column: CustomColumns.base.width, value: 100, operator: '>'),
-  )
-  .or(
-    ColumnWhereCondition(column: CustomColumns.base.height, value: 200, operator: '>'),
-  );
 
-final filter = AdvancedCustomFilter()
-  .addWhereCondition(group)
-  .addOrderBy(OrderByItem.desc(CustomColumns.base.createDate));
+PMFilter createFilter() {
+  final group = WhereConditionGroup()
+          .and(
+            ColumnWhereCondition(
+              column: CustomColumns.base.width,
+              value: '100',
+              operator: '>',
+            ),
+          )
+          .or(
+            ColumnWhereCondition(
+              column: CustomColumns.base.height,
+              value: '200',
+              operator: '>',
+            ),
+          );
+
+  final filter = AdvancedCustomFilter()
+          .addWhereCondition(group)
+          .addOrderBy(column: CustomColumns.base.createDate, isAsc: false);
+  
+  return filter;
+}
+
 ```
 
 **Main class ** of custom filter
