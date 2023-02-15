@@ -12,7 +12,7 @@ Features:
 - Add two new static methods for `PhotoManager`:
   - `getAssetCount` for getting assets count.
   - `getAssetListRange` for getting assets between start and end.
-
+  
 ## 2.5.2
 
 ### Improvements
@@ -825,4 +825,4 @@ First version.
 
 - API for photo.
 
-[migration guide]: MIGRATION_GUIDE.md
+[Migration Guide]: MIGRATION_GUIDE.md
