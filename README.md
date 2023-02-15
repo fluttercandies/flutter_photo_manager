@@ -4,14 +4,14 @@ that can be found in the LICENSE file. -->
 
 # photo_manager
 
-English | [中文说明](.) (🚧 WIP)
+English | [中文说明](#) (🚧 WIP)
 
 [![pub package](https://img.shields.io/pub/v/photo_manager?label=stable)][pub package]
 [![pub pre-release package](https://img.shields.io/pub/v/photo_manager?color=9d00ff&include_prereleases&label=dev)](https://pub.dev/packages/photo_manager)
 [![Build status](https://img.shields.io/github/actions/workflow/status/fluttercandies/flutter_photo_manager/runnable.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/actions/workflows/runnable.yml)
 [![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager)](https://github.com/fluttercandies/flutter_photo_manager/blob/main/LICENSE)
 
-[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?style=social&label=Stars)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/network)
 [![Awesome Flutter](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/Solido/awesome-flutter)
 <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
@@ -22,7 +22,7 @@ you can get assets (image/video/audio) on Android, iOS and macOS.
 ## Projects using this plugin
 
 | name                 | pub                                                                                                                | github                                                                                                                                                                  |
-| :------------------- | :----------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|:---------------------|:-------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | wechat_assets_picker | [![pub package](https://img.shields.io/pub/v/wechat_assets_picker)](https://pub.dev/packages/wechat_assets_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker) |
 | wechat_camera_picker | [![pub package](https://img.shields.io/pub/v/wechat_camera_picker)](https://pub.dev/packages/wechat_camera_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_camera_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_camera_picker) |
 
@@ -36,61 +36,61 @@ For versions upgrade across major versions,
 see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
 
 <!-- TOC -->
-
-- [photo_manager](#photo_manager)
-  - [Projects using this plugin](#projects-using-this-plugin)
-  - [Articles about this plugin](#articles-about-this-plugin)
-  - [Migration guide](#migration-guide)
-  - [Common issues](#common-issues)
-  - [Prepare for use](#prepare-for-use)
-    - [Add the plugin reference to pubspec.yaml](#add-the-plugin-reference-to-pubspecyaml)
-    - [Import in your projects](#import-in-your-projects)
-    - [Configure native platforms](#configure-native-platforms)
-      - [Android config preparation](#android-config-preparation)
-        - [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
-        - [Android 10+ (Q, 29)](#android-10-q-29)
-        - [Glide](#glide)
-      - [iOS config preparation](#ios-config-preparation)
-  - [Usage](#usage)
-    - [Request for permission](#request-for-permission)
-      - [Limited entities access on iOS](#limited-entities-access-on-ios)
-    - [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders-assetpathentity)
-    - [Get assets (`AssetEntity`)](#get-assets-assetentity)
-      - [From `AssetPathEntity`](#from-assetpathentity)
-      - [From ID](#from-id)
-      - [From raw data](#from-raw-data)
-      - [From iCloud](#from-icloud)
-      - [Display assets](#display-assets)
-      - [Obtain "Live Photos"](#obtain-live-photos)
-        - [Filtering only "Live Photos"](#filtering-only-live-photos)
-        - [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
-      - [Limitations](#limitations)
-        - [Android 10 media location permission](#android-10-media-location-permission)
-        - [Usage of the original data](#usage-of-the-original-data)
-        - [Long retrieving duration with file on iOS](#long-retrieving-duration-with-file-on-ios)
-    - [Entities change notify](#entities-change-notify)
-  - [Cache mechanism](#cache-mechanism)
-    - [Cache on Android](#cache-on-android)
-    - [Cache on iOS](#cache-on-ios)
-    - [Clear caches](#clear-caches)
-  - [Native extra configs](#native-extra-configs)
-    - [Android extra configs](#android-extra-configs)
-      - [Glide issues](#glide-issues)
-      - [Android 13 (Api 33) extra configs](#android-13-api-33-extra-configs)
-    - [iOS extra configs](#ios-extra-configs)
-      - [Localized system albums name](#localized-system-albums-name)
-    - [Experimental features](#experimental-features)
-      - [Preload thumbnails](#preload-thumbnails)
-      - [Delete entities](#delete-entities)
-      - [Copy an entity](#copy-an-entity)
-      - [Features for Android only](#features-for-android-only)
-        - [Move an entity to another album](#move-an-entity-to-another-album)
-        - [Remove all non-exist entities](#remove-all-non-exist-entities)
-      - [Features for iOS or macOS](#features-for-ios-or-macos)
-        - [Create a folder](#create-a-folder)
-        - [Create an album](#create-an-album)
-        - [Remove the entity entry from the album](#remove-the-entity-entry-from-the-album)
-        - [Delete a path entity](#delete-a-path-entity)
+* [photo_manager](#photomanager)
+  * [Projects using this plugin](#projects-using-this-plugin)
+  * [Articles about this plugin](#articles-about-this-plugin)
+  * [Migration guide](#migration-guide)
+  * [Common issues](#common-issues)
+  * [Prepare for use](#prepare-for-use)
+    * [Add the plugin reference to pubspec.yaml](#add-the-plugin-reference-to-pubspecyaml)
+    * [Import in your projects](#import-in-your-projects)
+    * [Configure native platforms](#configure-native-platforms)
+      * [Android config preparation](#android-config-preparation)
+        * [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
+        * [Android 10+ (Q, 29)](#android-10--q-29-)
+        * [Glide](#glide)
+      * [iOS config preparation](#ios-config-preparation)
+  * [Usage](#usage)
+    * [Request for permission](#request-for-permission)
+      * [Limited entities access on iOS](#limited-entities-access-on-ios)
+    * [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders--assetpathentity-)
+    * [Get assets (`AssetEntity`)](#get-assets--assetentity-)
+      * [From `AssetPathEntity`](#from-assetpathentity)
+      * [From ID](#from-id)
+      * [From raw data](#from-raw-data)
+      * [From iCloud](#from-icloud)
+      * [Display assets](#display-assets)
+      * [Obtain "Live Photos"](#obtain--live-photos-)
+        * [Filtering only "Live Photos"](#filtering-only--live-photos-)
+        * [Obtain the video from "Live Photos"](#obtain-the-video-from--live-photos-)
+      * [Limitations](#limitations)
+        * [Android 10 media location permission](#android-10-media-location-permission)
+        * [Usage of the original data](#usage-of-the-original-data)
+        * [Long retrieving duration with file on iOS](#long-retrieving-duration-with-file-on-ios)
+    * [Entities change notify](#entities-change-notify)
+  * [Cache mechanism](#cache-mechanism)
+    * [Cache on Android](#cache-on-android)
+    * [Cache on iOS](#cache-on-ios)
+    * [Clear caches](#clear-caches)
+  * [Native extra configs](#native-extra-configs)
+    * [Android extra configs](#android-extra-configs)
+      * [Glide issues](#glide-issues)
+      * [Android 13 (Api 33) extra configs](#android-13--api-33--extra-configs)
+    * [iOS extra configs](#ios-extra-configs)
+      * [Localized system albums name](#localized-system-albums-name)
+    * [Experimental features](#experimental-features)
+      * [Preload thumbnails](#preload-thumbnails)
+      * [Delete entities](#delete-entities)
+      * [Copy an entity](#copy-an-entity)
+      * [Features for Android only](#features-for-android-only)
+        * [Move an entity to another album](#move-an-entity-to-another-album)
+        * [Remove all non-exist entities](#remove-all-non-exist-entities)
+      * [Features for iOS or macOS](#features-for-ios-or-macos)
+        * [Create a folder](#create-a-folder)
+        * [Create an album](#create-an-album)
+        * [Remove the entity entry from the album](#remove-the-entity-entry-from-the-album)
+        * [Delete a path entity](#delete-a-path-entity)
+<!-- TOC -->
 
 ## Common issues
 
@@ -155,8 +155,9 @@ On Android 10, **Scoped Storage** was introduced,
 which causes the origin resource file not directly
 inaccessible through it file path.
 
-If your `compileSdkVersion` or `targetSdkVersion is`29`,
-you can consider adding`android:requestLegacyExternalStorage="true"`to your`AndroidManifest.xml` in order to obtain resources:
+If your `compileSdkVersion` or `targetSdkVersion is `29`,
+you can consider adding `android:requestLegacyExternalStorage="true"`
+to your `AndroidManifest.xml` in order to obtain resources:
 
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -259,13 +260,13 @@ and the `PHAsset` object on iOS/macOS.
 
 #### From `AssetPathEntity`
 
-You can use [the pagination method][`getassetlistpaged`]:
+You can use [the pagination method][`getAssetListPaged`]:
 
 ```dart
 final List<AssetEntity> entities = await path.getAssetListPaged(page: 0, size: 80);
 ```
 
-Or use [the range method][`getassetlistrange`]:
+Or use [the range method][`getAssetListRange`]:
 
 ```dart
 final List<AssetEntity> entities = await path.getAssetListRange(start: 0, end: 80);
@@ -490,7 +491,7 @@ the plugin will save a file in the cache folder for further use.
 Fortunately, on Android 11 and above, the resource path can be obtained directly again,
 but you can still use `requestLegacyExternalStorage`
 to access files in the storage without caching them.
-See [Android 10+ (Q, 29)](#android-10-q-29) for how to add the attribute.
+See [Android 10+ (Q, 29)](#android-10--q-29-) for how to add the attribute.
 
 ### Cache on iOS
 
@@ -526,7 +527,7 @@ Here are caches generation on different platforms,
 types and resolutions.
 
 | Platform | Thumbnail | File / Origin File |
-| -------- | --------- | ------------------ |
+|----------|-----------|--------------------|
 | Android  | Yes       | No                 |
 | iOS      | No        | Yes                |
 
@@ -578,10 +579,10 @@ no matter what language has been set to devices.
 To change the default language, see the following steps:
 
 - Open your iOS project (Runner.xcworkspace) using Xcode.
-  ![Edit localizations in Xcode 1](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterProjectEditinginXcode.png)
+![Edit localizations in Xcode 1](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterProjectEditinginXcode.png)
 
 - Select the project "Runner" and in the localizations table, click on the + icon.
-  ![Edit localizations in Xcode 2](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterAddLocalization.png)
+![Edit localizations in Xcode 2](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterAddLocalization.png)
 
 - Select the adequate language(s) you want to retrieve localized strings.
 - Validate the popup screen without any modification.
@@ -746,12 +747,23 @@ PhotoManager.editor.darwin.deletePath();
 ```
 
 [pub package]: https://pub.dev/packages/photo_manager
-[github issues]: https://github.com/fluttercandies/flutter_photo_manager/issues
-[`assetpathentity`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetPathEntity-class.html
-[`assetentity`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetEntity-class.html
-[`getassetpathlist`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoManager/getAssetPathList.html
-[`getassetlistpaged`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetPathEntity/getAssetListPaged.html
-[`getassetlistrange`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetPathEntity/getAssetListRange.html
-[`assetentity.fromid`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetEntity/fromId.html
-[`photocachingmanager.requestcacheassets`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoCachingManager/requestCacheAssets.html
-[`locallyavailablebuilder`]: https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/2055adfa74370339d10e6f09adef72f2130d2380/lib/src/widget/builder/locally_available_builder.dart
+[repo]: https://github.com/fluttercandies/flutter_photo_manager
+[GitHub issues]: https://github.com/fluttercandies/flutter_photo_manager/issues
+
+[Glide]: https://bumptech.github.io/glide/
+[Generated API]: https://bumptech.github.io/glide/doc/generatedapi.html
+[MediaColumns.RELATIVE_PATH]: https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#RELATIVE_PATH
+[PHAuthorizationStatus]: https://developer.apple.com/documentation/photokit/phauthorizationstatus?language=objc
+[PHCachingImageManager]: https://developer.apple.com/documentation/photokit/phcachingimagemanager?language=objc
+
+[`AssetPathEntity`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetPathEntity-class.html
+[`AssetEntity`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetEntity-class.html
+[`getAssetPathList`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoManager/getAssetPathList.html
+[`getAssetListPaged`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetPathEntity/getAssetListPaged.html
+[`getAssetListRange`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetPathEntity/getAssetListRange.html
+[`AssetEntity.fromId`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetEntity/fromId.html
+[`PhotoCachingManager.requestCacheAssets`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoCachingManager/requestCacheAssets.html
+
+[`LocallyAvailableBuilder`]: https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/2055adfa74370339d10e6f09adef72f2130d2380/lib/src/widget/builder/locally_available_builder.dart
+
+[flutter/flutter#20522]: https://github.com/flutter/flutter/issues/20522
