@@ -28,7 +28,7 @@ class _CustomFilterPageState extends State<CustomFilterPage> {
     super.dispose();
   }
 
-  BaseFilter createCustomFilter() {
+  PMFilter createCustomFilter() {
     // final AdvancedCustomFilter filter = AdvancedCustomFilter();
     final filter = CustomFilter.sql(
       where: _sqlController.text,

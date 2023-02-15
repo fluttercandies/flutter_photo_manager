@@ -7,12 +7,17 @@ import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
-import 'package:photo_manager/photo_manager.dart';
 
+import '../filter/base_filter.dart';
+import '../filter/classical/filter_option_group.dart';
 import '../internal/constants.dart';
 import '../internal/editor.dart';
+import '../internal/enums.dart';
 import '../internal/plugin.dart';
+import '../internal/progress_handler.dart';
 import '../utils/convert_utils.dart';
+import 'thumbnail.dart';
+import 'types.dart';
 
 /// The abstraction of albums and folders.
 /// It represent a bucket in the `MediaStore` on Android,
@@ -28,7 +33,7 @@ class AssetPathEntity {
     this.lastModified,
     this.type = RequestType.common,
     this.isAll = false,
-    BaseFilter? filterOption,
+    PMFilter? filterOption,
   }) : filterOption = filterOption ??= FilterOptionGroup();
 
   /// Obtain an entity from ID.
@@ -95,14 +100,14 @@ class AssetPathEntity {
   final bool isAll;
 
   /// The collection of filter options of the album.
-  final BaseFilter filterOption;
+  final PMFilter filterOption;
 
   /// Call this method to obtain new path entity.
   static Future<AssetPathEntity> obtainPathFromProperties({
     required String id,
     int albumType = 1,
     RequestType type = RequestType.common,
-    BaseFilter? optionGroup,
+    PMFilter? optionGroup,
     bool maxDateTimeToNow = true,
   }) async {
     optionGroup ??= FilterOptionGroup();

@@ -1,4 +1,4 @@
-import 'package:photo_manager/photo_manager.dart';
+import '../base_filter.dart';
 
 /// Full custom filter.
 ///
@@ -20,7 +20,7 @@ import 'package:photo_manager/photo_manager.dart';
 /// - [CustomFilter.sql]
 /// - [AdvancedCustomFilter]
 /// - [OrderByItem]
-abstract class CustomFilter extends BaseFilter {
+abstract class CustomFilter extends PMFilter {
   CustomFilter();
 
   factory CustomFilter.sql({
@@ -42,7 +42,7 @@ abstract class CustomFilter extends BaseFilter {
   }
 
   @override
-  BaseFilter updateDateToNow() {
+  PMFilter updateDateToNow() {
     return this;
   }
 

@@ -7,10 +7,16 @@ import 'dart:io';
 import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/services.dart';
-import 'package:photo_manager/photo_manager.dart';
 
+import '../filter/base_filter.dart';
+import '../filter/classical/filter_option_group.dart';
+import '../types/entity.dart';
+import '../types/thumbnail.dart';
+import '../types/types.dart';
 import '../utils/convert_utils.dart';
 import 'constants.dart';
+import 'enums.dart';
+import 'progress_handler.dart';
 
 PhotoManagerPlugin plugin = PhotoManagerPlugin();
 
@@ -24,7 +30,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     bool hasAll = true,
     bool onlyAll = false,
     RequestType type = RequestType.common,
-    BaseFilter? filterOption,
+    PMFilter? filterOption,
   }) async {
     if (onlyAll) {
       assert(hasAll, 'If only is true, then the hasAll must be not null.');
@@ -95,7 +101,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   /// Use pagination to get album content.
   Future<List<AssetEntity>> getAssetListPaged(
     String id, {
-    required BaseFilter optionGroup,
+    required PMFilter optionGroup,
     int page = 0,
     int size = 15,
     RequestType type = RequestType.common,
@@ -120,7 +126,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     required RequestType type,
     required int start,
     required int end,
-    required BaseFilter optionGroup,
+    required PMFilter optionGroup,
   }) async {
     final Map<dynamic, dynamic> map =
         await _channel.invokeMethod<Map<dynamic, dynamic>>(
@@ -206,7 +212,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   Future<Map<dynamic, dynamic>?> fetchPathProperties(
     String id,
     RequestType type,
-    BaseFilter optionGroup,
+    PMFilter optionGroup,
   ) {
     return _channel.invokeMethod(
       PMConstants.mFetchPathProperties,
@@ -546,10 +552,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<int> getAssetCount({
-    BaseFilter? filterOption,
+    PMFilter? filterOption,
     RequestType type = RequestType.common,
   }) {
-    final filter = filterOption ?? BaseFilter.defaultValue();
+    final filter = filterOption ?? PMFilter.defaultValue();
 
     return _channel.invokeMethod<int>(PMConstants.mGetAssetCount, {
       'type': type.value,
@@ -561,9 +567,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     required int start,
     required int end,
     RequestType type = RequestType.common,
-    BaseFilter? filterOption,
+    PMFilter? filterOption,
   }) {
-    final filter = filterOption ?? BaseFilter.defaultValue();
+    final filter = filterOption ?? PMFilter.defaultValue();
     return _channel.invokeMethod<Map>(PMConstants.mGetAssetsByRange, {
       'type': type.value,
       'start': start,

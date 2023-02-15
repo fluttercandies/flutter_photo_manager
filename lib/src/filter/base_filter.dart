@@ -1,4 +1,5 @@
-import 'package:photo_manager/photo_manager.dart';
+import 'custom/custom_columns.dart';
+import 'custom/custom_filter.dart';
 
 /// The type of the filter.
 enum BaseFilterType {
@@ -25,12 +26,12 @@ extension BaseFilterTypeExtension on BaseFilterType {
 /// The base class of all the filters.
 ///
 /// See also:
-abstract class BaseFilter {
+abstract class PMFilter {
   /// Construct a default filter.
-  BaseFilter();
+  PMFilter();
 
   /// Construct a default filter.
-  factory BaseFilter.defaultValue({
+  factory PMFilter.defaultValue({
     bool containsPathModified = false,
   }) {
     return CustomFilter.sql(
@@ -61,7 +62,7 @@ abstract class BaseFilter {
   Map<String, dynamic> childMap();
 
   /// The method only support for [FilterOptionGroup].
-  BaseFilter updateDateToNow();
+  PMFilter updateDateToNow();
 
   /// Convert the filter to a map for channel.
   Map<String, dynamic> toMap() {

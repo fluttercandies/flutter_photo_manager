@@ -4,10 +4,12 @@
 
 import 'dart:convert';
 
-import 'package:photo_manager/photo_manager.dart';
+import '../../internal/enums.dart';
+import '../base_filter.dart';
+import 'filter_options.dart';
 
 /// The group class to obtain [FilterOption]s.
-class FilterOptionGroup extends BaseFilter {
+class FilterOptionGroup extends PMFilter {
   /// Construct a default options group.
   FilterOptionGroup({
     FilterOption imageOption = const FilterOption(),
