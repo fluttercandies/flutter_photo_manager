@@ -102,7 +102,13 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
               onPressed: _persentLimited,
               child: const Text('PresentLimited'),
             ),
-        ],
+        ]
+            .map((e) => Container(
+                  padding: const EdgeInsets.all(3.0),
+                  height: 44,
+                  child: e,
+                ))
+            .toList(),
       ),
     );
   }
