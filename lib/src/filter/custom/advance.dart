@@ -260,6 +260,10 @@ class WhereConditionGroup extends WhereConditionItem {
 
     final sb = StringBuffer();
     for (final item in items) {
+      final text = item.text;
+      if (text.isEmpty) {
+        continue;
+      }
       if (sb.isNotEmpty) {
         sb.write(' ${item.logicalType == LogicalType.and ? 'AND' : 'OR'} ');
       }

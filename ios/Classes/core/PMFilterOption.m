@@ -301,7 +301,8 @@
 
     NSString *where = [self where];
     if (!where.isEmpty) {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat: @"%@ AND ( %@ )", where, typeWhere];
+        NSString *text = [NSString stringWithFormat:@"%@ AND ( %@ )", where, typeWhere];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat: text];
         options.predicate = predicate;
     } else {
         NSPredicate *predicate = [NSPredicate predicateWithFormat: typeWhere];
