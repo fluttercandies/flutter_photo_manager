@@ -2,23 +2,7 @@ import 'dart:io';
 
 import 'custom_columns.dart';
 import 'custom_filter.dart';
-
-/// The logical operator used in the [CustomFilter].
-enum LogicalType {
-  and,
-  or,
-}
-
-extension LogicalTypeExtension on LogicalType {
-  int get value {
-    switch (this) {
-      case LogicalType.and:
-        return 0;
-      case LogicalType.or:
-        return 1;
-    }
-  }
-}
+import 'order_by_item.dart';
 
 /// {@template PM.AdvancedCustomFilter}
 ///
@@ -41,15 +25,17 @@ extension LogicalTypeExtension on LogicalType {
 ///
 /// {@endtemplate}
 class AdvancedCustomFilter extends CustomFilter {
-  final List<WhereConditionItem> _whereItemList;
-  final List<OrderByItem> _orderByItemList;
+  final List<WhereConditionItem> _whereItemList = [];
+  final List<OrderByItem> _orderByItemList = [];
 
   /// {@macro PM.AdvancedCustomFilter}
   AdvancedCustomFilter({
     List<WhereConditionItem> where = const [],
     List<OrderByItem> orderBy = const [],
-  })  : _whereItemList = where,
-        _orderByItemList = orderBy;
+  }) {
+    _whereItemList.addAll(where);
+    _orderByItemList.addAll(orderBy);
+  }
 
   /// Add a [WhereConditionItem] to the filter.
   AdvancedCustomFilter addWhereCondition(
@@ -85,6 +71,23 @@ class AdvancedCustomFilter extends CustomFilter {
   @override
   List<OrderByItem> makeOrderBy() {
     return _orderByItemList;
+  }
+}
+
+/// The logical operator used in the [CustomFilter].
+enum LogicalType {
+  and,
+  or,
+}
+
+extension LogicalTypeExtension on LogicalType {
+  int get value {
+    switch (this) {
+      case LogicalType.and:
+        return 0;
+      case LogicalType.or:
+        return 1;
+    }
   }
 }
 
@@ -251,6 +254,10 @@ class WhereConditionGroup extends WhereConditionItem {
 
   @override
   String get text {
+    if (items.isEmpty) {
+      return '';
+    }
+
     final sb = StringBuffer();
     for (final item in items) {
       if (sb.isNotEmpty) {
@@ -333,8 +340,8 @@ class ColumnWhereCondition extends WhereConditionItem {
       return '';
     }
 
-    if (needCheck && _checkOtherColumn(column)) {
-      assert(needCheck && _checkOtherColumn(column),
+    if (needCheck && !_checkOtherColumn(column)) {
+      assert(needCheck && !_checkOtherColumn(column),
           'The $column is not support the platform, please check.');
       return '';
     }
