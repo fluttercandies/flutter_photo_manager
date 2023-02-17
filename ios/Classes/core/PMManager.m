@@ -139,7 +139,10 @@
     
     NSMutableArray<PMAssetEntity*>* array = [NSMutableArray new];
     
-    for (NSUInteger i = start; i< endOffset; i++){
+    for (NSUInteger i = start; i < endOffset; i++){
+        if (i >= result.count) {
+            break;
+        }
         PHAsset *asset = result[i];
         PMAssetEntity *pmAsset = [self convertPHAssetToAssetEntity:asset needTitle:[option needTitle]];
         [array addObject: pmAsset];
