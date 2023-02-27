@@ -4,10 +4,40 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'android/**'
+      - 'ios/**'
+      - 'example/lib/**'
+      - 'example/test/**'
+      - 'example/android/**'
+      - 'example/ios/**'
+      - 'example/macos/**'
+      - 'pubspec.yaml'
+      - 'example/pubspec.yaml'
+      - 'analysis_options.yaml'
+      - 'example/analysis_options.yaml'
+      - 'copy_on_publish.sh'
   pull_request:
     branches:
       - main
-
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'android/**'
+      - 'ios/**'
+      - 'example/lib/**'
+      - 'example/test/**'
+      - 'example/android/**'
+      - 'example/ios/**'
+      - 'example/macos/**'
+      - 'pubspec.yaml'
+      - 'example/pubspec.yaml'
+      - 'analysis_options.yaml'
+      - 'example/analysis_options.yaml'
+      - 'copy_on_publish.sh'
+      
 jobs:
   analyze:
     name: Analyze on ${{ matrix.os }}
@@ -59,6 +89,8 @@ jobs:
         uses: k-paxian/dart-package-publisher@master
         with:
           credentialJson: 'MockCredentialJson'
+          accessToken: 'MockAccessToken'
+          refreshToken: 'MockRefreshToken'
           flutter: true
           dryRunOnly: true
 
