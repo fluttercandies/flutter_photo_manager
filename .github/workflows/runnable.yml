@@ -19,6 +19,7 @@ on:
       - 'analysis_options.yaml'
       - 'example/analysis_options.yaml'
       - 'copy_on_publish.sh'
+      - 'CHANGELOG.md'
   pull_request:
     branches:
       - main
@@ -37,7 +38,7 @@ on:
       - 'analysis_options.yaml'
       - 'example/analysis_options.yaml'
       - 'copy_on_publish.sh'
-      
+      - 'CHANGELOG.md'
 jobs:
   analyze:
     name: Analyze on ${{ matrix.os }}
