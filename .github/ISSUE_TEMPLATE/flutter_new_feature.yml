@@ -20,9 +20,6 @@ body:
         - Android
         - iOS
         - macOS
-        - Web
-        - Windows
-        - Linux
     validations:
       required: true
   - type: textarea
