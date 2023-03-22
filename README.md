@@ -341,7 +341,7 @@ PMFilter createFilter() {
 }
 ```
 
-** Advanced ** filter
+**Advanced** filter
 
 `class AdvancedCustomFilter extends CustomFilter`
 
@@ -375,7 +375,7 @@ PMFilter createFilter() {
 
 ```
 
-**Main class ** of custom filter
+**Main class** of custom filter
 
 - `CustomFilter` : The base class of custom filter.
 - `OrderByItem` : The class of order by item. 
@@ -386,10 +386,14 @@ PMFilter createFilter() {
     - `WhereConditionGroup` : The class of where condition group. The class is used to make a group of where condition.
     - `ColumnWhereCondition`: The class of where condition. The column will be checked.
     - `DateColumnWhereCondition`: The class of where condition. Because dates have different conversion methods on iOS/macOS, this implementation smoothes the platform differences
-- `CustomColumns` : The class of custom columns. It is used to get the column name of the platform.
-  - `base` : The common columns.
+- `CustomColumns` : This class contains fields for different platforms. 
+  - `base` : The common fields are included here, but please note that the "id" field is invalid in iOS and may even cause errors. It is only valid on Android.
   - `android` : The columns of android.
   - `darwin` : The columns of iOS/macOS.
+
+> PS: The CustomColumns should be noted that iOS uses the Photos API, while Android uses ContentProvider, which is closer to SQLite. Therefore, even though they are called "columns," these fields are PHAsset fields on iOS/macOS and MediaStoreColumns fields on Android.
+
+![flow_chart](flow_chart/advance_custom_filter.png)
 
 #### From `AssetPathEntity`
 
