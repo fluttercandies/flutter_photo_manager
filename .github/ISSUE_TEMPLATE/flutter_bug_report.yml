@@ -1,0 +1,76 @@
+name: Flutter plugin bug report
+description: bug report
+title: "[Bug report] "
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Version of the plugin
+      placeholder: ex. 2.5.2
+    validations:
+      required: true
+  - type: dropdown
+    id: platforms
+    attributes:
+      label: Platforms
+      description: Check all that apply
+      multiple: true
+      options:
+        - dart
+        - Android
+        - iOS
+        - macOS
+    validations:
+      required: true
+  - type: input
+    id: device-model
+    attributes:
+      label: Device Model
+      description: "Device Model (ex. iPhone 12(iOS 14), Galaxy S21(Android 11))"
+      placeholder: ex. iPhone 12 (iOS 14)
+    validations:
+      required: true
+  - type: textarea
+    id: flutter-doctor
+    attributes:
+      label: flutter info
+      description: "flutter doctor -v in your terminal"
+      placeholder: ex. flutter doctor -v
+      render: sh
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: "How to reproduce?"
+      description: "How to reproduce the problem?"
+      placeholder: "ex. I found a bug when I call the PhotoManager.getAssetPathList method."
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Logs
+      description: "Error log"
+      placeholder: ex. flutter run --verbose
+      render: sh
+    validations:
+      required: false
+  - type: textarea
+    id: example-code
+    attributes:
+      label: "Example code (optional)"
+      description: "If you can, please provide a minimal example to reproduce the problem."
+      placeholder: "ex.  PhotoManager.editor.saveImageWithId(id, quality: 100)"
+      render: Dart
+    validations:
+      required: false
+  - type: input
+    id: contact
+    attributes:
+      label: Contact
+      description: Your contace (no requird)
+      placeholder: ex. email@example.com / twitter / github
+    validations:
+      required: false

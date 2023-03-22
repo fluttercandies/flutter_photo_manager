@@ -1,0 +1,51 @@
+name: How to use
+description: How to use the Flutter plugin
+title: "[How to use] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this issue!
+        You need read document before you ask question.
+        If you can, search the issue list
+        or [StackOverflow](https://stackoverflow.com/questions/tagged/flutter)
+        to see if someone has asked the same question.
+  - type: dropdown
+    id: platforms
+    attributes:
+      label: Platforms
+      description: Check all that apply
+      multiple: true
+      options:
+        - dart
+        - Android
+        - iOS
+        - macOS
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: "Describe the feature you want to be added"
+      placeholder: "ex. I want to add a new method to get the thumbnail of the asset."
+    validations:
+      required: true
+  - type: textarea
+    id: my-code
+    attributes:
+      label: My code
+      description: "I want to know how to use the method."
+      placeholder: ｜
+        'ex. I want to get the thumbnail of the asset to display it in the list.'
+    validations:
+      required: false
+  - type: textarea
+    id: try-do-it
+    attributes:
+      label: Try do it
+      description: "I have tried to do it, but I don't know how to do it."
+      placeholder: ｜
+        'ex. I want to get the thumbnail of the asset to display it in the list.'
+    validations:
+      required: false
