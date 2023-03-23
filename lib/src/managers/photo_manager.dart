@@ -5,7 +5,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import '../filter/filter_option_group.dart';
+import '../filter/base_filter.dart';
 import '../internal/editor.dart';
 import '../internal/enums.dart';
 import '../internal/plugin.dart' as base;
@@ -70,7 +70,7 @@ class PhotoManager {
   /// Obtain albums/folders list with couple filter options.
   ///
   /// To obtain albums list that contains the root album
-  /// (generally named "Recent"), set [hasAll] to true.
+  /// (generally named 'Recent'), set [hasAll] to true.
   ///
   /// To obtain only the root album in the list, set [onlyAll] to true.
   ///
@@ -81,7 +81,7 @@ class PhotoManager {
     bool hasAll = true,
     bool onlyAll = false,
     RequestType type = RequestType.common,
-    FilterOptionGroup? filterOption,
+    PMFilter? filterOption,
   }) async {
     return plugin.getAssetPathList(
       hasAll: hasAll,
@@ -157,4 +157,65 @@ class PhotoManager {
 
   /// Clear all file caches.
   static Future<void> clearFileCache() => plugin.clearFileCache();
+
+  /// Get the asset count
+  static Future<int> getAssetCount({
+    PMFilter? filterOption,
+    RequestType type = RequestType.common,
+  }) {
+    return plugin.getAssetCount(filterOption: filterOption, type: type);
+  }
+
+  /// Get the asset list with range.
+  ///
+  /// The [start] is base 0.
+  ///
+  /// The [end] is not included.
+  ///
+  /// The [filterOption] is used to filter the assets.
+  ///
+  /// The [type] is used to filter the assets type.
+  static Future<List<AssetEntity>> getAssetListRange({
+    required int start,
+    required int end,
+    PMFilter? filterOption,
+    RequestType type = RequestType.common,
+  }) async {
+    assert(start >= 0, 'start must >= 0');
+    assert(end >= 0, 'end must >= 0');
+    assert(start < end, 'start must < end');
+    return plugin.getAssetListWithRange(
+      start: start,
+      end: end,
+      filterOption: filterOption,
+      type: type,
+    );
+  }
+
+  /// Get the asset list with page.
+  ///
+  /// The [page] is base 0.
+  ///
+  /// The [pageCount] is the count of each page.
+  ///
+  /// The [filterOption] is used to filter the assets.
+  ///
+  /// The [type] is used to filter the assets type.
+  static Future<List<AssetEntity>> getAssetListPaged({
+    required int page,
+    required int pageCount,
+    PMFilter? filterOption,
+    RequestType type = RequestType.common,
+  }) async {
+    assert(page >= 0, 'page must >= 0');
+    assert(pageCount > 0, 'pageCount must > 0');
+    final start = page * pageCount;
+    final end = start + pageCount;
+    return getAssetListRange(
+      start: start,
+      end: end,
+      filterOption: filterOption,
+      type: type,
+    );
+  }
 }

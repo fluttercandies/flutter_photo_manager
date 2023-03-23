@@ -8,7 +8,8 @@ import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/services.dart';
 
-import '../filter/filter_option_group.dart';
+import '../filter/base_filter.dart';
+import '../filter/classical/filter_option_group.dart';
 import '../types/entity.dart';
 import '../types/thumbnail.dart';
 import '../types/types.dart';
@@ -29,7 +30,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     bool hasAll = true,
     bool onlyAll = false,
     RequestType type = RequestType.common,
-    FilterOptionGroup? filterOption,
+    PMFilter? filterOption,
   }) async {
     if (onlyAll) {
       assert(hasAll, 'If only is true, then the hasAll must be not null.');
@@ -37,16 +38,19 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     filterOption ??= FilterOptionGroup();
     // Avoid filtering live photos when searching for audios.
     if (type == RequestType.audio) {
-      filterOption = filterOption.copyWith(
-        containsLivePhotos: false,
-        onlyLivePhotos: false,
+      if (filterOption is FilterOptionGroup) {
+        filterOption.containsLivePhotos = false;
+        filterOption.onlyLivePhotos = false;
+      }
+    }
+    if (filterOption is FilterOptionGroup) {
+      assert(
+        type == RequestType.image || !filterOption.onlyLivePhotos,
+        'Filtering only Live Photos is only supported '
+        'when the request type contains image.',
       );
     }
-    assert(
-      type == RequestType.image || !filterOption.onlyLivePhotos,
-      'Filtering only Live Photos is only supported '
-      'when the request type contains image.',
-    );
+
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mGetAssetPathList,
       <String, dynamic>{
@@ -97,7 +101,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   /// Use pagination to get album content.
   Future<List<AssetEntity>> getAssetListPaged(
     String id, {
-    required FilterOptionGroup optionGroup,
+    required PMFilter optionGroup,
     int page = 0,
     int size = 15,
     RequestType type = RequestType.common,
@@ -122,7 +126,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     required RequestType type,
     required int start,
     required int end,
-    required FilterOptionGroup optionGroup,
+    required PMFilter optionGroup,
   }) async {
     final Map<dynamic, dynamic> map =
         await _channel.invokeMethod<Map<dynamic, dynamic>>(
@@ -208,7 +212,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   Future<Map<dynamic, dynamic>?> fetchPathProperties(
     String id,
     RequestType type,
-    FilterOptionGroup optionGroup,
+    PMFilter optionGroup,
   ) {
     return _channel.invokeMethod(
       PMConstants.mFetchPathProperties,
@@ -546,6 +550,38 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     }
     return null;
   }
+
+  Future<int> getAssetCount({
+    PMFilter? filterOption,
+    RequestType type = RequestType.common,
+  }) {
+    final filter = filterOption ?? PMFilter.defaultValue();
+
+    return _channel.invokeMethod<int>(PMConstants.mGetAssetCount, {
+      'type': type.value,
+      'option': filter.toMap(),
+    }).then((v) => v ?? 0);
+  }
+
+  Future<List<AssetEntity>> getAssetListWithRange({
+    required int start,
+    required int end,
+    RequestType type = RequestType.common,
+    PMFilter? filterOption,
+  }) {
+    final filter = filterOption ?? PMFilter.defaultValue();
+    return _channel.invokeMethod<Map>(PMConstants.mGetAssetsByRange, {
+      'type': type.value,
+      'start': start,
+      'end': end,
+      'option': filter.toMap(),
+    }).then((value) {
+      if (value == null) return [];
+      return ConvertUtils.convertToAssetList(
+        value.cast<String, dynamic>(),
+      );
+    });
+  }
 }
 
 mixin IosPlugin on BasePlugin {
@@ -635,5 +671,15 @@ mixin AndroidPlugin on BasePlugin {
       <String, dynamic>{'assetId': entity.id, 'albumId': target.id},
     );
     return result != null;
+  }
+
+  Future<List<String>> androidColumns() async {
+    final result = await _channel.invokeMethod(
+      PMConstants.mColumnNames,
+    );
+    if (result is List<dynamic>) {
+      return result.map((e) => e.toString()).toList();
+    }
+    return result ?? <String>[];
   }
 }

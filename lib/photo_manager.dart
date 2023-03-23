@@ -7,8 +7,14 @@
 /// To use, import `package:photo_manager/photo_manager.dart`.
 library photo_manager;
 
-export 'src/filter/filter_option_group.dart';
-export 'src/filter/filter_options.dart';
+export 'src/filter/base_filter.dart';
+export 'src/filter/classical/filter_option_group.dart';
+export 'src/filter/classical/filter_options.dart';
+
+export 'src/filter/custom/custom_filter.dart';
+export 'src/filter/custom/advance.dart';
+export 'src/filter/custom/custom_columns.dart';
+export 'src/filter/custom/order_by_item.dart';
 
 export 'src/internal/enums.dart';
 export 'src/internal/extensions.dart';
@@ -23,3 +29,5 @@ export 'src/managers/photo_manager.dart';
 export 'src/types/entity.dart';
 export 'src/types/thumbnail.dart';
 export 'src/types/types.dart';
+
+export 'src/utils/column_utils.dart';

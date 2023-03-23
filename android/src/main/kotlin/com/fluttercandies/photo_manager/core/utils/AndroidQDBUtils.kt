@@ -15,7 +15,7 @@ import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.cache.ScopedCache
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
-import com.fluttercandies.photo_manager.core.entity.FilterOption
+import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
 import com.fluttercandies.photo_manager.util.LogUtils
 import java.io.ByteArrayOutputStream
@@ -40,11 +40,9 @@ object AndroidQDBUtils : IDBUtils {
     ): List<AssetPathEntity> {
         val list = ArrayList<AssetPathEntity>()
         val args = ArrayList<String>()
-        val typeSelection: String = getCondFromType(requestType, option, args)
-        val dateSelection = getDateCond(args, option)
-        val sizeWhere = sizeWhere(requestType, option)
+        val where = option.makeWhere(requestType, args)
         val selections =
-            "$BUCKET_ID IS NOT NULL $typeSelection $dateSelection $sizeWhere"
+            "$BUCKET_ID IS NOT NULL $where"
 
         val cursor = context.contentResolver.query(
             allUri,
@@ -88,11 +86,9 @@ object AndroidQDBUtils : IDBUtils {
     ): List<AssetPathEntity> {
         val list = ArrayList<AssetPathEntity>()
         val args = ArrayList<String>()
-        val typeSelection = getCondFromType(requestType, option, args)
-        val dateSelection = getDateCond(args, option)
-        val sizeWhere = sizeWhere(requestType, option)
+        val where = option.makeWhere(requestType, args)
         val selections =
-            "$BUCKET_ID IS NOT NULL $typeSelection $dateSelection $sizeWhere"
+            "$BUCKET_ID IS NOT NULL $where"
 
         val cursor = context.contentResolver.query(
             allUri,
@@ -151,22 +147,19 @@ object AndroidQDBUtils : IDBUtils {
         if (!isAll) {
             args.add(pathId)
         }
-        val typeSelection: String = getCondFromType(requestType, option, args)
-        val sizeWhere = sizeWhere(requestType, option)
-        val dateSelection = getDateCond(args, option)
-        val keys = (assetKeys()).distinct().toTypedArray()
+        val where = option.makeWhere(requestType, args)
         val selection = if (isAll) {
-            "$BUCKET_ID IS NOT NULL $typeSelection $dateSelection $sizeWhere"
+            "$BUCKET_ID IS NOT NULL $where"
         } else {
-            "$BUCKET_ID = ? $typeSelection $dateSelection $sizeWhere"
+            "$BUCKET_ID = ? $where"
         }
         val sortOrder = getSortOrder(page * size, size, option)
         val cursor = context.contentResolver.query(
-            allUri,
-            keys,
-            selection,
-            args.toTypedArray(),
-            sortOrder
+                allUri,
+                keys(),
+                selection,
+                args.toTypedArray(),
+                sortOrder
         ) ?: return list
         cursor.use {
             cursorWithRange(it, page * size, size) { cursor ->
@@ -193,20 +186,17 @@ object AndroidQDBUtils : IDBUtils {
         if (!isAll) {
             args.add(galleryId)
         }
-        val typeSelection: String = getCondFromType(requestType, option, args)
-        val sizeWhere = sizeWhere(requestType, option)
-        val dateSelection = getDateCond(args, option)
-        val keys = assetKeys().distinct().toTypedArray()
+        val where = option.makeWhere(requestType, args)
         val selection = if (isAll) {
-            "$BUCKET_ID IS NOT NULL $typeSelection $dateSelection $sizeWhere"
+            "$BUCKET_ID IS NOT NULL $where"
         } else {
-            "$BUCKET_ID = ? $typeSelection $dateSelection $sizeWhere"
+            "$BUCKET_ID = ? $where"
         }
         val pageSize = end - start
         val sortOrder = getSortOrder(start, pageSize, option)
         val cursor = context.contentResolver.query(
             allUri,
-            keys,
+            keys(),
             selection,
             args.toTypedArray(),
             sortOrder
@@ -222,23 +212,26 @@ object AndroidQDBUtils : IDBUtils {
 
     }
 
-    private fun assetKeys() =
-        IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + arrayOf(RELATIVE_PATH)
+
+    override fun keys(): Array<String> {
+        return (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + arrayOf(
+                RELATIVE_PATH
+        )).distinct().toTypedArray()
+    }
 
     override fun getAssetEntity(
-        context: Context,
-        id: String,
-        checkIfExists: Boolean
+            context: Context,
+            id: String,
+            checkIfExists: Boolean
     ): AssetEntity? {
-        val keys = assetKeys().distinct().toTypedArray()
         val selection = "$_ID = ?"
         val args = arrayOf(id)
         val cursor = context.contentResolver.query(
-            allUri,
-            keys,
-            selection,
-            args,
-            null
+                allUri,
+                keys(),
+                selection,
+                args,
+                null
         ) ?: return null
         cursor.use {
             return if (it.moveToNext()) it.toAssetEntity(context, checkIfExists)
@@ -254,8 +247,9 @@ object AndroidQDBUtils : IDBUtils {
     ): AssetPathEntity? {
         val isAll = pathId == ""
         val args = ArrayList<String>()
-        val typeSelection: String = getCondFromType(type, option, args)
-        val dateSelection = getDateCond(args, option)
+
+        val where = option.makeWhere(type, args)
+
         val idSelection: String
         if (isAll) {
             idSelection = ""
@@ -263,9 +257,9 @@ object AndroidQDBUtils : IDBUtils {
             idSelection = "AND $BUCKET_ID = ?"
             args.add(pathId)
         }
-        val sizeWhere = sizeWhere(null, option)
+
         val selection =
-            "$BUCKET_ID IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere"
+            "$BUCKET_ID IS NOT NULL $where $idSelection"
         val cursor = context.contentResolver.query(
             allUri,
             IDBUtils.storeBucketKeys,

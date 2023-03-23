@@ -11,7 +11,7 @@ English | [中文说明](#) (🚧 WIP)
 [![Build status](https://img.shields.io/github/actions/workflow/status/fluttercandies/flutter_photo_manager/runnable.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/actions/workflows/runnable.yml)
 [![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager)](https://github.com/fluttercandies/flutter_photo_manager/blob/main/LICENSE)
 
-[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?style=social&label=Stars)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/network)
 [![Awesome Flutter](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/Solido/awesome-flutter)
 <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
@@ -22,7 +22,7 @@ you can get assets (image/video/audio) on Android, iOS and macOS.
 ## Projects using this plugin
 
 | name                 | pub                                                                                                                | github                                                                                                                                                                  |
-|:---------------------|:-------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| :------------------- | :----------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | wechat_assets_picker | [![pub package](https://img.shields.io/pub/v/wechat_assets_picker)](https://pub.dev/packages/wechat_assets_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker) |
 | wechat_camera_picker | [![pub package](https://img.shields.io/pub/v/wechat_camera_picker)](https://pub.dev/packages/wechat_camera_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_camera_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_camera_picker) |
 
@@ -55,7 +55,11 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
       * [Limited entities access on iOS](#limited-entities-access-on-ios)
     * [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders--assetpathentity-)
     * [Get assets (`AssetEntity`)](#get-assets--assetentity-)
+      * [PMFilter](#pmfilter)
+        * [PMFilterOptionGroup](#pmfilteroptiongroup)
+        * [CustomFilter](#customfilter)
       * [From `AssetPathEntity`](#from-assetpathentity)
+      * [From `PhotoManager` (Since 2.6.0)](#from-photomanager--since-260-)
       * [From ID](#from-id)
       * [From raw data](#from-raw-data)
       * [From iCloud](#from-icloud)
@@ -258,6 +262,142 @@ Assets (images/videos/audios) are abstracted as the [`AssetEntity`][] class.
 It represents a series of fields with `MediaStore` on Android,
 and the `PHAsset` object on iOS/macOS.
 
+
+#### PMFilter
+
+Some methods of `PhotoManager` and `AssetPathEntity` have a `filterOption`.
+
+- PhotoManager
+  - getAssetPathList (The filter param passed in by this method will be passed into the AssetPathEntity of the result)
+  - getAssetCount
+  - getAssetListRange
+  - getAssetListPaged
+- AssetPathEntity
+  - constructor (Method not recommended for users)
+  - fromId
+  - obtainPathFromProperties (Method not recommended for users)
+
+The `PMFilter` have two implementations:
+- [PMFilterOptionGroup](#PMFilterOptionGroup)
+- [CustomFilter](#CustomFilter)
+
+##### PMFilterOptionGroup
+
+Before 2.6.0, the only way to implement it.
+
+```dart
+final FilterOptionGroup filterOption = FilterOptionGroup(
+  imageOption: FilterOption(
+    sizeConstraint: SizeConstraint(
+      maxWidth: 10000,
+      maxHeight: 10000,
+      minWidth: 100,
+      minHeight: 100,
+      ignoreSize: false,
+    ),
+  ),
+  videoOption: FilterOption(
+    durationConstraint: DurationConstraint(
+      min: Duration(seconds: 1),
+      max: Duration(seconds: 30),
+      allowNullable: false,
+    ),
+  ),
+  createTimeCondition: DateTimeCondition(
+    min: DateTime(2020, 1, 1),
+    max: DateTime(2020, 12, 31),
+  ),
+  orders: [
+    OrderOption(
+      type: OrderOptionType.createDate,
+      asc: false,
+    ),
+  ],
+  /// other options
+);
+```
+
+##### CustomFilter
+
+This is an **experimental feature**, please submit an issue if you have any problems.
+
+`CustomFilter` was added in the 2.6.0 version of the plugin,
+which provide more flexible filtering conditions against host platforms.
+
+It is closer to the native way of use.
+You can customize where conditions and order conditions. 
+It is up to you to decide which fields to use for filtering and sorting
+
+
+**Like sql** construct a sql statement.
+
+The column name of iOS or android is different, so you need to use the `CustomColumns.base`、`CustomColumns.android` or `CustomColumns.darwin` to get the column name.
+
+```dart
+PMFilter createFilter() {
+  final CustomFilter filterOption = CustomFilter.sql(
+    where: '${CustomColumns.base.width} > 100 AND ${CustomColumns.base.height} > 200',
+    orderBy: [OrderByItem.desc(CustomColumns.base.createDate)],
+  );
+
+  return filterOption;
+}
+```
+
+**Advanced** filter
+
+`class AdvancedCustomFilter extends CustomFilter`
+
+The `AdvancedCustomFilter` is a subclass of `CustomFilter`, The have builder methods to help make a filter.
+
+```dart
+
+PMFilter createFilter() {
+  final group = WhereConditionGroup()
+          .and(
+            ColumnWhereCondition(
+              column: CustomColumns.base.width,
+              value: '100',
+              operator: '>',
+            ),
+          )
+          .or(
+            ColumnWhereCondition(
+              column: CustomColumns.base.height,
+              value: '200',
+              operator: '>',
+            ),
+          );
+
+  final filter = AdvancedCustomFilter()
+          .addWhereCondition(group)
+          .addOrderBy(column: CustomColumns.base.createDate, isAsc: false);
+  
+  return filter;
+}
+
+```
+
+**Main class** of custom filter
+
+- `CustomFilter` : The base class of custom filter.
+- `OrderByItem` : The class of order by item. 
+- `SqlCustomFilter` : The subclass of `CustomFilter`, It is used to make a like sql filter.
+- `AdvancedCustomFilter`: The subclass of `CustomFilter`, It is used to make a advanced filter.
+  - `WhereConditionItem` : The class of where condition item.
+    - `TextWhereCondition`: The class of where condition. The text will not be checked.
+    - `WhereConditionGroup` : The class of where condition group. The class is used to make a group of where condition.
+    - `ColumnWhereCondition`: The class of where condition. The column will be checked.
+    - `DateColumnWhereCondition`: The class of where condition. Because dates have different conversion methods on iOS/macOS, this implementation smoothes the platform differences
+- `CustomColumns` : This class contains fields for different platforms. 
+  - `base` : The common fields are included here, but please note that the "id" field is invalid in iOS and may even cause errors. It is only valid on Android.
+  - `android` : The columns of android.
+  - `darwin` : The columns of iOS/macOS.
+
+> PS: The CustomColumns should be noted that iOS uses the Photos API, while Android uses ContentProvider, which is closer to SQLite. Therefore, even though they are called "columns," these fields are PHAsset fields on iOS/macOS and MediaStoreColumns fields on Android.
+
+![flow_chart](flow_chart/advance_custom_filter.png)
+
 #### From `AssetPathEntity`
 
 You can use [the pagination method][`getAssetListPaged`]:
@@ -271,6 +411,29 @@ Or use [the range method][`getAssetListRange`]:
 ```dart
 final List<AssetEntity> entities = await path.getAssetListRange(start: 0, end: 80);
 ```
+
+#### From `PhotoManager` (Since 2.6.0)
+
+First, You need get count of assets:
+
+```dart
+final int count = await PhotoManager.getAssetCount();
+```
+
+Then, you can use [the pagination method][`getAssetListPaged`]:
+
+```dart
+final List<AssetEntity> entities = await PhotoManager.getAssetListPaged(page: 0, pageCount: 80);
+```
+
+Or use [the range method][`getAssetListRange`]:
+
+```dart
+final List<AssetEntity> entities = await PhotoManager.getAssetListRange(start: 0, end: 80);
+```
+
+**Note:**
+The `page`, `start` is base 0.
 
 #### From ID
 
@@ -527,7 +690,7 @@ Here are caches generation on different platforms,
 types and resolutions.
 
 | Platform | Thumbnail | File / Origin File |
-|----------|-----------|--------------------|
+| -------- | --------- | ------------------ |
 | Android  | Yes       | No                 |
 | iOS      | No        | Yes                |
 

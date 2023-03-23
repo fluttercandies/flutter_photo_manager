@@ -56,6 +56,10 @@ class PMConstants {
   static const String mCreateFolder = 'createFolder';
   static const String mRemoveInAlbum = 'removeInAlbum';
   static const String mMoveAssetToPath = 'moveAssetToPath';
+  static const String mColumnNames = 'getColumnNames';
+
+  static const String mGetAssetCount = 'getAssetCount';
+  static const String mGetAssetsByRange = 'getAssetsByRange';
 
   /// Constant value.
   static const int vDefaultThumbnailSize = 150;

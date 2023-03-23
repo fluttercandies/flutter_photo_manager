@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import "PMImport.h"
+#import <Photos/Photos.h>
 
 @class PMManager;
 @class PMNotificationManager;

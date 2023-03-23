@@ -36,13 +36,20 @@ class _SimpleExampleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OKToast(
-      child: ChangeNotifierProvider<PhotoProvider>.value(
-        value: provider, // This is for the advanced usages.
-        child: const MaterialApp(
-          title: 'Photo Manager Example',
-          home: _SimpleExamplePage(),
-        ),
+    return ChangeNotifierProvider<PhotoProvider>.value(
+      value: provider, // This is for the advanced usages.
+      child: MaterialApp(
+        title: 'Photo Manager Example',
+        builder: (context, child) {
+          if (child == null) return const SizedBox.shrink();
+          return Banner(
+            message: 'Debug',
+            location: BannerLocation.bottomStart,
+            child: OKToast(child: child),
+          );
+        },
+        home: const _SimpleExamplePage(),
+        debugShowCheckedModeBanner: false,
       ),
     );
   }

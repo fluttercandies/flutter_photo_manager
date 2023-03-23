@@ -8,7 +8,7 @@ import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
-import com.fluttercandies.photo_manager.core.entity.FilterOption
+import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
 import java.io.*
 import java.util.concurrent.locks.ReentrantLock
@@ -18,22 +18,25 @@ import kotlin.concurrent.withLock
 @Suppress("Deprecation", "InlinedApi")
 object DBUtils : IDBUtils {
     private val locationKeys = arrayOf(
-        MediaStore.Images.ImageColumns.LONGITUDE,
-        MediaStore.Images.ImageColumns.LATITUDE
+            MediaStore.Images.ImageColumns.LONGITUDE,
+            MediaStore.Images.ImageColumns.LATITUDE
     )
 
+    override fun keys(): Array<String> =
+            (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + locationKeys).distinct()
+                    .toTypedArray()
+
     override fun getAssetPathList(
-        context: Context,
-        requestType: Int,
-        option: FilterOption
+            context: Context,
+            requestType: Int,
+            option: FilterOption
     ): List<AssetPathEntity> {
         val list = ArrayList<AssetPathEntity>()
         val args = ArrayList<String>()
-        val typeSelection: String = getCondFromType(requestType, option, args)
-        val dateSelection = getDateCond(args, option)
-        val sizeWhere = sizeWhere(requestType, option)
+        val where = option.makeWhere(requestType, args)
+//        val where = makeWhere(requestType, option, args)
         val selection =
-            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere) GROUP BY (${MediaStore.MediaColumns.BUCKET_ID}"
+            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $where) GROUP BY (${MediaStore.MediaColumns.BUCKET_ID}"
         val cursor = context.contentResolver.query(
             allUri,
             IDBUtils.storeBucketKeys + arrayOf("count(1)"),
@@ -56,19 +59,18 @@ object DBUtils : IDBUtils {
         return list
     }
 
+
     override fun getMainAssetPathEntity(
         context: Context,
         requestType: Int,
         option: FilterOption
     ): List<AssetPathEntity> {
         val list = ArrayList<AssetPathEntity>()
-        val args = ArrayList<String>()
-        val typeSelection: String = getCondFromType(requestType, option, args)
         val projection = IDBUtils.storeBucketKeys + arrayOf("count(1)")
-        val dateSelection = getDateCond(args, option)
-        val sizeWhere = sizeWhere(requestType, option)
+        val args = ArrayList<String>()
+        val where = option.makeWhere(requestType, args)
         val selections =
-            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
+            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $where"
 
         val cursor = context.contentResolver.query(
             allUri,
@@ -101,8 +103,6 @@ object DBUtils : IDBUtils {
         option: FilterOption
     ): AssetPathEntity? {
         val args = ArrayList<String>()
-        val typeSelection: String = getCondFromType(type, option, args)
-        val dateSelection = getDateCond(args, option)
         val idSelection: String
         if (pathId == "") {
             idSelection = ""
@@ -110,9 +110,9 @@ object DBUtils : IDBUtils {
             idSelection = "AND ${MediaStore.MediaColumns.BUCKET_ID} = ?"
             args.add(pathId)
         }
-        val sizeWhere = sizeWhere(null, option)
+        val where = option.makeWhere(type, args)
         val selection =
-            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $idSelection $sizeWhere) GROUP BY (${MediaStore.MediaColumns.BUCKET_ID}"
+            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $where $idSelection) GROUP BY (${MediaStore.MediaColumns.BUCKET_ID}"
         val cursor = context.contentResolver.query(
             allUri,
             IDBUtils.storeBucketKeys + arrayOf("count(1)"),
@@ -146,15 +146,12 @@ object DBUtils : IDBUtils {
         if (!isAll) {
             args.add(pathId)
         }
-        val typeSelection = getCondFromType(requestType, option, args)
-        val dateSelection = getDateCond(args, option)
-        val sizeWhere = sizeWhere(requestType, option)
-        val keys =
-            (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + locationKeys).distinct().toTypedArray()
+        val where = option.makeWhere(requestType, args)
+        val keys = keys()
         val selection = if (isAll) {
-            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
+            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $where"
         } else {
-            "${MediaStore.MediaColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
+            "${MediaStore.MediaColumns.BUCKET_ID} = ? $where"
         }
         val sortOrder = getSortOrder(page * size, size, option)
         val cursor = context.contentResolver.query(
@@ -188,21 +185,19 @@ object DBUtils : IDBUtils {
         if (!isAll) {
             args.add(galleryId)
         }
-        val typeSelection = getCondFromType(requestType, option, args)
-        val dateSelection = getDateCond(args, option)
-        val sizeWhere = sizeWhere(requestType, option)
-        val keys =
-            (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + locationKeys).distinct().toTypedArray()
+        val where = option.makeWhere(requestType, args)
+        val keys = keys()
+
         val selection = if (isAll) {
-            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $typeSelection $dateSelection $sizeWhere"
+            "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $where"
         } else {
-            "${MediaStore.MediaColumns.BUCKET_ID} = ? $typeSelection $dateSelection $sizeWhere"
+            "${MediaStore.MediaColumns.BUCKET_ID} = ? $where"
         }
         val pageSize = end - start
         val sortOrder = getSortOrder(start, pageSize, option)
         val cursor = context.contentResolver.query(
-            allUri,
-            keys,
+                allUri,
+                keys,
             selection,
             args.toTypedArray(),
             sortOrder
@@ -217,9 +212,14 @@ object DBUtils : IDBUtils {
         return list
     }
 
-    override fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean): AssetEntity? {
+    override fun getAssetEntity(
+        context: Context,
+        id: String,
+        checkIfExists: Boolean
+    ): AssetEntity? {
         val keys =
-            (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + locationKeys + IDBUtils.typeKeys).distinct().toTypedArray()
+            (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + locationKeys + IDBUtils.typeKeys).distinct()
+                .toTypedArray()
         val selection = "${MediaStore.MediaColumns._ID} = ?"
         val args = arrayOf(id)
 

@@ -33,13 +33,13 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (void)setAuth:(BOOL)auth;
 
-- (NSArray<PMAssetPathEntity *> *)getAssetPathList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(PMFilterOptionGroup *)option;
+- (NSArray<PMAssetPathEntity *> *)getAssetPathList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(NSObject<PMBaseFilter> *)option;
 
-- (NSUInteger)getAssetCountFromPath:(NSString *)id type:(int)type filterOption:(PMFilterOptionGroup *)filterOption;
+- (NSUInteger)getAssetCountFromPath:(NSString *)id type:(int)type filterOption:(NSObject<PMBaseFilter> *)filterOption;
 
-- (NSArray<PMAssetEntity *> *)getAssetListPaged:(NSString *)id type:(int)type page:(NSUInteger)page size:(NSUInteger)size filterOption:(PMFilterOptionGroup *)filterOption;
+- (NSArray<PMAssetEntity *> *)getAssetListPaged:(NSString *)id type:(int)type page:(NSUInteger)page size:(NSUInteger)size filterOption:(NSObject<PMBaseFilter> *)filterOption;
 
-- (NSArray<PMAssetEntity *> *)getAssetListRange:(NSString *)id type:(int)type start:(NSUInteger)start end:(NSUInteger)end filterOption:(PMFilterOptionGroup *)filterOption;
+- (NSArray<PMAssetEntity *> *)getAssetListRange:(NSString *)id type:(int)type start:(NSUInteger)start end:(NSUInteger)end filterOption:(NSObject<PMBaseFilter> *)filterOption;
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)assetId;
 
@@ -51,7 +51,7 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (void)getFullSizeFileWithId:(NSString *)id isOrigin:(BOOL)isOrigin subtype:(int)subtype resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
 
-- (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type filterOption:(PMFilterOptionGroup *)filterOption;
+- (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type filterOption:(NSObject<PMBaseFilter> *)filterOption;
 
 - (void)deleteWithIds:(NSArray<NSString *> *)ids changedBlock:(ChangeIds)block;
 
@@ -81,7 +81,7 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler;
 
-- (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(PMFilterOptionGroup *)option;
+- (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(NSObject<PMBaseFilter> *)option;
 
 - (void)saveImageWithPath:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(void (^)(PMAssetEntity *))block;
 
@@ -104,4 +104,9 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (void)cancelCacheRequests;
 
 - (void)injectModifyToDate:(PMAssetPathEntity *)path;
+
+- (NSUInteger) getAssetCountWithType:(int)type option:(NSObject<PMBaseFilter> *) filter;
+
+- (NSArray<PMAssetEntity*>*) getAssetsWithType:(int)type option:(NSObject<PMBaseFilter> *)option start:(int)start end:(int)end;
+
 @end
