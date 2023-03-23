@@ -321,7 +321,8 @@ final FilterOptionGroup filterOption = FilterOptionGroup(
 
 This is an **experimental feature**, please submit an issue if you have any problems.
 
-Since 2.6.0, CustomFilter is added, more flexible.
+`CustomFilter` was added in the 2.6.0 version of the plugin,
+which provide more flexible filtering conditions against host platforms.
 
 It is closer to the native way of use.
 You can customize where conditions and order conditions. 
