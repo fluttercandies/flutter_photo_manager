@@ -319,6 +319,8 @@ final FilterOptionGroup filterOption = FilterOptionGroup(
 
 ##### CustomFilter
 
+This is an **experimental feature**, please submit an issue if you have any problems.
+
 Since 2.6.0, CustomFilter is added, more flexible.
 
 It is closer to the native way of use.
