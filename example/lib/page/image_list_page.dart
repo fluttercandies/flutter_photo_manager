@@ -179,7 +179,16 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               child: const Text('Copy to another path'),
               onPressed: () => copyToAnotherPath(entity),
             ),
-            _buildMoveAnotherPath(entity),
+            if (Platform.isAndroid)
+              ElevatedButton(
+                onPressed: () => Navigator.push<void>(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => MoveToAnotherExample(entity: entity),
+                  ),
+                ),
+                child: const Text('Move to another gallery.'),
+              ),
             _buildRemoveInAlbumWidget(entity),
             ElevatedButton(
               child: const Text('Test progress'),
@@ -215,7 +224,25 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                   }
                 },
               ),
-          ],
+            if (Platform.isIOS || Platform.isMacOS)
+              ElevatedButton(
+                child: const Text('Show asset track info in console'),
+                onPressed: () async {
+                  final metaList = await entity.getAvAssetTrackMetaList();
+                  print('metaList: ${metaList.map((e) => e.prettyJson())}');
+                },
+              ),
+          ]
+              .map(
+                (e) => Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 10,
+                  ),
+                  child: e,
+                ),
+              )
+              .toList(),
         ),
       ),
     );
@@ -335,21 +362,6 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
 
   void deleteAssetInAlbum(AssetEntity entity) {
     readPathProvider(context).removeInAlbum(entity);
-  }
-
-  Widget _buildMoveAnotherPath(AssetEntity entity) {
-    if (!Platform.isAndroid) {
-      return Container();
-    }
-    return ElevatedButton(
-      onPressed: () => Navigator.push<void>(
-        context,
-        MaterialPageRoute<void>(
-          builder: (_) => MoveToAnotherExample(entity: entity),
-        ),
-      ),
-      child: const Text('Move to another gallery.'),
-    );
   }
 
   Future<void> showThumb(AssetEntity entity, int size) async {

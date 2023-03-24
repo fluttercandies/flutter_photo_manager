@@ -2,6 +2,8 @@
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
 
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 
 import '../internal/enums.dart';
@@ -95,4 +97,10 @@ class PermissionRequestOption {
 
   @override
   int get hashCode => iosAccessLevel.hashCode;
+}
+
+mixin IMappable {
+  Map<String, dynamic> toMap();
+
+  String prettyJson() => const JsonEncoder.withIndent('  ').convert(toMap());
 }

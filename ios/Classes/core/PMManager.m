@@ -1475,4 +1475,31 @@
     }
 }
 
+#pragma mark get slow video info
+
+- (void)getAVAssetWithId:(NSString *)phAssetId completionHandler:(void (^)(AVAsset * _Nullable asset))completionHandler {
+    PHFetchResult *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[phAssetId] options:nil];
+
+    if (result.count > 0) {
+        PHAsset *asset = result.firstObject;
+
+        PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+        options.networkAccessAllowed = YES;
+
+        [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:options resultHandler:^(AVAsset * _Nullable avAsset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completionHandler) {
+                    completionHandler(avAsset);
+                }
+            });
+        }];
+    } else {
+        NSLog(@"Could not find PHAsset with ID %@", phAssetId);
+
+        if (completionHandler) {
+            completionHandler(nil);
+        }
+    }
+}
+
 @end

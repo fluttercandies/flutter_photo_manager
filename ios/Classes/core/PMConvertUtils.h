@@ -23,4 +23,7 @@
 + (PMFilterOption *)convertMapToPMFilterOption:(NSDictionary *)map;
 
 + (NSObject<PMBaseFilter> *)convertMapToOptionContainer:(NSDictionary *)map;
+
++ (NSArray *) convertAvAssetToSegmentsArray:(AVAsset *) asset;
+
 @end

@@ -187,4 +187,77 @@
     return (double) i / 1000.0;
 }
 
+#pragma mark convert slow video tracks
+
++ (NSArray *) convertAvAssetToSegmentsArray:(AVAsset *) asset {
+    NSMutableArray *result = [NSMutableArray new];
+    
+    NSArray<AVAssetTrack *> *tracks = [asset tracksWithMediaType:AVMediaTypeVideo];
+    
+    for (id track in tracks) {
+        NSDictionary *item = [self convertAVAssetTrackToDict:track];
+        [result addObject:item];
+    }
+    
+    return result;
+}
+
+
++ (NSDictionary *) convertCMTimeRange:(CMTimeRange)range {
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+
+    // Convert start time and duration to seconds
+    double startTime = CMTimeGetSeconds(range.start);
+    double duration = CMTimeGetSeconds(range.duration);
+
+    // Add the start time and duration to the dictionary
+    [dict setObject:[NSNumber numberWithDouble:startTime] forKey:@"startTime"];
+    [dict setObject:[NSNumber numberWithDouble:duration] forKey:@"duration"];
+
+    return dict;
+}
+
++ (NSDictionary*) convertAVAssetTrackToDict: (AVAssetTrack*) videoTrack {
+    NSArray *segments = videoTrack.segments;
+    
+    if (segments.count == 0) {
+        return nil;
+    }
+    
+    NSDictionary *meta = @{
+        @"mediaType": videoTrack.mediaType,
+        @"timeRange": [self convertCMTimeRange: videoTrack.timeRange],
+        @"nominalFrameRate": @(videoTrack.nominalFrameRate),
+    };
+    
+    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary: meta];
+    
+    NSMutableArray *segmentsArray = [[NSMutableArray alloc] init];
+    
+    // Iterate through the video segments
+      for (AVAssetTrackSegment *segment in videoTrack.segments) {
+          CMTimeMapping timeMapping = segment.timeMapping;
+          
+          NSDictionary *segmentDict = @{
+              @"source": @{
+                  @"startTime": @(CMTimeGetSeconds(timeMapping.source.start)),
+                  @"duration": @(CMTimeGetSeconds(timeMapping.source.duration))
+              },
+              @"target": @{
+                  @"startTime": @(CMTimeGetSeconds(timeMapping.target.start)),
+                  @"duration": @(CMTimeGetSeconds(timeMapping.target.duration))
+              }
+          };
+          
+          // Add the segment dictionary to the array
+          [segmentsArray addObject:segmentDict];
+      }
+
+      // Add the segments array to the main dictionary
+      [dict setObject:segmentsArray forKey:@"segments"];
+    
+    return dict;
+}
+
 @end
+

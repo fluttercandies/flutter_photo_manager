@@ -16,6 +16,7 @@ import '../internal/enums.dart';
 import '../internal/plugin.dart';
 import '../internal/progress_handler.dart';
 import '../utils/convert_utils.dart';
+import 'av_asset_meta.dart';
 import 'thumbnail.dart';
 import 'types.dart';
 
@@ -765,6 +766,16 @@ class AssetEntity {
   ///  * [mimeType] which is the synchronized getter of the MIME type.
   ///  * https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_conc/understand_utis_conc.html#//apple_ref/doc/uid/TP40001319-CH202-SW1
   Future<String?> get mimeTypeAsync => plugin.getMimeTypeAsync(this);
+
+  /// Get AVAssetMetadata for the asset.
+  ///  * Android: Always empty List.
+  ///  * iOS/macOS: [AVAssetMetadata].
+  Future<List<AVAssetTrackMeta>> getAvAssetTrackMetaList() async {
+    if (Platform.isIOS || Platform.isMacOS) {
+      return plugin.getAvAssetTrackMeta(this);
+    }
+    return [];
+  }
 
   AssetEntity copyWith({
     String? id,

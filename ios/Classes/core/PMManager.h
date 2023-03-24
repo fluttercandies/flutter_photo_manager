@@ -103,6 +103,8 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (void)cancelCacheRequests;
 
+- (void)getAVAssetWithId:(NSString *)phAssetId completionHandler:(void (^)(AVAsset * _Nullable asset))completionHandler;
+
 - (void)injectModifyToDate:(PMAssetPathEntity *)path;
 
 - (NSUInteger) getAssetCountWithType:(int)type option:(NSObject<PMBaseFilter> *) filter;

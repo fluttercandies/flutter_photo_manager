@@ -4,6 +4,7 @@
 
 import '../filter/base_filter.dart';
 import '../filter/classical/filter_option_group.dart';
+import '../types/av_asset_meta.dart';
 import '../types/entity.dart';
 import '../types/types.dart';
 
@@ -88,6 +89,16 @@ class ConvertUtils {
       longitude: data['lng'] as double?,
       mimeType: data['mimeType'] as String?,
     );
+    return result;
+  }
+
+  static List<AVAssetTrackMeta> convertToAVAssetTrackList(
+    List list,
+  ) {
+    final result = <AVAssetTrackMeta>[];
+    for (final Map item in list) {
+      result.add(AVAssetTrackMeta.fromJson(item));
+    }
     return result;
   }
 }

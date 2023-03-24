@@ -7,6 +7,7 @@ import 'dart:io';
 import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/services.dart';
+import 'package:photo_manager/src/types/av_asset_meta.dart';
 
 import '../filter/base_filter.dart';
 import '../filter/classical/filter_option_group.dart';
@@ -658,6 +659,15 @@ mixin IosPlugin on BasePlugin {
       },
     );
     return result?['msg'] == null;
+  }
+
+  Future<List<AVAssetTrackMeta>> getAvAssetTrackMeta(AssetEntity assetEntity) {
+    return _channel.invokeMethod<List>(PMConstants.mGetAvAssetTrackMeta, {
+      'assetId': assetEntity.id,
+    }).then((value) {
+      if (value is! List) return [];
+      return ConvertUtils.convertToAVAssetTrackList(value);
+    });
   }
 }
 

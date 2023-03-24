@@ -531,6 +531,12 @@
     } else if ([@"cancelCacheRequests" isEqualToString:call.method]) {
         [manager cancelCacheRequests];
         [handler reply:@YES];
+    } else if ([@"getAvAssetTrackMeta" isEqualToString:call.method]) {
+        NSString *assetId = call.arguments[@"assetId"];
+        [manager getAVAssetWithId:assetId completionHandler:^(AVAsset * _Nullable asset) {
+            NSArray *array = [PMConvertUtils convertAvAssetToSegmentsArray:asset];
+            [handler reply:array];
+        }];
     } else {
         [handler notImplemented];
     }
