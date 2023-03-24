@@ -28,6 +28,7 @@ export 'src/managers/photo_manager.dart';
 
 export 'src/types/entity.dart';
 export 'src/types/thumbnail.dart';
-export 'src/types/types.dart';
+export 'src/types/types.dart' hide IMappable;
+export 'src/types/av_asset_meta.dart';
 
 export 'src/utils/column_utils.dart';

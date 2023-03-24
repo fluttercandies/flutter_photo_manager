@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.7.0
+
+Feature:
+
+- Updated `AssetEntity` API to include `getAvAssetTrackMetaList()` method. (#912)
+
 ## 2.6.0
 
 Features:

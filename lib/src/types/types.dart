@@ -100,7 +100,10 @@ class PermissionRequestOption {
 }
 
 mixin IMappable {
+
+  /// Convert this object to a map.
   Map<String, dynamic> toMap();
 
+  /// Convert this object to pretty JSON string.
   String prettyJson() => const JsonEncoder.withIndent('  ').convert(toMap());
 }

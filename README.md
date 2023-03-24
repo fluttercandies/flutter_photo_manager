@@ -607,6 +607,29 @@ In generally, a `PHAsset` will have three status:
   In this case, the best practise is to use the `PMProgressHandler`
   to provide a responsive user interface.
 
+
+
+### AssetEntity
+
+
+
+#### Get track metadata
+
+| Class                 | Description                                                  |
+| --------------------- | ------------------------------------------------------------ |
+| `AVAssetTrackMeta`    | Represents metadata for a single track in an `AVAsset`.      |
+| `CMTimeRange`         | Represents a range of time defined by a start time and a duration. |
+| `AVAssetTrackSegment` | Represents a segment of an `AVAssetTrack`, defined by a source and target `CMTimeRange`. |
+
+Example:
+
+```dart
+void showTrackMeta(AssetEntity entity) async {
+  final metaList = await entity.getAvAssetTrackMetaList();
+  print('metaList: ${metaList.map((e) => e.prettyJson())}');
+}
+```
+
 ### Entities change notify
 
 Plugin will post entities change events from native,
