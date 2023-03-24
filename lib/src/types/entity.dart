@@ -769,7 +769,7 @@ class AssetEntity {
 
   /// Get AVAssetMetadata for the asset.
   ///  * Android: Always empty List.
-  ///  * iOS/macOS: [AVAssetMetadata].
+  ///  * iOS/macOS: [AVAssetTrack](https://developer.apple.com/documentation/avfoundation/avassettrack?language=objc).
   Future<List<AVAssetTrackMeta>> getAvAssetTrackMetaList() async {
     if (Platform.isIOS || Platform.isMacOS) {
       return plugin.getAvAssetTrackMeta(this);
