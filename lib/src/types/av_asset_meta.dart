@@ -112,6 +112,7 @@ class AVAssetTrackSegment with IMappable {
     };
   }
 }
+
 /// {@template av_asset_track_meta}
 /// A metadata object that represents a single track in an `AVAsset`.
 ///
