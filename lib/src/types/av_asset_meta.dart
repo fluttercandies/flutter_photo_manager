@@ -87,7 +87,6 @@ class AVAssetTrackMeta with IMappable {
   });
 
   factory AVAssetTrackMeta.fromJson(Map json) {
-    print(JsonEncoder.withIndent('  ').convert(json));
     return AVAssetTrackMeta(
       mediaType: json['mediaType'] as String,
       timeRange: CMTimeRange.fromJson(json['timeRange']),
