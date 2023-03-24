@@ -4,13 +4,14 @@
 
 import 'enums.dart';
 
+/// Provides extension methods for [PermissionState] values.
 extension PermissionStateExt on PermissionState {
-  /// Whether authorized or not.
+  /// Returns `true` if the permission has been granted; otherwise, `false`.
   bool get isAuth {
     return this == PermissionState.authorized;
   }
 
-  /// Whether the permission can access assets partially or fully,
+  /// Returns `true` if the permission grants partial or full access to assets; otherwise, `false`.
   bool get hasAccess {
     return this == PermissionState.authorized ||
         this == PermissionState.limited;

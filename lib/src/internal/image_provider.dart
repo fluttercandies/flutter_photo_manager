@@ -25,6 +25,13 @@ import 'enums.dart';
 ///   * Fetch [AssetEntity.originBytes] for images.
 /// Else, fetch [AssetEntity.thumbnailDataWithOption] with the given
 /// [thumbnailSize] and the [thumbnailFormat].
+///
+/// {@template remove_in_3_0}
+/// ***
+/// Because the Flutter version changes, there will be compatibility issues.
+/// This class is expected to be removed in 3.0 and become a separate package.
+/// ***
+/// {@endtemplate}
 @immutable
 class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
   const AssetEntityImageProvider(
@@ -214,6 +221,8 @@ class AssetEntityImageProvider extends ImageProvider<AssetEntityImageProvider> {
 /// A widget that displays an [AssetEntity] image.
 ///
 /// The widget uses [AssetEntityImageProvider] internally to resolve assets.
+///
+/// {@macro remove_in_3_0}
 class AssetEntityImage extends Image {
   AssetEntityImage(
     this.entity, {

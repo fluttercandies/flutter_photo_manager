@@ -128,12 +128,22 @@ class Editor {
   }
 }
 
+/// An editor for iOS/macOS.
 class DarwinEditor {
+  /// Creates a new [DarwinEditor] object.
   const DarwinEditor();
 
   /// {@template photo_manager.IosEditor.EnsureParentIsRootOrFolder}
-  /// Folders and albums can be only created under the root path or folders,
-  /// so the [parent] should be null, the root path or accessible folders.
+  ///
+  /// Throws an error if the given [parent] path is not null, the root path, or a folder path.
+  ///
+  /// This method is intended to be used by subclasses to ensure that a parent path is valid before creating assets or folders under it.
+  ///
+  /// Throws an [ArgumentError] if the parent path is not valid.
+  ///
+  /// See also:
+  ///
+  /// * [AssetPathEntity.isAll], which indicates whether the path represents all assets.
   /// {@endtemplate}
   void _ensureParentIsRootOrFolder(AssetPathEntity? parent) {
     if (parent != null && parent.albumType != 2 && !parent.isAll) {
@@ -205,11 +215,16 @@ class DarwinEditor {
     return plugin.iosRemoveInAlbum(list, parent);
   }
 
-  /// Delete the [path].
+  /// Deletes the given [path].
+  ///
+  /// Returns `true` if the operation was successful; otherwise, `false`.
   Future<bool> deletePath(AssetPathEntity path) {
     return plugin.iosDeleteCollection(path);
   }
 
+  /// Sets the favorite status of the given [entity].
+  ///
+  /// Returns the updated [AssetEntity] if the operation was successful; otherwise, `null`.
   Future<AssetEntity?> favoriteAsset({
     required AssetEntity entity,
     required bool favorite,
@@ -245,13 +260,20 @@ class DarwinEditor {
   }
 }
 
+/// An editor for iOS/macOS.
 class IosEditor extends DarwinEditor {
+  /// Creates a new [IosEditor] object.
   const IosEditor();
 }
 
+/// An editor for Android.
 class AndroidEditor {
+  /// Creates a new [AndroidEditor] object.
   const AndroidEditor();
 
+  /// Moves the given [entity] to the specified [target] path.
+  ///
+  /// Returns `true` if the move was successful; otherwise, `false`.
   Future<bool> moveAssetToAnother({
     required AssetEntity entity,
     required AssetPathEntity target,
@@ -259,6 +281,10 @@ class AndroidEditor {
     return plugin.androidMoveAssetToPath(entity, target);
   }
 
+  /// Removes all assets from the gallery that are no longer available on disk.
+  ///
+  /// This method is intended to be used after manually deleting files from the
+  /// device's storage. It returns `true` if this operation was successful; otherwise, `false`.
   Future<bool> removeAllNoExistsAsset() {
     return plugin.androidRemoveNoExistsAssets();
   }

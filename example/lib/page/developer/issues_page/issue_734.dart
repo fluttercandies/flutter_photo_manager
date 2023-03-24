@@ -65,10 +65,11 @@ class _Issue734PageState extends State<Issue734Page>
         Log.d(e);
       }
 
-      final List<AssetEntity> rangeList = await recent.getAssetListRange(start: i, end: i + 1);
+      final List<AssetEntity> rangeList =
+          await recent.getAssetListRange(start: i, end: i + 1);
       try {
-        Log.d('range($i, ${i+1}) list asset count: ${rangeList.length}');
-        Log.d('range($i, ${i+1}) list asset[0] id: ${rangeList[0].id}');
+        Log.d('range($i, ${i + 1}) list asset count: ${rangeList.length}');
+        Log.d('range($i, ${i + 1}) list asset[0] id: ${rangeList[0].id}');
       } catch (e) {
         Log.d(e);
       }

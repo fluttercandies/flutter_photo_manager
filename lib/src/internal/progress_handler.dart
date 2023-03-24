@@ -11,13 +11,15 @@ import 'package:flutter/services.dart';
 import 'constants.dart';
 import 'enums.dart';
 
-/// Handling assets loading progress when they need to download from cloud.
-/// Typically for iCloud assets downloading.
+/// Manages the progress of asset downloads from cloud storage services, such as iCloud.
 class PMProgressHandler {
+  /// Creates a new [PMProgressHandler] object.
+  ///
+  /// Throws an error if used on a platform other than iOS or macOS.
   PMProgressHandler() : _channelIndex = _incrementalIndex {
     assert(
       Platform.isIOS || Platform.isMacOS,
-      '$runtimeType should only used on iOS or macOS.',
+      '$runtimeType should only be used on iOS or macOS.',
     );
     _channel = OptionalMethodChannel(
       '${PMConstants.channelPrefix}/progress/$_channelIndex',
@@ -26,9 +28,10 @@ class PMProgressHandler {
     _incrementalIndex++;
   }
 
-  /// Incremental index that increase for each use.
+  /// An incremental index that increases each time this class is instantiated.
   static int _incrementalIndex = 0;
 
+  /// The channel index associated with this instance.
   int get channelIndex => _channelIndex;
   final int _channelIndex;
 
@@ -37,8 +40,7 @@ class PMProgressHandler {
   final StreamController<PMProgressState> _controller =
       StreamController<PMProgressState>.broadcast();
 
-  /// Obtain the download progress and status of the downloading asset
-  /// from the stream.
+  /// A stream that provides information about the download status and progress of the asset being downloaded.
   Stream<PMProgressState> get stream => _controller.stream;
 
   Future<dynamic> _onProgress(MethodCall call) async {
@@ -60,12 +62,17 @@ class PMProgressHandler {
 /// and [state] to indicate the request state of the asset.
 @immutable
 class PMProgressState {
+  /// Creates a new [PMProgressState] object with the given progress and state values.
   const PMProgressState(this.progress, this.state);
 
-  /// From 0.0 to 1.0.
+  /// A value between 0.0 and 1.0 representing the progress of the download.
   final double progress;
 
   /// {@macro photo_manager.PMRequestState}
+  ///
+  /// See also:
+  ///
+  /// * [PMRequestState], which defines possible states for an asset download request.
   final PMRequestState state;
 
   @override

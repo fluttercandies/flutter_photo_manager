@@ -1,21 +1,26 @@
+// Copyright 2018 The FlutterCandies author. All rights reserved.
+// Use of this source code is governed by an Apache license that can be found
+// in the LICENSE file.
+
 import 'dart:io';
 
-/// The utils for the [CustomColumns].
+/// Utility functions for working with the [CustomColumns] class.
 class ColumnUtils {
   const ColumnUtils._internal();
 
-  static const ColumnUtils instance = ColumnUtils._internal();
+  /// An instance of the [ColumnUtils] class.
+  static const instance = ColumnUtils._internal();
 
-  /// Convert to the format for the [MediaStore] in android or [NSPredicate] in iOS.
+  /// Converts a [DateTime] object to the format used by [MediaStore] on Android or [NSPredicate] on iOS/macOS.
   String convertDateTimeToSql(DateTime date, {bool isSeconds = true}) {
     final unix = date.millisecondsSinceEpoch;
+
     if (Platform.isAndroid) {
       return isSeconds ? (unix ~/ 1000).toString() : unix.toString();
     } else if (Platform.isIOS || Platform.isMacOS) {
-      final date = (unix / 1000) - 978307200;
-      // 978307200 is 2001-01-01 00:00:00 UTC, the 0 of the NSDate.
-      // The NSDate will be converted to CAST(unix - 978307200, "NSDate") in NSPredicate.
-      final dateStr = date.toStringAsFixed(6);
+      // The NSDate epoch starts at 2001-01-01T00:00:00Z, so we subtract this from the Unix timestamp in seconds.
+      final secondsFrom2001 = (unix / 1000) - 978307200;
+      final dateStr = secondsFrom2001.toStringAsFixed(6);
       return 'CAST($dateStr, "NSDate")';
     } else {
       throw UnsupportedError('Unsupported platform with date');

@@ -1,3 +1,7 @@
+// Copyright 2018 The FlutterCandies author. All rights reserved.
+// Use of this source code is governed by an Apache license that can be found
+// in the LICENSE file.
+
 import '../base_filter.dart';
 import 'order_by_item.dart';
 

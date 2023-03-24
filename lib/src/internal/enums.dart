@@ -12,9 +12,16 @@
 ///
 /// **IMPORTANT FOR MAINTAINERS:** **DO NOT** change orders of values.
 enum AssetType {
+  /// The asset is not an image, video, or audio file.
   other,
+
+  /// The asset is an image file.
   image,
+
+  /// The asset is a video file.
   video,
+
+  /// The asset is an audio file.
   audio,
 }
 
@@ -41,7 +48,14 @@ enum ResizeMode { none, fast, exact }
 ///  * [Apple documentation](https://developer.apple.com/documentation/photokit/phimagecontentmode)
 enum ResizeContentMode { fit, fill, def }
 
-enum OrderOptionType { createDate, updateDate }
+/// An enumeration of possible options for sorting asset lists.
+enum OrderOptionType {
+  /// Sorts assets by their creation date.
+  createDate,
+
+  /// Sorts assets by their modification date.
+  updateDate,
+}
 
 /// {@template photo_manager.PMRequestState}
 /// Indicate the current state when an asset is loading with [PMProgressHandler].
@@ -77,10 +91,40 @@ enum PermissionState {
 ///
 /// See also:
 ///  * [Apple documentation](https://developer.apple.com/documentation/photokit/phaccesslevel)
-enum IosAccessLevel { addOnly, readWrite }
+enum IosAccessLevel {
+  /// The user can only add photos to the library.
+  addOnly,
+
+  /// The user can read from and write to the photo library.
+  readWrite,
+}
 
 /// Common file types for images.
-enum ImageFileType { jpg, png, gif, tiff, heic, other }
+enum ImageFileType {
+  /// The image is a JPEG file.
+  jpg,
 
-/// Some special image types.
-enum SpecialImageType { gif, heic }
+  /// The image is a PNG file.
+  png,
+
+  /// The image is a GIF file.
+  gif,
+
+  /// The image is a TIFF file.
+  tiff,
+
+  /// The image is an HEIC file.
+  heic,
+
+  /// The image is another type of file.
+  other,
+}
+
+/// An enumeration of special image types.
+enum SpecialImageType {
+  /// The image is a GIF file.
+  gif,
+
+  /// The image is an HEIC file.
+  heic,
+}
