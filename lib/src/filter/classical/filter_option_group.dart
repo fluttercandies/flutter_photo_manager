@@ -31,6 +31,31 @@ class FilterOptionGroup extends PMFilter {
     this.orders.addAll(orders);
   }
 
+  factory FilterOptionGroup.android({
+    FilterOption imageOption = const FilterOption(),
+    FilterOption videoOption = const FilterOption(),
+    FilterOption audioOption = const FilterOption(),
+    bool containsPathModified = false,
+    bool containsLivePhotos = true,
+    bool onlyLivePhotos = false,
+    DateTimeCond? createTimeCond,
+    DateTimeCond? updateTimeCond,
+    DateTimeCond? takenTimeCond,
+    List<OrderOption> orders = const <OrderOption>[],
+  }) =>
+      _AndroidFilterOptionGroup(
+        imageOption: imageOption,
+        videoOption: videoOption,
+        audioOption: audioOption,
+        containsPathModified: containsPathModified,
+        containsLivePhotos: containsLivePhotos,
+        onlyLivePhotos: onlyLivePhotos,
+        createTimeCond: createTimeCond,
+        updateTimeCond: updateTimeCond,
+        takenTimeCond: takenTimeCond,
+        orders: orders,
+      );
+
   /// Construct an empty options group.
   FilterOptionGroup.empty();
 
@@ -148,4 +173,121 @@ class FilterOptionGroup extends PMFilter {
 
   @override
   BaseFilterType get type => BaseFilterType.classical;
+}
+
+class _AndroidFilterOptionGroup extends FilterOptionGroup {
+  _AndroidFilterOptionGroup({
+    FilterOption imageOption = const FilterOption(),
+    FilterOption videoOption = const FilterOption(),
+    FilterOption audioOption = const FilterOption(),
+    bool containsPathModified = false,
+    bool containsLivePhotos = true,
+    bool onlyLivePhotos = false,
+    DateTimeCond? createTimeCond,
+    DateTimeCond? updateTimeCond,
+    DateTimeCond? takenTimeCond,
+    List<OrderOption> orders = const <OrderOption>[],
+  }) : super(
+          imageOption: imageOption,
+          videoOption: videoOption,
+          audioOption: audioOption,
+          containsPathModified: containsPathModified,
+          containsLivePhotos: containsLivePhotos,
+          onlyLivePhotos: onlyLivePhotos,
+          createTimeCond: createTimeCond,
+          updateTimeCond: updateTimeCond,
+          orders: orders,
+        ) {
+    this.takenTimeCond = takenTimeCond ?? this.takenTimeCond;
+  }
+
+  DateTimeCond takenTimeCond = DateTimeCond.def().copyWith(ignore: true);
+
+  @override
+  void merge(covariant _AndroidFilterOptionGroup other) {
+    for (final AssetType type in _map.keys) {
+      _map[type] = _map[type]!.merge(other.getOption(type));
+    }
+    containsPathModified = other.containsPathModified;
+    containsLivePhotos = other.containsLivePhotos;
+    onlyLivePhotos = other.onlyLivePhotos;
+    createTimeCond = other.createTimeCond;
+    updateTimeCond = other.updateTimeCond;
+    takenTimeCond = other.takenTimeCond;
+    orders
+      ..clear()
+      ..addAll(other.orders);
+  }
+
+  @override
+  FilterOptionGroup updateDateToNow() {
+    return copyWith(
+      createTimeCond: createTimeCond.copyWith(
+        max: DateTime.now(),
+      ),
+      updateTimeCond: updateTimeCond.copyWith(
+        max: DateTime.now(),
+      ),
+      takenTimeCond: takenTimeCond.copyWith(
+        max: DateTime.now(),
+      ),
+    );
+  }
+
+  @override
+  Map<String, dynamic> childMap() {
+    return <String, dynamic>{
+      if (_map.containsKey(AssetType.image))
+        'image': getOption(AssetType.image).toMap(),
+      if (_map.containsKey(AssetType.video))
+        'video': getOption(AssetType.video).toMap(),
+      if (_map.containsKey(AssetType.audio))
+        'audio': getOption(AssetType.audio).toMap(),
+      'createDate': createTimeCond.toMap(),
+      'updateDate': updateTimeCond.toMap(),
+      'takenDate': takenTimeCond.toMap(),
+      'orders': orders.map((OrderOption e) => e.toMap()).toList(),
+      'containsLivePhotos': containsLivePhotos,
+      'onlyLivePhotos': onlyLivePhotos,
+    };
+  }
+
+  @override
+  _AndroidFilterOptionGroup copyWith({
+    FilterOption? imageOption,
+    FilterOption? videoOption,
+    FilterOption? audioOption,
+    bool? containsPathModified,
+    bool? containsLivePhotos,
+    bool? onlyLivePhotos,
+    DateTimeCond? createTimeCond,
+    DateTimeCond? updateTimeCond,
+    DateTimeCond? takenTimeCond,
+    List<OrderOption>? orders,
+  }) {
+    imageOption ??= _map[AssetType.image];
+    videoOption ??= _map[AssetType.video];
+    audioOption ??= _map[AssetType.audio];
+    containsPathModified ??= this.containsPathModified;
+    containsLivePhotos ??= this.containsLivePhotos;
+    onlyLivePhotos ??= this.onlyLivePhotos;
+    createTimeCond ??= this.createTimeCond;
+    updateTimeCond ??= this.updateTimeCond;
+    takenTimeCond ??= this.takenTimeCond;
+    orders ??= this.orders;
+
+    final _AndroidFilterOptionGroup result = _AndroidFilterOptionGroup()
+      ..setOption(AssetType.image, imageOption!)
+      ..setOption(AssetType.video, videoOption!)
+      ..setOption(AssetType.audio, audioOption!)
+      ..containsPathModified = containsPathModified
+      ..containsLivePhotos = containsLivePhotos
+      ..onlyLivePhotos = onlyLivePhotos
+      ..createTimeCond = createTimeCond
+      ..updateTimeCond = updateTimeCond
+      ..takenTimeCond = takenTimeCond
+      ..orders.addAll(orders);
+
+    return result;
+  }
 }

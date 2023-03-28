@@ -13,6 +13,7 @@ class CommonFilterOption(map: Map<*, *>) : FilterOption() {
     private val audioOption = ConvertUtils.getOptionFromType(map, AssetType.Audio)
     private val createDateCond = ConvertUtils.convertToDateCond(map["createDate"] as Map<*, *>)
     private val updateDateCond = ConvertUtils.convertToDateCond(map["updateDate"] as Map<*, *>)
+    private val takenDateCond = ConvertUtils.convertToDateCond(map["takenDate"] as Map<*, *>)
     override val containsPathModified = map["containsPathModified"] as Boolean
 
     private val orderByCond: List<OrderByCond> =
@@ -134,7 +135,10 @@ class CommonFilterOption(map: Map<*, *>) : FilterOption() {
             addDateCond(args, option.createDateCond, MediaStore.Images.Media.DATE_ADDED)
         val updateDateCond =
             addDateCond(args, option.updateDateCond, MediaStore.Images.Media.DATE_MODIFIED)
-        return "$createDateCond $updateDateCond"
+        val takenDateCond = addDateCond(args, option.takenDateCond, MediaStore.Images.Media.DATE_TAKEN)
+        println(takenDateCond)
+
+        return "$createDateCond $updateDateCond $takenDateCond"
     }
 
     private fun addDateCond(args: ArrayList<String>, dateCond: DateCond, dbKey: String): String {
@@ -142,12 +146,18 @@ class CommonFilterOption(map: Map<*, *>) : FilterOption() {
             return ""
         }
 
-        val minMs = dateCond.minMs
-        val maxMs = dateCond.maxMs
-
         val dateSelection = "AND ( $dbKey >= ? AND $dbKey <= ? )"
-        args.add((minMs / 1000).toString())
-        args.add((maxMs / 1000).toString())
+
+        var minMs = dateCond.minMs
+        var maxMs = dateCond.maxMs
+
+        if (dbKey != MediaStore.Images.Media.DATE_TAKEN) {
+            minMs /= 1000
+            maxMs /= 1000
+        }
+
+        args.add(minMs.toString())
+        args.add(maxMs.toString())
 
         return dateSelection
     }
