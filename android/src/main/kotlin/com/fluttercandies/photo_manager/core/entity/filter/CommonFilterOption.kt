@@ -136,7 +136,6 @@ class CommonFilterOption(map: Map<*, *>) : FilterOption() {
         val updateDateCond =
             addDateCond(args, option.updateDateCond, MediaStore.Images.Media.DATE_MODIFIED)
         val takenDateCond = addDateCond(args, option.takenDateCond, MediaStore.Images.Media.DATE_TAKEN)
-        println(takenDateCond)
 
         return "$createDateCond $updateDateCond $takenDateCond"
     }
