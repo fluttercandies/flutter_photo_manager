@@ -265,7 +265,7 @@ class AssetPathEntity {
     DateTime? lastModified,
     RequestType? type,
     bool? isAll,
-    FilterOptionGroup? filterOption,
+    PMFilter? filterOption,
   }) {
     return AssetPathEntity(
       id: id ?? this.id,
