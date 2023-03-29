@@ -16,7 +16,7 @@ that can be found in the LICENSE file. -->
 [![Awesome Flutter](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/Solido/awesome-flutter)
 <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
 
-使用Flutter Photo Manager插件可以轻松地获取设备中的相册和照片，并进行管理，它提供了抽象的媒体资源管理API，不需要UI集成即可在Android、iOS和macOS上获取媒体资源（图像/视频/音频）。
+使用Flutter Photo Manager插件可以轻松地获取设备中的相册和照片，并进行管理。它提供了抽象的媒体资源管理API，不需要UI集成即可在Android、iOS和macOS上获取媒体资源（图像/视频/音频）。
 
 ## 集成此插件的精彩项目
 
@@ -70,9 +70,9 @@ that can be found in the LICENSE file. -->
         - [原始数据的使用](#原始数据的使用)
         - [iOS上文件检索时间过长](#ios上文件检索时间过长)
     - [Entities change notify](#entities-change-notify)
-  - [Cache mechanism](#cache-mechanism)
-    - [Cache on Android](#cache-on-android)
-    - [Cache on iOS](#cache-on-ios)
+  - [缓存机制](#缓存机制)
+    - [Android缓存](#android缓存)
+    - [iOS缓存](#ios缓存)
     - [清除缓存](#清除缓存)
   - [原生额外配置](#原生额外配置)
     - [安卓额外配置](#安卓额外配置)
@@ -134,8 +134,8 @@ import 'package:photo_manager/photo_manager.dart';
 
 ##### Kotlin, Gradle, AGP
 
-从1.2.7开始，我们使用**Kotlin `1.5.21`** 和 **Android Gradle Plugin `4.1.0`** 提供此插件.
-如果你的项目使用了低于此版本的Kotlin/Gradle/AGP,建议升级到大于或等于此版本的Kotlin/Gradle/AGP。
+从1.2.7开始，我们使用**Kotlin `1.5.21`** 和 **Android Gradle Plugin `4.1.0`** 提供此插件。
+如果你的项目使用了低于此版本的Kotlin/Gradle/AGP，建议升级到大于或等于此版本的Kotlin/Gradle/AGP。
 
 更具体的做法:
 
@@ -397,7 +397,7 @@ PMFilter createFilter() {
 final List<AssetEntity> entities = await path.getAssetListPaged(page: 0, size: 80);
 ```
 
-`或`[随机][`getAssetListRange`]获取：
+也可以[随机][`getAssetListRange`]获取：
 
 ```dart
 final List<AssetEntity> entities = await path.getAssetListRange(start: 0, end: 80);
@@ -417,7 +417,7 @@ final int count = await PhotoManager.getAssetCount();
 final List<AssetEntity> entities = await PhotoManager.getAssetListPaged(page: 0, pageCount: 80);
 ```
 
-`或`使用[随机][`getAssetListRange`]获取：
+或使用[随机][`getAssetListRange`]获取：
 
 ```dart
 final List<AssetEntity> entities = await PhotoManager.getAssetListRange(start: 0, end: 80);
@@ -610,29 +610,28 @@ PhotoManager.removeChangeCallback(changeNotify);
 PhotoManager.stopChangeNotify();
 ```
 
-## Cache mechanism
+## 缓存机制
 
-### Cache on Android
+### Android缓存
 
-Because Android 10 restricts the ability to access the resource path directly,
-image caches will be generated during I/O processes.
-More specifically, when the `file`, `originFile` and any other I/O getters are called,
-the plugin will save a file in the cache folder for further use.
+由于Android 10限制了直接访问资源路径的能力，
+因此图像缓存将在I/O处理过程中生成。
+更具体地说，当调用`file`，`originFile`和任何其他I/O获取器时，
+插件将保存一个文件到缓存文件夹以供进一步使用。
 
-Fortunately, on Android 11 and above, the resource path can be obtained directly again,
-but you can still use `requestLegacyExternalStorage`
-to access files in the storage without caching them.
-See [Android 10+ (Q, 29)](#android-10--q-29-) for how to add the attribute.
+幸运的是，在Android 11及以上版本中，可以再次直接获取资源路径，
+但您仍然可以使用`requestLegacyExternalStorage`
+访问存储中的文件而不缓存它们。
+有关如何添加属性，请参见[Android 10+ (Q, 29)](#android-10--q-29-) for how to add the attribute.
 
-### Cache on iOS
+### iOS缓存
 
-iOS does not directly provide APIs to access the original files of the album.
-So a cached file will be generated locally
-into the container of the current application
-when you called `file`, `originFile` and any other I/O getters.
+iOS没有直接提供API来访问相册的原始文件。
+因此，当您调用`file`, `originFile`和任何其他I/O获取器时，
+将在当前应用程序的容器中本地生成一个缓存文件。
 
-If occupied disk spaces are sensitive in your use case,
-you can delete it after your usage has done (iOS only).
+如果在您的用例中占用磁盘空间很敏感，
+则可以在使用后删除它（仅适用于iOS）。
 
 ```dart
 import 'dart:io';
@@ -684,8 +683,7 @@ rootProject.allprojects {
 }
 ```
 
-查看 [ProGuard for Glide](https://github.com/bumptech/glide#proguard) 获取更多
-如果您想了解如何同时使用ProGuard和Glide，请查看相关文档。
+如果您想了解如何同时使用ProGuard和Glide，请到 [ProGuard for Glide](https://github.com/bumptech/glide#proguard) 获取更多信息。
 
 #### Android 13 (API level 33) 额外配置
 
@@ -842,17 +840,17 @@ PhotoManager.editor.darwin.createAlbum(
 该Asset不会从设备中删除，只会从相册中删除。
 
 ```dart
-// Make sure your path entity is accessible.
+// 确保你的路径能够访问的 Make sure your path entity is accessible.
 final AssetPathEntity pathEntity = accessiblePath;
 final AssetEntity entity = yourEntity;
 final List<AssetEntity> entities = <AssetEntity>[yourEntity, anotherEntity];
-// Remove single asset from the album.
-// It'll call the list method as the implementation.
+// 移除相簿的单个图片 Remove single asset from the album.
+// 这将调用列表的方法作为实现。It'll call the list method as the implementation.
 await PhotoManager.editor.darwin.removeInAlbum(
   yourEntity,
   accessiblePath,
 );
-// Remove assets from the album in batches.
+// 批量从相册中移除资产。
 await PhotoManager.editor.darwin.removeAssetsInAlbum(
   entities,
   accessiblePath,
