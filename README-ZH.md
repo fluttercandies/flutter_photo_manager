@@ -31,7 +31,7 @@ that can be found in the LICENSE file. -->
 
 ## 迁移指导
 
-对于跨主要版本的升级，请查看[migration guide](MIGRATION_GUIDE.md) 获取详细信息.
+对于跨主要版本的升级，请查看 [migration guide](MIGRATION_GUIDE.md)  获取详细信息.
 
 <!-- TOC -->
 - [photo\_manager](#photo_manager)
@@ -40,7 +40,7 @@ that can be found in the LICENSE file. -->
   - [迁移指导](#迁移指导)
   - [常遇的问题](#常遇的问题)
   - [使用前准备](#使用前准备)
-    - [请在pubspec.yaml中添加以下依赖：](#请在pubspecyaml中添加以下依赖)
+    - [请在 pubspec.yaml 中添加以下依赖：](#请在-pubspecyaml-中添加以下依赖)
     - [导入到你的项目中：](#导入到你的项目中)
     - [原生平台的配置](#原生平台的配置)
       - [Android 配置准备](#android-配置准备)
@@ -79,7 +79,7 @@ that can be found in the LICENSE file. -->
       - [Glide issues](#glide-issues)
       - [Android 13 (API level 33) 额外配置](#android-13-api-level-33-额外配置)
     - [iOS额外配置](#ios额外配置)
-      - [Localized system albums name](#localized-system-albums-name)
+      - [本地化的系统相册名](#本地化的系统相册名)
     - [实验性功能](#实验性功能)
       - [预加载缩略图](#预加载缩略图)
       - [删除 Entities](#删除-entities)
@@ -90,22 +90,22 @@ that can be found in the LICENSE file. -->
       - [适用于 iOS 或 macOS 的功能](#适用于-ios-或-macos-的功能)
         - [创建一个文件夹](#创建一个文件夹)
         - [创建一个相簿](#创建一个相簿)
-        - [从相册中删除Entity](#从相册中删除entity)
+        - [从相册中删除 Entity](#从相册中删除-entity)
         - [删除一个路径实体](#删除一个路径实体)
 <!-- TOC -->
 
 ## 常遇的问题
 
-你可以在[GitHub issues][]上搜索到经常遇到的问题，比如构建错误，运行时异常等等
+你可以在 [GitHub issues][] 上搜索到经常遇到的问题，比如构建错误，运行时异常等等
 
 ## 使用前准备
 
-### 请在pubspec.yaml中添加以下依赖：
+### 请在 pubspec.yaml 中添加以下依赖：
 
 两种方式添加到你的项目依赖中:
 
-- **(推荐)** 运行 `flutter pub add photo_manager`.
-- 或者直接在添加依赖到你的 `pubspec.yaml`中 `dependencies` 部分:
+- **(推荐)** 运行  `flutter pub add photo_manager`.
+- 或者直接在添加依赖到你的  `pubspec.yaml` 中  `dependencies` 部分:
 
 ```yaml
 dependencies:
@@ -126,35 +126,34 @@ import 'package:photo_manager/photo_manager.dart';
 最低的平台版本:
 **Android 16, iOS 9.0, macOS 10.15**.
 
-- Android: [Android 配置准备](#android-config-preparation).
-- iOS: [iOS 配置准备](#ios-config-preparation).
-- macOS: 和iOS几乎一致。
+- Android:  [Android 配置准备](#android-config-preparation).
+- iOS:  [iOS 配置准备](#ios-config-preparation).
+- macOS:  和iOS几乎一致。
 
 #### Android 配置准备
 
 ##### Kotlin, Gradle, AGP
 
-从1.2.7开始，我们使用**Kotlin `1.5.21`** 和 **Android Gradle Plugin `4.1.0`** 提供此插件。
+从1.2.7开始，我们使用 **Kotlin `1.5.21`**  和  **Android Gradle Plugin `4.1.0`** 提供此插件。
 如果你的项目使用了低于此版本的Kotlin/Gradle/AGP，建议升级到大于或等于此版本的Kotlin/Gradle/AGP。
 
 更具体的做法:
 
-- 更新你的Gradle version (`gradle-wrapper.properties`)
+- 更新你的 Gradle version (`gradle-wrapper.properties`)
   到 `7.5.1` 或者最新版本。
-- 更新你的Kotlin version (`ext.kotlin_version`)
+- 更新你的 Kotlin version (`ext.kotlin_version`)
   到 `1.5.30` 或者最新版本。
-- 更新你的AGP version (`com.android.tools.build:gradle`)
+- 更新你的 AGP version (`com.android.tools.build:gradle`)
   或者 `7.2.2` 或者最新版本。
 
 ##### Android 10+ (Q, 29)
 
-_If you're not compiling or targeting with 29 and above, you can skip this section._
 _如果您没有使用29及以上的编译或目标版本，您可以跳过本节。_
 
-在Android 10上，引入了**Scoped Storage**，这会导致原始资源文件不能通过其文件路径直接访问。
+在Android 10上，引入了 **Scoped Storage**，这会导致原始资源文件不能通过其文件路径直接访问。
 
-如果你的 `compileSdkVersion` or `targetSdkVersion 为 `29`,
-为了能够成功获取到媒体资源，你可以考虑通过在`AndroidManifest.xml`中添加`android:requestLegacyExternalStorage="true"`，如下所示:
+如果你的  `compileSdkVersion` or `targetSdkVersion 为 ` 29,
+为了能够成功获取到媒体资源，你可以考虑通过在 `AndroidManifest.xml` 中添加 `android:requestLegacyExternalStorage="true"`，如下所示:
 
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -175,15 +174,15 @@ _如果您没有使用29及以上的编译或目标版本，您可以跳过本�
 
 ##### Glide
 
-本插件是使用[Glide][]在安卓上来创建缩略图文件的。
+本插件是使用 [Glide][] 在安卓上来创建缩略图文件的。
 
-如果你发现[Glide][]出现了一些警告日志，那就说明主项目需要一个`AppGlideModule`的实现。
-请查看[Generated API][]的实现方式。
+如果你发现 [Glide][] 出现了一些警告日志，那就说明主项目需要一个 `AppGlideModule` 的实现。
+请查看 [Generated API][] 的实现方式。
 
 
 #### iOS 配置准备
 
-添加`NSPhotoLibraryUsageDescription`的字典到`ios/Runner/Info.plist`中：
+添加 `NSPhotoLibraryUsageDescription` 的字典到 `ios/Runner/Info.plist` 中：
 
 ```plist
 <key>NSPhotoLibraryUsageDescription</key>
@@ -191,10 +190,10 @@ _如果您没有使用29及以上的编译或目标版本，您可以跳过本�
 ```
 
 在iOS 11或者更高版本中，如果你请求相册的写入权限的话，那么你就需要
-添加`NSPhotoLibraryAddUsageDescription`的字典到`ios/Runner/Info.plist`。
+添加 `NSPhotoLibraryAddUsageDescription` 的字典到 `ios/Runner/Info.plist`。
 If you want to grant only write-access to the photo library on iOS 11 and above,
 
-这和上面的相簿`NSPhotoLibraryUsageDescription`权限请求差不多
+这和上面的相簿 `NSPhotoLibraryUsageDescription` 权限请求差不多
 
 ![permissions in Xcode](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/flutter_photo2.png)
 
@@ -202,7 +201,7 @@ If you want to grant only write-access to the photo library on iOS 11 and above,
 
 ### 权限请求
 
-大部分的API只在获取到权限后才能正常使用
+大部分的 API 只在获取到权限后才能正常使用
 
 ```dart
 final PermissionState _ps = await PhotoManager.requestPermissionExtend();
@@ -215,7 +214,7 @@ if (_ps.isAuth) {
 }
 ```
 
-但是如果你非常肯定你的调用只会在获取到权限之后才会执行，你就可以忽略权限的检查：
+但是如果你非常肯定你的调用只会在获取到权限之后才会执行，那么你可以忽略权限的检查：
 
 ```dart
 PhotoManager.setIgnorePermissionCheck(true);
@@ -225,11 +224,8 @@ PhotoManager.setIgnorePermissionCheck(true);
 
 随着iOS 14的发布，苹果在iOS上引入了部分资源限制的权限 "Limited Photos Library"。
 所以你需要使用`PhotoManager.requestPermissionExtend()`来获取权限，
-So use the `PhotoManager.requestPermissionExtend()` to request permissions.
 这个方法会返回当前的权限状态`PermissionState`。
-The method will return `PermissionState`.
-在[PHAuthorizationStatus][]上查看更多细节。
-See [PHAuthorizationStatus][] for more detail.
+详情请参阅[PHAuthorizationStatus][]。
 
 
 为了能够重新选择在APP上能够获取到的资源，请使用`PhotoManager.presentLimited()`去调起获得访问受限资源权限的弹窗
@@ -238,20 +234,20 @@ See [PHAuthorizationStatus][] for more detail.
 
 ### 获取相簿或者文件夹 (`AssetPathEntity`)
 
-相簿或者文件夹以抽象类[`AssetPathEntity`][]的形式呈现，
-在安卓中表示为一个资源桶`MediaStore`，在iOS/macOS中则是`PHAssetCollection`的对象。
+相簿或者文件夹以抽象类 [`AssetPathEntity`][] 的形式呈现，
+在安卓中表示为一个资源桶 `MediaStore` ，在iOS/macOS中则是 `PHAssetCollection` 的对象。
 全部获取：
 
 ```dart
 final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList();
 ```
 
-在[`getAssetPathList`][]查看更多细节
+详情请参阅[`getAssetPathList`][]。
 
 ### 获取资源 (`AssetEntity`)
 
-资源（图片/视频/音频）都是以抽象类[`AssetEntity`][]的方式呈现
-在安卓中表示一系列`MediaStore`的范围，在iOS/macOS则是`PHAsset`的对象。
+资源（图片/视频/音频）都是以抽象类 [`AssetEntity`][] 的方式呈现
+在安卓中表示一系列 `MediaStore` 的字段，在iOS/macOS则是`PHAsset`的对象。
 
 
 #### PMFilter
@@ -259,7 +255,7 @@ final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList();
 `PhotoManager` 的 `AssetPathEntity`一些方法拥有一个过滤选项的配置。
 
 - PhotoManager
-  - getAssetPathList (通过此方法传递过滤参数能够传递进资源路径实体[AssetPathEntity](#获取相簿或者文件夹-assetpathentity)选择后的结果中)
+  - getAssetPathList (通过此方法传递过滤参数能够传递进资源路径实体 [AssetPathEntity](#获取相簿或者文件夹-assetpathentity) 选择后的结果中)
   - getAssetCount
   - getAssetListRange
   - getAssetListPaged
@@ -268,7 +264,7 @@ final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList();
   - fromId
   - obtainPathFromProperties (不推荐使用属性去获取路径)
 
-`PMFilter`有两个实现：
+`PMFilter`  有两个实现：
 - [PMFilterOptionGroup](#PMFilterOptionGroup)
 - [CustomFilter](#CustomFilter)
 
@@ -310,9 +306,9 @@ final FilterOptionGroup filterOption = FilterOptionGroup(
 
 ##### CustomFilter
 
-这是试验的特性，如果在使用自定过滤器上遇到任何问题欢迎按照模板提交issue
+这是实验性的功能，如果在使用自定过滤器上遇到任何问题欢迎按照模板提交issue
 
-`CustomFilter`自定义过滤器是在插件的2.6.0的版本时添加的，
+`CustomFilter` 自定义过滤器是在插件的2.6.0的版本时添加的，
 这能够提供更加灵活的筛选条件以针对不同的主机平台。
 
 这更加接近原生的使用方式，你可以自定义筛选和排序的条件。取决于你想用哪些字段进行过滤或者排序。
@@ -321,7 +317,7 @@ final FilterOptionGroup filterOption = FilterOptionGroup(
 **类似SQL一样的** 构建一段SQL语句。
 
 
-iOS或者android的列名是不一样的，所以你需要使用`CustomColumns.base`、`CustomColumns.android`或者`CustomColumns.darwin`去获取列名字。
+iOS或者android的列名是不一样的，所以你需要使用 `CustomColumns.base`、`CustomColumns.android`或者`CustomColumns.darwin` 去获取列名字。
 
 ```dart
 PMFilter createFilter() {
@@ -339,7 +335,7 @@ PMFilter createFilter() {
 
 `class AdvancedCustomFilter extends CustomFilter`
 
-AdvancedCustomFilter是CustomFilter的子类，可以通过builder的方式去创建一个过滤器
+AdvancedCustomFilter 是 CustomFilter 的子类，可以通过 builder 的方式去创建一个过滤器
 
 ```dart
 
@@ -385,19 +381,19 @@ PMFilter createFilter() {
   - `android` : 适用于安卓的列。
   - `darwin` : 适用于iOS/macOS。
 
-> PS: 需要注意的是，iOS使用Photos API，而Android使用ContentProvider，更接近SQLite。因此，尽管它们被称为“columns”，但这些字段在iOS/macOS上是PHAsset字段，在Android上是MediaStoreColumns字段。
+> PS: 需要注意的是，iOS使用 Photos API，而 Android使用ContentProvider，更接近SQLite。所以虽然它们被称为“columns”，但这些字段在iOS/macOS上是PHAsset字段，在Android上是MediaStoreColumns字段。
 
 ![flow_chart](flow_chart/advance_custom_filter.png)
 
 #### 通过 `AssetPathEntity`
 
-可以[分页][`getAssetListPaged`]获取：
+可以分页 [getAssetListPaged][`getAssetListPaged`] 获取：
 
 ```dart
 final List<AssetEntity> entities = await path.getAssetListPaged(page: 0, size: 80);
 ```
 
-也可以[随机][`getAssetListRange`]获取：
+也可以随机 [getAssetListRange][`getAssetListRange`] 获取：
 
 ```dart
 final List<AssetEntity> entities = await path.getAssetListRange(start: 0, end: 80);
@@ -411,13 +407,13 @@ final List<AssetEntity> entities = await path.getAssetListRange(start: 0, end: 8
 final int count = await PhotoManager.getAssetCount();
 ```
 
-然后使用[分页][`getAssetListPaged`]获取：
+然后使用分页 [getAssetListPaged][`getAssetListPaged`] 获取：
 
 ```dart
 final List<AssetEntity> entities = await PhotoManager.getAssetListPaged(page: 0, pageCount: 80);
 ```
 
-或使用[随机][`getAssetListRange`]获取：
+或使用随机 [getAssetListRange][`getAssetListRange`] 获取：
 
 ```dart
 final List<AssetEntity> entities = await PhotoManager.getAssetListRange(start: 0, end: 80);
@@ -430,10 +426,10 @@ final List<AssetEntity> entities = await PhotoManager.getAssetListRange(start: 0
 
 ID概念表示：
 
-- 安卓上`MediaStore`的ID字段 The ID field of the `MediaStore` on Android。
-- iOS上为`localIdentifier`，表示`PHAsset`的唯一标识。
+- 安卓上 `MediaStore` 的ID字段。
+- iOS上为 `localIdentifier`，表示 `PHAsset` 的唯一标识。
 
-如果您想要实现与持久选择相关的功能，可以存储ID。使用[AssetEntity.fromId] []在保留ID后检索Entity。
+如果您想要实现与持久选择相关的功能，可以存储ID。使用 [AssetEntity.fromId] []在保留ID后检索Entity。
 
 ```dart
 final AssetEntity? asset = await AssetEntity.fromId(id);
@@ -487,12 +483,12 @@ iOS中，为了节省磁盘空间，资源可能仅保存在iCloud上。
 为了提供响应灵敏的用户界面，您可以使用PMProgressHandler在加载文件时检索进度。
 
 
-首选实现是wechat_asset_picker中的[LocallyAvailableBuilder][]，它在下载文件时提供进度指示器。
+首选实现是 wechat_asset_picker 中的 [LocallyAvailableBuilder][]，它在下载文件时提供进度指示器。
 
 
 #### Assets的显示
 
-插件提供`AssetEntityImage`组件和`AssetEntityImageProvider`来显示Assets
+插件提供 `AssetEntityImage` 组件和 `AssetEntityImageProvider` 来显示Assets
 
 ```dart
 final Widget image = AssetEntityImage(
@@ -514,11 +510,11 @@ final Widget imageFromProvider = Image(
 
 #### 获取 "实况照片"
 
-插件支持获取和过滤live photos
+插件支持获取和过滤 live photos
 
 ##### 仅过滤“实况照片”
 
-只会在过滤图片的时候支持
+只在过滤图片的时候支持
 
 ```dart
 final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
@@ -544,12 +540,12 @@ final File? originVideoFile = await entity.originFileWithSubtype;
 
 由于Android 10上的隐私政策问题，为了获取带有位置信息和EXIF元数据的原始数据，必须授予位置权限。
 
-如果你想使用位置权限，请将`ACCESS_MEDIA_LOCATION`权限添加到清单中。
+如果你想使用位置权限，请将 `ACCESS_MEDIA_LOCATION` 权限添加到清单中。
 
 
 ##### 原始数据的使用
 
-`originFile`和`originBytes`的getter会返回实体的原始数据。
+`originFile` 和 `originBytes` 的getter会返回实体的原始数据。
 然而在Flutter中有一些情况下，原始数据是无效的。以下是一些常见的情况：
 
 - 在多个平台上，HEIC文件不被完全支持。我们建议您上传JPEG文件（99％质量压缩的缩略图），
@@ -559,11 +555,9 @@ final File? originVideoFile = await entity.originFileWithSubtype;
 
 ##### iOS上文件检索时间过长
 
-There are several I/O methods in this library targeting `AssetEntity`,
-typically they are:
 这个库中有几个针对 AssetEntity 的 I/O 方法，通常它们是：
 
-- 所有名称为 `file` 的方法.
+- 所有名称为  `file`  的方法.
 - `AssetEntity.originBytes`.
 
 在 iOS 上，文件的检索和缓存受到沙盒机制的限制。
@@ -580,8 +574,7 @@ typically they are:
 但它们将包含不同的内容。
 请参见[日志](log)文件夹以获取更多记录的日志。
 
-要为这些事件注册回调，请使用
-[PhotoManager.addChangeCallback] 添加回调，
+要为这些事件注册回调，请使用 [PhotoManager.addChangeCallback] 添加回调，
 并使用 [PhotoManager.removeChangeCallback] 移除回调，
 就像 addListener 和 removeListener 方法一样。
 
@@ -616,18 +609,18 @@ PhotoManager.stopChangeNotify();
 
 由于Android 10限制了直接访问资源路径的能力，
 因此图像缓存将在I/O处理过程中生成。
-更具体地说，当调用`file`，`originFile`和任何其他I/O获取器时，
+更具体地说，当调用 `file`，`originFile` 和任何其他I/O获取器时，
 插件将保存一个文件到缓存文件夹以供进一步使用。
 
 幸运的是，在Android 11及以上版本中，可以再次直接获取资源路径，
-但您仍然可以使用`requestLegacyExternalStorage`
+但您仍然可以使用 `requestLegacyExternalStorage`
 访问存储中的文件而不缓存它们。
 有关如何添加属性，请参见[Android 10+ (Q, 29)](#android-10--q-29-) for how to add the attribute.
 
 ### iOS缓存
 
 iOS没有直接提供API来访问相册的原始文件。
-因此，当您调用`file`, `originFile`和任何其他I/O获取器时，
+因此，当您调用 `file`, `originFile` 和任何其他I/O获取器时，
 将在当前应用程序的容器中本地生成一个缓存文件。
 
 如果在您的用例中占用磁盘空间很敏感，
@@ -651,7 +644,7 @@ Future<void> useEntity(AssetEntity entity) async {
 
 ### 清除缓存
 
-你可以使用`PhotoManager.clearFileCache()`方法来清除插件生成的所有缓存。
+你可以使用 `PhotoManager.clearFileCache()` 方法来清除插件生成的所有缓存。
 这些缓存生成于不同平台、类型和分辨率等情况下。
 
 | Platform | Thumbnail | File / Origin File |
@@ -665,8 +658,7 @@ Future<void> useEntity(AssetEntity entity) async {
 
 #### Glide issues
 
-如果您发现与Glide存在任何冲突，
-那么您需要编辑 `android/build.gradle` 文件：
+如果你发现与Glide存在任何冲突，那么需要编辑 `android/build.gradle` 文件：
 
 ```gradle
 rootProject.allprojects {
@@ -683,7 +675,7 @@ rootProject.allprojects {
 }
 ```
 
-如果您想了解如何同时使用ProGuard和Glide，请到 [ProGuard for Glide](https://github.com/bumptech/glide#proguard) 获取更多信息。
+如果您想了解如何同时使用 ProGuard 和 Glide，详情请参阅 [ProGuard for Glide](https://github.com/bumptech/glide#proguard)。
 
 #### Android 13 (API level 33) 额外配置
 
@@ -699,23 +691,23 @@ rootProject.allprojects {
 
 ### iOS额外配置
 
-#### Localized system albums name
+#### 本地化的系统相册名
 
 默认情况下，iOS 只会以英语检索系统相册的名称，
 无论设备上设置了什么语言。
 要更改默认语言，请按照以下步骤操作：
 
-- 用Xcode打开你的iOS项目(Runner.xcworkspace)
+- 用 Xcode 打开你的 iOS 项目 (Runner.xcworkspace)
 ![Edit localizations in Xcode 1](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterProjectEditinginXcode.png)
 
-- 选择project的“Runner”，在本地化表格中单击加号图标。
+- 选择你项目的 “Runner”，在本地化表格中单击加号图标。
 ![Edit localizations in Xcode 2](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterAddLocalization.png)
 
 - 选择您想要检索本地化字符串的语言。
 - 在不进行任何修改的情况下验证弹出屏幕。
 - 重新构建您的 Flutter 项目。
 
-Now system albums label should display accordingly.
+现在系统相册的标签应该能够相应地显示。
 
 ### 实验性功能
 
@@ -729,7 +721,7 @@ Now system albums label should display accordingly.
 
 #### 预加载缩略图
 
-您可以使用 [`PhotoCachingManager.requestCacheAssets`][] 或 `PhotoCachingManager.requestCacheAssetsWithIds` 方法来
+您可以使用 [`PhotoCachingManager.requestCacheAssets`][] 或 [`PhotoCachingManager.requestCacheAssetsWithIds`][] 方法来
 针对具有指定缩略图选项的实体预加载缩略图。
 
 
@@ -737,7 +729,7 @@ Now system albums label should display accordingly.
 PhotoCachingManager().requestCacheAssets(assets: assets, option: option);
 ```
 
-您可以通过调用 `PhotoCachingManager().cancelCacheRequest()` 方法随时停止预加载。
+您可以通过调用 [`PhotoCachingManager().cancelCacheRequest()`][] 方法随时停止预加载。
 
 通常，在预览资源时将使用缩略图。
 但有时我们希望预加载资源以使其显示更快。
@@ -777,7 +769,7 @@ final AssetEntity? newEntity = await PhotoManager.editor.copyAssetToPath(
 
 - 对于 Android，它会插入源Entity的副本：
   - 在平台 <=28 上，该方法将复制大部分来源信息。
-  - 在平台 >=29 上，某些字段无法在插入期间修改， 如[MediaColumns.RELATIVE_PATH][].
+  - 在平台 >=29 上，某些字段无法在插入期间修改， 如 [MediaColumns.RELATIVE_PATH][].
 - 对于 iOS，它会创建一个快捷方式，而不是创建一个新的Entity。
   - 一些相册是智能相册，它们的内容由系统自动管理， 不能手动插入Entity。
 
@@ -802,9 +794,9 @@ await PhotoManager.editor.android.moveAssetToAnother(
 ##### 移除所有不存在的Entities
 
 这将删除所有本地不存在的项目（记录）。
-安卓的 `MediaStore`  中的记录可能会对应的文件被删除。
+安卓的 `MediaStore` 中的记录可能会对应的文件被删除。
 这些异常行为通常是由文件管理器、辅助工具或 adb 工具造成的。
-此操作消耗资源，请在调用下一个操作之前使用  `await` 关键字调用清理过程。
+此操作消耗资源，请在调用下一个操作之前使用 `await` 关键字调用清理过程。
 
 ```dart
 await PhotoManager.editor.android.removeAllNoExistsAsset();
@@ -834,10 +826,10 @@ PhotoManager.editor.darwin.createAlbum(
 );
 ```
 
-##### 从相册中删除Entity
+##### 从相册中删除 Entity
 
 从特定相册中删除资产条目的条目。
-该Asset不会从设备中删除，只会从相册中删除。
+该 Asset 不会从设备中删除，只会从相册中删除。
 
 ```dart
 // 确保你的路径能够访问的 Make sure your path entity is accessible.
