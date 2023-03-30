@@ -317,7 +317,7 @@ final FilterOptionGroup filterOption = FilterOptionGroup(
 **类似SQL一样的** 构建一段SQL语句。
 
 
-iOS或者android的列名是不一样的，所以你需要使用 `CustomColumns.base`、`CustomColumns.android`或者`CustomColumns.darwin` 去获取列名字。
+iOS或者android的列名是不一样的，所以你需要使用 `CustomColumns.base`、`CustomColumns.android` 或者 `CustomColumns.darwin` 去获取列名字。
 
 ```dart
 PMFilter createFilter() {
@@ -729,7 +729,7 @@ rootProject.allprojects {
 PhotoCachingManager().requestCacheAssets(assets: assets, option: option);
 ```
 
-您可以通过调用 [`PhotoCachingManager().cancelCacheRequest()`][] 方法随时停止预加载。
+您可以通过调用 [`PhotoCachingManager().cancelCacheRequest`][] 方法随时停止预加载。
 
 通常，在预览资源时将使用缩略图。
 但有时我们希望预加载资源以使其显示更快。
@@ -874,6 +874,8 @@ PhotoManager.editor.darwin.deletePath();
 [`getAssetListRange`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetPathEntity/getAssetListRange.html
 [`AssetEntity.fromId`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetEntity/fromId.html
 [`PhotoCachingManager.requestCacheAssets`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoCachingManager/requestCacheAssets.html
+[`PhotoCachingManager.requestCacheAssetsWithIds`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoCachingManager/requestCacheAssetsWithIds.html
+[`PhotoCachingManager().cancelCacheRequest`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoCachingManager/cancelCacheRequest.html
 
 [`LocallyAvailableBuilder`]: https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/2055adfa74370339d10e6f09adef72f2130d2380/lib/src/widget/builder/locally_available_builder.dart
 
