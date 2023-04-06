@@ -24,13 +24,17 @@ class CommonFilterOption(map: Map<*, *>) : FilterOption() {
         val dateSelection = getDateCond(args, option)
         val sizeWhere = sizeWhere(requestType, option)
 
-        var where = "$typeSelection $dateSelection $sizeWhere"
+        val where = "$typeSelection $dateSelection $sizeWhere"
 
-        if (needAnd) {
-            where = " AND ( $where )"
+        if (where.trim().isEmpty()) {
+            return ""
         }
 
-        return where
+        if (needAnd) {
+            return " AND ( $where )"
+        }
+
+        return " ( $where ) "
     }
 
     override fun orderByCondString(): String? {
