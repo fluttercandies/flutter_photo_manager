@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.6.1
+
+Fix:
+
+- [#918](https://github.com/fluttercandies/flutter_photo_manager/issues/918) by [#919](https://github.com/fluttercandies/flutter_photo_manager/issues/919)
+
 ## 2.6.0
 
 Features:
