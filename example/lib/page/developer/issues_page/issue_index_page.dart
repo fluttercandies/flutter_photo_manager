@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:photo_manager_example/widget/nav_column.dart';
+import 'package:photo_manager_example/widget/theme_button.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'issue_734.dart';
+import 'issue_918.dart';
 
 class IssuePage extends StatelessWidget {
   const IssuePage({
@@ -15,46 +19,12 @@ class IssuePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Issue page'),
       ),
-      body: const _NavColumn(
+      body: const NavColumn(
         children: <Widget>[
           Issue734Page(),
+          Issue918Page(),
         ],
       ),
-    );
-  }
-}
-
-class _NavColumn extends StatelessWidget {
-  const _NavColumn({
-    Key? key,
-    required this.children,
-  }) : super(key: key);
-
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Center(
-        child: Column(
-          children: <Widget>[
-            for (final Widget item in children) buildItem(context, item),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildItem(BuildContext context, Widget item) {
-    return ElevatedButton(
-      child: Text(item.toString()),
-      onPressed: () {
-        Navigator.push<void>(
-          context,
-          MaterialPageRoute<void>(builder: (_) => item),
-        );
-      },
     );
   }
 }
@@ -62,16 +32,25 @@ class _NavColumn extends StatelessWidget {
 mixin IssueBase<T extends StatefulWidget> on State<T> {
   int get issueNumber;
 
+  String get issueUrl =>
+      'https://github.com/fluttercandies/flutter_photo_manager/issues/$issueNumber';
+
   Widget buildUrlButton() {
     return IconButton(
       icon: const Icon(Icons.info),
       onPressed: () {
-        final String issueUrl =
-            'https://github.com/fluttercandies/flutter_photo_manager/issues/$issueNumber';
-
         Clipboard.setData(ClipboardData(text: issueUrl));
-
         showToast('The issue of $issueNumber was been copied.');
+      },
+      tooltip: 'Copy issue url to clipboard.',
+    );
+  }
+
+  Widget _buildOpenButton() {
+    return IconButton(
+      icon: const Icon(Icons.open_in_new),
+      onPressed: () {
+        launchUrl(Uri.parse(issueUrl));
       },
       tooltip: 'Copy issue url to clipboard.',
     );
@@ -81,6 +60,7 @@ mixin IssueBase<T extends StatefulWidget> on State<T> {
     return AppBar(
       title: Text('$issueNumber issue page'),
       actions: <Widget>[
+        _buildOpenButton(),
         buildUrlButton(),
       ],
     );
@@ -98,9 +78,16 @@ mixin IssueBase<T extends StatefulWidget> on State<T> {
   }
 
   Widget buildButton(String text, VoidCallback onTap) {
-    return ElevatedButton(
+    return ThemeButton(
       onPressed: onTap,
-      child: Text(text),
+      text: text,
+    );
+  }
+
+  Widget buildScaffold(List<Widget> children) {
+    return Scaffold(
+      appBar: buildAppBar(),
+      body: buildBody(children),
     );
   }
 }
