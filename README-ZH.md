@@ -657,7 +657,7 @@ Future<void> useEntity(AssetEntity entity) async {
 
 #### Glide issues
 
-如果你发现与Glide存在任何版本冲突，那么需要编辑 `android/build.gradle` 文件：
+如果你的项目存在 Glide 的版本冲突问题，那么需要编辑 `android/build.gradle` 文件：
 
 ```gradle
 rootProject.allprojects {
