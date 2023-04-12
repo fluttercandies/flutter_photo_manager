@@ -1,3 +1,7 @@
+// Copyright 2018 The FlutterCandies author. All rights reserved.
+// Use of this source code is governed by an Apache license that can be found
+// in the LICENSE file.
+
 import 'custom/custom_columns.dart';
 import 'custom/custom_filter.dart';
 import 'custom/order_by_item.dart';
@@ -48,7 +52,7 @@ abstract class PMFilter {
 
   /// Whether the [AssetPathEntity]s will return with modified time.
   ///
-  /// This option is performance-consuming. Use with cautious.
+  /// This option is performance-consuming. Use with caution.
   ///
   /// See also:
   ///  * [AssetPathEntity.lastModified].
@@ -62,7 +66,7 @@ abstract class PMFilter {
   /// The subclass should override this method to make params.
   Map<String, dynamic> childMap();
 
-  /// The method only support for [FilterOptionGroup].
+  /// The method only supports for [FilterOptionGroup].
   PMFilter updateDateToNow();
 
   /// Convert the filter to a map for channel.
