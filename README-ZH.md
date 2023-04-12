@@ -391,7 +391,7 @@ PMFilter createFilter() {
 
 #### 通过 `AssetPathEntity` 获取 `AssetEntity`
 
-分页获取资源 [getAssetListPaged][`getAssetListPaged`]：
+按页码获取资源 [getAssetListPaged][`getAssetListPaged`]：
 
 ```dart
 final List<AssetEntity> entities = await path.getAssetListPaged(page: 0, size: 80);
