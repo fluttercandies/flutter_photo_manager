@@ -319,7 +319,8 @@ final FilterOptionGroup filterOption = FilterOptionGroup(
 **类 SQL** 的用法：
 
 
-[`SqlCustomFilter`] 能够构造出类似SQL语句一样的查询过滤方式，但是 iOS 或者 Android 的列名是不一样的，所以你需要使用 `CustomColumns.base` 、`CustomColumns.android` 或者 `CustomColumns.darwin` 去获取列名字。
+[`SqlCustomFilter`] 能够构造出类似SQL语句一样的查询过滤方式，但 iOS 或者 Android 的列名是不一样的，
+所以你需要使用 `CustomColumns.base` 、`CustomColumns.android` 或者 `CustomColumns.darwin` 去获取列名字。
 
 ```dart
 PMFilter createFilter() {
