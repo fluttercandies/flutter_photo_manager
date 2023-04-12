@@ -846,7 +846,7 @@ await PhotoManager.editor.darwin.removeAssetsInAlbum(
 );
 ```
 
-##### 删除一个路径实体
+##### 删除一个 `AssetPathEntity`
 
 一些相簿无法删除。
 
