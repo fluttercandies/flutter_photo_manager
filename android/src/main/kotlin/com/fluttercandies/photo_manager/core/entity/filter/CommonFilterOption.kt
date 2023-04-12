@@ -23,7 +23,18 @@ class CommonFilterOption(map: Map<*, *>) : FilterOption() {
         val typeSelection: String = getCondFromType(requestType, option, args)
         val dateSelection = getDateCond(args, option)
         val sizeWhere = sizeWhere(requestType, option)
-        return "$typeSelection $dateSelection $sizeWhere"
+
+        val where = "$typeSelection $dateSelection $sizeWhere"
+
+        if (where.trim().isEmpty()) {
+            return ""
+        }
+
+        if (needAnd) {
+            return " AND ( $where )"
+        }
+
+        return " ( $where ) "
     }
 
     override fun orderByCondString(): String? {
@@ -125,7 +136,7 @@ class CommonFilterOption(map: Map<*, *>) : FilterOption() {
             cond.append("( $audioCondString )")
         }
 
-        return "AND ( $cond )"
+        return "( $cond )"
     }
 
 

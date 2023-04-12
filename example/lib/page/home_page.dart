@@ -232,10 +232,3 @@ class _NewHomePageState extends State<NewHomePage> {
     await PhotoManager.presentLimited();
   }
 }
-
-Widget buildButton(String text, VoidCallback function) {
-  return ElevatedButton(
-    onPressed: function,
-    child: Text(text),
-  );
-}
