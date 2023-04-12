@@ -103,7 +103,7 @@ that can be found in the LICENSE file. -->
 
 ### 请在 pubspec.yaml 中添加以下依赖：
 
-两种方式添加到你的项目依赖中:
+有两种方式可以把依赖添加到你的项目中:
 
 - **(推荐)** 运行  `flutter pub add photo_manager`.
 - 或者直接在添加依赖到你的  `pubspec.yaml` 中  `dependencies` 部分:
