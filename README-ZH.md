@@ -235,7 +235,7 @@ PhotoManager.setIgnorePermissionCheck(true);
 ### 获取 `AssetPathEntity`
 
 相簿或者文件夹以抽象类 [`AssetPathEntity`][] 的形式呈现，
-在安卓中表示为一个资源桶 `MediaStore` ，在iOS/macOS中则是 `PHAssetCollection` 的对象。
+在安卓中它表示为具有相同 `bucketId` 的 `MediaStore` 行的集合，在iOS/macOS中则是 `PHAssetCollection` 的对象。
 
 获取所有相册：
 
