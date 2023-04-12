@@ -827,7 +827,7 @@ PhotoManager.editor.darwin.createAlbum(
 
 ##### 从相册中删除 Entity
 
-从特定相册中删除资产条目的条目。
+从特定相册中删除 Asset。
 该 Asset 不会从设备中删除，只会从相册中删除。
 
 ```dart
