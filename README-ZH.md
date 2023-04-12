@@ -262,7 +262,7 @@ final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList();
   - getAssetListRange
   - getAssetListPaged
 - AssetPathEntity
-  - constructor (不推荐开发者使用构造器自行创建资源)
+  - constructor (不推荐使用者自行使用构造器创建它，因为无法保证实现)
   - fromId
   - obtainPathFromProperties (不推荐使用属性去获取路径)
 
