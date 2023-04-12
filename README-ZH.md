@@ -370,7 +370,7 @@ PMFilter createFilter() {
 
 **CustomFilter** 主要有以下几个类:
 
-- `CustomFilter` : 自定义过滤器的基类
+- `CustomFilter`: 自定义过滤器的基类
 - `OrderByItem` :  能够实现排序的类. 
 - `SqlCustomFilter` : `CustomFilter`的子类之一，通常用来构建出跟SQL一样的过滤器。
 - `AdvancedCustomFilter`: `CustomFilter`的子类之一，能够构建更高级的过滤选项的过滤器。
