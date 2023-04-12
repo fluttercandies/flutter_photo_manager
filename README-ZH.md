@@ -125,7 +125,7 @@ import 'package:photo_manager/photo_manager.dart';
 ### 原生平台的配置
 
 最低的平台版本:
-**Android 16, iOS 9.0, macOS 10.15**.
+**Android API 16, iOS 9.0, macOS 10.15**.
 
 - Android:  [Android 配置准备](#android-config-preparation).
 - iOS:  [iOS 配置准备](#ios-config-preparation).
