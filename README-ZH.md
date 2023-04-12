@@ -384,7 +384,8 @@ PMFilter createFilter() {
   - `android` : 适用于安卓的列。
   - `darwin` : 适用于iOS/macOS。
 
-> PS: 需要注意的是，iOS使用 Photos API，而 Android使用 ContentProvider ，更接近 SQLite 。所以虽然它们被称为 “columns”，但这些字段实际上在 iOS/macOS 上是 PHAsset 字段，而在 Android 上则是 MediaStoreColumns 字段。
+> PS: 需要注意的是，iOS 使用 Photos API，而 Android 使用 ContentProvider, Android 的写法更接近 SQLite，
+> 所以虽然都是 "columns"，但在 iOS/macOS 上它们是 PHAsset 的字段，而在 Android 上则是 MediaStoreColumns 的数据库字段。
 
 ![flow_chart](flow_chart/advance_custom_filter.png)
 
