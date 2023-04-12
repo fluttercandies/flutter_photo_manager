@@ -247,7 +247,7 @@ final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList();
 
 ### 获取资源 (`AssetEntity`)
 
-资源（图片/视频/音频）都是以抽象类 [`AssetEntity`][] 的方式呈现
+资源（图片/视频/音频）都是以 [`AssetEntity`][] 的方式呈现，它抽象了原生对象，尽量抹平原生差异
 在安卓中表示一系列 `MediaStore` 的字段，在iOS/macOS则是`PHAsset`的对象。
 
 
