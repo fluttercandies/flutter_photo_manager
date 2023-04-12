@@ -97,7 +97,7 @@ that can be found in the LICENSE file. -->
 
 ## 常见问题
 
-你可以在 [GitHub issues][] 上搜索到经常遇到的问题，比如构建错误，运行时异常等等
+你可以在 [GitHub issues][] 上搜索到经常遇到的问题，比如构建错误，运行时异常等等。
 
 ## 使用前准备
 
