@@ -397,7 +397,7 @@ PMFilter createFilter() {
 final List<AssetEntity> entities = await path.getAssetListPaged(page: 0, size: 80);
 ```
 
-也可以获取范围 [getAssetListRange][`getAssetListRange`]：
+也可以按开始和结束序号来获取 [getAssetListRange][`getAssetListRange`]：
 
 ```dart
 final List<AssetEntity> entities = await path.getAssetListRange(start: 0, end: 80);
