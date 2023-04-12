@@ -257,7 +257,7 @@ final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList();
 这个参数用于根据条件过滤资源。
 
 - PhotoManager
-  - getAssetPathList (通过此方法传递过滤参数能够传递进资源路径实体 [`AssetPathEntity`][] 选择后的结果中)
+  - getAssetPathList (通过此方法传递的 `filterOption` 参数会被传递进返回结果的每一个 [`AssetPathEntity`][] 中)
   - getAssetCount
   - getAssetListRange
   - getAssetListPaged
