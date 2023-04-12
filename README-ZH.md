@@ -106,7 +106,7 @@ that can be found in the LICENSE file. -->
 有两种方式可以把依赖添加到你的项目中:
 
 - **(推荐)** 运行  `flutter pub add photo_manager`.
-- 或者直接在添加依赖到你的  `pubspec.yaml` 中  `dependencies` 部分:
+- 或者直接添加到项目的 `pubspec.yaml` 中的 `dependencies` 部分:
 
 ```yaml
 dependencies:
