@@ -67,10 +67,10 @@ class FilterOption {
 
   /// Returns a [Map] representation of this [FilterOption] object, with keys corresponding to the property names.
   Map<String, dynamic> toMap() {
-    return {
-      'needTitle': needTitle,
-      'sizeConstraint': sizeConstraint.toMap(),
-      'durationConstraint': durationConstraint.toMap(),
+    return <String, dynamic>{
+      'title': needTitle,
+      'size': sizeConstraint.toMap(),
+      'duration': durationConstraint.toMap(),
     };
   }
 
