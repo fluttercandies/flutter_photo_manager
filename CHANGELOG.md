@@ -16,7 +16,7 @@ that can be found in the LICENSE file. -->
 
 ## 2.6.0
 
-Features:
+### Features:
 
 - Support `CustomFilter` for more filter options. (#901)
 - Add two new static methods for `PhotoManager`:
