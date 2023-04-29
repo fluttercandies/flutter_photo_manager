@@ -6,9 +6,13 @@ that can be found in the LICENSE file. -->
 
 ## 2.6.1
 
-Fix:
+### Improvements
 
-- [#918](https://github.com/fluttercandies/flutter_photo_manager/issues/918) by [#919](https://github.com/fluttercandies/flutter_photo_manager/issues/919)
+- Roll dependencies on Android. (#933)
+
+### Fixes
+
+- Fix filter option group. (#919)
 
 ## 2.6.0
 
