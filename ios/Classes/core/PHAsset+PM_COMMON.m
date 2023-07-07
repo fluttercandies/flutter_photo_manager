@@ -30,7 +30,7 @@
 
 - (bool)isLivePhoto {
     if (@available(iOS 9.1, *)) {
-        return [self mediaSubtypes] == PHAssetMediaSubtypePhotoLive;
+        return (self.mediaSubtypes & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive;
     }
     return NO;
 }

@@ -13,6 +13,7 @@ that can be found in the LICENSE file. -->
 ### Fixes
 
 - Fix filter option group. (#919)
+- Fix `originFileWithSubtype` and `fileWithSubtype` for livePhoto.
 
 ## 2.6.0
 
