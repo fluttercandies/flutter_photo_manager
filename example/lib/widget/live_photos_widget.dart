@@ -41,8 +41,8 @@ class _LivePhotosWidgetState extends State<LivePhotosWidget> {
     if (!mounted || url == null) {
       return;
     }
-    _controller = VideoPlayerController.network(
-      url,
+    _controller = VideoPlayerController.networkUrl(
+      Uri.parse(url),
       videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
     )
       ..initialize()
