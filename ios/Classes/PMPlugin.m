@@ -224,16 +224,16 @@
 #if __MAC_11_0
     if (@available(macOS 11.0, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
-            [self replyPermssionResult:handler status:status];
+            [self replyPermssionResult:handler status:status isOnlyAdd:(requestAccessLevel == PHAccessLevelAddOnly)];
         }];
     } else {
         [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-            [self replyPermssionResult:handler status:status];
+            [self replyPermssionResult:handler status:status isOnlyAdd:NO];
         }];
     }
 #else
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-        [self replyPermssionResult:handler status:status];
+        [self replyPermssionResult:handler status:status isOnlyAdd:NO];
     }];
 #endif
 }
