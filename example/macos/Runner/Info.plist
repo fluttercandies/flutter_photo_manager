@@ -4,6 +4,8 @@
 <dict>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>I will use photo library</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>You must agree the additions permission to save assets.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>

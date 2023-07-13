@@ -28,10 +28,12 @@ typedef void (^AssetResult)(PMAssetEntity *);
 @property(nonatomic, strong) NSObject <PMConvertProtocol> *converter;
 
 - (BOOL)isAuth;
+- (void)setAuth:(BOOL)auth;
+
+- (BOOL)isOnlyAddAuth;
+- (void)setOnlyAddAuth:(BOOL)auth;
 
 + (void)openSetting:(NSObject<PMResultHandler>*)result;
-
-- (void)setAuth:(BOOL)auth;
 
 - (NSArray<PMAssetPathEntity *> *)getAssetPathList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(NSObject<PMBaseFilter> *)option;
 

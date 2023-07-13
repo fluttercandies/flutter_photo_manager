@@ -36,10 +36,34 @@
     self.notificationManager = [PMNotificationManager managerWithRegistrar:registrar];
 }
 
+- (void) requestOnlyAddPermission:(void(^)(PHAuthorizationStatus status))handler {
+#if TARGET_OS_OSX
+    if (@available(macOS 11.0, *)) {
+        [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelAddOnly handler:handler];
+    } else {
+        [PHPhotoLibrary requestAuthorization: handler];
+    }
+#endif
+
+#if TARGET_OS_IOS
+    if (@available(iOS 14.0, *)) {
+        [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelAddOnly handler:handler];
+    } else {
+        [PHPhotoLibrary requestAuthorization: handler];
+    }
+#endif
+}
+
 - (void)onMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
     ResultHandler *handler = [ResultHandler handlerWithResult:result];
     PMManager *manager = self.manager;
-
+    
+    BOOL onlyAdd = NO;
+    if (call.arguments && [call.arguments isKindOfClass:[NSDictionary class]]){
+        id onlyAddParams = call.arguments[@"onlyAddPermission"];
+        onlyAdd = onlyAddParams && [onlyAddParams boolValue];
+    }
+    
     if ([call.method isEqualToString:@"requestPermissionExtend"]) {
         int requestAccessLevel = [call.arguments[@"iosAccessLevel"] intValue];
         [self handlePermission:manager handler:handler requestAccessLevel:requestAccessLevel];
@@ -58,26 +82,44 @@
         [handler reply:@1];
     } else if (manager.isAuth) {
         [self onAuth:call result:result];
+    } else if (onlyAdd && manager.isOnlyAddAuth) {
+        [self onAuth:call result:result];
     } else {
         if (ignoreCheckPermission) {
             [self onAuth:call result:result];
         } else {
-            [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-              BOOL auth = PHAuthorizationStatusAuthorized == status;
-              [manager setAuth:auth];
-              if (auth) {
-                  [self onAuth:call result:result];
-              } else {
-                  [handler replyError:@"need permission"];
-              }
-            }];
+            if (onlyAdd) {
+                [self requestOnlyAddPermission:^(PHAuthorizationStatus status) {
+                    BOOL auth = PHAuthorizationStatusAuthorized == status;
+                    [manager setOnlyAddAuth:auth];
+                    if (auth) {
+                        [self onAuth:call result:result];
+                    } else {
+                        [handler replyError:@"need add permission"];
+                    }
+                }];
+            } else {
+                [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+                    BOOL auth = PHAuthorizationStatusAuthorized == status;
+                    [manager setAuth:auth];
+                    if (auth) {
+                        [self onAuth:call result:result];
+                    } else {
+                        [handler replyError:@"need permission"];
+                    }
+                }];
+            }
         }
     }
 }
 
-- (void)replyPermssionResult:(ResultHandler *)handler status:(PHAuthorizationStatus)status {
+- (void)replyPermssionResult:(ResultHandler *)handler status:(PHAuthorizationStatus)status isOnlyAdd:(BOOL)isOnlyAdd {
     BOOL auth = PHAuthorizationStatusAuthorized == status;
-    [self.manager setAuth:auth];
+    if (isOnlyAdd) {
+        [self.manager setOnlyAddAuth:auth];
+    } else {
+        [self.manager setAuth:auth];
+    }
     [handler reply:@(status)];
 }
 
@@ -107,11 +149,11 @@
 #if __IPHONE_14_0
     if (@available(iOS 14, *)) {
         [PHPhotoLibrary requestAuthorizationForAccessLevel:requestAccessLevel handler:^(PHAuthorizationStatus status) {
-          [self replyPermssionResult:handler status:status];
+          [self replyPermssionResult:handler status:status isOnlyAdd: (requestAccessLevel == PHAccessLevelAddOnly)];
         }];
     } else {
         [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-          [self replyPermssionResult:handler status:status];
+          [self replyPermssionResult:handler status:status isOnlyAdd:NO];
         }];
     }
 #else
