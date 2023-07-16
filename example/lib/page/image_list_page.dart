@@ -192,7 +192,7 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                 <int>[500, 600, 700, 1000, 1500, 2000],
               ),
             ),
-            if (Platform.isIOS)
+            if (Platform.isIOS || Platform.isMacOS)
               ElevatedButton(
                 child: const Text('Toggle isFavorite'),
                 onPressed: () async {
@@ -214,6 +214,13 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                     setState(() {});
                   }
                 },
+              ),
+            if ((Platform.isIOS || Platform.isMacOS) && entity.isLivePhoto)
+              ElevatedButton(
+                onPressed: () {
+                  showLivePhotoInfo(entity);
+                },
+                child: const Text('Show live photo'),
               ),
           ],
         ),
@@ -445,5 +452,13 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
         );
       });
     }
+  }
+
+  Future<void> showLivePhotoInfo(AssetEntity entity) async {
+    final fileWithSubtype = await entity.originFile;
+    final originFileWithSubtype = await entity.originFileWithSubtype;
+
+    print('fileWithSubtype = $fileWithSubtype');
+    print('originFileWithSubtype = $originFileWithSubtype');
   }
 }

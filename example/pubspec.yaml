@@ -17,6 +17,7 @@ dependencies:
   photo_manager:
     path: ../
   provider: ^6.0.0
+  url_launcher: ^6.1.10
   video_player: ^2.1.14
 
 dev_dependencies:

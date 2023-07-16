@@ -1,28 +1,26 @@
 // Copyright 2018 The FlutterCandies author. All rights reserved.
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
-
 import 'package:flutter/foundation.dart';
 
 import '../internal/constants.dart';
 import '../internal/enums.dart';
 
-/// The [width] and [height] dimensions
-/// for the thumbnail data of an [AssetEntity].
+/// The dimensions of the thumbnail data for an [AssetEntity].
 @immutable
 class ThumbnailSize {
+  /// Creates a new [ThumbnailSize] object with the given width and height.
   const ThumbnailSize(this.width, this.height);
 
-  /// Creates a square [ThumbnailSize] whose [width] and [height]
-  /// are the given dimension.
+  /// Creates a square [ThumbnailSize] with the given dimension.
   const ThumbnailSize.square(int dimension)
       : width = dimension,
         height = dimension;
 
-  /// The width pixels.
+  /// The width in pixels.
   final int width;
 
-  /// The height pixels.
+  /// The height in pixels.
   final int height;
 
   /// Whether this size encloses a non-zero area.
@@ -48,9 +46,10 @@ class ThumbnailSize {
   String toString() => 'ThumbnailSize($width, $height)';
 }
 
-/// The thumbnail option when requesting assets.
+/// The options used when requesting thumbnails.
 @immutable
 class ThumbnailOption {
+  /// Creates a new [ThumbnailOption] object with the given parameters.
   const ThumbnailOption({
     required this.size,
     this.format = ThumbnailFormat.jpeg,
@@ -58,7 +57,7 @@ class ThumbnailOption {
     this.frame = 0,
   });
 
-  /// Construct thumbnail options only for iOS/macOS.
+  /// Constructs thumbnail options for iOS/macOS only.
   factory ThumbnailOption.ios({
     required ThumbnailSize size,
     ThumbnailFormat format = ThumbnailFormat.jpeg,
@@ -77,26 +76,30 @@ class ThumbnailOption {
     );
   }
 
-  /// The thumbnail size.
+  /// The size of the thumbnail.
   final ThumbnailSize size;
 
-  /// {@macro photo_manager.ThumbnailFormat}
+  /// The format of the thumbnail.
+  ///
+  /// See [ThumbnailFormat] for available formats.
   final ThumbnailFormat format;
 
   /// The quality value for the thumbnail.
   ///
-  /// Valid from 1 to 100.
+  /// Must be a value between 1 and 100 (inclusive).
+  ///
   /// Defaults to [PMConstants.vDefaultThumbnailQuality].
   final int quality;
 
-  /// The frame when loading thumbnail for videos.
+  /// The frame number when loading a thumbnail for videos.
   ///
-  /// This field only works for Android, since Glide accept the frame option
-  /// in request options.
+  /// This field is only used on Android, since Glide accepts the `frame`
+  /// option in request options.
   ///
   /// Defaults to 0.
   final int frame;
 
+  /// Converts this object to a map.
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'width': size.width,
@@ -107,11 +110,12 @@ class ThumbnailOption {
     };
   }
 
+  /// Checks that the assertions for this object are valid.
   void checkAssertions() {
     assert(!size.isEmpty, 'The size must not be empty.');
     assert(
       quality > 0 && quality <= 100,
-      'The quality must between 1 and 100',
+      'The quality must be between 1 and 100',
     );
   }
 
@@ -131,8 +135,10 @@ class ThumbnailOption {
   }
 }
 
+/// A version of [ThumbnailOption] that is used on iOS/macOS only.
 @immutable
 class _IOSThumbnailOption extends ThumbnailOption {
+  /// Creates a new [_IOSThumbnailOption] object with the given parameters.
   const _IOSThumbnailOption({
     required ThumbnailSize size,
     ThumbnailFormat format = ThumbnailFormat.jpeg,
@@ -142,8 +148,13 @@ class _IOSThumbnailOption extends ThumbnailOption {
     required this.resizeContentMode,
   }) : super(size: size, format: format, quality: quality);
 
+  /// The delivery mode for the thumbnail.
   final DeliveryMode deliveryMode;
+
+  /// The resize mode for the thumbnail.
   final ResizeMode resizeMode;
+
+  /// The resize content mode for the thumbnail.
   final ResizeContentMode resizeContentMode;
 
   @override

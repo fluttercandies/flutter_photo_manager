@@ -4,9 +4,20 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.6.1
+
+### Improvements
+
+- Roll dependencies on Android. (#933)
+
+### Fixes
+
+- Fix filter option group. (#919)
+- Fix `originFileWithSubtype` and `fileWithSubtype` for livePhoto.
+
 ## 2.6.0
 
-Features:
+### Features:
 
 - Support `CustomFilter` for more filter options. (#901)
 - Add two new static methods for `PhotoManager`:

@@ -13,9 +13,11 @@ import '../types/entity.dart';
 import '../types/types.dart';
 import 'notify_manager.dart';
 
-/// The core manager of this plugin.
-/// Use various methods in this class to access & manage assets.
+/// The core manager of this package, providing methods for accessing and managing assets.
 class PhotoManager {
+  /// Creates a new instance of the [PhotoManagerPlugin] class with an optional plugin instance to use instead of the global singleton.
+  ///
+  /// This is primarily intended for use in testing scenarios where you need to inject a mock or stubbed plugin instance.
   @visibleForTesting
   PhotoManager.withPlugin([base.PhotoManagerPlugin? photoManagerPlugin]) {
     if (photoManagerPlugin != null && photoManagerPlugin != base.plugin) {
@@ -23,13 +25,13 @@ class PhotoManager {
     }
   }
 
-  /// Editor instance for editing assets.
+  /// An editor instance for performing edits on assets.
   static final Editor editor = Editor();
 
-  /// Notify manager instance for managing photo changes.
+  /// A notify manager instance for managing asset change notifications.
   static final NotifyManager _notifyManager = NotifyManager();
 
-  /// The core class plugin that handles all methods in channels.
+  /// The global singleton of the [PhotoManagerPlugin] class that handles all method channels.
   static base.PhotoManagerPlugin get plugin => base.plugin;
 
   /// ### Android (AndroidManifest.xml)
@@ -91,7 +93,7 @@ class PhotoManager {
     );
   }
 
-  /// Whether the plugin should produce logs during the running process.
+  /// Controls whether the plugin should log messages to the console during operation.
   static Future<void> setLog(bool isLog) => plugin.setLog(isLog);
 
   /// Whether to ignore all runtime permissions check.
@@ -150,6 +152,13 @@ class PhotoManager {
     }
   }
 
+  /// Forces the plugin to use the old API for accessing the device's media library on Android 10 and above.
+  ///
+  /// This method should only be used as a last resort if the new API is not functioning correctly on certain devices.
+  /// Using this method may have negative effects on performance and stability, and is not recommended unless absolutely necessary.
+  /// If you are planning to publish your app on Google Play Store, it is not recommended to use this API.
+  ///
+  /// This method is asynchronous and returns a [Future] that completes when the operation is finished.
   static Future<void> forceOldApi() => plugin.forceOldApi();
 
   /// Get the system version.
@@ -158,7 +167,18 @@ class PhotoManager {
   /// Clear all file caches.
   static Future<void> clearFileCache() => plugin.clearFileCache();
 
-  /// Get the asset count
+  /// Returns the count of assets.
+  ///
+  /// This static method invokes the `getAssetCount()` method of the `plugin`
+  /// object to get the count of all assets. The optional `filterOption` parameter
+  /// allows you to filter the assets based on specific criteria.
+  /// By default, the `type` parameter is set to `RequestType.common`, which means that only common assets are counted.
+  ///
+  /// Parameters:
+  /// - `filterOption`: An optional parameter of type `PMFilter` that filters the assets based on specific criteria. Defaults to null.
+  /// - `type`: An optional parameter of type `RequestType`. Specifies the type of asset to count. Defaults to `RequestType.common`.
+  ///
+  /// Returns: A `Future<int>` object representing the number of assets requested.
   static Future<int> getAssetCount({
     PMFilter? filterOption,
     RequestType type = RequestType.common,

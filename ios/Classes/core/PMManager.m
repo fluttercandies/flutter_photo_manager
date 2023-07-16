@@ -460,7 +460,7 @@
     if (entity && entity.phAsset) {
         PHAsset *asset = entity.phAsset;
         if (@available(iOS 9.1, *)) {
-            if (asset.isLivePhoto && subtype == PHAssetMediaSubtypePhotoLive) {
+            if (asset.isLivePhoto && (subtype & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
                 [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler];
                 return;
             }

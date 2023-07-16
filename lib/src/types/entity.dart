@@ -265,7 +265,7 @@ class AssetPathEntity {
     DateTime? lastModified,
     RequestType? type,
     bool? isAll,
-    FilterOptionGroup? filterOption,
+    PMFilter? filterOption,
   }) {
     return AssetPathEntity(
       id: id ?? this.id,
@@ -817,12 +817,16 @@ class AssetEntity {
   String toString() => 'AssetEntity(id: $id , type: $type)';
 }
 
-/// Longitude and latitude.
+/// Represents a geographical location as a latitude-longitude pair.
 @immutable
 class LatLng {
+  /// Creates a new [LatLng] object with the given latitude and longitude.
   const LatLng({this.latitude, this.longitude});
 
+  /// The latitude of this location in degrees.
   final double? latitude;
+
+  /// The longitude of this location in degrees.
   final double? longitude;
 
   @override
