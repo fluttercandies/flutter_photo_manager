@@ -22,7 +22,7 @@ you can get assets (image/video/audio) on Android, iOS and macOS.
 ## Projects using this plugin
 
 | name                 | pub                                                                                                                | github                                                                                                                                                                  |
-| :------------------- | :----------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|:---------------------|:-------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | wechat_assets_picker | [![pub package](https://img.shields.io/pub/v/wechat_assets_picker)](https://pub.dev/packages/wechat_assets_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker) |
 | wechat_camera_picker | [![pub package](https://img.shields.io/pub/v/wechat_camera_picker)](https://pub.dev/packages/wechat_camera_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_camera_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_camera_picker) |
 
@@ -35,66 +35,73 @@ you can get assets (image/video/audio) on Android, iOS and macOS.
 For versions upgrade across major versions,
 see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
 
+<details>
+  <summary>TOC</summary>
+
 <!-- TOC -->
-- [photo\_manager](#photo_manager)
-  - [Projects using this plugin](#projects-using-this-plugin)
-  - [Articles about this plugin](#articles-about-this-plugin)
-  - [Migration guide](#migration-guide)
-  - [Common issues](#common-issues)
-  - [Prepare for use](#prepare-for-use)
-    - [Add the plugin reference to pubspec.yaml](#add-the-plugin-reference-to-pubspecyaml)
-    - [Import in your projects](#import-in-your-projects)
-    - [Configure native platforms](#configure-native-platforms)
-      - [Android config preparation](#android-config-preparation)
-        - [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
-        - [Android 10+ (Q, 29)](#android-10-q-29)
-        - [Glide](#glide)
-      - [iOS config preparation](#ios-config-preparation)
-  - [Usage](#usage)
-    - [Request for permission](#request-for-permission)
-      - [Limited entities access on iOS](#limited-entities-access-on-ios)
-    - [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders-assetpathentity)
-    - [Get assets (`AssetEntity`)](#get-assets-assetentity)
-      - [PMFilter](#pmfilter)
-        - [PMFilterOptionGroup](#pmfilteroptiongroup)
-        - [CustomFilter](#customfilter)
-      - [From `AssetPathEntity`](#from-assetpathentity)
-      - [From `PhotoManager` (Since 2.6.0)](#from-photomanager-since-260)
-      - [From ID](#from-id)
-      - [From raw data](#from-raw-data)
-      - [From iCloud](#from-icloud)
-      - [Display assets](#display-assets)
-      - [Obtain "Live Photos"](#obtain-live-photos)
-        - [Filtering only "Live Photos"](#filtering-only-live-photos)
-        - [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
-      - [Limitations](#limitations)
-        - [Android 10 media location permission](#android-10-media-location-permission)
-        - [Usage of the original data](#usage-of-the-original-data)
-        - [Long retrieving duration with file on iOS](#long-retrieving-duration-with-file-on-ios)
-    - [Entities change notify](#entities-change-notify)
-  - [Cache mechanism](#cache-mechanism)
-    - [Cache on Android](#cache-on-android)
-    - [Cache on iOS](#cache-on-ios)
-    - [Clear caches](#clear-caches)
-  - [Native extra configs](#native-extra-configs)
-    - [Android extra configs](#android-extra-configs)
-      - [Glide issues](#glide-issues)
-      - [Android 13 (Api 33) extra configs](#android-13-api-33-extra-configs)
-    - [iOS extra configs](#ios-extra-configs)
-      - [Localized system albums name](#localized-system-albums-name)
-    - [Experimental features](#experimental-features)
-      - [Preload thumbnails](#preload-thumbnails)
-      - [Delete entities](#delete-entities)
-      - [Copy an entity](#copy-an-entity)
-      - [Features for Android only](#features-for-android-only)
-        - [Move an entity to another album](#move-an-entity-to-another-album)
-        - [Remove all non-exist entities](#remove-all-non-exist-entities)
-      - [Features for iOS or macOS](#features-for-ios-or-macos)
-        - [Create a folder](#create-a-folder)
-        - [Create an album](#create-an-album)
-        - [Remove the entity entry from the album](#remove-the-entity-entry-from-the-album)
-        - [Delete a path entity](#delete-a-path-entity)
+* [photo_manager](#photomanager)
+  * [Projects using this plugin](#projects-using-this-plugin)
+  * [Articles about this plugin](#articles-about-this-plugin)
+  * [Migration guide](#migration-guide)
+  * [Common issues](#common-issues)
+  * [Prepare for use](#prepare-for-use)
+    * [Add the plugin reference to pubspec.yaml](#add-the-plugin-reference-to-pubspecyaml)
+    * [Import in your projects](#import-in-your-projects)
+    * [Configure native platforms](#configure-native-platforms)
+      * [Android config preparation](#android-config-preparation)
+        * [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
+        * [Android 10 (Q, 29)](#android-10-q-29)
+        * [Glide](#glide)
+      * [iOS config preparation](#ios-config-preparation)
+  * [Usage](#usage)
+    * [Request for permission](#request-for-permission)
+      * [Limited entities access on iOS](#limited-entities-access-on-ios)
+    * [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders-assetpathentity)
+    * [Get assets (`AssetEntity`)](#get-assets-assetentity)
+      * [From `AssetPathEntity`](#from-assetpathentity)
+      * [From `PhotoManager` (Since 2.6)](#from-photomanager-since-26)
+      * [From ID](#from-id)
+      * [From raw data](#from-raw-data)
+      * [From iCloud](#from-icloud)
+      * [Display assets](#display-assets)
+      * [Obtain "Live Photos"](#obtain-live-photos)
+        * [Filtering only "Live Photos"](#filtering-only-live-photos)
+        * [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
+      * [Limitations](#limitations)
+        * [Android 10 media location permission](#android-10-media-location-permission)
+        * [Usage of the original data](#usage-of-the-original-data)
+        * [Long retrieving duration with file on iOS](#long-retrieving-duration-with-file-on-ios)
+    * [Entities change notify](#entities-change-notify)
+  * [Filtering](#filtering)
+    * [FilterOptionGroup](#filteroptiongroup)
+    * [CustomFilter](#customfilter)
+      * [Advanced CustomFilter](#advanced-customfilter)
+      * [Classes explanations](#classes-explanations)
+  * [Cache mechanism](#cache-mechanism)
+    * [Cache on Android](#cache-on-android)
+    * [Cache on iOS](#cache-on-ios)
+    * [Clear caches](#clear-caches)
+  * [Native extra configs](#native-extra-configs)
+    * [Android extra configs](#android-extra-configs)
+      * [Glide issues](#glide-issues)
+      * [Android 13 (Api 33) extra configs](#android-13-api-33-extra-configs)
+    * [iOS extra configs](#ios-extra-configs)
+      * [Localized system albums name](#localized-system-albums-name)
+    * [Experimental features](#experimental-features)
+      * [Preload thumbnails](#preload-thumbnails)
+      * [Delete entities](#delete-entities)
+      * [Copy an entity](#copy-an-entity)
+      * [Features for Android only](#features-for-android-only)
+        * [Move an entity to another album](#move-an-entity-to-another-album)
+        * [Remove all non-exist entities](#remove-all-non-exist-entities)
+      * [Features for iOS or macOS](#features-for-ios-or-macos)
+        * [Create a folder](#create-a-folder)
+        * [Create an album](#create-an-album)
+        * [Remove the entity entry from the album](#remove-the-entity-entry-from-the-album)
+        * [Delete `AssetPathEntity`](#delete-assetpathentity)
 <!-- TOC -->
+
+</details>
 
 ## Common issues
 
@@ -137,8 +144,7 @@ Minimum platform versions:
 
 ##### Kotlin, Gradle, AGP
 
-Starting from 1.2.7, We ship this plugin with
-**Kotlin `1.5.21`** and **Android Gradle Plugin `4.1.0`**.
+We ship this plugin with **Kotlin `1.6.21`**.
 If your projects use a lower version of Kotlin/Gradle/AGP,
 please upgrade them to a newer version.
 
@@ -147,19 +153,20 @@ More specifically:
 - Upgrade your Gradle version (`gradle-wrapper.properties`)
   to `7.5.1` or the latest version.
 - Upgrade your Kotlin version (`ext.kotlin_version`)
-  to `1.5.30` or the latest version.
+  to `1.7.21` or the latest version.
 - Upgrade your AGP version (`com.android.tools.build:gradle`)
   to `7.2.2` or the latest version.
 
-##### Android 10+ (Q, 29)
+##### Android 10 (Q, 29)
 
-_If you're not compiling or targeting with 29 and above, you can skip this section._
+_If you're not setting your `compileSdkVersion` or `targetSdkVersion` to 29,
+you can skip this section._
 
 On Android 10, **Scoped Storage** was introduced,
 which causes the origin resource file not directly
 inaccessible through it file path.
 
-If your `compileSdkVersion` or `targetSdkVersion is `29`,
+If your `compileSdkVersion` or `targetSdkVersion` is `29`,
 you can consider adding `android:requestLegacyExternalStorage="true"`
 to your `AndroidManifest.xml` in order to obtain resources:
 
@@ -213,8 +220,8 @@ It's pretty much the same as the `NSPhotoLibraryUsageDescription`.
 Most of the APIs can only use with granted permission.
 
 ```dart
-final PermissionState _ps = await PhotoManager.requestPermissionExtend();
-if (_ps.isAuth) {
+final PermissionState ps = await PhotoManager.requestPermissionExtend();
+if (ps.isAuth) {
   // Granted.
 } else {
   // Limited(iOS) or Rejected, use `==` for more precise judgements.
@@ -224,19 +231,21 @@ if (_ps.isAuth) {
 
 But if you're pretty sure your callers will be only called
 after the permission is granted, you can ignore permission checks:
-
 ```dart
 PhotoManager.setIgnorePermissionCheck(true);
 ```
 
+For background processing (such as when the app is not in the foreground),
+ignore permissions check would be proper solution.
+
 #### Limited entities access on iOS
 
-With iOS 14 released, Apple brought a "Limited Photos Library" to iOS.
-So use the `PhotoManager.requestPermissionExtend()` to request permissions.
-The method will return `PermissionState`.
+With iOS 14 released, Apple brought a "Limited Photos Library" permission
+(`PermissionState.limited`) to iOS.
+The `PhotoManager.requestPermissionExtend()` method will return `PermissionState`.
 See [PHAuthorizationStatus][] for more detail.
 
-To reselect accessible entites for the app,
+To reselect accessible entities for the app,
 use `PhotoManager.presentLimited()` to call the modal of
 accessible entities' management.
 This method only available for iOS 14+ and when the permission state
@@ -262,178 +271,36 @@ Assets (images/videos/audios) are abstracted as the [`AssetEntity`][] class.
 It represents a series of fields with `MediaStore` on Android,
 and the `PHAsset` object on iOS/macOS.
 
-
-#### PMFilter
-
-Some methods of `PhotoManager` and `AssetPathEntity` have a `filterOption`.
-
-- PhotoManager
-  - getAssetPathList (The filter param passed in by this method will be passed into the AssetPathEntity of the result)
-  - getAssetCount
-  - getAssetListRange
-  - getAssetListPaged
-- AssetPathEntity
-  - constructor (Method not recommended for users)
-  - fromId
-  - obtainPathFromProperties (Method not recommended for users)
-
-The `PMFilter` have two implementations:
-- [PMFilterOptionGroup](#PMFilterOptionGroup)
-- [CustomFilter](#CustomFilter)
-
-##### PMFilterOptionGroup
-
-Before 2.6.0, the only way to implement it.
-
-```dart
-final FilterOptionGroup filterOption = FilterOptionGroup(
-  imageOption: FilterOption(
-    sizeConstraint: SizeConstraint(
-      maxWidth: 10000,
-      maxHeight: 10000,
-      minWidth: 100,
-      minHeight: 100,
-      ignoreSize: false,
-    ),
-  ),
-  videoOption: FilterOption(
-    durationConstraint: DurationConstraint(
-      min: Duration(seconds: 1),
-      max: Duration(seconds: 30),
-      allowNullable: false,
-    ),
-  ),
-  createTimeCondition: DateTimeCondition(
-    min: DateTime(2020, 1, 1),
-    max: DateTime(2020, 12, 31),
-  ),
-  orders: [
-    OrderOption(
-      type: OrderOptionType.createDate,
-      asc: false,
-    ),
-  ],
-  /// other options
-);
-```
-
-##### CustomFilter
-
-This is an **experimental feature**, please submit an issue if you have any problems.
-
-`CustomFilter` was added in the 2.6.0 version of the plugin,
-which provide more flexible filtering conditions against host platforms.
-
-It is closer to the native way of use.
-You can customize where conditions and order conditions. 
-It is up to you to decide which fields to use for filtering and sorting
-
-
-**Like sql** construct a sql statement.
-
-The column name of iOS or android is different, so you need to use the `CustomColumns.base`、`CustomColumns.android` or `CustomColumns.darwin` to get the column name.
-
-```dart
-PMFilter createFilter() {
-  final CustomFilter filterOption = CustomFilter.sql(
-    where: '${CustomColumns.base.width} > 100 AND ${CustomColumns.base.height} > 200',
-    orderBy: [OrderByItem.desc(CustomColumns.base.createDate)],
-  );
-
-  return filterOption;
-}
-```
-
-**Advanced** filter
-
-`class AdvancedCustomFilter extends CustomFilter`
-
-The `AdvancedCustomFilter` is a subclass of `CustomFilter`, The have builder methods to help make a filter.
-
-```dart
-
-PMFilter createFilter() {
-  final group = WhereConditionGroup()
-          .and(
-            ColumnWhereCondition(
-              column: CustomColumns.base.width,
-              value: '100',
-              operator: '>',
-            ),
-          )
-          .or(
-            ColumnWhereCondition(
-              column: CustomColumns.base.height,
-              value: '200',
-              operator: '>',
-            ),
-          );
-
-  final filter = AdvancedCustomFilter()
-          .addWhereCondition(group)
-          .addOrderBy(column: CustomColumns.base.createDate, isAsc: false);
-  
-  return filter;
-}
-
-```
-
-**Main class** of custom filter
-
-- `CustomFilter` : The base class of custom filter.
-- `OrderByItem` : The class of order by item. 
-- `SqlCustomFilter` : The subclass of `CustomFilter`, It is used to make a like sql filter.
-- `AdvancedCustomFilter`: The subclass of `CustomFilter`, It is used to make a advanced filter.
-  - `WhereConditionItem` : The class of where condition item.
-    - `TextWhereCondition`: The class of where condition. The text will not be checked.
-    - `WhereConditionGroup` : The class of where condition group. The class is used to make a group of where condition.
-    - `ColumnWhereCondition`: The class of where condition. The column will be checked.
-    - `DateColumnWhereCondition`: The class of where condition. Because dates have different conversion methods on iOS/macOS, this implementation smoothes the platform differences
-- `CustomColumns` : This class contains fields for different platforms. 
-  - `base` : The common fields are included here, but please note that the "id" field is invalid in iOS and may even cause errors. It is only valid on Android.
-  - `android` : The columns of android.
-  - `darwin` : The columns of iOS/macOS.
-
-> PS: The CustomColumns should be noted that iOS uses the Photos API, while Android uses ContentProvider, which is closer to SQLite. Therefore, even though they are called "columns," these fields are PHAsset fields on iOS/macOS and MediaStoreColumns fields on Android.
-
-![flow_chart](flow_chart/advance_custom_filter.png)
-
 #### From `AssetPathEntity`
 
 You can use [the pagination method][`getAssetListPaged`]:
-
 ```dart
 final List<AssetEntity> entities = await path.getAssetListPaged(page: 0, size: 80);
 ```
 
 Or use [the range method][`getAssetListRange`]:
-
 ```dart
 final List<AssetEntity> entities = await path.getAssetListRange(start: 0, end: 80);
 ```
 
-#### From `PhotoManager` (Since 2.6.0)
+#### From `PhotoManager` (Since 2.6)
 
 First, You need get count of assets:
-
 ```dart
 final int count = await PhotoManager.getAssetCount();
 ```
 
-Then, you can use [the pagination method][`getAssetListPaged`]:
-
+Then, you can use [the pagination method][`PhotoManager.getAssetListPaged`]:
 ```dart
 final List<AssetEntity> entities = await PhotoManager.getAssetListPaged(page: 0, pageCount: 80);
 ```
 
-Or use [the range method][`getAssetListRange`]:
-
+Or use [the range method][`PhotoManager.getAssetListRange`]:
 ```dart
 final List<AssetEntity> entities = await PhotoManager.getAssetListRange(start: 0, end: 80);
 ```
 
-**Note:**
-The `page`, `start` is base 0.
+**Note:** `page` and `start` starts from **0**.
 
 #### From ID
 
@@ -446,7 +313,6 @@ You can store the ID if you want to implement features
 that's related to persistent selections.
 Use [`AssetEntity.fromId`][] to retrieve the entity
 once you persist an ID.
-
 ```dart
 final AssetEntity? asset = await AssetEntity.fromId(id);
 ```
@@ -457,11 +323,10 @@ so the result might be null.
 
 #### From raw data
 
-You can create your own entity from raw data,
+You can create an entity from raw data,
 such as downloaded images, recorded videos, etc.
 The created entity will show as a corresponding resource
 on your device's gallery app.
-
 ```dart
 final Uint8List rawData = yourRawData;
 
@@ -486,8 +351,8 @@ final AssetEntity? videoEntity = await PhotoManager.editor.saveVideo(
 
 // [iOS only] Save a live photo from image and video `File`.
 // This only works when both image and video file were part of same live photo.
-final File imageFile = File('path/to/your/livephoto.heic');
-final File videoFile = File('path/to/your/livevideo.mp4');
+final File imageFile = File('path/to/your/live_photo.heic');
+final File videoFile = File('path/to/your/live_video.mp4');
 final AssetEntity? entity = await PhotoManager.editor.darwin.saveLivePhoto(
   imageFile: imageFile,
   videoFile: videoFile,
@@ -502,7 +367,7 @@ so the result might be null.
 #### From iCloud
 
 Resources might be saved only on iCloud to save disk space.
-When retrieving file from iCloud, the speed is depend on the network condition,
+When retrieving file from iCloud, the speed is depended on the network condition,
 which might be very slow that makes users feel anxious.
 To provide a responsive user interface, you can use `PMProgressHandler`
 to retrieve the progress when load a file.
@@ -515,7 +380,6 @@ when the file is downloading.
 
 The plugin provided the `AssetEntityImage` widget and
 the `AssetEntityImageProvider` to display assets:
-
 ```dart
 final Widget image = AssetEntityImage(
   yourAssetEntity,
@@ -541,7 +405,6 @@ This plugin supports obtain live photos and filtering them:
 ##### Filtering only "Live Photos"
 
 This is supported when filtering only image.
-
 ```dart
 final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
   type: RequestType.image,
@@ -580,7 +443,7 @@ However, there are some cases that the original data is invalid in Flutter.
 Here are some common cases:
 
 - HEIC files are not fully supported across platforms. We suggest you to
-  upload the JPEG file (99% quality compressed thumbnail) in order to keep
+  upload the JPEG file (`.file` if the file is HEIC) in order to keep
   a consistent behavior between multiple platforms.
   See [flutter/flutter#20522][] for more detail.
 - Videos will only be obtained in the original format,
@@ -601,7 +464,7 @@ In generally, a `PHAsset` will have three status:
 
 - `isLocallyAvailable` equals `true`, **also cached**: Available for obtain.
 - `isLocallyAvailable` equals `true`, **but not cached**: When you call I/O methods,
-  the resource will first cached into the sandbox, then available for obtain.
+  the resource will first cache into the sandbox, then available for obtain.
 - `isLocallyAvailable` equals `false`: Typically this means the asset exists,
   but it's saved only on iCloud, or some videos that not exported yet.
   In this case, the best practise is to use the `PMProgressHandler`
@@ -614,13 +477,13 @@ but they will include different contents.
 See [the `logs` folder](log) for more recorded logs.
 
 To register a callback for these events, use
-[`PhotoManager.addChangeCallback`] to add a callback,
-and use [`PhotoManager.removeChangeCallback`] to remove the callback,
+`PhotoManager.addChangeCallback` to add a callback,
+and use `PhotoManager.removeChangeCallback` to remove the callback,
 just like `addListener` and `removeListener` methods.
 
 After you added/removed callbacks, you can call
-[`PhotoManager.startChangeNotify`] method to enable to notify,
-and [`PhotoManager.stopChangeNotify`] method to stop notify.
+`PhotoManager.startChangeNotify` method to enable to notify,
+and `PhotoManager.stopChangeNotify` method to stop notify.
 
 ```dart
 import 'package:flutter/services.dart';
@@ -642,6 +505,131 @@ PhotoManager.removeChangeCallback(changeNotify);
 PhotoManager.stopChangeNotify();
 ```
 
+## Filtering
+
+Filtering assets are also supported by the plugin.
+Below methods have the `filterOption` argument to define the conditions when obtaining assets.
+- PhotoManager
+  - getAssetPathList (Accessible with `AssetPathEntity.filterOption`)
+  - getAssetCount
+  - getAssetListRange
+  - getAssetListPaged
+- AssetPathEntity
+  - constructor (not recommended to use directly)
+  - fromId
+  - obtainPathFromProperties (not recommended to use directly)
+
+There are two implementations of filters:
+- [FilterOptionGroup](#FilterOptionGroup)
+- [CustomFilter](#CustomFilter)
+
+### FilterOptionGroup
+
+The `FilterOptionGroup` is the only implementation before v2.6.0.
+
+```dart
+final FilterOptionGroup filterOption = FilterOptionGroup(
+  imageOption: FilterOption(
+    sizeConstraint: SizeConstraint(
+      maxWidth: 10000,
+      maxHeight: 10000,
+      minWidth: 100,
+      minHeight: 100,
+      ignoreSize: false,
+    ),
+  ),
+  videoOption: FilterOption(
+    durationConstraint: DurationConstraint(
+      min: Duration(seconds: 1),
+      max: Duration(seconds: 30),
+      allowNullable: false,
+    ),
+  ),
+  createTimeCondition: DateTimeCondition(
+    min: DateTime(2020, 1, 1),
+    max: DateTime(2020, 12, 31),
+  ),
+  orders: [
+    OrderOption(
+      type: OrderOptionType.createDate,
+      asc: false,
+    ),
+  ],
+  /// other options
+);
+```
+
+### CustomFilter
+
+**NOTE:** The `CustomFilter` is still a newbie of the plugin that introduced in v2.6.0,
+please help us to improve it by submitting issues if you've met any related problems.
+
+`CustomFilter` provides flexible filtering conditions, and it's targeting host platforms.
+The usages of the filter are more look close to native integrations,
+which is a `SQL-like` filter.
+
+The SQL columns name on Android and Darwin (iOS/macOS) are different,
+you'll need to use `CustomColumns.base`, `CustomColumns.android` and `CustomColumns.darwin`
+to get the columns name correctly.
+
+An example for how to construct a `CustomFilter`:
+```dart
+CustomFilter createFilter() {
+  return CustomFilter.sql(
+    where: '${CustomColumns.base.width} > 100 AND ${CustomColumns.base.height} > 200',
+    orderBy: [OrderByItem.desc(CustomColumns.base.createDate)],
+  );
+}
+```
+
+#### Advanced CustomFilter
+
+`AdvancedCustomFilter` is a subclass of `CustomFilter`,
+it has builder methods to help create the filter.
+
+```dart
+CustomFilter createFilter() {
+  final group = WhereConditionGroup()
+      .and(
+        ColumnWhereCondition(
+          column: CustomColumns.base.width,
+          value: '100',
+          operator: '>',
+        ),
+      )
+      .or(
+        ColumnWhereCondition(
+          column: CustomColumns.base.height,
+          value: '200',
+          operator: '>',
+        ),
+      );
+  final filter = AdvancedCustomFilter()
+      .addWhereCondition(group)
+      .addOrderBy(column: CustomColumns.base.createDate, isAsc: false);
+  return filter;
+}
+```
+
+#### Classes explanations
+
+- `CustomFilter`: The base class of custom filter.
+- `SqlCustomFilter`: Creates a SQL-like filter.
+- `AdvancedCustomFilter`: Creates an advanced filter.
+  - `OrderByItem`: The class of ORDER BY item.
+  - `WhereConditionItem`: The class of WHERE condition item.
+    - `WhereConditionGroup`: Create a group of where condition.
+    - `TextWhereCondition`: The text will not be verified if it's valid.
+    - `ColumnWhereCondition`: The input column will be verified if it's valid.
+    - `DateColumnWhereCondition`: Dates have different conversion methods on iOS/macOS, it helps to smoothest the platform differences.
+- `CustomColumns`: This class contains fields for different platforms.
+  - `base`: The common fields are included here, but please note that the "id" field is invalid in iOS and may even cause errors. It is only valid on Android.
+  - `android`: The columns of the Android platform.
+  - `darwin`: The columns of iOS/macOS platforms.
+
+Here is the flow chart to explain how advanced filter works:
+![flow_chart](flow_chart/advance_custom_filter.png)
+
 ## Cache mechanism
 
 ### Cache on Android
@@ -654,7 +642,8 @@ the plugin will save a file in the cache folder for further use.
 Fortunately, on Android 11 and above, the resource path can be obtained directly again,
 but you can still use `requestLegacyExternalStorage`
 to access files in the storage without caching them.
-See [Android 10+ (Q, 29)](#android-10--q-29-) for how to add the attribute.
+See [Android 10 (Q, 29)](#android-10-q-29) for how to add the attribute.
+The attribute is not required.
 
 ### Cache on iOS
 
@@ -673,7 +662,7 @@ Future<void> useEntity(AssetEntity entity) async {
   File? file;
   try {
     file = await entity.file;
-    handleFile(file!); // Custom method to handle the obtained file.
+    await handleFile(file!); // Custom method to handle the obtained file.
   } finally {
     if (Platform.isIOS) {
       file?.deleteSync(); // Delete it once the process has done.
@@ -690,8 +679,8 @@ Here are caches generation on different platforms,
 types and resolutions.
 
 | Platform | Thumbnail | File / Origin File |
-| -------- | --------- | ------------------ |
-| Android  | Yes       | No                 |
+|----------|-----------|--------------------|
+| Android  | Yes       | Yes (Android 10+)  |
 | iOS      | No        | Yes                |
 
 ## Native extra configs
@@ -723,7 +712,8 @@ if you want to know more about using ProGuard and Glide together.
 
 #### Android 13 (Api 33) extra configs
 
-When targeting Android 13 (API level 33), the following extra configs needs to be added to the manifest:
+When targeting Android 13 (API level 33),
+the following extra configs needs to be added to the manifest:
 
 ```xml
 <manifest>
@@ -753,9 +743,12 @@ To change the default language, see the following steps:
 
 Now system albums label should display accordingly.
 
+**Note**: Localize is not meant to customize albums name.
+
 ### Experimental features
 
 **Warning**: Features here aren't guaranteed to be fully usable
+across platforms and OS versions,
 since they involved with data modification.
 They can be modified/removed in any time,
 without following a proper version semantic.
@@ -766,7 +759,7 @@ Some APIs will make irreversible modification/deletion to data.
 #### Preload thumbnails
 
 You can preload thumbnails for entities with specified thumbnail options
-using [`PhotoCachingManager.requestCacheAssets`][]
+using `PhotoCachingManager.requestCacheAssets`
 or `PhotoCachingManager.requestCacheAssetsWithIds`.
 
 ```dart
@@ -776,7 +769,7 @@ PhotoCachingManager().requestCacheAssets(assets: assets, option: option);
 And you can stop in anytime by calling
 `PhotoCachingManager().cancelCacheRequest()`.
 
-Usually, when we're previewing assets, thumbnails will be use.
+Usually, when we're previewing assets, thumbnails will be loaded instantly.
 But sometimes we want to preload assets to make them display faster.
 
 The `PhotoCachingManager` uses the [PHCachingImageManager][] on iOS,
@@ -856,7 +849,8 @@ await PhotoManager.editor.android.removeAllNoExistsAsset();
 
 Some operating systems will prompt confirmation dialogs
 for each entities' deletion, we have no way to avoid them.
-Make sure your customers accept repeatedly confirmations.
+Make sure you're using the correct method,
+and your customers accept repeatedly confirmations.
 
 #### Features for iOS or macOS
 
@@ -865,7 +859,7 @@ Make sure your customers accept repeatedly confirmations.
 ```dart
 PhotoManager.editor.darwin.createFolder(
   name,
-  parent: parent, // Null, the root path or accessible folders.
+  parent: parent, // The value should be null, the root path or other accessible folders.
 );
 ```
 
@@ -874,7 +868,7 @@ PhotoManager.editor.darwin.createFolder(
 ```dart
 PhotoManager.editor.darwin.createAlbum(
   name,
-  parent: parent, // Null, the root path or accessible folders.
+  parent: parent, // The value should be null, the root path or other accessible folders.
 );
 ```
 
@@ -901,7 +895,7 @@ await PhotoManager.editor.darwin.removeAssetsInAlbum(
 );
 ```
 
-##### Delete a path entity
+##### Delete `AssetPathEntity`
 
 Smart albums can't be deleted.
 
@@ -924,8 +918,9 @@ PhotoManager.editor.darwin.deletePath();
 [`getAssetPathList`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoManager/getAssetPathList.html
 [`getAssetListPaged`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetPathEntity/getAssetListPaged.html
 [`getAssetListRange`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetPathEntity/getAssetListRange.html
+[`PhotoManager.getAssetListPaged`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoManager/getAssetListPaged.html
+[`PhotoManager.getAssetListRange`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoManager/getAssetListRange.html
 [`AssetEntity.fromId`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetEntity/fromId.html
-[`PhotoCachingManager.requestCacheAssets`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoCachingManager/requestCacheAssets.html
 
 [`LocallyAvailableBuilder`]: https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/2055adfa74370339d10e6f09adef72f2130d2380/lib/src/widget/builder/locally_available_builder.dart
 
