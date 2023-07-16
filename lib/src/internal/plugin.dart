@@ -66,7 +66,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return ConvertUtils.convertToPathList(
       result.cast<String, dynamic>(),
       type: type,
-      optionGroup: filterOption,
+      filterOption: filterOption,
     );
   }
 
@@ -447,7 +447,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return ConvertUtils.convertToPathList(
       items.cast<String, dynamic>(),
       type: pathEntity.type,
-      optionGroup: pathEntity.filterOption,
+      filterOption: pathEntity.filterOption,
     );
   }
 

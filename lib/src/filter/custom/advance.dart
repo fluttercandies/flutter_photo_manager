@@ -427,7 +427,7 @@ class DateColumnWhereCondition extends WhereConditionItem {
 ///
 /// If you are an advanced user and insist on using it,
 /// please understand the following:
-/// - Android: How to write where with `ContentReslover`.
+/// - Android: How to write where with `ContentResolver`.
 /// - iOS/macOS: How to format `NSPredicate`.
 ///
 /// {@endtemplate}
