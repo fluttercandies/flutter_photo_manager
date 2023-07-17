@@ -254,6 +254,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return deleted.cast<String>();
   }
 
+  final Map<String, dynamic> onlyAddPermission = <String, dynamic>{
+    'onlyAddPermission': true,
+  };
+
   Future<AssetEntity?> saveImage(
     typed_data.Uint8List data, {
     required String? title,
@@ -267,6 +271,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
         'title': title,
         'desc': desc ?? '',
         'relativePath': relativePath,
+        ...onlyAddPermission,
       },
     );
     if (result == null) {
@@ -296,6 +301,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
         'title': title,
         'desc': desc ?? '',
         'relativePath': relativePath,
+        ...onlyAddPermission,
       },
     );
     if (result == null) {
@@ -324,6 +330,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
         'title': title,
         'desc': desc ?? '',
         'relativePath': relativePath,
+        ...onlyAddPermission,
       },
     );
     if (result == null) {
@@ -358,6 +365,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
         'title': title,
         'desc': desc ?? '',
         'relativePath': relativePath,
+        ...onlyAddPermission,
       },
     );
     if (result == null) {

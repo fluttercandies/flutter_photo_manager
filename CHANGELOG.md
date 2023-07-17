@@ -14,6 +14,7 @@ that can be found in the LICENSE file. -->
 
 - Fix filter option group. (#919)
 - Fix `originFileWithSubtype` and `fileWithSubtype` for livePhoto.
+- Fix: support only add permission for iOS/macOS. (#944)
 
 ## 2.6.0
 

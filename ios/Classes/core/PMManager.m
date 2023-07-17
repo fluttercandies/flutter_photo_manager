@@ -16,6 +16,7 @@
 
 @implementation PMManager {
     BOOL __isAuth;
+    BOOL __isOnlyAddAuth;
     PMCacheContainer *cacheContainer;
 
     PHCachingImageManager *__cachingManager;
@@ -37,6 +38,15 @@
 
 - (void)setAuth:(BOOL)auth {
     __isAuth = auth;
+}
+
+
+- (BOOL)isOnlyAddAuth {
+    return __isOnlyAddAuth;
+}
+
+- (void)setOnlyAddAuth:(BOOL)auth {
+    __isOnlyAddAuth = auth;
 }
 
 - (PHCachingImageManager *)cachingManager {
@@ -367,6 +377,10 @@
 }
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)assetId {
+    if (!self.isAuth) {
+        return nil;
+    }
+    
     return [self getAssetEntity:assetId withCache:YES];
 }
 
