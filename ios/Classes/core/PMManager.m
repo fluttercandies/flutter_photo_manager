@@ -479,6 +479,12 @@
                 return;
             }
         }
+        if (@available(macOS 14.0, *)) {
+            if (asset.isLivePhoto && (subtype & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
+                [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler];
+                return;
+            }
+        }
         if (asset.isVideo) {
             if (isOrigin) {
                 [self fetchOriginVideoFile:asset handler:handler progressHandler:progressHandler];
@@ -705,6 +711,7 @@
                          resource:(PHAssetResource *)resource
                          isOrigin:(Boolean)isOrigin
                           manager:(NSFileManager *)manager {
+    NSString *id = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
     NSString *modifiedDate = [NSString stringWithFormat:@"%f", asset.modificationDate.timeIntervalSince1970];
     NSString *homePath = NSTemporaryDirectory();
     NSMutableString *path = [NSMutableString stringWithString:homePath];
@@ -714,7 +721,7 @@
     } else {
         filename = [asset valueForKey:@"filename"];
     }
-    filename = [NSString stringWithFormat:@"%@%@_%@", modifiedDate, isOrigin ? @"_o" : @"", filename];
+    filename = [NSString stringWithFormat:@"%@_%@%@_%@", id, modifiedDate, isOrigin ? @"_o" : @"", filename];
     NSString *typeDirPath;
     if (resource) {
         typeDirPath = resource.isImage ? PM_IMAGE_CACHE_PATH : PM_VIDEO_CACHE_PATH;
@@ -727,7 +734,7 @@
     }
     [manager createDirectoryAtPath:dirPath withIntermediateDirectories:true attributes:@{} error:nil];
     [path appendFormat:@"%@/%@", typeDirPath, filename];
-    [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"PHAsset path = %@", path]];
+    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"PHAsset path = %@", path]];
     return path;
 }
 
