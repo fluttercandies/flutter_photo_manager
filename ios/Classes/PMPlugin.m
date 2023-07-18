@@ -54,6 +54,33 @@
 #endif
 }
 
+
+- (void)requestPermissionForWriteAndRead:(void (^)(BOOL auth))handler {
+#if TARGET_OS_OSX
+    if (@available(macOS 11.0, *)) {
+        [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelReadWrite handler:^(PHAuthorizationStatus status) {
+          handler(status == PHAuthorizationStatusAuthorized || status == PHAuthorizationStatusLimited);
+        }];
+    } else {
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+          handler(status == PHAuthorizationStatusAuthorized);
+        }];
+    }
+#endif
+
+#if TARGET_OS_IOS
+    if (@available(iOS 14.0, *)) {
+        [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelReadWrite handler:^(PHAuthorizationStatus status) {
+          handler(status == PHAuthorizationStatusAuthorized || status == PHAuthorizationStatusLimited);
+        }];
+    } else {
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+          handler(status == PHAuthorizationStatusAuthorized);
+        }];
+    }
+#endif
+}
+
 - (void)onMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
     ResultHandler *handler = [ResultHandler handlerWithResult:result];
     PMManager *manager = self.manager;
@@ -99,14 +126,13 @@
                     }
                 }];
             } else {
-                [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-                    BOOL auth = PHAuthorizationStatusAuthorized == status;
-                    [manager setAuth:auth];
-                    if (auth) {
-                        [self onAuth:call result:result];
-                    } else {
-                        [handler replyError:@"need permission"];
-                    }
+                [self requestPermissionForWriteAndRead:^(BOOL auth) {
+                  [manager setAuth:auth];
+                  if (auth) {
+                      [self onAuth:call result:result];
+                  } else {
+                      [handler replyError:@"need permission"];
+                  }
                 }];
             }
         }
