@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_example/page/developer/android/column_names_page.dart';
 import 'package:photo_manager_example/page/developer/custom_filter_page.dart';
@@ -61,6 +62,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
             onPressed: () => navToWidget(const RemoveAndroidNotExistsExample()),
           ),
           ElevatedButton(
+            onPressed: _requestPermission,
+            child: const Text('Request permission'),
+          ),
+          ElevatedButton(
             onPressed: _upload,
             child: const Text('upload file to local to test EXIF.'),
           ),
@@ -72,6 +77,11 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
             ElevatedButton(
               onPressed: _saveLivePhoto,
               child: const Text('Save live photo'),
+            ),
+          if (Platform.isIOS || Platform.isMacOS)
+            ElevatedButton(
+              onPressed: _testNeedTitle,
+              child: const Text('Show needTitle in console'),
             ),
           ElevatedButton(
             onPressed: _navigatorSpeedOfTitle,
@@ -281,6 +291,53 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
     Log.d('on change ${call.method} ${call.arguments}');
     PhotoManager.removeChangeCallback(_callback);
     _isNotify = false;
+  }
+
+  Future<void> _testNeedTitle() async {
+    final status = await PhotoManager.requestPermissionExtend(
+      requestOption: const PermissionRequestOption(
+          iosAccessLevel: IosAccessLevel.readWrite),
+    );
+
+    if (!status.isAuth) {
+      showToast('Cannot have permission');
+      return;
+    }
+
+    Future<void> showInfo(String title, PMFilter option) async {
+      final assetList = await PhotoManager.getAssetListPaged(
+        page: 0,
+        pageCount: 20,
+        filterOption: option,
+        type: RequestType.image,
+      );
+
+      print('Show info for option: $title');
+
+      for (final asset in assetList) {
+        print('asset title: ${asset.title}');
+      }
+    }
+
+    final option1 = FilterOptionGroup(
+      imageOption: const FilterOption(
+        needTitle: true,
+      ),
+    );
+
+    await showInfo('option1', option1);
+
+    final PMFilter option2 = AdvancedCustomFilter()..needTitle = true;
+    await showInfo('option2', option2);
+  }
+
+  Future<void> _requestPermission() async {
+    final authStatus = await PhotoManager.requestPermissionExtend(
+      requestOption: const PermissionRequestOption(
+        iosAccessLevel: IosAccessLevel.readWrite,
+      ),
+    );
+    print('auth status: $authStatus');
   }
 
   @override

@@ -16,6 +16,7 @@ that can be found in the LICENSE file. -->
 - Fix `originFileWithSubtype` and `fileWithSubtype` for livePhoto.
 - Fix: support only add permission for iOS/macOS. (#944)
 - Fix: modified the output path for iOS(add id in next path).
+- Fix: `needTitle` for `CustomFilter`.
 
 ## 2.6.0
 
