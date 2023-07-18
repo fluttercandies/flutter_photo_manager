@@ -43,6 +43,7 @@ abstract class CustomFilter extends PMFilter {
     return <String, dynamic>{
       'where': makeWhere(),
       'orderBy': makeOrderBy().map((e) => e.toMap()).toList(),
+      'needTitle': needTitle,
     };
   }
 
@@ -50,6 +51,9 @@ abstract class CustomFilter extends PMFilter {
   PMFilter updateDateToNow() {
     return this;
   }
+
+  /// Whether the [AssetEntity]s will return with title.
+  bool needTitle = false;
 
   /// Make the where condition.
   String makeWhere();

@@ -17,6 +17,7 @@ that can be found in the LICENSE file. -->
 - Fix: support only add permission for iOS/macOS. (#944)
 - Fix: modified the output path for iOS(add id in next path).
 - Fix: Fixed a possible problem with the permission for darwin.
+- Fix: `needTitle` for `CustomFilter`.
 
 ## 2.6.0
 
