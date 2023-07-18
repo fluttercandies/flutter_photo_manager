@@ -7,6 +7,7 @@ import 'dart:io';
 import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/services.dart';
+import 'package:photo_manager/src/filter/path_filter.dart';
 
 import '../filter/base_filter.dart';
 import '../filter/classical/filter_option_group.dart';
@@ -31,6 +32,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     bool onlyAll = false,
     RequestType type = RequestType.common,
     PMFilter? filterOption,
+    required PMPathFilter pathFilterOption,
   }) async {
     if (onlyAll) {
       assert(hasAll, 'If only is true, then the hasAll must be not null.');
@@ -58,6 +60,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
         'hasAll': hasAll,
         'onlyAll': onlyAll,
         'option': filterOption.toMap(),
+        "pathOption": pathFilterOption.toMap(),
       },
     );
     if (result == null) {

@@ -11,6 +11,7 @@ typedef void (^ChangeIds)(NSArray<NSString *> *);
 @class PMFilterOption;
 @class PMFilterOptionGroup;
 @class PMThumbLoadOption;
+@class PMPathFilterOption;
 
 #import "PMProgressHandlerProtocol.h"
 #import "PMResultHandler.h"
@@ -35,7 +36,7 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 + (void)openSetting:(NSObject<PMResultHandler>*)result;
 
-- (NSArray<PMAssetPathEntity *> *)getAssetPathList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(NSObject<PMBaseFilter> *)option;
+- (NSArray<PMAssetPathEntity *> *)getAssetPathList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(NSObject <PMBaseFilter> *)option pathFilterOption:(PMPathFilterOption *)pathFilterOption;
 
 - (NSUInteger)getAssetCountFromPath:(NSString *)id type:(int)type filterOption:(NSObject<PMBaseFilter> *)filterOption;
 

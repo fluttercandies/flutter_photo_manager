@@ -8,6 +8,7 @@
 #import "PMThumbLoadOption.h"
 #import "PMProgressHandler.h"
 #import "PMConverter.h"
+#import "PMPathFilterOption.h"
 
 #import <PhotosUI/PhotosUI.h>
 
@@ -84,13 +85,13 @@
 - (void)onMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
     ResultHandler *handler = [ResultHandler handlerWithResult:result];
     PMManager *manager = self.manager;
-    
+
     BOOL onlyAdd = NO;
     if (call.arguments && [call.arguments isKindOfClass:[NSDictionary class]]){
         id onlyAddParams = call.arguments[@"onlyAddPermission"];
         onlyAdd = onlyAddParams && [onlyAddParams boolValue];
     }
-    
+
     if ([call.method isEqualToString:@"requestPermissionExtend"]) {
         int requestAccessLevel = [call.arguments[@"iosAccessLevel"] intValue];
         [self handlePermission:manager handler:handler requestAccessLevel:requestAccessLevel];
@@ -315,10 +316,10 @@
         BOOL onlyAll = [call.arguments[@"onlyAll"] boolValue];
         NSObject <PMBaseFilter> *option =
             [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
-        NSArray<PMAssetPathEntity *> *array = [manager getAssetPathList:type
-                                                                 hasAll:hasAll
-                                                                onlyAll:onlyAll
-                                                                 option:option];
+
+        PMPathFilterOption *pathFilterOption = [PMPathFilterOption optionWithDict:call.arguments[@"pathOption"]];
+
+        NSArray<PMAssetPathEntity *> *array = [manager getAssetPathList:type hasAll:hasAll onlyAll:onlyAll option:option pathFilterOption:pathFilterOption];
         NSDictionary *dictionary = [PMConvertUtils convertPathToMap:array];
         [handler reply:dictionary];
     } else if ([call.method isEqualToString:@"getAssetCountFromPath"]) {

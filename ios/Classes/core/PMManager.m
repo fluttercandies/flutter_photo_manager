@@ -6,13 +6,10 @@
 #import "PMCacheContainer.h"
 #import "PMConvertUtils.h"
 #import "PMFolderUtils.h"
-#import "PMFilterOption.h"
 #import "PMImageUtil.h"
-#import "PMLogUtils.h"
 #import "PMManager.h"
 #import "PMMD5Utils.h"
-#import "PMRequestTypeUtils.h"
-#import "PMThumbLoadOption.h"
+#import "PMPathFilterOption.h"
 
 @implementation PMManager {
     BOOL __isAuth;
@@ -57,22 +54,22 @@
     return __cachingManager;
 }
 
-- (NSArray<PMAssetPathEntity *> *)getAssetPathList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(NSObject<PMBaseFilter> *)option {
+- (NSArray<PMAssetPathEntity *> *)getAssetPathList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(NSObject <PMBaseFilter> *)option pathFilterOption:(PMPathFilterOption *)pathFilterOption {
     NSMutableArray<PMAssetPathEntity *> *array = [NSMutableArray new];
     PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:option];
     PHFetchOptions *fetchCollectionOptions = [PHFetchOptions new];
 
     PHFetchResult<PHAssetCollection *> *smartAlbumResult = [PHAssetCollection
-                                                            fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
-                                                            subtype:PHAssetCollectionSubtypeAny
-                                                            options:fetchCollectionOptions];
+        fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
+                              subtype:PHAssetCollectionSubtypeAny
+                              options:fetchCollectionOptions];
     if (onlyAll) {
         if (smartAlbumResult && smartAlbumResult.count) {
             for (PHAssetCollection *collection in smartAlbumResult) {
                 if (collection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumUserLibrary) {
                     PMAssetPathEntity *pathEntity = [PMAssetPathEntity
-                                                     entityWithId:collection.localIdentifier
-                                                     name:collection.localizedTitle];
+                        entityWithId:collection.localIdentifier
+                                name:collection.localizedTitle];
                     pathEntity.isAll = YES;
                     [array addObject:pathEntity];
                     break;
@@ -89,9 +86,9 @@
                   containsModified:option.containsModified];
 
     PHFetchResult<PHAssetCollection *> *albumResult = [PHAssetCollection
-                                                       fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum
-                                                       subtype:PHAssetCollectionSubtypeAny
-                                                       options:fetchCollectionOptions];
+        fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum
+                              subtype:PHAssetCollectionSubtypeAny
+                              options:fetchCollectionOptions];
     [self logCollections:albumResult option:assetOptions];
     [self injectAssetPathIntoArray:array
                             result:albumResult
