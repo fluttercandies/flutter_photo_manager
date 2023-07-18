@@ -270,7 +270,7 @@
 
 - (PHFetchOptions *)getFetchOptions:(int)type {
     PHFetchOptions *options = [PHFetchOptions new];
-    
+
     BOOL containsImage = [PMRequestTypeUtils containsImage:type];
     BOOL containsVideo = [PMRequestTypeUtils containsVideo:type];
     BOOL containsAudio = [PMRequestTypeUtils containsAudio:type];
@@ -319,7 +319,7 @@
 }
 
 - (BOOL)needTitle {
-    return NO;
+    return [self.params[@"needTitle"] boolValue];
 }
 
 @end
