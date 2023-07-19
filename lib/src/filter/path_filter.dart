@@ -242,7 +242,7 @@ extension PMDarwinAssetCollectionSubtypeExt on PMDarwinAssetCollectionSubtype {
     }
   }
 
-  static Map<int, PMDarwinAssetCollectionSubtype?>? _valuesMap = null;
+  static Map<int, PMDarwinAssetCollectionSubtype?>? _valuesMap;
 
   static PMDarwinAssetCollectionSubtype? fromValue(int? value) {
     if (value == null) {
