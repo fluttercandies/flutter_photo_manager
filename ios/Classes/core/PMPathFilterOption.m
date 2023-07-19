@@ -8,7 +8,7 @@
 @implementation PMPathFilterOption {
 
 }
-+ (id)optionWithDict:(NSDictionary *)dict {
++ (instancetype)optionWithDict:(NSDictionary *)dict {
     PMPathFilterOption *option = [PMPathFilterOption new];
     NSDictionary *darwinDict = dict[@"darwin"];
 

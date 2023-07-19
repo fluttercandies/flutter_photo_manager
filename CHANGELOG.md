@@ -6,6 +6,10 @@ that can be found in the LICENSE file. -->
 
 ## 2.6.1
 
+### Feature
+
+- Support `darwinType` and `darwinType` in `AssetPathEntity` on iOS and macOS. (#950)
+
 ### Improvements
 
 - Roll dependencies on Android. (#933)

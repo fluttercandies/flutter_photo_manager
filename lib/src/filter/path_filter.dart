@@ -1,7 +1,8 @@
-import 'dart:math';
-
-import '../types/entity.dart';
+// Copyright 2018 The FlutterCandies author. All rights reserved.
+// Use of this source code is governed by an Apache license that can be found
+// in the LICENSE file.
 import '../managers/photo_manager.dart';
+import '../types/entity.dart';
 
 /// {@template PM.path_filter}
 ///
@@ -65,11 +66,14 @@ class PMDarwinPathFilter {
   }
 }
 
+/// The type of PHAssetCollection.
 ///
+/// See document: https://developer.apple.com/documentation/photokit/phassetcollectiontype
+///
+/// The moment type is deprecated in iOS 13, so we don't support it.
 enum PMDarwinAssetCollectionType {
   album,
   smartAlbum,
-  moment,
 }
 
 extension PMDarwinAssetCollectionTypeExt on PMDarwinAssetCollectionType {
@@ -79,9 +83,18 @@ extension PMDarwinAssetCollectionTypeExt on PMDarwinAssetCollectionType {
         return 1;
       case PMDarwinAssetCollectionType.smartAlbum:
         return 2;
-      case PMDarwinAssetCollectionType.moment:
-        return 3;
     }
+  }
+
+  static PMDarwinAssetCollectionType? fromValue(int? value) {
+    switch (value) {
+      case 1:
+        return PMDarwinAssetCollectionType.album;
+      case 2:
+        return PMDarwinAssetCollectionType.smartAlbum;
+    }
+
+    return null;
   }
 }
 
@@ -227,5 +240,21 @@ extension PMDarwinAssetCollectionSubtypeExt on PMDarwinAssetCollectionSubtype {
         // pow(2, 63) - 1;
         return 9223372036854775807;
     }
+  }
+
+  static Map<int, PMDarwinAssetCollectionSubtype?>? _valuesMap = null;
+
+  static PMDarwinAssetCollectionSubtype? fromValue(int? value) {
+    if (value == null) {
+      return null;
+    }
+    if (_valuesMap == null) {
+      _valuesMap = <int, PMDarwinAssetCollectionSubtype>{};
+      for (final v in PMDarwinAssetCollectionSubtype.values) {
+        _valuesMap![v.value] = v;
+      }
+    }
+
+    return _valuesMap![value];
   }
 }

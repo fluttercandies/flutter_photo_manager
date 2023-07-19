@@ -73,6 +73,23 @@ class GalleryItemWidget extends StatelessWidget {
                   showToast('modified date = ${item.lastModified}');
                 },
               ),
+              ElevatedButton(
+                child: const Text('Show properties for PathEntity in console.'),
+                onPressed: () async {
+                  String buffer = '';
+
+                  buffer += 'name = ${item.name}\n';
+                  buffer += 'type = ${item.type}\n';
+                  buffer += 'isAll = ${item.isAll}\n';
+                  buffer += 'albumType = ${item.albumType}\n';
+                  buffer += 'darwinType = ${item.darwinType}\n';
+                  buffer += 'darwinSubType = ${item.darwinSubtype}\n';
+                  buffer += 'assetCount = ${await item.assetCountAsync}\n';
+                  buffer += 'id = ${item.id}\n';
+
+                  print(buffer);
+                },
+              ),
             ],
           );
         },

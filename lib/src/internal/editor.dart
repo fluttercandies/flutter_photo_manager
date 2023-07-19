@@ -5,6 +5,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import '../filter/path_filter.dart';
 import '../types/entity.dart';
 import 'plugin.dart';
 
@@ -211,6 +212,10 @@ class DarwinEditor {
     if (list.isEmpty) {
       return false;
     }
+    if (parent.darwinType == PMDarwinAssetCollectionType.smartAlbum) {
+      // Asset of smartAlbums can't be deleted.
+      return false;
+    }
     _ensureParentIsNotRootOrFolder(parent);
     return plugin.iosRemoveInAlbum(list, parent);
   }
@@ -218,7 +223,11 @@ class DarwinEditor {
   /// Deletes the given [path].
   ///
   /// Returns `true` if the operation was successful; otherwise, `false`.
-  Future<bool> deletePath(AssetPathEntity path) {
+  Future<bool> deletePath(AssetPathEntity path) async {
+    if (path.darwinType == PMDarwinAssetCollectionType.smartAlbum) {
+      // SmartAlbums can't be deleted.
+      return false;
+    }
     return plugin.iosDeleteCollection(path);
   }
 

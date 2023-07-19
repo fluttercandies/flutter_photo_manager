@@ -4,6 +4,7 @@
 
 import '../filter/base_filter.dart';
 import '../filter/classical/filter_option_group.dart';
+import '../filter/path_filter.dart';
 import '../types/entity.dart';
 import '../types/types.dart';
 
@@ -63,6 +64,12 @@ class ConvertUtils {
       lastModified: lastModified,
       type: type,
       isAll: data['isAll'] as bool,
+      darwinType: PMDarwinAssetCollectionTypeExt.fromValue(
+        data['darwinAssetCollectionType'],
+      ),
+      darwinSubtype: PMDarwinAssetCollectionSubtypeExt.fromValue(
+        data['darwinAssetCollectionSubtype'],
+      ),
     );
     return result;
   }

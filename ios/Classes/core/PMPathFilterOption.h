@@ -7,7 +7,7 @@
 
 @interface PMPathFilterOption : NSObject
 
-+ (id)optionWithDict:(NSDictionary *)dict;
++ (instancetype)optionWithDict:(NSDictionary *)dict;
 
 @property(nonatomic, strong) NSArray *type;
 @property(nonatomic, assign) NSArray *subType;

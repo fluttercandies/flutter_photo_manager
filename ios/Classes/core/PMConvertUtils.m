@@ -10,11 +10,14 @@
     NSMutableArray *data = [NSMutableArray new];
 
     for (PMAssetPathEntity *entity in array) {
+        PHAssetCollection *collection = entity.collection;
         NSDictionary *item = @{
             @"id": entity.id,
             @"name": entity.name,
             @"isAll": @(entity.isAll),
             @"albumType": @(entity.type),
+            @"darwinAssetCollectionType": @(collection.assetCollectionType),
+            @"darwinAssetCollectionSubtype": @(collection.assetCollectionSubtype),
         };
 
         NSMutableDictionary *params = [NSMutableDictionary new];
