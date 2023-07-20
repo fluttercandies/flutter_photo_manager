@@ -104,6 +104,7 @@ extension PMDarwinAssetCollectionTypeExt on PMDarwinAssetCollectionType {
 ///
 /// <details>
 ///
+/// ```objc
 /// typedef NS_ENUM(NSInteger, PHAssetCollectionSubtype) {
 ///
 ///     // PHAssetCollectionTypeAlbum regular subtypes
@@ -142,6 +143,7 @@ extension PMDarwinAssetCollectionTypeExt on PMDarwinAssetCollectionType {
 ///     // Used for fetching, if you don't care about the exact subtype
 ///     PHAssetCollectionSubtypeAny = NSIntegerMax
 /// };
+/// ```
 ///
 /// </details>
 enum PMDarwinAssetCollectionSubtype {
