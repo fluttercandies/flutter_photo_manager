@@ -4,11 +4,11 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
-## 2.6.1
+## 2.7.0
 
 ### Feature
 
-- Support `darwinType` and `darwinType` in `AssetPathEntity` on iOS and macOS. (#950)
+- Support `darwinType` and `darwinSubType` in `AssetPathEntity` on iOS and macOS. (#950)
 
 ### Improvements
 
