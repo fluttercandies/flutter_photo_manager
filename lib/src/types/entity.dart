@@ -156,7 +156,7 @@ class AssetPathEntity {
       return ConvertUtils.convertToPathList(
         result.cast<String, dynamic>(),
         type: type,
-        optionGroup: optionGroup,
+        filterOption: optionGroup,
       ).first;
     }
     throw error;
@@ -265,7 +265,7 @@ class AssetPathEntity {
       return ConvertUtils.convertToPathList(
         result.cast<String, dynamic>(),
         type: type,
-        optionGroup: filterOptionGroup ?? filterOption,
+        filterOption: filterOptionGroup ?? filterOption,
       ).first;
     }
     return null;
