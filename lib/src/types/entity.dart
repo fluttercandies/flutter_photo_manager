@@ -10,6 +10,7 @@ import 'package:flutter/rendering.dart';
 
 import '../filter/base_filter.dart';
 import '../filter/classical/filter_option_group.dart';
+import '../filter/path_filter.dart';
 import '../internal/constants.dart';
 import '../internal/editor.dart';
 import '../internal/enums.dart';
@@ -34,6 +35,8 @@ class AssetPathEntity {
     this.type = RequestType.common,
     this.isAll = false,
     PMFilter? filterOption,
+    this.darwinSubtype,
+    this.darwinType,
   }) : filterOption = filterOption ??= FilterOptionGroup();
 
   /// Obtain an entity from ID.
@@ -101,6 +104,16 @@ class AssetPathEntity {
 
   /// The collection of filter options of the album.
   final PMFilter filterOption;
+
+  /// The darwin collection type, in android, the value is always null.
+  ///
+  /// If the [albumType] is 2, the value will be null.
+  final PMDarwinAssetCollectionType? darwinType;
+
+  /// The darwin collection subtype, in android, the value is always null.
+  ///
+  /// If the [albumType] is 2, the value will be null.
+  final PMDarwinAssetCollectionSubtype? darwinSubtype;
 
   /// Call this method to obtain new path entity.
   static Future<AssetPathEntity> obtainPathFromProperties({
@@ -266,6 +279,8 @@ class AssetPathEntity {
     RequestType? type,
     bool? isAll,
     PMFilter? filterOption,
+    PMDarwinAssetCollectionType? darwinType,
+    PMDarwinAssetCollectionSubtype? darwinSubtype,
   }) {
     return AssetPathEntity(
       id: id ?? this.id,
@@ -275,6 +290,8 @@ class AssetPathEntity {
       type: type ?? this.type,
       isAll: isAll ?? this.isAll,
       filterOption: filterOption ?? this.filterOption,
+      darwinSubtype: darwinSubtype ?? this.darwinSubtype,
+      darwinType: darwinType ?? this.darwinType,
     );
   }
 

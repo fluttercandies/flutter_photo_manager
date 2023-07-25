@@ -66,6 +66,8 @@ class _NewHomePageState extends State<NewHomePage> {
             _buildPngCheck(),
             _buildNotifyCheck(),
             _buildFilterOption(watchProvider),
+            if (Platform.isIOS || Platform.isMacOS)
+              _buildPathFilterOption(),
           ],
         ),
       ),
@@ -223,6 +225,18 @@ class _NewHomePageState extends State<NewHomePage> {
         Navigator.push<void>(
           context,
           MaterialPageRoute<void>(builder: (_) => const FilterOptionPage()),
+        );
+      },
+    );
+  }
+
+  Widget _buildPathFilterOption() {
+    return CustomButton(
+      title: 'Change path filter options.',
+      onPressed: () {
+        Navigator.push<void>(
+          context,
+          MaterialPageRoute<void>(builder: (_) => const DarwinPathFilterPage()),
         );
       },
     );

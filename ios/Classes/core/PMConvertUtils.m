@@ -10,12 +10,14 @@
     NSMutableArray *data = [NSMutableArray new];
 
     for (PMAssetPathEntity *entity in array) {
+
         NSDictionary *item = @{
             @"id": entity.id,
             @"name": entity.name,
             @"isAll": @(entity.isAll),
             @"albumType": @(entity.type),
         };
+
 
         NSMutableDictionary *params = [NSMutableDictionary new];
         [params addEntriesFromDictionary:item];
@@ -24,6 +26,13 @@
         if (assetCount == 0) {
             continue;
         }
+
+        PHAssetCollection *collection = entity.collection;
+        if (collection) {
+            params[@"darwinAssetCollectionType"] = @(collection.assetCollectionType);
+            params[@"darwinAssetCollectionSubtype"] = @(collection.assetCollectionSubtype);
+        }
+
         if (assetCount != NSIntegerMax) {
             params[@"assetCount"] = @(assetCount);
         }

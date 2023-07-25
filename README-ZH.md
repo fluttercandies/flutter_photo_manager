@@ -49,16 +49,18 @@ that can be found in the LICENSE file. -->
     * [原生平台的配置](#原生平台的配置)
       * [Android 配置准备](#android-配置准备)
         * [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
-        * [Android 10 (Q, 29)](#android-10-q-29)
+        * [Android 10 (Q, 29)](#android-10--q-29-)
         * [Glide](#glide)
       * [iOS 配置准备](#ios-配置准备)
   * [使用方法](#使用方法)
     * [请求权限](#请求权限)
       * [iOS 受限的资源权限](#ios-受限的资源权限)
-    * [获取相簿或图集 (`AssetPathEntity`)](#获取相簿或图集-assetpathentity)
-    * [获取资源 (`AssetEntity`)](#获取资源-assetentity)
+    * [获取相簿或图集 (`AssetPathEntity`)](#获取相簿或图集--assetpathentity-)
+      * [`getAssetPathList` 方法的参数](#getassetpathlist-方法的参数)
+      * [PMPathFilterOption](#pmpathfilteroption)
+    * [获取资源 (`AssetEntity`)](#获取资源--assetentity-)
       * [通过 `AssetPathEntity` 获取](#通过-assetpathentity-获取)
-      * [通过 `PhotoManager` 方法 (2.6.0+) 获取](#通过-photomanager-方法-260-获取)
+      * [通过 `PhotoManager` 方法 (2.6.0+) 获取](#通过-photomanager-方法--260--获取)
       * [通过 ID 获取](#通过-id-获取)
       * [通过原始数据获取](#通过原始数据获取)
       * [通过 iCloud 获取](#通过-icloud-获取)
@@ -71,8 +73,8 @@ that can be found in the LICENSE file. -->
         * [原始数据的使用](#原始数据的使用)
         * [iOS 上文件检索时间过长](#ios-上文件检索时间过长)
     * [资源变动的通知回调](#资源变动的通知回调)
-      * [过滤资源](#过滤资源)
-        * [FilterOptionGroup](#filteroptiongroup)
+  * [过滤资源](#过滤资源)
+    * [FilterOptionGroup](#filteroptiongroup)
     * [CustomFilter](#customfilter)
       * [更高级的 CustomFilter](#更高级的-customfilter)
       * [相关类定义解释](#相关类定义解释)
@@ -83,7 +85,7 @@ that can be found in the LICENSE file. -->
   * [原生额外配置](#原生额外配置)
     * [Android 额外配置](#android-额外配置)
       * [Glide 相关问题](#glide-相关问题)
-      * [Android 13 (API level 33) 额外配置](#android-13-api-level-33-额外配置)
+      * [Android 13 (API level 33) 额外配置](#android-13--api-level-33--额外配置)
     * [iOS 额外配置](#ios-额外配置)
       * [配置系统相册名称的国际化](#配置系统相册名称的国际化)
     * [实验性功能](#实验性功能)
@@ -247,6 +249,34 @@ final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList();
 ```
 
 详情请参阅 [`getAssetPathList`][]。
+
+#### `getAssetPathList` 方法的参数
+
+| 参数名           | 说明                                                         | 默认值              |
+| :--------------- | ------------------------------------------------------------ | ------------------- |
+| hasAll           | 如果你需要一个包含所有资源（AssetEntity) 的 PathEntity ，传入 true | true                |
+| onlyAll          | 如果你只需要一个包含所有资源的，传入true                     | false               |
+| type             | 资源文件的类型（视频、图片、音频）                           | RequestType.common  |
+| filterOption     | 用于筛选 AssetEntity，详情请参阅 [过滤资源](#过滤资源)       | FilterOptionGroup() |
+| pathFilterOption | 只对 iOS 和 macOS生效，对应原生中的相册类型，详情请参阅 [PMPathFilterOption](#pmpathfilteroption)。 | 默认为包含所有      |
+
+#### PMPathFilterOption
+
+自 2.7.0 版本开始提供，当前仅支持 iOS 和 macOS。
+
+```dart
+final List<PMDarwinAssetCollectionType> pathTypeList = []; // 配置为你需要的类型
+final List<PMDarwinAssetCollectionSubtype> pathSubTypeList = []; // 配置为你需要的子类型
+final darwinPathFilterOption = PMDarwinPathFilter(
+      type: pathTypeList,
+      subType: pathSubTypeList,
+    );
+PMPathFilter pathFilter = PMPathFilter();
+```
+
+ `PMDarwinAssetCollectionType`的枚举值一一对应 [PHAssetCollectionType | 苹果官网文档](https://developer.apple.com/documentation/photokit/phassetcollectiontype?language=objc).
+
+ `PMDarwinAssetCollectionSubtype` 的枚举值一一对应 [PHAssetCollectionSubType | 苹果官网文档](https://developer.apple.com/documentation/photokit/phassetcollectionsubtype?language=objc).
 
 ### 获取资源 (`AssetEntity`)
 
@@ -464,7 +494,7 @@ PhotoManager.removeChangeCallback(changeNotify);
 PhotoManager.stopChangeNotify();
 ```
 
-#### 过滤资源
+## 过滤资源
 
 插件包含对资源过滤筛选的支持。
 以下的方法包含 `filterOption` 参数，用于指定资源过滤的条件。
@@ -482,7 +512,7 @@ PhotoManager.stopChangeNotify();
 - [FilterOptionGroup](#FilterOptionGroup)
 - [CustomFilter](#CustomFilter)
 
-##### FilterOptionGroup
+### FilterOptionGroup
 
 `FilterOptionGroup` 是 2.6.0 版本前唯一支持的筛选器实现。
 

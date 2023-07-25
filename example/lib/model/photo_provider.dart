@@ -180,6 +180,7 @@ class PhotoProvider extends ChangeNotifier {
         hasAll: hasAll,
         onlyAll: onlyAll,
         filterOption: option,
+        pathFilterOption: pathFilterOption,
       ),
       prefix: 'Obtain path list duration',
     );
@@ -243,6 +244,38 @@ class PhotoProvider extends ChangeNotifier {
     } else {
       thumbFormat = ThumbnailFormat.jpeg;
     }
+  }
+
+  /// For path filter option
+  var _pathFilterOption = const PMPathFilter();
+  PMPathFilter get pathFilterOption => _pathFilterOption;
+  List<PMDarwinAssetCollectionType> _pathTypeList = PMDarwinAssetCollectionType.values;
+
+  List<PMDarwinAssetCollectionType> get pathTypeList => _pathTypeList;
+
+  set pathTypeList(List<PMDarwinAssetCollectionType> value) {
+    _pathTypeList = value;
+    _onChangePathFilter();
+  }
+
+  late List<PMDarwinAssetCollectionSubtype> _pathSubTypeList = _pathFilterOption.darwin.subType;
+
+  List<PMDarwinAssetCollectionSubtype> get pathSubTypeList => _pathSubTypeList;
+
+  set pathSubTypeList(List<PMDarwinAssetCollectionSubtype> value) {
+    _pathSubTypeList = value;
+    _onChangePathFilter();
+  }
+
+  void _onChangePathFilter() {
+    final darwinPathFilterOption = PMDarwinPathFilter(
+      type: pathTypeList,
+      subType: pathSubTypeList,
+    );
+    _pathFilterOption = PMPathFilter(
+      darwin: darwinPathFilterOption,
+    );
+    notifyListeners();
   }
 }
 

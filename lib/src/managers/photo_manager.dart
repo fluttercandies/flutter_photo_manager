@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import '../filter/base_filter.dart';
+import '../filter/path_filter.dart';
 import '../internal/editor.dart';
 import '../internal/enums.dart';
 import '../internal/plugin.dart' as base;
@@ -84,12 +85,14 @@ class PhotoManager {
     bool onlyAll = false,
     RequestType type = RequestType.common,
     PMFilter? filterOption,
+    PMPathFilter pathFilterOption = const PMPathFilter(),
   }) async {
     return plugin.getAssetPathList(
       hasAll: hasAll,
       onlyAll: onlyAll,
       type: type,
       filterOption: filterOption,
+      pathFilterOption: pathFilterOption,
     );
   }
 

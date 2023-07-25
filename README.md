@@ -50,23 +50,25 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
     * [Configure native platforms](#configure-native-platforms)
       * [Android config preparation](#android-config-preparation)
         * [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
-        * [Android 10 (Q, 29)](#android-10-q-29)
+        * [Android 10 (Q, 29)](#android-10--q-29-)
         * [Glide](#glide)
       * [iOS config preparation](#ios-config-preparation)
   * [Usage](#usage)
     * [Request for permission](#request-for-permission)
       * [Limited entities access on iOS](#limited-entities-access-on-ios)
-    * [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders-assetpathentity)
-    * [Get assets (`AssetEntity`)](#get-assets-assetentity)
+    * [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders--assetpathentity-)
+      * [Params of `getAssetPathList`](#params-of-getassetpathlist)
+      * [PMPathFilterOption](#pmpathfilteroption)
+    * [Get assets (`AssetEntity`)](#get-assets--assetentity-)
       * [From `AssetPathEntity`](#from-assetpathentity)
-      * [From `PhotoManager` (Since 2.6)](#from-photomanager-since-26)
+      * [From `PhotoManager` (Since 2.6)](#from-photomanager--since-26-)
       * [From ID](#from-id)
       * [From raw data](#from-raw-data)
       * [From iCloud](#from-icloud)
       * [Display assets](#display-assets)
-      * [Obtain "Live Photos"](#obtain-live-photos)
-        * [Filtering only "Live Photos"](#filtering-only-live-photos)
-        * [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
+      * [Obtain "Live Photos"](#obtain--live-photos-)
+        * [Filtering only "Live Photos"](#filtering-only--live-photos-)
+        * [Obtain the video from "Live Photos"](#obtain-the-video-from--live-photos-)
       * [Limitations](#limitations)
         * [Android 10 media location permission](#android-10-media-location-permission)
         * [Usage of the original data](#usage-of-the-original-data)
@@ -84,7 +86,7 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
   * [Native extra configs](#native-extra-configs)
     * [Android extra configs](#android-extra-configs)
       * [Glide issues](#glide-issues)
-      * [Android 13 (Api 33) extra configs](#android-13-api-33-extra-configs)
+      * [Android 13 (Api 33) extra configs](#android-13--api-33--extra-configs)
     * [iOS extra configs](#ios-extra-configs)
       * [Localized system albums name](#localized-system-albums-name)
     * [Experimental features](#experimental-features)
@@ -265,6 +267,34 @@ final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList();
 
 See [`getAssetPathList`][] for more detail.
 
+#### Params of `getAssetPathList`
+
+| Name             | Description                                                  | Default value           |
+| :--------------- | ------------------------------------------------------------ | ----------------------- |
+| hasAll           | Set to true when you need an album containing all assets.    | true                    |
+| onlyAll          | Use this property if you only need one album containing all assets. | false                   |
+| type             | Type of media resource (video, image, audio)                 | RequestType.common      |
+| filterOption     | Used to filter resource files, see [Filtering](#filtering) for details | FilterOptionGroup()     |
+| pathFilterOption | Only valid for iOS and macOS, for the corresponding album type. See [PMPathFilterOption](#pmpathfilteroption) for more detail. | Include all by default. |
+
+#### PMPathFilterOption
+
+Provide since 2.7.0, currently only valid for iOS and macOS.
+
+```dart
+final List<PMDarwinAssetCollectionType> pathTypeList = []; // use your need type
+final List<PMDarwinAssetCollectionSubtype> pathSubTypeList = []; // use your need type
+final darwinPathFilterOption = PMDarwinPathFilter(
+      type: pathTypeList,
+      subType: pathSubTypeList,
+    );
+PMPathFilter pathFilter = PMPathFilter();
+```
+
+The `PMDarwinAssetCollectionType` has a one-to-one correspondence with [PHAssetCollectionType | Apple Developer Documentation](https://developer.apple.com/documentation/photokit/phassetcollectiontype?language=objc).
+
+The `PMDarwinAssetCollectionSubtype` has a one-to-one correspondence with [PHAssetCollectionSubType | Apple Developer Documentation](https://developer.apple.com/documentation/photokit/phassetcollectionsubtype?language=objc).
+
 ### Get assets (`AssetEntity`)
 
 Assets (images/videos/audios) are abstracted as the [`AssetEntity`][] class.
@@ -274,11 +304,13 @@ and the `PHAsset` object on iOS/macOS.
 #### From `AssetPathEntity`
 
 You can use [the pagination method][`getAssetListPaged`]:
+
 ```dart
 final List<AssetEntity> entities = await path.getAssetListPaged(page: 0, size: 80);
 ```
 
 Or use [the range method][`getAssetListRange`]:
+
 ```dart
 final List<AssetEntity> entities = await path.getAssetListRange(start: 0, end: 80);
 ```
@@ -286,16 +318,19 @@ final List<AssetEntity> entities = await path.getAssetListRange(start: 0, end: 8
 #### From `PhotoManager` (Since 2.6)
 
 First, You need get count of assets:
+
 ```dart
 final int count = await PhotoManager.getAssetCount();
 ```
 
 Then, you can use [the pagination method][`PhotoManager.getAssetListPaged`]:
+
 ```dart
 final List<AssetEntity> entities = await PhotoManager.getAssetListPaged(page: 0, pageCount: 80);
 ```
 
 Or use [the range method][`PhotoManager.getAssetListRange`]:
+
 ```dart
 final List<AssetEntity> entities = await PhotoManager.getAssetListRange(start: 0, end: 80);
 ```
@@ -313,6 +348,7 @@ You can store the ID if you want to implement features
 that's related to persistent selections.
 Use [`AssetEntity.fromId`][] to retrieve the entity
 once you persist an ID.
+
 ```dart
 final AssetEntity? asset = await AssetEntity.fromId(id);
 ```
@@ -327,6 +363,7 @@ You can create an entity from raw data,
 such as downloaded images, recorded videos, etc.
 The created entity will show as a corresponding resource
 on your device's gallery app.
+
 ```dart
 final Uint8List rawData = yourRawData;
 
@@ -380,6 +417,7 @@ when the file is downloading.
 
 The plugin provided the `AssetEntityImage` widget and
 the `AssetEntityImageProvider` to display assets:
+
 ```dart
 final Widget image = AssetEntityImage(
   yourAssetEntity,
@@ -405,6 +443,7 @@ This plugin supports obtain live photos and filtering them:
 ##### Filtering only "Live Photos"
 
 This is supported when filtering only image.
+
 ```dart
 final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
   type: RequestType.image,
@@ -509,6 +548,7 @@ PhotoManager.stopChangeNotify();
 
 Filtering assets are also supported by the plugin.
 Below methods have the `filterOption` argument to define the conditions when obtaining assets.
+
 - PhotoManager
   - getAssetPathList (Accessible with `AssetPathEntity.filterOption`)
   - getAssetCount
@@ -520,8 +560,9 @@ Below methods have the `filterOption` argument to define the conditions when obt
   - obtainPathFromProperties (not recommended to use directly)
 
 There are two implementations of filters:
-- [FilterOptionGroup](#FilterOptionGroup)
-- [CustomFilter](#CustomFilter)
+
+- [FilterOptionGroup](#filteroptiongroup)
+- [CustomFilter](#customfilter)
 
 ### FilterOptionGroup
 
@@ -573,6 +614,7 @@ you'll need to use `CustomColumns.base`, `CustomColumns.android` and `CustomColu
 to get the columns name correctly.
 
 An example for how to construct a `CustomFilter`:
+
 ```dart
 CustomFilter createFilter() {
   return CustomFilter.sql(
