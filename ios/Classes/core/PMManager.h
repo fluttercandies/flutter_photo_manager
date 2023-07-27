@@ -34,6 +34,8 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (BOOL)isOnlyAddAuth;
 - (void)setOnlyAddAuth:(BOOL)auth;
 
+- (void)refreshCurrentAuthStatus;
+
 + (void)openSetting:(NSObject<PMResultHandler>*)result;
 
 - (NSArray<PMAssetPathEntity *> *)getAssetPathList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(NSObject <PMBaseFilter> *)option pathFilterOption:(PMPathFilterOption *)pathFilterOption;

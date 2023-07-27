@@ -17,6 +17,8 @@
     PMCacheContainer *cacheContainer;
 
     PHCachingImageManager *__cachingManager;
+    
+    BOOL isRunRefreshAuthStatus;
 }
 
 - (instancetype)init {
@@ -44,6 +46,52 @@
 
 - (void)setOnlyAddAuth:(BOOL)auth {
     __isOnlyAddAuth = auth;
+}
+
+- (void)refreshCurrentAuthStatus {
+    if (isRunRefreshAuthStatus) {
+        return;
+    }
+    
+    isRunRefreshAuthStatus = true;
+    
+#if TARGET_OS_OSX
+    if (@available(macOS 11.0, *)) {
+        PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatusForAccessLevel:PHAccessLevelReadWrite];
+        if (status == PHAuthorizationStatusAuthorized || status == PHAuthorizationStatusLimited) {
+            [self setAuth:YES];
+        }
+        
+        status = [PHPhotoLibrary authorizationStatusForAccessLevel:PHAccessLevelAddOnly];
+        if (status == PHAuthorizationStatusAuthorized || status == PHAuthorizationStatusLimited) {
+            [self setOnlyAddAuth:YES];
+        }
+    } else {
+        PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+        if (status == PHAuthorizationStatusAuthorized){
+            [self setAuth:YES];
+        }
+    }
+#endif
+
+#if TARGET_OS_IOS
+    if (@available(iOS 14.0, *)) {
+        PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatusForAccessLevel:PHAccessLevelReadWrite];
+        if (status == PHAuthorizationStatusAuthorized || status == PHAuthorizationStatusLimited) {
+            [self setAuth:YES];
+        }
+        
+        status = [PHPhotoLibrary authorizationStatusForAccessLevel:PHAccessLevelAddOnly];
+        if (status == PHAuthorizationStatusAuthorized || status == PHAuthorizationStatusLimited) {
+            [self setOnlyAddAuth:YES];
+        }
+    } else {
+        PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+        if (status == PHAuthorizationStatusAuthorized){
+            [self setAuth:YES];
+        }
+    }
+#endif
 }
 
 - (PHCachingImageManager *)cachingManager {

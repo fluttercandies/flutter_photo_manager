@@ -91,6 +91,8 @@
         id onlyAddParams = call.arguments[@"onlyAddPermission"];
         onlyAdd = onlyAddParams && [onlyAddParams boolValue];
     }
+    
+    [manager refreshCurrentAuthStatus];
 
     if ([call.method isEqualToString:@"requestPermissionExtend"]) {
         int requestAccessLevel = [call.arguments[@"iosAccessLevel"] intValue];

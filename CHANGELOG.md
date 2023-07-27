@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.7.1
+
+### Improvements
+
+- Optimization: iOS/macOS permission.
+
 ## 2.7.0
 
 ### Feature
