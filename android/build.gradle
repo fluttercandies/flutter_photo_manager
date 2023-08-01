@@ -24,7 +24,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    namespace 'com.flutterandies.photo_manager'
+    if (project.android.hasProperty('namespace') ||
+        getGradle().getGradleVersion().substring(0, 1).toInteger() >= 8) {
+        namespace 'com.flutterandies.photo_manager'
+    }
 
     compileSdkVersion 33
 
