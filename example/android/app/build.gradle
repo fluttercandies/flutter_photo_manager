@@ -32,6 +32,8 @@ apply plugin: 'kotlin-kapt'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
+    namespace 'com.fluttercandies.photo_manager_example'
+
     compileSdkVersion compileVersion.toInteger()
 
     signingConfigs {
