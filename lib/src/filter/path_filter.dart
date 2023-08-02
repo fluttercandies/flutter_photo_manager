@@ -241,7 +241,7 @@ extension PMDarwinAssetCollectionSubtypeExt on PMDarwinAssetCollectionSubtype {
       case PMDarwinAssetCollectionSubtype.smartAlbumCinematic:
         return 218;
       case PMDarwinAssetCollectionSubtype.any:
-        return math.pow(2, 63) - 1;
+        return (math.pow(2, 63) - 1).toInt();
     }
   }
 
