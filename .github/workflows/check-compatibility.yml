@@ -1,0 +1,165 @@
+name: Add library to new flutter project
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  build-for-android-3-10-6:
+    name: Build for android with 3.10.6 on ubuntu-latest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.10.6
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+      - run: flutter doctor -v
+        name: Flutter info
+      - run: flutter create new_project --platforms=android
+        name: Create new project
+      - name: Add photo_manager to new project.
+        run: flutter pub add -- 'photo_manager:{"path":".."}'
+        working-directory: ${{ github.workspace }}/new_project
+        shell: bash
+      - run: flutter pub get
+        working-directory: ${{ github.workspace }}/new_project
+      - run: flutter build apk --debug
+        working-directory: ${{ github.workspace }}/new_project
+        name: Build example
+  build-for-ios-3-10-6:
+    name: Build for ios with 3.10.6 on macos-latest
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.10.6
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+      - run: flutter doctor -v
+        name: Flutter info
+      - run: flutter create new_project --platforms=ios
+        name: Create new project
+      - name: Add photo_manager to new project.
+        run: flutter pub add -- 'photo_manager:{"path":".."}'
+        working-directory: ${{ github.workspace }}/new_project
+        shell: bash
+      - run: flutter pub get
+        working-directory: ${{ github.workspace }}/new_project
+      - name: Set minimum iOS version
+        run: |
+              [ -f "ios/Podfile" ] && sed -i '' 's/platform :ios, .*/platform :ios, '\''11.0'\''/g' ios/Podfile
+              [ -f "ios/Runner.xcodeproj/project.pbxproj" ] && sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = .*;/IPHONEOS_DEPLOYMENT_TARGET = 11.0;/g' ios/Runner.xcodeproj/project.pbxproj
+        working-directory: ${{ github.workspace }}/new_project
+      - run: flutter build ios --release --no-codesign
+        working-directory: ${{ github.workspace }}/new_project
+        name: Build example
+  build-for-web-3-10-6:
+    name: Build for web with 3.10.6 on ubuntu-latest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.10.6
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+      - run: flutter doctor -v
+        name: Flutter info
+      - run: flutter create new_project --platforms=web
+        name: Create new project
+      - name: Add photo_manager to new project.
+        run: flutter pub add -- 'photo_manager:{"path":".."}'
+        working-directory: ${{ github.workspace }}/new_project
+        shell: bash
+      - run: flutter pub get
+        working-directory: ${{ github.workspace }}/new_project
+      - run: flutter build web --release
+        working-directory: ${{ github.workspace }}/new_project
+        name: Build example
+  build-for-linux-3-10-6:
+    name: Build for linux with 3.10.6 on ubuntu-latest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.10.6
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+      - name: Install required packages
+        run: |
+              sudo apt-get update -y
+              sudo apt-get install -y ninja-build libgtk-3-dev
+      - name: Enable support for linux
+        run: flutter config --enable-linux-desktop
+      - run: flutter doctor -v
+        name: Flutter info
+      - run: flutter create new_project --platforms=linux
+        name: Create new project
+      - name: Add photo_manager to new project.
+        run: flutter pub add -- 'photo_manager:{"path":".."}'
+        working-directory: ${{ github.workspace }}/new_project
+        shell: bash
+      - run: flutter pub get
+        working-directory: ${{ github.workspace }}/new_project
+      - run: flutter build linux --release
+        working-directory: ${{ github.workspace }}/new_project
+        name: Build example
+  build-for-macos-3-10-6:
+    name: Build for macos with 3.10.6 on macos-latest
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.10.6
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+      - run: flutter doctor -v
+        name: Flutter info
+      - run: flutter create new_project --platforms=macos
+        name: Create new project
+      - name: Add photo_manager to new project.
+        run: flutter pub add -- 'photo_manager:{"path":".."}'
+        working-directory: ${{ github.workspace }}/new_project
+        shell: bash
+      - run: flutter pub get
+        working-directory: ${{ github.workspace }}/new_project
+      - name: Set minimum macOS version
+        run: |
+              [ -f "macos/Podfile" ] && sed -i '' 's/platform :osx, .*/platform :osx, '\''11.0'\''/g' macos/Podfile
+              [ -f "macos/Runner.xcodeproj/project.pbxproj" ] && sed -i '' 's/MACOSX_DEPLOYMENT_TARGET = .*;/MACOSX_DEPLOYMENT_TARGET = 11.0;/g' macos/Runner.xcodeproj/project.pbxproj
+        working-directory: ${{ github.workspace }}/new_project
+      - run: flutter build macos --release
+        working-directory: ${{ github.workspace }}/new_project
+        name: Build example
+  build-for-windows-3-10-6:
+    name: Build for windows with 3.10.6 on windows-latest
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.10.6
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+      - run: flutter doctor -v
+        name: Flutter info
+      - run: flutter create new_project --platforms=windows
+        name: Create new project
+      - name: Add photo_manager to new project.
+        run: flutter pub add -- 'photo_manager:{"path":".."}'
+        working-directory: ${{ github.workspace }}/new_project
+        shell: bash
+      - run: flutter pub get
+        working-directory: ${{ github.workspace }}/new_project
+      - run: flutter build windows --release
+        working-directory: ${{ github.workspace }}/new_project
+        name: Build example
