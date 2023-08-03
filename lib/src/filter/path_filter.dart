@@ -1,6 +1,8 @@
 // Copyright 2018 The FlutterCandies author. All rights reserved.
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
+import 'dart:math' as math;
+
 import '../managers/photo_manager.dart';
 import '../types/entity.dart';
 
@@ -239,8 +241,7 @@ extension PMDarwinAssetCollectionSubtypeExt on PMDarwinAssetCollectionSubtype {
       case PMDarwinAssetCollectionSubtype.smartAlbumCinematic:
         return 218;
       case PMDarwinAssetCollectionSubtype.any:
-        // pow(2, 63) - 1;
-        return 9223372036854775807;
+        return (math.pow(2, 63) - 1).toInt();
     }
   }
 

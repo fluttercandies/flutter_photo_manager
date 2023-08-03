@@ -4,9 +4,17 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.7.1
+
+### Fixes
+
+- Fix namespace on Android.
+- Remove the package definition from the manifest.
+- Use `math.pow(2^63)-1` to make Web compile work again.
+
 ## 2.7.0
 
-### Feature
+### Features
 
 - Support `darwinType` and `darwinSubType` in `AssetPathEntity` on iOS and macOS. (#950)
 
