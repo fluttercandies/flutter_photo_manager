@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'issue_734.dart';
 import 'issue_918.dart';
+import 'issue_962.dart';
 
 class IssuePage extends StatelessWidget {
   const IssuePage({
@@ -23,6 +24,7 @@ class IssuePage extends StatelessWidget {
         children: <Widget>[
           Issue734Page(),
           Issue918Page(),
+          Issue962(),
         ],
       ),
     );
