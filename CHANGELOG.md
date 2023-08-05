@@ -11,7 +11,7 @@ that can be found in the LICENSE file. -->
 - Fix namespace on Android.
 - Remove the package definition from the manifest.
 - Use `math.pow(2^63)-1` to make Web compile work again.
-- Fix: the `end` of `PhotoManager.getAssetListRange` is handled incorrectly.(#962)
+- Fix the `end` argument of `PhotoManager.getAssetListRange` is being handled incorrectly on Darwin. (#962)
 
 ## 2.7.0
 
