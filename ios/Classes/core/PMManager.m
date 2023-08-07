@@ -149,7 +149,7 @@
     PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithOptions:options];
     
     NSUInteger endOffset = end;
-    if (endOffset < result.count) {
+    if (endOffset > result.count) {
         endOffset = result.count;
     }
     
