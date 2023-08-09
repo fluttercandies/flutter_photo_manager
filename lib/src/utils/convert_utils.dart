@@ -83,6 +83,7 @@ class ConvertUtils {
       typeInt: data['type'] as int,
       width: data['width'] as int,
       height: data['height'] as int,
+      filesize: data['size'] as int,
       duration: data['duration'] as int? ?? 0,
       orientation: data['orientation'] as int? ?? 0,
       isFavorite: data['favorite'] as bool? ?? false,

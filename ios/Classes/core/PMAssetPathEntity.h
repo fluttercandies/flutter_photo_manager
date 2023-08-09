@@ -25,6 +25,7 @@
 @property(nonatomic, assign) long createDt;
 @property(nonatomic, assign) NSUInteger width;
 @property(nonatomic, assign) NSUInteger height;
+@property(nonatomic, assign) long long size;
 @property(nonatomic, assign) long duration;
 @property(nonatomic, assign) int type;
 @property(nonatomic, strong) PHAsset *phAsset;
@@ -40,6 +41,7 @@
                   createDt:(long)createDt
                      width:(NSUInteger)width
                     height:(NSUInteger)height
+                      size:(long long)size
                   duration:(long)duration
                       type:(int)type;
 
@@ -47,6 +49,7 @@
                     createDt:(long)createDt
                        width:(NSUInteger)width
                       height:(NSUInteger)height
+                        size:(long long)size
                     duration:(long)duration
                         type:(int)type;
 
