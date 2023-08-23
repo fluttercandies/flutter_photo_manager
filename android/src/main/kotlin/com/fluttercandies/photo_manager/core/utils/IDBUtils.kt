@@ -1,5 +1,6 @@
 package com.fluttercandies.photo_manager.core.utils
 
+import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
@@ -68,8 +69,8 @@ interface IDBUtils {
         }
 
         val typeKeys = arrayOf(
-                MediaStore.Files.FileColumns.MEDIA_TYPE,
-                MediaStore.Images.Media.DISPLAY_NAME
+            MediaStore.Files.FileColumns.MEDIA_TYPE,
+            MediaStore.Images.Media.DISPLAY_NAME
         )
 
         val storeBucketKeys = arrayOf(BUCKET_ID, BUCKET_DISPLAY_NAME)
@@ -88,9 +89,9 @@ interface IDBUtils {
         get() = IDBUtils.allUri
 
     fun getAssetPathList(
-            context: Context,
-            requestType: Int = 0,
-            option: FilterOption
+        context: Context,
+        requestType: Int = 0,
+        option: FilterOption
     ): List<AssetPathEntity>
 
     fun getAssetListPaged(
@@ -194,10 +195,14 @@ interface IDBUtils {
                 } else if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
                     val mmr = MediaMetadataRetriever()
                     mmr.setDataSource(path)
-                    width = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toInt() ?: 0
-                    height = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toInt() ?: 0
-                    orientation = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toInt()
-                        ?: orientation
+                    width = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)
+                        ?.toInt() ?: 0
+                    height = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)
+                        ?.toInt() ?: 0
+                    orientation =
+                        mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)
+                            ?.toInt()
+                            ?: orientation
                     if (isAboveAndroidQ) mmr.close() else mmr.release()
                 }
             } catch (e: Throwable) {
@@ -459,7 +464,8 @@ interface IDBUtils {
         shouldKeepPath: Boolean = false,
     ): AssetEntity? {
         val cr = context.contentResolver
-        val uri = cr.insert(contentUri, values) ?: throw RuntimeException("Cannot insert the new asset.")
+        val uri =
+            cr.insert(contentUri, values) ?: throw RuntimeException("Cannot insert the new asset.")
         val id = ContentUris.parseId(uri)
         if (!shouldKeepPath) {
             val outputStream = cr.openOutputStream(uri)
@@ -472,7 +478,7 @@ interface IDBUtils {
 
     fun assetExists(context: Context, id: String): Boolean {
         val columns = arrayOf(_ID)
-        context.contentResolver.query(allUri, columns, "$_ID = ?", arrayOf(id), null).use {
+        context.contentResolver.logQuery(allUri, columns, "$_ID = ?", arrayOf(id), null).use {
             if (it == null) {
                 return false
             }
@@ -492,7 +498,8 @@ interface IDBUtils {
         if (LogUtils.isLog) {
             val splitter = "".padStart(40, '-')
             LogUtils.info("log error row $id start $splitter")
-            val cursor = context.contentResolver.query(allUri, null, "$_ID = ?", arrayOf(id), null)
+            val cursor =
+                context.contentResolver.logQuery(allUri, null, "$_ID = ?", arrayOf(id), null)
             cursor?.use {
                 val names = it.columnNames
                 if (it.moveToNext()) {
@@ -574,7 +581,7 @@ interface IDBUtils {
         val key = arrayOf(_ID, MediaStore.Files.FileColumns.MEDIA_TYPE, DATA)
         val idSelection = ids.joinToString(",") { "?" }
         val selection = "$_ID in ($idSelection)"
-        val cursor = context.contentResolver.query(
+        val cursor = context.contentResolver.logQuery(
             allUri,
             key,
             selection,
@@ -608,9 +615,9 @@ interface IDBUtils {
         val columns = arrayOf(DATE_MODIFIED)
         val sortOrder = "$DATE_MODIFIED desc"
         val cursor = if (pathId == PhotoManager.ALL_ID) {
-            context.contentResolver.query(allUri, columns, null, null, sortOrder)
+            context.contentResolver.logQuery(allUri, columns, null, null, sortOrder)
         } else {
-            context.contentResolver.query(
+            context.contentResolver.logQuery(
                 allUri,
                 columns,
                 "$BUCKET_ID = ?",
@@ -628,10 +635,40 @@ interface IDBUtils {
 
     fun getColumnNames(context: Context): List<String> {
         val cr = context.contentResolver
-        cr.query(allUri, null, null, null, null)?.use {
+        cr.logQuery(allUri, null, null, null, null)?.use {
             return it.columnNames.toList()
         }
         return emptyList()
+    }
+
+    fun ContentResolver.logQuery(
+        uri: Uri,
+        projection: Array<String>?,
+        selection: String?,
+        selectionArgs: Array<String>?,
+        sortOrder: String?
+    ): Cursor? {
+        fun log(logFunc: (log: String) -> Unit) {
+            if (LogUtils.isLog) {
+                val sb = StringBuilder()
+                sb.appendLine("uri: $uri")
+                sb.appendLine("projection: ${projection?.joinToString(", ")}")
+                sb.appendLine("selection: $selection")
+                sb.appendLine("selectionArgs: ${selectionArgs?.joinToString(", ")}")
+                sb.appendLine("sortOrder: $sortOrder")
+                logFunc(sb.toString())
+            }
+        }
+
+        try {
+            val cursor = query(uri, projection, selection, selectionArgs, sortOrder)
+            log(LogUtils::info)
+            return cursor
+        } catch (e: Exception) {
+            log(LogUtils::error)
+            LogUtils.error("happen query error", e)
+            throw e
+        }
     }
 
     fun getAssetCount(context: Context, option: FilterOption, requestType: Int): Int {
@@ -639,17 +676,23 @@ interface IDBUtils {
         val args = ArrayList<String>()
         val where = option.makeWhere(requestType, args, false)
         val order = option.orderByCondString()
-        cr.query(allUri, arrayOf(_ID), where, args.toTypedArray(), order).use {
+        cr.logQuery(allUri, arrayOf(_ID), where, args.toTypedArray(), order).use {
             return it?.count ?: 0
         }
     }
 
-    fun getAssetsByRange(context: Context, option: FilterOption, start: Int, end: Int, requestType: Int): List<AssetEntity> {
+    fun getAssetsByRange(
+        context: Context,
+        option: FilterOption,
+        start: Int,
+        end: Int,
+        requestType: Int
+    ): List<AssetEntity> {
         val cr = context.contentResolver
         val args = ArrayList<String>()
         val where = option.makeWhere(requestType, args, false)
         val order = option.orderByCondString()
-        cr.query(allUri, keys(), where, args.toTypedArray(), order)?.use {
+        cr.logQuery(allUri, keys(), where, args.toTypedArray(), order)?.use {
             val result = ArrayList<AssetEntity>()
             it.moveToPosition(start - 1)
             while (it.moveToNext()) {

@@ -37,7 +37,7 @@ object DBUtils : IDBUtils {
 //        val where = makeWhere(requestType, option, args)
         val selection =
             "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $where) GROUP BY (${MediaStore.MediaColumns.BUCKET_ID}"
-        val cursor = context.contentResolver.query(
+        val cursor = context.contentResolver.logQuery(
             allUri,
             IDBUtils.storeBucketKeys + arrayOf("count(1)"),
             selection,
@@ -72,7 +72,7 @@ object DBUtils : IDBUtils {
         val selections =
             "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $where"
 
-        val cursor = context.contentResolver.query(
+        val cursor = context.contentResolver.logQuery(
             allUri,
             projection,
             selections,
@@ -113,7 +113,7 @@ object DBUtils : IDBUtils {
         val where = option.makeWhere(type, args)
         val selection =
             "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $where $idSelection) GROUP BY (${MediaStore.MediaColumns.BUCKET_ID}"
-        val cursor = context.contentResolver.query(
+        val cursor = context.contentResolver.logQuery(
             allUri,
             IDBUtils.storeBucketKeys + arrayOf("count(1)"),
             selection,
@@ -154,7 +154,7 @@ object DBUtils : IDBUtils {
             "${MediaStore.MediaColumns.BUCKET_ID} = ? $where"
         }
         val sortOrder = getSortOrder(page * size, size, option)
-        val cursor = context.contentResolver.query(
+        val cursor = context.contentResolver.logQuery(
             allUri,
             keys,
             selection,
@@ -195,7 +195,7 @@ object DBUtils : IDBUtils {
         }
         val pageSize = end - start
         val sortOrder = getSortOrder(start, pageSize, option)
-        val cursor = context.contentResolver.query(
+        val cursor = context.contentResolver.logQuery(
                 allUri,
                 keys,
             selection,
@@ -223,7 +223,7 @@ object DBUtils : IDBUtils {
         val selection = "${MediaStore.MediaColumns._ID} = ?"
         val args = arrayOf(id)
 
-        val cursor = context.contentResolver.query(
+        val cursor = context.contentResolver.logQuery(
             allUri,
             keys,
             selection,
@@ -284,7 +284,7 @@ object DBUtils : IDBUtils {
             copyKeys.add(MediaStore.Video.VideoColumns.DESCRIPTION)
         }
 
-        val cursor = cr.query(
+        val cursor = cr.logQuery(
             allUri,
             copyKeys.toTypedArray() + arrayOf(MediaStore.MediaColumns.DATA),
             idSelection,
@@ -334,7 +334,7 @@ object DBUtils : IDBUtils {
         }
 
         val cr = context.contentResolver
-        val cursor = cr.query(
+        val cursor = cr.logQuery(
             allUri,
             arrayOf(MediaStore.MediaColumns.DATA),
             idSelection,
@@ -374,7 +374,7 @@ object DBUtils : IDBUtils {
         deleteLock.withLock {
             val removedList = ArrayList<String>()
             val cr = context.contentResolver
-            val cursor = cr.query(
+            val cursor = cr.logQuery(
                 allUri,
                 arrayOf(_ID, MediaStore.MediaColumns.DATA),
                 null,
@@ -409,7 +409,7 @@ object DBUtils : IDBUtils {
      * 1 : current asset parent path
      */
     override fun getSomeInfo(context: Context, assetId: String): Pair<String, String?>? {
-        val cursor = context.contentResolver.query(
+        val cursor = context.contentResolver.logQuery(
             allUri,
             arrayOf(MediaStore.MediaColumns.BUCKET_ID, MediaStore.MediaColumns.DATA),
             "${MediaStore.MediaColumns._ID} = ?",
@@ -432,7 +432,7 @@ object DBUtils : IDBUtils {
             MediaStore.MediaColumns.BUCKET_DISPLAY_NAME,
             MediaStore.MediaColumns.DATA
         )
-        val cursor = context.contentResolver.query(
+        val cursor = context.contentResolver.logQuery(
             allUri,
             keys,
             "${MediaStore.MediaColumns.BUCKET_ID} = ?",
