@@ -264,7 +264,12 @@ class PhotoManager(private val context: Context) {
                 if (cacheFuture.isCancelled) {
                     return@execute
                 }
-                cacheFuture.get()
+
+                try {
+                    cacheFuture.get()
+                } catch (e: Exception) {
+                    LogUtils.error(e)
+                }
             }
         }
     }
