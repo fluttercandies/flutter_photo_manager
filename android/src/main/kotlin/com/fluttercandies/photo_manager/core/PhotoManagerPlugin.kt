@@ -197,12 +197,22 @@ class PhotoManagerPlugin(
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            if (Methods.presentLimited == call.method) {
+                resultHandler.replyError("The $Methods.presentLimited must have READ_MEDIA_VISUAL_USER_SELECTED in manifest.")
+                return
+            }
+
             permissionsUtils.addManifestWithPermission34(
                 applicationContext,
                 permissions,
                 call,
                 resultHandler
             )
+        } else {
+            if (Methods.presentLimited == call.method) {
+                resultHandler.replyError("The $Methods.presentLimited must use Android 14(API 34) or higher.")
+                return
+            }
         }
 
         val utils = permissionsUtils.apply {
@@ -250,6 +260,10 @@ class PhotoManagerPlugin(
     ) {
         if (call.method == Methods.requestPermissionExtend) {
             resultHandler.reply(PermissionResult.Authorized.value)
+            return
+        }
+        if (call.method == Methods.presentLimited) {
+            resultHandler.reply(null)
             return
         }
         runOnBackground {
