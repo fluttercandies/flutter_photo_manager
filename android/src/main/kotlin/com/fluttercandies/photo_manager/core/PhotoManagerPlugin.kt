@@ -198,7 +198,7 @@ class PhotoManagerPlugin(
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             if (Methods.presentLimited == call.method) {
-                resultHandler.replyError("The $Methods.presentLimited must have READ_MEDIA_VISUAL_USER_SELECTED in manifest.")
+                resultHandler.replyError("The ${Methods.presentLimited} must have READ_MEDIA_VISUAL_USER_SELECTED in manifest.")
                 return
             }
 
@@ -210,7 +210,7 @@ class PhotoManagerPlugin(
             )
         } else {
             if (Methods.presentLimited == call.method) {
-                resultHandler.replyError("The $Methods.presentLimited must use Android 14(API 34) or higher.")
+                resultHandler.replyError("The ${Methods.presentLimited} must use Android 14(API 34) or higher.")
                 return
             }
         }
