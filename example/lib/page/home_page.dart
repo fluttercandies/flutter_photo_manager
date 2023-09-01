@@ -45,7 +45,7 @@ class _NewHomePageState extends State<NewHomePage> {
               title: 'Get all gallery list',
               onPressed: _scanGalleryList,
             ),
-            if (Platform.isIOS)
+            if (Platform.isIOS || Platform.isAndroid)
               CustomButton(
                 title: 'Change limited photos with PhotosUI',
                 onPressed: _changeLimitPhotos,

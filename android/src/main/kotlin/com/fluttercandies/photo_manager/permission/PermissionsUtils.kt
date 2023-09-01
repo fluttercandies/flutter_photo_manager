@@ -306,12 +306,13 @@ class PermissionsUtils {
         ) {
             permissions.add(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
 
-            if (Methods.presentLimited != call.method) {
+            if (Methods.presentLimited == call.method) {
                 permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
                 permissions.add(Manifest.permission.READ_MEDIA_VIDEO)
             } else {
                 permissions.remove(Manifest.permission.READ_MEDIA_IMAGES)
                 permissions.remove(Manifest.permission.READ_MEDIA_VIDEO)
+                permissions.remove(Manifest.permission.ACCESS_MEDIA_LOCATION)
             }
         }
     }

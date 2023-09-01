@@ -198,8 +198,14 @@ class PhotoManagerPlugin(
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             if (Methods.presentLimited == call.method) {
-                resultHandler.replyError("The ${Methods.presentLimited} must have READ_MEDIA_VISUAL_USER_SELECTED in manifest.")
-                return
+                val havePermissionInManifest = permissionsUtils.havePermissionInManifest(
+                    applicationContext,
+                    Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+                )
+                if (!havePermissionInManifest) {
+                    resultHandler.replyError("The ${Methods.presentLimited} must have READ_MEDIA_VISUAL_USER_SELECTED in manifest.")
+                    return
+                }
             }
 
             permissionsUtils.addManifestWithPermission34(
