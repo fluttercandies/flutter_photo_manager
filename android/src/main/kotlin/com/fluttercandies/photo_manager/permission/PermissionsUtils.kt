@@ -71,7 +71,8 @@ class PermissionsUtils {
      * @return 返回 [PermissionsUtils] 自身，进行链式调用
      */
     fun getPermissions(requestCode: Int, permissions: List<String>): PermissionsUtils {
-        return getPermissionsWithTips(requestCode, *permissions.toTypedArray())
+        val permissionSet = permissions.toSet()
+        return getPermissionsWithTips(requestCode, *permissionSet.toTypedArray())
     }
 
     /**
@@ -119,7 +120,9 @@ class PermissionsUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             resetStatus()
             for (p in permissions) {
-                if (mActivity!!.checkSelfPermission(p) == PackageManager.PERMISSION_DENIED) {
+                if (p == Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) {
+                    needToRequestPermissionsList.add(p)
+                } else if (mActivity!!.checkSelfPermission(p) == PackageManager.PERMISSION_DENIED) {
                     // Add the denied permission to the pending list.
                     needToRequestPermissionsList.add(p)
                 }
@@ -143,6 +146,13 @@ class PermissionsUtils {
         permissions: Array<String>,
         grantResults: IntArray
     ): PermissionsUtils {
+        var userSelectedResult = false
+        if (permissions.contains(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)) {
+            // Get it result
+            val index = permissions.indexOf(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+            val result = grantResults[index]
+            userSelectedResult = result == PackageManager.PERMISSION_GRANTED
+        }
         if (requestCode == this.requestCode) {
             for (i in permissions.indices) {
                 LogUtils.info("Returned permissions: " + permissions[i])
@@ -152,6 +162,17 @@ class PermissionsUtils {
                     grantedPermissionsList.add(permissions[i])
                 }
             }
+
+            if (userSelectedResult) {
+                // 如果包含 READ_MEDIA_VISUAL_USER_SELECTED 的允许的权限，则说明可以忽略 READ_MEDIA_IMAGES 和 READ_MEDIA_VIDEO 的拒绝
+                deniedPermissionsList.toList().forEach {
+                    if (it == Manifest.permission.READ_MEDIA_IMAGES || it == Manifest.permission.READ_MEDIA_VIDEO) {
+                        deniedPermissionsList.remove(it)
+                        grantedPermissionsList.add(it)
+                    }
+                }
+            }
+
             if (deniedPermissionsList.isNotEmpty()) {
                 // 回调用户拒绝监听
                 permissionsListener!!.onDenied(deniedPermissionsList, grantedPermissionsList)
@@ -246,7 +267,11 @@ class PermissionsUtils {
         val haveVideo = RequestTypeUtils.containsVideo(type)
         val haveAudio = RequestTypeUtils.containsAudio(type)
 
-        fun checkAndAddPermission(requestHavePermission: Boolean, tag: String, manifestPermission: String) {
+        fun checkAndAddPermission(
+            requestHavePermission: Boolean,
+            tag: String,
+            manifestPermission: String
+        ) {
             if (!requestHavePermission) {
                 return
             }
@@ -267,6 +292,30 @@ class PermissionsUtils {
 
     }
 
+    @RequiresApi(34)
+    fun addManifestWithPermission34(
+        context: Context,
+        permissions: ArrayList<String>,
+        call: MethodCall,
+        resultHandler: ResultHandler
+    ) {
+        if (havePermissionInManifest(
+                context,
+                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+            )
+        ) {
+            permissions.add(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+
+            if (Methods.presentLimited != call.method) {
+                permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
+                permissions.add(Manifest.permission.READ_MEDIA_VIDEO)
+            } else {
+                permissions.remove(Manifest.permission.READ_MEDIA_IMAGES)
+                permissions.remove(Manifest.permission.READ_MEDIA_VIDEO)
+            }
+        }
+    }
+
     fun havePermissionInManifest(context: Context, permission: String): Boolean {
         val applicationInfo = context.applicationInfo
         val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -283,4 +332,5 @@ class PermissionsUtils {
         }
         return packageInfo.requestedPermissions.contains(permission)
     }
+
 }

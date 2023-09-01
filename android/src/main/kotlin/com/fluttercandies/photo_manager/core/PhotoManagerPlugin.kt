@@ -196,6 +196,15 @@ class PhotoManagerPlugin(
             }
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            permissionsUtils.addManifestWithPermission34(
+                applicationContext,
+                permissions,
+                call,
+                resultHandler
+            )
+        }
+
         val utils = permissionsUtils.apply {
             withActivity(activity)
             permissionsListener = object : PermissionsListener {

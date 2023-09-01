@@ -10,6 +10,7 @@ class Methods {
         const val releaseMemoryCache = "releaseMemoryCache"
 
         const val requestPermissionExtend = "requestPermissionExtend"
+        const val presentLimited = "presentLimited"
 
         const val getThumbnail = "getThumb"
         const val requestCacheAssetsThumbnail = "requestCacheAssetsThumb"

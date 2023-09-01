@@ -542,8 +542,8 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<void> presentLimited() async {
-    assert(Platform.isIOS);
-    if (Platform.isIOS) {
+    assert(Platform.isIOS || Platform.isAndroid);
+    if (Platform.isIOS || Platform.isAndroid) {
       return _channel.invokeMethod(PMConstants.mPresentLimited);
     }
   }
