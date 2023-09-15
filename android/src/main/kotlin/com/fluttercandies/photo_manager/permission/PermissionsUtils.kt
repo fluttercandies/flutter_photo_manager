@@ -3,13 +3,17 @@ package com.fluttercandies.photo_manager.permission
 import android.Manifest
 import android.annotation.TargetApi
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.Build.VERSION_CODES.M
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.content.PermissionChecker
+import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import com.fluttercandies.photo_manager.constant.Methods
 import com.fluttercandies.photo_manager.core.utils.RequestTypeUtils
 import com.fluttercandies.photo_manager.util.LogUtils
@@ -22,6 +26,8 @@ import java.util.ArrayList
 class PermissionsUtils {
     /** 需要申请权限的Activity */
     private var mActivity: Activity? = null
+
+    private var context: Application? = null
 
     /** 是否正在请求权限 */
     var isRequesting = false
@@ -60,6 +66,12 @@ class PermissionsUtils {
      */
     fun withActivity(activity: Activity?): PermissionsUtils {
         mActivity = activity
+        context = activity?.application
+        return this
+    }
+
+    fun setListener(listener: PermissionsListener?): PermissionsUtils {
+        permissionsListener = listener
         return this
     }
 
@@ -74,6 +86,89 @@ class PermissionsUtils {
         val permissionSet = permissions.toSet()
         return getPermissionsWithTips(requestCode, *permissionSet.toTypedArray())
     }
+
+    private fun haveVideoAndImagePermission(): Boolean {
+        if (Build.VERSION.SDK_INT < M) {
+            return true
+        }
+
+        return false
+    }
+
+    private fun haveAudioPermission(): Boolean {
+        if (Build.VERSION.SDK_INT < M) {
+            return true
+        }
+
+        return if (Build.VERSION.SDK_INT >= 33) {
+            checkCallingOrSelfPermission(Manifest.permission.READ_MEDIA_AUDIO)
+        } else {
+            checkCallingOrSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+    }
+
+    fun haveLocationPermission(context: Context): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && havePermissionInManifest(
+            context,
+            Manifest.permission.ACCESS_MEDIA_LOCATION
+        )
+    }
+
+//    /**
+//     * 判断是否有足够的权限
+//     */
+//    private fun isHavePermissions(resultHandler: ResultHandler): Boolean {
+//        val method = resultHandler.call.method
+//
+//        var result = true
+//
+//        if (Methods.haveRequestTypeMethods.contains(method)) {
+//            val type = resultHandler.call.argument<Int>("type")
+//            val haveImage = RequestTypeUtils.containsImage(type!!)
+//            val haveVideo = RequestTypeUtils.containsVideo(type)
+//            val haveAudio = RequestTypeUtils.containsAudio(type)
+//
+//            if (haveImage || haveVideo) {
+//                result = haveVideoAndImagePermission() and result
+//            } else if (haveAudio) {
+//                result = haveAudioPermission() && result
+//            }
+//        }
+//
+//        if (Methods.needMediaLocationMethods.contains(method)) {
+//            result = haveLocationPermission(applicationContext) && result
+//        }
+//
+//    }
+//
+//    /**
+//     * 处理权限申请的所有逻辑
+//     */
+//    fun handlePermission(
+//        resultHandler: ResultHandler,
+//        onSuccess: (
+//            resultHandler: ResultHandler,
+//            needLocationPermission: Boolean
+//        ) -> Unit
+//    ) {
+//        // 1. 不同的SDK版本来区分权限申请
+//        if (Build.VERSION.SDK_INT < M) {
+//            // 小于6.0的直接回调成功即可
+//            onSuccess(resultHandler, true)
+//            return
+//        }
+//
+//        // 2. 判断是否已经有足够的权限
+//        if (isHavePermissions(resultHandler)) {
+//            onSuccess(resultHandler, true)
+//            return
+//        }
+//
+//        val method = resultHandler.call.method
+//        val params = resultHandler.call.arguments<Any>()
+//
+//
+//    }
 
     /**
      * 进行权限申请，带拒绝弹框提示
@@ -111,6 +206,50 @@ class PermissionsUtils {
     }
 
     /**
+     * Wrapper for [PermissionChecker.checkCallingOrSelfPermission]
+     */
+    fun checkCallingOrSelfPermission(permission: String): Boolean {
+        if (context == null) {
+            throw NullPointerException("Context for the permission request is not exist.")
+        }
+        return PERMISSION_GRANTED == PermissionChecker.checkCallingOrSelfPermission(
+            context!!,
+            permission
+        )
+    }
+
+    /**
+     * 检查对应方法是否需要申请权限
+     */
+    fun havePermission(videoOrImage: Boolean, audio: Boolean): Boolean {
+        if (Build.VERSION.SDK_INT < M) {
+            return true
+        }
+
+        return false
+    }
+
+    fun haveImageOrVideoPermission(): Boolean {
+        if (Build.VERSION.SDK_INT < M) {
+            return true
+        }
+
+        return if (Build.VERSION.SDK_INT >= 34) {
+            checkCallingOrSelfPermission(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+        } else if (Build.VERSION.SDK_INT == 33) {
+            val haveImage = checkCallingOrSelfPermission(Manifest.permission.READ_MEDIA_IMAGES)
+            val haveVideo = checkCallingOrSelfPermission(Manifest.permission.READ_MEDIA_VIDEO)
+            haveImage && haveVideo
+        } else {
+            checkCallingOrSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+    }
+
+    fun addVideoPermission(permissions: ArrayList<String>) {
+
+    }
+
+    /**
      * 检查所需权限是否已获取
      *
      * @param permissions 所需权限数组
@@ -120,9 +259,7 @@ class PermissionsUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             resetStatus()
             for (p in permissions) {
-                if (p == Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) {
-                    needToRequestPermissionsList.add(p)
-                } else if (mActivity!!.checkSelfPermission(p) == PackageManager.PERMISSION_DENIED) {
+                if (mActivity!!.checkSelfPermission(p) == PackageManager.PERMISSION_DENIED) {
                     // Add the denied permission to the pending list.
                     needToRequestPermissionsList.add(p)
                 }
@@ -194,6 +331,10 @@ class PermissionsUtils {
     }
 
     /**
+     *
+     */
+
+    /**
      * 跳转到应用的设置界面
      *
      * @param context 上下文
@@ -254,7 +395,7 @@ class PermissionsUtils {
                 permissions.add(Manifest.permission.READ_MEDIA_AUDIO)
             }
             return
-        } else if (!Methods.android13PermissionMethods.contains(method)) {
+        } else if (!Methods.haveRequestTypeMethods.contains(method)) {
             return
         }
 
@@ -325,7 +466,6 @@ class PermissionsUtils {
                 PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong())
             )
         } else {
-            @Suppress("DEPRECATION")
             context.packageManager.getPackageInfo(
                 applicationInfo.packageName,
                 PackageManager.GET_PERMISSIONS
@@ -334,4 +474,11 @@ class PermissionsUtils {
         return packageInfo.requestedPermissions.contains(permission)
     }
 
+    fun injectNeedPermissions(
+        context: Context,
+        requestType: Int,
+        mediaLocation: Boolean,
+        permissions: ArrayList<String>
+    ) {
+    }
 }

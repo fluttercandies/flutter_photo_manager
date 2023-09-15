@@ -5,7 +5,7 @@ import android.os.Looper
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
-class ResultHandler(var result: MethodChannel.Result?, val call: MethodCall? = null) {
+class ResultHandler(var result: MethodChannel.Result, val call: MethodCall) {
     init {
         handler.hasMessages(0) // just do it to init handler
     }
@@ -23,10 +23,9 @@ class ResultHandler(var result: MethodChannel.Result?, val call: MethodCall? = n
         }
         isReplied = true
         val result = this.result
-        this.result = null
         handler.post {
             try {
-                result?.success(any)
+                result.success(any)
             } catch (e: IllegalStateException) {
                 // Do nothing
             }
@@ -39,9 +38,8 @@ class ResultHandler(var result: MethodChannel.Result?, val call: MethodCall? = n
         }
         isReplied = true
         val result = this.result
-        this.result = null
         handler.post {
-            result?.error(code, message, obj)
+            result.error(code, message, obj)
         }
     }
 
@@ -51,9 +49,8 @@ class ResultHandler(var result: MethodChannel.Result?, val call: MethodCall? = n
         }
         isReplied = true
         val result = this.result
-        this.result = null
         handler.post {
-            result?.notImplemented()
+            result.notImplemented()
         }
     }
 

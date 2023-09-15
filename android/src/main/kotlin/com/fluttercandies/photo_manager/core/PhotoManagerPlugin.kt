@@ -3,9 +3,11 @@ package com.fluttercandies.photo_manager.core
 import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import androidx.activity.result.contract.ActivityResultContracts
 import com.bumptech.glide.Glide
 import com.fluttercandies.photo_manager.constant.Methods
 import io.flutter.plugin.common.BinaryMessenger
@@ -77,31 +79,198 @@ class PhotoManagerPlugin(
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result, call)
+        val method = call.method
 
-        if (call.method == "ignorePermissionCheck") {
-            val ignore = call.argument<Boolean>("ignore")!!
-            ignorePermissionCheck = ignore
-            resultHandler.reply(ignore)
+        if (Methods.isNotNeedPermissionMethod(method)) {
+            handleNotNeedPermissionMethod(resultHandler)
             return
         }
 
-        val handleResult = when (call.method) {
-            Methods.releaseMemoryCache -> {
-                // The plugin will not hold instances cache on Android.
-                resultHandler.reply(1)
-                true
-            }
 
+        if (Methods.isPermissionMethod(method)) {
+            handlePermissionMethod(resultHandler)
+            return
+        }
+
+        if (ignorePermissionCheck) {
+            val haveLocationPermission = permissionsUtils.haveLocationPermission(applicationContext)
+
+            onHandlePermissionResult(
+                resultHandler,
+                haveLocationPermission
+            )
+            return
+        }
+
+//        permissionsUtils.withActivity(activity)
+//            .handlePermission(resultHandler, this::onHandlePermissionResult)
+
+//        if (permissionsUtils.isRequesting) {
+//            resultHandler.replyError(
+//                "PERMISSION_REQUESTING",
+//                "Another permission request is still ongoing. Please request after the existing one is done.",
+//                null
+//            )
+//            return
+//        }
+//
+//        val needWritePermission =
+//            permissionsUtils.needWriteExternalStorage(call)
+//                    && Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q
+//                    && permissionsUtils.havePermissionInManifest(
+//                applicationContext,
+//                Manifest.permission.WRITE_EXTERNAL_STORAGE
+//            )
+//        val needReadPermission =
+//            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+//                    && permissionsUtils.havePermissionInManifest(
+//                applicationContext,
+//                Manifest.permission.READ_EXTERNAL_STORAGE
+//            )
+//        val needLocationPermission =
+//            permissionsUtils.needAccessLocation(call)
+//                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+//                    && permissionsUtils.havePermissionInManifest(
+//                applicationContext,
+//                Manifest.permission.ACCESS_MEDIA_LOCATION
+//            )
+//        val permissions = arrayListOf<String>()
+//        if (needReadPermission) {
+//            permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+//        }
+//        if (needWritePermission) {
+//            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//        }
+//        if (needLocationPermission) {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//                permissions.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
+//            }
+//        }
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//            permissionsUtils.addManifestWithPermission33(
+//                applicationContext,
+//                permissions,
+//                call,
+//                resultHandler
+//            )
+//            if (resultHandler.isReplied()) {
+//                return
+//            }
+//        }
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+//            if (Methods.presentLimited == call.method) {
+//                val havePermissionInManifest = permissionsUtils.havePermissionInManifest(
+//                    applicationContext,
+//                    Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+//                )
+//                if (!havePermissionInManifest) {
+//                    resultHandler.replyError("The ${Methods.presentLimited} must have READ_MEDIA_VISUAL_USER_SELECTED in manifest.")
+//                    return
+//                }
+//            }
+//
+//            permissionsUtils.addManifestWithPermission34(
+//                applicationContext,
+//                permissions,
+//                call,
+//                resultHandler
+//            )
+//        } else {
+//            if (Methods.presentLimited == call.method) {
+//                resultHandler.replyError("The ${Methods.presentLimited} must use Android 14(API 34) or higher.")
+//                return
+//            }
+//        }
+//
+//        val utils = permissionsUtils.apply {
+//            withActivity(activity)
+//            permissionsListener = object : PermissionsListener {
+//                override fun onGranted() {
+//                    LogUtils.info("onGranted call.method = ${call.method}")
+//                    onHandlePermissionResult(call, resultHandler, needLocationPermission)
+//                }
+//
+//                override fun onDenied(
+//                    deniedPermissions: MutableList<String>,
+//                    grantedPermissions: MutableList<String>
+//                ) {
+//                    LogUtils.info("onDenied call.method = ${call.method}")
+//                    if (call.method == Methods.requestPermissionExtend) {
+//                        resultHandler.reply(PermissionResult.Denied.value)
+//                        return
+//                    }
+//                    if (grantedPermissions.containsAll(permissions)) {
+//                        LogUtils.info("onGranted call.method = ${call.method}")
+//                        onHandlePermissionResult(call, resultHandler, needLocationPermission)
+//                    } else {
+//                        replyPermissionError(resultHandler)
+//                    }
+//                }
+//            }
+//        }
+//
+//        utils.getPermissions(3001, permissions)
+    }
+
+    private fun handlePermissionMethod(resultHandler: ResultHandler) {
+        val call = resultHandler.call
+        if (call.method == Methods.requestPermissionExtend) {
+            val androidPermission = call.argument<Map<*, *>>("permission")!!
+            val requestType = androidPermission["type"] as Int
+            val mediaLocation = androidPermission["mediaLocation"] as Boolean
+
+
+            val permissions = arrayListOf<String>()
+            permissionsUtils.injectNeedPermissions(
+                applicationContext,
+                requestType,
+                mediaLocation,
+                permissions,
+            )
+            permissionsUtils.withActivity(activity)
+                .setListener(object : PermissionsListener {
+                    override fun onGranted() {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun onDenied(
+                        deniedPermissions: MutableList<String>,
+                        grantedPermissions: MutableList<String>
+                    ) {
+                        TODO("Not yet implemented")
+                    }
+                })
+                .getPermissions(3001, permissions)
+
+            return
+        } else if (call.method == Methods.presentLimited) {
+//            resultHandler.reply(null)
+            return
+        }
+    }
+
+    private fun handleNotNeedPermissionMethod(resultHandler: ResultHandler) {
+        val call = resultHandler.call
+        when (call.method) {
             Methods.log -> {
                 LogUtils.isLog = call.arguments() ?: false
                 resultHandler.reply(1)
-                true
             }
 
             Methods.openSetting -> {
                 permissionsUtils.getAppDetailSettingIntent(activity)
                 resultHandler.reply(1)
-                true
+            }
+
+            Methods.forceOldAPI -> {
+                photoManager.useOldApi = true
+                resultHandler.reply(1)
+            }
+
+            Methods.systemVersion -> {
+                resultHandler.reply(Build.VERSION.SDK_INT.toString())
             }
 
             Methods.clearFileCache -> {
@@ -110,145 +279,19 @@ class PhotoManagerPlugin(
                     photoManager.clearFileCache()
                     resultHandler.reply(1)
                 }
-                true
             }
 
-            Methods.forceOldAPI -> {
-                photoManager.useOldApi = true
+            Methods.releaseMemoryCache -> {
+                // The plugin will not hold instances cache on Android.
                 resultHandler.reply(1)
-                true
             }
 
-            Methods.systemVersion -> {
-                resultHandler.reply(Build.VERSION.SDK_INT.toString())
-                true
-            }
-
-            else -> false
-        }
-
-        if (handleResult) {
-            return
-        }
-        if (ignorePermissionCheck) {
-            onHandlePermissionResult(
-                call,
-                resultHandler,
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-                        && permissionsUtils.havePermissionInManifest(
-                    applicationContext,
-                    Manifest.permission.ACCESS_MEDIA_LOCATION
-                )
-            )
-            return
-        }
-        if (permissionsUtils.isRequesting) {
-            resultHandler.replyError(
-                "PERMISSION_REQUESTING",
-                "Another permission request is still ongoing. Please request after the existing one is done.",
-                null
-            )
-            return
-        }
-
-        val needWritePermission =
-            permissionsUtils.needWriteExternalStorage(call)
-                    && Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q
-                    && permissionsUtils.havePermissionInManifest(
-                applicationContext,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-        val needReadPermission =
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
-                    && permissionsUtils.havePermissionInManifest(
-                applicationContext,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            )
-        val needLocationPermission =
-            permissionsUtils.needAccessLocation(call)
-                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-                    && permissionsUtils.havePermissionInManifest(
-                applicationContext,
-                Manifest.permission.ACCESS_MEDIA_LOCATION
-            )
-        val permissions = arrayListOf<String>()
-        if (needReadPermission) {
-            permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-        if (needWritePermission) {
-            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-        if (needLocationPermission) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                permissions.add(Manifest.permission.ACCESS_MEDIA_LOCATION)
+            Methods.ignorePermissionCheck -> {
+                val ignore = call.argument<Boolean>("ignore")!!
+                ignorePermissionCheck = ignore
+                resultHandler.reply(ignore)
             }
         }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionsUtils.addManifestWithPermission33(
-                applicationContext,
-                permissions,
-                call,
-                resultHandler
-            )
-            if (resultHandler.isReplied()) {
-                return
-            }
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            if (Methods.presentLimited == call.method) {
-                val havePermissionInManifest = permissionsUtils.havePermissionInManifest(
-                    applicationContext,
-                    Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
-                )
-                if (!havePermissionInManifest) {
-                    resultHandler.replyError("The ${Methods.presentLimited} must have READ_MEDIA_VISUAL_USER_SELECTED in manifest.")
-                    return
-                }
-            }
-
-            permissionsUtils.addManifestWithPermission34(
-                applicationContext,
-                permissions,
-                call,
-                resultHandler
-            )
-        } else {
-            if (Methods.presentLimited == call.method) {
-                resultHandler.replyError("The ${Methods.presentLimited} must use Android 14(API 34) or higher.")
-                return
-            }
-        }
-
-        val utils = permissionsUtils.apply {
-            withActivity(activity)
-            permissionsListener = object : PermissionsListener {
-                override fun onGranted() {
-                    LogUtils.info("onGranted call.method = ${call.method}")
-                    onHandlePermissionResult(call, resultHandler, needLocationPermission)
-                }
-
-                override fun onDenied(
-                    deniedPermissions: MutableList<String>,
-                    grantedPermissions: MutableList<String>
-                ) {
-                    LogUtils.info("onDenied call.method = ${call.method}")
-                    if (call.method == Methods.requestPermissionExtend) {
-                        resultHandler.reply(PermissionResult.Denied.value)
-                        return
-                    }
-                    if (grantedPermissions.containsAll(permissions)) {
-                        LogUtils.info("onGranted call.method = ${call.method}")
-                        onHandlePermissionResult(call, resultHandler, needLocationPermission)
-                    } else {
-                        replyPermissionError(resultHandler)
-                    }
-                }
-            }
-        }
-
-        utils.getPermissions(3001, permissions)
     }
 
     private fun replyPermissionError(resultHandler: ResultHandler) {
@@ -260,10 +303,10 @@ class PhotoManagerPlugin(
     }
 
     private fun onHandlePermissionResult(
-        call: MethodCall,
         resultHandler: ResultHandler,
         needLocationPermission: Boolean
     ) {
+        val call = resultHandler.call
         if (call.method == Methods.requestPermissionExtend) {
             resultHandler.reply(PermissionResult.Authorized.value)
             return

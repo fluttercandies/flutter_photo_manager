@@ -101,7 +101,7 @@ class PhotoManager(private val context: Context) {
                 format,
                 quality,
                 frame,
-                resultHandler.result
+                resultHandler,
             )
         } catch (e: Exception) {
             Log.e(LogUtils.TAG, "get $id thumbnail error, width : $width, height: $height", e)
