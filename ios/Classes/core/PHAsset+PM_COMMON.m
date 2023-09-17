@@ -68,7 +68,7 @@
             return [self getLivePhotosResource].originalFilename;
         }
     }
-    PHAssetResource *resource = [self getAdjustResource];
+    PHAssetResource *resource = [self getUntouchedResource];
     if (resource) {
         return resource.originalFilename;
     }
@@ -118,6 +118,31 @@
         }
     }
     return NO;
+}
+
+- (PHAssetResource *)getUntouchedResource {
+    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:self];
+    if (resources.count == 0) {
+        return nil;
+    }
+
+    if (resources.count == 1) {
+        return resources[0];
+    }
+
+    for (PHAssetResource *res in resources) {
+        if (self.mediaType == PHAssetMediaTypeImage
+            && res.type == PHAssetResourceTypePhoto) {
+            return res;
+        }
+        
+        if (self.mediaType == PHAssetMediaTypeVideo
+            && res.type == PHAssetResourceTypeVideo) {
+            return res;
+        }
+    }
+    
+    return nil;
 }
 
 - (PHAssetResource *)getAdjustResource {
