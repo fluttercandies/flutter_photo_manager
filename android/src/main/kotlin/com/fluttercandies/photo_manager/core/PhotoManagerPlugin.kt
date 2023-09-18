@@ -1,13 +1,10 @@
 package com.fluttercandies.photo_manager.core
 
-import android.Manifest
 import android.app.Activity
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import androidx.activity.result.contract.ActivityResultContracts
 import com.bumptech.glide.Glide
 import com.fluttercandies.photo_manager.constant.Methods
 import io.flutter.plugin.common.BinaryMessenger
@@ -49,12 +46,11 @@ class PhotoManagerPlugin(
 
     init {
         permissionsUtils.permissionsListener = object : PermissionsListener {
-            override fun onGranted() {
-            }
-
+            override fun onGranted(needPermissions: MutableList<String>) {}
             override fun onDenied(
                 deniedPermissions: MutableList<String>,
-                grantedPermissions: MutableList<String>
+                grantedPermissions: MutableList<String>,
+                needPermissions: MutableList<String>,
             ) {
             }
         }
@@ -82,12 +78,15 @@ class PhotoManagerPlugin(
         val method = call.method
 
         if (Methods.isNotNeedPermissionMethod(method)) {
+            // The method does not need permission.
+            // Usually, these methods are used to config the plugin or get some info.
             handleNotNeedPermissionMethod(resultHandler)
             return
         }
 
 
         if (Methods.isPermissionMethod(method)) {
+            // The method is used to request permission.
             handlePermissionMethod(resultHandler)
             return
         }
@@ -216,39 +215,53 @@ class PhotoManagerPlugin(
 
     private fun handlePermissionMethod(resultHandler: ResultHandler) {
         val call = resultHandler.call
-        if (call.method == Methods.requestPermissionExtend) {
-            val androidPermission = call.argument<Map<*, *>>("permission")!!
-            val requestType = androidPermission["type"] as Int
-            val mediaLocation = androidPermission["mediaLocation"] as Boolean
+        when (call.method) {
+            Methods.requestPermissionExtend -> {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                    resultHandler.reply(PermissionResult.Authorized.value)
+                    return
+                }
 
+                val androidPermission = call.argument<Map<*, *>>("permission")!!
+                val requestType = androidPermission["type"] as Int
+                val mediaLocation = androidPermission["mediaLocation"] as Boolean
 
-            val permissions = arrayListOf<String>()
-            permissionsUtils.injectNeedPermissions(
-                applicationContext,
-                requestType,
-                mediaLocation,
-                permissions,
-            )
-            permissionsUtils.withActivity(activity)
-                .setListener(object : PermissionsListener {
-                    override fun onGranted() {
-                        TODO("Not yet implemented")
-                    }
+                permissionsUtils.withActivity(activity)
+                    .setListener(object : PermissionsListener {
+                        override fun onGranted(needPermissions: MutableList<String>) {
+                            resultHandler.reply(PermissionResult.Authorized.value)
+                        }
 
-                    override fun onDenied(
-                        deniedPermissions: MutableList<String>,
-                        grantedPermissions: MutableList<String>
-                    ) {
-                        TODO("Not yet implemented")
-                    }
-                })
-                .getPermissions(3001, permissions)
+                        override fun onDenied(
+                            deniedPermissions: MutableList<String>,
+                            grantedPermissions: MutableList<String>,
+                            needPermissions: MutableList<String>
+                        ) {
+                            if (grantedPermissions.containsAll(needPermissions)) {
+                                resultHandler.reply(PermissionResult.Authorized.value)
+                            } else {
+                                resultHandler.reply(PermissionResult.Denied.value)
+                            }
+                        }
+                    })
+                    .requestPermission(
+                        applicationContext,
+                        requestType,
+                        mediaLocation,
+                    )
+            }
 
-            return
-        } else if (call.method == Methods.presentLimited) {
-//            resultHandler.reply(null)
-            return
+            Methods.presentLimited -> {
+                //            resultHandler.reply(null)
+            }
+
+            Methods.ignorePermissionCheck -> {
+                val ignore = call.argument<Boolean>("ignore")!!
+                ignorePermissionCheck = ignore
+                resultHandler.reply(ignore)
+            }
         }
+
     }
 
     private fun handleNotNeedPermissionMethod(resultHandler: ResultHandler) {
@@ -284,12 +297,6 @@ class PhotoManagerPlugin(
             Methods.releaseMemoryCache -> {
                 // The plugin will not hold instances cache on Android.
                 resultHandler.reply(1)
-            }
-
-            Methods.ignorePermissionCheck -> {
-                val ignore = call.argument<Boolean>("ignore")!!
-                ignorePermissionCheck = ignore
-                resultHandler.reply(ignore)
             }
         }
     }
