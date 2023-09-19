@@ -223,8 +223,11 @@ Most of the APIs can only use with granted permission.
 
 ```dart
 final PermissionState ps = await PhotoManager.requestPermissionExtend(); // the method can use optional param `permission`.
-if (ps.hasAccess) {
-  // Granted or limited.
+if (ps.isAuth) {
+  // Granted
+  // You can to get assets here.
+} else if (ps.hasAccess) {
+  // Access will continue, but the amount visible depends on the user's selection.
 } else {
   // Limited(iOS) or Rejected, use `==` for more precise judgements.
   // You can call `PhotoManager.openSetting()` to open settings for further steps.
@@ -240,7 +243,9 @@ PhotoManager.setIgnorePermissionCheck(true);
 For background processing (such as when the app is not in the foreground),
 ignore permissions check would be proper solution.
 
-#### Limited entities access on iOS
+#### Limited entities access
+
+##### Limited entities access on iOS
 
 With iOS 14 released, Apple brought a "Limited Photos Library" permission
 (`PermissionState.limited`) to iOS.
@@ -251,8 +256,16 @@ To reselect accessible entities for the app,
 use `PhotoManager.presentLimited()` to call the modal of
 accessible entities' management.
 This method only available for iOS 14+ and when the permission state
-is limited (`PermissionState.limited`),
-other platform won't make a valid call.
+is limited (`PermissionState.limited`).
+
+##### Limited entities access on android
+
+Similar to iOS, Android 14 (API 34) has also introduced this concept, and the usage on the Dart side is completely identical.
+
+However, there is a slight difference in behavior (based on the emulator).   
+
+In Android, once access permission to a certain resource is granted, it cannot be revoked,
+even if you do not select it again when using `presentLimited`.
 
 ### Get albums/folders (`AssetPathEntity`)
 

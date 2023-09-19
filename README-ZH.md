@@ -213,8 +213,11 @@ Android 10 引入了 **Scoped Storage**，导致原始资源文件不能通过�
 
 ```dart
 final PermissionState ps = await PhotoManager.requestPermissionExtend();
-if (ps.hasAccess) {
+if (ps.isAuth) {
+  // 已获取到权限
+} else if (ps.hasAccess) {
   // 已获取到权限（哪怕只是有限的访问权限）。
+  // iOS Android 目前都已经有了部分权限的概念。
 } else {
   // 权限受限制（iOS）或者被拒绝，使用 `==` 能够更准确的判断是受限还是拒绝。
   // 你可以使用 `PhotoManager.openSetting()` 打开系统设置页面进行进一步的逻辑定制。
@@ -228,14 +231,22 @@ PhotoManager.setIgnorePermissionCheck(true);
 
 对于一些后台操作（应用未启动等）而言，忽略检查是比较合适的做法。
 
-#### iOS 受限的资源权限
+#### 受限的资源权限
+
+##### iOS 受限的资源权限
 
 iOS14 引入了部分资源限制的权限 (`PermissionState.limited`)。
 `PhotoManager.requestPermissionExtend()` 会返回当前的权限状态 `PermissionState`。
 详情请参阅 [PHAuthorizationStatus][]。
 
 如果你想要重新选择在应用里能够读取到的资源，你可以使用 `PhotoManager.presentLimited()` 重新选择资源，
-这个方法仅在 iOS 14 以上的版本生效，其他平台或版本无法调用这个方法。
+这个方法对于 iOS 14 以上的版本生效。
+
+##### Android 受限的资源权限
+
+和 iOS 类似，安卓 14（API 34) 中也加入了这个概念，dart 端的使用方法也完全一致。
+
+但行为上略有不同（基于模拟器），安卓中一旦授予某个资源的访问权限，就无法撤销，即使再次使用 `presentLimited` 时不选中也一样。
 
 ### 获取相簿或图集 (`AssetPathEntity`)
 
