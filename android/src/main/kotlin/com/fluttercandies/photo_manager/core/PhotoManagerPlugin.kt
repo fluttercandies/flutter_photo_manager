@@ -92,14 +92,11 @@ class PhotoManagerPlugin(
         }
 
         if (ignorePermissionCheck) {
-            val haveLocationPermission = permissionsUtils.haveLocationPermission(applicationContext)
-
-            onHandlePermissionResult(
-                resultHandler,
-                haveLocationPermission
-            )
+            handleOtherMethods(resultHandler)
             return
         }
+
+        handleOtherMethods(resultHandler)
 
 //        permissionsUtils.withActivity(activity)
 //            .handlePermission(resultHandler, this::onHandlePermissionResult)
@@ -222,7 +219,7 @@ class PhotoManagerPlugin(
                     return
                 }
 
-                val androidPermission = call.argument<Map<*, *>>("permission")!!
+                val androidPermission = call.argument<Map<*, *>>("androidPermission")!!
                 val requestType = androidPermission["type"] as Int
                 val mediaLocation = androidPermission["mediaLocation"] as Boolean
 
@@ -237,11 +234,15 @@ class PhotoManagerPlugin(
                             grantedPermissions: MutableList<String>,
                             needPermissions: MutableList<String>
                         ) {
-                            if (grantedPermissions.containsAll(needPermissions)) {
-                                resultHandler.reply(PermissionResult.Authorized.value)
-                            } else {
-                                resultHandler.reply(PermissionResult.Denied.value)
-                            }
+                            val authResult =
+                                permissionsUtils.getAuthValue(requestType, mediaLocation)
+                            resultHandler.reply(authResult.value)
+//                            resultHandler.reply()
+//                            if (grantedPermissions.containsAll(needPermissions)) {
+//                                resultHandler.reply(authResult.value)
+//                            } else {
+//                                resultHandler.reply(PermissionResult.Denied.value)
+//                            }
                         }
                     })
                     .requestPermission(
@@ -252,7 +253,8 @@ class PhotoManagerPlugin(
             }
 
             Methods.presentLimited -> {
-                //            resultHandler.reply(null)
+                val type = call.argument<Int>("type")!!
+                permissionsUtils.presentLimited(type, resultHandler)
             }
 
             Methods.ignorePermissionCheck -> {
@@ -262,6 +264,25 @@ class PhotoManagerPlugin(
             }
         }
 
+    }
+
+    private fun handleOtherMethods(resultHandler: ResultHandler) {
+        runOnBackground {
+            try {
+                val needLocationPermission =
+                    permissionsUtils.haveLocationPermission(applicationContext)
+                handleMethodResult(resultHandler, needLocationPermission)
+            } catch (e: Exception) {
+                val call = resultHandler.call
+                val method = call.method
+                val params = call.arguments
+                resultHandler.replyError(
+                    "The $method method has an error: ${e.message}",
+                    e.stackTraceToString(),
+                    params
+                )
+            }
+        }
     }
 
     private fun handleNotNeedPermissionMethod(resultHandler: ResultHandler) {
@@ -309,39 +330,11 @@ class PhotoManagerPlugin(
         )
     }
 
-    private fun onHandlePermissionResult(
+    private fun handleMethodResult(
         resultHandler: ResultHandler,
         needLocationPermission: Boolean
     ) {
         val call = resultHandler.call
-        if (call.method == Methods.requestPermissionExtend) {
-            resultHandler.reply(PermissionResult.Authorized.value)
-            return
-        }
-        if (call.method == Methods.presentLimited) {
-            resultHandler.reply(null)
-            return
-        }
-        runOnBackground {
-            try {
-                handleMethodResult(call, resultHandler, needLocationPermission)
-            } catch (e: Exception) {
-                val method = call.method
-                val params = call.arguments
-                resultHandler.replyError(
-                    "The $method method has an error: ${e.message}",
-                    e.stackTraceToString(),
-                    params
-                )
-            }
-        }
-    }
-
-    private fun handleMethodResult(
-        call: MethodCall,
-        resultHandler: ResultHandler,
-        needLocationPermission: Boolean
-    ) {
         when (call.method) {
             Methods.getAssetPathList -> {
                 val type = call.argument<Int>("type")!!

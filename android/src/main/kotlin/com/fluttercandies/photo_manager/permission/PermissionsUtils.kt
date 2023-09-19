@@ -8,7 +8,9 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.core.content.PermissionChecker
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
+import com.fluttercandies.photo_manager.core.entity.PermissionResult
 import com.fluttercandies.photo_manager.util.LogUtils
+import com.fluttercandies.photo_manager.util.ResultHandler
 import java.lang.NullPointerException
 import kotlin.collections.ArrayList
 
@@ -139,7 +141,7 @@ class PermissionsUtils {
         permissions: Array<String>,
         grantResults: IntArray
     ): PermissionsUtils {
-        if (requestCode == PermissionDelegate.requestCode) {
+        if (requestCode == PermissionDelegate.requestCode || requestCode == PermissionDelegate.limitedRequestCode) {
             for (i in permissions.indices) {
                 LogUtils.info("Returned permissions: " + permissions[i])
                 if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
@@ -149,6 +151,12 @@ class PermissionsUtils {
                 }
             }
 
+            LogUtils.debug("dealResult: ")
+            LogUtils.debug("  permissions: $permissions")
+            LogUtils.debug("  grantResults: $grantResults")
+            LogUtils.debug("  deniedPermissionsList: $deniedPermissionsList")
+            LogUtils.debug("  grantedPermissionsList: $grantedPermissionsList")
+
             if (delegate.isHandlePermissionResult()) {
                 delegate.handlePermissionResult(
                     this,
@@ -157,7 +165,8 @@ class PermissionsUtils {
                     grantResults,
                     needToRequestPermissionsList,
                     deniedPermissionsList,
-                    grantedPermissionsList
+                    grantedPermissionsList,
+                    requestCode,
                 )
             } else {
                 if (deniedPermissionsList.isNotEmpty()) {
@@ -213,6 +222,14 @@ class PermissionsUtils {
     fun setNeedToRequestPermissionsList(permission: MutableList<String>) {
         needToRequestPermissionsList.clear()
         needToRequestPermissionsList.addAll(permission)
+    }
+
+    fun presentLimited(type: Int, resultHandler: ResultHandler) {
+        delegate.presentLimited(this, context!!, type, resultHandler)
+    }
+
+    fun getAuthValue(requestType: Int, mediaLocation: Boolean): PermissionResult {
+        return delegate.getAuthValue(context!!, requestType, mediaLocation)
     }
 
 }

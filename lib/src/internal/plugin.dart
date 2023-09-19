@@ -47,9 +47,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     }
     if (filterOption is FilterOptionGroup) {
       assert(
-        type == RequestType.image || !filterOption.onlyLivePhotos,
-        'Filtering only Live Photos is only supported '
-        'when the request type contains image.',
+      type == RequestType.image || !filterOption.onlyLivePhotos,
+      'Filtering only Live Photos is only supported '
+          'when the request type contains image.',
       );
     }
 
@@ -74,8 +74,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<PermissionState> requestPermissionExtend(
-    PermissionRequestOption requestOption,
-  ) async {
+      PermissionRequestOption requestOption,) async {
     final int result = await _channel.invokeMethod<int>(
       PMConstants.mRequestPermissionExtend,
       requestOption.toMap(),
@@ -102,15 +101,14 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   /// Use pagination to get album content.
-  Future<List<AssetEntity>> getAssetListPaged(
-    String id, {
+  Future<List<AssetEntity>> getAssetListPaged(String id, {
     required PMFilter optionGroup,
     int page = 0,
     int size = 15,
     RequestType type = RequestType.common,
   }) async {
     final Map<dynamic, dynamic> result =
-        await _channel.invokeMethod<Map<dynamic, dynamic>>(
+    await _channel.invokeMethod<Map<dynamic, dynamic>>(
       PMConstants.mGetAssetListPaged,
       <String, dynamic>{
         'id': id,
@@ -124,15 +122,14 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   /// Asset in the specified range.
-  Future<List<AssetEntity>> getAssetListRange(
-    String id, {
+  Future<List<AssetEntity>> getAssetListRange(String id, {
     required RequestType type,
     required int start,
     required int end,
     required PMFilter optionGroup,
   }) async {
     final Map<dynamic, dynamic> map =
-        await _channel.invokeMethod<Map<dynamic, dynamic>>(
+    await _channel.invokeMethod<Map<dynamic, dynamic>>(
       PMConstants.mGetAssetListRange,
       <String, dynamic>{
         'id': id,
@@ -146,10 +143,8 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return ConvertUtils.convertToAssetList(map.cast<String, dynamic>());
   }
 
-  void _injectParams(
-    Map<String, dynamic> params,
-    PMProgressHandler? progressHandler,
-  ) {
+  void _injectParams(Map<String, dynamic> params,
+      PMProgressHandler? progressHandler,) {
     if (progressHandler != null) {
       params['progressHandler'] = progressHandler.channelIndex;
     }
@@ -169,8 +164,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return _channel.invokeMethod(PMConstants.mGetThumb, params);
   }
 
-  Future<typed_data.Uint8List?> getOriginBytes(
-    String id, {
+  Future<typed_data.Uint8List?> getOriginBytes(String id, {
     PMProgressHandler? progressHandler,
   }) {
     final Map<String, dynamic> params = <String, dynamic>{'id': id};
@@ -182,8 +176,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return _channel.invokeMethod(PMConstants.mReleaseMemoryCache);
   }
 
-  Future<String?> getFullFile(
-    String id, {
+  Future<String?> getFullFile(String id, {
     required bool isOrigin,
     PMProgressHandler? progressHandler,
     int subtype = 0,
@@ -212,11 +205,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     );
   }
 
-  Future<Map<dynamic, dynamic>?> fetchPathProperties(
-    String id,
-    RequestType type,
-    PMFilter optionGroup,
-  ) {
+  Future<Map<dynamic, dynamic>?> fetchPathProperties(String id,
+      RequestType type,
+      PMFilter optionGroup,) {
     return _channel.invokeMethod(
       PMConstants.mFetchPathProperties,
       <String, dynamic>{
@@ -261,8 +252,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     'onlyAddPermission': true,
   };
 
-  Future<AssetEntity?> saveImage(
-    typed_data.Uint8List data, {
+  Future<AssetEntity?> saveImage(typed_data.Uint8List data, {
     required String? title,
     String? desc,
     String? relativePath,
@@ -286,8 +276,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     );
   }
 
-  Future<AssetEntity?> saveImageWithPath(
-    String path, {
+  Future<AssetEntity?> saveImageWithPath(String path, {
     required String title,
     String? desc,
     String? relativePath,
@@ -316,8 +305,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     );
   }
 
-  Future<AssetEntity?> saveVideo(
-    File file, {
+  Future<AssetEntity?> saveVideo(File file, {
     required String? title,
     String? desc,
     String? relativePath,
@@ -414,8 +402,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return LatLng(latitude: entity.latitude, longitude: entity.longitude);
   }
 
-  Future<String> getTitleAsync(
-    AssetEntity entity, {
+  Future<String> getTitleAsync(AssetEntity entity, {
     int subtype = 0,
   }) async {
     assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
@@ -442,10 +429,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<List<AssetPathEntity>> getSubPathEntities(
-    AssetPathEntity pathEntity,
-  ) async {
+      AssetPathEntity pathEntity,) async {
     final Map<dynamic, dynamic> result =
-        await _channel.invokeMethod<Map<dynamic, dynamic>>(
+    await _channel.invokeMethod<Map<dynamic, dynamic>>(
       PMConstants.mGetSubPath,
       <String, dynamic>{
         'id': pathEntity.id,
@@ -462,14 +448,12 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     );
   }
 
-  Future<AssetEntity?> copyAssetToGallery(
-    AssetEntity asset,
-    AssetPathEntity pathEntity,
-  ) async {
+  Future<AssetEntity?> copyAssetToGallery(AssetEntity asset,
+      AssetPathEntity pathEntity,) async {
     if (pathEntity.isAll) {
       assert(
-        pathEntity.isAll,
-        "You can't copy the asset into the album containing all the pictures.",
+      pathEntity.isAll,
+      "You can't copy the asset into the album containing all the pictures.",
       );
       return null;
     }
@@ -527,10 +511,8 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return _channel.invokeMethod(PMConstants.mCancelCacheRequests);
   }
 
-  Future<void> requestCacheAssetsThumbnail(
-    List<String> ids,
-    ThumbnailOption option,
-  ) {
+  Future<void> requestCacheAssetsThumbnail(List<String> ids,
+      ThumbnailOption option,) {
     assert(ids.isNotEmpty);
     return _channel.invokeMethod(
       PMConstants.mRequestCacheAssetsThumb,
@@ -541,10 +523,12 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     );
   }
 
-  Future<void> presentLimited() async {
+  Future<void> presentLimited(RequestType type) async {
     assert(Platform.isIOS || Platform.isAndroid);
     if (Platform.isIOS || Platform.isAndroid) {
-      return _channel.invokeMethod(PMConstants.mPresentLimited);
+      return _channel.invokeMethod(PMConstants.mPresentLimited, {
+        'type': type.value,
+      });
     }
   }
 
@@ -607,11 +591,9 @@ mixin IosPlugin on BasePlugin {
     return result;
   }
 
-  Future<AssetPathEntity?> iosCreateAlbum(
-    String name,
-    bool isRoot,
-    AssetPathEntity? parent,
-  ) async {
+  Future<AssetPathEntity?> iosCreateAlbum(String name,
+      bool isRoot,
+      AssetPathEntity? parent,) async {
     final Map<String, dynamic> map = <String, dynamic>{
       'name': name,
       'isRoot': isRoot,
@@ -632,11 +614,9 @@ mixin IosPlugin on BasePlugin {
     return AssetPathEntity.fromId(result['id'] as String);
   }
 
-  Future<AssetPathEntity?> iosCreateFolder(
-    String name,
-    bool isRoot,
-    AssetPathEntity? parent,
-  ) async {
+  Future<AssetPathEntity?> iosCreateFolder(String name,
+      bool isRoot,
+      AssetPathEntity? parent,) async {
     final Map<String, dynamic> map = <String, dynamic>{
       'name': name,
       'isRoot': isRoot,
@@ -657,10 +637,8 @@ mixin IosPlugin on BasePlugin {
     return AssetPathEntity.fromId(result['id'] as String, albumType: 2);
   }
 
-  Future<bool> iosRemoveInAlbum(
-    List<AssetEntity> entities,
-    AssetPathEntity path,
-  ) async {
+  Future<bool> iosRemoveInAlbum(List<AssetEntity> entities,
+      AssetPathEntity path,) async {
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mRemoveInAlbum,
       <dynamic, dynamic>{
@@ -673,10 +651,8 @@ mixin IosPlugin on BasePlugin {
 }
 
 mixin AndroidPlugin on BasePlugin {
-  Future<bool> androidMoveAssetToPath(
-    AssetEntity entity,
-    AssetPathEntity target,
-  ) async {
+  Future<bool> androidMoveAssetToPath(AssetEntity entity,
+      AssetPathEntity target,) async {
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mMoveAssetToPath,
       <String, dynamic>{'assetId': entity.id, 'albumId': target.id},

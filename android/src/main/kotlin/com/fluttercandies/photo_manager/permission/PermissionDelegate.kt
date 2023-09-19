@@ -1,17 +1,28 @@
 package com.fluttercandies.photo_manager.permission
 
+import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
+import com.fluttercandies.photo_manager.core.entity.PermissionResult
 import com.fluttercandies.photo_manager.permission.impl.PermissionDelegate19
 import com.fluttercandies.photo_manager.permission.impl.PermissionDelegate23
 import com.fluttercandies.photo_manager.permission.impl.PermissionDelegate29
 import com.fluttercandies.photo_manager.permission.impl.PermissionDelegate30
 import com.fluttercandies.photo_manager.permission.impl.PermissionDelegate33
 import com.fluttercandies.photo_manager.permission.impl.PermissionDelegate34
+import com.fluttercandies.photo_manager.util.LogUtils
+import com.fluttercandies.photo_manager.util.ResultHandler
 
 abstract class PermissionDelegate {
+
+    protected var resultHandler: ResultHandler? = null
+
+    private val tag: String
+        get() {
+            return this.javaClass.simpleName
+        }
 
     protected fun requestPermission(
         permissionsUtils: PermissionsUtils,
@@ -21,8 +32,9 @@ abstract class PermissionDelegate {
             ?: throw NullPointerException("Activity for the permission request is not exist.")
 
         permissionsUtils.setNeedToRequestPermissionsList(permission)
-
         ActivityCompat.requestPermissions(activity, permission.toTypedArray(), requestCode)
+
+        LogUtils.debug("requestPermission: $permission for code $requestCode")
     }
 
     /**
@@ -54,6 +66,14 @@ abstract class PermissionDelegate {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    protected fun havePermissionsForUser(context: Context, vararg permissions: String): Boolean {
+        return permissions.all { havePermissionForUser(context, it) }
+    }
+
+    protected fun haveAnyPermissionForUser(context: Context, vararg permissions: String): Boolean {
+        return permissions.any { havePermissionForUser(context, it) }
+    }
+
     /**
      * Check if the permission is granted for the user and it is in the manifest.
      */
@@ -68,7 +88,9 @@ abstract class PermissionDelegate {
      * Check if the [permission] are granted for the user and it is in the manifest.
      */
     fun havePermissions(context: Context, vararg permission: String): Boolean {
-        return permission.all { havePermission(context, it) }
+        val result = permission.all { havePermission(context, it) }
+        LogUtils.debug("[$tag] havePermissions: ${permission.toList()}, result: $result")
+        return result
     }
 
     /**
@@ -98,6 +120,7 @@ abstract class PermissionDelegate {
 
     companion object {
         const val requestCode = 3001
+        const val limitedRequestCode = 3002
 
         /**
          * Create a [PermissionDelegate] by the sdk version.
@@ -109,10 +132,7 @@ abstract class PermissionDelegate {
                 29 -> PermissionDelegate29()
                 in 30 until 33 -> PermissionDelegate30()
                 33 -> PermissionDelegate33()
-                in 34 until Int.MAX_VALUE -> {
-                    PermissionDelegate34()
-                }
-
+                in 34 until Int.MAX_VALUE -> PermissionDelegate34()
                 else -> throw UnsupportedOperationException(
                     "This sdk version is not supported yet."
                 )
@@ -131,12 +151,25 @@ abstract class PermissionDelegate {
         grantResults: IntArray,
         needToRequestPermissionsList: MutableList<String>,
         deniedPermissionsList: MutableList<String>,
-        grantedPermissionsList: MutableList<String>
+        grantedPermissionsList: MutableList<String>,
+        requestCode: Int
     ) {
         throw UnsupportedOperationException(
             "handlePermissionResult is not implemented," +
                     " please implement it in your delegate."
         )
     }
+
+    open fun presentLimited(
+        permissionsUtils: PermissionsUtils,
+        context: Application,
+        type: Int,
+        resultHandler: ResultHandler
+    ) {
+        LogUtils.debug("[$tag] presentLimited is not implemented")
+        resultHandler.reply(null)
+    }
+
+    abstract fun getAuthValue(context: Application, requestType: Int, mediaLocation: Boolean): PermissionResult
 
 }

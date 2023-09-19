@@ -1,7 +1,8 @@
 package com.fluttercandies.photo_manager.permission.impl
 
+import android.app.Application
 import android.content.Context
-import androidx.annotation.RequiresApi
+import com.fluttercandies.photo_manager.core.entity.PermissionResult
 import com.fluttercandies.photo_manager.permission.PermissionsUtils
 
 class PermissionDelegate19 : com.fluttercandies.photo_manager.permission.PermissionDelegate() {
@@ -20,5 +21,9 @@ class PermissionDelegate19 : com.fluttercandies.photo_manager.permission.Permiss
 
     override fun haveMediaLocation(context: Context): Boolean {
         return true
+    }
+
+    override fun getAuthValue(context: Application, requestType: Int, mediaLocation: Boolean): PermissionResult {
+        return PermissionResult.Authorized
     }
 }

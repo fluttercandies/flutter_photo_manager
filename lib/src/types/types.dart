@@ -82,8 +82,8 @@ class PermissionRequestOption with IMapMixin {
   const PermissionRequestOption({
     this.iosAccessLevel = IosAccessLevel.readWrite,
     this.androidPermission = const AndroidPermission(
-      RequestType.common,
-      false,
+      type: RequestType.common,
+      mediaLocation: false,
     ),
   });
 
@@ -125,7 +125,7 @@ class AndroidPermission with IMapMixin {
   final bool mediaLocation;
 
   /// The permission for android.
-  const AndroidPermission(this.type, this.mediaLocation);
+  const AndroidPermission({required this.type, required this.mediaLocation,});
 
   @override
   Map<String, dynamic> toMap() =>
