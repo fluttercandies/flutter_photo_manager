@@ -222,9 +222,9 @@ It's pretty much the same as the `NSPhotoLibraryUsageDescription`.
 Most of the APIs can only use with granted permission.
 
 ```dart
-final PermissionState ps = await PhotoManager.requestPermissionExtend();
-if (ps.isAuth) {
-  // Granted.
+final PermissionState ps = await PhotoManager.requestPermissionExtend(); // the method can use optional param `permission`.
+if (ps.hasAccess) {
+  // Granted or limited.
 } else {
   // Limited(iOS) or Rejected, use `==` for more precise judgements.
   // You can call `PhotoManager.openSetting()` to open settings for further steps.

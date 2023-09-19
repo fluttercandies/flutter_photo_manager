@@ -87,6 +87,7 @@ class PermissionRequestOption with IMapMixin {
     ),
   });
 
+  /// See [IosAccessLevel].
   final IosAccessLevel iosAccessLevel;
 
   /// See [AndroidPermission].
