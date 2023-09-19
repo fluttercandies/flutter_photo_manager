@@ -4,6 +4,22 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.8.0
+
+### Feature
+
+- Support android API 34(Android 14) limit access to photos and videos.
+- Because limit permission, we refactor the permission request API.
+
+***Breaking changes for permission behavior***
+
+Now, users need to ensure they have the access permissions through the 
+following means before using the API to access resources.
+Two ways:
+
+1. `PhotoManager.requestPermissionExtend()` and the result is `PermissionState.authorized` or `PermissionState.limited`.
+2. `PhotoManager.setIgnorePermissionCheck(true)` to ignore permission check and use other permission plugin.
+
 ## 2.7.1
 
 ### Fixes
@@ -38,9 +54,9 @@ that can be found in the LICENSE file. -->
 
 - Support `CustomFilter` for more filter options. (#901)
 - Add two new static methods for `PhotoManager`:
-  - `getAssetCount` for getting assets count.
-  - `getAssetListRange` for getting assets between start and end.
-  
+    - `getAssetCount` for getting assets count.
+    - `getAssetListRange` for getting assets between start and end.
+
 ## 2.5.2
 
 ### Improvements
@@ -120,8 +136,8 @@ that can be found in the LICENSE file. -->
 
 - Introduce `AssetPathEntity.assetCountAsync` getter,
   which improves the speed when loading paths mainly on iOS, also:
-  - Deprecate `AssetPathEntity.assetCount`.
-  - Remove `FilterOptionGroup.containsEmptyAlbum`.
+    - Deprecate `AssetPathEntity.assetCount`.
+    - Remove `FilterOptionGroup.containsEmptyAlbum`.
 
 ### Improvements
 
@@ -545,7 +561,7 @@ and applied multiple ### Fixes which make this plugin as the most solid ever.
   but at the same time user have to bear the risks corresponding to the permission).
 - Support clean file cache.
 - Experimental
-  - Preload image (Use `PhotoCachingManager` api.)
+    - Preload image (Use `PhotoCachingManager` api.)
 - Add `OrderOption` as sort condition. The option default value is order by create date desc;
 - Support icloud asset progress.
 
@@ -608,14 +624,14 @@ and applied multiple ### Fixes which make this plugin as the most solid ever.
 - Create AssetEntity with id.
 - Create AssetPathEntity from id.
 - Only iOS
-  - Create folder or album.
-  - Remove assets in album.
-  - Delete folder or album.
-  - Favorite asset.
+    - Create folder or album.
+    - Remove assets in album.
+    - Delete folder or album.
+    - Favorite asset.
 - Only android
-  - move asset to another path.
-  - Remove all non-existing rows.
-  - add `relativePath` for android.
+    - move asset to another path.
+    - Remove all non-existing rows.
+    - add `relativePath` for android.
 
 ### Improvements
 
