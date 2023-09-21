@@ -3,8 +3,7 @@
 // in the LICENSE file.
 
 /// Contains an abstract method toMap to indicate that it can be converted into a Map object
-mixin IMapMixin{
-
+mixin IMapMixin {
   /// Convert current object to a map.
   ///
   /// Usually for transfer to MethodChannel.

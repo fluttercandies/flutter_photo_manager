@@ -239,29 +239,28 @@ class _DarwinPathFilterPageState extends State<DarwinPathFilterPage> {
     final PhotoProvider provider = context.watch<PhotoProvider>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Path filter'),
-      ),
-      body: ListView(
-        children: <Widget>[
-          buildGroup<PMDarwinAssetCollectionType>(
-            'PMDarwinAssetCollectionType',
-            PMDarwinAssetCollectionType.values,
-            provider.pathTypeList,
-            (value) {
-              provider.pathTypeList = value;
-            },
-          ),
-          buildGroup<PMDarwinAssetCollectionSubtype>(
-            'PMDarwinAssetCollectionSubtype',
-            PMDarwinAssetCollectionSubtype.values,
-            provider.pathSubTypeList,
-            (value) {
-              provider.pathSubTypeList = value;
-            },
-          ),
-        ],
-      )
-    );
+        appBar: AppBar(
+          title: const Text('Path filter'),
+        ),
+        body: ListView(
+          children: <Widget>[
+            buildGroup<PMDarwinAssetCollectionType>(
+              'PMDarwinAssetCollectionType',
+              PMDarwinAssetCollectionType.values,
+              provider.pathTypeList,
+              (value) {
+                provider.pathTypeList = value;
+              },
+            ),
+            buildGroup<PMDarwinAssetCollectionSubtype>(
+              'PMDarwinAssetCollectionSubtype',
+              PMDarwinAssetCollectionSubtype.values,
+              provider.pathSubTypeList,
+              (value) {
+                provider.pathSubTypeList = value;
+              },
+            ),
+          ],
+        ));
   }
 }

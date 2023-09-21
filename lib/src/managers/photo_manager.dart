@@ -70,7 +70,8 @@ class PhotoManager {
   ///  * iOS 15: https://developer.apple.com/documentation/photokit/phphotolibrary/3752108-presentlimitedlibrarypickerfromv/
   static Future<void> presentLimited({
     RequestType type = RequestType.all,
-}) => plugin.presentLimited(type);
+  }) =>
+      plugin.presentLimited(type);
 
   /// Obtain albums/folders list with couple filter options.
   ///

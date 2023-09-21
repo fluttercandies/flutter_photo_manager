@@ -35,44 +35,42 @@ class _NewHomePageState extends State<NewHomePage> {
   Widget build(BuildContext context) {
     return ChangeNotifierBuilder<PhotoProvider>(
       value: watchProvider,
-      builder: (_, __) =>
-          Scaffold(
-            appBar: AppBar(
-              title: const Text('photo manager example'),
+      builder: (_, __) => Scaffold(
+        appBar: AppBar(
+          title: const Text('photo manager example'),
+        ),
+        body: ListView(
+          padding: const EdgeInsets.all(8.0),
+          children: <Widget>[
+            CustomButton(
+              title: 'Get all gallery list',
+              onPressed: _scanGalleryList,
             ),
-            body: ListView(
-              padding: const EdgeInsets.all(8.0),
+            if (Platform.isIOS || Platform.isAndroid)
+              CustomButton(
+                title: 'Change limited photos with PhotosUI',
+                onPressed: _changeLimitPhotos,
+              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                CustomButton(
-                  title: 'Get all gallery list',
-                  onPressed: _scanGalleryList,
-                ),
-                if (Platform.isIOS || Platform.isAndroid)
-                  CustomButton(
-                    title: 'Change limited photos with PhotosUI',
-                    onPressed: _changeLimitPhotos,
-                  ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Text('scan type'),
-                    Container(width: 10),
-                  ],
-                ),
-                _buildTypeChecks(watchProvider),
-                _buildHasAllCheck(),
-                _buildOnlyAllCheck(),
-                _buildContainsLivePhotos(),
-                _buildOnlyLivePhotos(),
-                _buildPathContainsModifiedDateCheck(),
-                _buildPngCheck(),
-                _buildNotifyCheck(),
-                _buildFilterOption(watchProvider),
-                if (Platform.isIOS || Platform.isMacOS)
-                  _buildPathFilterOption(),
+                const Text('scan type'),
+                Container(width: 10),
               ],
             ),
-          ),
+            _buildTypeChecks(watchProvider),
+            _buildHasAllCheck(),
+            _buildOnlyAllCheck(),
+            _buildContainsLivePhotos(),
+            _buildOnlyLivePhotos(),
+            _buildPathContainsModifiedDateCheck(),
+            _buildPngCheck(),
+            _buildNotifyCheck(),
+            _buildFilterOption(watchProvider),
+            if (Platform.isIOS || Platform.isMacOS) _buildPathFilterOption(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -122,10 +120,9 @@ class _NewHomePageState extends State<NewHomePage> {
   Future<void> _scanGalleryList() async {
     final permissionResult = await PhotoManager.requestPermissionExtend(
         requestOption: PermissionRequestOption(
-          androidPermission: AndroidPermission(
-              type: readProvider.type, mediaLocation: true),
-        )
-    );
+      androidPermission:
+          AndroidPermission(type: readProvider.type, mediaLocation: true),
+    ));
     if (!permissionResult.hasAccess) {
       showToast('no permission');
       return;

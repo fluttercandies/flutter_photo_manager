@@ -94,8 +94,7 @@ class PermissionRequestOption with IMapMixin {
   final AndroidPermission androidPermission;
 
   @override
-  Map<String, dynamic> toMap() =>
-      <String, dynamic>{
+  Map<String, dynamic> toMap() => <String, dynamic>{
         'iosAccessLevel': iosAccessLevel.index + 1,
         'androidPermission': androidPermission.toMap(),
       };
@@ -103,7 +102,7 @@ class PermissionRequestOption with IMapMixin {
   @override
   bool operator ==(Object other) =>
       other is PermissionRequestOption &&
-          iosAccessLevel == other.iosAccessLevel;
+      iosAccessLevel == other.iosAccessLevel;
 
   @override
   int get hashCode => iosAccessLevel.hashCode;
@@ -111,7 +110,6 @@ class PermissionRequestOption with IMapMixin {
 
 /// The permission for android.
 class AndroidPermission with IMapMixin {
-
   /// The type of your need.
   ///
   /// See [RequestType].
@@ -126,11 +124,13 @@ class AndroidPermission with IMapMixin {
   final bool mediaLocation;
 
   /// The permission for android.
-  const AndroidPermission({required this.type, required this.mediaLocation,});
+  const AndroidPermission({
+    required this.type,
+    required this.mediaLocation,
+  });
 
   @override
-  Map<String, dynamic> toMap() =>
-      <String, dynamic>{
+  Map<String, dynamic> toMap() => <String, dynamic>{
         'type': type.value,
         'mediaLocation': mediaLocation,
       };
