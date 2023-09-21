@@ -3,7 +3,6 @@ package com.fluttercandies.photo_manager.permission.impl
 import android.Manifest
 import android.app.Application
 import android.content.Context
-import android.os.Build
 import androidx.annotation.RequiresApi
 import com.fluttercandies.photo_manager.core.entity.PermissionResult
 import com.fluttercandies.photo_manager.permission.PermissionsUtils

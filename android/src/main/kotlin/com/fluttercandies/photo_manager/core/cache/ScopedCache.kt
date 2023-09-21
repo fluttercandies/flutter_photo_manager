@@ -9,7 +9,6 @@ import com.fluttercandies.photo_manager.core.utils.AndroidQDBUtils
 import com.fluttercandies.photo_manager.util.LogUtils
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.Exception
 
 @RequiresApi(Build.VERSION_CODES.Q)
 class ScopedCache {

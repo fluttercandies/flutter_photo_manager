@@ -10,10 +10,10 @@ import android.os.Looper
 import android.provider.BaseColumns
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.*
-import io.flutter.plugin.common.BinaryMessenger
-import io.flutter.plugin.common.MethodChannel
 import com.fluttercandies.photo_manager.core.utils.IDBUtils
 import com.fluttercandies.photo_manager.util.LogUtils
+import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.plugin.common.MethodChannel
 
 @Suppress("Range")
 class PhotoManagerNotifyChannel(
@@ -180,6 +180,7 @@ class PhotoManagerNotifyChannel(
                         }
                     }
                 }
+
                 type == MEDIA_TYPE_AUDIO -> {
                     val cursor = cr.query(
                         allUri,
@@ -203,6 +204,7 @@ class PhotoManagerNotifyChannel(
                         }
                     }
                 }
+
                 else -> {
                     val cursor = cr.query(
                         allUri,

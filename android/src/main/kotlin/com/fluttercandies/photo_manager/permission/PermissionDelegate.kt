@@ -170,6 +170,10 @@ abstract class PermissionDelegate {
         resultHandler.reply(null)
     }
 
-    abstract fun getAuthValue(context: Application, requestType: Int, mediaLocation: Boolean): PermissionResult
+    abstract fun getAuthValue(
+        context: Application,
+        requestType: Int,
+        mediaLocation: Boolean
+    ): PermissionResult
 
 }

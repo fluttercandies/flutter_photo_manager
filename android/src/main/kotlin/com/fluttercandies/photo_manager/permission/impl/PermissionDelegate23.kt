@@ -38,7 +38,11 @@ open class PermissionDelegate23 : com.fluttercandies.photo_manager.permission.Pe
         return true
     }
 
-    override fun getAuthValue(context: Application, requestType: Int, mediaLocation: Boolean): PermissionResult {
+    override fun getAuthValue(
+        context: Application,
+        requestType: Int,
+        mediaLocation: Boolean
+    ): PermissionResult {
         if (havePermissions(context, readPermission, writePermission)) {
             return PermissionResult.Authorized
         } else {

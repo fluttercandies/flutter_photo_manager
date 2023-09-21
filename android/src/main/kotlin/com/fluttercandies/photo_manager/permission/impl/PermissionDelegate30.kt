@@ -44,7 +44,11 @@ class PermissionDelegate30 : PermissionDelegate() {
         return havePermission(context, mediaLocationPermission)
     }
 
-    override fun getAuthValue(context: Application, requestType: Int, mediaLocation: Boolean): PermissionResult {
+    override fun getAuthValue(
+        context: Application,
+        requestType: Int,
+        mediaLocation: Boolean
+    ): PermissionResult {
         if (havePermissions(context, readPermission)) {
             return PermissionResult.Authorized
         } else {

@@ -11,8 +11,6 @@ import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import com.fluttercandies.photo_manager.core.entity.PermissionResult
 import com.fluttercandies.photo_manager.util.LogUtils
 import com.fluttercandies.photo_manager.util.ResultHandler
-import java.lang.NullPointerException
-import kotlin.collections.ArrayList
 
 class PermissionsUtils {
     /** 需要申请权限的Activity */
@@ -88,29 +86,6 @@ class PermissionsUtils {
             requestType,
             mediaLocation,
         )
-
-//        delegate.requestPermissions(this, context!!, requestCode, false)
-//        val permissionSet = permissions.toSet()
-//        if (mActivity == null) {
-//            throw NullPointerException("Activity for the permission request is not exist.")
-//        }
-//        check(!isRequesting) { "Another permission request is ongoing." }
-//        isRequesting = true
-//        this.requestCode = requestCode
-//        if (!checkPermissions(*permissions)) {
-//            // 通过上面的 checkPermissions，可以知道能得到进入到这里面的都是 6.0 的机子
-//            ActivityCompat.requestPermissions(
-//                mActivity!!,
-//                needToRequestPermissionsList.toTypedArray(),
-//                requestCode
-//            )
-//            for (i in needToRequestPermissionsList.indices) {
-//                LogUtils.info("Permissions: " + needToRequestPermissionsList[i])
-//            }
-//        } else if (permissionsListener != null) {
-//            isRequesting = false
-//            permissionsListener!!.onGranted()
-//        }
         return this
     }
 

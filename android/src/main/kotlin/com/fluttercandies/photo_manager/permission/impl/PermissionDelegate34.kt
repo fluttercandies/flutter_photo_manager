@@ -187,7 +187,11 @@ class PermissionDelegate34 : PermissionDelegate() {
         requestPermission(permissionsUtils, permissions)
     }
 
-    override fun getAuthValue(context: Application, requestType: Int, mediaLocation: Boolean): PermissionResult {
+    override fun getAuthValue(
+        context: Application,
+        requestType: Int,
+        mediaLocation: Boolean
+    ): PermissionResult {
         var result = PermissionResult.NotDetermined
 
         fun changeResult(newResult: PermissionResult) {
