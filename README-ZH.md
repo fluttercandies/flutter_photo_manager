@@ -87,6 +87,7 @@ that can be found in the LICENSE file. -->
   * [原生额外配置](#原生额外配置)
     * [Android 额外配置](#android-额外配置)
       * [Glide 相关问题](#glide-相关问题)
+      * [Android 14 (API level 34) 额外配置](#android-14-api-level-34-额外配置)
       * [Android 13 (API level 33) 额外配置](#android-13-api-level-33-额外配置)
     * [iOS 额外配置](#ios-额外配置)
       * [配置系统相册名称的国际化](#配置系统相册名称的国际化)
@@ -708,6 +709,17 @@ rootProject.allprojects {
 
 如果你想了解如何同时使用 ProGuard 和 Glide，请参阅
 [ProGuard for Glide](https://github.com/bumptech/glide#proguard)。
+
+#### Android 14 (API level 34) 额外配置
+
+当应用的 `targetSdkVersion` 为 34 (Android 14) 时，
+你需要在清单文件中添加以下额外配置：
+
+```xml
+<manifest>
+   <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" /> <!-- 这是一个可选的配置，不指定并不影响在代码中使用它 -->
+</manifest>
+```
 
 #### Android 13 (API level 33) 额外配置
 

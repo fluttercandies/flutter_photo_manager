@@ -88,6 +88,7 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
   * [Native extra configs](#native-extra-configs)
     * [Android extra configs](#android-extra-configs)
       * [Glide issues](#glide-issues)
+      * [Android 14 (Api 34) extra configs](#android-14-api-34-extra-configs)
       * [Android 13 (Api 33) extra configs](#android-13-api-33-extra-configs)
     * [iOS extra configs](#ios-extra-configs)
       * [Localized system albums name](#localized-system-albums-name)
@@ -765,6 +766,15 @@ rootProject.allprojects {
 
 See [ProGuard for Glide](https://github.com/bumptech/glide#proguard)
 if you want to know more about using ProGuard and Glide together.
+
+#### Android 14 (Api 34) extra configs
+
+When targeting Android 14 (API level 34),
+the following extra configs needs to be added to the manifest:
+
+```xml
+<uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />  <!-- If you want to use the limited access feature, it is an optional permission. -->
+```
 
 #### Android 13 (Api 33) extra configs
 
