@@ -262,12 +262,11 @@ is limited (`PermissionState.limited`).
 
 ##### Limited entities access on android
 
-Similar to iOS, Android 14 (API 34) has also introduced this concept, and the usage on the Dart side is completely identical.
+Android 14 (API 34) has also introduced the concept of limited assets similar to iOS.
 
-However, there is a slight difference in behavior (based on the emulator).   
-
-In Android, once access permission to a certain resource is granted, it cannot be revoked,
-even if you do not select it again when using `presentLimited`.
+However, there is a slight difference in behavior (based on the emulator):
+On Android, the access permission to a certain resource cannot be revoked once it is granted,
+even if it hasn't been selected when using `presentLimited` in future actions.
 
 ### Get albums/folders (`AssetPathEntity`)
 
