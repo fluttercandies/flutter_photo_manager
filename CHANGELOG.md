@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.7.2
+
+### Improvements
+
+- Add locks to the image provider.
+
 ## 2.7.1
 
 ### Fixes
