@@ -5,14 +5,14 @@ on:
   push:
 
 jobs:
-  build-for-android-3-10-6:
-    name: Build for android with 3.10.6 on ubuntu-latest
+  build-for-android:
+    name: Build for Android on ubuntu-latest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.10.6
+          channel: 'stable'
           cache: true
           cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       - uses: actions/setup-java@v3
@@ -32,14 +32,14 @@ jobs:
       - run: flutter build apk --debug
         working-directory: ${{ github.workspace }}/new_project
         name: Build example
-  build-for-ios-3-10-6:
-    name: Build for ios with 3.10.6 on macos-latest
+  build-for-ios:
+    name: Build for ios on macos-latest
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.10.6
+          channel: 'stable'
           cache: true
           cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       - run: flutter doctor -v
@@ -60,14 +60,14 @@ jobs:
       - run: flutter build ios --release --no-codesign
         working-directory: ${{ github.workspace }}/new_project
         name: Build example
-  build-for-web-3-10-6:
-    name: Build for web with 3.10.6 on ubuntu-latest
+  build-for-web:
+    name: Build for Web on ubuntu-latest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.10.6
+          channel: 'stable'
           cache: true
           cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       - run: flutter doctor -v
@@ -83,14 +83,14 @@ jobs:
       - run: flutter build web --release
         working-directory: ${{ github.workspace }}/new_project
         name: Build example
-  build-for-linux-3-10-6:
-    name: Build for linux with 3.10.6 on ubuntu-latest
+  build-for-linux:
+    name: Build for Linux on ubuntu-latest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.10.6
+          channel: 'stable'
           cache: true
           cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       - name: Install required packages
@@ -112,14 +112,14 @@ jobs:
       - run: flutter build linux --release
         working-directory: ${{ github.workspace }}/new_project
         name: Build example
-  build-for-macos-3-10-6:
-    name: Build for macos with 3.10.6 on macos-latest
+  build-for-macos:
+    name: Build for macOS on macos-latest
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.10.6
+          channel: 'stable'
           cache: true
           cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       - run: flutter doctor -v
@@ -140,14 +140,14 @@ jobs:
       - run: flutter build macos --release
         working-directory: ${{ github.workspace }}/new_project
         name: Build example
-  build-for-windows-3-10-6:
-    name: Build for windows with 3.10.6 on windows-latest
+  build-for-windows:
+    name: Build for Windows on windows-latest
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.10.6
+          channel: 'stable'
           cache: true
           cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       - run: flutter doctor -v

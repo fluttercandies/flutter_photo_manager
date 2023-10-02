@@ -4,6 +4,16 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.7.2
+
+### Fixes
+
+- Correct the key when fetching video info with MMR on Android. (#997)
+
+### Improvements
+
+- Add locks to the image provider.
+
 ## 2.7.1
 
 ### Fixes

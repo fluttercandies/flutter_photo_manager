@@ -1,3 +1,5 @@
+require 'fileutils'
+
 # Uncomment this line to define a global platform for your project
 platform :ios, '11.0'
 
@@ -48,6 +50,10 @@ def install_plugin_pods(application_path = nil, relative_symlink_dir, platform)
     plugin_path = plugin_hash['path']
     if (plugin_name && plugin_path)
       specPath = "#{plugin_path}/#{platform}/#{plugin_name}.podspec"
+      unless File.exist?(specPath)
+        puts "#{specPath} does not exists. Fallback to the Darwin one."
+        specPath = "#{plugin_path}/darwin/#{plugin_name}.podspec"
+      end
       pod plugin_name, :path => specPath
     end
   end
