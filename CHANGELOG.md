@@ -9,6 +9,8 @@ that can be found in the LICENSE file. -->
 ### Fixes
 
 - Correct the key when fetching video info with MMR on Android. (#997)
+- Retrieve original media instead of one with adjustments/filters for subtype files on iOS. (#976)
+- Returns original file name instead of `FullSizeRender.*` if this has adjustments on iOS. (#976)
 
 ### Improvements
 
