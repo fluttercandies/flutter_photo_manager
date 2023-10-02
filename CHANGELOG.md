@@ -4,6 +4,13 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.7.3
+
+### Fixes
+
+- [iOS] Add PHAsset extension method `getUntouchedResource` to retrieve original media instead of one with adjustments / filters.
+- [iOS] Fix: When retrieving an asset title, now returns original file name instead of `FullSizeRender.*` if this has adjustments. (#976)
+
 ## 2.7.2
 
 ### Fixes
