@@ -1296,6 +1296,16 @@
             return;
         }
     } else { // create in top
+        // Check whether the album with the same name already exists，If it exists, return directly start
+        PHFetchResult<PHAssetCollection *> *smartAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
+        for (int i = 0; i<smartAlbums.count; i++) {
+            PHAssetCollection *collection = smartAlbums[i];
+            if ([collection.localizedTitle isEqual: name]) {
+                block(collection.localIdentifier, NULL);
+                return;
+            }
+        }
+        // Check whether the album with the same name already exists end
         [PHPhotoLibrary.sharedPhotoLibrary
          performChangesAndWait:^{
             PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:name];
