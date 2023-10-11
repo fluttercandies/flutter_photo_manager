@@ -1,7 +1,6 @@
 package com.fluttercandies.photo_manager.core.entity.filter
 
 import com.fluttercandies.photo_manager.core.utils.RequestTypeUtils
-import java.util.ArrayList
 
 class CustomOption(private val map: Map<*, *>) : FilterOption() {
 

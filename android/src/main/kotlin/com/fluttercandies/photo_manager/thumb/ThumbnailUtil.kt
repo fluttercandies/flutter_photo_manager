@@ -9,11 +9,9 @@ import com.bumptech.glide.request.FutureTarget
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.signature.ObjectKey
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
-import io.flutter.plugin.common.MethodChannel
 import com.fluttercandies.photo_manager.core.entity.ThumbLoadOption
 import com.fluttercandies.photo_manager.util.ResultHandler
 import java.io.ByteArrayOutputStream
-import java.io.File
 
 object ThumbnailUtil {
     fun getThumbnail(
@@ -24,10 +22,8 @@ object ThumbnailUtil {
         format: Bitmap.CompressFormat,
         quality: Int,
         frame: Long,
-        result: MethodChannel.Result?
+        resultHandler: ResultHandler
     ) {
-        val resultHandler = ResultHandler(result)
-
         try {
             val resource = Glide.with(context)
                 .asBitmap()

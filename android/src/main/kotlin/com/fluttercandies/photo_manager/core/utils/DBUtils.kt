@@ -8,9 +8,9 @@ import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
-import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
-import java.io.*
+import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
+import java.io.File
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -18,18 +18,18 @@ import kotlin.concurrent.withLock
 @Suppress("Deprecation", "InlinedApi")
 object DBUtils : IDBUtils {
     private val locationKeys = arrayOf(
-            MediaStore.Images.ImageColumns.LONGITUDE,
-            MediaStore.Images.ImageColumns.LATITUDE
+        MediaStore.Images.ImageColumns.LONGITUDE,
+        MediaStore.Images.ImageColumns.LATITUDE
     )
 
     override fun keys(): Array<String> =
-            (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + locationKeys).distinct()
-                    .toTypedArray()
+        (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + locationKeys).distinct()
+            .toTypedArray()
 
     override fun getAssetPathList(
-            context: Context,
-            requestType: Int,
-            option: FilterOption
+        context: Context,
+        requestType: Int,
+        option: FilterOption
     ): List<AssetPathEntity> {
         val list = ArrayList<AssetPathEntity>()
         val args = ArrayList<String>()
@@ -196,8 +196,8 @@ object DBUtils : IDBUtils {
         val pageSize = end - start
         val sortOrder = getSortOrder(start, pageSize, option)
         val cursor = context.contentResolver.logQuery(
-                allUri,
-                keys,
+            allUri,
+            keys,
             selection,
             args.toTypedArray(),
             sortOrder

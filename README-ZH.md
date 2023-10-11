@@ -49,18 +49,20 @@ that can be found in the LICENSE file. -->
     * [原生平台的配置](#原生平台的配置)
       * [Android 配置准备](#android-配置准备)
         * [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
-        * [Android 10 (Q, 29)](#android-10--q-29-)
+        * [Android 10 (Q, 29)](#android-10-q-29)
         * [Glide](#glide)
       * [iOS 配置准备](#ios-配置准备)
   * [使用方法](#使用方法)
     * [请求权限](#请求权限)
-      * [iOS 受限的资源权限](#ios-受限的资源权限)
-    * [获取相簿或图集 (`AssetPathEntity`)](#获取相簿或图集--assetpathentity-)
+      * [受限的资源权限](#受限的资源权限)
+        * [iOS 受限的资源权限](#ios-受限的资源权限)
+        * [Android 受限的资源权限](#android-受限的资源权限)
+    * [获取相簿或图集 (`AssetPathEntity`)](#获取相簿或图集-assetpathentity)
       * [`getAssetPathList` 方法的参数](#getassetpathlist-方法的参数)
       * [PMPathFilterOption](#pmpathfilteroption)
-    * [获取资源 (`AssetEntity`)](#获取资源--assetentity-)
+    * [获取资源 (`AssetEntity`)](#获取资源-assetentity)
       * [通过 `AssetPathEntity` 获取](#通过-assetpathentity-获取)
-      * [通过 `PhotoManager` 方法 (2.6.0+) 获取](#通过-photomanager-方法--260--获取)
+      * [通过 `PhotoManager` 方法 (2.6.0+) 获取](#通过-photomanager-方法-260-获取)
       * [通过 ID 获取](#通过-id-获取)
       * [通过原始数据获取](#通过原始数据获取)
       * [通过 iCloud 获取](#通过-icloud-获取)
@@ -85,7 +87,8 @@ that can be found in the LICENSE file. -->
   * [原生额外配置](#原生额外配置)
     * [Android 额外配置](#android-额外配置)
       * [Glide 相关问题](#glide-相关问题)
-      * [Android 13 (API level 33) 额外配置](#android-13--api-level-33--额外配置)
+      * [Android 14 (API level 34) 额外配置](#android-14-api-level-34-额外配置)
+      * [Android 13 (API level 33) 额外配置](#android-13-api-level-33-额外配置)
     * [iOS 额外配置](#ios-额外配置)
       * [配置系统相册名称的国际化](#配置系统相册名称的国际化)
     * [实验性功能](#实验性功能)
@@ -214,7 +217,10 @@ Android 10 引入了 **Scoped Storage**，导致原始资源文件不能通过�
 ```dart
 final PermissionState ps = await PhotoManager.requestPermissionExtend();
 if (ps.isAuth) {
-  // 已获取到权限。
+  // 已获取到权限
+} else if (ps.hasAccess) {
+  // 已获取到权限（哪怕只是有限的访问权限）。
+  // iOS Android 目前都已经有了部分权限的概念。
 } else {
   // 权限受限制（iOS）或者被拒绝，使用 `==` 能够更准确的判断是受限还是拒绝。
   // 你可以使用 `PhotoManager.openSetting()` 打开系统设置页面进行进一步的逻辑定制。
@@ -228,14 +234,23 @@ PhotoManager.setIgnorePermissionCheck(true);
 
 对于一些后台操作（应用未启动等）而言，忽略检查是比较合适的做法。
 
-#### iOS 受限的资源权限
+#### 受限的资源权限
+
+##### iOS 受限的资源权限
 
 iOS14 引入了部分资源限制的权限 (`PermissionState.limited`)。
 `PhotoManager.requestPermissionExtend()` 会返回当前的权限状态 `PermissionState`。
 详情请参阅 [PHAuthorizationStatus][]。
 
 如果你想要重新选择在应用里能够读取到的资源，你可以使用 `PhotoManager.presentLimited()` 重新选择资源，
-这个方法仅在 iOS 14 以上的版本生效，其他平台或版本无法调用这个方法。
+这个方法对于 iOS 14 以上的版本生效。
+
+##### Android 受限的资源权限
+
+与 iOS 类似，Android 14 (API 34) 中也引入了这个概念。
+它们在行为上略有不同（基于模拟器）：
+在 Android 中一旦授予某个资源的访问权限，就无法撤销，
+即使再次使用 `presentLimited` 时不选中也不会撤销对它的访问权限。
 
 ### 获取相簿或图集 (`AssetPathEntity`)
 
@@ -694,6 +709,17 @@ rootProject.allprojects {
 
 如果你想了解如何同时使用 ProGuard 和 Glide，请参阅
 [ProGuard for Glide](https://github.com/bumptech/glide#proguard)。
+
+#### Android 14 (API level 34) 额外配置
+
+当应用的 `targetSdkVersion` 为 34 (Android 14) 时，
+你需要在清单文件中添加以下额外配置：
+
+```xml
+<manifest>
+   <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" /> <!-- 这是一个可选的配置，不指定并不影响在代码中使用它 -->
+</manifest>
+```
 
 #### Android 13 (API level 33) 额外配置
 

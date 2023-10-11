@@ -1,31 +1,28 @@
 package com.fluttercandies.photo_manager.permission
 
-import android.Manifest
-import android.annotation.TargetApi
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
-import com.fluttercandies.photo_manager.constant.Methods
-import com.fluttercandies.photo_manager.core.utils.RequestTypeUtils
+import androidx.core.content.PermissionChecker
+import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
+import com.fluttercandies.photo_manager.core.entity.PermissionResult
 import com.fluttercandies.photo_manager.util.LogUtils
 import com.fluttercandies.photo_manager.util.ResultHandler
-import io.flutter.plugin.common.MethodCall
-import java.lang.IllegalStateException
-import java.lang.NullPointerException
-import java.util.ArrayList
 
 class PermissionsUtils {
     /** 需要申请权限的Activity */
     private var mActivity: Activity? = null
 
+    private var context: Application? = null
+
     /** 是否正在请求权限 */
     var isRequesting = false
         private set
+
+    private val delegate: PermissionDelegate = PermissionDelegate.create()
 
     /**
      * 需要申请的权限的List
@@ -43,11 +40,6 @@ class PermissionsUtils {
     private val grantedPermissionsList: MutableList<String> = ArrayList()
 
     /**
-     * 某次进行权限申请的requestCode
-     */
-    private var requestCode = 0
-
-    /**
      * 授权监听回调
      */
     var permissionsListener: PermissionsListener? = null
@@ -60,73 +52,54 @@ class PermissionsUtils {
      */
     fun withActivity(activity: Activity?): PermissionsUtils {
         mActivity = activity
+        context = activity?.application
+        return this
+    }
+
+    fun getActivity(): Activity? {
+        return mActivity
+    }
+
+    fun setListener(listener: PermissionsListener?): PermissionsUtils {
+        permissionsListener = listener
         return this
     }
 
     /**
      * 进行权限申请，不带拒绝弹框提示
      *
-     * @param requestCode 指定该次申请的requestCode
-     * @param permissions 要申请的权限数组
-     * @return 返回 [PermissionsUtils] 自身，进行链式调用
-     */
-    fun getPermissions(requestCode: Int, permissions: List<String>): PermissionsUtils {
-        return getPermissionsWithTips(requestCode, *permissions.toTypedArray())
-    }
-
-    /**
-     * 进行权限申请，带拒绝弹框提示
+     * @param applicationContext [Application.getApplicationContext]
+     * @param requestType type of request, see [com.fluttercandies.photo_manager.core.utils.RequestTypeUtils]
+     * @param permissions A mutable list of permission to request, the method will be modified in the method.
+     * @param mediaLocation Whether to request media location permission.
      *
-     * @param requestCode 指定该次申请的requestCode
-     * @param permissions 要申请的权限数组
      * @return 返回 [PermissionsUtils] 自身，进行链式调用
      */
-    @TargetApi(23)
-    private fun getPermissionsWithTips(
-        requestCode: Int,
-        vararg permissions: String
+    fun requestPermission(
+        applicationContext: Context,
+        requestType: Int,
+        mediaLocation: Boolean,
     ): PermissionsUtils {
-        if (mActivity == null) {
-            throw NullPointerException("Activity for the permission request is not exist.")
-        }
-        check(!isRequesting) { "Another permission request is ongoing." }
-        isRequesting = true
-        this.requestCode = requestCode
-        if (!checkPermissions(*permissions)) {
-            // 通过上面的 checkPermissions，可以知道能得到进入到这里面的都是 6.0 的机子
-            ActivityCompat.requestPermissions(
-                mActivity!!,
-                needToRequestPermissionsList.toTypedArray(),
-                requestCode
-            )
-            for (i in needToRequestPermissionsList.indices) {
-                LogUtils.info("Permissions: " + needToRequestPermissionsList[i])
-            }
-        } else if (permissionsListener != null) {
-            isRequesting = false
-            permissionsListener!!.onGranted()
-        }
+        delegate.requestPermission(
+            this,
+            applicationContext,
+            requestType,
+            mediaLocation,
+        )
         return this
     }
 
     /**
-     * 检查所需权限是否已获取
-     *
-     * @param permissions 所需权限数组
-     * @return 是否全部已获取
+     * Wrapper for [PermissionChecker.checkCallingOrSelfPermission]
      */
-    private fun checkPermissions(vararg permissions: String): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            resetStatus()
-            for (p in permissions) {
-                if (mActivity!!.checkSelfPermission(p) == PackageManager.PERMISSION_DENIED) {
-                    // Add the denied permission to the pending list.
-                    needToRequestPermissionsList.add(p)
-                }
-            }
-            return needToRequestPermissionsList.isEmpty()
+    fun checkCallingOrSelfPermission(permission: String): Boolean {
+        if (context == null) {
+            throw NullPointerException("Context for the permission request is not exist.")
         }
-        return true
+        return PERMISSION_GRANTED == PermissionChecker.checkCallingOrSelfPermission(
+            context!!,
+            permission
+        )
     }
 
     /**
@@ -143,7 +116,7 @@ class PermissionsUtils {
         permissions: Array<String>,
         grantResults: IntArray
     ): PermissionsUtils {
-        if (requestCode == this.requestCode) {
+        if (requestCode == PermissionDelegate.requestCode || requestCode == PermissionDelegate.limitedRequestCode) {
             for (i in permissions.indices) {
                 LogUtils.info("Returned permissions: " + permissions[i])
                 if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
@@ -152,14 +125,39 @@ class PermissionsUtils {
                     grantedPermissionsList.add(permissions[i])
                 }
             }
-            if (deniedPermissionsList.isNotEmpty()) {
-                // 回调用户拒绝监听
-                permissionsListener!!.onDenied(deniedPermissionsList, grantedPermissionsList)
+
+            LogUtils.debug("dealResult: ")
+            LogUtils.debug("  permissions: $permissions")
+            LogUtils.debug("  grantResults: $grantResults")
+            LogUtils.debug("  deniedPermissionsList: $deniedPermissionsList")
+            LogUtils.debug("  grantedPermissionsList: $grantedPermissionsList")
+
+            if (delegate.isHandlePermissionResult()) {
+                delegate.handlePermissionResult(
+                    this,
+                    context!!,
+                    permissions,
+                    grantResults,
+                    needToRequestPermissionsList,
+                    deniedPermissionsList,
+                    grantedPermissionsList,
+                    requestCode,
+                )
             } else {
-                // 回调用户同意监听
-                permissionsListener!!.onGranted()
+                if (deniedPermissionsList.isNotEmpty()) {
+                    // 回调用户拒绝监听
+                    permissionsListener!!.onDenied(
+                        deniedPermissionsList,
+                        grantedPermissionsList,
+                        needToRequestPermissionsList
+                    )
+                } else {
+                    // 回调用户同意监听
+                    permissionsListener!!.onGranted(needToRequestPermissionsList)
+                }
             }
         }
+        resetStatus()
         isRequesting = false
         return this
     }
@@ -171,6 +169,10 @@ class PermissionsUtils {
         if (deniedPermissionsList.isNotEmpty()) deniedPermissionsList.clear()
         if (needToRequestPermissionsList.isNotEmpty()) needToRequestPermissionsList.clear()
     }
+
+    /**
+     *
+     */
 
     /**
      * 跳转到应用的设置界面
@@ -188,99 +190,21 @@ class PermissionsUtils {
         context.startActivity(localIntent)
     }
 
-    fun needWriteExternalStorage(call: MethodCall): Boolean {
-        return when (call.method) {
-            Methods.saveImage,
-            Methods.saveImageWithPath,
-            Methods.saveVideo,
-            Methods.copyAsset,
-            Methods.moveAssetToPath,
-            Methods.deleteWithIds,
-            Methods.removeNoExistsAssets -> true
-
-            else -> false
-        }
+    fun haveLocationPermission(applicationContext: Context): Boolean {
+        return delegate.haveMediaLocation(applicationContext)
     }
 
-    fun needAccessLocation(call: MethodCall): Boolean {
-        return when (call.method) {
-            Methods.copyAsset,
-            Methods.getLatLng,
-            Methods.getOriginBytes -> true
-
-            Methods.getFullFile -> call.argument<Boolean>("isOrigin")!! && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-            else -> false
-        }
+    fun setNeedToRequestPermissionsList(permission: MutableList<String>) {
+        needToRequestPermissionsList.clear()
+        needToRequestPermissionsList.addAll(permission)
     }
 
-    @RequiresApi(33)
-    fun addManifestWithPermission33(
-        context: Context,
-        permissions: ArrayList<String>,
-        call: MethodCall,
-        resultHandler: ResultHandler
-    ) {
-        val method = call.method
-        if (method == Methods.requestPermissionExtend) {
-            // Check all permissions listed in the manifest, regardless the request type.
-            if (havePermissionInManifest(context, Manifest.permission.READ_MEDIA_IMAGES)) {
-                permissions.add(Manifest.permission.READ_MEDIA_IMAGES)
-            }
-            if (havePermissionInManifest(context, Manifest.permission.READ_MEDIA_VIDEO)) {
-                permissions.add(Manifest.permission.READ_MEDIA_VIDEO)
-            }
-            if (havePermissionInManifest(context, Manifest.permission.READ_MEDIA_AUDIO)) {
-                permissions.add(Manifest.permission.READ_MEDIA_AUDIO)
-            }
-            return
-        } else if (!Methods.android13PermissionMethods.contains(method)) {
-            return
-        }
-
-        val type = call.argument<Int>("type")
-        if (type == null) {
-            resultHandler.replyError("The $method must pass the 'type' params")
-            return
-        }
-        val haveImage = RequestTypeUtils.containsImage(type)
-        val haveVideo = RequestTypeUtils.containsVideo(type)
-        val haveAudio = RequestTypeUtils.containsAudio(type)
-
-        fun checkAndAddPermission(requestHavePermission: Boolean, tag: String, manifestPermission: String) {
-            if (!requestHavePermission) {
-                return
-            }
-
-            if (!havePermissionInManifest(context, manifestPermission)) {
-                throw IllegalStateException("Request $tag must have $manifestPermission in manifest.")
-            }
-            permissions.add(manifestPermission)
-        }
-
-        try {
-            checkAndAddPermission(haveImage, "image", Manifest.permission.READ_MEDIA_IMAGES)
-            checkAndAddPermission(haveVideo, "video", Manifest.permission.READ_MEDIA_VIDEO)
-            checkAndAddPermission(haveAudio, "audio", Manifest.permission.READ_MEDIA_AUDIO)
-        } catch (e: IllegalStateException) {
-            resultHandler.replyError("Permissions check error", e.message, e)
-        }
-
+    fun presentLimited(type: Int, resultHandler: ResultHandler) {
+        delegate.presentLimited(this, context!!, type, resultHandler)
     }
 
-    fun havePermissionInManifest(context: Context, permission: String): Boolean {
-        val applicationInfo = context.applicationInfo
-        val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.packageManager.getPackageInfo(
-                applicationInfo.packageName,
-                PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong())
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            context.packageManager.getPackageInfo(
-                applicationInfo.packageName,
-                PackageManager.GET_PERMISSIONS
-            )
-        }
-        return packageInfo.requestedPermissions.contains(permission)
+    fun getAuthValue(requestType: Int, mediaLocation: Boolean): PermissionResult {
+        return delegate.getAuthValue(context!!, requestType, mediaLocation)
     }
+
 }

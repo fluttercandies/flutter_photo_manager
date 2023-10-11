@@ -17,7 +17,7 @@ class PMConstants {
   static const String mFetchEntityProperties = 'fetchEntityProperties';
   static const String mGetAssetCountFromPath = 'getAssetCountFromPath';
 
-  /// The 4 methods have [RequestType] params, for android-13
+  /// These methods have [RequestType] params for Android 13+ (33+).
   static const String mFetchPathProperties = 'fetchPathProperties';
   static const String mGetAssetPathList = 'getAssetPathList';
   static const String mGetAssetListPaged = 'getAssetListPaged';

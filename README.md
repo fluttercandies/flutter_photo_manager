@@ -50,25 +50,27 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
     * [Configure native platforms](#configure-native-platforms)
       * [Android config preparation](#android-config-preparation)
         * [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
-        * [Android 10 (Q, 29)](#android-10--q-29-)
+        * [Android 10 (Q, 29)](#android-10-q-29)
         * [Glide](#glide)
       * [iOS config preparation](#ios-config-preparation)
   * [Usage](#usage)
     * [Request for permission](#request-for-permission)
-      * [Limited entities access on iOS](#limited-entities-access-on-ios)
-    * [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders--assetpathentity-)
+      * [Limited entities access](#limited-entities-access)
+        * [Limited entities access on iOS](#limited-entities-access-on-ios)
+        * [Limited entities access on android](#limited-entities-access-on-android)
+    * [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders-assetpathentity)
       * [Params of `getAssetPathList`](#params-of-getassetpathlist)
       * [PMPathFilterOption](#pmpathfilteroption)
-    * [Get assets (`AssetEntity`)](#get-assets--assetentity-)
+    * [Get assets (`AssetEntity`)](#get-assets-assetentity)
       * [From `AssetPathEntity`](#from-assetpathentity)
-      * [From `PhotoManager` (Since 2.6)](#from-photomanager--since-26-)
+      * [From `PhotoManager` (Since 2.6)](#from-photomanager-since-26)
       * [From ID](#from-id)
       * [From raw data](#from-raw-data)
       * [From iCloud](#from-icloud)
       * [Display assets](#display-assets)
-      * [Obtain "Live Photos"](#obtain--live-photos-)
-        * [Filtering only "Live Photos"](#filtering-only--live-photos-)
-        * [Obtain the video from "Live Photos"](#obtain-the-video-from--live-photos-)
+      * [Obtain "Live Photos"](#obtain-live-photos)
+        * [Filtering only "Live Photos"](#filtering-only-live-photos)
+        * [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
       * [Limitations](#limitations)
         * [Android 10 media location permission](#android-10-media-location-permission)
         * [Usage of the original data](#usage-of-the-original-data)
@@ -86,7 +88,8 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
   * [Native extra configs](#native-extra-configs)
     * [Android extra configs](#android-extra-configs)
       * [Glide issues](#glide-issues)
-      * [Android 13 (Api 33) extra configs](#android-13--api-33--extra-configs)
+      * [Android 14 (Api 34) extra configs](#android-14-api-34-extra-configs)
+      * [Android 13 (Api 33) extra configs](#android-13-api-33-extra-configs)
     * [iOS extra configs](#ios-extra-configs)
       * [Localized system albums name](#localized-system-albums-name)
     * [Experimental features](#experimental-features)
@@ -222,9 +225,12 @@ It's pretty much the same as the `NSPhotoLibraryUsageDescription`.
 Most of the APIs can only use with granted permission.
 
 ```dart
-final PermissionState ps = await PhotoManager.requestPermissionExtend();
+final PermissionState ps = await PhotoManager.requestPermissionExtend(); // the method can use optional param `permission`.
 if (ps.isAuth) {
-  // Granted.
+  // Granted
+  // You can to get assets here.
+} else if (ps.hasAccess) {
+  // Access will continue, but the amount visible depends on the user's selection.
 } else {
   // Limited(iOS) or Rejected, use `==` for more precise judgements.
   // You can call `PhotoManager.openSetting()` to open settings for further steps.
@@ -240,7 +246,9 @@ PhotoManager.setIgnorePermissionCheck(true);
 For background processing (such as when the app is not in the foreground),
 ignore permissions check would be proper solution.
 
-#### Limited entities access on iOS
+#### Limited entities access
+
+##### Limited entities access on iOS
 
 With iOS 14 released, Apple brought a "Limited Photos Library" permission
 (`PermissionState.limited`) to iOS.
@@ -251,8 +259,15 @@ To reselect accessible entities for the app,
 use `PhotoManager.presentLimited()` to call the modal of
 accessible entities' management.
 This method only available for iOS 14+ and when the permission state
-is limited (`PermissionState.limited`),
-other platform won't make a valid call.
+is limited (`PermissionState.limited`).
+
+##### Limited entities access on android
+
+Android 14 (API 34) has also introduced the concept of limited assets similar to iOS.
+
+However, there is a slight difference in behavior (based on the emulator):
+On Android, the access permission to a certain resource cannot be revoked once it is granted,
+even if it hasn't been selected when using `presentLimited` in future actions.
 
 ### Get albums/folders (`AssetPathEntity`)
 
@@ -751,6 +766,15 @@ rootProject.allprojects {
 
 See [ProGuard for Glide](https://github.com/bumptech/glide#proguard)
 if you want to know more about using ProGuard and Glide together.
+
+#### Android 14 (Api 34) extra configs
+
+When targeting Android 14 (API level 34),
+the following extra configs needs to be added to the manifest:
+
+```xml
+<uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />  <!-- If you want to use the limited access feature, it is an optional permission. -->
+```
 
 #### Android 13 (Api 33) extra configs
 

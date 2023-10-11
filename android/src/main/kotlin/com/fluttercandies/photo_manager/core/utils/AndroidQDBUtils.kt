@@ -15,8 +15,8 @@ import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.cache.ScopedCache
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
-import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
+import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
 import com.fluttercandies.photo_manager.util.LogUtils
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -155,11 +155,11 @@ object AndroidQDBUtils : IDBUtils {
         }
         val sortOrder = getSortOrder(page * size, size, option)
         val cursor = context.contentResolver.logQuery(
-                allUri,
-                keys(),
-                selection,
-                args.toTypedArray(),
-                sortOrder
+            allUri,
+            keys(),
+            selection,
+            args.toTypedArray(),
+            sortOrder
         ) ?: return list
         cursor.use {
             cursorWithRange(it, page * size, size) { cursor ->
@@ -215,23 +215,23 @@ object AndroidQDBUtils : IDBUtils {
 
     override fun keys(): Array<String> {
         return (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + IDBUtils.typeKeys + arrayOf(
-                RELATIVE_PATH
+            RELATIVE_PATH
         )).distinct().toTypedArray()
     }
 
     override fun getAssetEntity(
-            context: Context,
-            id: String,
-            checkIfExists: Boolean
+        context: Context,
+        id: String,
+        checkIfExists: Boolean
     ): AssetEntity? {
         val selection = "$_ID = ?"
         val args = arrayOf(id)
         val cursor = context.contentResolver.logQuery(
-                allUri,
-                keys(),
-                selection,
-                args,
-                null
+            allUri,
+            keys(),
+            selection,
+            args,
+            null
         ) ?: return null
         cursor.use {
             return if (it.moveToNext()) it.toAssetEntity(context, checkIfExists)
