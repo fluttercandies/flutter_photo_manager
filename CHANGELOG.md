@@ -21,6 +21,16 @@ User must follow the below methods to ensure permissions were granted:
 2. `PhotoManager.setIgnorePermissionCheck(true)`, ignoring permission checks,
    handle permission with other mechanisms.
 
+### Fixes
+
+- Correct the key when fetching video info with MMR on Android. (#997)
+- Retrieve original media instead of one with adjustments/filters for subtype files on iOS. (#976)
+- Returns original file name instead of `FullSizeRender.*` if this has adjustments on iOS. (#976)
+
+### Improvements
+
+- Add locks to the image provider.
+
 ## 2.7.1
 
 ### Fixes
