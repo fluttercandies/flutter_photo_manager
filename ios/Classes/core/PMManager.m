@@ -370,10 +370,6 @@
 }
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)assetId {
-    if (!self.isAuth) {
-        return nil;
-    }
-
     return [self getAssetEntity:assetId withCache:YES];
 }
 
