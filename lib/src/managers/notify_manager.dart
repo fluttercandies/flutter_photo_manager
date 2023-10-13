@@ -16,12 +16,14 @@ import '../internal/plugin.dart';
 class NotifyManager {
   /// The method channel used to communicate with the native platform.
   static const _channel = MethodChannel('${PMConstants.channelPrefix}/notify');
-/// Returns a [Stream] that emits a boolean value indicating whether asset change notifications are currently enabled.
+
+  /// Returns a [Stream] that emits a boolean value indicating whether asset change notifications are currently enabled.
   Stream<bool> get notifyStream => _controller.stream;
+
   /// The stream controller used to manage the [notifyStream].
   final _controller = StreamController<bool>.broadcast();
 
-/// The list of callback functions to be executed upon asset changes.
+  /// The list of callback functions to be executed upon asset changes.
   final _notifyCallback = <foundation.ValueChanged<MethodCall>>[];
 
   /// {@template photo_manager.NotifyManager.addChangeCallback}
@@ -55,7 +57,7 @@ class NotifyManager {
   }
 
   /// {@template photo_manager.NotifyManager.stopChangeNotify}
-  
+
   /// Disables asset change notifications.
   ///
   /// Remember to remove all callback functions for changes.

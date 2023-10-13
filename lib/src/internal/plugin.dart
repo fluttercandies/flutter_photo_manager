@@ -541,10 +541,12 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     );
   }
 
-  Future<void> presentLimited() async {
-    assert(Platform.isIOS);
-    if (Platform.isIOS) {
-      return _channel.invokeMethod(PMConstants.mPresentLimited);
+  Future<void> presentLimited(RequestType type) async {
+    assert(Platform.isIOS || Platform.isAndroid);
+    if (Platform.isIOS || Platform.isAndroid) {
+      return _channel.invokeMethod(PMConstants.mPresentLimited, {
+        'type': type.value,
+      });
     }
   }
 

@@ -4,6 +4,33 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.8.0
+
+### Feature
+
+- Support android API 34(Android 14) limit access to photos and videos.
+- Because limit permission, we refactor the permission request API.
+
+***Breaking changes for permission behavior***
+
+Methods do not implicitly call for permission requests anymore.
+User must follow the below methods to ensure permissions were granted:
+
+1. `PhotoManager.requestPermissionExtend()`, verify if the result is
+   `PermissionState.authorized` or `PermissionState.limited`.
+2. `PhotoManager.setIgnorePermissionCheck(true)`, ignoring permission checks,
+   handle permission with other mechanisms.
+
+### Fixes
+
+- Correct the key when fetching video info with MMR on Android. (#997)
+- Retrieve original media instead of one with adjustments/filters for subtype files on iOS. (#976)
+- Returns original file name instead of `FullSizeRender.*` if this has adjustments on iOS. (#976)
+
+### Improvements
+
+- Add locks to the image provider.
+
 ## 2.7.1
 
 ### Fixes
@@ -11,6 +38,7 @@ that can be found in the LICENSE file. -->
 - Fix namespace on Android.
 - Remove the package definition from the manifest.
 - Use `math.pow(2^63)-1` to make Web compile work again.
+- Fix the `end` argument of `PhotoManager.getAssetListRange` is being handled incorrectly on Darwin. (#962)
 
 ## 2.7.0
 
@@ -39,7 +67,7 @@ that can be found in the LICENSE file. -->
 - Add two new static methods for `PhotoManager`:
   - `getAssetCount` for getting assets count.
   - `getAssetListRange` for getting assets between start and end.
-  
+
 ## 2.5.2
 
 ### Improvements

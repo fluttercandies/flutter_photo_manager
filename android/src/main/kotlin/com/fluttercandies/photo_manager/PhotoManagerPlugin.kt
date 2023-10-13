@@ -1,5 +1,6 @@
 package com.fluttercandies.photo_manager
 
+import com.fluttercandies.photo_manager.permission.PermissionsUtils
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -7,7 +8,6 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener
 import com.fluttercandies.photo_manager.core.PhotoManagerPlugin as InnerPhotoManagerPlugin
-import com.fluttercandies.photo_manager.permission.PermissionsUtils
 
 class PhotoManagerPlugin : FlutterPlugin, ActivityAware {
     private var plugin: InnerPhotoManagerPlugin? = null

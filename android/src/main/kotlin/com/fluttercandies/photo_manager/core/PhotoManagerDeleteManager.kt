@@ -8,9 +8,9 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
-import io.flutter.plugin.common.PluginRegistry
 import com.fluttercandies.photo_manager.core.utils.IDBUtils
 import com.fluttercandies.photo_manager.util.ResultHandler
+import io.flutter.plugin.common.PluginRegistry
 
 class PhotoManagerDeleteManager(val context: Context, private var activity: Activity?) :
     PluginRegistry.ActivityResultListener {

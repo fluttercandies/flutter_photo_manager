@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_example/widget/nav_button.dart';
 import 'package:provider/provider.dart';
@@ -45,7 +46,7 @@ class _NewHomePageState extends State<NewHomePage> {
               title: 'Get all gallery list',
               onPressed: _scanGalleryList,
             ),
-            if (Platform.isIOS)
+            if (Platform.isIOS || Platform.isAndroid)
               CustomButton(
                 title: 'Change limited photos with PhotosUI',
                 onPressed: _changeLimitPhotos,
@@ -66,8 +67,7 @@ class _NewHomePageState extends State<NewHomePage> {
             _buildPngCheck(),
             _buildNotifyCheck(),
             _buildFilterOption(watchProvider),
-            if (Platform.isIOS || Platform.isMacOS)
-              _buildPathFilterOption(),
+            if (Platform.isIOS || Platform.isMacOS) _buildPathFilterOption(),
           ],
         ),
       ),
@@ -118,6 +118,16 @@ class _NewHomePageState extends State<NewHomePage> {
   }
 
   Future<void> _scanGalleryList() async {
+    final permissionResult = await PhotoManager.requestPermissionExtend(
+        requestOption: PermissionRequestOption(
+      androidPermission:
+          AndroidPermission(type: readProvider.type, mediaLocation: true),
+    ));
+    if (!permissionResult.hasAccess) {
+      showToast('no permission');
+      return;
+    }
+
     await readProvider.refreshGalleryList();
     if (!mounted) {
       return;

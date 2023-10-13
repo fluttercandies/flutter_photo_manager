@@ -2,8 +2,6 @@ package com.fluttercandies.photo_manager.util
 
 import android.database.Cursor
 import android.util.Log
-import java.lang.Exception
-import java.lang.StringBuilder
 
 object LogUtils {
     const val TAG = "PhotoManager"

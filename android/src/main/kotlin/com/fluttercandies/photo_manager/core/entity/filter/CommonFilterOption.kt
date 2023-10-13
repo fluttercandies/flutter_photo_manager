@@ -5,7 +5,6 @@ import android.provider.MediaStore
 import com.fluttercandies.photo_manager.constant.AssetType
 import com.fluttercandies.photo_manager.core.utils.ConvertUtils
 import com.fluttercandies.photo_manager.core.utils.RequestTypeUtils
-import java.util.ArrayList
 
 class CommonFilterOption(map: Map<*, *>) : FilterOption() {
     private val videoOption = ConvertUtils.getOptionFromType(map, AssetType.Video)
