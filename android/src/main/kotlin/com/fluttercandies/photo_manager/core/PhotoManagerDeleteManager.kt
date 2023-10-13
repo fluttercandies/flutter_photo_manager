@@ -57,7 +57,7 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
     @RequiresApi(Build.VERSION_CODES.R)
     fun deleteInApi30(uris: List<Uri?>, resultHandler: ResultHandler) {
         this.androidRHandler = resultHandler
-        val pendingIntent = MediaStore.createTrashRequest(cr, uris.mapNotNull { it }, true)
+        val pendingIntent = MediaStore.createDeleteRequest(cr, uris.mapNotNull { it })
         activity?.startIntentSenderForResult(
             pendingIntent.intentSender,
             androidRDeleteRequestCode,
