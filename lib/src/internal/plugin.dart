@@ -257,6 +257,13 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     return deleted.cast<String>();
   }
 
+  Future<List<String>> moveToTrash(List<AssetEntity> list) {
+    return _channel.invokeMethod(
+      PMConstants.mMoveToTrash,
+      <String, dynamic>{'ids': list.map((e) => e.id).toList()},
+    ).then((value) => value.cast<String>());
+  }
+
   final Map<String, dynamic> onlyAddPermission = <String, dynamic>{
     'onlyAddPermission': true,
   };
