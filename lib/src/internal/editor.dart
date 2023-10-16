@@ -44,11 +44,6 @@ class Editor {
     return plugin.deleteWithIds(ids);
   }
 
-  /// Move to trash
-  Future<List<String>> moveToTrash(List<AssetEntity> list) {
-    return plugin.moveToTrash(list);
-  }
-
   /// Save image to gallery from the given [data].
   ///
   /// {@template photo_manager.Editor.TitleWhenSaving}
@@ -301,5 +296,10 @@ class AndroidEditor {
   /// device's storage. It returns `true` if this operation was successful; otherwise, `false`.
   Future<bool> removeAllNoExistsAsset() {
     return plugin.androidRemoveNoExistsAssets();
+  }
+
+  /// Move to trash
+  Future<List<String>> moveToTrash(List<AssetEntity> list) {
+    return plugin.moveToTrash(list);
   }
 }
