@@ -13,9 +13,20 @@
     return self;
 }
 
-+ (instancetype)handlerWithResult:(FlutterResult)result {
-    return [[self alloc] initWithResult:result];
+- (instancetype)initWithCall:(FlutterMethodCall *)call result:(FlutterResult)result {
+    self = [super init];
+    if (self) {
+        self.call = call;
+        self.result = result;
+    }
+
+    return self;
 }
+
++ (instancetype)handlerWithCall:(FlutterMethodCall *)call result:(FlutterResult)result {
+    return [[self alloc] initWithCall:call result:result];
+}
+
 
 - (void)reply:(id)obj {
     if (isReply) {

@@ -12,8 +12,6 @@
 #import "PMPathFilterOption.h"
 
 @implementation PMManager {
-    BOOL __isAuth;
-    BOOL __isOnlyAddAuth;
     PMCacheContainer *cacheContainer;
 
     PHCachingImageManager *__cachingManager;
@@ -22,28 +20,9 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        __isAuth = NO;
         cacheContainer = [PMCacheContainer new];
     }
-
     return self;
-}
-
-- (BOOL)isAuth {
-    return __isAuth;
-}
-
-- (void)setAuth:(BOOL)auth {
-    __isAuth = auth;
-}
-
-
-- (BOOL)isOnlyAddAuth {
-    return __isOnlyAddAuth;
-}
-
-- (void)setOnlyAddAuth:(BOOL)auth {
-    __isOnlyAddAuth = auth;
 }
 
 - (PHCachingImageManager *)cachingManager {
@@ -391,10 +370,6 @@
 }
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)assetId {
-    if (!self.isAuth) {
-        return nil;
-    }
-    
     return [self getAssetEntity:assetId withCache:YES];
 }
 
