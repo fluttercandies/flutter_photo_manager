@@ -297,4 +297,9 @@ class AndroidEditor {
   Future<bool> removeAllNoExistsAsset() {
     return plugin.androidRemoveNoExistsAssets();
   }
+
+  /// Move to trash
+  Future<List<String>> moveToTrash(List<AssetEntity> list) {
+    return plugin.moveToTrash(list);
+  }
 }

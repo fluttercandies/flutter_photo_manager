@@ -51,6 +51,11 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
             ids.toTypedArray()
         )
     }
+//
+//    enum class Action {
+//        Delete,
+//        Trash,
+//    }
 
     private var androidRHandler: ResultHandler? = null
 
@@ -58,6 +63,20 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
     fun deleteInApi30(uris: List<Uri?>, resultHandler: ResultHandler) {
         this.androidRHandler = resultHandler
         val pendingIntent = MediaStore.createDeleteRequest(cr, uris.mapNotNull { it })
+        activity?.startIntentSenderForResult(
+            pendingIntent.intentSender,
+            androidRDeleteRequestCode,
+            null,
+            0,
+            0,
+            0
+        )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    fun moveToTrashInApi30(uris: List<Uri?>, resultHandler: ResultHandler) {
+        this.androidRHandler = resultHandler
+        val pendingIntent = MediaStore.createTrashRequest(cr, uris.mapNotNull { it }, true)
         activity?.startIntentSenderForResult(
             pendingIntent.intentSender,
             androidRDeleteRequestCode,

@@ -798,10 +798,10 @@ no matter what language has been set to devices.
 To change the default language, see the following steps:
 
 - Open your iOS project (Runner.xcworkspace) using Xcode.
-![Edit localizations in Xcode 1](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterProjectEditinginXcode.png)
+  ![Edit localizations in Xcode 1](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterProjectEditinginXcode.png)
 
 - Select the project "Runner" and in the localizations table, click on the + icon.
-![Edit localizations in Xcode 2](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterAddLocalization.png)
+  ![Edit localizations in Xcode 2](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/iosFlutterAddLocalization.png)
 
 - Select the adequate language(s) you want to retrieve localized strings.
 - Validate the popup screen without any modification.
@@ -917,6 +917,15 @@ Some operating systems will prompt confirmation dialogs
 for each entities' deletion, we have no way to avoid them.
 Make sure you're using the correct method,
 and your customers accept repeatedly confirmations.
+
+##### Move entities to trash
+
+```dart
+await PhotoManager.editor.android.moveToTrash(list);
+```
+
+The method support android 30 or higher. It will move the entities to trash.
+If the method is called on android 29 or lower, it will throw an exception.
 
 #### Features for iOS or macOS
 

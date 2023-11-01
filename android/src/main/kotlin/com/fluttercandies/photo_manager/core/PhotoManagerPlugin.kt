@@ -539,6 +539,26 @@ class PhotoManagerPlugin(
                 }
             }
 
+            Methods.moveToTrash -> {
+                try {
+                    val ids = call.argument<List<String>>("ids")!!
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        val uris = ids.map { photoManager.getUri(it) }.toList()
+                        deleteManager.moveToTrashInApi30(uris, resultHandler)
+                    } else {
+                        LogUtils.error("The API 29 or lower have not the IS_TRASHED row in MediaStore.")
+                        resultHandler.replyError(
+                            "The api not support 29 or lower.",
+                            "",
+                            UnsupportedOperationException("The api cannot be used in 29 or lower.")
+                        )
+                    }
+                } catch (e: Exception) {
+                    LogUtils.error("deleteWithIds failed", e)
+                    resultHandler.replyError("deleteWithIds failed")
+                }
+            }
+
             Methods.removeNoExistsAssets -> {
                 photoManager.removeAllExistsAssets(resultHandler)
             }

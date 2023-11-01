@@ -21,6 +21,11 @@ User must follow the below methods to ensure permissions were granted:
 2. `PhotoManager.setIgnorePermissionCheck(true)`, ignoring permission checks,
    handle permission with other mechanisms.
 
+Behavior changes to the method of the method of `PhotoManager.editor.deleteWithIds`:
+
+- The behavior changes to delete instead of moving to Trash on Android 30+. (#959)
+- Provides a new method to move resources to the Trash. (`PhotoManager.editor.android.moveToTrash`), the method only support Android 30+. (#1005)
+
 ### Fixes
 
 - Correct the key when fetching video info with MMR on Android. (#997)

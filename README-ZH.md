@@ -838,6 +838,14 @@ await PhotoManager.editor.android.moveAssetToAnother(
 
 （对于 Android 30+，由于系统限制，此功能当前被屏蔽。）
 
+##### 将资源移动到废纸篓
+
+```dart
+await PhotoManager.editor.android.moveToTrash(list);
+```
+
+这个方法用于将资源移动到废纸篓，它仅支持安卓 API 30+，低于 30 的 API 会抛出异常。
+
 ##### 移除所有不存在的资源
 
 这将删除所有本地不存在的相册条目。

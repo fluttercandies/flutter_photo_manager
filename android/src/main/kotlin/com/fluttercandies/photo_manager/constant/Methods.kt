@@ -69,7 +69,10 @@ class Methods {
 
         const val getLatLng = "getLatLngAndroidQ"
         const val notify = "notify"
+
         const val deleteWithIds = "deleteWithIds"
+        const val moveToTrash = "moveToTrash"
+
         const val saveImage = "saveImage"
         const val saveImageWithPath = "saveImageWithPath"
         const val saveVideo = "saveVideo"
