@@ -147,7 +147,7 @@ import 'package:photo_manager/photo_manager.dart';
 
 ##### Kotlin, Gradle, AGP
 
-该插件使用 **Kotlin `1.6.21`** 来构建。
+该插件使用 **Kotlin `1.7.22`** 来构建。
 如果你的项目使用了低于此版本的 Kotlin/Gradle/AGP，请升级到大于或等于指定版本。
 
 更具体的做法:
@@ -155,7 +155,7 @@ import 'package:photo_manager/photo_manager.dart';
 - 更新你的 Gradle version (`gradle-wrapper.properties`)
   到 `7.5.1` 或者最新版本。
 - 更新你的 Kotlin version (`ext.kotlin_version`)
-  到 `1.7.21` 或者最新版本。
+  到 `1.7.22` 或者最新版本。
 - 更新你的 AGP version (`com.android.tools.build:gradle`)
   或者 `7.2.2` 或者最新版本。
 
