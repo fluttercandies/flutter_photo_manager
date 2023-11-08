@@ -149,7 +149,7 @@ Minimum platform versions:
 
 ##### Kotlin, Gradle, AGP
 
-We ship this plugin with **Kotlin `1.6.21`**.
+We ship this plugin with **Kotlin `1.7.22`**.
 If your projects use a lower version of Kotlin/Gradle/AGP,
 please upgrade them to a newer version.
 
@@ -158,7 +158,7 @@ More specifically:
 - Upgrade your Gradle version (`gradle-wrapper.properties`)
   to `7.5.1` or the latest version.
 - Upgrade your Kotlin version (`ext.kotlin_version`)
-  to `1.7.21` or the latest version.
+  to `1.7.22` or the latest version.
 - Upgrade your AGP version (`com.android.tools.build:gradle`)
   to `7.2.2` or the latest version.
 
