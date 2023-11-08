@@ -9,12 +9,11 @@ jobs:
     name: Build for Android on ubuntu-latest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           cache: true
-          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       - uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
@@ -36,12 +35,11 @@ jobs:
     name: Build for ios on macos-latest
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           cache: true
-          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       - run: flutter doctor -v
         name: Flutter info
       - run: flutter create new_project --platforms=ios
@@ -64,12 +62,11 @@ jobs:
     name: Build for Web on ubuntu-latest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           cache: true
-          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       - run: flutter doctor -v
         name: Flutter info
       - run: flutter create new_project --platforms=web
@@ -87,12 +84,11 @@ jobs:
     name: Build for Linux on ubuntu-latest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           cache: true
-          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       - name: Install required packages
         run: |
               sudo apt-get update -y
@@ -116,12 +112,11 @@ jobs:
     name: Build for macOS on macos-latest
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           cache: true
-          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       - run: flutter doctor -v
         name: Flutter info
       - run: flutter create new_project --platforms=macos
@@ -144,12 +139,11 @@ jobs:
     name: Build for Windows on windows-latest
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           cache: true
-          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       - run: flutter doctor -v
         name: Flutter info
       - run: flutter create new_project --platforms=windows
