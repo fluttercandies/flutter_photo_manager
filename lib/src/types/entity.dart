@@ -29,7 +29,7 @@ class AssetPathEntity {
     required this.id,
     required this.name,
     @Deprecated('Use assetCountAsync instead. This will be removed in 3.0.0')
-        this.assetCount = 0,
+    this.assetCount = 0,
     this.albumType = 1,
     this.lastModified,
     this.type = RequestType.common,
