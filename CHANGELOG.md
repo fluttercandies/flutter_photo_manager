@@ -11,7 +11,7 @@ Remove next methods of class
 
 - `Editor.iOS`: use `Editor.darwin` instead.
 - `PermisstionRequestOption`: use `PermissionRequestOption` instead.
-- `AssetPathEntity.assetCount` 
+- `AssetPathEntity.assetCount`: use `AssetPathEntity.assetCountAsync` instead.
 
 ## 2.8.0
 

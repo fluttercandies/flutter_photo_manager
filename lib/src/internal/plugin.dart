@@ -84,12 +84,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<int> getAssetCountFromPath(AssetPathEntity path) async {
-    // Use `assetCount` for Android until we break the API
-    // and migrate to `InternalAssetPathEntity`.
-    if (Platform.isAndroid) {
-      // ignore: deprecated_member_use_from_same_package
-      return path.assetCount;
-    }
     final int result = await _channel.invokeMethod<int>(
       PMConstants.mGetAssetCountFromPath,
       <String, dynamic>{

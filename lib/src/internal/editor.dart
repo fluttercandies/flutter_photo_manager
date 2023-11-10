@@ -10,7 +10,6 @@ import '../types/entity.dart';
 import 'plugin.dart';
 
 class Editor {
-  final IosEditor _ios = const IosEditor();
   final DarwinEditor _darwin = const DarwinEditor();
   final AndroidEditor _android = const AndroidEditor();
 
@@ -259,12 +258,6 @@ class DarwinEditor {
       relativePath: relativePath,
     );
   }
-}
-
-/// An editor for iOS/macOS.
-class IosEditor extends DarwinEditor {
-  /// Creates a new [IosEditor] object.
-  const IosEditor();
 }
 
 /// An editor for Android.

@@ -58,7 +58,6 @@ class ConvertUtils {
       id: data['id'] as String,
       name: data['name'] as String,
       // ignore: deprecated_member_use_from_same_package
-      assetCount: data['assetCount'] as int? ?? 0,
       albumType: data['albumType'] as int? ?? 1,
       filterOption: filterOption ?? FilterOptionGroup(),
       lastModified: lastModified,
