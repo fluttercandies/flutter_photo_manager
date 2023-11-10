@@ -295,6 +295,16 @@ class PhotoManager(private val context: Context) {
         resultHandler.reply(assetCount)
     }
 
+    fun getAssetCount(
+        resultHandler: ResultHandler,
+        option: FilterOption,
+        requestType: Int,
+        galleryId: String,
+    ) {
+        val assetCount = dbUtils.getAssetCount(context, option, requestType, galleryId)
+        resultHandler.reply(assetCount)
+    }
+
     fun getAssetsByRange(
         resultHandler: ResultHandler,
         option: FilterOption,
