@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  http: ^0.13.0
+  http: ^1.1.0
   oktoast: ^3.1.0
   path_provider: ^2.0.5
   photo_manager:
