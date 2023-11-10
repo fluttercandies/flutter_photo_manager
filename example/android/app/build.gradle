@@ -45,6 +45,15 @@ android {
         }
     }
 
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.current()
+        targetCompatibility JavaVersion.current()
+    }
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
