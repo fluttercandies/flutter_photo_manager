@@ -28,8 +28,6 @@ class AssetPathEntity {
   AssetPathEntity({
     required this.id,
     required this.name,
-    @Deprecated('Use assetCountAsync instead. This will be removed in 3.0.0')
-    this.assetCount = 0,
     this.albumType = 1,
     this.lastModified,
     this.type = RequestType.common,
@@ -68,13 +66,6 @@ class AssetPathEntity {
   ///  * Android: Path name.
   ///  * iOS/macOS: Album/Folder name.
   final String name;
-
-  /// Total assets count of the album.
-  ///
-  /// The synchronized count will cause performance regression on iOS,
-  /// here the asynchronized getter [assetCountAsync] is preferred.
-  @Deprecated('Use assetCountAsync instead. This will be removed in 3.0.0')
-  final int assetCount;
 
   /// Total assets count of the path with the asynchronized getter.
   Future<int> get assetCountAsync => plugin.getAssetCountFromPath(this);

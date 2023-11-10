@@ -71,11 +71,6 @@ class RequestType {
   String toString() => '$runtimeType($value)';
 }
 
-@Deprecated(
-  'Use PermissionRequestOption instead. This will be removed in 3.0.0',
-)
-typedef PermisstionRequestOption = PermissionRequestOption;
-
 /// See [PermissionState].
 @immutable
 class PermissionRequestOption with IMapMixin {

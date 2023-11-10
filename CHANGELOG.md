@@ -4,6 +4,15 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 3.0.0
+
+***Breaking changes*** for remove some methods and classes.
+Remove next methods of class
+
+- `Editor.iOS`: use `Editor.darwin` instead.
+- `PermisstionRequestOption`: use `PermissionRequestOption` instead.
+- `AssetPathEntity.assetCount` 
+
 ## 2.8.0
 
 ### Feature
