@@ -67,7 +67,7 @@ JavaVersion getJavaVersion() {
     def javaVersion = project.findProperty("java.version")
     if (javaVersion != null) {
         res = JavaVersion.toVersion(javaVersion)
-        println("Get java version from project's gradle.properties: $javaVersion")
+        logger.info("Get java version from project's gradle.properties: $javaVersion.")
     }
 
     String javaHome
@@ -75,21 +75,21 @@ JavaVersion getJavaVersion() {
     javaHome = System.getenv("JAVA_HOME")
     if (res == null && javaHome != null) {
         res = getJavaFromHome(javaHome)
-        println("Get java version from JAVA_HOME: $javaHome")
+        logger.info("Get java version from JAVA_HOME: $javaHome.")
     }
 
     // 2. read gradle.properties
     javaHome = project.findProperty("java.home")
     if (res == null && javaHome != null) {
         res = getJavaFromHome(javaHome)
-        println("Get java version from gradle.properties: $javaHome")
+        logger.info("Get java version from gradle.properties: $javaHome.")
     }
 
     // 3. read from property with java.home
     javaHome = System.getProperty("java.home")
     if (res == null && javaHome != null) {
         res = getJavaFromHome(javaHome)
-        println("Get java version from java.home: $javaHome")
+        logger.info("Get java version from java.home: $javaHome.")
     }
 
     if (res != null) {
@@ -109,7 +109,7 @@ android {
     compileSdkVersion 34
 
     def javaVersion = getJavaVersion()
-    println("The photo_manager java version is ${javaVersion}")
+    logger.info("Using java ${javaVersion} in android.compileOptions.sourceCompatibility and android.compileOptions.targetCompatibility")
 
     compileOptions {
         sourceCompatibility javaVersion
