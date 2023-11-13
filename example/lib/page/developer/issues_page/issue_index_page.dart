@@ -5,6 +5,7 @@ import 'package:photo_manager_example/widget/nav_column.dart';
 import 'package:photo_manager_example/widget/theme_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'issue_1025.dart';
 import 'issue_734.dart';
 import 'issue_918.dart';
 import 'issue_962.dart';
@@ -25,6 +26,7 @@ class IssuePage extends StatelessWidget {
           Issue734Page(),
           Issue918Page(),
           Issue962(),
+          Issue1025Page(),
         ],
       ),
     );
@@ -42,7 +44,19 @@ mixin IssueBase<T extends StatefulWidget> on State<T> {
       icon: const Icon(Icons.info),
       onPressed: () {
         Clipboard.setData(ClipboardData(text: issueUrl));
-        showToast('The issue of $issueNumber was been copied.');
+        showToastWidget(Material(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.black87,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              'The issue of $issueNumber was been copied.',
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ));
       },
       tooltip: 'Copy issue url to clipboard.',
     );
