@@ -12,7 +12,6 @@ import '../filter/base_filter.dart';
 import '../filter/classical/filter_option_group.dart';
 import '../filter/path_filter.dart';
 import '../internal/constants.dart';
-import '../internal/editor.dart';
 import '../internal/enums.dart';
 import '../internal/plugin.dart';
 import '../internal/progress_handler.dart';
@@ -28,8 +27,6 @@ class AssetPathEntity {
   AssetPathEntity({
     required this.id,
     required this.name,
-    @Deprecated('Use assetCountAsync instead. This will be removed in 3.0.0')
-    this.assetCount = 0,
     this.albumType = 1,
     this.lastModified,
     this.type = RequestType.common,
@@ -68,13 +65,6 @@ class AssetPathEntity {
   ///  * Android: Path name.
   ///  * iOS/macOS: Album/Folder name.
   final String name;
-
-  /// Total assets count of the album.
-  ///
-  /// The synchronized count will cause performance regression on iOS,
-  /// here the asynchronized getter [assetCountAsync] is preferred.
-  @Deprecated('Use assetCountAsync instead. This will be removed in 3.0.0')
-  final int assetCount;
 
   /// Total assets count of the path with the asynchronized getter.
   Future<int> get assetCountAsync => plugin.getAssetCountFromPath(this);

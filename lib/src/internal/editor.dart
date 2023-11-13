@@ -10,17 +10,8 @@ import '../types/entity.dart';
 import 'plugin.dart';
 
 class Editor {
-  final IosEditor _ios = const IosEditor();
   final DarwinEditor _darwin = const DarwinEditor();
   final AndroidEditor _android = const AndroidEditor();
-
-  @Deprecated('Use `Editor.darwin` instead. This will be removed in 3.0.0')
-  IosEditor get iOS {
-    if (Platform.isIOS || Platform.isMacOS) {
-      return _ios;
-    }
-    throw const OSError('iOS Editor should only be use on iOS.');
-  }
 
   /// Support iOS and macOS.
   DarwinEditor get darwin {
@@ -267,12 +258,6 @@ class DarwinEditor {
       relativePath: relativePath,
     );
   }
-}
-
-/// An editor for iOS/macOS.
-class IosEditor extends DarwinEditor {
-  /// Creates a new [IosEditor] object.
-  const IosEditor();
 }
 
 /// An editor for Android.

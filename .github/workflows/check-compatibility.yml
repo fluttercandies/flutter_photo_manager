@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: '11'
+          java-version: '17'
       - run: flutter doctor -v
         name: Flutter info
       - run: flutter create new_project --platforms=android

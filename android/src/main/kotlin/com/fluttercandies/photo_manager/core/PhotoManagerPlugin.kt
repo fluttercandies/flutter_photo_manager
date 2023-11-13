@@ -357,6 +357,14 @@ class PhotoManagerPlugin(
                 resultHandler.reply(ConvertUtils.convertAssets(list))
             }
 
+            Methods.getAssetCountFromPath -> {
+                val galleryId = call.getString("id")
+                val type = call.getInt("type")
+                val option = call.getOption()
+
+                photoManager.getAssetCount(resultHandler, option, type, galleryId)
+            }
+
             Methods.getAssetListRange -> {
                 val galleryId = call.getString("id")
                 val type = call.getInt("type")
