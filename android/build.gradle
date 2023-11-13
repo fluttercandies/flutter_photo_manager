@@ -109,7 +109,7 @@ android {
     compileSdkVersion 34
 
     def javaVersion = getJavaVersion()
-    logger.info("Using java ${javaVersion} in android.compileOptions.sourceCompatibility and android.compileOptions.targetCompatibility")
+    logger.info("Using java ${javaVersion} at android.compileOptions.sourceCompatibility and android.compileOptions.targetCompatibility in photo_manager.")
 
     compileOptions {
         sourceCompatibility javaVersion
