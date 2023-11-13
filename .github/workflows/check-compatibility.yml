@@ -7,6 +7,7 @@ on:
   push:
     branches: 
       - main
+      - 2.x
 
 jobs:
   build-for-android:

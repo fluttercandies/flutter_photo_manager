@@ -4,6 +4,15 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.8.1
+
+### Feature
+
+Fix:
+
+- Upgrade android/build.gradle to load current java version from some environment variables.
+- Fix the `setIgnorePermissionCheck` method not working on Android.
+
 ## 2.8.0
 
 ### Feature
