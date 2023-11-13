@@ -256,12 +256,6 @@ class PhotoManagerPlugin(
                 val type = call.argument<Int>("type")!!
                 permissionsUtils.presentLimited(type, resultHandler)
             }
-
-            Methods.ignorePermissionCheck -> {
-                val ignore = call.argument<Boolean>("ignore")!!
-                ignorePermissionCheck = ignore
-                resultHandler.reply(ignore)
-            }
         }
 
     }
@@ -318,6 +312,12 @@ class PhotoManagerPlugin(
             Methods.releaseMemoryCache -> {
                 // The plugin will not hold instances cache on Android.
                 resultHandler.reply(1)
+            }
+
+            Methods.ignorePermissionCheck -> {
+                val ignore = call.argument<Boolean>("ignore")!!
+                ignorePermissionCheck = ignore
+                resultHandler.reply(ignore)
             }
         }
     }
