@@ -19,10 +19,22 @@ class IssuePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Issue page'),
+        title: const Text('Issue page list'),
       ),
-      body: const NavColumn(
-        children: <Widget>[
+      body: NavColumn(
+        titleBuilder: (w) {
+          if (w is StatefulWidget) {
+            // ignore: invalid_use_of_protected_member
+            final state = (w).createState();
+
+            if (state is IssueBase) {
+              final issueNumber = state.issueNumber;
+              return 'Issue $issueNumber';
+            }
+          }
+          return w.toStringShort();
+        },
+        children: const <Widget>[
           Issue734Page(),
           Issue918Page(),
           Issue962(),

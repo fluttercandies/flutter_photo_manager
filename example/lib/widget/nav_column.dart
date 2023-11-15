@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:photo_manager_example/widget/theme_button.dart';
 
+String _defaultBuilder(Widget w) {
+  return w.toStringShort();
+}
+
 class NavColumn extends StatelessWidget {
   const NavColumn({
     Key? key,
     required this.children,
+    this.titleBuilder = _defaultBuilder,
   }) : super(key: key);
 
   final List<Widget> children;
+  final String Function(Widget w) titleBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +31,7 @@ class NavColumn extends StatelessWidget {
 
   Widget buildItem(BuildContext context, Widget item) {
     return ThemeButton(
-      text: item.toStringShort(),
+      text: titleBuilder(item),
       onPressed: () {
         Navigator.push<void>(
           context,
