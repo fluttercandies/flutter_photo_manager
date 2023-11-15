@@ -6,6 +6,7 @@ import 'package:photo_manager_example/widget/theme_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'issue_1025.dart';
+import 'issue_1031.dart';
 import 'issue_734.dart';
 import 'issue_918.dart';
 import 'issue_962.dart';
@@ -41,6 +42,7 @@ class IssuePage extends StatelessWidget {
           Issue962(),
           Issue1025Page(),
           Issue988(),
+          Issue1031Page(),
         ],
       ),
     );
