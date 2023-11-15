@@ -25,9 +25,9 @@ class _Issue988State extends State<Issue988> with IssueBase {
 
   Future<void> loadGallery() async {
     final list = await PhotoManager.getAssetPathList(
-      type: RequestType.image,
       hasAll: true,
-      onlyAll: false,
+      type: RequestType.all,
+      filterOption: PMFilter.defaultValue(),
     );
     print('list.length ${list.length}');
     setState(() {
