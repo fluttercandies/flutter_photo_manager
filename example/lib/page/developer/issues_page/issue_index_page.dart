@@ -9,6 +9,7 @@ import 'issue_1025.dart';
 import 'issue_734.dart';
 import 'issue_918.dart';
 import 'issue_962.dart';
+import 'issue_988.dart';
 
 class IssuePage extends StatelessWidget {
   const IssuePage({
@@ -39,6 +40,7 @@ class IssuePage extends StatelessWidget {
           Issue918Page(),
           Issue962(),
           Issue1025Page(),
+          Issue988(),
         ],
       ),
     );
