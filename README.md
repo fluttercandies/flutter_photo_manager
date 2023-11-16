@@ -430,7 +430,10 @@ when the file is downloading.
 
 #### Display assets
 
-The plugin provided the `AssetEntityImage` widget and
+Since v3.0.0, the plugin doesn't provide any UI widgets.
+The original `AssetEntityImage` was moved to the new package [`photo_manager_image_provider`][photo_manager_image_provider].
+
+The new plugin provided the `AssetEntityImage` widget and
 the `AssetEntityImageProvider` to display assets:
 
 ```dart
@@ -1000,3 +1003,4 @@ PhotoManager.editor.darwin.deletePath();
 [`LocallyAvailableBuilder`]: https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/2055adfa74370339d10e6f09adef72f2130d2380/lib/src/widget/builder/locally_available_builder.dart
 
 [flutter/flutter#20522]: https://github.com/flutter/flutter/issues/20522
+[photo_manager_image_provider]: https://pub.dev/packages/photo_manager_image_provider
