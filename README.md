@@ -431,7 +431,8 @@ when the file is downloading.
 #### Display assets
 
 Since v3.0.0, the plugin doesn't provide any UI widgets.
-The original `AssetEntityImage` was moved to the new package [`photo_manager_image_provider`][photo_manager_image_provider].
+`AssetEntityImage` and `AssetEntityImageProvider` are provided in the new package
+[`photo_manager_image_provider`][photo_manager_image_provider].
 
 The new plugin provided the `AssetEntityImage` widget and
 the `AssetEntityImageProvider` to display assets:
