@@ -397,9 +397,17 @@ iOS 为了节省磁盘空间，可能将资源仅保存在 iCloud 上。
 
 #### 展示资源
 
-插件提供 `AssetEntityImage` widget 和
+从 v3.0.0 开始，插件不再提供任何 UI 组件。
+`AssetEntityImage` 和 `AssetEntityImageProvider` 在
+[`photo_manager_image_provider`][photo_manager_image_provider]
+插件中提供。
+
+新的插件提供 `AssetEntityImage` widget 和
 `AssetEntityImageProvider` 来处理资源的展示：
+
 ```dart
+import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
+
 final Widget image = AssetEntityImage(
   yourAssetEntity,
   isOriginal: false,
@@ -933,3 +941,4 @@ PhotoManager.editor.darwin.deletePath();
 [`LocallyAvailableBuilder`]: https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/2055adfa74370339d10e6f09adef72f2130d2380/lib/src/widget/builder/locally_available_builder.dart
 
 [flutter/flutter#20522]: https://github.com/flutter/flutter/issues/20522
+[photo_manager_image_provider]: https://pub.flutter-io.cn/packages/photo_manager_image_provider
