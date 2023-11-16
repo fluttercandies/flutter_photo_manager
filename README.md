@@ -437,6 +437,8 @@ The new plugin provided the `AssetEntityImage` widget and
 the `AssetEntityImageProvider` to display assets:
 
 ```dart
+import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
+
 final Widget image = AssetEntityImage(
   yourAssetEntity,
   isOriginal: false, // Defaults to `true`.

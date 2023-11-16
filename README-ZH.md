@@ -399,9 +399,13 @@ iOS 为了节省磁盘空间，可能将资源仅保存在 iCloud 上。
 
 从 v3.0.0 开始，插件不再提供任何 UI 组件。
 原有的 `AssetEntityImage` 转移至 [`photo_manager_image_provider`][photo_manager_image_provider]。
-插件提供 `AssetEntityImage` widget 和
+
+新的插件提供 `AssetEntityImage` widget 和
 `AssetEntityImageProvider` 来处理资源的展示：
+
 ```dart
+import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
+
 final Widget image = AssetEntityImage(
   yourAssetEntity,
   isOriginal: false,
