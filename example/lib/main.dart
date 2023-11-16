@@ -40,6 +40,9 @@ class _SimpleExampleApp extends StatelessWidget {
       value: provider, // This is for the advanced usages.
       child: MaterialApp(
         title: 'Photo Manager Example',
+        theme: ThemeData(
+          colorSchemeSeed: Colors.blue,
+        ),
         builder: (context, child) {
           if (child == null) return const SizedBox.shrink();
           return Banner(

@@ -10,6 +10,7 @@ import 'issue_1031.dart';
 import 'issue_734.dart';
 import 'issue_918.dart';
 import 'issue_962.dart';
+import 'issue_979.dart';
 import 'issue_988.dart';
 
 class IssuePage extends StatelessWidget {
@@ -43,6 +44,7 @@ class IssuePage extends StatelessWidget {
           Issue1025Page(),
           Issue988(),
           Issue1031Page(),
+          Issue979(),
         ],
       ),
     );
@@ -54,6 +56,33 @@ mixin IssueBase<T extends StatefulWidget> on State<T> {
 
   String get issueUrl =>
       'https://github.com/fluttercandies/flutter_photo_manager/issues/$issueNumber';
+
+  final List<String> _logs = [];
+
+  void addLog(String log) {
+    log = '[${DateTime.now().toIso8601String()}] $log';
+    _logs.insert(0, log);
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Widget buildLogWidget({bool expaned = true}) {
+    final w = ListView.separated(
+      itemBuilder: (_, index) {
+        final log = _logs[index];
+        return Text(log);
+      },
+      itemCount: _logs.length,
+      separatorBuilder: (_, __) => const Divider(),
+    );
+
+    if (expaned) {
+      return Expanded(child: w);
+    } else {
+      return w;
+    }
+  }
 
   Widget buildUrlButton() {
     return IconButton(
