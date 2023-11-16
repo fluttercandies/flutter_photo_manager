@@ -23,6 +23,18 @@ class _Issue979State extends State<Issue979> with IssueBase {
   int get issueNumber => 979;
 
   Future<void> _saveAndRead() async {
+    final auth = await PhotoManager.requestPermissionExtend(
+      requestOption: const PermissionRequestOption(
+        iosAccessLevel: IosAccessLevel.addOnly,
+      ),
+    );
+    if (!auth.hasAccess) {
+      addLog('request permission fail, $auth');
+      return;
+    }
+
+    addLog('request permission success, wait download file...');
+
     try {
       final file = await AssetsUtils.downloadJpeg();
       final name = file.path.split('/').last;

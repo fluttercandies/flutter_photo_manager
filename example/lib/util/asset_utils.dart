@@ -7,7 +7,7 @@ class AssetsUtils {
   AssetsUtils._();
 
   static const String jpegUrl =
-      'https://cdn.jsdelivr.net/gh/ExampleAssets/ExampleAsset@master/IMG_1096.jpeg';
+      'https://gitlab.com/CaiJingLong/ExampleAsset/-/raw/main/IMG_1096.jpeg?ref_type=heads';
 
   static Future<File> downloadJpeg() async {
     final cacheDir = await getApplicationCacheDirectory();
