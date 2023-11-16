@@ -96,6 +96,10 @@ extension LogicalTypeExtension on LogicalType {
 }
 
 /// {@template PM.column_where_condition}
+/// 
+/// The where condition item for custom filter.
+/// 
+/// {@endtemplate}
 abstract class WhereConditionItem {
   /// The text of the condition.
   String get text;
