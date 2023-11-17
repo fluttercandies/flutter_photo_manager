@@ -226,7 +226,11 @@ class __DeleteAssetImageListState extends State<_DeleteAssetImageList> {
             .deleteWithIds(checked.map((e) => e.id).toList());
 
         showToast('Delete success, ids: $ids');
-        
+
+        if (ids.isNotEmpty) {
+          checked.removeWhere((element) => ids.contains(element.id));
+        }
+
         // refresh the list
         loadAssets();
       },
