@@ -19,11 +19,13 @@ class NavColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Center(
-        child: Column(
-          children: <Widget>[
-            for (final Widget item in children) buildItem(context, item),
-          ],
+      child: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: <Widget>[
+              for (final Widget item in children) buildItem(context, item),
+            ],
+          ),
         ),
       ),
     );

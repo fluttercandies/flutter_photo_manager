@@ -1,6 +1,7 @@
 package com.fluttercandies.photo_manager.core
 
 import android.app.Activity
+import android.app.RecoverableSecurityException
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -9,8 +10,10 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import com.fluttercandies.photo_manager.core.utils.IDBUtils
+import com.fluttercandies.photo_manager.util.LogUtils
 import com.fluttercandies.photo_manager.util.ResultHandler
 import io.flutter.plugin.common.PluginRegistry
+import java.util.LinkedList
 
 class PhotoManagerDeleteManager(val context: Context, private var activity: Activity?) :
     PluginRegistry.ActivityResultListener {
@@ -19,17 +22,59 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
         this.activity = activity
     }
 
+    private var androidQDeleteRequestCode = 40070
+    private val androidQUriMap = mutableMapOf<String, Uri?>()
+    private val androidQSuccessIds = mutableListOf<String>()
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    inner class AndroidQDeleteTask(
+        val id: String,
+        val uri: Uri,
+        private val exception: RecoverableSecurityException
+    ) {
+        fun requestPermission() {
+            val intent = Intent().apply {
+                data = uri
+            }
+            activity?.startIntentSenderForResult(
+                exception.userAction.actionIntent.intentSender,
+                androidQDeleteRequestCode,
+                intent,
+                0,
+                0,
+                0
+            )
+        }
+
+        fun handleResult(resultCode: Int) {
+            if (resultCode == Activity.RESULT_OK) {
+                androidQSuccessIds.add(id)
+            }
+            requestAndroidQNextPermission()
+        }
+
+    }
+
+    private var waitPermissionQueue = LinkedList<AndroidQDeleteTask>()
+    private var currentTask: AndroidQDeleteTask? = null
+
     private var androidRDeleteRequestCode = 40069
 
     private val cr: ContentResolver
         get() = context.contentResolver
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
         if (requestCode == androidRDeleteRequestCode) {
             handleAndroidRDelete(resultCode)
             return true
         }
-        return true
+        if (requestCode == androidQDeleteRequestCode) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                currentTask?.handleResult(resultCode)
+            }
+            return true
+        }
+        return false
     }
 
     private fun handleAndroidRDelete(resultCode: Int) {
@@ -58,6 +103,7 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
 //    }
 
     private var androidRHandler: ResultHandler? = null
+    private var androidQHandler: ResultHandler? = null
 
     @RequiresApi(Build.VERSION_CODES.R)
     fun deleteInApi30(uris: List<Uri?>, resultHandler: ResultHandler) {
@@ -71,6 +117,73 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
             0,
             0
         )
+    }
+
+    private fun findIdByUriInApi29(uri: Uri): String? {
+        for (entry in androidQUriMap) {
+            if (entry.value == uri) {
+                return entry.key
+            }
+        }
+        return null
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun requestAndroidQNextPermission() {
+        val task = waitPermissionQueue.poll()
+
+        if (task == null) {
+            // all permission is granted or denied
+            replyAndroidQDeleteResult()
+            return
+        }
+
+        currentTask = task
+        task.requestPermission()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun deleteJustInApi29(uris: HashMap<String, Uri?>, resultHandler: ResultHandler) {
+        this.androidQHandler = resultHandler
+
+        androidQUriMap.clear()
+        androidQUriMap.putAll(uris)
+        androidQSuccessIds.clear()
+        waitPermissionQueue.clear()
+
+        for (entry in uris) {
+            val uri = entry.value ?: continue
+            val id = entry.key
+            try {
+                cr.delete(uri, null, null)
+            } catch (e: Exception) {
+                // request delete permission
+                if (e is RecoverableSecurityException) {
+                    val task = AndroidQDeleteTask(id, uri, e)
+                    waitPermissionQueue.add(task)
+                } else {
+                    LogUtils.error("delete assets error in api 29", e)
+                    replyAndroidQDeleteResult()
+                    return
+                }
+            }
+        }
+
+        requestAndroidQNextPermission()
+    }
+
+    private fun replyAndroidQDeleteResult() {
+        if (androidQSuccessIds.isNotEmpty()) {
+            // execute real delete
+            for (id in androidQSuccessIds) {
+                val uri = androidQUriMap[id] ?: continue
+                cr.delete(uri, null, null)
+            }
+        }
+
+        androidQHandler?.reply(androidQSuccessIds.toList())
+        androidQSuccessIds.clear()
+        androidQHandler = null
     }
 
     @RequiresApi(Build.VERSION_CODES.R)

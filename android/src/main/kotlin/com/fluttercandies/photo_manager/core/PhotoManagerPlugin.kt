@@ -2,6 +2,7 @@ package com.fluttercandies.photo_manager.core
 
 import android.app.Activity
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -537,6 +538,13 @@ class PhotoManagerPlugin(
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                         val uris = ids.map { photoManager.getUri(it) }.toList()
                         deleteManager.deleteInApi30(uris, resultHandler)
+                    } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+                        val idUriMap = HashMap<String, Uri?>()
+                        for (id in ids) {
+                            val uri = photoManager.getUri(id)
+                            idUriMap[id] = uri
+                        }
+                        deleteManager.deleteJustInApi29(idUriMap, resultHandler)
                     } else {
                         deleteManager.deleteInApi28(ids)
                         resultHandler.reply(ids)

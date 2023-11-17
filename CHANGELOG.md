@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 3.0.0-dev.2
+
+Fix:
+
+- Fix `PhotoManager.editor.deleteWithIds` method not working on Android API 29.
+
 ## 3.0.0-dev.1
 
 ***Breaking changes*** for remove some methods and classes.
