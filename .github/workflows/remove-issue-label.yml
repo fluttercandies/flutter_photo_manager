@@ -1,0 +1,17 @@
+name: Remove label when issue is closed
+on:
+  issues:
+    types:
+      - closed
+
+jobs:
+  add-label:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: remove label
+        run:
+          gh issue edit ${{ github.event.issue.number }} --remove-label 'await triage'
