@@ -12,20 +12,20 @@
 }
 
 - (instancetype)initWithRegistrar:
-(NSObject<FlutterPluginRegistrar> *)registrar {
+    (NSObject <FlutterPluginRegistrar> *)registrar {
     self = [super init];
     if (self) {
         self.registrar = registrar;
         channel = [FlutterMethodChannel
-                   methodChannelWithName:@"com.fluttercandies/photo_manager/notify"
-                   binaryMessenger:[registrar messenger]];
+            methodChannelWithName:@"com.fluttercandies/photo_manager/notify"
+                  binaryMessenger:[registrar messenger]];
         _notifying = NO;
     }
-    
+
     return self;
 }
 
-+ (instancetype)managerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
++ (instancetype)managerWithRegistrar:(NSObject <FlutterPluginRegistrar> *)registrar {
     return [[self alloc] initWithRegistrar:registrar];
 }
 
@@ -58,10 +58,12 @@
     NSMutableDictionary *detailResult = [self convertChangeDetailsToNotifyDetail:details];
     detailResult[@"oldCount"] = @(oldCount);
     detailResult[@"newCount"] = @(newCount);
-    
+
     [PMLogUtils.sharedInstance
-     info:[NSString stringWithFormat:@"on change result = %@", detailResult]];
-    [channel invokeMethod:@"change" arguments:detailResult];
+        info:[NSString stringWithFormat:@"on change result = %@", detailResult]];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [channel invokeMethod:@"change" arguments:detailResult];
+    });
 }
 
 - (void)refreshFetchResult {
@@ -73,11 +75,11 @@
     NSArray<PHObject *> *changedObjects = details.changedObjects;
     NSArray<PHObject *> *insertedObjects = details.insertedObjects;
     NSArray<PHObject *> *removedObjects = details.removedObjects;
-    
+
     [self addToResult:dictionary key:@"update" objects:changedObjects];
     [self addToResult:dictionary key:@"create" objects:insertedObjects];
     [self addToResult:dictionary key:@"delete" objects:removedObjects];
-    
+
     return dictionary;
 }
 
@@ -85,28 +87,28 @@
                 key:(NSString *)key
             objects:(NSArray<PHObject *> *)changedObjects {
     NSMutableArray *items = [NSMutableArray new];
-    
+
     for (PHObject *object in changedObjects) {
         if ([object isMemberOfClass:PHAsset.class]) {
-            PHAsset *asset = (PHAsset *)object;
+            PHAsset *asset = (PHAsset *) object;
             NSMutableDictionary *itemDict = [NSMutableDictionary new];
             PHFetchResult<PHAssetCollection *> *collections = [PHAssetCollection
-                                                               fetchAssetCollectionsContainingAsset:asset
-                                                               withType:PHAssetCollectionTypeAlbum
-                                                               options:nil];
+                fetchAssetCollectionsContainingAsset:asset
+                                            withType:PHAssetCollectionTypeAlbum
+                                             options:nil];
             itemDict[@"id"] = object.localIdentifier;
             NSMutableArray *collectionArray = [NSMutableArray new];
             for (PHAssetCollection *collection in collections) {
                 NSDictionary *collectionDict = @{
-                    @"id" : collection.localIdentifier,
-                    @"title" : collection.localizedTitle
+                    @"id": collection.localIdentifier,
+                    @"title": collection.localizedTitle
                 };
                 [collectionArray addObject:collectionDict];
             }
             [items addObject:itemDict];
         }
     }
-    
+
     dictionary[key] = items;
 }
 
