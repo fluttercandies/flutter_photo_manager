@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:oktoast/oktoast.dart';
@@ -7,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'issue_1025.dart';
 import 'issue_1031.dart';
+import 'issue_1051.dart';
 import 'issue_734.dart';
 import 'issue_918.dart';
 import 'issue_962.dart';
@@ -18,6 +21,26 @@ class IssuePage extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
+  List<Widget> currentPlatformWidgets(BuildContext context, List<Widget> list) {
+    final res = <Widget>[];
+
+    for (final item in list) {
+      if (item is StatefulWidget) {
+        // ignore: invalid_use_of_protected_member
+        final state = (item).createState();
+        if (state is IssueBase) {
+          if (state.supportCurrentPlatform()) {
+            res.add(item);
+          }
+        } else {
+          res.add(item);
+        }
+      }
+    }
+
+    return res;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,28 +48,31 @@ class IssuePage extends StatelessWidget {
         title: const Text('Issue page list'),
       ),
       body: NavColumn(
-        titleBuilder: (w) {
-          if (w is StatefulWidget) {
-            // ignore: invalid_use_of_protected_member
-            final state = (w).createState();
+          titleBuilder: (w) {
+            if (w is StatefulWidget) {
+              // ignore: invalid_use_of_protected_member
+              final state = (w).createState();
 
-            if (state is IssueBase) {
-              final issueNumber = state.issueNumber;
-              return 'Issue $issueNumber';
+              if (state is IssueBase) {
+                final issueNumber = state.issueNumber;
+                return 'Issue $issueNumber';
+              }
             }
-          }
-          return w.toStringShort();
-        },
-        children: const <Widget>[
-          Issue734Page(),
-          Issue918Page(),
-          Issue962(),
-          Issue1025Page(),
-          Issue988(),
-          Issue1031Page(),
-          Issue979(),
-        ],
-      ),
+            return w.toStringShort();
+          },
+          children: currentPlatformWidgets(
+            context,
+            const <Widget>[
+              Issue734Page(),
+              Issue918Page(),
+              Issue962(),
+              Issue1025Page(),
+              Issue988(),
+              Issue1031Page(),
+              Issue979(),
+              Issus1051(),
+            ],
+          )),
     );
   }
 }
@@ -58,6 +84,22 @@ mixin IssueBase<T extends StatefulWidget> on State<T> {
       'https://github.com/fluttercandies/flutter_photo_manager/issues/$issueNumber';
 
   final List<String> _logs = [];
+
+  List<TargetPlatform>? get supportPlatforms {
+    return null;
+  }
+
+  bool supportCurrentPlatform() {
+    final platforms = supportPlatforms;
+    if (platforms == null) {
+      return true;
+    }
+    return platforms
+        .map((e) => e.toString().toLowerCase())
+        .where((element) =>
+            element.contains(Platform.operatingSystem.toLowerCase()))
+        .isNotEmpty;
+  }
 
   void addLog(String log) {
     log = '[${DateTime.now().toIso8601String()}] $log';
