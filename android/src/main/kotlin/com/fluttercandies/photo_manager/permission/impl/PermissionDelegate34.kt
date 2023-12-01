@@ -184,7 +184,7 @@ class PermissionDelegate34 : PermissionDelegate() {
             permissions.add(mediaImage)
         }
 
-        requestPermission(permissionsUtils, permissions)
+        requestPermission(permissionsUtils, permissions, limitedRequestCode)
     }
 
     override fun getAuthValue(

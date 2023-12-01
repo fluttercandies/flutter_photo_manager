@@ -26,7 +26,8 @@ abstract class PermissionDelegate {
 
     protected fun requestPermission(
         permissionsUtils: PermissionsUtils,
-        permission: MutableList<String>
+        permission: MutableList<String>,
+        requestCode: Int = PermissionDelegate.requestCode
     ) {
         val activity = permissionsUtils.getActivity()
             ?: throw NullPointerException("Activity for the permission request is not exist.")
