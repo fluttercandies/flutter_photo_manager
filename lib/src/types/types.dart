@@ -60,6 +60,20 @@ class RequestType {
     return RequestType(value << bit);
   }
 
+  static List<RequestType> values = <RequestType>[
+    image,
+    video,
+    audio,
+  ];
+
+  static RequestType fromTypes(List<RequestType> types) {
+    var result = const RequestType(0);
+    for (final type in types) {
+      result += type;
+    }
+    return result;
+  }
+
   @override
   bool operator ==(Object other) =>
       other is RequestType && value == other.value;

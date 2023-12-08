@@ -32,17 +32,17 @@ class PermissionDelegate34 : PermissionDelegate() {
         requestType: Int,
         mediaLocation: Boolean
     ) {
-        LogUtils.debug("requestPermission")
+        LogUtils.info("requestPermission")
         var havePermission = true
 
         val containsImage = RequestTypeUtils.containsImage(requestType)
         val containsVideo = RequestTypeUtils.containsVideo(requestType)
         val containsAudio = RequestTypeUtils.containsAudio(requestType)
 
-        val permissions = mutableListOf<String>()
+        val needPermissions = mutableListOf<String>()
 
         if (containsVideo || containsImage) {
-            permissions.add(mediaVisualUserSelected)
+            needPermissions.add(mediaVisualUserSelected)
             // check have media visual user selected permission, the permission does not need to be defined in the manifest.
             val haveMediaVisualUserSelected =
                 havePermissionForUser(context, mediaVisualUserSelected)
@@ -50,32 +50,32 @@ class PermissionDelegate34 : PermissionDelegate() {
             havePermission = haveMediaVisualUserSelected
 
             if (mediaLocation) {
-                permissions.add(mediaLocationPermission)
+                needPermissions.add(mediaLocationPermission)
                 havePermission = havePermission && havePermission(context, mediaLocationPermission)
             }
 
             if (containsVideo) {
-                permissions.add(mediaVideo)
+                needPermissions.add(mediaVideo)
             }
 
             if (containsImage) {
-                permissions.add(mediaImage)
+                needPermissions.add(mediaImage)
             }
 
         }
 
         if (containsAudio) {
-            permissions.add(mediaAudio)
+            needPermissions.add(mediaAudio)
             havePermission = havePermission && havePermission(context, mediaAudio)
         }
 
-        LogUtils.debug("Current permissions: $permissions")
-        LogUtils.debug("havePermission: $havePermission")
+        LogUtils.info("Current permissions: $needPermissions")
+        LogUtils.info("havePermission: $havePermission")
 
         if (havePermission) {
-            permissionsUtils.permissionsListener?.onGranted(permissions)
+            permissionsUtils.permissionsListener?.onGranted(needPermissions)
         } else {
-            requestPermission(permissionsUtils, permissions)
+            requestPermission(permissionsUtils, needPermissions)
         }
     }
 
