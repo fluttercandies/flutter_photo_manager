@@ -11,7 +11,7 @@ that can be found in the LICENSE file. -->
 [![Build status](https://img.shields.io/github/actions/workflow/status/fluttercandies/flutter_photo_manager/runnable.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/actions/workflows/runnable.yml)
 [![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager)](https://github.com/fluttercandies/flutter_photo_manager/blob/main/LICENSE)
 
-[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?style=social&label=Stars)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/network)
 [![Awesome Flutter](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/Solido/awesome-flutter)
 <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
@@ -97,6 +97,7 @@ that can be found in the LICENSE file. -->
       * [复制资源](#复制资源)
       * [仅适用于 Android 的功能](#仅适用于-android-的功能)
         * [将资源移动到另一个相册](#将资源移动到另一个相册)
+        * [将资源移动到废纸篓](#将资源移动到废纸篓)
         * [移除所有不存在的资源](#移除所有不存在的资源)
       * [适用于 iOS 或 macOS 的功能](#适用于-ios-或-macos-的功能)
         * [创建一个文件夹](#创建一个文件夹)
@@ -725,7 +726,7 @@ rootProject.allprojects {
 
 ```xml
 <manifest>
-   <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" /> <!-- 这是一个可选的配置，不指定并不影响在代码中使用它 -->
+   <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" /> <!-- 如果需要提供可选的资源的功能 -->
 </manifest>
 ```
 

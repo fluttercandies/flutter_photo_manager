@@ -3,44 +3,60 @@
 The document only describes the equivalent changes to the API.
 If you want to see the new feature support, please refer to [readme][] and [change log][].
 
-- [Migration Guide](#migration-guide)
-  - [2.x to 3.0](#2x-to-30)
-    - [Overall](#overall)
-      - [AssetEntityImage and AssetEntityImageProvider](#assetentityimage-and-assetentityimageprovider)
-  - [2.x to 2.2](#2x-to-22)
-    - [Overall](#overall-1)
-      - [`assetCount`](#assetcount)
-  - [1.x to 2.0](#1x-to-20)
-    - [Overall](#overall-2)
-    - [API migrations](#api-migrations)
-      - [`getAssetListPaged`](#getassetlistpaged)
-      - [Filtering only videos](#filtering-only-videos)
-      - [`isLocallyAvailable`](#islocallyavailable)
-      - [iOS Editor favorite asset](#ios-editor-favorite-asset)
-  - [0.6 to 1.0](#06-to-10)
-  - [0.5 To 0.6](#05-to-06)
+<!-- TOC -->
+* [Migration Guide](#migration-guide)
+  * [2.x to 3.0](#2x-to-30)
+    * [Overall](#overall)
+      * [`AssetEntityImage` and `AssetEntityImageProvider`](#assetentityimage-and-assetentityimageprovider)
+  * [2.x to 2.8](#2x-to-28)
+    * [Overall](#overall-1)
+  * [2.x to 2.2](#2x-to-22)
+    * [Overall](#overall-2)
+      * [`assetCount`](#assetcount)
+  * [1.x to 2.0](#1x-to-20)
+    * [Overall](#overall-3)
+    * [API migrations](#api-migrations)
+      * [`getAssetListPaged`](#getassetlistpaged)
+      * [Filtering only videos](#filtering-only-videos)
+      * [`isLocallyAvailable`](#islocallyavailable)
+      * [iOS Editor favorite asset](#ios-editor-favorite-asset)
+  * [0.6 to 1.0](#06-to-10)
+  * [0.5 To 0.6](#05-to-06)
+<!-- TOC -->
 
 ## 2.x to 3.0
 
 ### Overall
 
-- `Editor.iOS`: use `Editor.darwin` instead.
-- `PermisstionRequestOption`: use `PermissionRequestOption` instead.
-- `AssetPathEntity.assetCount`: use `AssetPathEntity.assetCountAsync` instead.
+- Use `Editor.darwin` instead of `Editor.iOS`.
+- Use `PermissionRequestOption` instead of `PermisstionRequestOption`.
+- Use `AssetPathEntity.assetCountAsync` instead of `AssetPathEntity.assetCount`.
 - Removed `AssetEntityImage` and `AssetEntityImageProvider`.
 
-#### AssetEntityImage and AssetEntityImageProvider
+#### `AssetEntityImage` and `AssetEntityImageProvider`
 
-You just include [photo_manager_image_provider](https://pub.dev/packages/photo_manager_image_provider/install) in your project.
-
-If you use the flutter 3.14.0 or higher, use 2.x version, otherwise use 1.x version.
-
-`flutter pub add photo_manager_image_provider:^2.1.0`
-`flutter pub add photo_manager_image_provider:^1.1.0`
+These classes are no longer provided from the package.
+Instead, include
+[photo_manager_image_provider](https://pub.dev/packages/photo_manager_image_provider/install)
+to use `AssetEntityImage` and `AssetEntityImageProvider`.
 
 ```dart
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 ```
+
+## 2.x to 2.8
+
+### Overall
+
+Methods invoked with assets permission no longer call for permissions implicitly.
+Users must follow the below methods to ensure permissions were granted:
+
+1. `PhotoManager.requestPermissionExtend()`, verify if the result is
+   `authorized` or `limited`.
+2. `PhotoManager.setIgnorePermissionCheck(true)`, ignoring permission checks,
+   or handle permissions with other mechanisms.
+
+`PhotoManager.editor.deleteWithIds` only move assets to the trash on Android 30 and above.
 
 ## 2.x to 2.2
 
