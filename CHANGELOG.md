@@ -4,6 +4,10 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 3.0.0-dev.5
+
+- Fix: the requestPermissionExtend method returns the wrong result on android API 34.
+
 ## 3.0.0-dev.4
 
 - Fix presentLimit have no result on android API 34. [#1051](https://github.com/fluttercandies/flutter_photo_manager/issues/1051)

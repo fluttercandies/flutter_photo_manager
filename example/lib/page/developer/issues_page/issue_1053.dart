@@ -59,10 +59,10 @@ class _Issus1053State extends State<Issus1053> with IssueBase<Issus1053> {
       case 1:
         title = 'image';
         break;
-      case 1 << 1:
+      case 2:
         title = 'video';
         break;
-      case 1 << 2:
+      case 4:
         title = 'audio';
         break;
     }
