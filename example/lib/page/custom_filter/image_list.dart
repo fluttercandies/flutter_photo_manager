@@ -3,7 +3,7 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_example/widget/image_item_widget.dart';
 
 class ImageList extends StatelessWidget {
-  const ImageList({Key? key, required this.list}) : super(key: key);
+  const ImageList({super.key, required this.list});
 
   final List<AssetEntity> list;
 

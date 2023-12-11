@@ -9,10 +9,10 @@ import 'package:video_player/video_player.dart';
 
 class LivePhotosWidget extends StatefulWidget {
   const LivePhotosWidget({
-    Key? key,
+    super.key,
     required this.entity,
     required this.useOrigin,
-  }) : super(key: key);
+  });
 
   final AssetEntity entity;
   final bool useOrigin;

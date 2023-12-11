@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class NavButton extends StatelessWidget {
   const NavButton({
-    Key? key,
+    super.key,
     required this.title,
     required this.page,
-  }) : super(key: key);
+  });
 
   final String title;
   final Widget page;
@@ -24,10 +24,10 @@ class NavButton extends StatelessWidget {
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
-    Key? key,
+    super.key,
     required this.title,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   final String title;
   final VoidCallback onPressed;

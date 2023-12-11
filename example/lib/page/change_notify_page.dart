@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class ChangeNotifyExample extends StatefulWidget {
-  const ChangeNotifyExample({Key? key}) : super(key: key);
+  const ChangeNotifyExample({super.key});
 
   @override
   State<ChangeNotifyExample> createState() => _ChangeNotifyExampleState();

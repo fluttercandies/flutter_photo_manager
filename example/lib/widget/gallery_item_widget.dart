@@ -11,10 +11,10 @@ import 'dialog/list_dialog.dart';
 
 class GalleryItemWidget extends StatelessWidget {
   const GalleryItemWidget({
-    Key? key,
+    super.key,
     required this.path,
     required this.setState,
-  }) : super(key: key);
+  });
 
   final AssetPathEntity path;
   final ValueSetter<VoidCallback> setState;

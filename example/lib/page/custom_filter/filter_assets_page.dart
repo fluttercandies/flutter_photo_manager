@@ -4,9 +4,9 @@ import 'package:photo_manager_example/page/custom_filter/image_list.dart';
 
 class FilterAssetsContent extends StatelessWidget {
   const FilterAssetsContent({
-    Key? key,
+    super.key,
     required this.filter,
-  }) : super(key: key);
+  });
   final CustomFilter filter;
 
   Future<List<AssetEntity>> getAssets() async {

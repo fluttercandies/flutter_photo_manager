@@ -21,9 +21,9 @@ import 'move_to_another_gallery_example.dart';
 
 class GalleryContentListPage extends StatefulWidget {
   const GalleryContentListPage({
-    Key? key,
+    super.key,
     required this.path,
-  }) : super(key: key);
+  });
 
   final AssetPathEntity path;
 

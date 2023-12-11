@@ -5,7 +5,7 @@ import 'package:photo_manager_example/page/developer/issues_page/issue_index_pag
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
 class Issue988 extends StatefulWidget {
-  const Issue988({Key? key}) : super(key: key);
+  const Issue988({super.key});
 
   @override
   State<Issue988> createState() {
@@ -87,9 +87,8 @@ class _Issue988State extends State<Issue988> with IssueBase {
 
 class _DeleteAssetImageList extends StatefulWidget {
   const _DeleteAssetImageList({
-    Key? key,
     required this.path,
-  }) : super(key: key);
+  });
 
   final AssetPathEntity path;
 

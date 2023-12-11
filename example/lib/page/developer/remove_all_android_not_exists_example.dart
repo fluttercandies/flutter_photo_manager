@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class RemoveAndroidNotExistsExample extends StatefulWidget {
-  const RemoveAndroidNotExistsExample({Key? key}) : super(key: key);
+  const RemoveAndroidNotExistsExample({super.key});
 
   @override
   State<RemoveAndroidNotExistsExample> createState() =>

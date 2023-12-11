@@ -7,9 +7,9 @@ import 'order_by_action.dart';
 
 class CustomFilterSqlPage extends StatefulWidget {
   const CustomFilterSqlPage({
-    Key? key,
+    super.key,
     required this.builder,
-  }) : super(key: key);
+  });
 
   final Widget Function(BuildContext context, CustomFilter filter) builder;
 

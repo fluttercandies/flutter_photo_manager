@@ -13,7 +13,7 @@ import 'filter_option_page.dart';
 import 'gallery_list_page.dart';
 
 class NewHomePage extends StatefulWidget {
-  const NewHomePage({Key? key}) : super(key: key);
+  const NewHomePage({super.key});
 
   @override
   State<NewHomePage> createState() => _NewHomePageState();

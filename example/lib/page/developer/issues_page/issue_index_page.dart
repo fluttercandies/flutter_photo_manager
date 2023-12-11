@@ -19,8 +19,8 @@ import 'issue_988.dart';
 
 class IssuePage extends StatelessWidget {
   const IssuePage({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   List<Widget> currentPlatformWidgets(BuildContext context, List<Widget> list) {
     final res = <Widget>[];

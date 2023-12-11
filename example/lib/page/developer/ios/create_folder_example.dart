@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class CreateFolderExample extends StatefulWidget {
-  const CreateFolderExample({Key? key}) : super(key: key);
+  const CreateFolderExample({super.key});
 
   @override
   State<CreateFolderExample> createState() => _CreateFolderExampleState();

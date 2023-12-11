@@ -4,9 +4,9 @@ import 'package:photo_manager_example/page/custom_filter/order_by_action.dart';
 
 class AdvancedCustomFilterPage extends StatefulWidget {
   const AdvancedCustomFilterPage({
-    Key? key,
+    super.key,
     required this.builder,
-  }) : super(key: key);
+  });
 
   final Widget Function(BuildContext context, CustomFilter filter) builder;
 
@@ -82,11 +82,11 @@ class _AdvancedCustomFilterPageState extends State<AdvancedCustomFilterPage> {
 
 class WhereAction extends StatelessWidget {
   const WhereAction({
-    Key? key,
+    super.key,
     required this.where,
     required this.onChanged,
     // required this
-  }) : super(key: key);
+  });
 
   final List<WhereConditionItem> where;
   final ValueChanged<List<WhereConditionItem>> onChanged;
@@ -113,9 +113,8 @@ class WhereAction extends StatelessWidget {
 
 class _WhereConditionPage extends StatefulWidget {
   const _WhereConditionPage({
-    Key? key,
     required this.where,
-  }) : super(key: key);
+  });
 
   final List<WhereConditionItem> where;
 
@@ -232,7 +231,7 @@ class _WhereConditionPageState extends State<_WhereConditionPage> {
 }
 
 class _CreateWhereDialog extends StatefulWidget {
-  const _CreateWhereDialog({Key? key}) : super(key: key);
+  const _CreateWhereDialog();
 
   @override
   State<_CreateWhereDialog> createState() => _CreateWhereDialogState();

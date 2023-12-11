@@ -7,10 +7,10 @@ typedef ChangeNotifierWidgetBuilder<T extends ChangeNotifier> = Widget Function(
 
 class ChangeNotifierBuilder<T extends ChangeNotifier> extends StatefulWidget {
   const ChangeNotifierBuilder({
-    Key? key,
+    super.key,
     required this.builder,
     required this.value,
-  }) : super(key: key);
+  });
 
   final ChangeNotifierWidgetBuilder<T> builder;
   final T value;

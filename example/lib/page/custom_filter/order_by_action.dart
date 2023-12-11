@@ -23,10 +23,10 @@ Future<void> changeOrderBy(
 
 class OrderByAction extends StatelessWidget {
   const OrderByAction({
-    Key? key,
+    super.key,
     required this.items,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   final List<OrderByItem> items;
   final ValueChanged<List<OrderByItem>> onChanged;
@@ -72,9 +72,9 @@ class OrderByAction extends StatelessWidget {
 
 class OrderByActionPage extends StatefulWidget {
   const OrderByActionPage({
-    Key? key,
+    super.key,
     required this.items,
-  }) : super(key: key);
+  });
 
   final List<OrderByItem> items;
 

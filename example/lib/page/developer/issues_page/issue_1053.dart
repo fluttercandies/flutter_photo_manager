@@ -5,7 +5,7 @@ import 'package:photo_manager/photo_manager.dart';
 import 'issue_index_page.dart';
 
 class Issus1053 extends StatefulWidget {
-  const Issus1053({Key? key}) : super(key: key);
+  const Issus1053({super.key});
 
   @override
   State<Issus1053> createState() => _Issus1053State();
