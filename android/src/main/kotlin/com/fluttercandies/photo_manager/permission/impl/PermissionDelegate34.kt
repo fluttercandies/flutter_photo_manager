@@ -44,10 +44,10 @@ class PermissionDelegate34 : PermissionDelegate() {
         val containsVideo = RequestTypeUtils.containsVideo(requestType)
         val containsAudio = RequestTypeUtils.containsAudio(requestType)
 
-        val needPermissions = mutableListOf<String>()
+        val requiredPermissions = mutableListOf<String>()
 
         if (containsVideo || containsImage) {
-            needPermissions.add(mediaVisualUserSelected)
+            requiredPermissions.add(mediaVisualUserSelected)
             // check have media visual user selected permission, the permission does not need to be defined in the manifest.
             val haveMediaVisualUserSelected =
                 havePermissionForUser(context, mediaVisualUserSelected)
@@ -55,32 +55,32 @@ class PermissionDelegate34 : PermissionDelegate() {
             havePermission = haveMediaVisualUserSelected
 
             if (mediaLocation) {
-                needPermissions.add(mediaLocationPermission)
+                requiredPermissions.add(mediaLocationPermission)
                 havePermission = havePermission && havePermission(context, mediaLocationPermission)
             }
 
             if (containsVideo) {
-                needPermissions.add(mediaVideo)
+                requiredPermissions.add(mediaVideo)
             }
 
             if (containsImage) {
-                needPermissions.add(mediaImage)
+                requiredPermissions.add(mediaImage)
             }
 
         }
 
         if (containsAudio) {
-            needPermissions.add(mediaAudio)
+            requiredPermissions.add(mediaAudio)
             havePermission = havePermission && havePermission(context, mediaAudio)
         }
 
-        LogUtils.info("Current permissions: $needPermissions")
+        LogUtils.info("Current permissions: $requiredPermissions")
         LogUtils.info("havePermission: $havePermission")
 
         if (havePermission) {
-            permissionsUtils.permissionsListener?.onGranted(needPermissions)
+            permissionsUtils.permissionsListener?.onGranted(requiredPermissions)
         } else {
-            requestPermission(permissionsUtils, needPermissions)
+            requestPermission(permissionsUtils, requiredPermissions)
         }
     }
 

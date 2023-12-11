@@ -60,14 +60,12 @@ class RequestType {
     return RequestType(value << bit);
   }
 
-  static List<RequestType> values = <RequestType>[
-    image,
-    video,
-    audio,
-  ];
+  /// The values of [RequestType].
+  static const values = <RequestType>[image, video, audio];
 
+  /// Computes the request type from given types.
   static RequestType fromTypes(List<RequestType> types) {
-    var result = const RequestType(0);
+    RequestType result = const RequestType(0);
     for (final type in types) {
       result += type;
     }

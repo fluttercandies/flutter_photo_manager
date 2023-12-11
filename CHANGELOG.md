@@ -8,7 +8,9 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## 3.0.0-dev.5
 
-- Fix: the requestPermissionExtend method returns the wrong result on android API 34.
+### Fixes
+
+- Fix `requestPermissionExtend` returns the incorrect status on Android API 34.
 
 ## 3.0.0-dev.4
 
