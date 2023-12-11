@@ -32,6 +32,11 @@ class PermissionDelegate34 : PermissionDelegate() {
         requestType: Int,
         mediaLocation: Boolean
     ) {
+        if (havePermissions(context, requestType)) {
+            permissionsUtils.permissionsListener?.onGranted(mutableListOf())
+            return
+        }
+
         LogUtils.info("requestPermission")
         var havePermission = true
 
