@@ -5,7 +5,7 @@ import '../../../util/log.dart';
 import 'issue_index_page.dart';
 
 class Issue734Page extends StatefulWidget {
-  const Issue734Page({Key? key}) : super(key: key);
+  const Issue734Page({super.key});
 
   @override
   State<Issue734Page> createState() => _Issue734PageState();

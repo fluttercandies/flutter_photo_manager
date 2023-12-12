@@ -227,7 +227,7 @@ class PhotoManagerPlugin(
                 permissionsUtils.withActivity(activity)
                     .setListener(object : PermissionsListener {
                         override fun onGranted(needPermissions: MutableList<String>) {
-                            resultHandler.reply(PermissionResult.Authorized.value)
+                            resultHandler.reply(permissionsUtils.getAuthValue(requestType, mediaLocation).value)
                         }
 
                         override fun onDenied(

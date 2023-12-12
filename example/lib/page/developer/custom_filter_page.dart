@@ -3,7 +3,7 @@ import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class CustomFilterPage extends StatefulWidget {
-  const CustomFilterPage({Key? key}) : super(key: key);
+  const CustomFilterPage({super.key});
 
   @override
   State<CustomFilterPage> createState() => _CustomFilterPageState();

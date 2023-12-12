@@ -13,7 +13,7 @@ import 'filter_option_page.dart';
 import 'gallery_list_page.dart';
 
 class NewHomePage extends StatefulWidget {
-  const NewHomePage({Key? key}) : super(key: key);
+  const NewHomePage({super.key});
 
   @override
   State<NewHomePage> createState() => _NewHomePageState();
@@ -120,8 +120,10 @@ class _NewHomePageState extends State<NewHomePage> {
   Future<void> _scanGalleryList() async {
     final permissionResult = await PhotoManager.requestPermissionExtend(
         requestOption: PermissionRequestOption(
-      androidPermission:
-          AndroidPermission(type: readProvider.type, mediaLocation: true),
+      androidPermission: AndroidPermission(
+        type: readProvider.type,
+        mediaLocation: true,
+      ),
     ));
     if (!permissionResult.hasAccess) {
       showToast('no permission');

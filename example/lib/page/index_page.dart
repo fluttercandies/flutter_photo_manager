@@ -8,7 +8,7 @@ import 'home_page.dart';
 import 'save_image_example.dart';
 
 class IndexPage extends StatefulWidget {
-  const IndexPage({Key? key}) : super(key: key);
+  const IndexPage({super.key});
 
   @override
   State<IndexPage> createState() => _IndexPageState();

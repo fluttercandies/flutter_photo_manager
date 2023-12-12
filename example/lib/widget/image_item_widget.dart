@@ -4,11 +4,11 @@ import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
 class ImageItemWidget extends StatelessWidget {
   const ImageItemWidget({
-    Key? key,
+    super.key,
     required this.entity,
     required this.option,
     this.onTap,
-  }) : super(key: key);
+  });
 
   final AssetEntity entity;
   final ThumbnailOption option;

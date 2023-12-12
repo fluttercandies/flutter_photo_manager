@@ -32,7 +32,7 @@ void main() {
 }
 
 class _SimpleExampleApp extends StatelessWidget {
-  const _SimpleExampleApp({Key? key}) : super(key: key);
+  const _SimpleExampleApp();
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +59,7 @@ class _SimpleExampleApp extends StatelessWidget {
 }
 
 class _SimpleExamplePage extends StatefulWidget {
-  const _SimpleExamplePage({Key? key}) : super(key: key);
+  const _SimpleExamplePage();
 
   @override
   _SimpleExamplePageState createState() => _SimpleExamplePageState();

@@ -18,7 +18,7 @@ import 'issues_page/issue_index_page.dart';
 import 'remove_all_android_not_exists_example.dart';
 
 class DeveloperIndexPage extends StatefulWidget {
-  const DeveloperIndexPage({Key? key}) : super(key: key);
+  const DeveloperIndexPage({super.key});
 
   @override
   State<DeveloperIndexPage> createState() => _DeveloperIndexPageState();

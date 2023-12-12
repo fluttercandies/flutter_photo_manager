@@ -9,7 +9,7 @@ import 'package:photo_manager/photo_manager.dart';
 import '../util/log.dart';
 
 class SaveMediaExample extends StatefulWidget {
-  const SaveMediaExample({Key? key}) : super(key: key);
+  const SaveMediaExample({super.key});
 
   @override
   State<SaveMediaExample> createState() => _SaveMediaExampleState();

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class ThemeButton extends StatelessWidget {
   const ThemeButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   final String text;
   final VoidCallback onPressed;

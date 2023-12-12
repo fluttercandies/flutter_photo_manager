@@ -1,7 +1,7 @@
 name: photo_manager
 description: A Flutter plugin that provides assets abstraction management APIs on Android, iOS, and macOS.
 repository: https://github.com/fluttercandies/flutter_photo_manager
-version: 3.0.0-dev.4
+version: 3.0.0-dev.5
 
 environment:
   sdk: ">=2.13.0 <4.0.0"

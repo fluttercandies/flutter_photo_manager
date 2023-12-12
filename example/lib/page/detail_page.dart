@@ -7,7 +7,7 @@ import '../widget/live_photos_widget.dart';
 import '../widget/video_widget.dart';
 
 class DetailPage extends StatefulWidget {
-  const DetailPage({Key? key, required this.entity}) : super(key: key);
+  const DetailPage({super.key, required this.entity});
 
   final AssetEntity entity;
 

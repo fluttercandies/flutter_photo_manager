@@ -6,7 +6,7 @@ import 'package:photo_manager_example/page/custom_filter/path_page.dart';
 class FilterPathList extends StatelessWidget {
   final CustomFilter filter;
 
-  const FilterPathList({Key? key, required this.filter}) : super(key: key);
+  const FilterPathList({super.key, required this.filter});
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +29,9 @@ class FilterPathList extends StatelessWidget {
 
 class PathList extends StatelessWidget {
   const PathList({
-    Key? key,
+    super.key,
     required this.list,
-  }) : super(key: key);
+  });
 
   final List<AssetPathEntity> list;
 

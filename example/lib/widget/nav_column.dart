@@ -7,10 +7,10 @@ String _defaultBuilder(Widget w) {
 
 class NavColumn extends StatelessWidget {
   const NavColumn({
-    Key? key,
+    super.key,
     required this.children,
     this.titleBuilder = _defaultBuilder,
-  }) : super(key: key);
+  });
 
   final List<Widget> children;
   final String Function(Widget w) titleBuilder;

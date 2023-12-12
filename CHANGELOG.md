@@ -6,6 +6,12 @@ that can be found in the LICENSE file. -->
 
 To know more about breaking changes, see the [Migration Guide][].
 
+## 3.0.0-dev.5
+
+### Fixes
+
+- Fix `requestPermissionExtend` returns the incorrect status on Android API 34.
+
 ## 3.0.0-dev.4
 
 ### Fixes

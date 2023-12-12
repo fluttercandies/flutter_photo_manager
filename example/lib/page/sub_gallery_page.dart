@@ -5,10 +5,10 @@ import '../widget/gallery_item_widget.dart';
 
 class SubFolderPage extends StatefulWidget {
   const SubFolderPage({
-    Key? key,
+    super.key,
     required this.pathList,
     required this.title,
-  }) : super(key: key);
+  });
 
   final List<AssetPathEntity> pathList;
   final String title;

@@ -4,7 +4,7 @@ import 'package:photo_manager/photo_manager.dart';
 import '../../util/log.dart';
 
 class DevelopingExample extends StatefulWidget {
-  const DevelopingExample({Key? key}) : super(key: key);
+  const DevelopingExample({super.key});
 
   @override
   State<DevelopingExample> createState() => _DevelopingExampleState();

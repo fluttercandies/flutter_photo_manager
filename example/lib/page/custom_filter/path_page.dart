@@ -3,7 +3,7 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_example/page/custom_filter/image_list.dart';
 
 class PathPage extends StatefulWidget {
-  const PathPage({Key? key, required this.path}) : super(key: key);
+  const PathPage({super.key, required this.path});
   final AssetPathEntity path;
 
   @override
@@ -25,7 +25,7 @@ class _PathPageState extends State<PathPage> {
 }
 
 class GalleryWidget extends StatefulWidget {
-  const GalleryWidget({Key? key, required this.path}) : super(key: key);
+  const GalleryWidget({super.key, required this.path});
 
   final AssetPathEntity path;
 

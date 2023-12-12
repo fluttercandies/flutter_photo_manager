@@ -4,7 +4,7 @@ import 'package:photo_manager/photo_manager.dart';
 import 'issue_index_page.dart';
 
 class Issue962 extends StatefulWidget {
-  const Issue962({Key? key}) : super(key: key);
+  const Issue962({super.key});
 
   @override
   State<Issue962> createState() => _Issue962State();

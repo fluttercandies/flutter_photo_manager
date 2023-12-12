@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class ListDialog extends StatefulWidget {
   const ListDialog({
-    Key? key,
+    super.key,
     required this.children,
     this.padding = EdgeInsets.zero,
-  }) : super(key: key);
+  });
 
   final List<Widget> children;
   final EdgeInsetsGeometry padding;
