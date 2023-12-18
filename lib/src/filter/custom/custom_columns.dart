@@ -421,6 +421,10 @@ class DarwinColumns extends CustomColumns {
   String get adjustmentFormatIdentifier =>
       _getKey('adjustmentFormatIdentifier');
 
+  // An enumeration of asset playback styles that dictate how to present an asset to the user.
+  // unsupported = 0, image = 1, imageAnimated = 2, livePhoto = 3, video = 4, videoLooping = 5
+  String get playbackStyle => _getKey('playbackStyle');
+
   @override
   List<String> getValues() {
     return [
@@ -431,6 +435,7 @@ class DarwinColumns extends CustomColumns {
       hidden,
       hasAdjustments,
       adjustmentFormatIdentifier,
+      playbackStyle,
     ];
   }
 
