@@ -678,11 +678,16 @@ class AssetEntity {
   ///  * https://developer.android.com/reference/android/content/ContentUris
   ///  * https://developer.apple.com/documentation/avfoundation/avurlasset
   Future<String?> getMediaUrl() async {
-    if (type == AssetType.video || type == AssetType.audio || isLivePhoto) {
+    if (type == AssetType.video ||
+        type == AssetType.audio ||
+        isLivePhoto ||
+        _isAndroidImage) {
       return plugin.getMediaUrl(this);
     }
     return null;
   }
+
+  bool get _isAndroidImage => Platform.isAndroid && type == AssetType.image;
 
   bool get _platformMatched =>
       Platform.isIOS || Platform.isMacOS || Platform.isAndroid;
