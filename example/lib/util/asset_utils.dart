@@ -10,7 +10,7 @@ class AssetsUtils {
       'https://gitlab.com/CaiJingLong/ExampleAsset/-/raw/main/IMG_1096.jpeg?ref_type=heads';
 
   static Future<File> downloadJpeg() async {
-    final cacheDir = await getApplicationCacheDirectory();
+    final cacheDir = await getTemporaryDirectory();
 
     final dtMs = DateTime.now().millisecondsSinceEpoch;
     final file = File('${cacheDir.path}/$dtMs.jpg');
