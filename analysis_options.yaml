@@ -2,4 +2,5 @@ include: package:flutter_lints/flutter.yaml
 
 linter:
   rules:
-    - avoid_print
+    avoid_print: true
+    use_build_context_synchronously: false
