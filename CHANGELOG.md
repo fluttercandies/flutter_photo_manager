@@ -12,6 +12,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 See the [Migration Guide][] for details of breaking changes.
 
+### Improvements
+
+- Remove the restriction of `getMediaUrl`.
+
 ### Fixes
 
 - Fix `PhotoManager.editor.deleteWithIds` method not working on Android API 29.
