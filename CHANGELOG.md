@@ -6,41 +6,22 @@ that can be found in the LICENSE file. -->
 
 To know more about breaking changes, see the [Migration Guide][].
 
-## 3.0.0-dev.5
-
-### Fixes
-
-- Fix `requestPermissionExtend` returns the incorrect status on Android API 34.
-
-## 3.0.0-dev.4
-
-### Fixes
-
-- Fix `presentLimit` did not finish on Android. (#1052)
-
-## 3.0.0-dev.3
-
-### Fixes
-
-- Dispatch channel calls in main thread on Darwin.
-
-## 3.0.0-dev.2
-
-### Fixes
-
-- Fix `PhotoManager.editor.deleteWithIds` method not working on Android API 29.
-
-## 3.0.0-dev.1
+## 3.0.0
 
 ### Breaking changes
 
 See the [Migration Guide][] for details of breaking changes.
 
+### Fixes
+
+- Fix `PhotoManager.editor.deleteWithIds` method not working on Android API 29.
+- Dispatch channel calls in main thread on Darwin.
+- Fix `presentLimit` did not finish on Android. (#1052)
+- Fix `requestPermissionExtend` returns the incorrect status on Android API 34.
+
 ## 2.8.1
 
-### Feature
-
-Fix:
+### Fixes
 
 - Upgrade android/build.gradle to load current java version from some environment variables.
 - Fix the `setIgnorePermissionCheck` method not working on Android.
