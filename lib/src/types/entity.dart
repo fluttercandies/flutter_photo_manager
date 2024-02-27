@@ -668,7 +668,7 @@ class AssetEntity {
   /// Check whether the asset has been deleted.
   Future<bool> get exists => plugin.assetExistsWithId(id);
 
-  /// Provide regular URL for players. Only available for audios and videos.
+  /// Provide regular URL for players.
   ///  * Android: Content URI, e.g.
   ///    `content://media/external/video/media/894857`.
   ///  * iOS/macOS: File URL. e.g.
@@ -677,11 +677,8 @@ class AssetEntity {
   /// See also:
   ///  * https://developer.android.com/reference/android/content/ContentUris
   ///  * https://developer.apple.com/documentation/avfoundation/avurlasset
-  Future<String?> getMediaUrl() async {
-    if (type == AssetType.video || type == AssetType.audio || isLivePhoto) {
-      return plugin.getMediaUrl(this);
-    }
-    return null;
+  Future<String?> getMediaUrl() {
+    return plugin.getMediaUrl(this);
   }
 
   bool get _platformMatched =>
