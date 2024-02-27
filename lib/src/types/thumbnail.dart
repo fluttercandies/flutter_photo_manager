@@ -91,12 +91,14 @@ class ThumbnailOption {
   /// Defaults to [PMConstants.vDefaultThumbnailQuality].
   final int quality;
 
+  /// {@template photo_manager.ThumbnailOption.frame}
   /// The frame number when loading a thumbnail for videos.
   ///
   /// This field is only used on Android, since Glide accepts the `frame`
   /// option in request options.
   ///
   /// Defaults to 0.
+  /// {@endtemplate}
   final int frame;
 
   /// Converts this object to a map.
