@@ -103,6 +103,9 @@
 }
 
 - (BOOL)imageIsAdjust:(NSArray<PHAssetResource *> *)resources {
+    if (self.mediaSubtypes != PHAssetMediaSubtypeNone) {
+        return NO;
+    }
     for (PHAssetResource *res in resources) {
         if (res.type == PHAssetResourceTypeFullSizePhoto) {
             return YES;
