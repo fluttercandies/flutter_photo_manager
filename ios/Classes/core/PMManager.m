@@ -525,7 +525,7 @@
         if (error) {
             NSLog(@"error = %@", error);
             [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
-            [handler reply:nil];
+            [handler replyError:[NSString stringWithFormat:@"%@", error]];
         } else {
             [handler reply:path];
             [self notifySuccess:progressHandler];
@@ -566,7 +566,7 @@
         if (error) {
             NSLog(@"error = %@", error);
             [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
-            [handler reply:nil];
+            [handler replyError:[NSString stringWithFormat:@"%@", error]];
         } else {
             [handler reply:path];
             [self notifySuccess:progressHandler];
@@ -778,7 +778,8 @@
                              completionHandler:^(NSError *_Nullable error) {
         if (error) {
             NSLog(@"error = %@", error);
-            [handler reply:nil];
+            [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
+            [handler replyError:[NSString stringWithFormat:@"%@", error]];
         } else {
             [handler reply:path];
             [self notifySuccess:progressHandler];
