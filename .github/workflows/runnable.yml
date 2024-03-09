@@ -48,7 +48,7 @@ jobs:
         os: [ ubuntu-latest ]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: 'adopt'
           java-version: '17'
@@ -62,8 +62,10 @@ jobs:
           flutter --version
       - name: Prepare dependencies
         run: flutter pub get
-      - name: Analyse the repo
-        run: flutter analyze lib example/lib
+      - name: Check Dart code formatting
+        run: dart format . -o none --set-exit-if-changed
+      - name: Analyze Dart code
+        run: flutter analyze .
       - name: Run tests
         run: flutter test
       - name: Generate docs
@@ -76,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: 'adopt'
           java-version: '17'
@@ -106,7 +108,7 @@ jobs:
         os: [ ubuntu-latest ]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'adopt'
@@ -128,7 +130,7 @@ jobs:
         os: [ macos-latest ]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: 'adopt'
           java-version: '17'
