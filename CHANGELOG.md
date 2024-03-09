@@ -13,6 +13,10 @@ To know more about breaking changes, see the [Migration Guide][].
 - Do not predicate subtypes images as adjusted on Darwin.
 - Fix `PMProgressHandler` not getting notified when failed on Darwin.
 
+### Improvements
+
+- Improve code formatting.
+
 ## 3.0.0
 
 ### Breaking changes
