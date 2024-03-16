@@ -38,7 +38,7 @@ that can be found in the LICENSE file. -->
   <summary>目录列表</summary>
 
 <!-- TOC -->
-* [photo_manager](#photomanager)
+* [photo_manager](#photo_manager)
   * [集成此插件的推荐项目](#集成此插件的推荐项目)
   * [关于此插件的文章](#关于此插件的文章)
   * [破坏性改动迁移指南](#破坏性改动迁移指南)
@@ -246,6 +246,15 @@ iOS14 引入了部分资源限制的权限 (`PermissionState.limited`)。
 如果你想要重新选择在应用里能够读取到的资源，你可以使用 `PhotoManager.presentLimited()` 重新选择资源，
 这个方法对于 iOS 14 以上的版本生效。
 
+如果你想要禁止每次应用重新启动后访问媒体时自动弹出提示，
+你可以将 `Info.plist` 的 `Prevent limited photos access alert` 设置为 `YES`
+（或者像下面一样手动编写）：
+
+```plist
+<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
+<true/>
+```
+
 ##### Android 受限的资源权限
 
 与 iOS 类似，Android 14 (API 34) 中也引入了这个概念。
@@ -268,13 +277,13 @@ final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList();
 
 #### `getAssetPathList` 方法的参数
 
-| 参数名           | 说明                                                         | 默认值              |
-| :--------------- | ------------------------------------------------------------ | ------------------- |
-| hasAll           | 如果你需要一个包含所有资源（AssetEntity) 的 PathEntity ，传入 true | true                |
-| onlyAll          | 如果你只需要一个包含所有资源的，传入true                     | false               |
-| type             | 资源文件的类型（视频、图片、音频）                           | RequestType.common  |
-| filterOption     | 用于筛选 AssetEntity，详情请参阅 [过滤资源](#过滤资源)       | FilterOptionGroup() |
-| pathFilterOption | 只对 iOS 和 macOS生效，对应原生中的相册类型，详情请参阅 [PMPathFilterOption](#pmpathfilteroption)。 | 默认为包含所有      |
+| 参数名              | 说明                                                                           | 默认值                 |
+|:-----------------|------------------------------------------------------------------------------|---------------------|
+| hasAll           | 如果你需要一个包含所有资源（AssetEntity) 的 PathEntity ，传入 true                             | true                |
+| onlyAll          | 如果你只需要一个包含所有资源的，传入true                                                       | false               |
+| type             | 资源文件的类型（视频、图片、音频）                                                            | RequestType.common  |
+| filterOption     | 用于筛选 AssetEntity，详情请参阅 [过滤资源](#过滤资源)                                         | FilterOptionGroup() |
+| pathFilterOption | 只对 iOS 和 macOS生效，对应原生中的相册类型，详情请参阅 [PMPathFilterOption](#pmpathfilteroption)。 | 默认为包含所有             |
 
 #### PMPathFilterOption
 

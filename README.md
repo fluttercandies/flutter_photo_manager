@@ -39,7 +39,7 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
   <summary>TOC</summary>
 
 <!-- TOC -->
-* [photo_manager](#photomanager)
+* [photo_manager](#photo_manager)
   * [Projects using this plugin](#projects-using-this-plugin)
   * [Articles about this plugin](#articles-about-this-plugin)
   * [Migration guide](#migration-guide)
@@ -57,7 +57,7 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
     * [Request for permission](#request-for-permission)
       * [Limited entities access](#limited-entities-access)
         * [Limited entities access on iOS](#limited-entities-access-on-ios)
-        * [Limited entities access on android](#limited-entities-access-on-android)
+        * [Limited entities access on Android](#limited-entities-access-on-android)
     * [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders-assetpathentity)
       * [Params of `getAssetPathList`](#params-of-getassetpathlist)
       * [PMPathFilterOption](#pmpathfilteroption)
@@ -262,7 +262,17 @@ accessible entities' management.
 This method only available for iOS 14+ and when the permission state
 is limited (`PermissionState.limited`).
 
-##### Limited entities access on android
+To suppress the automatic prompting from the system
+when each time you access the media after the app has restarted,
+you can set the `Prevent limited photos access alert` key to `YES`
+in your app's `Info.plist` (or manually writing as below):
+
+```plist
+<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
+<true/>
+```
+
+##### Limited entities access on Android
 
 Android 14 (API 34) has also introduced the concept of limited assets similar to iOS.
 
@@ -285,12 +295,12 @@ See [`getAssetPathList`][] for more detail.
 
 #### Params of `getAssetPathList`
 
-| Name             | Description                                                  | Default value           |
-| :--------------- | ------------------------------------------------------------ | ----------------------- |
-| hasAll           | Set to true when you need an album containing all assets.    | true                    |
-| onlyAll          | Use this property if you only need one album containing all assets. | false                   |
-| type             | Type of media resource (video, image, audio)                 | RequestType.common      |
-| filterOption     | Used to filter resource files, see [Filtering](#filtering) for details | FilterOptionGroup()     |
+| Name             | Description                                                                                                                    | Default value           |
+|:-----------------|--------------------------------------------------------------------------------------------------------------------------------|-------------------------|
+| hasAll           | Set to true when you need an album containing all assets.                                                                      | true                    |
+| onlyAll          | Use this property if you only need one album containing all assets.                                                            | false                   |
+| type             | Type of media resource (video, image, audio)                                                                                   | RequestType.common      |
+| filterOption     | Used to filter resource files, see [Filtering](#filtering) for details                                                         | FilterOptionGroup()     |
 | pathFilterOption | Only valid for iOS and macOS, for the corresponding album type. See [PMPathFilterOption](#pmpathfilteroption) for more detail. | Include all by default. |
 
 #### PMPathFilterOption
