@@ -25,6 +25,7 @@ export 'src/internal/progress_handler.dart';
 export 'src/managers/caching_manager.dart';
 export 'src/managers/notify_manager.dart';
 export 'src/managers/photo_manager.dart';
+export 'src/managers/platform_delegate.dart';
 
 export 'src/types/entity.dart';
 export 'src/types/thumbnail.dart';

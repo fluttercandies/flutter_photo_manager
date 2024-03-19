@@ -22,7 +22,14 @@ flutter:
       android:
         package: com.fluttercandies.photo_manager
         pluginClass: PhotoManagerPlugin
+        dartPluginClass: CommonDelegate
       ios:
         pluginClass: PhotoManagerPlugin
+        dartPluginClass: CommonDelegate
       macos:
         pluginClass: PhotoManagerPlugin
+        dartPluginClass: CommonDelegate
+      ohos:
+        package: com.fluttercandies.photo_manager
+        pluginClass: PhotoManagerPlugin
+        dartPluginClass: HarmonyDelegate
