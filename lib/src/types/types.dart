@@ -92,6 +92,7 @@ class PermissionRequestOption with IMapMixin {
       type: RequestType.common,
       mediaLocation: false,
     ),
+    this.ohosPermissions = _defaultOhosPermissions,
   });
 
   /// See [IosAccessLevel].
@@ -100,10 +101,19 @@ class PermissionRequestOption with IMapMixin {
   /// See [AndroidPermission].
   final AndroidPermission androidPermission;
 
+  /// The ohos permissions
+  final List<String> ohosPermissions;
+
+  static const List<String> _defaultOhosPermissions = <String>[
+    'ohos.permission.READ_IMAGEVIDEO',
+    'ohos.permission.WRITE_IMAGEVIDEO',
+  ];
+
   @override
   Map<String, dynamic> toMap() => <String, dynamic>{
         'iosAccessLevel': iosAccessLevel.index + 1,
         'androidPermission': androidPermission.toMap(),
+        'ohosPermissions': ohosPermissions,
       };
 
   @override

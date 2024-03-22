@@ -16,6 +16,7 @@ import '../internal/enums.dart';
 import '../internal/plugin.dart';
 import '../internal/progress_handler.dart';
 import '../utils/convert_utils.dart';
+import '../../platform_utils.dart';
 import 'thumbnail.dart';
 import 'types.dart';
 
@@ -34,6 +35,8 @@ class AssetPathEntity {
     PMFilter? filterOption,
     this.darwinSubtype,
     this.darwinType,
+    this.albumTypeOhos,
+    this.albumSubtypeOhos,
   }) : filterOption = filterOption ??= FilterOptionGroup();
 
   /// Obtain an entity from ID.
@@ -104,6 +107,14 @@ class AssetPathEntity {
   ///
   /// If the [albumType] is 2, the value will be null.
   final PMDarwinAssetCollectionSubtype? darwinSubtype;
+
+  /// The type of the album on ohos.
+  /// 0 - USER; 1024 - SYSTEM
+  final int? albumTypeOhos;
+
+  /// The type of the albumSubtype on ohos.
+  /// 1 - USER_GENERIC; 1025 - FAVORITE; 1026 - VIDEO; 2147483647 - ANY
+  final int? albumSubtypeOhos;
 
   /// Call this method to obtain new path entity.
   static Future<AssetPathEntity> obtainPathFromProperties({
@@ -271,6 +282,8 @@ class AssetPathEntity {
     PMFilter? filterOption,
     PMDarwinAssetCollectionType? darwinType,
     PMDarwinAssetCollectionSubtype? darwinSubtype,
+    int? albumTypeOhos,
+    int? albumSubtypeOhos,
   }) {
     return AssetPathEntity(
       id: id ?? this.id,
@@ -282,6 +295,8 @@ class AssetPathEntity {
       filterOption: filterOption ?? this.filterOption,
       darwinSubtype: darwinSubtype ?? this.darwinSubtype,
       darwinType: darwinType ?? this.darwinType,
+      albumTypeOhos: albumTypeOhos ?? this.albumTypeOhos,
+      albumSubtypeOhos: albumSubtypeOhos ?? this.albumSubtypeOhos,
     );
   }
 
@@ -295,7 +310,9 @@ class AssetPathEntity {
         albumType == other.albumType &&
         type == other.type &&
         lastModified == other.lastModified &&
-        isAll == other.isAll;
+        isAll == other.isAll &&
+        albumTypeOhos == other.albumTypeOhos &&
+        albumSubtypeOhos == other.albumSubtypeOhos;
   }
 
   @override
@@ -305,7 +322,9 @@ class AssetPathEntity {
       albumType.hashCode ^
       type.hashCode ^
       lastModified.hashCode ^
-      isAll.hashCode;
+      isAll.hashCode ^
+      albumTypeOhos.hashCode ^
+      albumSubtypeOhos.hashCode;
 
   @override
   String toString() {
@@ -682,7 +701,10 @@ class AssetEntity {
   }
 
   bool get _platformMatched =>
-      Platform.isIOS || Platform.isMacOS || Platform.isAndroid;
+      Platform.isIOS ||
+      Platform.isMacOS ||
+      Platform.isAndroid ||
+      PlatformUtils.isOhos;
 
   Future<File?> _getFile({
     bool isOrigin = false,
@@ -718,8 +740,9 @@ class AssetEntity {
     if (!_platformMatched) {
       return null;
     }
-    if (Platform.isAndroid &&
-        int.parse(await plugin.getSystemVersion()) >= 29) {
+    if ((Platform.isAndroid &&
+            int.parse(await plugin.getSystemVersion()) >= 29) ||
+        PlatformUtils.isOhos) {
       return plugin.getOriginBytes(id, progressHandler: progressHandler);
     }
     final File? file = await originFile;

@@ -17,12 +17,12 @@ English | [中文](README-ZH.md)
 <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
 
 A Flutter plugin that provides assets abstraction management APIs without UI integration,
-you can get assets (image/video/audio) on Android, iOS and macOS.
+you can get assets (image/video/audio) on Android, iOS , macOS and OpenHarmony.
 
 ## Projects using this plugin
 
 | name                 | pub                                                                                                                | github                                                                                                                                                                  |
-|:---------------------|:-------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| :------------------- | :----------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | wechat_assets_picker | [![pub package](https://img.shields.io/pub/v/wechat_assets_picker)](https://pub.dev/packages/wechat_assets_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker) |
 | wechat_camera_picker | [![pub package](https://img.shields.io/pub/v/wechat_camera_picker)](https://pub.dev/packages/wechat_camera_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_camera_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_camera_picker) |
 
@@ -39,73 +39,73 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
   <summary>TOC</summary>
 
 <!-- TOC -->
-* [photo_manager](#photomanager)
-  * [Projects using this plugin](#projects-using-this-plugin)
-  * [Articles about this plugin](#articles-about-this-plugin)
-  * [Migration guide](#migration-guide)
-  * [Common issues](#common-issues)
-  * [Prepare for use](#prepare-for-use)
-    * [Add the plugin reference to pubspec.yaml](#add-the-plugin-reference-to-pubspecyaml)
-    * [Import in your projects](#import-in-your-projects)
-    * [Configure native platforms](#configure-native-platforms)
-      * [Android config preparation](#android-config-preparation)
-        * [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
-        * [Android 10 (Q, 29)](#android-10-q-29)
-        * [Glide](#glide)
-      * [iOS config preparation](#ios-config-preparation)
-  * [Usage](#usage)
-    * [Request for permission](#request-for-permission)
-      * [Limited entities access](#limited-entities-access)
-        * [Limited entities access on iOS](#limited-entities-access-on-ios)
-        * [Limited entities access on android](#limited-entities-access-on-android)
-    * [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders-assetpathentity)
-      * [Params of `getAssetPathList`](#params-of-getassetpathlist)
-      * [PMPathFilterOption](#pmpathfilteroption)
-    * [Get assets (`AssetEntity`)](#get-assets-assetentity)
-      * [From `AssetPathEntity`](#from-assetpathentity)
-      * [From `PhotoManager` (Since 2.6)](#from-photomanager-since-26)
-      * [From ID](#from-id)
-      * [From raw data](#from-raw-data)
-      * [From iCloud](#from-icloud)
-      * [Display assets](#display-assets)
-      * [Obtain "Live Photos"](#obtain-live-photos)
-        * [Filtering only "Live Photos"](#filtering-only-live-photos)
-        * [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
-      * [Limitations](#limitations)
-        * [Android 10 media location permission](#android-10-media-location-permission)
-        * [Usage of the original data](#usage-of-the-original-data)
-        * [Long retrieving duration with file on iOS](#long-retrieving-duration-with-file-on-ios)
-    * [Entities change notify](#entities-change-notify)
-  * [Filtering](#filtering)
-    * [FilterOptionGroup](#filteroptiongroup)
-    * [CustomFilter](#customfilter)
-      * [Advanced CustomFilter](#advanced-customfilter)
-      * [Classes explanations](#classes-explanations)
-  * [Cache mechanism](#cache-mechanism)
-    * [Cache on Android](#cache-on-android)
-    * [Cache on iOS](#cache-on-ios)
-    * [Clear caches](#clear-caches)
-  * [Native extra configs](#native-extra-configs)
-    * [Android extra configs](#android-extra-configs)
-      * [Glide issues](#glide-issues)
-      * [Android 14 (API 34) extra configs](#android-14-api-34-extra-configs)
-      * [Android 13 (API 33) extra configs](#android-13-api-33-extra-configs)
-    * [iOS extra configs](#ios-extra-configs)
-      * [Localized system albums name](#localized-system-albums-name)
-    * [Experimental features](#experimental-features)
-      * [Preload thumbnails](#preload-thumbnails)
-      * [Delete entities](#delete-entities)
-      * [Copy an entity](#copy-an-entity)
-      * [Features for Android only](#features-for-android-only)
-        * [Move an entity to another album](#move-an-entity-to-another-album)
-        * [Remove all non-exist entities](#remove-all-non-exist-entities)
-        * [Move entities to trash](#move-entities-to-trash)
-      * [Features for iOS or macOS](#features-for-ios-or-macos)
-        * [Create a folder](#create-a-folder)
-        * [Create an album](#create-an-album)
-        * [Remove the entity entry from the album](#remove-the-entity-entry-from-the-album)
-        * [Delete `AssetPathEntity`](#delete-assetpathentity)
-<!-- TOC -->
+
+- [photo\_manager](#photo_manager)
+  - [Projects using this plugin](#projects-using-this-plugin)
+  - [Articles about this plugin](#articles-about-this-plugin)
+  - [Migration guide](#migration-guide)
+  - [Common issues](#common-issues)
+  - [Prepare for use](#prepare-for-use)
+    - [Add the plugin reference to pubspec.yaml](#add-the-plugin-reference-to-pubspecyaml)
+    - [Import in your projects](#import-in-your-projects)
+    - [Configure native platforms](#configure-native-platforms)
+      - [Android config preparation](#android-config-preparation)
+        - [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
+        - [Android 10 (Q, 29)](#android-10-q-29)
+        - [Glide](#glide)
+      - [iOS config preparation](#ios-config-preparation)
+  - [Usage](#usage)
+    - [Request for permission](#request-for-permission)
+      - [Limited entities access](#limited-entities-access)
+        - [Limited entities access on iOS](#limited-entities-access-on-ios)
+        - [Limited entities access on android](#limited-entities-access-on-android)
+    - [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders-assetpathentity)
+      - [Params of `getAssetPathList`](#params-of-getassetpathlist)
+      - [PMPathFilterOption](#pmpathfilteroption)
+    - [Get assets (`AssetEntity`)](#get-assets-assetentity)
+      - [From `AssetPathEntity`](#from-assetpathentity)
+      - [From `PhotoManager` (Since 2.6)](#from-photomanager-since-26)
+      - [From ID](#from-id)
+      - [From raw data](#from-raw-data)
+      - [From iCloud](#from-icloud)
+      - [Display assets](#display-assets)
+      - [Obtain "Live Photos"](#obtain-live-photos)
+        - [Filtering only "Live Photos"](#filtering-only-live-photos)
+        - [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
+      - [Limitations](#limitations)
+        - [Android 10 media location permission](#android-10-media-location-permission)
+        - [Usage of the original data](#usage-of-the-original-data)
+        - [Long retrieving duration with file on iOS](#long-retrieving-duration-with-file-on-ios)
+    - [Entities change notify](#entities-change-notify)
+  - [Filtering](#filtering)
+    - [FilterOptionGroup](#filteroptiongroup)
+    - [CustomFilter](#customfilter)
+      - [Advanced CustomFilter](#advanced-customfilter)
+      - [Classes explanations](#classes-explanations)
+  - [Cache mechanism](#cache-mechanism)
+    - [Cache on Android](#cache-on-android)
+    - [Cache on iOS](#cache-on-ios)
+    - [Clear caches](#clear-caches)
+  - [Native extra configs](#native-extra-configs)
+    - [Android extra configs](#android-extra-configs)
+      - [Glide issues](#glide-issues)
+      - [Android 14 (API 34) extra configs](#android-14-api-34-extra-configs)
+      - [Android 13 (API 33) extra configs](#android-13-api-33-extra-configs)
+    - [iOS extra configs](#ios-extra-configs)
+      - [Localized system albums name](#localized-system-albums-name)
+    - [Experimental features](#experimental-features)
+      - [Preload thumbnails](#preload-thumbnails)
+      - [Delete entities](#delete-entities)
+      - [Copy an entity](#copy-an-entity)
+      - [Features for Android only](#features-for-android-only)
+        - [Move an entity to another album](#move-an-entity-to-another-album)
+        - [Remove all non-exist entities](#remove-all-non-exist-entities)
+        - [Move entities to trash](#move-entities-to-trash)
+      - [Features for iOS or macOS](#features-for-ios-or-macos)
+        - [Create a folder](#create-a-folder)
+        - [Create an album](#create-an-album)
+        - [Remove the entity entry from the album](#remove-the-entity-entry-from-the-album)
+        - [Delete `AssetPathEntity`](#delete-assetpathentity)
 
 </details>
 
@@ -240,6 +240,7 @@ if (ps.isAuth) {
 
 But if you're pretty sure your callers will be only called
 after the permission is granted, you can ignore permission checks:
+
 ```dart
 PhotoManager.setIgnorePermissionCheck(true);
 ```
@@ -285,12 +286,12 @@ See [`getAssetPathList`][] for more detail.
 
 #### Params of `getAssetPathList`
 
-| Name             | Description                                                  | Default value           |
-| :--------------- | ------------------------------------------------------------ | ----------------------- |
-| hasAll           | Set to true when you need an album containing all assets.    | true                    |
-| onlyAll          | Use this property if you only need one album containing all assets. | false                   |
-| type             | Type of media resource (video, image, audio)                 | RequestType.common      |
-| filterOption     | Used to filter resource files, see [Filtering](#filtering) for details | FilterOptionGroup()     |
+| Name             | Description                                                                                                                    | Default value           |
+| :--------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------- |
+| hasAll           | Set to true when you need an album containing all assets.                                                                      | true                    |
+| onlyAll          | Use this property if you only need one album containing all assets.                                                            | false                   |
+| type             | Type of media resource (video, image, audio)                                                                                   | RequestType.common      |
+| filterOption     | Used to filter resource files, see [Filtering](#filtering) for details                                                         | FilterOptionGroup()     |
 | pathFilterOption | Only valid for iOS and macOS, for the corresponding album type. See [PMPathFilterOption](#pmpathfilteroption) for more detail. | Include all by default. |
 
 #### PMPathFilterOption
@@ -742,7 +743,7 @@ Here are caches generation on different platforms,
 types and resolutions.
 
 | Platform | Thumbnail | File / Origin File |
-|----------|-----------|--------------------|
+| -------- | --------- | ------------------ |
 | Android  | Yes       | Yes (Android 10+)  |
 | iOS      | No        | Yes                |
 
@@ -990,13 +991,11 @@ PhotoManager.editor.darwin.deletePath();
 [pub package]: https://pub.dev/packages/photo_manager
 [repo]: https://github.com/fluttercandies/flutter_photo_manager
 [GitHub issues]: https://github.com/fluttercandies/flutter_photo_manager/issues
-
 [Glide]: https://bumptech.github.io/glide/
 [Generated API]: https://bumptech.github.io/glide/doc/generatedapi.html
 [MediaColumns.RELATIVE_PATH]: https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#RELATIVE_PATH
 [PHAuthorizationStatus]: https://developer.apple.com/documentation/photokit/phauthorizationstatus?language=objc
 [PHCachingImageManager]: https://developer.apple.com/documentation/photokit/phcachingimagemanager?language=objc
-
 [`AssetPathEntity`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetPathEntity-class.html
 [`AssetEntity`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetEntity-class.html
 [`getAssetPathList`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoManager/getAssetPathList.html
@@ -1005,8 +1004,6 @@ PhotoManager.editor.darwin.deletePath();
 [`PhotoManager.getAssetListPaged`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoManager/getAssetListPaged.html
 [`PhotoManager.getAssetListRange`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoManager/getAssetListRange.html
 [`AssetEntity.fromId`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetEntity/fromId.html
-
 [`LocallyAvailableBuilder`]: https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/2055adfa74370339d10e6f09adef72f2130d2380/lib/src/widget/builder/locally_available_builder.dart
-
 [flutter/flutter#20522]: https://github.com/flutter/flutter/issues/20522
 [photo_manager_image_provider]: https://pub.dev/packages/photo_manager_image_provider

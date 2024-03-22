@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 import '../../utils/column_utils.dart';
+import '../../../platform_utils.dart';
 
 /// {@template custom_columns}
 ///
@@ -40,6 +41,9 @@ class CustomColumns {
   /// The darwin columns, contains the ios and macos specific columns.
   static const DarwinColumns darwin = DarwinColumns();
 
+  /// The ohos columns, contains the ohos specific columns.
+  static const AndroidMediaColumns ohos = AndroidMediaColumns();
+
   static const ColumnUtils utils = ColumnUtils.instance;
 
   /// {@macro custom_columns}
@@ -51,12 +55,17 @@ class CustomColumns {
   /// Whether the current platform is ios or macos.
   bool get isDarwin => Platform.isIOS || Platform.isMacOS;
 
+  /// Whether the current platform is openharmony.
+  bool get isOhos => PlatformUtils.isOhos;
+
   /// The id column.
   String get id {
     if (isAndroid) {
       return '_id';
     } else if (isDarwin) {
       return 'localIdentifier';
+    } else if (isOhos) {
+      return 'uri';
     } else {
       throw UnsupportedError('Unsupported platform with id');
     }
@@ -76,7 +85,7 @@ class CustomColumns {
   /// - 2: video
   /// - 3: audio
   String get mediaType {
-    if (isAndroid) {
+    if (isAndroid || isOhos) {
       return 'media_type';
     } else if (isDarwin) {
       return 'mediaType';
@@ -91,7 +100,7 @@ class CustomColumns {
   ///
   /// In iOS/macOS, the value of this column not null.
   String get width {
-    if (isAndroid) {
+    if (isAndroid || isOhos) {
       return 'width';
     } else if (isDarwin) {
       return 'pixelWidth';
@@ -106,7 +115,7 @@ class CustomColumns {
   ///
   /// In iOS/macOS, the value of this column not null.
   String get height {
-    if (isAndroid) {
+    if (isAndroid || isOhos) {
       return 'height';
     } else if (isDarwin) {
       return 'pixelHeight';
@@ -121,7 +130,7 @@ class CustomColumns {
   ///
   /// In iOS/macOS, the value of this column is 0 when the media is image.
   String get duration {
-    if (isAndroid) {
+    if (isAndroid || isOhos) {
       return 'duration';
     } else if (isDarwin) {
       return 'duration';
@@ -154,7 +163,7 @@ class CustomColumns {
   ///
   /// {@endtemplate}
   String get createDate {
-    if (isAndroid) {
+    if (isAndroid || isOhos) {
       return 'date_added';
     } else if (isDarwin) {
       return 'creationDate';
@@ -167,7 +176,7 @@ class CustomColumns {
   ///
   /// {@macro date_column}
   String get modifiedDate {
-    if (isAndroid) {
+    if (isAndroid || isOhos) {
       return 'date_modified';
     } else if (isDarwin) {
       return 'modificationDate';
@@ -182,7 +191,7 @@ class CustomColumns {
   ///
   ///
   String get isFavorite {
-    if (isAndroid) {
+    if (isAndroid || isOhos) {
       return 'is_favorite';
     } else if (isDarwin) {
       return 'favorite';
@@ -229,6 +238,8 @@ class CustomColumns {
       return const AndroidMediaColumns().getValues();
     } else if (Platform.isIOS || Platform.isMacOS) {
       return const DarwinColumns().getValues();
+    } else if (PlatformUtils.isOhos) {
+      return const OhosColumns().getValues();
     } else {
       throw UnsupportedError('Unsupported platform with platformValues');
     }
@@ -436,6 +447,43 @@ class DarwinColumns extends CustomColumns {
 
   static List<String> values() {
     return const DarwinColumns().getValues();
+  }
+}
+
+/// A class that contains the names of the columns used in the custom filter.
+///
+/// About the values mean, please see document of ohos: https://developer.android.com/reference/android/provider/MediaStore
+class OhosColumns extends CustomColumns {
+  const OhosColumns();
+
+  String _getKey(String value) {
+    if (isOhos) {
+      return value;
+    } else {
+      throw UnsupportedError('Unsupported column $value in platform');
+    }
+  }
+
+  String get displayName => _getKey('display_name');
+  String get size => _getKey('size');
+  String get dateTaken => _getKey('date_taken');
+  String get orientation => _getKey('orientation');
+  String get title => _getKey('title');
+
+  @override
+  List<String> getValues() {
+    return [
+      ...super.getValues(),
+      displayName,
+      size,
+      dateTaken,
+      orientation,
+      title,
+    ];
+  }
+
+  static List<String> values() {
+    return const OhosColumns().getValues();
   }
 }
 

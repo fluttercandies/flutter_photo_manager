@@ -6,6 +6,12 @@ that can be found in the LICENSE file. -->
 
 To know more about breaking changes, see the [Migration Guide][].
 
+## 3.1.0
+
+### Features
+
+- Support OpenHarmony.
+
 ## 3.0.1
 
 ### Fixes
