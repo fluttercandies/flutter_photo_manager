@@ -62,6 +62,7 @@ jobs:
         run: |
           dart --version
           flutter --version
+      - run: flutter doctor -v
       - name: Prepare dependencies
         run: flutter pub get
       - name: Check Dart code formatting
@@ -88,6 +89,7 @@ jobs:
         with:
           channel: 'stable'
           cache: true
+      - run: flutter doctor -v
       - name: Prepare dependencies
         run: flutter pub get
       - name: Copy before dry run
@@ -118,8 +120,7 @@ jobs:
         with:
           channel: 'stable'
           cache: true
-      - run: dart --version
-      - run: flutter --version
+      - run: flutter doctor -v
       - run: flutter pub get
       - run: cd example; flutter build apk --debug
 
@@ -140,8 +141,7 @@ jobs:
         with:
           channel: 'stable'
           cache: true
-      - run: dart --version
-      - run: flutter --version
+      - run: flutter doctor -v
       - run: flutter pub get
       - run: cd example; flutter build apk --debug
 
@@ -162,8 +162,7 @@ jobs:
         with:
           channel: 'stable'
           cache: true
-      - run: dart --version
-      - run: flutter --version
+      - run: flutter doctor -v
       - run: flutter pub get
       - run: cd example; flutter build apk --debug
 
@@ -185,8 +184,7 @@ jobs:
           channel: 'stable'
           architecture: x64
           cache: true
-      - run: dart --version
-      - run: flutter --version
+      - run: flutter doctor -v
       - run: flutter pub get
       - run: cd example; flutter build ios --no-codesign
       - run: cd example; flutter build macos --debug
