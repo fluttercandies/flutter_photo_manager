@@ -17,7 +17,7 @@ English | [中文](README-ZH.md)
 <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
 
 A Flutter plugin that provides assets abstraction management APIs without UI integration,
-you can get assets (image/video/audio) on Android, iOS and macOS.
+you can get assets (image/video/audio) on Android, iOS, macOS and OpenHarmony.
 
 ## Projects using this plugin
 
