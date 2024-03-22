@@ -121,6 +121,50 @@ jobs:
       - run: flutter pub get
       - run: cd example; flutter build apk --debug
 
+  test_android_on_windows:
+    needs: analyze
+    name: Test Android build on windows
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+      - run: dart --version
+      - run: flutter --version
+      - run: flutter pub get
+      - run: cd example; flutter build apk --debug
+
+  test_android_on_macos:
+    needs: analyze
+    name: Test Android build on macOS
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+      - run: dart --version
+      - run: flutter --version
+      - run: flutter pub get
+      - run: cd example; flutter build apk --debug
+
   test_darwin:
     needs: analyze
     name: Test Darwin build on ${{ matrix.os }}
