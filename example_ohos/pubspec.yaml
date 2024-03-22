@@ -1,4 +1,4 @@
-name: photo_manager_example
+name: photo_manager_example_ohos
 description: Demonstrates how to use the photo_manager plugin.
 version: 3.0.0+26
 publish_to: none
@@ -20,9 +20,14 @@ dependencies:
   video_player: ^2.1.14
   # photo_manager_image_provider: ^1.1.0 # if you use the flutter 3.14.0 or higher, you can use the version ^2.1.0
   photo_manager_image_provider: ^2.1.0
-
+  path_provider_ohos:
+     git:
+       url: https://gitee.com/openharmony-sig/flutter_packages.git
+       path: packages/path_provider/path_provider_ohos
+  photo_manager_example:
+    path: ../example     
 dev_dependencies:
-  flutter_lints: ^3.0.1
+  flutter_lints: 2.0.3
   flutter_test:
     sdk: flutter
   test: any
@@ -33,3 +38,6 @@ flutter:
 dependency_overrides:
   photo_manager:
     path: ../
+  photo_manager_image_provider: 1.1.1
+  http: 0.13.6
+  flutter_lints: 2.0.3
