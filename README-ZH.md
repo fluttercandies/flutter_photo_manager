@@ -38,72 +38,72 @@ that can be found in the LICENSE file. -->
   <summary>目录列表</summary>
 
 <!-- TOC -->
-- [photo\_manager](#photo_manager)
-  - [集成此插件的推荐项目](#集成此插件的推荐项目)
-  - [关于此插件的文章](#关于此插件的文章)
-  - [破坏性改动迁移指南](#破坏性改动迁移指南)
-  - [常见问题](#常见问题)
-  - [使用前准备](#使用前准备)
-    - [添加依赖](#添加依赖)
-    - [导入到你的项目中：](#导入到你的项目中)
-    - [原生平台的配置](#原生平台的配置)
-      - [Android 配置准备](#android-配置准备)
-        - [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
-        - [Android 10 (Q, 29)](#android-10-q-29)
-        - [Glide](#glide)
-      - [iOS 配置准备](#ios-配置准备)
-  - [使用方法](#使用方法)
-    - [请求权限](#请求权限)
-      - [受限的资源权限](#受限的资源权限)
-        - [iOS 受限的资源权限](#ios-受限的资源权限)
-        - [Android 受限的资源权限](#android-受限的资源权限)
-    - [获取相簿或图集 (`AssetPathEntity`)](#获取相簿或图集-assetpathentity)
-      - [`getAssetPathList` 方法的参数](#getassetpathlist-方法的参数)
-      - [PMPathFilterOption](#pmpathfilteroption)
-    - [获取资源 (`AssetEntity`)](#获取资源-assetentity)
-      - [通过 `AssetPathEntity` 获取](#通过-assetpathentity-获取)
-      - [通过 `PhotoManager` 方法 (2.6.0+) 获取](#通过-photomanager-方法-260-获取)
-      - [通过 ID 获取](#通过-id-获取)
-      - [通过原始数据获取](#通过原始数据获取)
-      - [通过 iCloud 获取](#通过-icloud-获取)
-      - [展示资源](#展示资源)
-      - [获取「实况照片」](#获取实况照片)
-        - [仅过滤「实况照片」](#仅过滤实况照片)
-        - [获取「实况照片」的视频](#获取实况照片的视频)
-      - [限制](#限制)
-        - [Android 10 媒体位置权限](#android-10-媒体位置权限)
-        - [原始数据的使用](#原始数据的使用)
-        - [iOS 上文件检索时间过长](#ios-上文件检索时间过长)
-    - [资源变动的通知回调](#资源变动的通知回调)
-  - [过滤资源](#过滤资源)
-    - [FilterOptionGroup](#filteroptiongroup)
-    - [CustomFilter](#customfilter)
-      - [更高级的 CustomFilter](#更高级的-customfilter)
-      - [相关类定义解释](#相关类定义解释)
-  - [缓存机制](#缓存机制)
-    - [Android 缓存](#android-缓存)
-    - [iOS 缓存](#ios-缓存)
-    - [清除缓存](#清除缓存)
-  - [原生额外配置](#原生额外配置)
-    - [Android 额外配置](#android-额外配置)
-      - [Glide 相关问题](#glide-相关问题)
-      - [Android 14 (API level 34) 额外配置](#android-14-api-level-34-额外配置)
-      - [Android 13 (API level 33) 额外配置](#android-13-api-level-33-额外配置)
-    - [iOS 额外配置](#ios-额外配置)
-      - [配置系统相册名称的国际化](#配置系统相册名称的国际化)
-    - [实验性功能](#实验性功能)
-      - [预加载缩略图](#预加载缩略图)
-      - [删除资源](#删除资源)
-      - [复制资源](#复制资源)
-      - [仅适用于 Android 的功能](#仅适用于-android-的功能)
-        - [将资源移动到另一个相册](#将资源移动到另一个相册)
-        - [将资源移动到废纸篓](#将资源移动到废纸篓)
-        - [移除所有不存在的资源](#移除所有不存在的资源)
-      - [适用于 iOS 或 macOS 的功能](#适用于-ios-或-macos-的功能)
-        - [创建一个文件夹](#创建一个文件夹)
-        - [创建一个相簿](#创建一个相簿)
-        - [从相册中移除资源](#从相册中移除资源)
-        - [删除 `AssetPathEntity`](#删除-assetpathentity)
+* [photo_manager](#photo_manager)
+  * [集成此插件的推荐项目](#集成此插件的推荐项目)
+  * [关于此插件的文章](#关于此插件的文章)
+  * [破坏性改动迁移指南](#破坏性改动迁移指南)
+  * [常见问题](#常见问题)
+  * [使用前准备](#使用前准备)
+    * [添加依赖](#添加依赖)
+    * [导入到你的项目中：](#导入到你的项目中)
+    * [原生平台的配置](#原生平台的配置)
+      * [Android 配置准备](#android-配置准备)
+        * [Kotlin, Gradle, AGP](#kotlin-gradle-agp)
+        * [Android 10 (Q, 29)](#android-10-q-29)
+        * [Glide](#glide)
+      * [iOS 配置准备](#ios-配置准备)
+  * [使用方法](#使用方法)
+    * [请求权限](#请求权限)
+      * [受限的资源权限](#受限的资源权限)
+        * [iOS 受限的资源权限](#ios-受限的资源权限)
+        * [Android 受限的资源权限](#android-受限的资源权限)
+    * [获取相簿或图集 (`AssetPathEntity`)](#获取相簿或图集-assetpathentity)
+      * [`getAssetPathList` 方法的参数](#getassetpathlist-方法的参数)
+      * [PMPathFilterOption](#pmpathfilteroption)
+    * [获取资源 (`AssetEntity`)](#获取资源-assetentity)
+      * [通过 `AssetPathEntity` 获取](#通过-assetpathentity-获取)
+      * [通过 `PhotoManager` 方法 (2.6.0+) 获取](#通过-photomanager-方法-260-获取)
+      * [通过 ID 获取](#通过-id-获取)
+      * [通过原始数据获取](#通过原始数据获取)
+      * [通过 iCloud 获取](#通过-icloud-获取)
+      * [展示资源](#展示资源)
+      * [获取「实况照片」](#获取实况照片)
+        * [仅过滤「实况照片」](#仅过滤实况照片)
+        * [获取「实况照片」的视频](#获取实况照片的视频)
+      * [限制](#限制)
+        * [Android 10 媒体位置权限](#android-10-媒体位置权限)
+        * [原始数据的使用](#原始数据的使用)
+        * [iOS 上文件检索时间过长](#ios-上文件检索时间过长)
+    * [资源变动的通知回调](#资源变动的通知回调)
+  * [过滤资源](#过滤资源)
+    * [FilterOptionGroup](#filteroptiongroup)
+    * [CustomFilter](#customfilter)
+      * [更高级的 CustomFilter](#更高级的-customfilter)
+      * [相关类定义解释](#相关类定义解释)
+  * [缓存机制](#缓存机制)
+    * [Android 缓存](#android-缓存)
+    * [iOS 缓存](#ios-缓存)
+    * [清除缓存](#清除缓存)
+  * [原生额外配置](#原生额外配置)
+    * [Android 额外配置](#android-额外配置)
+      * [Glide 相关问题](#glide-相关问题)
+      * [Android 14 (API level 34) 额外配置](#android-14-api-level-34-额外配置)
+      * [Android 13 (API level 33) 额外配置](#android-13-api-level-33-额外配置)
+    * [iOS 额外配置](#ios-额外配置)
+      * [配置系统相册名称的国际化](#配置系统相册名称的国际化)
+    * [实验性功能](#实验性功能)
+      * [预加载缩略图](#预加载缩略图)
+      * [删除资源](#删除资源)
+      * [复制资源](#复制资源)
+      * [仅适用于 Android 的功能](#仅适用于-android-的功能)
+        * [将资源移动到另一个相册](#将资源移动到另一个相册)
+        * [将资源移动到废纸篓](#将资源移动到废纸篓)
+        * [移除所有不存在的资源](#移除所有不存在的资源)
+      * [适用于 iOS 或 macOS 的功能](#适用于-ios-或-macos-的功能)
+        * [创建一个文件夹](#创建一个文件夹)
+        * [创建一个相簿](#创建一个相簿)
+        * [从相册中移除资源](#从相册中移除资源)
+        * [删除 `AssetPathEntity`](#删除-assetpathentity)
 <!-- TOC -->
 
 </details>
@@ -246,6 +246,15 @@ iOS14 引入了部分资源限制的权限 (`PermissionState.limited`)。
 如果你想要重新选择在应用里能够读取到的资源，你可以使用 `PhotoManager.presentLimited()` 重新选择资源，
 这个方法对于 iOS 14 以上的版本生效。
 
+如果你想要禁止每次应用重新启动后访问媒体时自动弹出提示，
+你可以将 `Info.plist` 的 `Prevent limited photos access alert` 设置为 `YES`
+（或者像下面一样手动编写）：
+
+```plist
+<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
+<true/>
+```
+
 ##### Android 受限的资源权限
 
 与 iOS 类似，Android 14 (API 34) 中也引入了这个概念。
@@ -268,13 +277,13 @@ final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList();
 
 #### `getAssetPathList` 方法的参数
 
-| 参数名           | 说明                                                         | 默认值              |
-| :--------------- | ------------------------------------------------------------ | ------------------- |
-| hasAll           | 如果你需要一个包含所有资源（AssetEntity) 的 PathEntity ，传入 true | true                |
-| onlyAll          | 如果你只需要一个包含所有资源的，传入true                     | false               |
-| type             | 资源文件的类型（视频、图片、音频）                           | RequestType.common  |
-| filterOption     | 用于筛选 AssetEntity，详情请参阅 [过滤资源](#过滤资源)       | FilterOptionGroup() |
-| pathFilterOption | 只对 iOS 和 macOS生效，对应原生中的相册类型，详情请参阅 [PMPathFilterOption](#pmpathfilteroption)。 | 默认为包含所有      |
+| 参数名              | 说明                                                                           | 默认值                 |
+|:-----------------|------------------------------------------------------------------------------|---------------------|
+| hasAll           | 如果你需要一个包含所有资源（AssetEntity) 的 PathEntity ，传入 true                             | true                |
+| onlyAll          | 如果你只需要一个包含所有资源的，传入true                                                       | false               |
+| type             | 资源文件的类型（视频、图片、音频）                                                            | RequestType.common  |
+| filterOption     | 用于筛选 AssetEntity，详情请参阅 [过滤资源](#过滤资源)                                         | FilterOptionGroup() |
+| pathFilterOption | 只对 iOS 和 macOS生效，对应原生中的相册类型，详情请参阅 [PMPathFilterOption](#pmpathfilteroption)。 | 默认为包含所有             |
 
 #### PMPathFilterOption
 

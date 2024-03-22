@@ -4,6 +4,7 @@ import 'package:photo_manager_example/page/custom_filter/path_list.dart';
 
 import 'custom_filter/advance_filter_page.dart';
 import 'custom_filter/custom_filter_sql_page.dart';
+import 'custom_filter/custom_filter_sql_gif_image.dart';
 import 'custom_filter/filter_assets_page.dart';
 
 class CustomFilterExamplePage extends StatelessWidget {
@@ -47,6 +48,14 @@ class CustomFilterExamplePage extends StatelessWidget {
             buildItem(
               'Custom Filter sql assets',
               CustomFilterSqlPage(
+                builder: (BuildContext context, CustomFilter filter) {
+                  return FilterAssetsContent(filter: filter);
+                },
+              ),
+            ),
+            buildItem(
+              'Custom filter SQL for only GIF images',
+              CustomFilterSqlGIFImage(
                 builder: (BuildContext context, CustomFilter filter) {
                   return FilterAssetsContent(filter: filter);
                 },

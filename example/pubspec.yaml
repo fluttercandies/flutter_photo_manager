@@ -4,14 +4,14 @@ version: 3.0.0+26
 publish_to: none
 
 environment:
-  sdk: ^3.2.0
-  flutter: ">=3.16.0"
+  sdk: ^2.19.0
+  flutter: ">=3.7.12"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  http: ^1.1.0
+  http: any
   oktoast: ^3.1.0
   path_provider: ^2.0.5
   photo_manager: ^3.0.0
@@ -20,9 +20,12 @@ dependencies:
   video_player: ^2.1.14
   # photo_manager_image_provider: ^1.1.0 # if you use the flutter 3.14.0 or higher, you can use the version ^2.1.0
   photo_manager_image_provider: ^2.1.0
-
+  path_provider_ohos:
+     git:
+       url: https://gitee.com/openharmony-sig/flutter_packages.git
+       path: packages/path_provider/path_provider_ohos
 dev_dependencies:
-  flutter_lints: ^3.0.1
+  flutter_lints: any
   flutter_test:
     sdk: flutter
   test: any
@@ -33,3 +36,4 @@ flutter:
 dependency_overrides:
   photo_manager:
     path: ../
+  # photo_manager_image_provider: 1.1.1
