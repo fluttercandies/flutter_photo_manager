@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - .github/workflows/runnable.yml
       - 'lib/**'
       - 'test/**'
       - 'android/**'
@@ -24,6 +25,7 @@ on:
     branches:
       - main
     paths:
+      - .github/workflows/runnable.yml
       - 'lib/**'
       - 'test/**'
       - 'android/**'
