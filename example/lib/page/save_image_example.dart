@@ -3,8 +3,10 @@ import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photo_manager/platform_utils.dart';
 
 import '../util/log.dart';
 
@@ -49,6 +51,8 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
       ))![0]
           .absolute
           .path;
+    } else if (PlatformUtils.isOhos) {
+      dir = (await getDownloadsDirectory())!.absolute.path;
     } else {
       dir = (await getDownloadsDirectory())!.absolute.path;
     }
@@ -156,6 +160,7 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
       await checkRequest(() async {
         final AssetEntity? asset =
             await PhotoManager.editor.saveVideo(file, title: name);
+        showToast('saved asset: $asset');
         Log.d('saved asset: $asset');
       });
       client.close();

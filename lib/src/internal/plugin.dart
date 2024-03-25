@@ -26,7 +26,7 @@ mixin BasePlugin {
 }
 
 /// The plugin class is the core class that call channel's methods.
-class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
+class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   Future<List<AssetPathEntity>> getAssetPathList({
     bool hasAll = true,
     bool onlyAll = false,
@@ -419,10 +419,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
     AssetEntity entity, {
     int subtype = 0,
   }) async {
-    assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
-    if (Platform.isAndroid) {
-      return entity.title!;
-    }
     if (Platform.isIOS || Platform.isMacOS) {
       return await _channel.invokeMethod<String>(
         PMConstants.mGetTitleAsync,
@@ -432,7 +428,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin {
         },
       ) as String;
     }
-    return '';
+    return entity.title ?? '';
   }
 
   Future<String?> getMediaUrl(AssetEntity entity) {
@@ -688,6 +684,18 @@ mixin AndroidPlugin on BasePlugin {
   }
 
   Future<List<String>> androidColumns() async {
+    final result = await _channel.invokeMethod(
+      PMConstants.mColumnNames,
+    );
+    if (result is List<dynamic>) {
+      return result.map((e) => e.toString()).toList();
+    }
+    return result ?? <String>[];
+  }
+}
+
+mixin OhosPlugin on BasePlugin {
+  Future<List<String>> ohosColumns() async {
     final result = await _channel.invokeMethod(
       PMConstants.mColumnNames,
     );

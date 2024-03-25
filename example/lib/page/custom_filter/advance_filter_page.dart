@@ -133,15 +133,11 @@ class _WhereConditionPageState extends State<_WhereConditionPage> {
     _where.addAll(widget.where);
   }
 
-  void _onWillPop(bool didPop) {
-    if (didPop) {
-      return;
-    }
+  Future<bool> _onWillPop() {
     if (!isChanged) {
-      Navigator.of(context).pop();
-      return;
+      return Future.value(true);
     }
-    showDialog(
+    return showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -151,14 +147,13 @@ class _WhereConditionPageState extends State<_WhereConditionPage> {
             TextButton(
               child: const Text('No'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(false);
               },
             ),
             TextButton(
               child: const Text('Yes'),
               onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(true);
               },
             ),
           ],
@@ -169,9 +164,8 @@ class _WhereConditionPageState extends State<_WhereConditionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: _onWillPop,
+    return WillPopScope(
+      onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Where Condition'),

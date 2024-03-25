@@ -17,7 +17,7 @@ that can be found in the LICENSE file. -->
 <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
 
 通过相册的抽象 API 对设备中的资源（图片、视频、音频）进行管理，不需要集成 UI。
-在 Android、iOS 和 macOS 上可用。
+在 Android、iOS、macOS and OpenHarmony上可用。
 
 ## 集成此插件的推荐项目
 

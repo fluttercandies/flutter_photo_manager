@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photo_manager/platform_utils.dart';
 
 Future<void> changeOrderBy(
   BuildContext context,
@@ -93,12 +94,9 @@ class _OrderByActionPageState extends State<OrderByActionPage> {
     _items.addAll(widget.items);
   }
 
-  void sureBack(bool didPop) {
-    if (didPop) {
-      return;
-    }
+  Future<bool> sureBack() {
     if (isEdit) {
-      showDialog(
+      return showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Are you sure?'),
@@ -106,14 +104,13 @@ class _OrderByActionPageState extends State<OrderByActionPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(false);
               },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(true);
               },
               child: const Text('Sure'),
             ),
@@ -121,15 +118,14 @@ class _OrderByActionPageState extends State<OrderByActionPage> {
         ),
       ).then((value) => value == true);
     } else {
-      Navigator.of(context).pop();
+      return Future.value(true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: sureBack,
+    return WillPopScope(
+      onWillPop: sureBack,
       child: _buildBody(context),
     );
   }
@@ -194,6 +190,8 @@ class _OrderByActionPageState extends State<OrderByActionPage> {
       columns = AndroidMediaColumns.values();
     } else if (Platform.isMacOS || Platform.isIOS) {
       columns = DarwinColumns.values();
+    } else if (PlatformUtils.isOhos) {
+      columns = OhosColumns.values();
     } else {
       return const SizedBox.shrink();
     }
