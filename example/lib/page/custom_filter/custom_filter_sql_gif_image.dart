@@ -14,7 +14,8 @@ class CustomFilterSqlGIFImage extends StatefulWidget {
   final Widget Function(BuildContext context, CustomFilter filter) builder;
 
   @override
-  State<CustomFilterSqlGIFImage> createState() => _CustomFilterSqlGIFImageState();
+  State<CustomFilterSqlGIFImage> createState() =>
+      _CustomFilterSqlGIFImageState();
 }
 
 class _CustomFilterSqlGIFImageState extends State<CustomFilterSqlGIFImage> {
