@@ -25,7 +25,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
         // 'page': page,
         // 'size': size,
         // 'option': optionGroup.toMap(),
-        let id: string = args.get('id');
+        // let id: string = args.get('id');
         let page: number = args.get('page');
         let size: number = args.get('size');
         let assets: Array<Map<string, ESObject>> | null = await this.getAssetList(args, page * size, (page + 1) * size);
@@ -157,7 +157,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
         let args: Map<String, ESObject> = call.args;
         let start: number = args.get('start');
         let end: number = args.get('end');
-        let allObjects: Array<photoAccessHelper.Album> = await AlbumHandler.getAlbums(args);
+        let allObjects: Array<photoAccessHelper.Album> = await AlbumHandler.getAlbums(args, true, true);
         let data: Array<Map<string, ESObject>> = [];
         for (let i = 0; i < allObjects.length; i++) {
           const element = allObjects[i];
@@ -185,10 +185,9 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
           result.error('no ohos.permission.WRITE_IMAGEVIDEO', '', '');
           return true;
         }
-        let phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.uiContext);
         let args: Map<string, ESObject> = call.args;
         let ids: Array<string> = args.get('ids');
-        await phAccessHelper.createDeleteRequest(ids);
+        await photoAccessHelper.MediaAssetChangeRequest.deleteAssets(this.uiContext, ids);
         result.success(ids);
       }
         break;

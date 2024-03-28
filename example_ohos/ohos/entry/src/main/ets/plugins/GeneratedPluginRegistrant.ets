@@ -2,6 +2,8 @@ import FlutterEngine from '@ohos/flutter_ohos/src/main/ets/embedding/engine/Flut
 import Log from '@ohos/flutter_ohos/src/main/ets/util/Log';
 import PathProviderPlugin from '@ohos/path_provider_ohos'
 import PhotoManagerPlugin from '@ohos/photo_manager'
+import UrlLauncherPlugin from '@ohos/url_launcher_ohos'
+import VideoPlayerPlugin from '@ohos/video_player_ohos'
 
 /**
  * Generated file. Do not edit.
@@ -17,6 +19,8 @@ export class GeneratedPluginRegistrant {
     try {
       flutterEngine.getPlugins()?.add(new PathProviderPlugin());
       flutterEngine.getPlugins()?.add(new PhotoManagerPlugin());
+      flutterEngine.getPlugins()?.add(new UrlLauncherPlugin());
+      flutterEngine.getPlugins()?.add(new VideoPlayerPlugin());
     } catch (e) {
       Log.e(
         TAG,

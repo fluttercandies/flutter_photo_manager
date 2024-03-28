@@ -7,6 +7,7 @@ import 'dart:io';
 import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/services.dart';
+import 'package:photo_manager/platform_utils.dart';
 import 'package:photo_manager/src/filter/path_filter.dart';
 
 import '../filter/base_filter.dart';
@@ -548,8 +549,11 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   }
 
   Future<String?> getMimeTypeAsync(AssetEntity entity) async {
-    assert(Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
-    if (Platform.isAndroid) {
+    assert(Platform.isAndroid ||
+        Platform.isIOS ||
+        Platform.isMacOS ||
+        PlatformUtils.isOhos);
+    if (Platform.isAndroid || PlatformUtils.isOhos) {
       return entity.mimeType;
     }
     if (Platform.isIOS || Platform.isMacOS) {

@@ -20,10 +20,7 @@ dependencies:
   video_player: ^2.1.14
   # photo_manager_image_provider: ^1.1.0 # if you use the flutter 3.14.0 or higher, you can use the version ^2.1.0
   photo_manager_image_provider: ^2.1.0
-  path_provider_ohos:
-     git:
-       url: https://gitee.com/openharmony-sig/flutter_packages.git
-       path: packages/path_provider/path_provider_ohos
+
   photo_manager_example:
     path: ../example     
 dev_dependencies:
@@ -41,3 +38,15 @@ dependency_overrides:
   photo_manager_image_provider: 1.1.1
   http: 0.13.6
   flutter_lints: 2.0.3
+  path_provider:
+     git:
+       url: https://gitee.com/openharmony-sig/flutter_packages.git
+       path: packages/path_provider/path_provider
+  video_player:
+     git:
+       url: https://gitee.com/openharmony-sig/flutter_packages.git
+       path: packages/video_player/video_player
+  url_launcher:
+     git:
+       url: https://gitee.com/openharmony-sig/flutter_packages.git
+       path: packages/url_launcher/url_launcher                      
