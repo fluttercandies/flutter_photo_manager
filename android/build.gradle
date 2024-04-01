@@ -31,14 +31,11 @@ apply plugin: 'kotlin-android'
  * @return java version
  */
 static JavaVersion getJavaFromHome(String path) {
+    println("get java from home path: $path")
     def javaExe = path + "/bin/java"
-    Process process = Runtime.getRuntime().exec(new String[]{javaExe, "-version"})
-    process.waitFor()
-
-    def input = process.getErrorStream() ?: process.getInputStream()
-    def reader = new BufferedReader(new InputStreamReader(input))
-    def version = reader.readLine()
-    reader.close()
+    def version = exec {
+        commandLine "$javaExe -version"
+    }
 
     String regex = "\"(.+)\""
     Pattern pattern = Pattern.compile(regex)
@@ -54,46 +51,52 @@ static JavaVersion getJavaFromHome(String path) {
             v = v.substring(0, 3)
         }
 
+        println("java version string: ${v}")
+
         return JavaVersion.toVersion(v)
     }
 }
 
 JavaVersion getJavaVersion() {
-    // 0. Get java.version property from project's gradle.properties
-    // The version value is like 1.8, 11, 17, 21, etc.
-    // Also see: https://docs.gradle.org/current/javadoc/org/gradle/api/JavaVersion.html#toVersion-java.lang.Object-
-    JavaVersion res
+    try {
+// 0. Get java.version property from project's gradle.properties
+        // The version value is like 1.8, 11, 17, 21, etc.
+        // Also see: https://docs.gradle.org/current/javadoc/org/gradle/api/JavaVersion.html#toVersion-java.lang.Object-
+        JavaVersion res
 
-    def javaVersion = project.findProperty("java.version")
-    if (javaVersion != null) {
-        res = JavaVersion.toVersion(javaVersion)
-        println("Get java version from project's gradle.properties: $javaVersion")
-    }
+        def javaVersion = project.findProperty("java.version")
+        if (javaVersion != null) {
+            res = JavaVersion.toVersion(javaVersion)
+            println("Get java version from project's gradle.properties: $javaVersion")
+        }
 
-    String javaHome
-    // 1. read from JAVA_HOME environment variable
-    javaHome = System.getenv("JAVA_HOME")
-    if (res == null && javaHome != null) {
-        res = getJavaFromHome(javaHome)
-        println("Get java version from JAVA_HOME: $javaHome")
-    }
+        String javaHome
+        // 1. read from JAVA_HOME environment variable
+        javaHome = System.getenv("JAVA_HOME")
+        if (res == null && javaHome != null) {
+            res = getJavaFromHome(javaHome)
+            println("Get java version from JAVA_HOME: $javaHome")
+        }
 
-    // 2. read gradle.properties
-    javaHome = project.findProperty("java.home")
-    if (res == null && javaHome != null) {
-        res = getJavaFromHome(javaHome)
-        println("Get java version from gradle.properties: $javaHome")
-    }
+        // 2. read gradle.properties
+        javaHome = project.findProperty("java.home")
+        if (res == null && javaHome != null) {
+            res = getJavaFromHome(javaHome)
+            println("Get java version from gradle.properties: $javaHome")
+        }
 
-    // 3. read from property with java.home
-    javaHome = System.getProperty("java.home")
-    if (res == null && javaHome != null) {
-        res = getJavaFromHome(javaHome)
-        println("Get java version from java.home: $javaHome")
-    }
+        // 3. read from property with java.home
+        javaHome = System.getProperty("java.home")
+        if (res == null && javaHome != null) {
+            res = getJavaFromHome(javaHome)
+            println("Get java version from java.home: $javaHome")
+        }
 
-    if (res != null) {
-        return res
+        if (res != null) {
+            return res
+        }
+    } catch (Exception e) {
+        e.printStackTrace()
     }
 
     // last, use default version with current
@@ -102,7 +105,7 @@ JavaVersion getJavaVersion() {
 
 android {
     if (project.android.hasProperty('namespace') ||
-        getGradle().getGradleVersion().substring(0, 1).toInteger() >= 8) {
+            getGradle().getGradleVersion().substring(0, 1).toInteger() >= 8) {
         namespace 'com.flutterandies.photo_manager'
     }
 
