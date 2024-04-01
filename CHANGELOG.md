@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # CHANGELOG
 
+## 2.8.2
+
+### Fixes
+
+- Use AGP java version in `android/build.gradle`.
+
 ## 2.8.1
 
 ### Feature
