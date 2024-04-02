@@ -9,14 +9,16 @@ Future<void> changeOrderBy(
   List<OrderByItem> items,
   ValueChanged<List<OrderByItem>> onChanged,
 ) async {
+  OrderByActionPage._saveItems = null;
   final result = await Navigator.push<List<OrderByItem>>(
-    context,
-    MaterialPageRoute<List<OrderByItem>>(
-      builder: (_) => OrderByActionPage(
-        items: items.toList(),
-      ),
-    ),
-  );
+        context,
+        MaterialPageRoute<List<OrderByItem>>(
+          builder: (_) => OrderByActionPage(
+            items: items.toList(),
+          ),
+        ),
+      ) ??
+      OrderByActionPage._saveItems;
   if (result != null) {
     onChanged(result);
   }
@@ -78,7 +80,7 @@ class OrderByActionPage extends StatefulWidget {
   });
 
   final List<OrderByItem> items;
-
+  static List<OrderByItem>? _saveItems;
   @override
   State<OrderByActionPage> createState() => _OrderByActionPageState();
 }
@@ -92,42 +94,12 @@ class _OrderByActionPageState extends State<OrderByActionPage> {
   void initState() {
     super.initState();
     _items.addAll(widget.items);
-  }
-
-  Future<bool> sureBack() {
-    if (isEdit) {
-      return showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Are you sure?'),
-          content: const Text('You have not saved the changes.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: const Text('Sure'),
-            ),
-          ],
-        ),
-      ).then((value) => value == true);
-    } else {
-      return Future.value(true);
-    }
+    OrderByActionPage._saveItems = _items;
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: sureBack,
-      child: _buildBody(context),
-    );
+    return _buildBody(context);
   }
 
   Widget _buildBody(BuildContext context) {

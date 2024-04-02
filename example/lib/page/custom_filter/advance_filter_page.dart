@@ -96,12 +96,14 @@ class WhereAction extends StatelessWidget {
     return IconButton(
       icon: const Icon(Icons.filter_alt),
       onPressed: () {
+        _WhereConditionPage._saveItems = null;
         Navigator.push<List<WhereConditionItem>>(
           context,
           MaterialPageRoute(
             builder: (context) => _WhereConditionPage(where: where),
           ),
         ).then((value) {
+          value ??= _WhereConditionPage._saveItems;
           if (value != null) {
             onChanged(value);
           }
@@ -118,6 +120,8 @@ class _WhereConditionPage extends StatefulWidget {
 
   final List<WhereConditionItem> where;
 
+  static List<WhereConditionItem>? _saveItems;
+
   @override
   State<_WhereConditionPage> createState() => _WhereConditionPageState();
 }
@@ -131,58 +135,27 @@ class _WhereConditionPageState extends State<_WhereConditionPage> {
   void initState() {
     super.initState();
     _where.addAll(widget.where);
-  }
-
-  Future<bool> _onWillPop() {
-    if (!isChanged) {
-      return Future.value(true);
-    }
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Are you sure?'),
-          content: const Text('Do you want to leave without saving?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-            ),
-            TextButton(
-              child: const Text('Yes'),
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-            ),
-          ],
-        );
-      },
-    ).then((value) => value == true);
+    _WhereConditionPage._saveItems = _where;
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Where Condition'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: _createNew,
-            ),
-          ],
-        ),
-        body: buildList(context),
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.done),
-          onPressed: () {
-            Navigator.of(context).pop(_where);
-          },
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Where Condition'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: _createNew,
+          ),
+        ],
+      ),
+      body: buildList(context),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.done),
+        onPressed: () {
+          Navigator.of(context).pop(_where);
+        },
       ),
     );
   }
