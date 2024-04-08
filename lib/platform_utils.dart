@@ -5,12 +5,12 @@ library photo_manager_platform_utils;
 
 import 'dart:io';
 
-/// A utility to check the platform for [ohos]
-///
+/// An utility to match platforms. It adds a general support for
+/// OpenHarmony OS.
 class PlatformUtils {
-  PlatformUtils._();
+  const PlatformUtils._();
 
   /// Whether the operating system is a version of
   /// [ohos](https://en.wikipedia.org/wiki/OpenHarmony).
-  static bool get isOhos => Platform.operatingSystem == 'ohos';
+  static final isOhos = Platform.operatingSystem == 'ohos';
 }
