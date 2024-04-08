@@ -53,7 +53,7 @@ class _Issus1053State extends State<Issus1053> with IssueBase<Issus1053> {
   @override
   int get issueNumber => 1053;
 
-  _buildCheck(RequestType item) {
+  Widget _buildCheck(RequestType item) {
     String title = '';
     switch (item.value) {
       case 1:

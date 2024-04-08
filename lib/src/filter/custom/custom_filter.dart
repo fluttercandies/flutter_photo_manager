@@ -79,9 +79,9 @@ abstract class CustomFilter extends PMFilter {
 ///
 /// {@endtemplate}
 class SqlCustomFilter extends CustomFilter {
-
   /// {@macro PM.sql_custom_filter}
   SqlCustomFilter(this.where, this.orderBy);
+
   /// The where condition.
   final String where;
 
