@@ -64,8 +64,10 @@ jobs:
         run: flutter pub get
       - name: Check Dart code formatting
         run: dart format . -o none --set-exit-if-changed
-      - name: Analyze Dart code
-        run: flutter analyze .
+      - name: Analyze Dart code (lib)
+        run: flutter analyze lib
+      - name: Analyze Dart code (example)
+        run: flutter analyze example
       - name: Run tests
         run: flutter test
       - name: Generate docs
