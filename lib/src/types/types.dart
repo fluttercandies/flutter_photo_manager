@@ -4,6 +4,7 @@
 
 import 'package:flutter/foundation.dart';
 
+import '../internal/constants.dart';
 import '../internal/enums.dart';
 import '../internal/map_interface.dart';
 
@@ -92,7 +93,7 @@ class PermissionRequestOption with IMapMixin {
       type: RequestType.common,
       mediaLocation: false,
     ),
-    this.ohosPermissions = _defaultOhosPermissions,
+    this.ohosPermissions = PMConstants.vDefaultOhosPermissions,
   });
 
   /// See [IosAccessLevel].
@@ -101,13 +102,8 @@ class PermissionRequestOption with IMapMixin {
   /// See [AndroidPermission].
   final AndroidPermission androidPermission;
 
-  /// The ohos permissions
+  /// The requesting permission list for the OHOS.
   final List<String> ohosPermissions;
-
-  static const List<String> _defaultOhosPermissions = <String>[
-    'ohos.permission.READ_IMAGEVIDEO',
-    'ohos.permission.WRITE_IMAGEVIDEO',
-  ];
 
   @override
   Map<String, dynamic> toMap() => <String, dynamic>{
@@ -119,7 +115,10 @@ class PermissionRequestOption with IMapMixin {
   @override
   bool operator ==(Object other) =>
       other is PermissionRequestOption &&
-      iosAccessLevel == other.iosAccessLevel;
+      iosAccessLevel == other.iosAccessLevel &&
+      androidPermission == other.androidPermission &&
+      ohosPermissions.every((p) => other.ohosPermissions.contains(p)) &&
+      other.ohosPermissions.every((n) => ohosPermissions.contains(n));
 
   @override
   int get hashCode => iosAccessLevel.hashCode;
@@ -127,6 +126,11 @@ class PermissionRequestOption with IMapMixin {
 
 /// The permission for android.
 class AndroidPermission with IMapMixin {
+  const AndroidPermission({
+    required this.type,
+    required this.mediaLocation,
+  });
+
   /// The type of your need.
   ///
   /// See [RequestType].
@@ -139,12 +143,6 @@ class AndroidPermission with IMapMixin {
   ///
   /// See it in [android](https://developer.android.com/reference/android/Manifest.permission#ACCESS_MEDIA_LOCATION).
   final bool mediaLocation;
-
-  /// The permission for android.
-  const AndroidPermission({
-    required this.type,
-    required this.mediaLocation,
-  });
 
   @override
   Map<String, dynamic> toMap() => <String, dynamic>{

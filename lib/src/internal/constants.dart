@@ -67,4 +67,9 @@ class PMConstants {
   static const int vDefaultThumbnailQuality = 95;
   static const ThumbnailSize vDefaultGridThumbnailSize =
       ThumbnailSize.square(200);
+
+  static const vDefaultOhosPermissions = <String>[
+    'ohos.permission.READ_IMAGEVIDEO',
+    'ohos.permission.WRITE_IMAGEVIDEO',
+  ];
 }
