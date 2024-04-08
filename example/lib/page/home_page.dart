@@ -119,12 +119,13 @@ class _NewHomePageState extends State<NewHomePage> {
 
   Future<void> _scanGalleryList() async {
     final permissionResult = await PhotoManager.requestPermissionExtend(
-        requestOption: PermissionRequestOption(
-      androidPermission: AndroidPermission(
-        type: readProvider.type,
-        mediaLocation: true,
+      requestOption: PermissionRequestOption(
+        androidPermission: AndroidPermission(
+          type: readProvider.type,
+          mediaLocation: true,
+        ),
       ),
-    ));
+    );
     if (!permissionResult.hasAccess) {
       showToast('no permission');
       return;

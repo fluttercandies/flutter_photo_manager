@@ -65,7 +65,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'hasAll': hasAll,
         'onlyAll': onlyAll,
         'option': filterOption.toMap(),
-        "pathOption": pathFilterOption.toMap(),
+        'pathOption': pathFilterOption.toMap(),
       },
     );
     if (result == null) {

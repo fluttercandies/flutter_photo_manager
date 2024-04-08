@@ -110,12 +110,12 @@ class __DeleteAssetImageListState extends State<_DeleteAssetImageList> {
   Future<void> loadAssets({int count = 100}) async {
     widget.path;
 
-    widget.path
-        .getAssetListRange(start: 0, end: count)
-        .then((value) => setState(() {
-              assetList.clear();
-              assetList.addAll(value);
-            }));
+    widget.path.getAssetListRange(start: 0, end: count).then(
+          (value) => setState(() {
+            assetList.clear();
+            assetList.addAll(value);
+          }),
+        );
   }
 
   @override

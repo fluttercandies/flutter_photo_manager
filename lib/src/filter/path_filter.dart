@@ -14,13 +14,13 @@ import '../types/entity.dart';
 ///
 /// {@endtemplate}
 class PMPathFilter {
-  /// For macOS and iOS.
-  final PMDarwinPathFilter darwin;
-
   /// {@macro PM.path_filter}
   const PMPathFilter({
     this.darwin = const PMDarwinPathFilter(),
   });
+
+  /// For macOS and iOS.
+  final PMDarwinPathFilter darwin;
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -37,6 +37,17 @@ class PMPathFilter {
 ///
 /// {@endtemplate}
 class PMDarwinPathFilter {
+  /// {@macro PM.darwin_path_filter}
+  const PMDarwinPathFilter({
+    this.type = const [
+      PMDarwinAssetCollectionType.album,
+      PMDarwinAssetCollectionType.smartAlbum,
+    ],
+    this.subType = const [
+      PMDarwinAssetCollectionSubtype.any,
+    ],
+  });
+
   /// For type of the collection.
   ///
   /// See [PMDarwinAssetCollectionType]
@@ -50,17 +61,6 @@ class PMDarwinPathFilter {
   ///
   /// [The document of apple](https://developer.apple.com/documentation/photokit/phassetcollectionsubtype/)
   final List<PMDarwinAssetCollectionSubtype> subType;
-
-  /// {@macro PM.darwin_path_filter}
-  const PMDarwinPathFilter({
-    this.type = const [
-      PMDarwinAssetCollectionType.album,
-      PMDarwinAssetCollectionType.smartAlbum,
-    ],
-    this.subType = const [
-      PMDarwinAssetCollectionSubtype.any,
-    ],
-  });
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{

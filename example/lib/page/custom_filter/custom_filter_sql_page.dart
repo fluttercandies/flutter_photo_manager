@@ -96,7 +96,8 @@ class _CustomFilterSqlPageState extends State<CustomFilterSqlPage> {
           ),
           ListTile(
             title: Text(
-                'Order By: \n${_orderBy.map((e) => e.toString()).join('\n')}'),
+              'Order By: \n${_orderBy.map((e) => e.toString()).join('\n')}',
+            ),
             subtitle: const Text('Click to edit'),
             onTap: () {
               changeOrderBy(context, _orderBy, (List<OrderByItem> value) {

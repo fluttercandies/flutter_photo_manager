@@ -3,4 +3,7 @@ include: package:flutter_lints/flutter.yaml
 linter:
   rules:
     avoid_print: true
+    prefer_single_quotes: true
+    require_trailing_commas: true
+    sort_constructors_first: true
     use_build_context_synchronously: false

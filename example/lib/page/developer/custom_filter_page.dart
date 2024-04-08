@@ -19,24 +19,26 @@ class _CustomFilterPageState extends State<CustomFilterPage> {
         title: const Text('DevCustomFilterPage'),
       ),
       body: Center(
-        child: Column(children: [
-          const Text(
-            'Click button to show filter log in console',
-            textAlign: TextAlign.center,
-          ),
-          ...[
-            filterButton(_sqlFilter),
-            filterButton(_widthFilter),
-            filterButton(_advancedFilter),
-          ].map(
-            (e) => Container(
-              // alignment: Alignment.center,
-              width: double.infinity,
-              margin: const EdgeInsets.all(8.0),
-              child: e,
+        child: Column(
+          children: [
+            const Text(
+              'Click button to show filter log in console',
+              textAlign: TextAlign.center,
             ),
-          )
-        ]),
+            ...[
+              filterButton(_sqlFilter),
+              filterButton(_widthFilter),
+              filterButton(_advancedFilter),
+            ].map(
+              (e) => Container(
+                // alignment: Alignment.center,
+                width: double.infinity,
+                margin: const EdgeInsets.all(8.0),
+                child: e,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -120,28 +122,43 @@ class _CustomFilterPageState extends State<CustomFilterPage> {
     final subGroup1 = WhereConditionGroup()
         .and(
           ColumnWhereCondition(
-              column: columns.height, operator: '<', value: '100'),
+            column: columns.height,
+            operator: '<',
+            value: '100',
+          ),
         )
         .or(
           ColumnWhereCondition(
-              column: columns.height, operator: '>', value: '1000'),
+            column: columns.height,
+            operator: '>',
+            value: '1000',
+          ),
         );
 
     final subGroup2 = WhereConditionGroup()
         .and(
           ColumnWhereCondition(
-              column: columns.width, operator: '<', value: '200'),
+            column: columns.width,
+            operator: '<',
+            value: '200',
+          ),
         )
         .or(
           ColumnWhereCondition(
-              column: columns.width, operator: '>', value: '1000'),
+            column: columns.width,
+            operator: '>',
+            value: '1000',
+          ),
         );
 
     final dateColumn = columns.createDate;
     final date = DateTime.now().subtract(const Duration(days: 30));
 
     final dateItem = DateColumnWhereCondition(
-        column: dateColumn, operator: '>', value: date);
+      column: dateColumn,
+      operator: '>',
+      value: date,
+    );
 
     final whereGroup = WhereConditionGroup()
         .and(

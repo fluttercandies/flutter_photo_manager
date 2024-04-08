@@ -13,15 +13,11 @@ import '../../../platform_utils.dart';
 ///
 /// A class that contains the names of the columns used in the custom filter.
 ///
-/// The names of the columns are different on different platforms.
-///
-/// For example, the `width` column on Android is `width`, but on iOS it is `pixelWidth`.
-///
+/// The names of the columns are different on different platforms. For example,
+/// the `width` column on Android is `width`, but on iOS it is `pixelWidth`.
 /// The definition of the column name can be found in next link:
-///
-/// Android: https://developer.android.com/reference/android/provider/MediaStore.MediaColumns
-///
-/// iOS: https://developer.apple.com/documentation/photokit/phasset
+///  - Android: https://developer.android.com/reference/android/provider/MediaStore.MediaColumns
+///  - iOS: https://developer.apple.com/documentation/photokit/phasset
 ///
 /// Special Columns to see [AndroidMediaColumns] and [DarwinColumns].
 ///
@@ -32,6 +28,9 @@ import '../../../platform_utils.dart';
 ///
 /// {@endtemplate}
 class CustomColumns {
+  /// {@macro custom_columns}
+  const CustomColumns();
+
   /// The base columns, contains the common columns.
   static const CustomColumns base = CustomColumns();
 
@@ -46,16 +45,13 @@ class CustomColumns {
 
   static const ColumnUtils utils = ColumnUtils.instance;
 
-  /// {@macro custom_columns}
-  const CustomColumns();
-
   /// Whether the current platform is android.
   bool get isAndroid => Platform.isAndroid;
 
   /// Whether the current platform is ios or macos.
   bool get isDarwin => Platform.isIOS || Platform.isMacOS;
 
-  /// Whether the current platform is openharmony.
+  /// Whether the current platform is OpenHarmony OS.
   bool get isOhos => PlatformUtils.isOhos;
 
   /// The id column.
@@ -66,9 +62,8 @@ class CustomColumns {
       return 'localIdentifier';
     } else if (isOhos) {
       return 'uri';
-    } else {
-      throw UnsupportedError('Unsupported platform with id');
     }
+    throw UnsupportedError('Unsupported platform with id');
   }
 
   /// The media type column.
@@ -475,9 +470,13 @@ class OhosColumns extends CustomColumns {
   }
 
   String get displayName => _getKey('display_name');
+
   String get size => _getKey('size');
+
   String get dateTaken => _getKey('date_taken');
+
   String get orientation => _getKey('orientation');
+
   String get title => _getKey('title');
 
   @override
@@ -501,15 +500,14 @@ class OhosColumns extends CustomColumns {
 ///
 /// If text() throws an exception, it will return an empty string.
 class WhereItem {
+  const WhereItem(this.column, this.condition);
+
   final ValueGetter<String> column;
-
   final ValueGetter<String> condition;
-
-  WhereItem(this.column, this.condition);
 
   String text() {
     try {
-      return "${column()} ${condition()}";
+      return '${column()} ${condition()}';
     } on UnsupportedError {
       return '';
     }

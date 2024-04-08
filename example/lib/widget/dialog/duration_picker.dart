@@ -49,7 +49,10 @@ class _DurationPickerState extends State<DurationPicker> {
                     Navigator.pop(
                       context,
                       Duration(
-                          hours: hours, minutes: minutes, seconds: seconds),
+                        hours: hours,
+                        minutes: minutes,
+                        seconds: seconds,
+                      ),
                     );
                   },
                   child: const Text(
@@ -75,21 +78,23 @@ class _DurationPickerState extends State<DurationPicker> {
                       },
                     ),
                     _buildPicker(
-                        title: 'min',
-                        currentValue: minutes,
-                        max: 59,
-                        valueChanged: (int value) {
-                          minutes = value;
-                          changeDuration();
-                        }),
+                      title: 'min',
+                      currentValue: minutes,
+                      max: 59,
+                      valueChanged: (int value) {
+                        minutes = value;
+                        changeDuration();
+                      },
+                    ),
                     _buildPicker(
-                        title: 'sec',
-                        currentValue: seconds,
-                        max: 59,
-                        valueChanged: (int value) {
-                          seconds = value;
-                          changeDuration();
-                        }),
+                      title: 'sec',
+                      currentValue: seconds,
+                      max: 59,
+                      valueChanged: (int value) {
+                        seconds = value;
+                        changeDuration();
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -111,32 +116,33 @@ class _DurationPickerState extends State<DurationPicker> {
     ValueChanged<int>? valueChanged,
   }) {
     return Expanded(
-        child: Stack(
-      children: <Widget>[
-        CupertinoPicker.builder(
-          scrollController:
-              FixedExtentScrollController(initialItem: currentValue),
-          itemExtent: 88,
-          childCount: max + 1,
-          onSelectedItemChanged: (int value) {
-            valueChanged?.call(value);
-          },
-          itemBuilder: (BuildContext context, int index) {
-            return Center(
-              child: Text(index.toString()),
-            );
-          },
-        ),
-        IgnorePointer(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 50.0),
-              child: Text(title),
+      child: Stack(
+        children: <Widget>[
+          CupertinoPicker.builder(
+            scrollController:
+                FixedExtentScrollController(initialItem: currentValue),
+            itemExtent: 88,
+            childCount: max + 1,
+            onSelectedItemChanged: (int value) {
+              valueChanged?.call(value);
+            },
+            itemBuilder: (BuildContext context, int index) {
+              return Center(
+                child: Text(index.toString()),
+              );
+            },
+          ),
+          IgnorePointer(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 50.0),
+                child: Text(title),
+              ),
             ),
           ),
-        ),
-      ],
-    ));
+        ],
+      ),
+    );
   }
 }
 

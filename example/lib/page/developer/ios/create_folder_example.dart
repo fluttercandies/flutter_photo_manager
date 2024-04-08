@@ -81,7 +81,8 @@ class _CreateFolderExampleState extends State<CreateFolderExample> {
     return DropdownButton<AssetPathEntity>(
       items: subDir
           .map<DropdownMenuItem<AssetPathEntity>>(
-              (AssetPathEntity v) => _buildItem(v))
+            (AssetPathEntity v) => _buildItem(v),
+          )
           .toList(),
       onChanged: (AssetPathEntity? path) {
         parent = path;

@@ -213,7 +213,7 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
   String condition = '==';
   TextEditingController textValueController = TextEditingController();
 
-  var _date = DateTime.now();
+  DateTime _date = DateTime.now();
 
   WhereConditionItem createItem() {
     final cond = condition;

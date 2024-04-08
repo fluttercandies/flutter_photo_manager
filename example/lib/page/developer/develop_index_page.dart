@@ -113,11 +113,13 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
               child: const Text('PresentLimited'),
             ),
         ]
-            .map((e) => Container(
-                  padding: const EdgeInsets.all(3.0),
-                  height: 44,
-                  child: e,
-                ))
+            .map(
+              (e) => Container(
+                padding: const EdgeInsets.all(3.0),
+                height: 44,
+                child: e,
+              ),
+            )
             .toList(),
       ),
     );
@@ -176,19 +178,22 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
     }
     f.createSync();
 
-    resp.listen((List<int> data) {
-      f.writeAsBytesSync(data, mode: FileMode.append);
-    }, onDone: () async {
-      client.close();
-      Log.d('the video file length = ${f.lengthSync()}');
-      final AssetEntity? result =
-          await PhotoManager.editor.saveVideo(f, title: title);
-      if (result != null) {
-        Log.d('result : ${(await result.originFile)?.path}');
-      } else {
-        Log.d('result is null');
-      }
-    });
+    resp.listen(
+      (List<int> data) {
+        f.writeAsBytesSync(data, mode: FileMode.append);
+      },
+      onDone: () async {
+        client.close();
+        Log.d('the video file length = ${f.lengthSync()}');
+        final AssetEntity? result =
+            await PhotoManager.editor.saveVideo(f, title: title);
+        if (result != null) {
+          Log.d('result : ${(await result.originFile)?.path}');
+        } else {
+          Log.d('result is null');
+        }
+      },
+    );
   }
 
   Future<File?> _downloadFile(String url) async {
@@ -214,10 +219,12 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
   Future<void> _saveLivePhoto() async {
     final File? imgFile = await _downloadFile(exampleHeicUrl);
     print(
-        'The image download to ${imgFile?.path}, length: ${imgFile?.lengthSync()}');
+      'The image download to ${imgFile?.path}, length: ${imgFile?.lengthSync()}',
+    );
     final File? videoFile = await _downloadFile(exampleMovUrl);
     print(
-        'The video download to ${videoFile?.path}, length: ${videoFile?.lengthSync()}');
+      'The video download to ${videoFile?.path}, length: ${videoFile?.lengthSync()}',
+    );
 
     try {
       if (imgFile == null || videoFile == null) {
@@ -296,7 +303,8 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
   Future<void> _testNeedTitle() async {
     final status = await PhotoManager.requestPermissionExtend(
       requestOption: const PermissionRequestOption(
-          iosAccessLevel: IosAccessLevel.readWrite),
+        iosAccessLevel: IosAccessLevel.readWrite,
+      ),
     );
 
     if (!status.isAuth) {

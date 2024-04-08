@@ -97,7 +97,7 @@ class GalleryItemWidget extends StatelessWidget {
       // onDoubleTap: () async {
       //   final list =
       //       await item.getAssetListRange(start: 0, end: item.assetCount);
-      //   for (var i = 0; i < list.length; i++) {
+      //   for (int i = 0; i < list.length; i++) {
       //     final asset = list[i];
       //   }
       // },
