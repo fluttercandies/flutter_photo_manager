@@ -9,7 +9,6 @@ import com.fluttercandies.photo_manager.core.entity.PermissionResult
 import com.fluttercandies.photo_manager.permission.impl.PermissionDelegate19
 import com.fluttercandies.photo_manager.permission.impl.PermissionDelegate23
 import com.fluttercandies.photo_manager.permission.impl.PermissionDelegate29
-import com.fluttercandies.photo_manager.permission.impl.PermissionDelegate30
 import com.fluttercandies.photo_manager.permission.impl.PermissionDelegate33
 import com.fluttercandies.photo_manager.permission.impl.PermissionDelegate34
 import com.fluttercandies.photo_manager.util.LogUtils
@@ -130,8 +129,7 @@ abstract class PermissionDelegate {
             return when (Build.VERSION.SDK_INT) {
                 in 1 until 23 -> PermissionDelegate19()
                 in 23 until 29 -> PermissionDelegate23()
-                29 -> PermissionDelegate29()
-                in 30 until 33 -> PermissionDelegate30()
+                in 29 until 33 -> PermissionDelegate29()
                 33 -> PermissionDelegate33()
                 in 34 until Int.MAX_VALUE -> PermissionDelegate34()
                 else -> throw UnsupportedOperationException(

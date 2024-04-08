@@ -18,6 +18,8 @@ To know more about breaking changes, see the [Migration Guide][].
 
 - Do not predicate subtypes images as adjusted on Darwin.
 - Fix `PMProgressHandler` not getting notified when failed on Darwin.
+- Merge Android API 29 and 30 `PermissionDelegate`s
+  which allows Android API 29 to grant permissions without `WRITE_EXTERNAL_STORAGE`.
 
 ### Improvements
 
