@@ -35,8 +35,8 @@ class AssetPathEntity {
     PMFilter? filterOption,
     this.darwinSubtype,
     this.darwinType,
-    this.albumTypeOhos,
-    this.albumSubtypeOhos,
+    this.ohosAlbumType,
+    this.ohosAlbumSubtype,
   }) : filterOption = filterOption ??= FilterOptionGroup();
 
   /// Obtain an entity from ID.
@@ -110,11 +110,11 @@ class AssetPathEntity {
 
   /// The type of the album on ohos.
   /// 0 - USER; 1024 - SYSTEM
-  final int? albumTypeOhos;
+  final int? ohosAlbumType;
 
   /// The type of the albumSubtype on ohos.
   /// 1 - USER_GENERIC; 1025 - FAVORITE; 1026 - VIDEO; 2147483647 - ANY
-  final int? albumSubtypeOhos;
+  final int? ohosAlbumSubtype;
 
   /// Call this method to obtain new path entity.
   static Future<AssetPathEntity> obtainPathFromProperties({
@@ -282,8 +282,8 @@ class AssetPathEntity {
     PMFilter? filterOption,
     PMDarwinAssetCollectionType? darwinType,
     PMDarwinAssetCollectionSubtype? darwinSubtype,
-    int? albumTypeOhos,
-    int? albumSubtypeOhos,
+    int? ohosAlbumType,
+    int? ohosAlbumSubtype,
   }) {
     return AssetPathEntity(
       id: id ?? this.id,
@@ -295,8 +295,8 @@ class AssetPathEntity {
       filterOption: filterOption ?? this.filterOption,
       darwinSubtype: darwinSubtype ?? this.darwinSubtype,
       darwinType: darwinType ?? this.darwinType,
-      albumTypeOhos: albumTypeOhos ?? this.albumTypeOhos,
-      albumSubtypeOhos: albumSubtypeOhos ?? this.albumSubtypeOhos,
+      ohosAlbumType: ohosAlbumType ?? this.ohosAlbumType,
+      ohosAlbumSubtype: ohosAlbumSubtype ?? this.ohosAlbumSubtype,
     );
   }
 
@@ -311,8 +311,8 @@ class AssetPathEntity {
         type == other.type &&
         lastModified == other.lastModified &&
         isAll == other.isAll &&
-        albumTypeOhos == other.albumTypeOhos &&
-        albumSubtypeOhos == other.albumSubtypeOhos;
+        ohosAlbumType == other.ohosAlbumType &&
+        ohosAlbumSubtype == other.ohosAlbumSubtype;
   }
 
   @override
@@ -323,8 +323,8 @@ class AssetPathEntity {
       type.hashCode ^
       lastModified.hashCode ^
       isAll.hashCode ^
-      albumTypeOhos.hashCode ^
-      albumSubtypeOhos.hashCode;
+      ohosAlbumType.hashCode ^
+      ohosAlbumSubtype.hashCode;
 
   @override
   String toString() {
@@ -740,9 +740,13 @@ class AssetEntity {
     if (!_platformMatched) {
       return null;
     }
-    if ((Platform.isAndroid &&
-            int.parse(await plugin.getSystemVersion()) >= 29) ||
-        PlatformUtils.isOhos) {
+    if (Platform.isAndroid) {
+      final sdkInt = int.parse(await plugin.getSystemVersion());
+      if (sdkInt > 29) {
+        return plugin.getOriginBytes(id, progressHandler: progressHandler);
+      }
+    }
+    if (PlatformUtils.isOhos) {
       return plugin.getOriginBytes(id, progressHandler: progressHandler);
     }
     final File? file = await originFile;
