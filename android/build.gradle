@@ -26,6 +26,48 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+void log(Object msg) {
+    logger.log(LogLevel.INFO, "[PhotoManager] $msg")
+}
+
+class ExecResult {
+    int exitValue
+    String output
+
+    ExecResult(int exitValue, String output) {
+        this.exitValue = exitValue
+        this.output = output
+    }
+}
+
+static ExecResult executeCommand(String... args) {
+
+    int exitValue;
+    String output;
+
+    try {
+        Process process = new ProcessBuilder(args).start()
+
+        def stream = new ByteArrayOutputStream()
+        stream.withStream { bos ->
+            process.inputStream.withStream { ins ->
+                bos << ins
+            }
+            process.errorStream.withStream { ins ->
+                bos << ins
+            }
+            output = bos.toString("UTF-8")
+        }
+        exitValue = process.waitFor()
+    } catch (Exception e) {
+        e.printStackTrace()
+        exitValue = -1
+        output = e.toString()
+    }
+
+    return new ExecResult(exitValue, output)
+}
+
 /**
  * Get java version from JAVA_HOME
  * @param path JAVA_HOME path
@@ -34,15 +76,21 @@ apply plugin: 'kotlin-android'
 JavaVersion getJavaFromHome(String path) {
     println("get java from home path: $path")
     def javaExe = path + "/bin/java"
-    def version = exec {
-        commandLine "$javaExe -version"
+
+    def version = executeCommand(javaExe, "-version")
+
+    if (version.exitValue != 0) {
+        return null
     }
+
+    def versionText = version.output
+    log("versionText: ${versionText}")
 
     String regex = "\"(.+)\""
     Pattern pattern = Pattern.compile(regex)
 
     // 创建 Matcher 对象
-    Matcher matcher = pattern.matcher(version)
+    Matcher matcher = pattern.matcher(versionText)
 
     if (matcher.find()) {
         String v = matcher.group(1)
@@ -56,6 +104,8 @@ JavaVersion getJavaFromHome(String path) {
 
         return JavaVersion.toVersion(v)
     }
+
+    return null
 }
 
 JavaVersion getJavaVersion() {
