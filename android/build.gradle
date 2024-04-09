@@ -31,7 +31,7 @@ apply plugin: 'kotlin-android'
  * @param path JAVA_HOME path
  * @return java version
  */
-static JavaVersion getJavaFromHome(String path) {
+JavaVersion getJavaFromHome(String path) {
     println("get java from home path: $path")
     def javaExe = path + "/bin/java"
     def version = exec {
