@@ -23,10 +23,6 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
-kotlin {
-    jvmToolchain(17)
-}
-
 android {
     if (project.android.hasProperty('namespace') ||
             getGradle().getGradleVersion().substring(0, 1).toInteger() >= 8) {
@@ -37,6 +33,11 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     defaultConfig {
