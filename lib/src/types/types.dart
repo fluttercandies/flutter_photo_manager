@@ -3,6 +3,7 @@
 // in the LICENSE file.
 
 import 'package:flutter/foundation.dart';
+import 'package:photo_manager/src/filter/path_filter.dart';
 
 import '../internal/constants.dart';
 import '../internal/enums.dart';
@@ -149,4 +150,77 @@ class AndroidPermission with IMapMixin {
         'type': type.value,
         'mediaLocation': mediaLocation,
       };
+}
+
+/// The extra information of the album type.
+class AlbumType {
+  AlbumType({this.darwin, this.ohos});
+
+  /// The extra information of the album type on macOS and iOS.
+  final DarwinAlbumType? darwin;
+
+  /// The extra information of the album type on OpenHarmony.
+  final OhosAlbumType? ohos;
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! AlbumType) {
+      return false;
+    }
+    return darwin == other.darwin && ohos == other.ohos;
+  }
+
+  @override
+  int get hashCode => darwin.hashCode ^ ohos.hashCode;
+}
+
+/// The extra information of the album type on macOS and iOS.
+class DarwinAlbumType {
+  DarwinAlbumType({this.subtype, this.type});
+
+  /// The darwin collection type, in android, the value is always null.
+  ///
+  /// If the [type] is 2, the value will be null.
+  ///
+  ///
+  final PMDarwinAssetCollectionType? type;
+
+  /// The darwin collection subtype, in android, the value is always null.
+  ///
+  /// If the [type] is 2, the value will be null.
+  ///
+  final PMDarwinAssetCollectionSubtype? subtype;
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! DarwinAlbumType) {
+      return false;
+    }
+    return type == other.type && subtype == other.subtype;
+  }
+
+  @override
+  int get hashCode => type.hashCode ^ subtype.hashCode;
+}
+
+/// The extra information of the album type on OpenHarmony.
+class OhosAlbumType {
+  OhosAlbumType({this.subtype, this.type});
+
+  /// The type of the album on ohos.
+  final PMOhosAlbumType? type;
+
+  /// The subtype of the album on ohos.
+  final PMOhosAlbumSubtype? subtype;
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! OhosAlbumType) {
+      return false;
+    }
+    return type == other.type && subtype == other.subtype;
+  }
+
+  @override
+  int get hashCode => type.hashCode ^ subtype.hashCode;
 }

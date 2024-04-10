@@ -21,7 +21,7 @@ export class SaveHandler extends HandlerBase implements MethodCallHandlerBase {
         // 'desc': desc ?? '',
         // 'relativePath': relativePath,
         // 'onlyAddPermission': true,
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         let list: Uint8Array = args.get('image');
         await this._save(args, result, photoAccessHelper.PhotoType.IMAGE, list.buffer as ArrayBuffer);
       }
@@ -32,7 +32,7 @@ export class SaveHandler extends HandlerBase implements MethodCallHandlerBase {
         // 'desc': desc ?? '',
         // 'relativePath': relativePath,
         // 'onlyAddPermission': true,
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         let path: string = args.get('path');
         let buff = await SaveHandler.getBuffFromPath(path);
         await this._save(args, result, photoAccessHelper.PhotoType.IMAGE, buff);
@@ -44,7 +44,7 @@ export class SaveHandler extends HandlerBase implements MethodCallHandlerBase {
         // 'desc': desc ?? '',
         // 'relativePath': relativePath,
         // 'onlyAddPermission': true,
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         let path: string = args.get('path');
         let buff = await SaveHandler.getBuffFromPath(path);
         await this._save(args, result, photoAccessHelper.PhotoType.VIDEO, buff);
@@ -67,7 +67,7 @@ export class SaveHandler extends HandlerBase implements MethodCallHandlerBase {
     return buff;
   }
 
-  private async _save(args: Map<String, ESObject>, result: MethodResult, photoType: photoAccessHelper.PhotoType, buffer: ArrayBuffer,
+  private async _save(args: Map<string, ESObject>, result: MethodResult, photoType: photoAccessHelper.PhotoType, buffer: ArrayBuffer,
     //  srcUri?: string
   ): Promise<void> {
     if (!(await PermissionHandler.permissionWriteCheck())) {

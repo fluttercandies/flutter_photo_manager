@@ -26,7 +26,7 @@ export class PermissionHandler extends HandlerBase implements MethodCallHandlerB
       }
         break;
       case 'requestPermissionExtend': {
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         let ohosPermissions: Array<Permissions> = args.get('ohosPermissions');
 
         if (Array.isArray(ohosPermissions)) {
@@ -43,7 +43,7 @@ export class PermissionHandler extends HandlerBase implements MethodCallHandlerB
       }
         break;
       case 'ignorePermissionCheck': {
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         PermissionHandler.ignoreCheck = args.get('ignore');
         result.success(null);
       }

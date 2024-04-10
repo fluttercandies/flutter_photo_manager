@@ -40,7 +40,7 @@ export default class PhotoManagerNotifyPlugin implements FlutterPlugin, MethodCa
   async onMethodCall(call: MethodCall, result: MethodResult): Promise<boolean> {
     switch (call.method) {
       case 'notify': {
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         let notify: boolean = args.get('notify');
         result.success(this.notify(notify));
       }

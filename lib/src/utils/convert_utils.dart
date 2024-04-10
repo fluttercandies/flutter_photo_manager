@@ -2,6 +2,10 @@
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
 
+import 'dart:io';
+
+import 'package:photo_manager/platform_utils.dart';
+
 import '../filter/base_filter.dart';
 import '../filter/classical/filter_option_group.dart';
 import '../filter/path_filter.dart';
@@ -69,6 +73,29 @@ class ConvertUtils {
       darwinSubtype: PMDarwinAssetCollectionSubtypeExt.fromValue(
         data['darwinAssetCollectionSubtype'],
       ),
+      albumTypeEx: Platform.isIOS || Platform.isMacOS
+          ? AlbumType(
+              darwin: DarwinAlbumType(
+                type: PMDarwinAssetCollectionTypeExt.fromValue(
+                  data['darwinAssetCollectionType'],
+                ),
+                subtype: PMDarwinAssetCollectionSubtypeExt.fromValue(
+                  data['darwinAssetCollectionSubtype'],
+                ),
+              ),
+            )
+          : PlatformUtils.isOhos
+              ? AlbumType(
+                  ohos: OhosAlbumType(
+                    type: PMOhosAlbumTypeExt.fromValue(
+                      data['ohosAlbumType'],
+                    ),
+                    subtype: PMOhosAlbumSubtypeExt.fromValue(
+                      data['ohosAlbumSubtype'],
+                    ),
+                  ),
+                )
+              : null,
     );
     return result;
   }

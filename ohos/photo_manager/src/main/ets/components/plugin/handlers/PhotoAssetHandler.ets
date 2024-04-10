@@ -19,7 +19,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
     }
     switch (call.method) {
       case 'getAssetListPaged': {
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         // 'id': id,
         // 'type': type.value,
         // 'page': page,
@@ -40,7 +40,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
       }
         break;
       case 'getFullFile': {
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         let id: string = args.get('id');
         // 'id': id,
         // 'isOrigin': isOrigin,
@@ -56,7 +56,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
       }
         break;
       case 'getOriginBytes': {
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         let id: string = args.get('id');
         //option
         //type
@@ -134,7 +134,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
         // 'start': start,
         // 'end': end,
         // 'option': optionGroup.toMap(),
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         let start: number = args.get('start');
         let end: number = args.get('end');
 
@@ -154,7 +154,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
         // 'start': start,
         // 'end': end,
         // 'option': filter.toMap(),
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         let start: number = args.get('start');
         let end: number = args.get('end');
         let allObjects: Array<photoAccessHelper.Album> = await AlbumHandler.getAlbums(args, true, true);
@@ -201,7 +201,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
     return true;
   }
 
-  async getAssetList(args: Map<String, ESObject>, start: number, end: number, album?: photoAccessHelper.AbsAlbum | null): Promise<Array<Map<string, ESObject>> | null> {
+  async getAssetList(args: Map<string, ESObject>, start: number, end: number, album?: photoAccessHelper.AbsAlbum | null): Promise<Array<Map<string, ESObject>> | null> {
     if (!(await PermissionHandler.permissionReadCheck())) {
       return null;
     }

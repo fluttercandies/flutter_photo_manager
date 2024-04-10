@@ -7,6 +7,7 @@ import { dataSharePredicates } from '@kit.ArkData';
 import PhotoManagerPlugin from '../PhotoManagerPlugin';
 import { PermissionHandler } from './PermissionHandler';
 import { AsyncCallback } from '@ohos.base';
+import { MapUtils } from '../utils/MapUtils';
 
 export class AlbumHandler extends HandlerBase implements MethodCallHandlerBase {
   async onMethodCall(call: MethodCall, result: MethodResult): Promise<boolean> {
@@ -16,7 +17,7 @@ export class AlbumHandler extends HandlerBase implements MethodCallHandlerBase {
     }
     switch (call.method) {
       case 'getAssetPathList': {
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         // 'type': type.value,
         // 'hasAll': hasAll,
         // 'onlyAll': onlyAll,
@@ -27,10 +28,21 @@ export class AlbumHandler extends HandlerBase implements MethodCallHandlerBase {
         let onlyAll: boolean = args.get('onlyAll');
 
         let albums: Array<Map<string, ESObject>> = [];
+        // "pathOption": pathFilterOption.toMap(),
+        let pathOption: Map<string, ESObject> = args.get('pathOption');
+        // type
+        // subType
+        let ohosPathFilter: Map<string, ESObject> = pathOption.get('ohos');
+
+        let pathFilterType: Array<number> = MapUtils.get(ohosPathFilter, 'type', []);
+        let pathFilterSubtype: Array<number> = MapUtils.get(ohosPathFilter, 'subType', []);
+
         let allObjects: Array<photoAccessHelper.Album> = await AlbumHandler.getAlbums(args, hasAll, onlyAll);
         for (let index = 0; index < allObjects.length; index++) {
           const album = allObjects[index];
-          // this.albums.set(element.albumUri, element);
+          if (!(pathFilterType.includes(album.albumType) && (pathFilterSubtype.includes(album.albumSubtype) || pathFilterSubtype.includes(photoAccessHelper.AlbumSubtype.ANY)))) {
+            continue;
+          }
           albums.push(AlbumHandler.albumToMap(album));
         }
 
@@ -40,7 +52,7 @@ export class AlbumHandler extends HandlerBase implements MethodCallHandlerBase {
       }
         break;
       case 'getAssetCountFromPath': {
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         let id: string = args.get('id');
         //option
         //type
@@ -54,7 +66,7 @@ export class AlbumHandler extends HandlerBase implements MethodCallHandlerBase {
       }
         break;
       case 'fetchPathProperties': {
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         let id: string = args.get('id');
         //option
         //type
@@ -74,7 +86,7 @@ export class AlbumHandler extends HandlerBase implements MethodCallHandlerBase {
       case 'getAssetCount': {
         // 'type': type.value,
         // 'option': filter.toMap(),
-        let args: Map<String, ESObject> = call.args;
+        let args: Map<string, ESObject> = call.args;
         //option
         //type
         let allObjects: Array<photoAccessHelper.Album> = await AlbumHandler.getAlbums(args, true, true);
@@ -139,7 +151,7 @@ export class AlbumHandler extends HandlerBase implements MethodCallHandlerBase {
     return null;
   }
 
-  static async getAlbums(args: Map<String, ESObject>, hasAll: boolean = true, onlyAll: boolean = false): Promise<Array<photoAccessHelper.Album>> {
+  static async getAlbums(args: Map<string, ESObject>, hasAll: boolean = true, onlyAll: boolean = false): Promise<Array<photoAccessHelper.Album>> {
     if (!(await PermissionHandler.permissionReadCheck())) {
       return [];
     }
@@ -206,8 +218,8 @@ export class AlbumHandler extends HandlerBase implements MethodCallHandlerBase {
       ///  * iOS: 1 - Album, 2 - Folder.
       ['albumType', 1],
       ['assetCount', album.count],
-      ['albumTypeOhos', album.albumType],
-      ['albumSubtypeOhos', album.albumSubtype],
+      ['ohosAlbumType', album.albumType],
+      ['ohosAlbumSubtype', album.albumSubtype],
       // ['albumTypeNameOhos', EnumUtils.getName(photoAccessHelper.AlbumType, album.albumType)],
       // ['albumSubtypeNameOhos', EnumUtils.getName(photoAccessHelper.AlbumSubtype, album.albumSubtype)],
       ['isAll', (album instanceof AllAlbum) ? (album as AllAlbum).isAll : false],

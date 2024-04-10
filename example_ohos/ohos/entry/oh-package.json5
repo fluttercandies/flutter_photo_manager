@@ -6,9 +6,9 @@
   author: '',
   license: '',
   dependencies: {
-    '@ohos/photo_manager': 'file:./har/photo_manager.har',
     '@ohos/path_provider_ohos': 'file:./har/path_provider_ohos.har',
     '@ohos/url_launcher_ohos': 'file:./har/url_launcher_ohos.har',
     '@ohos/video_player_ohos': 'file:./har/video_player_ohos.har',
+    '@ohos/photo_manager': 'file:./har/photo_manager.har',
   },
 }

@@ -33,10 +33,17 @@ class AssetPathEntity {
     this.type = RequestType.common,
     this.isAll = false,
     PMFilter? filterOption,
-    this.darwinSubtype,
-    this.darwinType,
-    this.ohosAlbumType,
-    this.ohosAlbumSubtype,
+    @Deprecated(
+      'Use `albumTypeEx` instead. '
+      'This feature was deprecated after v3.1.0.',
+    )
+        this.darwinSubtype,
+    @Deprecated(
+      'Use `albumTypeEx` instead. '
+      'This feature was deprecated after v3.1.0.',
+    )
+        this.darwinType,
+    this.albumTypeEx,
   }) : filterOption = filterOption ??= FilterOptionGroup();
 
   /// Obtain an entity from ID.
@@ -101,20 +108,26 @@ class AssetPathEntity {
   /// The darwin collection type, in android, the value is always null.
   ///
   /// If the [albumType] is 2, the value will be null.
+  ///
+  ///
+  @Deprecated(
+    'Use `albumTypeEx` instead. '
+    'This feature was deprecated after v3.1.0.',
+  )
   final PMDarwinAssetCollectionType? darwinType;
 
   /// The darwin collection subtype, in android, the value is always null.
   ///
   /// If the [albumType] is 2, the value will be null.
+  ///
+  @Deprecated(
+    'Use `albumTypeEx` instead. '
+    'This feature was deprecated after v3.1.0.',
+  )
   final PMDarwinAssetCollectionSubtype? darwinSubtype;
 
-  /// The type of the album on ohos.
-  /// 0 - USER; 1024 - SYSTEM
-  final int? ohosAlbumType;
-
-  /// The type of the albumSubtype on ohos.
-  /// 1 - USER_GENERIC; 1025 - FAVORITE; 1026 - VIDEO; 2147483647 - ANY
-  final int? ohosAlbumSubtype;
+  /// The extra information of the album type.
+  final AlbumType? albumTypeEx;
 
   /// Call this method to obtain new path entity.
   static Future<AssetPathEntity> obtainPathFromProperties({
@@ -280,10 +293,17 @@ class AssetPathEntity {
     RequestType? type,
     bool? isAll,
     PMFilter? filterOption,
-    PMDarwinAssetCollectionType? darwinType,
-    PMDarwinAssetCollectionSubtype? darwinSubtype,
-    int? ohosAlbumType,
-    int? ohosAlbumSubtype,
+    @Deprecated(
+      'Use `albumTypeEx` instead. '
+      'This feature was deprecated after v3.1.0.',
+    )
+        PMDarwinAssetCollectionType? darwinType,
+    @Deprecated(
+      'Use `albumTypeEx` instead. '
+      'This feature was deprecated after v3.1.0.',
+    )
+        PMDarwinAssetCollectionSubtype? darwinSubtype,
+    AlbumType? albumTypeEx,
   }) {
     return AssetPathEntity(
       id: id ?? this.id,
@@ -295,8 +315,7 @@ class AssetPathEntity {
       filterOption: filterOption ?? this.filterOption,
       darwinSubtype: darwinSubtype ?? this.darwinSubtype,
       darwinType: darwinType ?? this.darwinType,
-      ohosAlbumType: ohosAlbumType ?? this.ohosAlbumType,
-      ohosAlbumSubtype: ohosAlbumSubtype ?? this.ohosAlbumSubtype,
+      albumTypeEx: albumTypeEx ?? this.albumTypeEx,
     );
   }
 
@@ -311,8 +330,7 @@ class AssetPathEntity {
         type == other.type &&
         lastModified == other.lastModified &&
         isAll == other.isAll &&
-        ohosAlbumType == other.ohosAlbumType &&
-        ohosAlbumSubtype == other.ohosAlbumSubtype;
+        albumTypeEx == other.albumTypeEx;
   }
 
   @override
@@ -323,8 +341,7 @@ class AssetPathEntity {
       type.hashCode ^
       lastModified.hashCode ^
       isAll.hashCode ^
-      ohosAlbumType.hashCode ^
-      ohosAlbumSubtype.hashCode;
+      albumTypeEx.hashCode;
 
   @override
   String toString() {
