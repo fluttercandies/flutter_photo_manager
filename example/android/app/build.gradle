@@ -58,9 +58,6 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    lintOptions {
-        disable 'InvalidPackage'
-    }
 
     defaultConfig {
         applicationId "com.fluttercandies.photo_manager_example"
@@ -81,6 +78,9 @@ android {
         release {
             signingConfig signingConfigs.release
         }
+    }
+    lint {
+        disable 'InvalidPackage'
     }
 }
 
