@@ -37,12 +37,12 @@ class AssetPathEntity {
       'Use `albumTypeEx` instead. '
       'This feature was deprecated after v3.1.0.',
     )
-        this.darwinSubtype,
+    this.darwinSubtype,
     @Deprecated(
       'Use `albumTypeEx` instead. '
       'This feature was deprecated after v3.1.0.',
     )
-        this.darwinType,
+    this.darwinType,
     this.albumTypeEx,
   }) : filterOption = filterOption ??= FilterOptionGroup();
 
@@ -297,12 +297,12 @@ class AssetPathEntity {
       'Use `albumTypeEx` instead. '
       'This feature was deprecated after v3.1.0.',
     )
-        PMDarwinAssetCollectionType? darwinType,
+    PMDarwinAssetCollectionType? darwinType,
     @Deprecated(
       'Use `albumTypeEx` instead. '
       'This feature was deprecated after v3.1.0.',
     )
-        PMDarwinAssetCollectionSubtype? darwinSubtype,
+    PMDarwinAssetCollectionSubtype? darwinSubtype,
     AlbumType? albumTypeEx,
   }) {
     return AssetPathEntity(
