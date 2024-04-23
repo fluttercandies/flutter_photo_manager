@@ -82,8 +82,9 @@ class GalleryItemWidget extends StatelessWidget {
                   buffer += 'type = ${item.type}\n';
                   buffer += 'isAll = ${item.isAll}\n';
                   buffer += 'albumType = ${item.albumType}\n';
-                  buffer += 'darwinType = ${item.darwinType}\n';
-                  buffer += 'darwinSubType = ${item.darwinSubtype}\n';
+                  buffer += 'darwinType = ${item.albumTypeEx?.darwin?.type}\n';
+                  buffer +=
+                      'darwinSubType = ${item.albumTypeEx?.darwin?.subtype}\n';
                   buffer += 'assetCount = ${await item.assetCountAsync}\n';
                   buffer += 'id = ${item.id}\n';
 
