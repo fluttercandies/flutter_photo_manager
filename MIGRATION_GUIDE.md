@@ -5,6 +5,8 @@ If you want to see the new feature support, please refer to [readme][] and [chan
 
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
+  * [3.0.x to 3.1](#30x-to-31)
+    * [AlbumType](#albumType)
   * [2.x to 3.0](#2x-to-30)
     * [Overall](#overall)
       * [`AssetEntityImage` and `AssetEntityImageProvider`](#assetentityimage-and-assetentityimageprovider)
@@ -23,6 +25,28 @@ If you want to see the new feature support, please refer to [readme][] and [chan
   * [0.6 to 1.0](#06-to-10)
   * [0.5 To 0.6](#05-to-06)
 <!-- TOC -->
+
+## 3.0.x to 3.1
+
+### `AlbumType`
+
+The extra information of the album type has been abstract as `AlbumType` which contains Darwin (iOS/macOS) and OpenHarmony album infomation. The new class deprecates [AssetPathEntity.darwinType] and [AssetPathEntity.darwinSubtype], [AssetPathEntity.albumTypeEx] should be used instead.
+
+Before:
+
+```dart
+final AssetPathEntity entity = await AssetPathEntity.fromId('');
+final PMDarwinAssetCollectionType? darwinType = entity.darwinType;
+final PMDarwinAssetCollectionSubtype? darwinSubtype = entity.darwinSubtype;
+```
+
+After: 
+
+```dart
+final AssetPathEntity entity = await AssetPathEntity.fromId('');
+final PMDarwinAssetCollectionType? darwinType = entity.albumTypeEx?.darwin?.type;
+final PMDarwinAssetCollectionSubtype? darwinSubtype = entity.albumTypeEx?.darwin?.subtype;
+```
 
 ## 2.x to 3.0
 

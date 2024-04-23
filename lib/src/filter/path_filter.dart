@@ -311,7 +311,7 @@ class PMOhosPathFilter {
 }
 
 /// The type of the album on ohos.
-/// https://docs.openharmony.cn/pages/v4.0/zh-cn/application-dev/reference/apis/js-apis-photoAccessHelper.md#albumtype
+/// See also: https://docs.openharmony.cn/pages/v4.0/zh-cn/application-dev/reference/apis/js-apis-photoAccessHelper.md#albumtype
 enum PMOhosAlbumType {
   /// 0 - USER; 用户相册。
   user,
@@ -321,7 +321,7 @@ enum PMOhosAlbumType {
 }
 
 /// The subtype of the album on ohos.
-/// https://docs.openharmony.cn/pages/v4.0/zh-cn/application-dev/reference/apis/js-apis-photoAccessHelper.md#albumsubtype
+/// See also: https://docs.openharmony.cn/pages/v4.0/zh-cn/application-dev/reference/apis/js-apis-photoAccessHelper.md#albumsubtype
 enum PMOhosAlbumSubtype {
   /// 1 - USER_GENERIC; 用户相册。
   userGeneric,
