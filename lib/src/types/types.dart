@@ -3,8 +3,8 @@
 // in the LICENSE file.
 
 import 'package:flutter/foundation.dart';
-import 'package:photo_manager/src/filter/path_filter.dart';
 
+import '../filter/path_filter.dart';
 import '../internal/constants.dart';
 import '../internal/enums.dart';
 import '../internal/map_interface.dart';
@@ -154,7 +154,7 @@ class AndroidPermission with IMapMixin {
 
 /// The extra information of the album type.
 class AlbumType {
-  AlbumType({this.darwin, this.ohos});
+  const AlbumType({this.darwin, this.ohos});
 
   /// The extra information of the album type on macOS and iOS.
   final DarwinAlbumType? darwin;
@@ -176,7 +176,7 @@ class AlbumType {
 
 /// The extra information of the album type on macOS and iOS.
 class DarwinAlbumType {
-  DarwinAlbumType({this.subtype, this.type});
+  const DarwinAlbumType({this.subtype, this.type});
 
   /// The darwin collection type, in android, the value is always null.
   ///
@@ -205,7 +205,7 @@ class DarwinAlbumType {
 
 /// The extra information of the album type on OpenHarmony.
 class OhosAlbumType {
-  OhosAlbumType({this.subtype, this.type});
+  const OhosAlbumType({this.subtype, this.type});
 
   /// The type of the album on ohos.
   final PMOhosAlbumType? type;

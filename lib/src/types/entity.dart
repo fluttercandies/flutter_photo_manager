@@ -8,6 +8,7 @@ import 'dart:typed_data' as typed_data;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
+import '../../platform_utils.dart';
 import '../filter/base_filter.dart';
 import '../filter/classical/filter_option_group.dart';
 import '../filter/path_filter.dart';
@@ -16,7 +17,6 @@ import '../internal/enums.dart';
 import '../internal/plugin.dart';
 import '../internal/progress_handler.dart';
 import '../utils/convert_utils.dart';
-import '../../platform_utils.dart';
 import 'thumbnail.dart';
 import 'types.dart';
 
@@ -35,12 +35,12 @@ class AssetPathEntity {
     PMFilter? filterOption,
     @Deprecated(
       'Use `albumTypeEx` instead. '
-      'This feature was deprecated after v3.1.0.',
+      'This feature was deprecated after v3.1.0',
     )
     this.darwinSubtype,
     @Deprecated(
       'Use `albumTypeEx` instead. '
-      'This feature was deprecated after v3.1.0.',
+      'This feature was deprecated after v3.1.0',
     )
     this.darwinType,
     this.albumTypeEx,
@@ -112,7 +112,7 @@ class AssetPathEntity {
   ///
   @Deprecated(
     'Use `albumTypeEx` instead. '
-    'This feature was deprecated after v3.1.0.',
+    'This feature was deprecated after v3.1.0',
   )
   final PMDarwinAssetCollectionType? darwinType;
 
@@ -122,7 +122,7 @@ class AssetPathEntity {
   ///
   @Deprecated(
     'Use `albumTypeEx` instead. '
-    'This feature was deprecated after v3.1.0.',
+    'This feature was deprecated after v3.1.0',
   )
   final PMDarwinAssetCollectionSubtype? darwinSubtype;
 
@@ -295,12 +295,12 @@ class AssetPathEntity {
     PMFilter? filterOption,
     @Deprecated(
       'Use `albumTypeEx` instead. '
-      'This feature was deprecated after v3.1.0.',
+      'This feature was deprecated after v3.1.0',
     )
     PMDarwinAssetCollectionType? darwinType,
     @Deprecated(
       'Use `albumTypeEx` instead. '
-      'This feature was deprecated after v3.1.0.',
+      'This feature was deprecated after v3.1.0',
     )
     PMDarwinAssetCollectionSubtype? darwinSubtype,
     AlbumType? albumTypeEx,
@@ -332,6 +332,10 @@ class AssetPathEntity {
         type == other.type &&
         lastModified == other.lastModified &&
         isAll == other.isAll &&
+        // ignore: deprecated_member_use_from_same_package
+        darwinType == other.darwinType &&
+        // ignore: deprecated_member_use_from_same_package
+        darwinSubtype == other.darwinSubtype &&
         albumTypeEx == other.albumTypeEx;
   }
 
@@ -343,6 +347,10 @@ class AssetPathEntity {
       type.hashCode ^
       lastModified.hashCode ^
       isAll.hashCode ^
+      // ignore: deprecated_member_use_from_same_package
+      darwinType.hashCode ^
+      // ignore: deprecated_member_use_from_same_package
+      darwinSubtype.hashCode ^
       albumTypeEx.hashCode;
 
   @override

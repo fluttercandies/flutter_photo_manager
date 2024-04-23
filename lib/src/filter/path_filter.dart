@@ -57,14 +57,14 @@ class PMDarwinPathFilter {
   ///
   /// See [PMDarwinAssetCollectionType]
   ///
-  /// [The document of apple](https://developer.apple.com/documentation/photokit/phassetcollectiontype/)
+  /// See also: https://developer.apple.com/documentation/photokit/phassetcollectiontype
   final List<PMDarwinAssetCollectionType> type;
 
   /// For subtype of the collection.
   ///
   /// See [PMDarwinAssetCollectionSubtype]
   ///
-  /// [The document of apple](https://developer.apple.com/documentation/photokit/phassetcollectionsubtype/)
+  /// See also: https://developer.apple.com/documentation/photokit/phassetcollectionsubtype
   final List<PMDarwinAssetCollectionSubtype> subType;
 
   Map<String, dynamic> toMap() {
@@ -292,14 +292,14 @@ class PMOhosPathFilter {
   ///
   /// See [PMOhosAlbumType]
   ///
-  /// [The document of oepnharmony](https://docs.openharmony.cn/pages/v4.0/zh-cn/application-dev/reference/apis/js-apis-photoAccessHelper.md#albumtype)
+  /// See also: https://docs.openharmony.cn/pages/v4.0/zh-cn/application-dev/reference/apis/js-apis-photoAccessHelper.md#albumtype
   final List<PMOhosAlbumType> type;
 
   /// For subtype of the album.
   ///
   /// See [PMOhosAlbumSubtype]
   ///
-  /// [The document of openharmony](https://docs.openharmony.cn/pages/v4.0/zh-cn/application-dev/reference/apis/js-apis-photoAccessHelper.md#albumsubtype)
+  /// See also: https://docs.openharmony.cn/pages/v4.0/zh-cn/application-dev/reference/apis/js-apis-photoAccessHelper.md#albumsubtype
   final List<PMOhosAlbumSubtype> subType;
 
   Map<String, dynamic> toMap() {

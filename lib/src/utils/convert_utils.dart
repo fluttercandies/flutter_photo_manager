@@ -58,6 +58,30 @@ class ConvertUtils {
     final DateTime? lastModified = modified != null
         ? DateTime.fromMillisecondsSinceEpoch(modified * 1000)
         : null;
+    AlbumType? albumTypeEx;
+    if (Platform.isIOS || Platform.isMacOS) {
+      albumTypeEx = AlbumType(
+        darwin: DarwinAlbumType(
+          type: PMDarwinAssetCollectionTypeExt.fromValue(
+            data['darwinAssetCollectionType'],
+          ),
+          subtype: PMDarwinAssetCollectionSubtypeExt.fromValue(
+            data['darwinAssetCollectionSubtype'],
+          ),
+        ),
+      );
+    } else if (PlatformUtils.isOhos) {
+      albumTypeEx = AlbumType(
+        ohos: OhosAlbumType(
+          type: PMOhosAlbumTypeExt.fromValue(
+            data['ohosAlbumType'],
+          ),
+          subtype: PMOhosAlbumSubtypeExt.fromValue(
+            data['ohosAlbumSubtype'],
+          ),
+        ),
+      );
+    }
     final AssetPathEntity result = AssetPathEntity(
       id: data['id'] as String,
       name: data['name'] as String,
@@ -75,29 +99,7 @@ class ConvertUtils {
       darwinSubtype: PMDarwinAssetCollectionSubtypeExt.fromValue(
         data['darwinAssetCollectionSubtype'],
       ),
-      albumTypeEx: Platform.isIOS || Platform.isMacOS
-          ? AlbumType(
-              darwin: DarwinAlbumType(
-                type: PMDarwinAssetCollectionTypeExt.fromValue(
-                  data['darwinAssetCollectionType'],
-                ),
-                subtype: PMDarwinAssetCollectionSubtypeExt.fromValue(
-                  data['darwinAssetCollectionSubtype'],
-                ),
-              ),
-            )
-          : PlatformUtils.isOhos
-              ? AlbumType(
-                  ohos: OhosAlbumType(
-                    type: PMOhosAlbumTypeExt.fromValue(
-                      data['ohosAlbumType'],
-                    ),
-                    subtype: PMOhosAlbumSubtypeExt.fromValue(
-                      data['ohosAlbumSubtype'],
-                    ),
-                  ),
-                )
-              : null,
+      albumTypeEx: albumTypeEx,
     );
     return result;
   }

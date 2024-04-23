@@ -204,9 +204,8 @@ class DarwinEditor {
       return false;
     }
     // ignore: deprecated_member_use_from_same_package
-    if (parent.darwinType == PMDarwinAssetCollectionType.smartAlbum ||
-        parent.albumTypeEx?.darwin?.type ==
-            PMDarwinAssetCollectionType.smartAlbum) {
+    if ((parent.darwinType ?? parent.albumTypeEx?.darwin?.type) ==
+        PMDarwinAssetCollectionType.smartAlbum) {
       // Asset of smartAlbums can't be deleted.
       return false;
     }
@@ -219,9 +218,8 @@ class DarwinEditor {
   /// Returns `true` if the operation was successful; otherwise, `false`.
   Future<bool> deletePath(AssetPathEntity path) async {
     // ignore: deprecated_member_use_from_same_package
-    if (path.darwinType == PMDarwinAssetCollectionType.smartAlbum ||
-        path.albumTypeEx?.darwin?.type ==
-            PMDarwinAssetCollectionType.smartAlbum) {
+    if ((path.darwinType ?? path.albumTypeEx?.darwin?.type) ==
+        PMDarwinAssetCollectionType.smartAlbum) {
       // SmartAlbums can't be deleted.
       return false;
     }
