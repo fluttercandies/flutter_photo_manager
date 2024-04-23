@@ -313,7 +313,9 @@ class AssetPathEntity {
       type: type ?? this.type,
       isAll: isAll ?? this.isAll,
       filterOption: filterOption ?? this.filterOption,
+      // ignore: deprecated_member_use_from_same_package
       darwinSubtype: darwinSubtype ?? this.darwinSubtype,
+      // ignore: deprecated_member_use_from_same_package
       darwinType: darwinType ?? this.darwinType,
       albumTypeEx: albumTypeEx ?? this.albumTypeEx,
     );

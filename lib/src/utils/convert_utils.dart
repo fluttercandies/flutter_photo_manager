@@ -67,9 +67,11 @@ class ConvertUtils {
       lastModified: lastModified,
       type: type,
       isAll: data['isAll'] as bool,
+      // ignore: deprecated_member_use_from_same_package
       darwinType: PMDarwinAssetCollectionTypeExt.fromValue(
         data['darwinAssetCollectionType'],
       ),
+      // ignore: deprecated_member_use_from_same_package
       darwinSubtype: PMDarwinAssetCollectionSubtypeExt.fromValue(
         data['darwinAssetCollectionSubtype'],
       ),
