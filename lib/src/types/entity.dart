@@ -34,12 +34,12 @@ class AssetPathEntity {
     this.isAll = false,
     PMFilter? filterOption,
     @Deprecated(
-      'Use `albumTypeEx` instead. '
+      'Use `albumTypeEx.darwin.type` instead. '
       'This feature was deprecated after v3.1.0',
     )
     this.darwinSubtype,
     @Deprecated(
-      'Use `albumTypeEx` instead. '
+      'Use `albumTypeEx.darwin.subtype` instead. '
       'This feature was deprecated after v3.1.0',
     )
     this.darwinType,
@@ -108,10 +108,8 @@ class AssetPathEntity {
   /// The darwin collection type, in android, the value is always null.
   ///
   /// If the [albumType] is 2, the value will be null.
-  ///
-  ///
   @Deprecated(
-    'Use `albumTypeEx` instead. '
+    'Use `albumTypeEx.darwin.type` instead. '
     'This feature was deprecated after v3.1.0',
   )
   final PMDarwinAssetCollectionType? darwinType;
@@ -119,9 +117,8 @@ class AssetPathEntity {
   /// The darwin collection subtype, in android, the value is always null.
   ///
   /// If the [albumType] is 2, the value will be null.
-  ///
   @Deprecated(
-    'Use `albumTypeEx` instead. '
+    'Use `albumTypeEx.darwin.subtype` instead. '
     'This feature was deprecated after v3.1.0',
   )
   final PMDarwinAssetCollectionSubtype? darwinSubtype;

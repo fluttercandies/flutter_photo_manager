@@ -30,7 +30,7 @@ If you want to see the new feature support, please refer to [readme][] and [chan
 
 ### `AlbumType`
 
-The extra information of the album type has been abstract as `AlbumType` which contains Darwin (iOS/macOS) and OpenHarmony album infomation. The new class deprecates [AssetPathEntity.darwinType] and [AssetPathEntity.darwinSubtype], [AssetPathEntity.albumTypeEx] should be used instead.
+The extra information of the album type has been abstract as `AlbumType` which contains Darwin (iOS/macOS) and OpenHarmony album infomation. The new class deprecates `AssetPathEntity.darwinType` and `AssetPathEntity.darwinSubtype`, `AssetPathEntity.albumTypeEx` should be used instead.
 
 Before:
 
