@@ -5,7 +5,7 @@ group 'com.fluttercandies.photo_manager'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.9.20'
+    ext.kotlin_version = '1.9.23'
     repositories {
         google()
         mavenCentral()
@@ -25,26 +25,72 @@ rootProject.allprojects {
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+
+void log(Object msg) {
+    logger.log(LogLevel.INFO, "[PhotoManager] $msg")
+}
+
+class ExecResult {
+    int exitValue
+    String output
+
+    ExecResult(int exitValue, String output) {
+        this.exitValue = exitValue
+        this.output = output
+    }
+}
+
+static ExecResult executeCommand(String... args) {
+
+    int exitValue;
+    String output;
+
+    try {
+        Process process = new ProcessBuilder(args).start()
+
+        def stream = new ByteArrayOutputStream()
+        stream.withStream { bos ->
+            process.inputStream.withStream { ins ->
+                bos << ins
+            }
+            process.errorStream.withStream { ins ->
+                bos << ins
+            }
+            output = bos.toString("UTF-8")
+        }
+        exitValue = process.waitFor()
+    } catch (Exception e) {
+        e.printStackTrace()
+        exitValue = -1
+        output = e.toString()
+    }
+
+    return new ExecResult(exitValue, output)
+}
+
 /**
  * Get java version from JAVA_HOME
  * @param path JAVA_HOME path
  * @return java version
  */
-static JavaVersion getJavaFromHome(String path) {
+JavaVersion getJavaFromHome(String path) {
+    log("Reading java version from JAVA_HOME: ${path}")
     def javaExe = path + "/bin/java"
-    Process process = Runtime.getRuntime().exec(new String[]{javaExe, "-version"})
-    process.waitFor()
 
-    def input = process.getErrorStream() ?: process.getInputStream()
-    def reader = new BufferedReader(new InputStreamReader(input))
-    def version = reader.readLine()
-    reader.close()
+    def version = executeCommand(javaExe, "-version")
+
+    if (version.exitValue != 0) {
+        return null
+    }
+
+    def versionText = version.output
+    log("versionText: ${versionText}")
 
     String regex = "\"(.+)\""
     Pattern pattern = Pattern.compile(regex)
 
     // 创建 Matcher 对象
-    Matcher matcher = pattern.matcher(version)
+    Matcher matcher = pattern.matcher(versionText)
 
     if (matcher.find()) {
         String v = matcher.group(1)
@@ -54,46 +100,66 @@ static JavaVersion getJavaFromHome(String path) {
             v = v.substring(0, 3)
         }
 
+        log("java version string: ${v}")
+
         return JavaVersion.toVersion(v)
     }
+
+    return null
 }
 
 JavaVersion getJavaVersion() {
-    // 0. Get java.version property from project's gradle.properties
-    // The version value is like 1.8, 11, 17, 21, etc.
-    // Also see: https://docs.gradle.org/current/javadoc/org/gradle/api/JavaVersion.html#toVersion-java.lang.Object-
-    JavaVersion res
+    try {
+        // 0. Get java.version property from project's gradle.properties
+        // The version value is like 1.8, 11, 17, 21, etc.
+        // Also see: https://docs.gradle.org/current/javadoc/org/gradle/api/JavaVersion.html#toVersion-java.lang.Object-
+        JavaVersion res
 
-    def javaVersion = project.findProperty("java.version")
-    if (javaVersion != null) {
-        res = JavaVersion.toVersion(javaVersion)
-        logger.info("Get java version from project's gradle.properties: $javaVersion.")
-    }
+        def javaVersion = project.rootProject.findProperty("java.version")
+        if (javaVersion != null) {
+            res = JavaVersion.toVersion(javaVersion)
+            log("Get java version from project's gradle.properties: $javaVersion")
+            if (res != null) {
+                return res
+            }
+        }
 
-    String javaHome
-    // 1. read from JAVA_HOME environment variable
-    javaHome = System.getenv("JAVA_HOME")
-    if (res == null && javaHome != null) {
-        res = getJavaFromHome(javaHome)
-        logger.info("Get java version from JAVA_HOME: $javaHome.")
-    }
+        String javaHome
+        // 1. read from JAVA_HOME environment variable
+        javaHome = System.getenv("JAVA_HOME")
+        if (res == null && javaHome != null) {
+            res = getJavaFromHome(javaHome)
+            log("Get java version from JAVA_HOME: $javaHome")
+            if (res != null) {
+                return res
+            }
+        }
 
-    // 2. read gradle.properties
-    javaHome = project.findProperty("java.home")
-    if (res == null && javaHome != null) {
-        res = getJavaFromHome(javaHome)
-        logger.info("Get java version from gradle.properties: $javaHome.")
-    }
+        // 2. read gradle.properties
+        javaHome = project.rootProject.findProperty("java.home")
+        if (res == null && javaHome != null) {
+            res = getJavaFromHome(javaHome)
+            log("Get java version from gradle.properties: $javaHome")
+            if (res != null) {
+                return res
+            }
+        }
 
-    // 3. read from property with java.home
-    javaHome = System.getProperty("java.home")
-    if (res == null && javaHome != null) {
-        res = getJavaFromHome(javaHome)
-        logger.info("Get java version from java.home: $javaHome.")
-    }
+        // 3. read from property with java.home
+        javaHome = System.getProperty("java.home")
+        if (res == null && javaHome != null) {
+            res = getJavaFromHome(javaHome)
+            log("Get java version from java.home: $javaHome")
+            if (res != null) {
+                return res
+            }
+        }
 
-    if (res != null) {
-        return res
+        if (res != null) {
+            return res
+        }
+    } catch (Exception e) {
+        e.printStackTrace()
     }
 
     // last, use default version with current
@@ -108,16 +174,14 @@ android {
 
     compileSdkVersion 34
 
-    def javaVersion = getJavaVersion()
-    logger.info("Using java ${javaVersion} at android.compileOptions.sourceCompatibility and android.compileOptions.targetCompatibility in photo_manager.")
-
-    compileOptions {
-        sourceCompatibility javaVersion
-        targetCompatibility javaVersion
-    }
-
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    compileOptions {
+        def version = getJavaVersion()
+        sourceCompatibility = version
+        targetCompatibility = version
     }
 
     defaultConfig {
