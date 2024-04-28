@@ -25,4 +25,6 @@ A Flutter plugin that provides assets abstraction management APIs.
 
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
   s.swift_version = '5.0'
+
+  s.resource_bundles = {'photo_manager_privacy' => ['Resources/PrivacyInfo.xcprivacy']}
 end
