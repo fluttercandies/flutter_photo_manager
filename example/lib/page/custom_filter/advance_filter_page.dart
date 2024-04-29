@@ -50,7 +50,9 @@ class _AdvancedCustomFilterPageState extends State<AdvancedCustomFilterPage> {
           WhereAction(
             where: _where,
             onChanged: (value) {
-              if (!mounted) return;
+              if (!mounted) {
+                return;
+              }
               setState(() {
                 _where.clear();
                 _where.addAll(value);
@@ -60,7 +62,9 @@ class _AdvancedCustomFilterPageState extends State<AdvancedCustomFilterPage> {
           OrderByAction(
             items: _orderBy,
             onChanged: (values) {
-              if (!mounted) return;
+              if (!mounted) {
+                return;
+              }
               setState(() {
                 _orderBy.clear();
                 _orderBy.addAll(values);
@@ -160,7 +164,7 @@ class _WhereConditionPageState extends State<_WhereConditionPage> {
     );
   }
 
-  void _createNew() async {
+  Future<void> _createNew() async {
     final result = await showDialog<WhereConditionItem>(
       context: context,
       builder: (context) {
@@ -254,7 +258,9 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
                 );
               }).toList(),
               onChanged: (value) {
-                if (value == null) return;
+                if (value == null) {
+                  return;
+                }
                 setState(() {
                   column = value;
                 });
@@ -270,7 +276,9 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
                 );
               }).toList(),
               onChanged: (value) {
-                if (value == null) return;
+                if (value == null) {
+                  return;
+                }
                 setState(() {
                   condition = value;
                 });
@@ -330,7 +338,9 @@ class _CreateWhereDialogState extends State<_CreateWhereDialog> {
               firstDate: DateTime(1970),
               lastDate: DateTime(2100),
             );
-            if (date == null) return;
+            if (date == null) {
+              return;
+            }
             setState(() {
               _date = date;
             });

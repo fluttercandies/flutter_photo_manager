@@ -532,7 +532,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       'end': end,
       'option': filter.toMap(),
     }).then((value) {
-      if (value == null) return [];
+      if (value == null) {
+        return [];
+      }
       return ConvertUtils.convertToAssetList(
         value.cast<String, dynamic>(),
       );

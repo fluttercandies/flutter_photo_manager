@@ -8,15 +8,15 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## 3.1.0
 
+### Breaking changes
+
+- `AssetPathEntity.darwinType` and `AssetPathEntity.darwinSubtype` are deprecated.
+
+See the [Migration Guide][] for details of breaking changes.
+
 ### Features
 
 - Support OpenHarmony.
-
-### Breaking changes
-
-- `AssetPathEntity.darwinType` and `AssetPathEntity.darwinSubtype` are deprecated after v3.1.0, and use `AssetPathEntity.albumTypeEx` instead. See the [Migration Guide][] for details of breaking changes.
-
-## 3.0.1
 
 ### Fixes
 

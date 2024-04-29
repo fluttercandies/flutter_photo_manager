@@ -1,6 +1,6 @@
 name: photo_manager_example
 description: Demonstrates how to use the photo_manager plugin.
-version: 3.0.0+26
+version: 3.1.0+26
 publish_to: none
 
 environment:
@@ -12,8 +12,7 @@ dependencies:
     sdk: flutter
 
   photo_manager: # override
-  # photo_manager_image_provider: ^1.1.1
-  photo_manager_image_provider: ^2.1.1 # Flutter ^3.14.0
+  photo_manager_image_provider: ^2.1.1
 
   http: ">=0.13.6 <2.0.0"
   oktoast: ^3.1.0

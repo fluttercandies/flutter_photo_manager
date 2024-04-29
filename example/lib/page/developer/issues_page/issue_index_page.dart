@@ -28,7 +28,7 @@ class IssuePage extends StatelessWidget {
     for (final item in list) {
       if (item is StatefulWidget) {
         // ignore: invalid_use_of_protected_member
-        final state = (item).createState();
+        final state = item.createState();
         if (state is IssueBase) {
           if (state.supportCurrentPlatform()) {
             res.add(item);
@@ -52,7 +52,7 @@ class IssuePage extends StatelessWidget {
         titleBuilder: (w) {
           if (w is StatefulWidget) {
             // ignore: invalid_use_of_protected_member
-            final state = (w).createState();
+            final state = w.createState();
 
             if (state is IssueBase) {
               final issueNumber = state.issueNumber;

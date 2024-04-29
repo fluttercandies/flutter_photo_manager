@@ -65,11 +65,11 @@ class _Issue988State extends State<Issue988> with IssueBase {
       decoration: const InputDecoration(
         hintText: 'Filter with name',
       ),
-      onChanged: ((value) {
+      onChanged: (value) {
         filterList = list.where((element) {
           return element.name.toLowerCase().contains(value.toLowerCase());
         }).toList();
-      }),
+      },
     );
   }
 

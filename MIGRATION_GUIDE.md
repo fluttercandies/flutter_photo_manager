@@ -6,17 +6,17 @@ If you want to see the new feature support, please refer to [readme][] and [chan
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
   * [3.0.x to 3.1](#30x-to-31)
-    * [AlbumType](#albumType)
-  * [2.x to 3.0](#2x-to-30)
     * [Overall](#overall)
+  * [2.x to 3.0](#2x-to-30)
+    * [Overall](#overall-1)
       * [`AssetEntityImage` and `AssetEntityImageProvider`](#assetentityimage-and-assetentityimageprovider)
   * [2.x to 2.8](#2x-to-28)
-    * [Overall](#overall-1)
-  * [2.x to 2.2](#2x-to-22)
     * [Overall](#overall-2)
+  * [2.x to 2.2](#2x-to-22)
+    * [Overall](#overall-3)
       * [`assetCount`](#assetcount)
   * [1.x to 2.0](#1x-to-20)
-    * [Overall](#overall-3)
+    * [Overall](#overall-4)
     * [API migrations](#api-migrations)
       * [`getAssetListPaged`](#getassetlistpaged)
       * [Filtering only videos](#filtering-only-videos)
@@ -28,24 +28,27 @@ If you want to see the new feature support, please refer to [readme][] and [chan
 
 ## 3.0.x to 3.1
 
-### `AlbumType`
+### Overall
 
-The extra information of the album type has been abstract as `AlbumType` which contains Darwin (iOS/macOS) and OpenHarmony album infomation. The new class deprecates `AssetPathEntity.darwinType` and `AssetPathEntity.darwinSubtype`, `AssetPathEntity.albumTypeEx` should be used instead.
+The extra information of the album type has been abstract as `AlbumType`
+which contains Darwin (iOS/macOS) and OpenHarmony album information.
+The new class deprecates `AssetPathEntity.darwinType` and `AssetPathEntity.darwinSubtype`,
+`AssetPathEntity.albumTypeEx` should be used instead.
 
 Before:
 
 ```dart
-final AssetPathEntity entity = await AssetPathEntity.fromId('');
-final PMDarwinAssetCollectionType? darwinType = entity.darwinType;
-final PMDarwinAssetCollectionSubtype? darwinSubtype = entity.darwinSubtype;
+final path = await AssetPathEntity.fromId('');
+final PMDarwinAssetCollectionType? darwinType = path.darwinType;
+final PMDarwinAssetCollectionSubtype? darwinSubtype = path.darwinSubtype;
 ```
 
 After: 
 
 ```dart
-final AssetPathEntity entity = await AssetPathEntity.fromId('');
-final PMDarwinAssetCollectionType? darwinType = entity.albumTypeEx?.darwin?.type;
-final PMDarwinAssetCollectionSubtype? darwinSubtype = entity.albumTypeEx?.darwin?.subtype;
+final path = await AssetPathEntity.fromId('');
+final PMDarwinAssetCollectionType? darwinType = path.albumTypeEx?.darwin?.type;
+final PMDarwinAssetCollectionSubtype? darwinSubtype = path.albumTypeEx?.darwin?.subtype;
 ```
 
 ## 2.x to 3.0

@@ -16,7 +16,7 @@ class _Issue962State extends State<Issue962> with IssueBase<Issue962> {
 
   ValueNotifier<String> logNotifier = ValueNotifier<String>('');
 
-  void onChange() async {
+  Future<void> onChange() async {
     if (start >= end) {
       logNotifier.value = 'start must less than end';
       return;

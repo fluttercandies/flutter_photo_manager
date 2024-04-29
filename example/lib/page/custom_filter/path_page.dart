@@ -49,7 +49,9 @@ class _GalleryWidgetState extends State<GalleryWidget> {
     }
     final list = await widget.path.getAssetListRange(start: 0, end: count);
     setState(() {
-      if (mounted) _list = list;
+      if (mounted) {
+        _list = list;
+      }
     });
   }
 

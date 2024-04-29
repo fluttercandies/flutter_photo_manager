@@ -6,8 +6,8 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
-import '../../utils/column_utils.dart';
 import '../../../platform_utils.dart';
+import '../../utils/column_utils.dart';
 
 /// {@template custom_columns}
 ///

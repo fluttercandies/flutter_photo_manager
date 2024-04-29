@@ -35,11 +35,7 @@ class PMPathFilter {
 }
 
 /// {@template PM.darwin_path_filter}
-///
-/// For filter the [AssetPathEntity] on macOS and iOS.
-///
-/// Also see [PhotoManager.getAssetPathList]
-///
+/// The filter of [AssetPathEntity] on iOS and macOS.
 /// {@endtemplate}
 class PMDarwinPathFilter {
   /// {@macro PM.darwin_path_filter}
@@ -53,16 +49,12 @@ class PMDarwinPathFilter {
     ],
   });
 
-  /// For type of the collection.
-  ///
-  /// See [PMDarwinAssetCollectionType]
+  /// Collection type (PMDarwinAssetCollectionType) filtering.
   ///
   /// See also: https://developer.apple.com/documentation/photokit/phassetcollectiontype
   final List<PMDarwinAssetCollectionType> type;
 
-  /// For subtype of the collection.
-  ///
-  /// See [PMDarwinAssetCollectionSubtype]
+  /// Collection subtype (PMDarwinAssetCollectionSubtype) filtering.
   ///
   /// See also: https://developer.apple.com/documentation/photokit/phassetcollectionsubtype
   final List<PMDarwinAssetCollectionSubtype> subType;
@@ -270,11 +262,7 @@ extension PMDarwinAssetCollectionSubtypeExt on PMDarwinAssetCollectionSubtype {
 }
 
 /// {@template PM.ohos_path_filter}
-///
-/// For filter the [AssetPathEntity] on OpenHarmony.
-///
-/// Also see [PhotoManager.getAssetPathList]
-///
+/// The filter of [AssetPathEntity] on OpenHarmony.
 /// {@endtemplate}
 class PMOhosPathFilter {
   /// {@macro PM.ohos_path_filter}
@@ -288,16 +276,12 @@ class PMOhosPathFilter {
     ],
   });
 
-  /// For type of the album.
-  ///
-  /// See [PMOhosAlbumType]
+  /// Album type (PMOhosAlbumType) filtering.
   ///
   /// See also: https://docs.openharmony.cn/pages/v4.0/zh-cn/application-dev/reference/apis/js-apis-photoAccessHelper.md#albumtype
   final List<PMOhosAlbumType> type;
 
-  /// For subtype of the album.
-  ///
-  /// See [PMOhosAlbumSubtype]
+  /// Album subtype (PMOhosAlbumSubtype) filtering.
   ///
   /// See also: https://docs.openharmony.cn/pages/v4.0/zh-cn/application-dev/reference/apis/js-apis-photoAccessHelper.md#albumsubtype
   final List<PMOhosAlbumSubtype> subType;

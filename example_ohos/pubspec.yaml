@@ -1,6 +1,6 @@
 name: photo_manager_example_ohos
 description: Demonstrates how to use the photo_manager plugin.
-version: 3.0.0+26
+version: 3.1.0+26
 publish_to: none
 
 environment:
@@ -35,11 +35,11 @@ dependency_overrides:
      git:
        url: https://gitee.com/openharmony-sig/flutter_packages
        path: packages/path_provider/path_provider
+  url_launcher:
+    git:
+      url: https://gitee.com/openharmony-sig/flutter_packages
+      path: packages/url_launcher/url_launcher
   video_player:
      git:
        url: https://gitee.com/openharmony-sig/flutter_packages
        path: packages/video_player/video_player
-  url_launcher:
-     git:
-       url: https://gitee.com/openharmony-sig/flutter_packages
-       path: packages/url_launcher/url_launcher                      
