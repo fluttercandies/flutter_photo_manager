@@ -28,6 +28,7 @@ To know more about breaking changes, see the [Migration Guide][].
 ### Improvements
 
 - Improve code formatting.
+- Add privacy file for iOS/macOS. (#1120)
 
 ## 3.0.0
 
