@@ -4,6 +4,8 @@
 
 import 'package:flutter/foundation.dart';
 
+import '../filter/path_filter.dart';
+import '../internal/constants.dart';
 import '../internal/enums.dart';
 import '../internal/map_interface.dart';
 
@@ -92,6 +94,7 @@ class PermissionRequestOption with IMapMixin {
       type: RequestType.common,
       mediaLocation: false,
     ),
+    this.ohosPermissions = PMConstants.vDefaultOhosPermissions,
   });
 
   /// See [IosAccessLevel].
@@ -100,16 +103,23 @@ class PermissionRequestOption with IMapMixin {
   /// See [AndroidPermission].
   final AndroidPermission androidPermission;
 
+  /// The requesting permission list for the OHOS.
+  final List<String> ohosPermissions;
+
   @override
   Map<String, dynamic> toMap() => <String, dynamic>{
         'iosAccessLevel': iosAccessLevel.index + 1,
         'androidPermission': androidPermission.toMap(),
+        'ohosPermissions': ohosPermissions,
       };
 
   @override
   bool operator ==(Object other) =>
       other is PermissionRequestOption &&
-      iosAccessLevel == other.iosAccessLevel;
+      iosAccessLevel == other.iosAccessLevel &&
+      androidPermission == other.androidPermission &&
+      ohosPermissions.every((p) => other.ohosPermissions.contains(p)) &&
+      other.ohosPermissions.every((n) => ohosPermissions.contains(n));
 
   @override
   int get hashCode => iosAccessLevel.hashCode;
@@ -117,6 +127,11 @@ class PermissionRequestOption with IMapMixin {
 
 /// The permission for android.
 class AndroidPermission with IMapMixin {
+  const AndroidPermission({
+    required this.type,
+    required this.mediaLocation,
+  });
+
   /// The type of your need.
   ///
   /// See [RequestType].
@@ -130,15 +145,82 @@ class AndroidPermission with IMapMixin {
   /// See it in [android](https://developer.android.com/reference/android/Manifest.permission#ACCESS_MEDIA_LOCATION).
   final bool mediaLocation;
 
-  /// The permission for android.
-  const AndroidPermission({
-    required this.type,
-    required this.mediaLocation,
-  });
-
   @override
   Map<String, dynamic> toMap() => <String, dynamic>{
         'type': type.value,
         'mediaLocation': mediaLocation,
       };
+}
+
+/// The extra information of the album type.
+class AlbumType {
+  const AlbumType({this.darwin, this.ohos});
+
+  /// The extra information of the album type on macOS and iOS.
+  final DarwinAlbumType? darwin;
+
+  /// The extra information of the album type on OpenHarmony.
+  final OhosAlbumType? ohos;
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! AlbumType) {
+      return false;
+    }
+    return darwin == other.darwin && ohos == other.ohos;
+  }
+
+  @override
+  int get hashCode => darwin.hashCode ^ ohos.hashCode;
+}
+
+/// The extra information of the album type on macOS and iOS.
+class DarwinAlbumType {
+  const DarwinAlbumType({this.subtype, this.type});
+
+  /// The darwin collection type, in android, the value is always null.
+  ///
+  /// If the [type] is 2, the value will be null.
+  ///
+  ///
+  final PMDarwinAssetCollectionType? type;
+
+  /// The darwin collection subtype, in android, the value is always null.
+  ///
+  /// If the [type] is 2, the value will be null.
+  ///
+  final PMDarwinAssetCollectionSubtype? subtype;
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! DarwinAlbumType) {
+      return false;
+    }
+    return type == other.type && subtype == other.subtype;
+  }
+
+  @override
+  int get hashCode => type.hashCode ^ subtype.hashCode;
+}
+
+/// The extra information of the album type on OpenHarmony.
+class OhosAlbumType {
+  const OhosAlbumType({this.subtype, this.type});
+
+  /// The type of the album on ohos.
+  final PMOhosAlbumType? type;
+
+  /// The subtype of the album on ohos.
+  final PMOhosAlbumSubtype? subtype;
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! OhosAlbumType) {
+      return false;
+    }
+    return type == other.type && subtype == other.subtype;
+  }
+
+  @override
+  int get hashCode => type.hashCode ^ subtype.hashCode;
 }

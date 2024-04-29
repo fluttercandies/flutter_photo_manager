@@ -247,8 +247,9 @@ class PhotoProvider extends ChangeNotifier {
   }
 
   /// For path filter option
-  var _pathFilterOption = const PMPathFilter();
   PMPathFilter get pathFilterOption => _pathFilterOption;
+  PMPathFilter _pathFilterOption = const PMPathFilter();
+
   List<PMDarwinAssetCollectionType> _pathTypeList =
       PMDarwinAssetCollectionType.values;
 

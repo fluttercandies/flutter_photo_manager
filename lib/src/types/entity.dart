@@ -8,6 +8,7 @@ import 'dart:typed_data' as typed_data;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
+import '../../platform_utils.dart';
 import '../filter/base_filter.dart';
 import '../filter/classical/filter_option_group.dart';
 import '../filter/path_filter.dart';
@@ -32,8 +33,17 @@ class AssetPathEntity {
     this.type = RequestType.common,
     this.isAll = false,
     PMFilter? filterOption,
+    @Deprecated(
+      'Use `albumTypeEx.darwin.type` instead. '
+      'This feature was deprecated after v3.1.0',
+    )
     this.darwinSubtype,
+    @Deprecated(
+      'Use `albumTypeEx.darwin.subtype` instead. '
+      'This feature was deprecated after v3.1.0',
+    )
     this.darwinType,
+    this.albumTypeEx,
   }) : filterOption = filterOption ??= FilterOptionGroup();
 
   /// Obtain an entity from ID.
@@ -98,12 +108,23 @@ class AssetPathEntity {
   /// The darwin collection type, in android, the value is always null.
   ///
   /// If the [albumType] is 2, the value will be null.
+  @Deprecated(
+    'Use `albumTypeEx.darwin.type` instead. '
+    'This feature was deprecated after v3.1.0',
+  )
   final PMDarwinAssetCollectionType? darwinType;
 
   /// The darwin collection subtype, in android, the value is always null.
   ///
   /// If the [albumType] is 2, the value will be null.
+  @Deprecated(
+    'Use `albumTypeEx.darwin.subtype` instead. '
+    'This feature was deprecated after v3.1.0',
+  )
   final PMDarwinAssetCollectionSubtype? darwinSubtype;
+
+  /// The extra information of the album type.
+  final AlbumType? albumTypeEx;
 
   /// Call this method to obtain new path entity.
   static Future<AssetPathEntity> obtainPathFromProperties({
@@ -269,8 +290,17 @@ class AssetPathEntity {
     RequestType? type,
     bool? isAll,
     PMFilter? filterOption,
+    @Deprecated(
+      'Use `albumTypeEx` instead. '
+      'This feature was deprecated after v3.1.0',
+    )
     PMDarwinAssetCollectionType? darwinType,
+    @Deprecated(
+      'Use `albumTypeEx` instead. '
+      'This feature was deprecated after v3.1.0',
+    )
     PMDarwinAssetCollectionSubtype? darwinSubtype,
+    AlbumType? albumTypeEx,
   }) {
     return AssetPathEntity(
       id: id ?? this.id,
@@ -280,8 +310,11 @@ class AssetPathEntity {
       type: type ?? this.type,
       isAll: isAll ?? this.isAll,
       filterOption: filterOption ?? this.filterOption,
+      // ignore: deprecated_member_use_from_same_package
       darwinSubtype: darwinSubtype ?? this.darwinSubtype,
+      // ignore: deprecated_member_use_from_same_package
       darwinType: darwinType ?? this.darwinType,
+      albumTypeEx: albumTypeEx ?? this.albumTypeEx,
     );
   }
 
@@ -295,7 +328,12 @@ class AssetPathEntity {
         albumType == other.albumType &&
         type == other.type &&
         lastModified == other.lastModified &&
-        isAll == other.isAll;
+        isAll == other.isAll &&
+        // ignore: deprecated_member_use_from_same_package
+        darwinType == other.darwinType &&
+        // ignore: deprecated_member_use_from_same_package
+        darwinSubtype == other.darwinSubtype &&
+        albumTypeEx == other.albumTypeEx;
   }
 
   @override
@@ -305,7 +343,12 @@ class AssetPathEntity {
       albumType.hashCode ^
       type.hashCode ^
       lastModified.hashCode ^
-      isAll.hashCode;
+      isAll.hashCode ^
+      // ignore: deprecated_member_use_from_same_package
+      darwinType.hashCode ^
+      // ignore: deprecated_member_use_from_same_package
+      darwinSubtype.hashCode ^
+      albumTypeEx.hashCode;
 
   @override
   String toString() {
@@ -682,7 +725,10 @@ class AssetEntity {
   }
 
   bool get _platformMatched =>
-      Platform.isIOS || Platform.isMacOS || Platform.isAndroid;
+      Platform.isIOS ||
+      Platform.isMacOS ||
+      Platform.isAndroid ||
+      PlatformUtils.isOhos;
 
   Future<File?> _getFile({
     bool isOrigin = false,
@@ -718,8 +764,13 @@ class AssetEntity {
     if (!_platformMatched) {
       return null;
     }
-    if (Platform.isAndroid &&
-        int.parse(await plugin.getSystemVersion()) >= 29) {
+    if (Platform.isAndroid) {
+      final sdkInt = int.parse(await plugin.getSystemVersion());
+      if (sdkInt > 29) {
+        return plugin.getOriginBytes(id, progressHandler: progressHandler);
+      }
+    }
+    if (PlatformUtils.isOhos) {
       return plugin.getOriginBytes(id, progressHandler: progressHandler);
     }
     final File? file = await originFile;

@@ -44,7 +44,9 @@ class _SimpleExampleApp extends StatelessWidget {
           colorSchemeSeed: Colors.blue,
         ),
         builder: (context, child) {
-          if (child == null) return const SizedBox.shrink();
+          if (child == null) {
+            return const SizedBox.shrink();
+          }
           return Banner(
             message: 'Debug',
             location: BannerLocation.bottomStart,

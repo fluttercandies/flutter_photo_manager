@@ -12,7 +12,7 @@ class ColumnNamesPage extends StatefulWidget {
 class _ColumnNamesPageState extends State<ColumnNamesPage> {
   List<String> _columns = [];
 
-  void _refresh() async {
+  Future<void> _refresh() async {
     final columns = await PhotoManager.plugin.androidColumns();
     print('columns: $columns');
     columns.sort();

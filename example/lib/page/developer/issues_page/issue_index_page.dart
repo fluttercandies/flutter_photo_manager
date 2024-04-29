@@ -28,7 +28,7 @@ class IssuePage extends StatelessWidget {
     for (final item in list) {
       if (item is StatefulWidget) {
         // ignore: invalid_use_of_protected_member
-        final state = (item).createState();
+        final state = item.createState();
         if (state is IssueBase) {
           if (state.supportCurrentPlatform()) {
             res.add(item);
@@ -49,32 +49,33 @@ class IssuePage extends StatelessWidget {
         title: const Text('Issue page list'),
       ),
       body: NavColumn(
-          titleBuilder: (w) {
-            if (w is StatefulWidget) {
-              // ignore: invalid_use_of_protected_member
-              final state = (w).createState();
+        titleBuilder: (w) {
+          if (w is StatefulWidget) {
+            // ignore: invalid_use_of_protected_member
+            final state = w.createState();
 
-              if (state is IssueBase) {
-                final issueNumber = state.issueNumber;
-                return 'Issue $issueNumber';
-              }
+            if (state is IssueBase) {
+              final issueNumber = state.issueNumber;
+              return 'Issue $issueNumber';
             }
-            return w.toStringShort();
-          },
-          children: currentPlatformWidgets(
-            context,
-            const <Widget>[
-              Issue734Page(),
-              Issue918Page(),
-              Issue962(),
-              Issue1025Page(),
-              Issue988(),
-              Issue1031Page(),
-              Issue979(),
-              Issus1051(),
-              Issus1053(),
-            ],
-          )),
+          }
+          return w.toStringShort();
+        },
+        children: currentPlatformWidgets(
+          context,
+          const <Widget>[
+            Issue734Page(),
+            Issue918Page(),
+            Issue962(),
+            Issue1025Page(),
+            Issue988(),
+            Issue1031Page(),
+            Issue979(),
+            Issus1051(),
+            Issus1053(),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -98,8 +99,9 @@ mixin IssueBase<T extends StatefulWidget> on State<T> {
     }
     return platforms
         .map((e) => e.toString().toLowerCase())
-        .where((element) =>
-            element.contains(Platform.operatingSystem.toLowerCase()))
+        .where(
+          (element) => element.contains(Platform.operatingSystem.toLowerCase()),
+        )
         .isNotEmpty;
   }
 
@@ -133,19 +135,21 @@ mixin IssueBase<T extends StatefulWidget> on State<T> {
       icon: const Icon(Icons.info),
       onPressed: () {
         Clipboard.setData(ClipboardData(text: issueUrl));
-        showToastWidget(Material(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.black87,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              'The issue of $issueNumber was been copied.',
-              style: const TextStyle(color: Colors.white),
+        showToastWidget(
+          Material(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.black87,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'The issue of $issueNumber was been copied.',
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
           ),
-        ));
+        );
       },
       tooltip: 'Copy issue url to clipboard.',
     );

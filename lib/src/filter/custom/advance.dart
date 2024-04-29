@@ -29,9 +29,6 @@ import 'order_by_item.dart';
 ///
 /// {@endtemplate}
 class AdvancedCustomFilter extends CustomFilter {
-  final List<WhereConditionItem> _whereItemList = [];
-  final List<OrderByItem> _orderByItemList = [];
-
   /// {@macro PM.AdvancedCustomFilter}
   AdvancedCustomFilter({
     List<WhereConditionItem> where = const [],
@@ -40,6 +37,9 @@ class AdvancedCustomFilter extends CustomFilter {
     _whereItemList.addAll(where);
     _orderByItemList.addAll(orderBy);
   }
+
+  final List<WhereConditionItem> _whereItemList = [];
+  final List<OrderByItem> _orderByItemList = [];
 
   /// Add a [WhereConditionItem] to the filter.
   AdvancedCustomFilter addWhereCondition(
@@ -101,15 +101,6 @@ extension LogicalTypeExtension on LogicalType {
 ///
 /// {@endtemplate}
 abstract class WhereConditionItem {
-  /// The text of the condition.
-  String get text;
-
-  /// The logical operator used in the [CustomFilter].
-  ///
-  /// See also:
-  /// - [LogicalType]
-  LogicalType logicalType = LogicalType.and;
-
   /// The default constructor.
   WhereConditionItem({this.logicalType = LogicalType.and});
 
@@ -120,6 +111,15 @@ abstract class WhereConditionItem {
   }) {
     return TextWhereCondition(text, type: type);
   }
+
+  /// The text of the condition.
+  String get text;
+
+  /// The logical operator used in the [CustomFilter].
+  ///
+  /// See also:
+  /// - [LogicalType]
+  LogicalType logicalType = LogicalType.and;
 
   /// The platform values.
   ///
@@ -200,10 +200,10 @@ abstract class WhereConditionItem {
 ///
 /// {@endtemplate}
 class WhereConditionGroup extends WhereConditionItem {
-  final List<WhereConditionItem> items = [];
-
   /// {@macro PM.column_where_condition_group}
   WhereConditionGroup();
+
+  final List<WhereConditionItem> items = [];
 
   /// Add a [WhereConditionItem] to the group.
   ///
@@ -320,11 +320,19 @@ bool _checkOtherColumn(String column) {
 ///
 /// {@endtemplate}
 class ColumnWhereCondition extends WhereConditionItem {
-  ///   - Android: the column name in the MediaStore database.
-  ///   - iOS/macOS: the field with the PHAsset.
+  /// {@macro PM.column_where_condition}
+  ColumnWhereCondition({
+    required this.column,
+    required this.operator,
+    required this.value,
+    this.needCheck = true,
+  });
+
+  ///  - Android: the column name in the MediaStore database.
+  ///  - iOS/macOS: the field with the PHAsset.
   final String column;
 
-  /// such as: `=`, `>`, `>=`, `!=`, `like`, `in`, `between`, `is null`, `is not null`.
+  /// `=`, `>`, `>=`, `!=`, `like`, `in`, `between`, `is null`, `is not null`
   final String? operator;
 
   /// The value of the condition.
@@ -335,26 +343,21 @@ class ColumnWhereCondition extends WhereConditionItem {
   /// If false, don't check the column.
   final bool needCheck;
 
-  /// {@macro PM.column_where_condition}
-  ColumnWhereCondition({
-    required this.column,
-    required this.operator,
-    required this.value,
-    this.needCheck = true,
-  }) : super();
-
   @override
   String get text {
     if (needCheck && _checkDateColumn(column)) {
-      assert(needCheck && _checkDateColumn(column),
-          'The column: $column is date type, please use DateColumnWhereCondition');
-
+      assert(
+        needCheck && _checkDateColumn(column),
+        'The column: $column is date type, please use DateColumnWhereCondition',
+      );
       return '';
     }
 
     if (needCheck && !_checkOtherColumn(column)) {
-      assert(needCheck && !_checkOtherColumn(column),
-          'The $column is not support the platform, please check.');
+      assert(
+        needCheck && !_checkOtherColumn(column),
+        'The $column is not support the platform, please check.',
+      );
       return '';
     }
 
@@ -378,6 +381,13 @@ class ColumnWhereCondition extends WhereConditionItem {
 ///
 /// {@endtemplate}
 class DateColumnWhereCondition extends WhereConditionItem {
+  DateColumnWhereCondition({
+    required this.column,
+    required this.operator,
+    required this.value,
+    this.checkColumn = true,
+  }) : super();
+
   /// The column name of the date type.
   final String column;
 
@@ -388,29 +398,27 @@ class DateColumnWhereCondition extends WhereConditionItem {
   final DateTime value;
   final bool checkColumn;
 
-  DateColumnWhereCondition({
-    required this.column,
-    required this.operator,
-    required this.value,
-    this.checkColumn = true,
-  }) : super();
-
   @override
   String get text {
     if (checkColumn && !_checkDateColumn(column)) {
-      assert(checkColumn && !_checkDateColumn(column),
-          'The date column just support createDate, modifiedDate, dateTaken, dateExpires');
+      assert(
+        checkColumn && !_checkDateColumn(column),
+        'Only `createDate`, `modifiedDate`, `dateTaken`,'
+        'and `dateExpires` are support.',
+      );
       return '';
     }
     final sb = StringBuffer();
     sb.write(column);
     sb.write(' $operator ');
-    var isSecond = true;
+    bool isSecond = true;
     if (Platform.isAndroid) {
       isSecond = column != CustomColumns.android.dateTaken;
     }
-    final sql =
-        CustomColumns.utils.convertDateTimeToSql(value, isSeconds: isSecond);
+    final sql = CustomColumns.utils.convertDateTimeToSql(
+      value,
+      isSeconds: isSecond,
+    );
     sb.write(' $sql');
     return sb.toString();
   }
@@ -440,12 +448,11 @@ class DateColumnWhereCondition extends WhereConditionItem {
 ///
 /// {@endtemplate}
 class TextWhereCondition extends WhereConditionItem {
-  @override
-  final String text;
-
   /// {@macro PM.text_where_condition}
   TextWhereCondition(
     this.text, {
     LogicalType type = LogicalType.and,
   }) : super(logicalType: type);
+  @override
+  final String text;
 }

@@ -4,9 +4,9 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_example/page/custom_filter/path_page.dart';
 
 class FilterPathList extends StatelessWidget {
-  final CustomFilter filter;
-
   const FilterPathList({super.key, required this.filter});
+
+  final CustomFilter filter;
 
   @override
   Widget build(BuildContext context) {

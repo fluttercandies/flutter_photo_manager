@@ -4,43 +4,14 @@ on:
   push:
     branches:
       - main
-    paths:
-      - .github/workflows/runnable.yml
-      - 'lib/**'
-      - 'test/**'
-      - 'android/**'
-      - 'ios/**'
-      - 'example/lib/**'
-      - 'example/test/**'
-      - 'example/android/**'
-      - 'example/ios/**'
-      - 'example/macos/**'
-      - 'pubspec.yaml'
-      - 'example/pubspec.yaml'
-      - 'analysis_options.yaml'
-      - 'example/analysis_options.yaml'
-      - 'copy_on_publish.sh'
-      - 'CHANGELOG.md'
+    paths-ignore:
+      - "**.md"
   pull_request:
     branches:
       - main
-    paths:
-      - .github/workflows/runnable.yml
-      - 'lib/**'
-      - 'test/**'
-      - 'android/**'
-      - 'ios/**'
-      - 'example/lib/**'
-      - 'example/test/**'
-      - 'example/android/**'
-      - 'example/ios/**'
-      - 'example/macos/**'
-      - 'pubspec.yaml'
-      - 'example/pubspec.yaml'
-      - 'analysis_options.yaml'
-      - 'example/analysis_options.yaml'
-      - 'copy_on_publish.sh'
-      - 'CHANGELOG.md'
+    paths-ignore:
+      - "**.md"
+
 jobs:
   analyze:
     name: Analyze on ${{ matrix.os }}
@@ -67,8 +38,12 @@ jobs:
         run: flutter pub get
       - name: Check Dart code formatting
         run: dart format . -o none --set-exit-if-changed
-      - name: Analyze Dart code
-        run: flutter analyze .
+      - name: Analyze lib
+        run: flutter analyze lib
+      - name: Analyze example
+        run: flutter analyze example
+#      - name: Analyze example_ohos
+#        run: flutter analyze example_ohos
       - name: Run tests
         run: flutter test
       - name: Generate docs
@@ -93,7 +68,9 @@ jobs:
       - name: Prepare dependencies
         run: flutter pub get
       - name: Copy before dry run
-        run: ./copy_on_publish.sh
+        run: |
+          chmod +x ./copy_on_publish.sh
+          ./copy_on_publish.sh
       - name: Publish dry run
         uses: k-paxian/dart-package-publisher@master
         with:

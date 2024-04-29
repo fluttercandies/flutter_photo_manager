@@ -6,21 +6,18 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../platform_utils.dart';
 import '../../utils/column_utils.dart';
 
 /// {@template custom_columns}
 ///
 /// A class that contains the names of the columns used in the custom filter.
 ///
-/// The names of the columns are different on different platforms.
-///
-/// For example, the `width` column on Android is `width`, but on iOS it is `pixelWidth`.
-///
+/// The names of the columns are different on different platforms. For example,
+/// the `width` column on Android is `width`, but on iOS it is `pixelWidth`.
 /// The definition of the column name can be found in next link:
-///
-/// Android: https://developer.android.com/reference/android/provider/MediaStore.MediaColumns
-///
-/// iOS: https://developer.apple.com/documentation/photokit/phasset
+///  - Android: https://developer.android.com/reference/android/provider/MediaStore.MediaColumns
+///  - iOS: https://developer.apple.com/documentation/photokit/phasset
 ///
 /// Special Columns to see [AndroidMediaColumns] and [DarwinColumns].
 ///
@@ -31,6 +28,9 @@ import '../../utils/column_utils.dart';
 ///
 /// {@endtemplate}
 class CustomColumns {
+  /// {@macro custom_columns}
+  const CustomColumns();
+
   /// The base columns, contains the common columns.
   static const CustomColumns base = CustomColumns();
 
@@ -40,10 +40,10 @@ class CustomColumns {
   /// The darwin columns, contains the ios and macos specific columns.
   static const DarwinColumns darwin = DarwinColumns();
 
-  static const ColumnUtils utils = ColumnUtils.instance;
+  /// The ohos columns, contains the ohos specific columns.
+  static const AndroidMediaColumns ohos = AndroidMediaColumns();
 
-  /// {@macro custom_columns}
-  const CustomColumns();
+  static const ColumnUtils utils = ColumnUtils.instance;
 
   /// Whether the current platform is android.
   bool get isAndroid => Platform.isAndroid;
@@ -51,15 +51,19 @@ class CustomColumns {
   /// Whether the current platform is ios or macos.
   bool get isDarwin => Platform.isIOS || Platform.isMacOS;
 
+  /// Whether the current platform is OpenHarmony OS.
+  bool get isOhos => PlatformUtils.isOhos;
+
   /// The id column.
   String get id {
     if (isAndroid) {
       return '_id';
     } else if (isDarwin) {
       return 'localIdentifier';
-    } else {
-      throw UnsupportedError('Unsupported platform with id');
+    } else if (isOhos) {
+      return 'uri';
     }
+    throw UnsupportedError('Unsupported platform with id');
   }
 
   /// The media type column.
@@ -76,7 +80,7 @@ class CustomColumns {
   /// - 2: video
   /// - 3: audio
   String get mediaType {
-    if (isAndroid) {
+    if (isAndroid || isOhos) {
       return 'media_type';
     } else if (isDarwin) {
       return 'mediaType';
@@ -91,7 +95,7 @@ class CustomColumns {
   ///
   /// In iOS/macOS, the value of this column not null.
   String get width {
-    if (isAndroid) {
+    if (isAndroid || isOhos) {
       return 'width';
     } else if (isDarwin) {
       return 'pixelWidth';
@@ -106,7 +110,7 @@ class CustomColumns {
   ///
   /// In iOS/macOS, the value of this column not null.
   String get height {
-    if (isAndroid) {
+    if (isAndroid || isOhos) {
       return 'height';
     } else if (isDarwin) {
       return 'pixelHeight';
@@ -121,7 +125,7 @@ class CustomColumns {
   ///
   /// In iOS/macOS, the value of this column is 0 when the media is image.
   String get duration {
-    if (isAndroid) {
+    if (isAndroid || isOhos) {
       return 'duration';
     } else if (isDarwin) {
       return 'duration';
@@ -154,7 +158,7 @@ class CustomColumns {
   ///
   /// {@endtemplate}
   String get createDate {
-    if (isAndroid) {
+    if (isAndroid || isOhos) {
       return 'date_added';
     } else if (isDarwin) {
       return 'creationDate';
@@ -167,7 +171,7 @@ class CustomColumns {
   ///
   /// {@macro date_column}
   String get modifiedDate {
-    if (isAndroid) {
+    if (isAndroid || isOhos) {
       return 'date_modified';
     } else if (isDarwin) {
       return 'modificationDate';
@@ -182,7 +186,7 @@ class CustomColumns {
   ///
   ///
   String get isFavorite {
-    if (isAndroid) {
+    if (isAndroid || isOhos) {
       return 'is_favorite';
     } else if (isDarwin) {
       return 'favorite';
@@ -229,6 +233,8 @@ class CustomColumns {
       return const AndroidMediaColumns().getValues();
     } else if (Platform.isIOS || Platform.isMacOS) {
       return const DarwinColumns().getValues();
+    } else if (PlatformUtils.isOhos) {
+      return const OhosColumns().getValues();
     } else {
       throw UnsupportedError('Unsupported platform with platformValues');
     }
@@ -449,19 +455,59 @@ class DarwinColumns extends CustomColumns {
   }
 }
 
+/// A class that contains the names of the columns used in the custom filter.
+///
+/// About the values mean, please see document of ohos: https://developer.android.com/reference/android/provider/MediaStore
+class OhosColumns extends CustomColumns {
+  const OhosColumns();
+
+  String _getKey(String value) {
+    if (isOhos) {
+      return value;
+    } else {
+      throw UnsupportedError('Unsupported column $value in platform');
+    }
+  }
+
+  String get displayName => _getKey('display_name');
+
+  String get size => _getKey('size');
+
+  String get dateTaken => _getKey('date_taken');
+
+  String get orientation => _getKey('orientation');
+
+  String get title => _getKey('title');
+
+  @override
+  List<String> getValues() {
+    return [
+      ...super.getValues(),
+      displayName,
+      size,
+      dateTaken,
+      orientation,
+      title,
+    ];
+  }
+
+  static List<String> values() {
+    return const OhosColumns().getValues();
+  }
+}
+
 /// Where item class
 ///
 /// If text() throws an exception, it will return an empty string.
 class WhereItem {
+  const WhereItem(this.column, this.condition);
+
   final ValueGetter<String> column;
-
   final ValueGetter<String> condition;
-
-  WhereItem(this.column, this.condition);
 
   String text() {
     try {
-      return "${column()} ${condition()}";
+      return '${column()} ${condition()}';
     } on UnsupportedError {
       return '';
     }

@@ -6,7 +6,17 @@ that can be found in the LICENSE file. -->
 
 To know more about breaking changes, see the [Migration Guide][].
 
-## 3.0.1
+## 3.1.0
+
+### Breaking changes
+
+- `AssetPathEntity.darwinType` and `AssetPathEntity.darwinSubtype` are deprecated.
+
+See the [Migration Guide][] for details of breaking changes.
+
+### Features
+
+- Support OpenHarmony.
 
 ### Fixes
 

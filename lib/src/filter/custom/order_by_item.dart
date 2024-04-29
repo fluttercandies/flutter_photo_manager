@@ -20,12 +20,6 @@
 ///
 /// {@endtemplate}
 class OrderByItem {
-  /// The column name.
-  final String column;
-
-  /// The order type.
-  final bool isAsc;
-
   /// {@macro PM.order_by_item}
   const OrderByItem(this.column, this.isAsc);
 
@@ -40,6 +34,12 @@ class OrderByItem {
     required this.column,
     this.isAsc = true,
   });
+
+  /// The column name.
+  final String column;
+
+  /// The order type.
+  final bool isAsc;
 
   /// Convert to the map.
   Map toMap() {

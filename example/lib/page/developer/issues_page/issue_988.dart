@@ -65,11 +65,11 @@ class _Issue988State extends State<Issue988> with IssueBase {
       decoration: const InputDecoration(
         hintText: 'Filter with name',
       ),
-      onChanged: ((value) {
+      onChanged: (value) {
         filterList = list.where((element) {
           return element.name.toLowerCase().contains(value.toLowerCase());
         }).toList();
-      }),
+      },
     );
   }
 
@@ -110,12 +110,12 @@ class __DeleteAssetImageListState extends State<_DeleteAssetImageList> {
   Future<void> loadAssets({int count = 100}) async {
     widget.path;
 
-    widget.path
-        .getAssetListRange(start: 0, end: count)
-        .then((value) => setState(() {
-              assetList.clear();
-              assetList.addAll(value);
-            }));
+    widget.path.getAssetListRange(start: 0, end: count).then(
+          (value) => setState(() {
+            assetList.clear();
+            assetList.addAll(value);
+          }),
+        );
   }
 
   @override
