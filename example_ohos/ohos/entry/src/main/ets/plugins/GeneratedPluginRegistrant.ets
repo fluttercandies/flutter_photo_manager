@@ -1,9 +1,8 @@
-import FlutterEngine from '@ohos/flutter_ohos/src/main/ets/embedding/engine/FlutterEngine';
-import Log from '@ohos/flutter_ohos/src/main/ets/util/Log';
-import PathProviderPlugin from '@ohos/path_provider_ohos'
-import PhotoManagerPlugin from '@ohos/photo_manager'
-import UrlLauncherPlugin from '@ohos/url_launcher_ohos'
-import VideoPlayerPlugin from '@ohos/video_player_ohos'
+import { FlutterEngine, Log } from '@ohos/flutter_ohos';
+import PathProviderPlugin from 'path_provider_ohos';
+import PhotoManagerPlugin from 'photo_manager';
+import UrlLauncherPlugin from 'url_launcher_ohos';
+import VideoPlayerPlugin from 'video_player_ohos';
 
 /**
  * Generated file. Do not edit.

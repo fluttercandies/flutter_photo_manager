@@ -16,9 +16,11 @@ export class PermissionHandler extends HandlerBase implements MethodCallHandlerB
       case 'openSetting': {
         let applicationInfo = this.context!.applicationInfo;
         let wantInfo: Want = {
-          action: 'action.settings.app.info',
+          bundleName: 'com.huawei.hmos.settings',
+          abilityName: 'com.huawei.hmos.settings.MainAbility',
+          uri: 'application_info_entry',
           parameters: {
-            settingsParamBundleName: applicationInfo.name
+            pushParams: applicationInfo.name
           }
         }
         await this.uiContext!.startAbility(wantInfo);
