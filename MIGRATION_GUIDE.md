@@ -7,6 +7,8 @@ If you want to see the new feature support, please refer to [readme][] and [chan
 * [Migration Guide](#migration-guide)
   * [3.0.x to 3.1](#30x-to-31)
     * [Overall](#overall)
+      * [`containsLivePhotos`](#containslivephotos)
+      * [`AlbumType`](#albumtype)
   * [2.x to 3.0](#2x-to-30)
     * [Overall](#overall-1)
       * [`AssetEntityImage` and `AssetEntityImageProvider`](#assetentityimage-and-assetentityimageprovider)
@@ -29,6 +31,15 @@ If you want to see the new feature support, please refer to [readme][] and [chan
 ## 3.0.x to 3.1
 
 ### Overall
+
+- `containsLivePhotos` now defaults to `false` instead of `true`.
+- `AssetPathEntity.darwinType` and `AssetPathEntity.darwinSubtype` are deprecated.
+
+#### `containsLivePhotos`
+
+Live Photos are used to being obtained when querying images and videos, the behavior sometimes causes drama that users don't want to see images when getting videos. The flag is now disabled by default.
+
+#### `AlbumType`
 
 The extra information of the album type has been abstract as `AlbumType`
 which contains Darwin (iOS/macOS) and OpenHarmony album information.
