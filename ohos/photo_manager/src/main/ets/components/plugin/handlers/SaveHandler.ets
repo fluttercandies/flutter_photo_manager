@@ -73,40 +73,29 @@ export class SaveHandler extends HandlerBase implements MethodCallHandlerBase {
     if (!(await PermissionHandler.permissionWriteCheck())) {
       result.error('no ohos.permission.WRITE_IMAGEVIDEO', '', '');
     }
-    let title: string = args.get('title');
-    let extension: string = photoType == photoAccessHelper.PhotoType.IMAGE ? 'jpg' : 'mp4';
-    if (title != undefined && title.includes('.')) {
-      let list: Array<string> = title.split('.')
-      if (list.length == 2) {
-        title = list[0];
-        extension = list[1];
-      }
-    }
-    let phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.uiContext);
-    let createOptions: photoAccessHelper.CreateOptions = {};
-    if (title != undefined) {
-      createOptions = {
-        title: title,
-      };
-    }
+
     try {
-      let path = await phAccessHelper.createAsset(photoType, extension, createOptions);
-      let file = fs.openSync(path, fs.OpenMode.WRITE_ONLY | fs.OpenMode.CREATE);
-      // if (buffer != undefined) {
-      let writeLen = await fs.write(file.fd, buffer);
-      // }
-      // else if (srcUri != undefined) {
-      //   await fs.copyFile(srcUri, path,);
-      // }
-
-      await fs.close(file.fd);
-      // can't find it if we do it right now
-      await new Promise<void>((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 1000);
-      });
-
+      let title: string = args.get('title');
+      let extension: string = photoType == photoAccessHelper.PhotoType.IMAGE ? 'jpg' : 'mp4';
+      if (title != undefined && title.includes('.')) {
+        let list: Array<string> = title.split('.')
+        if (list.length == 2) {
+          title = list[0];
+          extension = list[1];
+        }
+      }
+      let createOptions: photoAccessHelper.CreateOptions = {};
+      if (title != undefined) {
+        createOptions = {
+          title: title,
+        };
+      }
+      let phAccessHelper = photoAccessHelper.getPhotoAccessHelper(this.uiContext);
+      let assetChangeRequest: photoAccessHelper.MediaAssetChangeRequest = photoAccessHelper.MediaAssetChangeRequest.createAssetRequest(this.uiContext, photoType, extension, createOptions);
+      assetChangeRequest.addResource(photoType == photoAccessHelper.PhotoType.IMAGE ? photoAccessHelper.ResourceType.IMAGE_RESOURCE : photoAccessHelper.ResourceType.VIDEO_RESOURCE, buffer);
+      await phAccessHelper.applyChanges(assetChangeRequest);
+      let asset = assetChangeRequest.getAsset();
+      let path = asset.uri;
       let photoAsset: photoAccessHelper.PhotoAsset | null = await PhotoAssetHandler.getPhotoAsset(path);
       if (photoAsset != null) {
         result.success(PhotoAssetHandler.photoAssetToMap(photoAsset));

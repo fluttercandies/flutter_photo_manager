@@ -35,7 +35,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
           ));
         }
         else {
-          result.error('', '', '');
+          result.error(`${call.method} failed`, `not find assets by ${args}`, null);
         }
       }
         break;
@@ -51,7 +51,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
           result.success(photoAsset.uri);
         }
         else {
-          result.error('', '', '');
+          result.error(`${call.method} failed`, `not find asset by ${id}`, null);
         }
       }
         break;
@@ -72,7 +72,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
           result.success(new Uint8Array(arrayBuffer));
         }
         else {
-          result.error('', '', '');
+          result.error(`${call.method} failed`, `not find asset by ${args}`, null);
         }
       }
         break;
@@ -124,7 +124,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
           result.success(uint8Array);
         }
         else {
-          result.error('', '', '');
+          result.error(`${call.method} failed`, `not find asset by ${args}`, null);
         }
       }
         break;
@@ -145,7 +145,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
           ));
         }
         else {
-          result.error('', '', '');
+          result.error(`${call.method} failed`, `not find assets by ${args}`, null);
         }
       }
         break;
@@ -171,7 +171,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
             data.push(...assets);
           }
           else {
-            result.error('', '', '');
+            result.error(`${call.method} failed`, `not find assets by ${args}`, null);
             return true;
           }
         }

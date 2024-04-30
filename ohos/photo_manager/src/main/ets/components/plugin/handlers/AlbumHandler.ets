@@ -61,7 +61,7 @@ export class AlbumHandler extends HandlerBase implements MethodCallHandlerBase {
           result.success(album.count);
         }
         else {
-          result.error('', '', '');
+          result.error(`${call.method} failed`, `not find album by ${id}`, null);
         }
       }
         break;
@@ -79,7 +79,7 @@ export class AlbumHandler extends HandlerBase implements MethodCallHandlerBase {
           ));
         }
         else {
-          result.error('', '', '');
+          result.error(`${call.method} failed`, `not find album by ${id}`, null);
         }
       }
         break;
