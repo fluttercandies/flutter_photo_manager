@@ -38,7 +38,7 @@ class FilterOptionGroup extends PMFilter {
     FilterOption videoOption = const FilterOption(),
     FilterOption audioOption = const FilterOption(),
     bool containsPathModified = false,
-    this.containsLivePhotos = true,
+    this.containsLivePhotos = false,
     this.onlyLivePhotos = false,
     DateTimeCond? createTimeCond,
     DateTimeCond? updateTimeCond,
@@ -65,10 +65,10 @@ class FilterOptionGroup extends PMFilter {
 
   /// Whether the result should contain live photos.
   ///
-  /// Defaults to `true`.
+  /// Defaults to `false`.
   ///
   /// This option only takes effects on iOS.
-  bool containsLivePhotos = true;
+  bool containsLivePhotos = false;
 
   final Map<AssetType, FilterOption> _map = <AssetType, FilterOption>{};
 
