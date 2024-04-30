@@ -11,6 +11,7 @@ To know more about breaking changes, see the [Migration Guide][].
 ### Breaking changes
 
 - `AssetPathEntity.darwinType` and `AssetPathEntity.darwinSubtype` are deprecated.
+- `containsLivePhotos` now defaults to `false`.
 
 See the [Migration Guide][] for details of breaking changes.
 
