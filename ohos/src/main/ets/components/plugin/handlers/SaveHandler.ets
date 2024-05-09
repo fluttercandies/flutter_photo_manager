@@ -78,10 +78,10 @@ export class SaveHandler extends HandlerBase implements MethodCallHandlerBase {
       let title: string = args.get('title');
       let extension: string = photoType == photoAccessHelper.PhotoType.IMAGE ? 'jpg' : 'mp4';
       if (title != undefined && title.includes('.')) {
-        let list: Array<string> = title.split('.')
-        if (list.length == 2) {
-          title = list[0];
-          extension = list[1];
+        const lastIndex = title.lastIndexOf('.');
+        if (lastIndex > 0 && lastIndex < title.length -1) {
+          extension = title.slice(lastIndex + 1);
+          title = title.slice(0, lastIndex);
         }
       }
       let createOptions: photoAccessHelper.CreateOptions = {};
