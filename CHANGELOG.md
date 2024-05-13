@@ -6,6 +6,12 @@ that can be found in the LICENSE file. -->
 
 To know more about breaking changes, see the [Migration Guide][].
 
+## 3.1.1
+
+### Improvements
+
+* Update plugin structure for OpenHarmony
+
 ## 3.1.0
 
 ### Breaking changes
