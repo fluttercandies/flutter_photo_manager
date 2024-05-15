@@ -421,7 +421,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
     // let size = this.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.SIZE);
     let date_added = PhotoAssetHandler.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.DATE_ADDED);
     let date_modified = PhotoAssetHandler.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.DATE_MODIFIED);
-    let duration = PhotoAssetHandler.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.DURATION);
+    let duration: number = PhotoAssetHandler.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.DURATION) as number;
     let width = PhotoAssetHandler.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.WIDTH);
     let height = PhotoAssetHandler.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.HEIGHT);
     // let date_taken = this.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.DATE_TAKEN);
@@ -436,7 +436,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
         ['type', photoAsset.photoType],
         ['width', width],
         ['height', height],
-        ['duration', duration],
+        ['duration', Math.ceil(duration / 1000)],
         ['orientation', orientation],
         ['favorite', is_favorite == 1],
         // dart 会根据 title 获取图片类型，所以这里返回文件路径比较好
