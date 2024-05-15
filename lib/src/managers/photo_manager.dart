@@ -127,6 +127,7 @@ class PhotoManager {
   /// call the [getAssetPathList] to start again.
   ///
   /// Make sure callers of this method have `await`ed properly.
+  /// This method is not support on OpenHarmony
   static Future<void> releaseCache() => plugin.releaseCache();
 
   /// {@macro photo_manager.NotifyManager.addChangeCallback}
@@ -171,6 +172,7 @@ class PhotoManager {
   static Future<String> systemVersion() => plugin.getSystemVersion();
 
   /// Clear all file caches.
+  /// This method is not support on OpenHarmony
   static Future<void> clearFileCache() => plugin.clearFileCache();
 
   /// Returns the count of assets.

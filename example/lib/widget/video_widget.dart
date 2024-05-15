@@ -2,9 +2,19 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photo_manager/platform_utils.dart';
 import 'package:video_player/video_player.dart';
 
 import '../util/log.dart';
+
+class VideoPlayerControllerHelper {
+  static VideoPlayerController? Function(
+    int fileFd, {
+    Future<ClosedCaptionFile>? closedCaptionFile,
+    VideoPlayerOptions? videoPlayerOptions,
+    Map<String, String> httpHeaders,
+  })? fileFd;
+}
 
 class VideoWidget extends StatefulWidget {
   const VideoWidget({
@@ -61,17 +71,31 @@ class _VideoWidgetState extends State<VideoWidget> {
   }
 
   void _initVideoWithFile() {
-    widget.entity.file.then((File? file) {
-      _stopwatch.stop();
-      Log.d('Elapsed time for `file`: ${_stopwatch.elapsed}');
-      if (!mounted || file == null) {
-        return;
-      }
-      _controller = VideoPlayerController.file(file)
-        ..initialize()
-        ..addListener(() => setState(() {}));
-      setState(() {});
-    });
+    if (PlatformUtils.isOhos) {
+      widget.entity.fileFd().then((int? fd) {
+        _stopwatch.stop();
+        Log.d('Elapsed time for `file`: ${_stopwatch.elapsed}');
+        if (!mounted || fd == null) {
+          return;
+        }
+        _controller = VideoPlayerControllerHelper.fileFd!.call(fd)!
+          ..initialize()
+          ..addListener(() => setState(() {}));
+        setState(() {});
+      });
+    } else {
+      widget.entity.file.then((File? file) {
+        _stopwatch.stop();
+        Log.d('Elapsed time for `file`: ${_stopwatch.elapsed}');
+        if (!mounted || file == null) {
+          return;
+        }
+        _controller = VideoPlayerController.file(file)
+          ..initialize()
+          ..addListener(() => setState(() {}));
+        setState(() {});
+      });
+    }
   }
 
   void _initVideoWithMediaUrl() {

@@ -821,6 +821,12 @@ class AssetEntity {
   ///  * https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_conc/understand_utis_conc.html#//apple_ref/doc/uid/TP40001319-CH202-SW1
   Future<String?> get mimeTypeAsync => plugin.getMimeTypeAsync(this);
 
+  /// Returns the fd of this photo access.
+  /// It's only work on OpenHarmony
+  Future<int?> fileFd() async {
+    return plugin.getFileFd(id);
+  }
+
   AssetEntity copyWith({
     String? id,
     int? typeInt,

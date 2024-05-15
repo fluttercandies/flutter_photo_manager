@@ -1000,28 +1000,14 @@ PhotoManager.editor.darwin.deletePath();
 
 #### Features for OpenHarmony
 
-It supports following features for now and only support image and video types.
+Currently, most functions are supported, except for those related to caching. and only support image and video types.
 
-| Feature                 | OpenHarmony |
-| :---------------------- | :---------: |
-| getAssetPathList        |      ✅      |
-| getAssetCountFromPath   |      ✅      |
-| fetchPathProperties     |      ✅      |
-| getAssetCount           |      ✅      |
-| getAssetListPaged       |      ✅      |
-| getOriginBytes          |      ✅      |
-| getThumb                |      ✅      |
-| getAssetListRange       |      ✅      |
-| getAssetsByRange        |      ✅      |
-| deleteWithIds           |      ✅      |
-| getColumnNames          |      ✅      |
-| saveImage               |      ✅      |
-| saveImageWithPath       |      ✅      |
-| saveVideo               |      ✅      |
-| requestPermissionExtend |      ✅      |
-| ignorePermissionCheck   |      ✅      |
-| log                     |      ✅      |
-| notify                  |      ✅      |
+| Feature                        | OpenHarmony |
+| :----------------------------- | :---------: |
+| releaseCache                   |      ❌      |
+| clearFileCache                 |      ❌      |
+| requestCacheAssetsThumbnail    |      ❌      |
+| getSubPathEntities             |      ❌      |
 
 
 [pub package]: https://pub.dev/packages/photo_manager

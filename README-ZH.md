@@ -932,28 +932,14 @@ PhotoManager.editor.darwin.deletePath();
 
 #### 适用于 OpenHarmony 的功能
 
-暂时支持下面的功能,目前鸿蒙只支持图片和视频 2 种资源类型。
+目前支持大部分的功能，除了跟缓存相关。目前鸿蒙只支持图片和视频 2 种资源类型。
 
-| Feature                 | OpenHarmony |
-| :---------------------- | :---------: |
-| getAssetPathList        |      ✅      |
-| getAssetCountFromPath   |      ✅      |
-| fetchPathProperties     |      ✅      |
-| getAssetCount           |      ✅      |
-| getAssetListPaged       |      ✅      |
-| getOriginBytes          |      ✅      |
-| getThumb                |      ✅      |
-| getAssetListRange       |      ✅      |
-| getAssetsByRange        |      ✅      |
-| deleteWithIds           |      ✅      |
-| getColumnNames          |      ✅      |
-| saveImage               |      ✅      |
-| saveImageWithPath       |      ✅      |
-| saveVideo               |      ✅      |
-| requestPermissionExtend |      ✅      |
-| ignorePermissionCheck   |      ✅      |
-| log                     |      ✅      |
-| notify                  |      ✅      |
+| Feature                        | OpenHarmony |
+| :----------------------------- | :---------: |
+| releaseCache                   |      ❌      |
+| clearFileCache                 |      ❌      |
+| requestCacheAssetsThumbnail    |      ❌      |
+| getSubPathEntities             |      ❌      |
 
 
 [pub package]: https://pub.flutter-io.cn/packages/photo_manager
