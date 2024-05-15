@@ -16,6 +16,9 @@ dependencies:
     path: ../example
 
   photo_manager_image_provider: # override
+  video_player: # override
+  url_launcher: # override
+  path_provider: # override
 
 dev_dependencies:
   flutter_lints: any

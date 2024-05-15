@@ -6,6 +6,7 @@ import { RequestType } from '../types/RequestType';
 import { dataSharePredicates } from '@kit.ArkData';
 import PhotoManagerPlugin from '../PhotoManagerPlugin';
 import { PermissionHandler } from './PermissionHandler';
+import { PhotoAssetHandler } from './PhotoAssetHandler';
 import { AsyncCallback } from '@ohos.base';
 import { MapUtils } from '../utils/MapUtils';
 
@@ -246,6 +247,13 @@ export class AlbumHandler extends HandlerBase implements MethodCallHandlerBase {
 
     return new AllAlbum(requestType, assets.getCount());
 
+  }
+
+  static async copyToAlbum(album: photoAccessHelper.Album, photoAsset: photoAccessHelper.PhotoAsset): Promise<void> {
+    let phAccessHelper = photoAccessHelper.getPhotoAccessHelper(PhotoManagerPlugin.uiContext);
+    let albumChangeRequest = new photoAccessHelper.MediaAlbumChangeRequest(album);
+    albumChangeRequest.addAssets([photoAsset]);
+    await phAccessHelper.applyChanges(albumChangeRequest);
   }
 }
 

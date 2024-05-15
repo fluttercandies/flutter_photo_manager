@@ -180,19 +180,99 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
         ));
       }
         break;
-      case 'deleteWithIds': {
+      case 'deleteWithIds':
+      case 'moveToTrash': {
         if (!(await PermissionHandler.permissionWriteCheck())) {
           result.error('no ohos.permission.WRITE_IMAGEVIDEO', '', '');
           return true;
         }
         let args: Map<string, ESObject> = call.args;
         let ids: Array<string> = args.get('ids');
+
+
         await photoAccessHelper.MediaAssetChangeRequest.deleteAssets(this.uiContext, ids);
+        // 从回收站里面彻底删除，系统接口，目前不支持
+        // if (call.method == 'deleteWithIds') {
+        //
+        // }
         result.success(ids);
       }
         break;
       case 'getColumnNames':
         result.success(Object.keys(photoAccessHelper.PhotoKeys));
+        break;
+      case 'fetchEntityProperties': {
+        let args: Map<string, ESObject> = call.args;
+        let id: string = args.get('id');
+        let photoAsset: photoAccessHelper.PhotoAsset | null = await PhotoAssetHandler.getPhotoAsset(id);
+        if (photoAsset != null) {
+          result.success(PhotoAssetHandler.photoAssetToMap(photoAsset));
+        }
+        else {
+          result.error(`${call.method} failed`, `not find asset by ${args}`, null);
+        }
+      }
+        break;
+      case 'assetExists': {
+        let args: Map<string, ESObject> = call.args;
+        let id: string = args.get('id');
+        let photoAsset: photoAccessHelper.PhotoAsset | null = await PhotoAssetHandler.getPhotoAsset(id);
+        result.success(photoAsset != null);
+      }
+        break;
+      case 'favoriteAsset': {
+        let args: Map<string, ESObject> = call.args;
+        let id: string = args.get('id');
+        let favorite: Boolean = args.get('favorite');
+        let photoAsset: photoAccessHelper.PhotoAsset | null = await PhotoAssetHandler.getPhotoAsset(id);
+        if (photoAsset == null) {
+          result.success(false);
+        }
+        else {
+          result.success(PhotoAssetHandler.setAssetMember(photoAsset, photoAccessHelper.PhotoKeys.FAVORITE, favorite ? 'true' : 'false'));
+        }
+      }
+        break;
+      case 'getFileFd': {
+        let args: Map<string, ESObject> = call.args;
+        let id: string = args.get('id');
+        let photoAsset: photoAccessHelper.PhotoAsset | null = await PhotoAssetHandler.getPhotoAsset(id);
+        if (photoAsset != null) {
+          let file = await fs.open(photoAsset.uri, fs.OpenMode.READ_ONLY);
+          result.success(file.fd);
+        }
+        else {
+          result.error(`${call.method} failed`, `not find asset by ${args}`, null);
+        }
+      }
+        break;
+      case 'copyAsset': {
+        let args: Map<string, ESObject> = call.args;
+        let id: string = args.get('assetId');
+        let galleryId: string = args.get('galleryId');
+        let photoAsset: photoAccessHelper.PhotoAsset | null = await PhotoAssetHandler.getPhotoAsset(id);
+
+        let album: photoAccessHelper.Album | null = await AlbumHandler.getAlbum(galleryId);
+        if (photoAsset != null && album != null) {
+          try {
+            await AlbumHandler.copyToAlbum(album, photoAsset);
+            result.success(PhotoAssetHandler.photoAssetToMap(photoAsset));
+          }
+          catch (e) {
+            result.error(`${call.method} failed`, e.toString(), null);
+          }
+        }
+        else {
+          let errorInfo = '';
+          if (photoAsset == null) {
+            errorInfo = `not find asset by ${id}`;
+          }
+          if (album == null) {
+            errorInfo += `not find album by ${galleryId}`;
+          }
+          result.error(`${call.method} failed`, errorInfo, null);
+        }
+      }
         break;
       default:
         return false;
@@ -305,6 +385,16 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
     }
     catch (e) {
       return null;
+    }
+  }
+
+  static setAssetMember(photoAsset: photoAccessHelper.PhotoAsset, member: string, value: string): Boolean {
+    try {
+      photoAsset.set(member, value);
+      return true;
+    }
+    catch (e) {
+      return false;
     }
   }
 
