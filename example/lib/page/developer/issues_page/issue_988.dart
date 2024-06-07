@@ -165,6 +165,7 @@ class __DeleteAssetImageListState extends State<_DeleteAssetImageList> {
                     right: 0,
                     top: 0,
                     child: Checkbox(
+                      // ignore: deprecated_member_use
                       overlayColor: MaterialStateProperty.all(Colors.white),
                       value: checked.contains(asset),
                       onChanged: (bool? value) {
