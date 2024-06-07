@@ -11,9 +11,12 @@ To know more about breaking changes, see the [Migration Guide][].
 ### Improvements
 
 * Restores `containsLivePhotos` to `true` by default and deprecates it.
+* Use the main resource's filename for title by default on iOS.
+
+### Fixes
+
 * Fix obtaining the correct resource from various types of resources on iOS.
 * Fix `isLocallyAvailable` for edited assets on iOS.
-* Use the main resource's filename for title by default on iOS.
 
 ## 3.1.1
 
