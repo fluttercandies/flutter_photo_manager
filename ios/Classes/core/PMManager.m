@@ -168,9 +168,14 @@
     if (isExist) {
         return YES;
     }
-    NSArray *rArray = [PHAssetResource assetResourcesForAsset:asset];
+    if (!resource) {
+        resource = [asset getCurrentResource];
+    }
+    if (!resource) {
+        return NO;
+    }
     // If this returns NO, then the asset is in iCloud or not saved locally yet.
-    return [[rArray.firstObject valueForKey:@"locallyAvailable"] boolValue];
+    return [[resource valueForKey:@"locallyAvailable"] boolValue];
 }
 
 #pragma clang diagnostic push
