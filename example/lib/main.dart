@@ -96,7 +96,7 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
       showToast('Permission is not accessible.');
       return;
     }
-    /// Customize your own filter options.
+    // Customize your own filter options.
     final PMFilter filter = FilterOptionGroup(
       imageOption: const FilterOption(
         sizeConstraint: SizeConstraint(ignoreSize: true),
