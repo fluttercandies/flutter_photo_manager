@@ -11,5 +11,6 @@
 - (bool)isVideo;
 - (bool)isAudio;
 - (bool)isImageOrVideo;
+- (bool)isValid;
 
 @end

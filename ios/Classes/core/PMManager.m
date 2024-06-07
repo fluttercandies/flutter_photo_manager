@@ -534,7 +534,7 @@
 }
 
 - (void)fetchOriginVideoFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PHAssetResource *resource = [asset getAdjustResource];
+    PHAssetResource *resource = [asset getCurrentResource];
     if (!resource) {
         [handler reply:nil];
         return;
@@ -745,7 +745,7 @@
 }
 
 - (void)fetchOriginImageFile:(PHAsset *)asset resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PHAssetResource *imageResource = [asset getAdjustResource];
+    PHAssetResource *imageResource = [asset getCurrentResource];
     if (!imageResource) {
         [handler reply:nil];
         return;

@@ -37,4 +37,12 @@
     return [self isVideo] || [self isImage];
 }
 
+- (bool)isValid {
+    bool isResource = self.type != PHAssetResourceTypeAdjustmentData;
+    if (@available(iOS 17.0, *)) {
+        isResource = isResource && self.type != PHAssetResourceTypePhotoProxy;
+    }
+    return isResource;
+}
+
 @end
