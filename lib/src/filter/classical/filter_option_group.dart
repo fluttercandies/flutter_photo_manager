@@ -38,7 +38,11 @@ class FilterOptionGroup extends PMFilter {
     FilterOption videoOption = const FilterOption(),
     FilterOption audioOption = const FilterOption(),
     bool containsPathModified = false,
-    this.containsLivePhotos = false,
+    @Deprecated(
+      'The option will be always enabled by default. '
+      'This will be removed in v4.0.0',
+    )
+    this.containsLivePhotos = true,
     this.onlyLivePhotos = false,
     DateTimeCond? createTimeCond,
     DateTimeCond? updateTimeCond,
@@ -68,6 +72,10 @@ class FilterOptionGroup extends PMFilter {
   /// Defaults to `true`.
   ///
   /// This option only takes effects on iOS.
+  @Deprecated(
+    'The option will be always enabled by default. '
+    'This will be removed in v4.0.0',
+  )
   bool containsLivePhotos = true;
 
   final Map<AssetType, FilterOption> _map = <AssetType, FilterOption>{};
@@ -189,6 +197,10 @@ class FilterOptionGroup extends PMFilter {
     FilterOption? videoOption,
     FilterOption? audioOption,
     bool? containsPathModified,
+    @Deprecated(
+      'The option will be enabled by default. '
+      'This will be removed in v4.0.0',
+    )
     bool? containsLivePhotos,
     bool? onlyLivePhotos,
     DateTimeCond? createTimeCond,

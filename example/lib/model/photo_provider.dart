@@ -215,6 +215,7 @@ class PhotoProvider extends ChangeNotifier {
       ..setOption(AssetType.audio, option)
       ..createTimeCond = createDtCond
       ..containsPathModified = _containsPathModified
+      // ignore: deprecated_member_use
       ..containsLivePhotos = _containsLivePhotos
       ..onlyLivePhotos = onlyLivePhotos;
   }
