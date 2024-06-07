@@ -136,6 +136,7 @@
         container.dateOption = [self convertMapToPMDateOption:map[@"createDate"]];
         container.updateOption = [self convertMapToPMDateOption:map[@"updateDate"]];
         container.containsModified = [map[@"containsPathModified"] boolValue];
+        container.containsLivePhotos = [map[@"containsLivePhotos"] boolValue];
         container.onlyLivePhotos = [map[@"onlyLivePhotos"] boolValue];
 
         NSArray *sortArray = map[@"orders"];
