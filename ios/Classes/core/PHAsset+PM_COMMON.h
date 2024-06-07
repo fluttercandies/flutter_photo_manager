@@ -27,10 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
  @return The MIME type of this asset if available, otherwise `nil`.
  */
 - (nullable NSString*)mimeType;
-- (BOOL)isAdjust;
-- (PHAssetResource *)getAdjustResource;
-- (PHAssetResource *)getUntouchedResource;
-- (void)requestAdjustedData:(void (^)(NSData *_Nullable result))block;
+- (PHAssetResource *)getCurrentResource;
+- (void)requestCurrentResourceData:(void (^)(NSData *_Nullable result))block;
 - (PHAssetResource *)getLivePhotosResource;
 
 @end

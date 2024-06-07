@@ -168,9 +168,14 @@
     if (isExist) {
         return YES;
     }
-    NSArray *rArray = [PHAssetResource assetResourcesForAsset:asset];
+    if (!resource) {
+        resource = [asset getCurrentResource];
+    }
+    if (!resource) {
+        return NO;
+    }
     // If this returns NO, then the asset is in iCloud or not saved locally yet.
-    return [[rArray.firstObject valueForKey:@"locallyAvailable"] boolValue];
+    return [[resource valueForKey:@"locallyAvailable"] boolValue];
 }
 
 #pragma clang diagnostic push
@@ -534,7 +539,7 @@
 }
 
 - (void)fetchOriginVideoFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PHAssetResource *resource = [asset getAdjustResource];
+    PHAssetResource *resource = [asset getCurrentResource];
     if (!resource) {
         [handler reply:nil];
         return;
@@ -745,7 +750,7 @@
 }
 
 - (void)fetchOriginImageFile:(PHAsset *)asset resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PHAssetResource *imageResource = [asset getAdjustResource];
+    PHAssetResource *imageResource = [asset getCurrentResource];
     if (!imageResource) {
         [handler reply:nil];
         return;

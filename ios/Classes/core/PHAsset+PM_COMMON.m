@@ -4,6 +4,7 @@
 //
 
 #import "PHAsset+PM_COMMON.h"
+#import "PHAssetResource+PM_COMMON.h"
 #if TARGET_OS_IOS || TARGET_OS_WATCH || TARGET_OS_TV
 #import <MobileCoreServices/MobileCoreServices.h>
 #else
@@ -64,11 +65,12 @@
 
 - (NSString *)originalFilenameWithSubtype:(int)subtype {
     if (@available(iOS 9.1, *)) {
-        if ([self isLivePhoto] && subtype == PHAssetMediaSubtypePhotoLive) {
+        BOOL isLivePhotoSubtype = (subtype & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive;
+        if ([self isLivePhoto] && isLivePhotoSubtype) {
             return [self getLivePhotosResource].originalFilename;
         }
     }
-    PHAssetResource *resource = [self getUntouchedResource];
+    PHAssetResource *resource = [self getRawResource];
     if (resource) {
         return resource.originalFilename;
     }
@@ -123,63 +125,64 @@
     return NO;
 }
 
-- (PHAssetResource *)getUntouchedResource {
+- (PHAssetResource *)getRawResource {
     NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:self];
-    if (resources.count == 0) {
-        return nil;
-    }
-
-    if (resources.count == 1) {
-        return resources[0];
-    }
-
     for (PHAssetResource *res in resources) {
-        if (self.mediaType == PHAssetMediaTypeImage
-            && res.type == PHAssetResourceTypePhoto) {
+        if (self.isImage && res.isImage && res.type == PHAssetResourceTypePhoto) {
             return res;
         }
-        
-        if (self.mediaType == PHAssetMediaTypeVideo
-            && res.type == PHAssetResourceTypeVideo) {
+        if (self.isVideo && res.isVideo && res.type == PHAssetResourceTypeVideo) {
+            return res;
+        }
+        if (self.isAudio && res.isAudio && res.type == PHAssetResourceTypeAudio) {
             return res;
         }
     }
-    
     return nil;
 }
 
-- (PHAssetResource *)getAdjustResource {
+- (PHAssetResource *)getCurrentResource {
     NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:self];
-    if (resources.count == 0) {
+    NSMutableArray<PHAssetResource *> *filtered = [NSMutableArray array];
+    for (PHAssetResource *res in resources) {
+        if (!res.isValid) {
+            continue;
+        }
+        BOOL isAllowedType = NO;
+        if (self.isImage && res.isImage) {
+            isAllowedType = res.type == PHAssetResourceTypePhoto ||
+            res.type == PHAssetResourceTypeAlternatePhoto ||
+            res.type == PHAssetResourceTypeFullSizePhoto;
+        } else if (self.isVideo && res.isVideo) {
+            isAllowedType = res.type == PHAssetResourceTypeVideo ||
+            res.type == PHAssetResourceTypeFullSizeVideo ||
+            res.type == PHAssetResourceTypeFullSizePairedVideo;
+        } else if (self.isAudio && res.isAudio) {
+            isAllowedType = res.type == PHAssetResourceTypeAudio;
+        }
+        if (isAllowedType) {
+            [filtered addObject:res];
+        }
+    }
+    if (filtered.count == 0) {
         return nil;
     }
     
-    if (resources.count == 1) {
+    if (filtered.count == 1) {
         return resources[0];
     }
     
-    if (![self isAdjust]) {
-        for (PHAssetResource *res in resources) {
-            if (self.mediaType == PHAssetMediaTypeImage
-                && res.type == PHAssetResourceTypePhoto) {
-                return res;
-            }
-            
-            if (self.mediaType == PHAssetMediaTypeVideo
-                && res.type == PHAssetResourceTypeVideo) {
-                return res;
-            }
+    for (PHAssetResource *res in filtered) {
+        BOOL isCurrent = [[res valueForKey:@"isCurrent"] boolValue];
+        if (isCurrent) {
+            return res;
         }
-        
-        return nil;
     }
-    
-    for (PHAssetResource *res in resources) {
+    for (PHAssetResource *res in filtered) {
         if (self.mediaType == PHAssetMediaTypeImage &&
             res.type == PHAssetResourceTypeFullSizePhoto) {
             return res;
         }
-        
         if (self.mediaType == PHAssetMediaTypeVideo &&
             res.type == PHAssetResourceTypeFullSizeVideo) {
             return res;
@@ -188,8 +191,8 @@
     return nil;
 }
 
-- (void)requestAdjustedData:(void (^)(NSData *_Nullable))block {
-    PHAssetResource *res = [self getAdjustResource];
+- (void)requestCurrentResourceData:(void (^)(NSData *_Nullable))block {
+    PHAssetResource *res = [self getCurrentResource];
     
     PHAssetResourceManager *manager = PHAssetResourceManager.defaultManager;
     PHAssetResourceRequestOptions *opt = [PHAssetResourceRequestOptions new];
@@ -228,19 +231,16 @@
     
     if (@available(iOS 9.1, *)) {
         if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypePairedVideo) {
-            resource = resources.lastObject;
+            return resources.lastObject;
         }
-        if (!resource) {
-            for (PHAssetResource *r in resources) {
-                // Iterate to find the paired video.
-                if (r.type == PHAssetResourceTypePairedVideo) {
-                    resource = r;
-                    break;
-                }
+        for (PHAssetResource *r in resources) {
+            // Iterate to find the paired video.
+            if (r.type == PHAssetResourceTypePairedVideo) {
+                return r;
             }
         }
     }
-    return resource;
+    return nil;
 }
 
 @end
