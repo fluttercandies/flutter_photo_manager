@@ -65,10 +65,10 @@ class FilterOptionGroup extends PMFilter {
 
   /// Whether the result should contain live photos.
   ///
-  /// Defaults to `false`.
+  /// Defaults to `true`.
   ///
   /// This option only takes effects on iOS.
-  bool containsLivePhotos = false;
+  bool containsLivePhotos = true;
 
   final Map<AssetType, FilterOption> _map = <AssetType, FilterOption>{};
 
