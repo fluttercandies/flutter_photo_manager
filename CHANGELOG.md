@@ -6,11 +6,19 @@ that can be found in the LICENSE file. -->
 
 To know more about breaking changes, see the [Migration Guide][].
 
+## 3.2.0
+
+### Improvements
+
+* Restores `containsLivePhotos` to `true` by default and deprecates it.
+* Fix obtaining the correct resource from various types of resources on iOS.
+* Use the main resource's filename for title by default.
+
 ## 3.1.1
 
 ### Improvements
 
-* Update plugin structure for OpenHarmony
+* Update plugin structure for OpenHarmony.
 
 ## 3.1.0
 
