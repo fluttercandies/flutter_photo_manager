@@ -222,7 +222,8 @@ object AndroidQDBUtils : IDBUtils {
     override fun getAssetEntity(
         context: Context,
         id: String,
-        checkIfExists: Boolean
+        checkIfExists: Boolean,
+        contentValues: ContentValues?
     ): AssetEntity? {
         val selection = "$_ID = ?"
         val args = arrayOf(id)
@@ -234,7 +235,7 @@ object AndroidQDBUtils : IDBUtils {
             null
         ) ?: return null
         cursor.use {
-            return if (it.moveToNext()) it.toAssetEntity(context, checkIfExists)
+            return if (it.moveToNext()) it.toAssetEntity(context, checkIfExists, contentValues)
             else null
         }
     }

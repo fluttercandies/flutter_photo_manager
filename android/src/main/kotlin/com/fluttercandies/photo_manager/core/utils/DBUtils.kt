@@ -215,7 +215,8 @@ object DBUtils : IDBUtils {
     override fun getAssetEntity(
         context: Context,
         id: String,
-        checkIfExists: Boolean
+        checkIfExists: Boolean,
+        contentValues: ContentValues?
     ): AssetEntity? {
         val keys =
             (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + locationKeys + IDBUtils.typeKeys).distinct()
@@ -232,7 +233,7 @@ object DBUtils : IDBUtils {
         ) ?: return null
         cursor.use {
             return if (it.moveToNext()) {
-                it.toAssetEntity(context, checkIfExists)
+                it.toAssetEntity(context, checkIfExists, contentValues)
             } else {
                 null
             }

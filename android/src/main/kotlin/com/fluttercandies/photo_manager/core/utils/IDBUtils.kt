@@ -126,7 +126,12 @@ interface IDBUtils {
         option: FilterOption
     ): List<AssetEntity>
 
-    fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean = true): AssetEntity?
+    fun getAssetEntity(
+        context: Context,
+        id: String,
+        checkIfExists: Boolean = true,
+        contentValues: ContentValues? = null
+    ): AssetEntity?
 
     fun getMediaType(type: Int): Int {
         return when (type) {
@@ -170,31 +175,38 @@ interface IDBUtils {
 //        return getDouble(getColumnIndex(columnName))
 //    }
 
-    fun Cursor.toAssetEntity(context: Context, checkIfExists: Boolean = true): AssetEntity? {
+    fun Cursor.toAssetEntity(
+        context: Context,
+        checkIfExists: Boolean = true,
+        cv: ContentValues? = null
+    ): AssetEntity? {
         val path = getString(DATA)
         if (checkIfExists && path.isNotBlank() && !File(path).exists()) {
             return null
         }
 
         val id = getLong(_ID)
+
+        // Fallback to [cv] if provided.
         val date = if (isAboveAndroidQ) {
-            var tmpTime = getLong(DATE_TAKEN) / 1000
+            var tmpTime = (cv?.getAsLong(DATE_TAKEN) ?: getLong(DATE_TAKEN)) / 1000
             if (tmpTime == 0L) {
-                tmpTime = getLong(DATE_ADDED)
+                tmpTime = cv?.getAsLong(DATE_ADDED) ?: getLong(DATE_ADDED)
             }
             tmpTime
-        } else getLong(DATE_ADDED)
-        val type = getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
-        val mimeType = getString(MIME_TYPE)
+        } else cv?.getAsLong(DATE_ADDED) ?: getLong(DATE_ADDED)
+        val type = cv?.getAsInteger(MediaStore.Files.FileColumns.MEDIA_TYPE)
+            ?: getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
+        val mimeType = cv?.getAsString(MIME_TYPE) ?: getString(MIME_TYPE)
         val duration = if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) 0
-        else getLong(DURATION)
-        var width = getInt(WIDTH)
-        var height = getInt(HEIGHT)
-        val displayName = getString(DISPLAY_NAME)
-        val modifiedDate = getLong(DATE_MODIFIED)
-        var orientation: Int = getInt(ORIENTATION)
+        else cv?.getAsLong(DURATION) ?: getLong(DURATION)
+        var width = cv?.getAsInteger(WIDTH) ?: getInt(WIDTH)
+        var height = cv?.getAsInteger(HEIGHT) ?: getInt(HEIGHT)
+        val displayName = cv?.getAsString(DISPLAY_NAME) ?: getString(DISPLAY_NAME)
+        val modifiedDate = cv?.getAsLong(DATE_MODIFIED) ?: getLong(DATE_MODIFIED)
+        var orientation: Int = cv?.getAsInteger(ORIENTATION) ?: getInt(ORIENTATION)
         val relativePath: String? = if (isAboveAndroidQ) {
-            getString(RELATIVE_PATH)
+            cv?.getAsString(RELATIVE_PATH) ?: getString(RELATIVE_PATH)
         } else null
         if (width == 0 || height == 0) {
             try {
@@ -487,7 +499,7 @@ interface IDBUtils {
             outputStream.use { os -> inputStream.use { it.copyTo(os) } }
         }
         cr.notifyChange(uri, null)
-        return getAssetEntity(context, id.toString())
+        return getAssetEntity(context, id.toString(), contentValues = values)
     }
 
     fun assetExists(context: Context, id: String): Boolean {
