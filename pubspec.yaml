@@ -10,8 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_platform_utils: ^1.0.0
-
+ 
 dev_dependencies:
   flutter_lints: any
   flutter_test:

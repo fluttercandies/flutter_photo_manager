@@ -721,14 +721,4 @@ mixin OhosPlugin on BasePlugin {
     }
     return result ?? <String>[];
   }
-
-  Future<int?> getFileFd(String id) async {
-    if (PlatformUtils.isOhos) {
-      return _channel.invokeMethod<int>(
-        PMConstants.mGetFileFd,
-        {'id': id},
-      );
-    }
-    return null;
-  }
 }

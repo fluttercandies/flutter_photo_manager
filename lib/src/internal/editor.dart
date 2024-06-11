@@ -316,11 +316,6 @@ class OhosEditor {
     return plugin.ohosColumns();
   }
 
-  /// Returns the fd of this photo access.
-  Future<int?> getFileFd(String id) async {
-    return plugin.getFileFd(id);
-  }
-
   /// Sets the favorite status of the given [entity].
   ///
   /// Returns the updated [AssetEntity] if the operation was successful; otherwise, `null`.
