@@ -195,16 +195,6 @@ class AssetPathEntity {
   }) {
     assert(albumType == 1, 'Only album can request for assets.');
     assert(size > 0, 'Page size must be greater than 0.');
-
-    final filterOption = this.filterOption;
-
-    if (filterOption is FilterOptionGroup) {
-      assert(
-        type == RequestType.image || !filterOption.onlyLivePhotos,
-        'Filtering only Live Photos is only supported '
-        'when the request type contains image.',
-      );
-    }
     return plugin.getAssetListPaged(
       id,
       page: page,

@@ -68,12 +68,6 @@ class _SimpleExamplePage extends StatefulWidget {
 }
 
 class _SimpleExamplePageState extends State<_SimpleExamplePage> {
-  /// Customize your own filter options.
-  final FilterOptionGroup _filterOptionGroup = FilterOptionGroup(
-    imageOption: const FilterOption(
-      sizeConstraint: SizeConstraint(ignoreSize: true),
-    ),
-  );
   final int _sizePerPage = 50;
 
   AssetPathEntity? _path;
@@ -102,10 +96,16 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
       showToast('Permission is not accessible.');
       return;
     }
+    // Customize your own filter options.
+    final PMFilter filter = FilterOptionGroup(
+      imageOption: const FilterOption(
+        sizeConstraint: SizeConstraint(ignoreSize: true),
+      ),
+    );
     // Obtain assets using the path entity.
     final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
       onlyAll: true,
-      filterOption: _filterOptionGroup,
+      filterOption: filter,
     );
     if (!mounted) {
       return;

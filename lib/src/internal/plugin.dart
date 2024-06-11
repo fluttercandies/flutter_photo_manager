@@ -43,22 +43,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       assert(hasAll, 'If only is true, then the hasAll must be not null.');
     }
     filterOption ??= FilterOptionGroup();
-    // Avoid filtering live photos when searching for audios.
-    if (type == RequestType.audio) {
-      if (filterOption is FilterOptionGroup) {
-        filterOption.containsLivePhotos = false;
-        filterOption.onlyLivePhotos = false;
-      }
-    }
-    if (filterOption is FilterOptionGroup) {
-      assert(
-        type == RequestType.image || !filterOption.onlyLivePhotos,
-        'Filtering only Live Photos is only supported '
-        'when the request type contains image.',
-      );
-    }
-
-    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
+    final result = await _channel.invokeMethod<Map>(
       PMConstants.mGetAssetPathList,
       <String, dynamic>{
         'type': type.value,
@@ -72,7 +57,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       return <AssetPathEntity>[];
     }
     return ConvertUtils.convertToPathList(
-      result.cast<String, dynamic>(),
+      result.cast(),
       type: type,
       filterOption: filterOption,
     );

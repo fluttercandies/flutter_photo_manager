@@ -22,7 +22,7 @@ you can get assets (image/video/audio) on Android, iOS, macOS and OpenHarmony.
 ## Projects using this plugin
 
 | name                 | pub                                                                                                                | github                                                                                                                                                                  |
-| :------------------- | :----------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|:---------------------|:-------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | wechat_assets_picker | [![pub package](https://img.shields.io/pub/v/wechat_assets_picker)](https://pub.dev/packages/wechat_assets_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_assets_picker) |
 | wechat_camera_picker | [![pub package](https://img.shields.io/pub/v/wechat_camera_picker)](https://pub.dev/packages/wechat_camera_picker) | [![star](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_camera_picker?style=social)](https://github.com/fluttercandies/flutter_wechat_camera_picker) |
 
@@ -297,7 +297,7 @@ See [`getAssetPathList`][] for more detail.
 #### Params of `getAssetPathList`
 
 | Name             | Description                                                                                                                    | Default value           |
-| :--------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------- |
+|:-----------------|--------------------------------------------------------------------------------------------------------------------------------|-------------------------|
 | hasAll           | Set to true when you need an album containing all assets.                                                                      | true                    |
 | onlyAll          | Use this property if you only need one album containing all assets.                                                            | false                   |
 | type             | Type of media resource (video, image, audio)                                                                                   | RequestType.common      |
@@ -753,7 +753,7 @@ Here are caches generation on different platforms,
 types and resolutions.
 
 | Platform | Thumbnail | File / Origin File |
-| -------- | --------- | ------------------ |
+|----------|-----------|--------------------|
 | Android  | Yes       | Yes (Android 10+)  |
 | iOS      | No        | Yes                |
 
@@ -786,8 +786,9 @@ if you want to know more about using ProGuard and Glide together.
 
 #### Android 14 (API 34) extra configs
 
-When targeting Android 14 (API level 34),
-the following extra configs needs to be added to the manifest:
+When running on Android 14 (API level 34),
+the following permissions needs to be added to the manifest
+even if your `targetSdkVersion` and `compileSdkVersion` is not `34`:
 
 ```xml
 <manifest>
@@ -797,8 +798,9 @@ the following extra configs needs to be added to the manifest:
 
 #### Android 13 (API 33) extra configs
 
-When targeting Android 13 (API level 33),
-the following extra configs needs to be added to the manifest:
+When running on Android 13 (API level 33),
+the following permissions needs to be added to the manifest
+even if your `targetSdkVersion` and `compileSdkVersion` is not `33`:
 
 ```xml
 <manifest>

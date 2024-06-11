@@ -731,8 +731,9 @@ rootProject.allprojects {
 
 #### Android 14 (API level 34) 额外配置
 
-当应用的 `targetSdkVersion` 为 34 (Android 14) 时，
-你需要在清单文件中添加以下额外配置：
+当你的应用在 API 34 (Android 14) 的设备上运行时，
+就算你的 `targetSdkVersion` 和 `compileSdkVersion` 不是 `34`，
+你也需要在清单文件中添加以下权限配置：
 
 ```xml
 <manifest>
@@ -742,8 +743,9 @@ rootProject.allprojects {
 
 #### Android 13 (API level 33) 额外配置
 
-当应用的 `targetSdkVersion` 为 33 (Android 13) 时，
-你需要在清单文件中添加以下额外配置：
+当你的应用在 API 33 (Android 13) 的设备上运行时，
+就算你的 `targetSdkVersion` 和 `compileSdkVersion` 不是 `33`，
+你也需要在清单文件中添加以下权限配置：
 
 ```xml
 <manifest>

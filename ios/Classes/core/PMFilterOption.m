@@ -113,21 +113,6 @@
         [cond appendString:durationCond];
         [args addObjectsFromArray:durationArgs];
 
-        if (@available(iOS 9.1, *)) {
-            if (!containsImage && optionGroup.containsLivePhotos) {
-                [cond appendString:@" )"];
-                [cond appendString:@" OR "];
-                [cond appendString:@"( "];
-                [cond appendString:@"mediaType == %d"];
-                [args addObject:@(PHAssetMediaTypeImage)];
-                [cond appendString:@" AND "];
-                [cond appendString:[NSString
-                    stringWithFormat:@"( mediaSubtype & %lu ) == 8",
-                                     (unsigned long) PHAssetMediaSubtypePhotoLive]
-                ];
-            }
-        }
-
         [cond appendString:@" ) "];
     }
 
