@@ -6,15 +6,6 @@ import 'package:video_player/video_player.dart';
 
 import '../util/log.dart';
 
-class VideoPlayerControllerHelper {
-  static VideoPlayerController? Function(
-    int fileFd, {
-    Future<ClosedCaptionFile>? closedCaptionFile,
-    VideoPlayerOptions? videoPlayerOptions,
-    Map<String, String> httpHeaders,
-  })? fileFd;
-}
-
 class VideoWidget extends StatefulWidget {
   const VideoWidget({
     super.key,
