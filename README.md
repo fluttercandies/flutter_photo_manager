@@ -1002,28 +1002,14 @@ PhotoManager.editor.darwin.deletePath();
 
 #### Features for OpenHarmony
 
-> Audio is not yet supported by the OpenHarmony.
+Currently, most functions are supported, except for those related to caching. and only support image and video types.
 
-| Feature                 | OpenHarmony |
-|:------------------------|:-----------:|
-| getAssetPathList        |      ✅      |
-| getAssetCountFromPath   |      ✅      |
-| fetchPathProperties     |      ✅      |
-| getAssetCount           |      ✅      |
-| getAssetListPaged       |      ✅      |
-| getOriginBytes          |      ✅      |
-| getThumb                |      ✅      |
-| getAssetListRange       |      ✅      |
-| getAssetsByRange        |      ✅      |
-| deleteWithIds           |      ✅      |
-| getColumnNames          |      ✅      |
-| saveImage               |      ✅      |
-| saveImageWithPath       |      ✅      |
-| saveVideo               |      ✅      |
-| requestPermissionExtend |      ✅      |
-| ignorePermissionCheck   |      ✅      |
-| log                     |      ✅      |
-| notify                  |      ✅      |
+| Feature                        | OpenHarmony |
+| :----------------------------- | :---------: |
+| releaseCache                   |      ❌      |
+| clearFileCache                 |      ❌      |
+| requestCacheAssetsThumbnail    |      ❌      |
+| getSubPathEntities             |      ❌      |
 
 
 [pub package]: https://pub.dev/packages/photo_manager

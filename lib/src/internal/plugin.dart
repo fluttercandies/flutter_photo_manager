@@ -162,7 +162,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return _channel.invokeMethod(PMConstants.mGetOriginBytes, params);
   }
 
-  Future<void> releaseCache() {
+  Future<void> releaseCache() async {
+    if (PlatformUtils.isOhos) {
+      return;
+    }
     return _channel.invokeMethod(PMConstants.mReleaseMemoryCache);
   }
 
@@ -335,6 +338,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   }
 
   Future<String> getSystemVersion() async {
+    if (PlatformUtils.isOhos) {
+      return '';
+    }
     return await _channel.invokeMethod<String>(
       PMConstants.mSystemVersion,
     ) as String;
@@ -375,7 +381,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return entity.title ?? '';
   }
 
-  Future<String?> getMediaUrl(AssetEntity entity) {
+  Future<String?> getMediaUrl(AssetEntity entity) async {
+    if (PlatformUtils.isOhos) {
+      return entity.id;
+    }
     return _channel.invokeMethod(
       PMConstants.mGetMediaUrl,
       <String, dynamic>{'id': entity.id, 'type': entity.typeInt},
@@ -385,6 +394,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   Future<List<AssetPathEntity>> getSubPathEntities(
     AssetPathEntity pathEntity,
   ) async {
+    if (PlatformUtils.isOhos) {
+      return <AssetPathEntity>[];
+    }
     final Map<dynamic, dynamic> result =
         await _channel.invokeMethod<Map<dynamic, dynamic>>(
       PMConstants.mGetSubPath,
@@ -442,7 +454,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     );
   }
 
-  Future<void> clearFileCache() {
+  Future<void> clearFileCache() async {
+    if (PlatformUtils.isOhos) {
+      return;
+    }
     return _channel.invokeMethod(PMConstants.mClearFileCache);
   }
 
@@ -453,7 +468,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   Future<void> requestCacheAssetsThumbnail(
     List<String> ids,
     ThumbnailOption option,
-  ) {
+  ) async {
+    if (PlatformUtils.isOhos) {
+      return;
+    }
     assert(ids.isNotEmpty);
     return _channel.invokeMethod(
       PMConstants.mRequestCacheAssetsThumb,
@@ -527,14 +545,15 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   }
 
   Future<bool> isLocallyAvailable(String id, {bool isOrigin = false}) async {
-    if (Platform.isAndroid) {
-      return true;
+    if (Platform.isIOS || Platform.isMacOS) {
+      final bool result = await _channel.invokeMethod<bool>(
+        PMConstants.mIsLocallyAvailable,
+        <String, dynamic>{'id': id, 'isOrigin': isOrigin},
+      ) as bool;
+      return result;
     }
-    final bool result = await _channel.invokeMethod<bool>(
-      PMConstants.mIsLocallyAvailable,
-      <String, dynamic>{'id': id, 'isOrigin': isOrigin},
-    ) as bool;
-    return result;
+
+    return true;
   }
 }
 

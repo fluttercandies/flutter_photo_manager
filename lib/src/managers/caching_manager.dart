@@ -20,6 +20,7 @@ class PhotoCachingManager {
   );
 
   /// Request caching for assets.
+  /// The method does not supported on OpenHarmony.
   Future<void> requestCacheAssets({
     required List<AssetEntity> assets,
     ThumbnailOption option = _defaultOption,
@@ -32,6 +33,7 @@ class PhotoCachingManager {
   }
 
   /// Request caching for assets' ID.
+  /// The method does not supported on OpenHarmony.
   Future<void> requestCacheAssetsWithIds({
     required List<String> assetIds,
     ThumbnailOption option = _defaultOption,
@@ -41,5 +43,6 @@ class PhotoCachingManager {
   }
 
   /// Cancel all cache request.
+  /// The method does not supported on OpenHarmony.
   Future<void> cancelCacheRequest() => plugin.cancelCacheRequests();
 }

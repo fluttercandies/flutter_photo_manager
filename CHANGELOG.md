@@ -12,6 +12,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 * Restores `containsLivePhotos` to `true` by default and deprecates it.
 * Use the main resource's filename for title by default on iOS.
+* Support more methods on the OpenHarmony.
 
 ### Fixes
 

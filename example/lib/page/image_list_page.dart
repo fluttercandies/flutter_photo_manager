@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photo_manager/platform_utils.dart';
 import 'package:provider/provider.dart';
 
 import '../model/photo_provider.dart';
@@ -192,16 +193,23 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                 <int>[500, 600, 700, 1000, 1500, 2000],
               ),
             ),
-            if (Platform.isIOS || Platform.isMacOS)
+            if (Platform.isIOS || Platform.isMacOS || PlatformUtils.isOhos)
               ElevatedButton(
                 child: const Text('Toggle isFavorite'),
                 onPressed: () async {
                   final bool isFavorite = entity.isFavorite;
                   print('Current isFavorite: $isFavorite');
-                  await PhotoManager.editor.darwin.favoriteAsset(
-                    entity: entity,
-                    favorite: !isFavorite,
-                  );
+                  if (PlatformUtils.isOhos) {
+                    await PhotoManager.editor.ohos.favoriteAsset(
+                      entity: entity,
+                      favorite: !isFavorite,
+                    );
+                  } else {
+                    await PhotoManager.editor.darwin.favoriteAsset(
+                      entity: entity,
+                      favorite: !isFavorite,
+                    );
+                  }
                   final AssetEntity? newEntity =
                       await entity.obtainForNewProperties();
                   print('New isFavorite: ${newEntity?.isFavorite}');
