@@ -110,7 +110,7 @@ jobs:
         with:
           if-no-files-found: error
           path: ${{ github.workspace }}/example/build/app/outputs/flutter-apk/app-release.apk
-          name: app-release-${{github.ref}}.apk
+          name: app-release-${{github.sha}}.apk
       - name: comment url in pull request
         uses: actions/github-script@v4
         with:
@@ -120,7 +120,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Download apk from [here](${{ steps.apk.outputs.artifact-url }}) for ${{ github.ref}}'
+              body: 'Download apk from [here](${{ steps.apk.outputs.artifact-url }}) for ${{ github.sha}}'
             })
         
 
