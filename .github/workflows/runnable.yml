@@ -99,7 +99,14 @@ jobs:
           cache: true
       - run: flutter doctor -v
       - run: flutter pub get
-      - run: cd example; flutter build apk --debug
+      - run: flutter build apk --release
+        name: Build apk
+        working-directory: ${{ github.workspace }}/example
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: error
+          path: ${{ github.workspace }}/example/build/app/outputs/flutter-apk/app-release.apk
 
   test_android_on_windows:
     needs: analyze
