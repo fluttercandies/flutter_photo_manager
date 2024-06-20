@@ -113,6 +113,7 @@ jobs:
           name: app-release-${{github.sha}}.apk
       - name: comment url in pull request
         uses: actions/github-script@v4
+        if: github.event_name == 'pull_request'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
