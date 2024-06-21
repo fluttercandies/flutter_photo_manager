@@ -440,6 +440,12 @@
                       contentMode:option.contentMode
                           options:requestOptions
                     resultHandler:^(PMImage *result, NSDictionary *info) {
+        if (info[PHImageErrorKey]) {
+            [handler reply: nil];
+            [self notifySuccess:progressHandler];
+            return;
+        }
+
         BOOL downloadFinished = [PMManager isDownloadFinish:info];
 
         if (!downloadFinished) {
