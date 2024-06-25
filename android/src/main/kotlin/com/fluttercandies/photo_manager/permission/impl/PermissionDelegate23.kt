@@ -46,7 +46,7 @@ open class PermissionDelegate23 : com.fluttercandies.photo_manager.permission.Pe
         requestType: Int,
         mediaLocation: Boolean
     ): PermissionResult {
-        return if (havePermissions(context, readPermission, writePermission)) {
+        return if (havePermissions(context, requestType)) {
             PermissionResult.Authorized
         } else {
             PermissionResult.Denied
