@@ -40,7 +40,7 @@ abstract class PermissionDelegate {
     /**
      * Check if the permission is in the manifest.
      */
-    private fun havePermissionInManifest(context: Context, permission: String): Boolean {
+    protected fun havePermissionInManifest(context: Context, permission: String): Boolean {
         val applicationInfo = context.applicationInfo
         val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             context.packageManager.getPackageInfo(
