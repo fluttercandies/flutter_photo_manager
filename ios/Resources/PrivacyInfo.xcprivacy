@@ -21,6 +21,7 @@
 	<key>NSPrivacyTrackingDomains</key>
 	<array/>
 	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
 		<dict>
 			<key>NSPrivacyAccessedAPIType</key>
 			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
@@ -29,7 +30,7 @@
 				<string>C617.1</string>
 			</array>
 		</dict>
-	<array/>
+	</array>
 	<key>NSPrivacyTracking</key>
 	<false/>
 </dict>
