@@ -39,9 +39,13 @@
 
 - (bool)isValid {
     bool isResource = self.type != PHAssetResourceTypeAdjustmentData;
+
+#if __IPHONE_17_0
     if (@available(iOS 17.0, *)) {
         isResource = isResource && self.type != PHAssetResourceTypePhotoProxy;
     }
+#endif
+
     return isResource;
 }
 
