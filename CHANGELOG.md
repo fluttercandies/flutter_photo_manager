@@ -14,7 +14,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ### Fixes
 
-* Fix compile exceptions with Xcode versions which is not compatible with iOS 17.0.
+* Fixes compile exceptions with Xcode versions that are not compatible with iOS 17.0.
 
 ## 3.2.0
 
