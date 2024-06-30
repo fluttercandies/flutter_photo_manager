@@ -6,6 +6,16 @@ that can be found in the LICENSE file. -->
 
 To know more about breaking changes, see the [Migration Guide][].
 
+## 3.2.1
+
+### Improvements
+
+* Declare `NSPrivacyAccessedAPICategoryFileTimestamp` for iOS privacy policies.
+
+### Fixes
+
+* Fixes compile exceptions with Xcode versions that are not compatible with iOS 17.0.
+
 ## 3.2.0
 
 ### Improvements
