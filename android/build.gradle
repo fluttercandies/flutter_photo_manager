@@ -30,82 +30,32 @@ void log(Object msg) {
     logger.log(LogLevel.INFO, "[PhotoManager] $msg")
 }
 
-class ExecResult {
-    int exitValue
-    String output
-
-    ExecResult(int exitValue, String output) {
-        this.exitValue = exitValue
-        this.output = output
-    }
-}
-
-static ExecResult executeCommand(String... args) {
-
-    int exitValue;
-    String output;
-
-    try {
-        Process process = new ProcessBuilder(args).start()
-
-        def stream = new ByteArrayOutputStream()
-        stream.withStream { bos ->
-            process.inputStream.withStream { ins ->
-                bos << ins
-            }
-            process.errorStream.withStream { ins ->
-                bos << ins
-            }
-            output = bos.toString("UTF-8")
-        }
-        exitValue = process.waitFor()
-    } catch (Exception e) {
-        e.printStackTrace()
-        exitValue = -1
-        output = e.toString()
-    }
-
-    return new ExecResult(exitValue, output)
-}
-
 /**
  * Get java version from JAVA_HOME
  * @param path JAVA_HOME path
  * @return java version
  */
 JavaVersion getJavaFromHome(String path) {
-    log("Reading java version from JAVA_HOME: ${path}")
-    def javaExe = path + "/bin/java"
+    def releaseFile = new File(path, "release")
 
-    def version = executeCommand(javaExe, "-version")
-
-    if (version.exitValue != 0) {
-        return null
-    }
-
-    def versionText = version.output
-    log("versionText: ${versionText}")
-
-    String regex = "\"(.+)\""
-    Pattern pattern = Pattern.compile(regex)
-
-    // 创建 Matcher 对象
-    Matcher matcher = pattern.matcher(versionText)
-
-    if (matcher.find()) {
-        String v = matcher.group(1)
-
-        if (v.startsWith("1.")) {
-            // just save the major and minor version
-            v = v.substring(0, 3)
+    if (releaseFile.exists()) {
+        def pattern = Pattern.compile("JAVA_VERSION=\"(\\d+)\"")
+        def matcher = pattern.matcher(releaseFile.text)
+        if (matcher.find()) {
+            def version = matcher.group(1)
+            log("Get java version from release file: $version")
+            return JavaVersion.toVersion(version)
+        }
+    } else {
+        def javaBin = new File("$path/bin/java")
+        if (javaBin.exists()) {
+            return JavaVersion.VERSION_1_8
+        }else if(new File("$path/bin/java.exe").exists()){
+            return JavaVersion.VERSION_1_8
         }
 
-        log("java version string: ${v}")
-
-        return JavaVersion.toVersion(v)
+        return null
     }
-
-    return null
 }
 
 JavaVersion getJavaVersion() {
