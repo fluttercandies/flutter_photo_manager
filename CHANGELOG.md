@@ -15,6 +15,7 @@ To know more about breaking changes, see the [Migration Guide][].
 ### Fixes
 
 * Fixes compile exceptions with Xcode versions that are not compatible with iOS 17.0.
+* Modified the way to read the Java version in `build.gradle`.
 
 ## 3.2.0
 
