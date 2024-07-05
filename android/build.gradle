@@ -47,10 +47,10 @@ JavaVersion getJavaFromHome(String path) {
             return JavaVersion.toVersion(version)
         }
     } else {
-        def javaBin = new File("$path/bin/java")
+        def javaBin = new File("${path}/bin/java")
         if (javaBin.exists()) {
             return JavaVersion.VERSION_1_8
-        }else if(new File("$path/bin/java.exe").exists()){
+        } else if (new File("${path}/bin/java.exe").exists()) {
             return JavaVersion.VERSION_1_8
         }
 
