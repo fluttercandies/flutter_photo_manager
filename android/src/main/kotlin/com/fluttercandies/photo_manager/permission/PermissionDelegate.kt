@@ -15,7 +15,6 @@ import com.fluttercandies.photo_manager.util.LogUtils
 import com.fluttercandies.photo_manager.util.ResultHandler
 
 abstract class PermissionDelegate {
-
     protected var resultHandler: ResultHandler? = null
 
     private val tag: String
@@ -174,5 +173,4 @@ abstract class PermissionDelegate {
         requestType: Int,
         mediaLocation: Boolean
     ): PermissionResult
-
 }
