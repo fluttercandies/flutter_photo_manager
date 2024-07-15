@@ -6,6 +6,13 @@ that can be found in the LICENSE file. -->
 
 To know more about breaking changes, see the [Migration Guide][].
 
+## Unreleased
+
+### Fixes
+
+- Fix `fetchPathProperties` exception on android of API 28.
+
+
 ## 3.2.1
 
 ### Improvements
