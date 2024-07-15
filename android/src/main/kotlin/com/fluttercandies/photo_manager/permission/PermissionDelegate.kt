@@ -15,7 +15,6 @@ import com.fluttercandies.photo_manager.util.LogUtils
 import com.fluttercandies.photo_manager.util.ResultHandler
 
 abstract class PermissionDelegate {
-
     protected var resultHandler: ResultHandler? = null
 
     private val tag: String
@@ -40,7 +39,7 @@ abstract class PermissionDelegate {
     /**
      * Check if the permission is in the manifest.
      */
-    private fun havePermissionInManifest(context: Context, permission: String): Boolean {
+    protected fun havePermissionInManifest(context: Context, permission: String): Boolean {
         val applicationInfo = context.applicationInfo
         val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             context.packageManager.getPackageInfo(
@@ -174,5 +173,4 @@ abstract class PermissionDelegate {
         requestType: Int,
         mediaLocation: Boolean
     ): PermissionResult
-
 }
