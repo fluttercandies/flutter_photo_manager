@@ -3,8 +3,9 @@
 // in the LICENSE file.
 
 import 'dart:io';
-import 'dart:typed_data';
+import 'dart:typed_data' as typed_data;
 
+import 'package:flutter/services.dart';
 import 'package:photo_manager/platform_utils.dart';
 
 import '../filter/path_filter.dart';
@@ -66,16 +67,18 @@ class Editor {
   /// or guessed by the system, which does not always work.
   /// {@endtemplate}
   Future<AssetEntity?> saveImage(
-    Uint8List data, {
+    typed_data.Uint8List data, {
     required String title,
     String? desc,
     String? relativePath,
+    DeviceOrientation? orientation,
   }) {
     return plugin.saveImage(
       data,
       title: title,
       desc: desc,
       relativePath: relativePath,
+      orientation: orientation,
     );
   }
 
@@ -91,12 +94,14 @@ class Editor {
     required String title,
     String? desc,
     String? relativePath,
+    DeviceOrientation? orientation,
   }) {
     return plugin.saveImageWithPath(
       path,
       title: title,
       desc: desc,
       relativePath: relativePath,
+      orientation: orientation,
     );
   }
 
@@ -112,12 +117,14 @@ class Editor {
     required String title,
     String? desc,
     String? relativePath,
+    DeviceOrientation? orientation,
   }) {
     return plugin.saveVideo(
       file,
       title: title,
       desc: desc,
       relativePath: relativePath,
+      orientation: orientation,
     );
   }
 

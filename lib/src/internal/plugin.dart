@@ -18,6 +18,7 @@ import '../types/types.dart';
 import '../utils/convert_utils.dart';
 import 'constants.dart';
 import 'enums.dart';
+import 'extensions.dart';
 import 'progress_handler.dart';
 
 PhotoManagerPlugin plugin = PhotoManagerPlugin();
@@ -249,6 +250,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     required String? title,
     String? desc,
     String? relativePath,
+    DeviceOrientation? orientation,
   }) async {
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mSaveImage,
@@ -257,6 +259,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'title': title,
         'desc': desc ?? '',
         'relativePath': relativePath,
+        'orientation': orientation?.value,
         ...onlyAddPermission,
       },
     );
@@ -274,6 +277,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     required String title,
     String? desc,
     String? relativePath,
+    DeviceOrientation? orientation,
   }) async {
     final File file = File(path);
     if (!file.existsSync()) {
@@ -287,6 +291,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'title': title,
         'desc': desc ?? '',
         'relativePath': relativePath,
+        'orientation': orientation?.value,
         ...onlyAddPermission,
       },
     );
@@ -304,6 +309,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     required String? title,
     String? desc,
     String? relativePath,
+    DeviceOrientation? orientation,
   }) async {
     if (!file.existsSync()) {
       assert(false, 'File must exists.');
@@ -316,6 +322,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'title': title,
         'desc': desc ?? '',
         'relativePath': relativePath,
+        'orientation': orientation?.value,
         ...onlyAddPermission,
       },
     );

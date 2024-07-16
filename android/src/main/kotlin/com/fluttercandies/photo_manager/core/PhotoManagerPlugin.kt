@@ -31,9 +31,9 @@ class PhotoManagerPlugin(
     private val permissionsUtils: PermissionsUtils
 ) : MethodChannel.MethodCallHandler {
     companion object {
-        private const val poolSize = 8
+        private const val POOL_SIZE = 8
         private val threadPool: ThreadPoolExecutor = ThreadPoolExecutor(
-            poolSize,
+            POOL_SIZE,
             Int.MAX_VALUE,
             1,
             TimeUnit.MINUTES,
@@ -227,7 +227,9 @@ class PhotoManagerPlugin(
                 permissionsUtils.withActivity(activity)
                     .setListener(object : PermissionsListener {
                         override fun onGranted(needPermissions: MutableList<String>) {
-                            resultHandler.reply(permissionsUtils.getAuthValue(requestType, mediaLocation).value)
+                            resultHandler.reply(
+                                permissionsUtils.getAuthValue(requestType, mediaLocation).value
+                            )
                         }
 
                         override fun onDenied(
@@ -467,7 +469,14 @@ class PhotoManagerPlugin(
                     val title = call.argument<String>("title") ?: ""
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
-                    val entity = photoManager.saveImage(image, title, desc, relativePath)
+                    val orientation = call.argument<Int?>("orientation")
+                    val entity = photoManager.saveImage(
+                        image,
+                        title,
+                        desc,
+                        relativePath,
+                        orientation,
+                    )
                     if (entity == null) {
                         resultHandler.reply(null)
                         return
@@ -486,8 +495,14 @@ class PhotoManagerPlugin(
                     val title = call.argument<String>("title") ?: ""
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
-                    val entity =
-                        photoManager.saveImage(imagePath, title, desc, relativePath)
+                    val orientation = call.argument<Int?>("orientation")
+                    val entity = photoManager.saveImage(
+                        imagePath,
+                        title,
+                        desc,
+                        relativePath,
+                        orientation,
+                    )
                     if (entity == null) {
                         resultHandler.reply(null)
                         return
@@ -506,8 +521,14 @@ class PhotoManagerPlugin(
                     val title = call.argument<String>("title")!!
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
-                    val entity =
-                        photoManager.saveVideo(videoPath, title, desc, relativePath)
+                    val orientation = call.argument<Int?>("orientation")
+                    val entity = photoManager.saveVideo(
+                        videoPath,
+                        title,
+                        desc,
+                        relativePath,
+                        orientation,
+                    )
                     if (entity == null) {
                         resultHandler.reply(null)
                         return
