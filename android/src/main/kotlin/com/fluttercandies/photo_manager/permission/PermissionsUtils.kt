@@ -171,10 +171,6 @@ class PermissionsUtils {
     }
 
     /**
-     *
-     */
-
-    /**
      * 跳转到应用的设置界面
      *
      * @param context 上下文
@@ -206,5 +202,4 @@ class PermissionsUtils {
     fun getAuthValue(requestType: Int, mediaLocation: Boolean): PermissionResult {
         return delegate.getAuthValue(context!!, requestType, mediaLocation)
     }
-
 }

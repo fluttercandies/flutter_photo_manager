@@ -12,6 +12,11 @@ To know more about breaking changes, see the [Migration Guide][].
 
 - Fix `fetchPathProperties` exception on android of API 28.
 
+## 3.2.2
+
+### Fixes 
+
+* Do not require `WRITE_EXTERNAL_STORAGE` if not declared in the manifest with Android 29-.
 
 ## 3.2.1
 
