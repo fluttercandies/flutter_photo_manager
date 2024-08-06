@@ -6,6 +6,8 @@ import '../util/common_util.dart';
 import '../util/log.dart';
 
 class PhotoProvider extends ChangeNotifier {
+  bool showVerboseLog = false;
+
   List<AssetPathEntity> list = <AssetPathEntity>[];
 
   RequestType type = RequestType.common;
@@ -279,6 +281,11 @@ class PhotoProvider extends ChangeNotifier {
     _pathFilterOption = PMPathFilter(
       darwin: darwinPathFilterOption,
     );
+    notifyListeners();
+  }
+
+  void changeVerboseLog(bool v) {
+    showVerboseLog = v;
     notifyListeners();
   }
 }

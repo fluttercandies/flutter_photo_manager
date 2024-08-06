@@ -23,15 +23,116 @@ import 'progress_handler.dart';
 PhotoManagerPlugin plugin = PhotoManagerPlugin();
 
 mixin BasePlugin {
-  final MethodChannel _channel = const MethodChannel(PMConstants.channelPrefix);
+  MethodChannel _channel = const MethodChannel(PMConstants.channelPrefix);
 
   final Map<String, dynamic> onlyAddPermission = <String, dynamic>{
     'onlyAddPermission': true,
   };
 }
 
+class VerboseLogMethodChannel extends MethodChannel {
+  VerboseLogMethodChannel({
+    required String name,
+    required this.logFilePath,
+  }) : super(name);
+
+  final String logFilePath;
+
+  var index = 0;
+
+  @override
+  Future<T?> invokeMethod<T>(String method, [arguments]) async {
+    final channelIndex = index;
+    index++;
+    final sw = Stopwatch()..start();
+    logVerboseStart(index: channelIndex, method: method);
+    final result = await super.invokeMethod(method, arguments);
+    sw.stop();
+    logVerbose(
+      index: channelIndex,
+      method: method,
+      args: arguments,
+      result: result,
+      stopwatch: sw,
+    );
+    return result;
+  }
+
+  void _writeLog(String log) {
+    // write log to file
+    final file = File(logFilePath);
+    const splitter = '===';
+    file.writeAsStringSync(
+      '$log\n$splitter\n',
+      mode: FileMode.append,
+    );
+  }
+
+  String _formatArgs(args) {
+    if (args == null) {
+      return 'null';
+    }
+    if (args is Map) {
+      final String res = args.keys.map((key) {
+        final value = args[key];
+        return '$key: ${_formatArgs(value)}';
+      }).join(', ');
+      return 'Map{ $res }';
+    }
+    if (args is Uint8List || args is List<int>) {
+      return 'IntList(${args.length})';
+    }
+    if (args is List) {
+      if (args.isEmpty) {
+        return 'List(empty)';
+      }
+      final type = args.first.runtimeType;
+      return 'List(${args.length})<$type>';
+    }
+    return args.toString();
+  }
+
+  void logVerboseStart({
+    required int index,
+    required String method,
+  }) {
+    final log = '''#$index - invoke - $method
+  Method: $method
+    ''';
+
+    _writeLog(log);
+  }
+
+  void logVerbose({
+    required int index,
+    required String method,
+    required args,
+    required result,
+    required Stopwatch stopwatch,
+  }) {
+    final log = '''#$index - result - $method
+  Time: ${stopwatch.elapsedMilliseconds}ms
+  Args: ${_formatArgs(args)}
+  Result: ${_formatArgs(args)}
+    ''';
+
+    _writeLog(log);
+  }
+}
+
 /// The plugin class is the core class that call channel's methods.
 class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
+  void setVerbose(bool isVerbose, String logPath) {
+    if (isVerbose) {
+      _channel = VerboseLogMethodChannel(
+        name: PMConstants.channelPrefix,
+        logFilePath: logPath,
+      );
+    } else {
+      _channel = const MethodChannel(PMConstants.channelPrefix);
+    }
+  }
+
   Future<List<AssetPathEntity>> getAssetPathList({
     bool hasAll = true,
     bool onlyAll = false,
