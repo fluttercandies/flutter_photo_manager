@@ -38,7 +38,7 @@ class VerboseLogMethodChannel extends MethodChannel {
 
   final String logFilePath;
 
-  var index = 0;
+  int index = 0;
 
   @override
   Future<T?> invokeMethod<T>(String method, [arguments]) async {
