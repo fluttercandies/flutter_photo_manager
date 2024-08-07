@@ -8,6 +8,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+*None.*
+
+## 3.2.3
+
 ### Fixes
 
 - Access `PMProgressHandler` more safely on iOS/macOS to avoid crashes and unfinished results.
