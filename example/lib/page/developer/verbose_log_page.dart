@@ -116,6 +116,7 @@ class _VerboseLogPageState extends State<VerboseLogPage> {
       ),
       body: Column(
         children: [
+          _buildFunctions(),
           _buildFilter(),
           Expanded(
             child: ListView.separated(
@@ -146,5 +147,94 @@ class _VerboseLogPageState extends State<VerboseLogPage> {
 
   Widget _buildFilter() {
     return Container();
+  }
+
+  Widget functionItem(String text, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        child: Text(text),
+      ),
+    );
+  }
+
+  void showInfo(List<String> info) {
+    final text = info.join('\n');
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Text(text),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildFunctions() {
+    return Wrap(
+      children: [
+        // analyze count
+        functionItem('Analyze Count', () {
+          final invokeCount = logList.where((e) => e.isInvokeLog).length;
+          final resultCount = logList.where((e) => e.isResultLog).length;
+
+          // time info
+          final timeList = logList
+              .where((e) => e.swTime != null)
+              .map((e) => e.swTime!)
+              .toList();
+
+          timeList.sort();
+
+          // 0~10ms
+          // 10~20ms
+          // 20~50ms
+          // 50~100ms
+          // 100ms+
+          final timeMap = <String, int>{
+            '0~10ms': 0,
+            '10~20ms': 0,
+            '20~50ms': 0,
+            '50~100ms': 0,
+            '100ms+': 0,
+          };
+
+          for (final time in timeList) {
+            if (time < 10) {
+              timeMap['0~10ms'] = timeMap['0~10ms']! + 1;
+            } else if (time < 20) {
+              timeMap['10~20ms'] = timeMap['10~20ms']! + 1;
+            } else if (time < 50) {
+              timeMap['20~50ms'] = timeMap['20~50ms']! + 1;
+            } else if (time < 100) {
+              timeMap['50~100ms'] = timeMap['50~100ms']! + 1;
+            } else {
+              timeMap['100ms+'] = timeMap['100ms+']! + 1;
+            }
+          }
+
+          final timeInfo = timeMap.entries
+              .where((e) => e.value > 0)
+              .map((e) => '    ${e.key}: ${e.value}')
+              .toList();
+
+          showInfo([
+            'Invoke Count: $invokeCount',
+            'Result Count: $resultCount',
+            'Time Info:',
+            ...timeInfo,
+          ]);
+        }),
+      ],
+    );
   }
 }
