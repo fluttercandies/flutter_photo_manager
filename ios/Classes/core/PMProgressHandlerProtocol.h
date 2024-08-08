@@ -12,6 +12,4 @@ typedef enum PMProgressState{
 
 - (void)notify:(double)progress state:(PMProgressState)state;
 
-- (void)deinit;
-
 @end

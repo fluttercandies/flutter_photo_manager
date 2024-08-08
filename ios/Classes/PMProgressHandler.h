@@ -17,8 +17,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)register:(NSObject <FlutterPluginRegistrar> *)registrar channelIndex:(int)index;
 
-- (void)deinit;
-
 @end
 
 NS_ASSUME_NONNULL_END
