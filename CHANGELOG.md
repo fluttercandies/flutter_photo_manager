@@ -10,6 +10,11 @@ To know more about breaking changes, see the [Migration Guide][].
 
 *None.*
 
+### Developer
+
+- Add verbose log for `MethodChannelPlugin`. (Use `PhotoManager.setLog` and pass `verboseFilePath` to enable it.)
+- Add `getVerboseFilePath` for `PhotoManager`.
+
 ## 3.2.3
 
 ### Fixes

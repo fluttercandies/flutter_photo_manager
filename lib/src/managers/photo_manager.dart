@@ -100,7 +100,22 @@ class PhotoManager {
   }
 
   /// Controls whether the plugin should log messages to the console during operation.
-  static Future<void> setLog(bool isLog) => plugin.setLog(isLog);
+  ///
+  /// The [isLog] parameter is used to enable or disable logging.
+  /// The [verboseFilePath] parameter is used to specify the path to record verbose logs.
+  static Future<void> setLog(
+    bool isLog, {
+    String? verboseFilePath,
+  }) async {
+    final isVerbose = isLog && verboseFilePath != null;
+    await plugin.setLog(isLog);
+    if (verboseFilePath != null) {
+      plugin.setVerbose(isVerbose, verboseFilePath);
+    }
+  }
+
+  /// Get the verbose file path
+  static String? getVerboseFilePath() => plugin.getVerboseFilePath();
 
   /// Whether to ignore all runtime permissions check.
   ///
