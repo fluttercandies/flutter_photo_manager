@@ -656,6 +656,14 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
 
     return true;
   }
+
+  String? getVerboseFilePath() {
+    if (plugin._channel is VerboseLogMethodChannel) {
+      return (plugin._channel as VerboseLogMethodChannel).logFilePath;
+    }
+
+    return null;
+  }
 }
 
 mixin IosPlugin on BasePlugin {
