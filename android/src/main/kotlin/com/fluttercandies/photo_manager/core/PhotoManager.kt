@@ -92,10 +92,6 @@ class PhotoManager(private val context: Context) {
         val frame = option.frame
         try {
             val asset = dbUtils.getAssetEntity(context, id)
-            if (asset == null) {
-                resultHandler.replyError("The asset not found!")
-                return
-            }
             ThumbnailUtil.getThumbnail(
                 context,
                 asset,
@@ -115,10 +111,6 @@ class PhotoManager(private val context: Context) {
 
     fun getOriginBytes(id: String, resultHandler: ResultHandler, needLocationPermission: Boolean) {
         val asset = dbUtils.getAssetEntity(context, id)
-        if (asset == null) {
-            resultHandler.replyError("The asset not found")
-            return
-        }
         try {
             val byteArray = dbUtils.getOriginBytes(context, asset, needLocationPermission)
             resultHandler.reply(byteArray)
@@ -154,7 +146,7 @@ class PhotoManager(private val context: Context) {
             }
         }
         val galleryEntity = dbUtils.getAssetPathEntityFromId(context, id, type, option)
-        if (galleryEntity != null && option.containsPathModified) {
+        if (option.containsPathModified) {
             dbUtils.injectModifiedDate(context, galleryEntity)
         }
 
@@ -171,7 +163,7 @@ class PhotoManager(private val context: Context) {
         title: String,
         description: String,
         relativePath: String?
-    ): AssetEntity? {
+    ): AssetEntity {
         return dbUtils.saveImage(context, image, title, description, relativePath)
     }
 
@@ -180,14 +172,11 @@ class PhotoManager(private val context: Context) {
         title: String,
         description: String,
         relativePath: String?
-    ): AssetEntity? {
+    ): AssetEntity {
         return dbUtils.saveImage(context, path, title, description, relativePath)
     }
 
-    fun saveVideo(path: String, title: String, desc: String, relativePath: String?): AssetEntity? {
-        if (!File(path).exists()) {
-            return null
-        }
+    fun saveVideo(path: String, title: String, desc: String, relativePath: String?): AssetEntity {
         return dbUtils.saveVideo(context, path, title, desc, relativePath)
     }
 
@@ -213,10 +202,6 @@ class PhotoManager(private val context: Context) {
     fun copyToGallery(assetId: String, galleryId: String, resultHandler: ResultHandler) {
         try {
             val assetEntity = dbUtils.copyToGallery(context, assetId, galleryId)
-            if (assetEntity == null) {
-                resultHandler.reply(null)
-                return
-            }
             resultHandler.reply(ConvertUtils.convertAsset(assetEntity))
         } catch (e: Exception) {
             LogUtils.error(e)
@@ -227,10 +212,6 @@ class PhotoManager(private val context: Context) {
     fun moveToGallery(assetId: String, albumId: String, resultHandler: ResultHandler) {
         try {
             val assetEntity = dbUtils.moveToGallery(context, assetId, albumId)
-            if (assetEntity == null) {
-                resultHandler.reply(null)
-                return
-            }
             resultHandler.reply(ConvertUtils.convertAsset(assetEntity))
         } catch (e: Exception) {
             LogUtils.error(e)
@@ -243,13 +224,13 @@ class PhotoManager(private val context: Context) {
         resultHandler.reply(result)
     }
 
-    fun fetchEntityProperties(id: String): AssetEntity? {
+    fun fetchEntityProperties(id: String): AssetEntity {
         return dbUtils.getAssetEntity(context, id)
     }
 
-    fun getUri(id: String): Uri? {
+    fun getUri(id: String): Uri {
         val asset = dbUtils.getAssetEntity(context, id)
-        return asset?.getUri()
+        return asset.getUri()
     }
 
     private val cacheFutures = ArrayList<FutureTarget<Bitmap>>()

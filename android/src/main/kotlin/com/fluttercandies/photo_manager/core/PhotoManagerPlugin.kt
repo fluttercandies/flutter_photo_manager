@@ -423,11 +423,7 @@ class PhotoManagerPlugin(
             Methods.fetchEntityProperties -> {
                 val id = call.argument<String>("id")!!
                 val asset = photoManager.fetchEntityProperties(id)
-                val assetResult = if (asset != null) {
-                    ConvertUtils.convertAsset(asset)
-                } else {
-                    null
-                }
+                val assetResult = ConvertUtils.convertAsset(asset)
                 resultHandler.reply(assetResult)
             }
 
@@ -468,10 +464,6 @@ class PhotoManagerPlugin(
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val entity = photoManager.saveImage(image, title, desc, relativePath)
-                    if (entity == null) {
-                        resultHandler.reply(null)
-                        return
-                    }
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
                 } catch (e: Exception) {
@@ -488,10 +480,6 @@ class PhotoManagerPlugin(
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val entity =
                         photoManager.saveImage(imagePath, title, desc, relativePath)
-                    if (entity == null) {
-                        resultHandler.reply(null)
-                        return
-                    }
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
                 } catch (e: Exception) {
@@ -508,10 +496,6 @@ class PhotoManagerPlugin(
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val entity =
                         photoManager.saveVideo(videoPath, title, desc, relativePath)
-                    if (entity == null) {
-                        resultHandler.reply(null)
-                        return
-                    }
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
                 } catch (e: Exception) {

@@ -13,7 +13,7 @@ import java.io.FileOutputStream
 @RequiresApi(Build.VERSION_CODES.Q)
 class ScopedCache {
     companion object {
-        private const val filenamePrefix = "pm_"
+        private const val FILENAME_PREFIX = "pm_"
     }
 
     fun getCacheFileFromEntity(
@@ -49,14 +49,14 @@ class ScopedCache {
 
     private fun getCacheFile(context: Context, assetEntity: AssetEntity, isOrigin: Boolean): File {
         val originString = if (isOrigin) "_o" else ""
-        val name = "$filenamePrefix${assetEntity.id}${originString}_${assetEntity.displayName}"
+        val name = "$FILENAME_PREFIX${assetEntity.id}${originString}_${assetEntity.displayName}"
         return File(context.cacheDir, name)
     }
 
     fun clearFileCache(context: Context) {
         val files = context.cacheDir?.listFiles()?.filterNotNull() ?: return
         for (file in files) {
-            if (file.name.startsWith(filenamePrefix)) {
+            if (file.name.startsWith(FILENAME_PREFIX)) {
                 file.delete()
             }
         }

@@ -126,7 +126,7 @@ interface IDBUtils {
         option: FilterOption
     ): List<AssetEntity>
 
-    fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean = true): AssetEntity?
+    fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean = true): AssetEntity
 
     fun getMediaType(type: Int): Int {
         return when (type) {
@@ -170,13 +170,13 @@ interface IDBUtils {
 //        return getDouble(getColumnIndex(columnName))
 //    }
 
-    fun Cursor.toAssetEntity(context: Context, checkIfExists: Boolean = true): AssetEntity? {
+    fun Cursor.toAssetEntity(context: Context, checkIfExists: Boolean = true): AssetEntity {
+        val id = getLong(_ID)
         val path = getString(DATA)
         if (checkIfExists && path.isNotBlank() && !File(path).exists()) {
-            return null
+            throw RuntimeException("Asset ($id) does not exists at its path ($path).")
         }
 
-        val id = getLong(_ID)
         val date = if (isAboveAndroidQ) {
             var tmpTime = getLong(DATE_TAKEN) / 1000
             if (tmpTime == 0L) {
@@ -244,7 +244,7 @@ interface IDBUtils {
         pathId: String,
         type: Int,
         option: FilterOption
-    ): AssetPathEntity?
+    ): AssetPathEntity
 
     fun getFilePath(context: Context, id: String, origin: Boolean): String?
 
@@ -254,7 +254,7 @@ interface IDBUtils {
         title: String,
         desc: String,
         relativePath: String?
-    ): AssetEntity? {
+    ): AssetEntity {
         var inputStream = ByteArrayInputStream(bytes)
         fun refreshInputStream() {
             inputStream = ByteArrayInputStream(bytes)
@@ -323,7 +323,7 @@ interface IDBUtils {
         title: String,
         desc: String,
         relativePath: String?
-    ): AssetEntity? {
+    ): AssetEntity {
         fromPath.checkDirs()
         val file = File(fromPath)
         var inputStream = FileInputStream(file)
@@ -402,7 +402,7 @@ interface IDBUtils {
         title: String,
         desc: String,
         relativePath: String?
-    ): AssetEntity? {
+    ): AssetEntity {
         fromPath.checkDirs()
         val file = File(fromPath)
         var inputStream = FileInputStream(file)
@@ -476,7 +476,7 @@ interface IDBUtils {
         contentUri: Uri,
         values: ContentValues,
         shouldKeepPath: Boolean = false,
-    ): AssetEntity? {
+    ): AssetEntity {
         val cr = context.contentResolver
         val uri =
             cr.insert(contentUri, values) ?: throw RuntimeException("Cannot insert the new asset.")
@@ -493,9 +493,6 @@ interface IDBUtils {
     fun assetExists(context: Context, id: String): Boolean {
         val columns = arrayOf(_ID)
         context.contentResolver.logQuery(allUri, columns, "$_ID = ?", arrayOf(id), null).use {
-            if (it == null) {
-                return false
-            }
             return it.count >= 1
         }
     }
@@ -512,9 +509,14 @@ interface IDBUtils {
         if (LogUtils.isLog) {
             val splitter = "".padStart(40, '-')
             LogUtils.info("log error row $id start $splitter")
-            val cursor =
-                context.contentResolver.logQuery(allUri, null, "$_ID = ?", arrayOf(id), null)
-            cursor?.use {
+            val cursor = context.contentResolver.logQuery(
+                allUri,
+                null,
+                "$_ID = ?",
+                arrayOf(id),
+                null
+            )
+            cursor.use {
                 val names = it.columnNames
                 if (it.moveToNext()) {
                     for (i in 0 until names.count()) {
@@ -542,9 +544,9 @@ interface IDBUtils {
         return "$orderBy LIMIT $pageSize OFFSET $start"
     }
 
-    fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity?
+    fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity
 
-    fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity?
+    fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity
 
     fun getSomeInfo(context: Context, assetId: String): Pair<String, String?>?
 
@@ -601,7 +603,7 @@ interface IDBUtils {
             selection,
             ids.toTypedArray(),
             null
-        ) ?: return emptyList()
+        )
         val list = ArrayList<String>()
         val map = HashMap<String, String>()
         cursor.use {
@@ -638,7 +640,7 @@ interface IDBUtils {
                 arrayOf(pathId),
                 sortOrder
             )
-        } ?: return null
+        }
         cursor.use {
             if (it.moveToNext()) {
                 return it.getLong(DATE_MODIFIED)
@@ -649,10 +651,9 @@ interface IDBUtils {
 
     fun getColumnNames(context: Context): List<String> {
         val cr = context.contentResolver
-        cr.logQuery(allUri, null, null, null, null)?.use {
+        cr.logQuery(allUri, null, null, null, null).use {
             return it.columnNames.toList()
         }
-        return emptyList()
     }
 
     fun ContentResolver.logQuery(
@@ -661,7 +662,7 @@ interface IDBUtils {
         selection: String?,
         selectionArgs: Array<String>?,
         sortOrder: String?
-    ): Cursor? {
+    ): Cursor {
         fun log(logFunc: (log: String) -> Unit, cursor: Cursor?) {
             if (LogUtils.isLog) {
                 val sb = StringBuilder()
@@ -681,7 +682,7 @@ interface IDBUtils {
         try {
             val cursor = query(uri, projection, selection, selectionArgs, sortOrder)
             log(LogUtils::info, cursor)
-            return cursor
+            return cursor ?: throw RuntimeException("Failed to obtain the cursor.")
         } catch (e: Exception) {
             log(LogUtils::error, null)
             LogUtils.error("happen query error", e)
@@ -695,7 +696,7 @@ interface IDBUtils {
         val where = option.makeWhere(requestType, args, false)
         val order = option.orderByCondString()
         cr.logQuery(allUri, arrayOf(_ID), where, args.toTypedArray(), order).use {
-            return it?.count ?: 0
+            return it.count
         }
     }
 
@@ -724,7 +725,7 @@ interface IDBUtils {
 
         val order = option.orderByCondString()
         cr.logQuery(allUri, arrayOf(_ID), where, args.toTypedArray(), order).use {
-            return it?.count ?: 0
+            return it.count
         }
     }
 
@@ -740,19 +741,17 @@ interface IDBUtils {
         val args = ArrayList<String>()
         val where = option.makeWhere(requestType, args, false)
         val order = option.orderByCondString()
-        cr.logQuery(allUri, keys(), where, args.toTypedArray(), order)?.use {
+        cr.logQuery(allUri, keys(), where, args.toTypedArray(), order).use {
             val result = ArrayList<AssetEntity>()
             it.moveToPosition(start - 1)
             while (it.moveToNext()) {
-                val asset = it.toAssetEntity(context, false) ?: continue
+                val asset = it.toAssetEntity(context, false)
                 result.add(asset)
-
                 if (result.count() == end - start) {
                     break
                 }
             }
-
             return result
-        } ?: return emptyList()
+        }
     }
 }

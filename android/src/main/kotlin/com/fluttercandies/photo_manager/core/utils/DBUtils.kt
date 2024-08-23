@@ -42,7 +42,7 @@ object DBUtils : IDBUtils {
             selection,
             args.toTypedArray(),
             null
-        ) ?: return list
+        )
         cursor.use {
             while (it.moveToNext()) {
                 val id = it.getString(0)
@@ -77,7 +77,7 @@ object DBUtils : IDBUtils {
             selections,
             args.toTypedArray(),
             null
-        ) ?: return list
+        )
         cursor.use {
             if (it.moveToNext()) {
                 val countIndex = projection.indexOf("count(1)")
@@ -100,7 +100,7 @@ object DBUtils : IDBUtils {
         pathId: String,
         type: Int,
         option: FilterOption
-    ): AssetPathEntity? {
+    ): AssetPathEntity {
         val args = ArrayList<String>()
         val where = option.makeWhere(type, args)
         val idSelection: String
@@ -118,7 +118,7 @@ object DBUtils : IDBUtils {
             selection,
             args.toTypedArray(),
             null
-        ) ?: return null
+        )
         cursor.use {
             return if (it.moveToNext()) {
                 val id = it.getString(0)
@@ -126,7 +126,7 @@ object DBUtils : IDBUtils {
                 val assetCount = it.getInt(2)
                 AssetPathEntity(id, name, assetCount, 0)
             } else {
-                null
+                throwMsg("Failed to find the path $pathId")
             }
         }
     }
@@ -159,10 +159,10 @@ object DBUtils : IDBUtils {
             selection,
             args.toTypedArray(),
             sortOrder
-        ) ?: return list
+        )
         cursor.use {
             while (it.moveToNext()) {
-                it.toAssetEntity(context)?.apply {
+                it.toAssetEntity(context).apply {
                     list.add(this)
                 }
             }
@@ -200,10 +200,10 @@ object DBUtils : IDBUtils {
             selection,
             args.toTypedArray(),
             sortOrder
-        ) ?: return list
+        )
         cursor.use {
             while (it.moveToNext()) {
-                it.toAssetEntity(context)?.apply {
+                it.toAssetEntity(context).apply {
                     list.add(this)
                 }
             }
@@ -215,7 +215,7 @@ object DBUtils : IDBUtils {
         context: Context,
         id: String,
         checkIfExists: Boolean
-    ): AssetEntity? {
+    ): AssetEntity {
         val keys =
             (IDBUtils.storeImageKeys + IDBUtils.storeVideoKeys + locationKeys + IDBUtils.typeKeys).distinct()
                 .toTypedArray()
@@ -228,12 +228,12 @@ object DBUtils : IDBUtils {
             selection,
             args,
             null
-        ) ?: return null
+        )
         cursor.use {
             return if (it.moveToNext()) {
                 it.toAssetEntity(context, checkIfExists)
             } else {
-                null
+                throwMsg("Failed to find asset $id")
             }
         }
     }
@@ -247,25 +247,27 @@ object DBUtils : IDBUtils {
     }
 
     override fun getExif(context: Context, id: String): ExifInterface? {
-        val asset = getAssetEntity(context, id) ?: return null
+        val asset = getAssetEntity(context, id)
         val file = File(asset.path)
         return if (file.exists()) ExifInterface(asset.path) else null
     }
 
-    override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
-        val assetEntity = getAssetEntity(context, id) ?: return null
+    override fun getFilePath(context: Context, id: String, origin: Boolean): String {
+        val assetEntity = getAssetEntity(context, id)
         return assetEntity.path
     }
 
-    override fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity? {
-        val (currentGalleryId, _) = getSomeInfo(context, assetId)
-            ?: throw RuntimeException("Cannot get gallery id of $assetId")
+    override fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity {
+        val (currentGalleryId, _) = getSomeInfo(context, assetId) ?: throwMsg(
+            "Cannot get gallery id of $assetId"
+        )
         if (galleryId == currentGalleryId) {
-            throw RuntimeException("No copy required, because the target gallery is the same as the current one.")
+            throwMsg(
+                "No copy required, because the target gallery is the same as the current one."
+            )
         }
         val cr = context.contentResolver
         val asset = getAssetEntity(context, assetId)
-            ?: throw RuntimeException("No copy required, because the target gallery is the same as the current one.")
 
         val copyKeys = arrayListOf(
             MediaStore.MediaColumns.DISPLAY_NAME,
@@ -289,9 +291,9 @@ object DBUtils : IDBUtils {
             idSelection,
             arrayOf(assetId),
             null
-        ) ?: throw RuntimeException("Cannot find asset .")
+        )
         if (!cursor.moveToNext()) {
-            throw RuntimeException("Cannot find asset .")
+            throwMsg("Cannot find asset .")
         }
         val insertUri = MediaStoreUtils.getInsertUri(mediaType)
         val galleryInfo = getGalleryInfo(context, galleryId) ?: throwMsg("Cannot find gallery info")
@@ -304,10 +306,9 @@ object DBUtils : IDBUtils {
             put(MediaStore.MediaColumns.DATA, outputPath)
         }
 
-        val insertedUri =
-            cr.insert(insertUri, cv) ?: throw RuntimeException("Cannot insert new asset.")
+        val insertedUri = cr.insert(insertUri, cv) ?: throwMsg("Cannot insert new asset.")
         val outputStream = cr.openOutputStream(insertedUri)
-            ?: throw RuntimeException("Cannot open output stream for $insertedUri.")
+            ?: throwMsg("Cannot open output stream for $insertedUri.")
         val inputStream = File(asset.path).inputStream()
         inputStream.use {
             outputStream.use {
@@ -317,11 +318,11 @@ object DBUtils : IDBUtils {
 
         cursor.close()
         val insertedId = insertedUri.lastPathSegment
-            ?: throw RuntimeException("Cannot open output stream for $insertedUri.")
+            ?: throwMsg("Cannot open output stream for $insertedUri.")
         return getAssetEntity(context, insertedId)
     }
 
-    override fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity? {
+    override fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity {
         val (currentGalleryId, _) = getSomeInfo(context, assetId)
             ?: throwMsg("Cannot get gallery id of $assetId")
 
@@ -339,7 +340,7 @@ object DBUtils : IDBUtils {
             idSelection,
             arrayOf(assetId),
             null
-        ) ?: throwMsg("Cannot find $assetId path")
+        )
 
         val targetPath = if (cursor.moveToNext()) {
             val srcPath = cursor.getString(0)
@@ -379,7 +380,7 @@ object DBUtils : IDBUtils {
                 null,
                 null,
                 null
-            ) ?: return false
+            )
             cursor.use {
                 while (it.moveToNext()) {
                     val id = it.getString(_ID)
@@ -414,7 +415,7 @@ object DBUtils : IDBUtils {
             "${MediaStore.MediaColumns._ID} = ?",
             arrayOf(assetId),
             null
-        ) ?: return null
+        )
         cursor.use {
             if (!it.moveToNext()) {
                 return null
@@ -437,7 +438,7 @@ object DBUtils : IDBUtils {
             "${MediaStore.MediaColumns.BUCKET_ID} = ?",
             arrayOf(galleryId),
             null
-        ) ?: return null
+        )
         cursor.use {
             if (!it.moveToNext()) {
                 return null
