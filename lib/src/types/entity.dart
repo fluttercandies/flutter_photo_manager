@@ -455,13 +455,17 @@ class AssetEntity {
   /// This field could be 0 in cases that EXIF info is failed to parse.
   final int height;
 
-  bool get _isLandscape => orientation == 90 || orientation == 270;
+  // 90 and 270 typically means the image is flipping.
+  bool get _isFlipping => orientation == 90 || orientation == 270;
 
-  int get orientatedWidth => _isLandscape ? height : width;
+  /// The orientated width according to the orientation.
+  int get orientatedWidth => _isFlipping ? height : width;
 
-  int get orientatedHeight => _isLandscape ? width : height;
+  /// The orientated height according to the orientation.
+  int get orientatedHeight => _isFlipping ? width : height;
 
-  Size get orientatedSize => _isLandscape ? size.flipped : size;
+  /// The orientated size according to the orientation.
+  Size get orientatedSize => _isFlipping ? size.flipped : size;
 
   /// Latitude value of the location when shooting.
   ///  * Android: `MediaStore.Images.ImageColumns.LATITUDE`.
