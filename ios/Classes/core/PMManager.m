@@ -425,7 +425,6 @@
                                          NSDictionary *info) {
         if (error) {
             [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
-            [progressHandler deinit];
             return;
         }
         if (progress != 1) {
@@ -609,7 +608,6 @@
     [options setProgressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
         if (error) {
             [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
-            [progressHandler deinit];
             return;
         }
         if (progress != 1) {
@@ -697,7 +695,6 @@
                 } else if (exportSession.status == AVAssetExportSessionStatusFailed ||
                            exportSession.status == AVAssetExportSessionStatusCancelled) {
                     [self notifyProgress:progressHandler progress:1.0 state:PMProgressStateFailed];
-                    [progressHandler deinit];
                     [handler replyError:[NSString stringWithFormat:@"%@", exportSession.error]];
                 }
             }];
@@ -812,7 +809,6 @@
                                   NSDictionary *info) {
         if (error) {
             [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
-            [progressHandler deinit];
             return;
         }
         if (progress != 1) {
@@ -1477,7 +1473,6 @@
 
 - (void)notifySuccess:(NSObject <PMProgressHandlerProtocol> *)handler {
     [self notifyProgress:handler progress:1 state:PMProgressStateSuccess];
-    [handler deinit];
 }
 
 

@@ -21,20 +21,7 @@ class GalleryItemWidget extends StatelessWidget {
 
   Widget buildGalleryItemWidget(AssetPathEntity item, BuildContext context) {
     final navigator = Navigator.of(context);
-    return GestureDetector(
-      child: ListTile(
-        title: Text(item.name),
-        subtitle: FutureBuilder<int>(
-          future: item.assetCountAsync,
-          builder: (_, AsyncSnapshot<int> data) {
-            if (data.hasData) {
-              return Text('count : ${data.data}');
-            }
-            return const SizedBox.shrink();
-          },
-        ),
-        trailing: _buildSubButton(item),
-      ),
+    return InkWell(
       onTap: () async {
         if (item.albumType == 2) {
           showToast("The folder can't get asset");
@@ -108,6 +95,19 @@ class GalleryItemWidget extends StatelessWidget {
       //     final asset = list[i];
       //   }
       // },
+      child: ListTile(
+        title: Text(item.name),
+        subtitle: FutureBuilder<int>(
+          future: item.assetCountAsync,
+          builder: (_, AsyncSnapshot<int> data) {
+            if (data.hasData) {
+              return Text('count : ${data.data}');
+            }
+            return const SizedBox.shrink();
+          },
+        ),
+        trailing: _buildSubButton(item),
+      ),
     );
   }
 

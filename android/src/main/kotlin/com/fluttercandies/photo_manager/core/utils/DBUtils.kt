@@ -34,7 +34,6 @@ object DBUtils : IDBUtils {
         val list = ArrayList<AssetPathEntity>()
         val args = ArrayList<String>()
         val where = option.makeWhere(requestType, args)
-//        val where = makeWhere(requestType, option, args)
         val selection =
             "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $where) GROUP BY (${MediaStore.MediaColumns.BUCKET_ID}"
         val cursor = context.contentResolver.logQuery(
@@ -103,6 +102,7 @@ object DBUtils : IDBUtils {
         option: FilterOption
     ): AssetPathEntity? {
         val args = ArrayList<String>()
+        val where = option.makeWhere(type, args)
         val idSelection: String
         if (pathId == "") {
             idSelection = ""
@@ -110,7 +110,6 @@ object DBUtils : IDBUtils {
             idSelection = "AND ${MediaStore.MediaColumns.BUCKET_ID} = ?"
             args.add(pathId)
         }
-        val where = option.makeWhere(type, args)
         val selection =
             "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL $where $idSelection) GROUP BY (${MediaStore.MediaColumns.BUCKET_ID}"
         val cursor = context.contentResolver.logQuery(

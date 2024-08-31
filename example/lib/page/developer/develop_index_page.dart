@@ -8,14 +8,18 @@ import 'package:oktoast/oktoast.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_example/page/developer/android/column_names_page.dart';
 import 'package:photo_manager_example/page/developer/custom_filter_page.dart';
+import 'package:provider/provider.dart';
 
+import '../../model/photo_provider.dart';
 import '../../util/log.dart';
+import '../../util/log_export.dart';
 import 'create_entity_by_id.dart';
 import 'dev_title_page.dart';
 import 'ios/create_folder_example.dart';
 import 'ios/edit_asset.dart';
 import 'issues_page/issue_index_page.dart';
 import 'remove_all_android_not_exists_example.dart';
+import 'verbose_log_page.dart';
 
 class DeveloperIndexPage extends StatefulWidget {
   const DeveloperIndexPage({super.key});
@@ -31,6 +35,26 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
   static const exampleHeicUrl =
       'https://cdn.jsdelivr.net/gh/ExampleAssets/ExampleAsset@master/preview_0.heic';
 
+  Widget _buildVerboseLogSwitch(BuildContext conetxt) {
+    final PhotoProvider provider = context.watch<PhotoProvider>();
+    final bool verboseLog = provider.showVerboseLog;
+    return CheckboxListTile(
+      title: const Text('Verbose log'),
+      value: verboseLog,
+      onChanged: (value) async {
+        provider.changeVerboseLog(value!);
+        setState(() {});
+
+        if (verboseLog) {
+          final path = await PMVerboseLogUtil.shared.getLogFilePath();
+          PhotoManager.setLog(true, verboseFilePath: path);
+        } else {
+          PhotoManager.setLog(false);
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,6 +64,11 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
       body: ListView(
         padding: const EdgeInsets.all(8.0),
         children: <Widget>[
+          _buildVerboseLogSwitch(context),
+          ElevatedButton(
+            onPressed: () => navToWidget(const VerboseLogPage()),
+            child: const Text('Show verbose log'),
+          ),
           ElevatedButton(
             onPressed: () => navToWidget(const CustomFilterPage()),
             child: const Text('Custom filter'),

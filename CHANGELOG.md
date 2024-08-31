@@ -6,6 +6,39 @@ that can be found in the LICENSE file. -->
 
 To know more about breaking changes, see the [Migration Guide][].
 
+## Unreleased
+
+*None.*
+
+### Developer
+
+- Add verbose log for `MethodChannelPlugin`. (Use `PhotoManager.setLog` and pass `verboseFilePath` to enable it.)
+- Add `getVerboseFilePath` for `PhotoManager`.
+
+## 3.2.3
+
+### Fixes
+
+- Access `PMProgressHandler` more safely on iOS/macOS to avoid crashes and unfinished results.
+
+## 3.2.2
+
+### Fixes
+
+- Do not require `WRITE_EXTERNAL_STORAGE` if not declared in the manifest with Android 29-.
+- Fix `fetchPathProperties` exception on android of API 28.
+
+## 3.2.1
+
+### Improvements
+
+* Declare `NSPrivacyAccessedAPICategoryFileTimestamp` for iOS privacy policies.
+
+### Fixes
+
+* Fixes compile exceptions with Xcode versions that are not compatible with iOS 17.0.
+* Modified the way to read the Java version in `build.gradle`.
+
 ## 3.2.0
 
 ### Improvements
