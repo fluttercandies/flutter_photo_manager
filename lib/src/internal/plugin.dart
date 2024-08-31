@@ -141,7 +141,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     required PMPathFilter pathFilterOption,
   }) async {
     if (onlyAll) {
-      assert(hasAll, 'If only is true, then the hasAll must be not null.');
+      hasAll = true;
     }
     filterOption ??= FilterOptionGroup();
     final result = await _channel.invokeMethod<Map>(
@@ -352,6 +352,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     String? relativePath,
     int? orientation,
   }) async {
+    _throwIfOrientationInvalid(orientation);
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mSaveImage,
       <String, dynamic>{
@@ -379,10 +380,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     String? relativePath,
     int? orientation,
   }) async {
+    _throwIfOrientationInvalid(orientation);
     final File file = File(path);
     if (!file.existsSync()) {
-      assert(false, 'File must exists.');
-      return null;
+      throw ArgumentError('$path does not exists');
     }
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mSaveImageWithPath,
@@ -411,9 +412,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     String? relativePath,
     int? orientation,
   }) async {
+    _throwIfOrientationInvalid(orientation);
     if (!file.existsSync()) {
-      assert(false, 'File must exists.');
-      return null;
+      throw ArgumentError('${file.path} does not exists');
     }
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mSaveVideo,
@@ -527,11 +528,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     AssetPathEntity pathEntity,
   ) async {
     if (pathEntity.isAll) {
-      assert(
-        pathEntity.isAll,
-        "You can't copy the asset into the album containing all the pictures.",
+      throw ArgumentError(
+        'Cannot copy into the album containing all the assets.',
       );
-      return null;
     }
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mCopyAsset,
@@ -579,7 +578,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     if (PlatformUtils.isOhos) {
       return;
     }
-    assert(ids.isNotEmpty);
+    if (ids.isEmpty) {
+      throw ArgumentError('Empty IDs are not allowed');
+    }
     return _channel.invokeMethod(
       PMConstants.mRequestCacheAssetsThumb,
       <String, dynamic>{
@@ -590,7 +591,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   }
 
   Future<void> presentLimited(RequestType type) async {
-    assert(Platform.isIOS || Platform.isAndroid);
     if (Platform.isIOS || Platform.isAndroid) {
       return _channel.invokeMethod(PMConstants.mPresentLimited, {
         'type': type.value,
@@ -599,12 +599,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   }
 
   Future<String?> getMimeTypeAsync(AssetEntity entity) async {
-    assert(
-      Platform.isAndroid ||
-          Platform.isIOS ||
-          Platform.isMacOS ||
-          PlatformUtils.isOhos,
-    );
     if (Platform.isAndroid || PlatformUtils.isOhos) {
       return entity.mimeType;
     }
@@ -622,7 +616,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     RequestType type = RequestType.common,
   }) {
     final filter = filterOption ?? PMFilter.defaultValue();
-
     return _channel.invokeMethod<int>(PMConstants.mGetAssetCount, {
       'type': type.value,
       'option': filter.toMap(),
@@ -682,14 +675,12 @@ mixin IosPlugin on BasePlugin {
   }) async {
     assert(Platform.isIOS || Platform.isMacOS);
     if (!imageFile.existsSync()) {
-      assert(false, 'File of the image must exist.');
-      return null;
+      throw ArgumentError('The image file does not exists');
     }
     if (!videoFile.existsSync()) {
-      assert(false, 'videoFile must exists.');
-      return null;
+      throw ArgumentError('The video file does not exists');
     }
-    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
+    final result = await _channel.invokeMethod(
       PMConstants.mSaveLivePhoto,
       <String, dynamic>{
         'imagePath': imageFile.absolute.path,
@@ -700,13 +691,7 @@ mixin IosPlugin on BasePlugin {
         ...onlyAddPermission,
       },
     );
-    if (result == null) {
-      return null;
-    }
-    return ConvertUtils.convertMapToAsset(
-      result.cast<String, dynamic>(),
-      title: title,
-    );
+    return ConvertUtils.convertMapToAsset(result.cast(), title: title);
   }
 
   Future<AssetPathEntity?> iosCreateAlbum(
@@ -836,4 +821,18 @@ mixin OhosPlugin on BasePlugin {
     }
     return result ?? <String>[];
   }
+}
+
+void _throwIfOrientationInvalid(int? value) {
+  if (value == null ||
+      value == 0 ||
+      value == 90 ||
+      value == 180 ||
+      value == 270) {
+    return;
+  }
+  throw ArgumentError(
+    'The given orientation is invalid, '
+    'allowed values are 0, 90, 180, 270, and null.',
+  );
 }
