@@ -8,7 +8,11 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+### Improvements
+
+- Allows saving assets with a given orientation value.
+- Reads image size from EXIF rather than decoding from the bitmap factory.
+- Upgrades Android EXIF library.
 
 ### Developer
 

@@ -15,7 +15,7 @@ data class AssetEntity(
     val type: Int,
     val displayName: String,
     val modifiedDate: Long,
-    val orientation: Int,
+    var orientation: Int,
     var lat: Double? = null,
     var lng: Double? = null,
     val androidQRelativePath: String? = null,
