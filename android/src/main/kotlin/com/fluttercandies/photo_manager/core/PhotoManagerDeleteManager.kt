@@ -80,7 +80,7 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
     private fun handleAndroidRDelete(resultCode: Int) {
         if (resultCode == Activity.RESULT_OK) {
             androidRHandler?.apply {
-                val ids = call?.argument<List<String>>("ids") ?: return@apply
+                val ids = call.argument<List<String>>("ids") ?: return@apply
                 androidRHandler?.reply(ids)
             }
         } else {
