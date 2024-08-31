@@ -5,7 +5,6 @@
 import 'dart:io';
 import 'dart:typed_data' as typed_data;
 
-import 'package:flutter/services.dart';
 import 'package:photo_manager/platform_utils.dart';
 
 import '../filter/path_filter.dart';
@@ -60,18 +59,23 @@ class Editor {
   /// [desc] is the description field that only works on Android.
   /// {@endtemplate}
   ///
-  /// {@template photo_manager.Editor.SavingAssets}
+  /// {@template photo_manager.Editor.RelativePathWhenSaving}
   /// On Android 29 and above, you can use [relativePath] to specify the
   /// `RELATIVE_PATH` used in the MediaStore.
   /// The MIME type will either be formed from the title if you pass one,
   /// or guessed by the system, which does not always work.
+  /// {@endtemplate}
+  ///
+  /// {@template photo_manager.Editor.OrientationWhenSaving}
+  /// [orientation] is only available on Android. It could be useful when
+  /// some devices cannot recognizes the asset's size info well.
   /// {@endtemplate}
   Future<AssetEntity?> saveImage(
     typed_data.Uint8List data, {
     required String title,
     String? desc,
     String? relativePath,
-    DeviceOrientation? orientation,
+    int? orientation,
   }) {
     return plugin.saveImage(
       data,
@@ -88,13 +92,15 @@ class Editor {
   ///
   /// {@macro photo_manager.Editor.DescriptionWhenSaving}
   ///
-  /// {@macro photo_manager.Editor.SavingAssets}
+  /// {@macro photo_manager.Editor.RelativePathWhenSaving}
+  ///
+  /// {@macro photo_manager.Editor.OrientationWhenSaving}
   Future<AssetEntity?> saveImageWithPath(
     String path, {
     required String title,
     String? desc,
     String? relativePath,
-    DeviceOrientation? orientation,
+    int? orientation,
   }) {
     return plugin.saveImageWithPath(
       path,
@@ -111,13 +117,15 @@ class Editor {
   ///
   /// {@macro photo_manager.Editor.DescriptionWhenSaving}
   ///
-  /// {@macro photo_manager.Editor.SavingAssets}
+  /// {@macro photo_manager.Editor.RelativePathWhenSaving}
+  ///
+  /// {@macro photo_manager.Editor.OrientationWhenSaving}
   Future<AssetEntity?> saveVideo(
     File file, {
     required String title,
     String? desc,
     String? relativePath,
-    DeviceOrientation? orientation,
+    int? orientation,
   }) {
     return plugin.saveVideo(
       file,
@@ -266,7 +274,9 @@ class DarwinEditor {
   ///
   /// {@macro photo_manager.Editor.DescriptionWhenSaving}
   ///
-  /// {@macro photo_manager.Editor.SavingAssets}
+  /// {@macro photo_manager.Editor.RelativePathWhenSaving}
+  ///
+  /// {@macro photo_manager.Editor.OrientationWhenSaving}
   Future<AssetEntity?> saveLivePhoto({
     required File imageFile,
     required File videoFile,
