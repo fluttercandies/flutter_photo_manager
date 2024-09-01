@@ -53,7 +53,7 @@ class Editor {
   /// [filename] will be helpful to evaluate the MIME type from the [data].
   ///
   /// {@template photo_manager.Editor.TitleWhenSaving}
-  /// [title] is the title field that only works on Android.
+  /// [title] is the title field on Android, and the original filename on iOS.
   /// {@endtemplate}
   ///
   /// {@template photo_manager.Editor.DescriptionWhenSaving}
