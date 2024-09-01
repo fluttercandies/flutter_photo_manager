@@ -8,6 +8,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+*None.*
+
+## 3.3.0
+
 ### Breaking changes
 
 `saveImage` now requires `filename` rather than `title` other save methods do not require `title` anymore.
