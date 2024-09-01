@@ -50,9 +50,10 @@ class Editor {
 
   /// Save image to gallery from the given [data].
   ///
+  /// [filename] will be helpful to evaluate the MIME type from the [data].
+  ///
   /// {@template photo_manager.Editor.TitleWhenSaving}
-  /// [title] typically means the filename of the saving entity, which can be
-  /// obtained by `basename(file.path)`.
+  /// [title] is the title field on Android, and the original filename on iOS.
   /// {@endtemplate}
   ///
   /// {@template photo_manager.Editor.DescriptionWhenSaving}
@@ -72,13 +73,15 @@ class Editor {
   /// {@endtemplate}
   Future<AssetEntity?> saveImage(
     typed_data.Uint8List data, {
-    required String title,
+    required String filename,
+    String? title,
     String? desc,
     String? relativePath,
     int? orientation,
   }) {
     return plugin.saveImage(
       data,
+      filename: filename,
       title: title,
       desc: desc,
       relativePath: relativePath,
@@ -86,7 +89,7 @@ class Editor {
     );
   }
 
-  /// Save image to gallery from the given [path].
+  /// Save image to gallery from the given [filePath].
   ///
   /// {@macro photo_manager.Editor.TitleWhenSaving}
   ///
@@ -96,14 +99,14 @@ class Editor {
   ///
   /// {@macro photo_manager.Editor.OrientationWhenSaving}
   Future<AssetEntity?> saveImageWithPath(
-    String path, {
-    required String title,
+    String filePath, {
+    String? title,
     String? desc,
     String? relativePath,
     int? orientation,
   }) {
     return plugin.saveImageWithPath(
-      path,
+      filePath,
       title: title,
       desc: desc,
       relativePath: relativePath,
@@ -122,7 +125,7 @@ class Editor {
   /// {@macro photo_manager.Editor.OrientationWhenSaving}
   Future<AssetEntity?> saveVideo(
     File file, {
-    required String title,
+    String? title,
     String? desc,
     String? relativePath,
     int? orientation,
@@ -280,14 +283,14 @@ class DarwinEditor {
   Future<AssetEntity?> saveLivePhoto({
     required File imageFile,
     required File videoFile,
-    required String title,
+    required String filename,
     String? desc,
     String? relativePath,
   }) {
     return plugin.saveLivePhoto(
       imageFile: imageFile,
       videoFile: videoFile,
-      title: title,
+      filename: filename,
       desc: desc,
       relativePath: relativePath,
     );

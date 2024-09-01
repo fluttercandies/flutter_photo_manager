@@ -403,10 +403,10 @@
                   }];
     } else if ([call.method isEqualToString:@"saveImage"]) {
         NSData *data = [call.arguments[@"image"] data];
-        NSString *title = call.arguments[@"title"];
+        NSString *filename = call.arguments[@"filename"];
         NSString *desc = call.arguments[@"desc"];
         [manager saveImage:data
-                     title:title
+                  filename:filename
                       desc:desc
                      block:^(PMAssetEntity *asset) {
                        if (!asset) {
@@ -417,10 +417,10 @@
                      }];
     } else if ([call.method isEqualToString:@"saveImageWithPath"]) {
         NSString *path = call.arguments[@"path"];
-        NSString *title = call.arguments[@"title"];
+        NSString *filename = call.arguments[@"title"];
         NSString *desc = call.arguments[@"desc"];
         [manager saveImageWithPath:path
-                             title:title
+                          filename:filename
                               desc:desc
                              block:^(PMAssetEntity *asset) {
                                if (!asset) {
@@ -431,10 +431,10 @@
                              }];
     } else if ([call.method isEqualToString:@"saveVideo"]) {
         NSString *videoPath = call.arguments[@"path"];
-        NSString *title = call.arguments[@"title"];
+        NSString *filename = call.arguments[@"title"];
         NSString *desc = call.arguments[@"desc"];
         [manager saveVideo:videoPath
-                     title:title
+                  filename:filename
                       desc:desc
                      block:^(PMAssetEntity *asset) {
                        if (!asset) {
@@ -446,11 +446,11 @@
     } else if ([call.method isEqualToString:@"saveLivePhoto"]) {
         NSString *videoPath = call.arguments[@"videoPath"];
         NSString *imagePath = call.arguments[@"imagePath"];
-        NSString *title = call.arguments[@"title"];
+        NSString *filename = call.arguments[@"filename"];
         NSString *desc = call.arguments[@"desc"];
         [manager saveLivePhoto:imagePath
                      videoPath:videoPath
-                         title:title
+                      filename:filename
                           desc:desc
                          block:^(PMAssetEntity *asset) {
                            if (!asset) {

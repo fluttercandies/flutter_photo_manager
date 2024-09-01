@@ -262,7 +262,7 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
       final assets = await PhotoManager.editor.darwin.saveLivePhoto(
         imageFile: imgFile,
         videoFile: videoFile,
-        title: 'preview_0',
+        filename: 'preview_0',
       );
       print('save live photo result : ${assets?.id}');
     } finally {

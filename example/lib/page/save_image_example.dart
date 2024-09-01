@@ -195,7 +195,7 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
     await checkRequest(() async {
       final AssetEntity? asset = await PhotoManager.editor.saveImage(
         uint8List,
-        title: '${DateTime.now().millisecondsSinceEpoch}.jpg',
+        filename: '${DateTime.now().millisecondsSinceEpoch}.jpg',
       );
       Log.d('saved asset: $asset');
     });

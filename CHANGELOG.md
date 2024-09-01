@@ -8,9 +8,14 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+### Breaking changes
+
+`saveImage` now requires `filename` rather than `title` other save methods do not require `title` anymore.
+
 ### Improvements
 
 - Allows saving assets with a given orientation value.
+- Improves the reading sequence when saving assets, which likely fixes issues with wrong orientation value.
 - Reads image size from EXIF rather than decoding from the bitmap factory.
 - Upgrades Android EXIF library.
 

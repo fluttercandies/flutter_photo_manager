@@ -5,20 +5,23 @@ If you want to see the new feature support, please refer to [readme][] and [chan
 
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
-  * [3.0.x to 3.1](#30x-to-31)
+  * [3.x to 3.3](#3x-to-33)
     * [Overall](#overall)
+      * [`saveImage`](#saveimage)
+  * [3.0.x to 3.1](#30x-to-31)
+    * [Overall](#overall-1)
       * [`containsLivePhotos`](#containslivephotos)
       * [`AlbumType`](#albumtype)
   * [2.x to 3.0](#2x-to-30)
-    * [Overall](#overall-1)
+    * [Overall](#overall-2)
       * [`AssetEntityImage` and `AssetEntityImageProvider`](#assetentityimage-and-assetentityimageprovider)
   * [2.x to 2.8](#2x-to-28)
-    * [Overall](#overall-2)
-  * [2.x to 2.2](#2x-to-22)
     * [Overall](#overall-3)
+  * [2.x to 2.2](#2x-to-22)
+    * [Overall](#overall-4)
       * [`assetCount`](#assetcount)
   * [1.x to 2.0](#1x-to-20)
-    * [Overall](#overall-4)
+    * [Overall](#overall-5)
     * [API migrations](#api-migrations)
       * [`getAssetListPaged`](#getassetlistpaged)
       * [Filtering only videos](#filtering-only-videos)
@@ -27,6 +30,25 @@ If you want to see the new feature support, please refer to [readme][] and [chan
   * [0.6 to 1.0](#06-to-10)
   * [0.5 To 0.6](#05-to-06)
 <!-- TOC -->
+
+## 3.x to 3.3
+
+### Overall
+
+In order to let developers write the most precise API usage,
+the `title` of `saveImage` has migrated to `filename`.
+
+#### `saveImage`
+
+Before:
+```dart
+final entity = await PhotoManager.editor.saveImage(bytes, title: 'new.jpg');
+```
+
+After:
+```dart
+final entity = await PhotoManager.editor.saveImage(bytes, filename: 'new.jpg');
+```
 
 ## 3.0.x to 3.1
 
