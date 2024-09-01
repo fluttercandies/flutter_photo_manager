@@ -13,13 +13,3 @@ fun String.checkDirs() {
         targetFile.parentFile!!.mkdirs()
     }
 }
-
-fun InputStream.getOrientationDegrees(): Int {
-    return try {
-        this.use {
-            return@use ExifInterface(it).rotationDegrees
-        }
-    } catch (ignored: Throwable) {
-        0
-    }
-}
