@@ -395,21 +395,21 @@ interface IDBUtils {
 
     fun saveVideo(
         context: Context,
-        fromPath: String,
+        filePath: String,
         title: String,
         desc: String,
         relativePath: String,
         orientation: Int?
     ): AssetEntity? {
-        fromPath.checkDirs()
-        val file = File(fromPath)
+        filePath.checkDirs()
+        val file = File(filePath)
         var inputStream = FileInputStream(file)
         fun refreshStream() {
             inputStream = FileInputStream(file)
         }
 
         val typeFromStream = URLConnection.guessContentTypeFromName(title)
-            ?: URLConnection.guessContentTypeFromName(fromPath)
+            ?: URLConnection.guessContentTypeFromName(filePath)
             ?: inputStream.let {
                 val type = URLConnection.guessContentTypeFromStream(inputStream)
                 refreshStream()
@@ -417,7 +417,7 @@ interface IDBUtils {
             }
             ?: "video/*"
 
-        val info = VideoUtils.getPropertiesUseMediaPlayer(fromPath)
+        val info = VideoUtils.getPropertiesUseMediaPlayer(filePath)
 
         val (rotationDegrees, latLong) = ExifInterface(inputStream).let { exif ->
             Pair(
@@ -459,7 +459,7 @@ interface IDBUtils {
                 put(MediaStore.Video.VideoColumns.LONGITUDE, latLong.last())
             }
             if (shouldKeepPath) {
-                put(DATA, fromPath)
+                put(DATA, filePath)
             }
         }
 

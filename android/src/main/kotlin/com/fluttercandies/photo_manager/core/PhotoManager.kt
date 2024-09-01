@@ -18,7 +18,6 @@ import com.fluttercandies.photo_manager.core.utils.IDBUtils
 import com.fluttercandies.photo_manager.thumb.ThumbnailUtil
 import com.fluttercandies.photo_manager.util.LogUtils
 import com.fluttercandies.photo_manager.util.ResultHandler
-import java.io.File
 import java.util.concurrent.Executors
 
 class PhotoManager(private val context: Context) {
@@ -167,36 +166,33 @@ class PhotoManager(private val context: Context) {
     }
 
     fun saveImage(
-        image: ByteArray,
-        title: String,
+        bytes: ByteArray,
+        filename: String,
         description: String,
         relativePath: String,
         orientation: Int?
     ): AssetEntity? {
-        return dbUtils.saveImage(context, image, title, description, relativePath, orientation)
+        return dbUtils.saveImage(context, bytes, filename, description, relativePath, orientation)
     }
 
     fun saveImage(
-        path: String,
+        filePath: String,
         title: String,
         description: String,
         relativePath: String,
         orientation: Int?
     ): AssetEntity? {
-        return dbUtils.saveImage(context, path, title, description, relativePath, orientation)
+        return dbUtils.saveImage(context, filePath, title, description, relativePath, orientation)
     }
 
     fun saveVideo(
-        path: String,
+        filePath: String,
         title: String,
         desc: String,
         relativePath: String,
         orientation: Int?
     ): AssetEntity? {
-        if (!File(path).exists()) {
-            return null
-        }
-        return dbUtils.saveVideo(context, path, title, desc, relativePath, orientation)
+        return dbUtils.saveVideo(context, filePath, title, desc, relativePath, orientation)
     }
 
     fun assetExists(id: String, resultHandler: ResultHandler) {

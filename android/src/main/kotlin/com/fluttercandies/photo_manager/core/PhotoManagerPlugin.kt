@@ -465,14 +465,14 @@ class PhotoManagerPlugin(
 
             Methods.saveImage -> {
                 try {
-                    val image = call.argument<ByteArray>("image")!!
-                    val title = call.argument<String>("title") ?: ""
+                    val bytes = call.argument<ByteArray>("image")!!
+                    val filename = call.argument<String>("title") ?: ""
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
                     val entity = photoManager.saveImage(
-                        image,
-                        title,
+                        bytes,
+                        filename,
                         desc,
                         relativePath,
                         orientation,
@@ -491,13 +491,13 @@ class PhotoManagerPlugin(
 
             Methods.saveImageWithPath -> {
                 try {
-                    val imagePath = call.argument<String>("path")!!
+                    val filePath = call.argument<String>("path")!!
                     val title = call.argument<String>("title") ?: ""
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
                     val entity = photoManager.saveImage(
-                        imagePath,
+                        filePath,
                         title,
                         desc,
                         relativePath,
@@ -517,13 +517,13 @@ class PhotoManagerPlugin(
 
             Methods.saveVideo -> {
                 try {
-                    val videoPath = call.argument<String>("path")!!
+                    val filePath = call.argument<String>("path")!!
                     val title = call.argument<String>("title")!!
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
                     val entity = photoManager.saveVideo(
-                        videoPath,
+                        filePath,
                         title,
                         desc,
                         relativePath,
