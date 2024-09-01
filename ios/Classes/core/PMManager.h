@@ -57,6 +57,11 @@ typedef void (^AssetResult)(PMAssetEntity *);
             desc:(NSString *)desc
             block:(AssetResult)block;
 
+- (void)saveImageWithPath:(NSString *)path
+            filename:(NSString *)filename
+            desc:(NSString *)desc
+            block:(void (^)(PMAssetEntity *))block;
+
 - (void)saveVideo:(NSString *)path
             filename:(NSString *)filename
             desc:(NSString *)desc
@@ -79,8 +84,6 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler;
 
 - (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(NSObject<PMBaseFilter> *)option;
-
-- (void)saveImageWithPath:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(void (^)(PMAssetEntity *))block;
 
 - (void)copyAssetWithId:(NSString *)id toGallery:(NSString *)gallery block:(void (^)(PMAssetEntity *entity, NSString *msg))block;
 
