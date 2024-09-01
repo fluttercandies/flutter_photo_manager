@@ -311,7 +311,7 @@ interface IDBUtils {
             inputStream,
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             values,
-        )
+        )?.copy(orientation = orientation ?: rotationDegrees)
     }
 
     fun saveImage(
@@ -390,7 +390,7 @@ interface IDBUtils {
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             values,
             shouldKeepPath
-        )
+        )?.copy(orientation = orientation ?: rotationDegrees)
     }
 
     fun saveVideo(
@@ -469,7 +469,7 @@ interface IDBUtils {
             MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
             values,
             shouldKeepPath
-        )
+        )?.copy(orientation = orientation ?: rotationDegrees)
     }
 
     private fun insertUri(
