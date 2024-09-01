@@ -251,6 +251,7 @@ interface IDBUtils {
         context: Context,
         bytes: ByteArray,
         filename: String,
+        title: String,
         desc: String,
         relativePath: String,
         orientation: Int?
@@ -286,9 +287,9 @@ interface IDBUtils {
                 MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
             )
             put(MediaStore.Images.ImageColumns.DESCRIPTION, desc)
-            put(DISPLAY_NAME, filename)
+            put(DISPLAY_NAME, title)
             put(MIME_TYPE, typeFromStream)
-            put(TITLE, filename)
+            put(TITLE, title)
             put(DATE_ADDED, timestamp)
             put(DATE_MODIFIED, timestamp)
             put(WIDTH, width)

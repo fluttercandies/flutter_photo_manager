@@ -467,12 +467,14 @@ class PhotoManagerPlugin(
                 try {
                     val bytes = call.argument<ByteArray>("image")!!
                     val filename = call.argument<String>("filename") ?: ""
+                    val title = call.argument<String>("title") ?: ""
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
                     val entity = photoManager.saveImage(
                         bytes,
                         filename,
+                        title,
                         desc,
                         relativePath,
                         orientation,

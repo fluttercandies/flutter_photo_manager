@@ -347,7 +347,8 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
 
   Future<AssetEntity?> saveImage(
     typed_data.Uint8List data, {
-    required String? filename,
+    required String filename,
+    String? title,
     String? desc,
     String? relativePath,
     int? orientation,
@@ -358,7 +359,8 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       <String, dynamic>{
         'image': data,
         'filename': filename,
-        'desc': desc ?? '',
+        'title': title,
+        'desc': desc,
         'relativePath': relativePath,
         'orientation': orientation,
         ...onlyAddPermission,
@@ -374,23 +376,23 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   }
 
   Future<AssetEntity?> saveImageWithPath(
-    String path, {
-    required String title,
+    String filePath, {
+    String? title,
     String? desc,
     String? relativePath,
     int? orientation,
   }) async {
     _throwIfOrientationInvalid(orientation);
-    final File file = File(path);
+    final File file = File(filePath);
     if (!file.existsSync()) {
-      throw ArgumentError('$path does not exists');
+      throw ArgumentError('$filePath does not exists');
     }
     final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
       PMConstants.mSaveImageWithPath,
       <String, dynamic>{
-        'path': path,
+        'path': file.absolute.path,
         'title': title,
-        'desc': desc ?? '',
+        'desc': desc,
         'relativePath': relativePath,
         'orientation': orientation,
         ...onlyAddPermission,
@@ -407,7 +409,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
 
   Future<AssetEntity?> saveVideo(
     File file, {
-    required String? title,
+    String? title,
     String? desc,
     String? relativePath,
     int? orientation,

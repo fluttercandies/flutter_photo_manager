@@ -168,11 +168,12 @@ class PhotoManager(private val context: Context) {
     fun saveImage(
         bytes: ByteArray,
         filename: String,
+        title: String,
         description: String,
         relativePath: String,
         orientation: Int?
     ): AssetEntity? {
-        return dbUtils.saveImage(context, bytes, filename, description, relativePath, orientation)
+        return dbUtils.saveImage(context, bytes, filename, title, description, relativePath, orientation)
     }
 
     fun saveImage(
