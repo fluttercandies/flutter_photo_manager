@@ -671,7 +671,7 @@ mixin IosPlugin on BasePlugin {
   Future<AssetEntity?> saveLivePhoto({
     required File imageFile,
     required File videoFile,
-    required String? title,
+    required String? filename,
     String? desc,
     String? relativePath,
   }) async {
@@ -687,13 +687,13 @@ mixin IosPlugin on BasePlugin {
       <String, dynamic>{
         'imagePath': imageFile.absolute.path,
         'videoPath': videoFile.absolute.path,
-        'title': title,
-        'desc': desc ?? '',
+        'filename': filename,
+        'desc': desc,
         'relativePath': relativePath,
         ...onlyAddPermission,
       },
     );
-    return ConvertUtils.convertMapToAsset(result.cast(), title: title);
+    return ConvertUtils.convertMapToAsset(result.cast(), title: filename);
   }
 
   Future<AssetPathEntity?> iosCreateAlbum(

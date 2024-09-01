@@ -283,14 +283,14 @@ class DarwinEditor {
   Future<AssetEntity?> saveLivePhoto({
     required File imageFile,
     required File videoFile,
-    required String title,
+    required String filename,
     String? desc,
     String? relativePath,
   }) {
     return plugin.saveLivePhoto(
       imageFile: imageFile,
       videoFile: videoFile,
-      title: title,
+      filename: filename,
       desc: desc,
       relativePath: relativePath,
     );

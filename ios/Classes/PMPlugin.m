@@ -446,11 +446,11 @@
     } else if ([call.method isEqualToString:@"saveLivePhoto"]) {
         NSString *videoPath = call.arguments[@"videoPath"];
         NSString *imagePath = call.arguments[@"imagePath"];
-        NSString *title = call.arguments[@"title"];
+        NSString *filename = call.arguments[@"filename"];
         NSString *desc = call.arguments[@"desc"];
         [manager saveLivePhoto:imagePath
                      videoPath:videoPath
-                         title:title
+                      filename:filename
                           desc:desc
                          block:^(PMAssetEntity *asset) {
                            if (!asset) {

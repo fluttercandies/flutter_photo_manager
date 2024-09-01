@@ -53,18 +53,18 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (void)deleteWithIds:(NSArray<NSString *> *)ids changedBlock:(ChangeIds)block;
 
 - (void)saveImage:(NSData *)data
-            title:(NSString *)title
+         filename:(NSString *)filename
             desc:(NSString *)desc
             block:(AssetResult)block;
 
 - (void)saveVideo:(NSString *)path
-            title:(NSString *)title
+         filename:(NSString *)filename
             desc:(NSString *)desc
             block:(AssetResult)block;
 
 - (void)saveLivePhoto:(NSString *)imagePath
             videoPath:(NSString *)videoPath
-            title:(NSString *)title
+            filename:(NSString *)filename
             desc:(NSString *)desc
             block:(AssetResult)block;
 

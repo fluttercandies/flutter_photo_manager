@@ -126,14 +126,14 @@
 - (NSArray<PMAssetEntity *> *)getAssetsWithType:(int)type option:(NSObject<PMBaseFilter> *)option start:(int)start end:(int)end {
     PHFetchOptions *options = [option getFetchOptions:type];
     PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithOptions:options];
-    
+
     NSUInteger endOffset = end;
     if (endOffset > result.count) {
         endOffset = result.count;
     }
-    
+
     NSMutableArray<PMAssetEntity*>* array = [NSMutableArray new];
-    
+
     for (NSUInteger i = start; i < endOffset; i++){
         if (i >= result.count) {
             break;
@@ -142,7 +142,7 @@
         PMAssetEntity *pmAsset = [self convertPHAssetToAssetEntity:asset needTitle:[option needTitle]];
         [array addObject: pmAsset];
     }
-    
+
     return array;
 }
 
@@ -1022,11 +1022,11 @@
 
 - (void)saveLivePhoto:(NSString *)imagePath
             videoPath:(NSString *)videoPath
-            title:(NSString *)title
+            filename:(NSString *)filename
             desc:(NSString *)desc
             block:(AssetResult)block {
-    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save LivePhoto with imagePath: %@, videoPath: %@, title: %@, desc %@",
-                                     imagePath, videoPath, title, desc]];
+    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save LivePhoto with imagePath: %@, videoPath: %@, filename: %@, desc %@",
+                                     imagePath, videoPath, filename, desc]];
     NSURL *videoURL = [NSURL fileURLWithPath:videoPath];
     NSURL *imageURL = [NSURL fileURLWithPath:imagePath];
     __block NSString *assetId = nil;
@@ -1034,7 +1034,7 @@
      performChanges:^{
         PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
         PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
-        [options setOriginalFilename:title];
+        [options setOriginalFilename:filename];
         [request addResourceWithType:PHAssetResourceTypePhoto fileURL:imageURL options:options];
         [request addResourceWithType:PHAssetResourceTypePairedVideo fileURL:videoURL options:options];
         assetId = request.placeholderForCreatedAsset.localIdentifier;
