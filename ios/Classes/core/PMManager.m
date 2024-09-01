@@ -934,11 +934,11 @@
 }
 
 - (void)saveImage:(NSData *)data
-            title:(NSString *)title
+         filename:(NSString *)filename
              desc:(NSString *)desc
             block:(AssetResult)block {
     __block NSString *assetId = nil;
-    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save image with data, length: %lu, title:%@, desc: %@", (unsigned long)data.length, title, desc]];
+    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save image with data, length: %lu, filename:%@, desc: %@", (unsigned long)data.length, filename, desc]];
 
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
@@ -946,7 +946,7 @@
         [PHAssetCreationRequest creationRequestForAsset];
         PHAssetResourceCreationOptions *options =
         [PHAssetResourceCreationOptions new];
-        [options setOriginalFilename:title];
+        [options setOriginalFilename:filename];
         [request addResourceWithType:PHAssetResourceTypePhoto
                                 data:data
                              options:options];
@@ -963,8 +963,11 @@
     }];
 }
 
-- (void)saveImageWithPath:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(void (^)(PMAssetEntity *))block {
-    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save image with path: %@ title:%@, desc: %@", path, title, desc]];
+- (void)saveImageWithPath:(NSString *)path
+                 filename:(NSString *)filename
+                     desc:(NSString *)desc
+                    block:(void (^)(PMAssetEntity *))block {
+    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save image with path: %@ filename:%@, desc: %@", path, filename, desc]];
 
     __block NSString *assetId = nil;
     [[PHPhotoLibrary sharedPhotoLibrary]
@@ -973,7 +976,7 @@
         [PHAssetCreationRequest creationRequestForAsset];
         PHAssetResourceCreationOptions *options =
         [PHAssetResourceCreationOptions new];
-        [options setOriginalFilename:title];
+        [options setOriginalFilename:filename];
         NSData *data = [NSData dataWithContentsOfFile:path];
         [request addResourceWithType:PHAssetResourceTypePhoto
                                 data:data
@@ -992,18 +995,17 @@
 }
 
 - (void)saveVideo:(NSString *)path
-            title:(NSString *)title
+         filename:(NSString *)filename
              desc:(NSString *)desc
             block:(AssetResult)block {
-    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save video with path: %@, title: %@, desc %@",
-                                     path, title, desc]];
+    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save video with path: %@, filename: %@, desc %@", path, filename, desc]];
     NSURL *fileURL = [NSURL fileURLWithPath:path];
     __block NSString *assetId = nil;
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
         PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
         PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
-        [options setOriginalFilename:title];
+        [options setOriginalFilename:filename];
         [request addResourceWithType:PHAssetResourceTypeVideo fileURL:fileURL options:options];
         assetId = request.placeholderForCreatedAsset.localIdentifier;
     }

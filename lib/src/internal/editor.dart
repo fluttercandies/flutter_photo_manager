@@ -51,8 +51,8 @@ class Editor {
   /// Save image to gallery from the given [data].
   ///
   /// {@template photo_manager.Editor.TitleWhenSaving}
-  /// [title] typically means the filename of the saving entity, which can be
-  /// obtained by `basename(file.path)`.
+  /// [filename] ([title]) typically means the filename of the saving entity,
+  /// which can be obtained by `basename(file.path)`.
   /// {@endtemplate}
   ///
   /// {@template photo_manager.Editor.DescriptionWhenSaving}
@@ -72,14 +72,14 @@ class Editor {
   /// {@endtemplate}
   Future<AssetEntity?> saveImage(
     typed_data.Uint8List data, {
-    required String title,
+    required String filename,
     String? desc,
     String? relativePath,
     int? orientation,
   }) {
     return plugin.saveImage(
       data,
-      title: title,
+      filename: filename,
       desc: desc,
       relativePath: relativePath,
       orientation: orientation,

@@ -347,7 +347,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
 
   Future<AssetEntity?> saveImage(
     typed_data.Uint8List data, {
-    required String? title,
+    required String? filename,
     String? desc,
     String? relativePath,
     int? orientation,
@@ -357,7 +357,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       PMConstants.mSaveImage,
       <String, dynamic>{
         'image': data,
-        'title': title,
+        'filename': filename,
         'desc': desc ?? '',
         'relativePath': relativePath,
         'orientation': orientation,
@@ -369,7 +369,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     }
     return ConvertUtils.convertMapToAsset(
       result.cast<String, dynamic>(),
-      title: title,
+      title: filename,
     );
   }
 

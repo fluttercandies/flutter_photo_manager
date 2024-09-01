@@ -403,10 +403,10 @@
                   }];
     } else if ([call.method isEqualToString:@"saveImage"]) {
         NSData *data = [call.arguments[@"image"] data];
-        NSString *title = call.arguments[@"title"];
+        NSString *filename = call.arguments[@"filename"];
         NSString *desc = call.arguments[@"desc"];
         [manager saveImage:data
-                     title:title
+                  filename:filename
                       desc:desc
                      block:^(PMAssetEntity *asset) {
                        if (!asset) {
