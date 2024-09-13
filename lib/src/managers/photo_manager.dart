@@ -80,8 +80,10 @@ class PhotoManager {
   ///
   /// Note: On Android, this method may require an [Activity] context. If called in a background service,
   /// make sure to call the [setIgnorePermissionCheck] method first.
-  static Future<PermissionState> getPermissionState() {
-    return plugin.getPermissionState();
+  static Future<PermissionState> getPermissionState({
+    PermissionRequestOption requestOption = const PermissionRequestOption(),
+  }) {
+    return plugin.getPermissionState(requestOption);
   }
 
   /// Prompts the limited assets selection modal on iOS.

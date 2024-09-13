@@ -135,8 +135,19 @@
 }
 
 - (void)getPermissionState:(ResultHandler *)handler {
+    int requestAccessLevel = [handler.call.arguments[@"iosAccessLevel"] intValue];
+#if __IPHONE_14_0
+    if (@available(iOS 14, *)) {
+        PHAuthorizationStatus result = [PHPhotoLibrary authorizationStatusForAccessLevel: requestAccessLevel];
+        [handler reply: @(result)];
+    } else {
+        PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+        [handler reply:@(status)];
+    }
+#else
     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
     [handler reply:@(status)];
+#endif
 }
 
 - (void)handleAboutPermissionMethod:(ResultHandler *)handler {

@@ -324,8 +324,10 @@ class PhotoManagerPlugin(
             }
 
             Methods.getPermissionState -> {
-                val type = call.argument<Int>("type")!!
-                permissionsUtils.getAuthValue(type, false).let {
+                val androidPermission = call.argument<Map<*, *>>("androidPermission")!!
+                val requestType = androidPermission["type"] as Int
+                val mediaLocation = androidPermission["mediaLocation"] as Boolean
+                permissionsUtils.getAuthValue(requestType, mediaLocation).let {
                     resultHandler.reply(it.value)
                 }
             }
