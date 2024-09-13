@@ -58,7 +58,8 @@ class _PermissionStatePageState extends State<PermissionStatePage> {
 
   Future<void> _requestPermission() async {
     final PermissionRequestOption option = _option();
-    final result = await PhotoManager.requestPermissionExtend(requestOption: option);
+    final result =
+        await PhotoManager.requestPermissionExtend(requestOption: option);
     setState(() {
       _permissionState = result;
     });
