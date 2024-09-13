@@ -1,5 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
+
+extension on List<Widget> {
+  List<Widget> paddingAll(double padding) {
+    return map((e) => Padding(padding: EdgeInsets.all(padding), child: e))
+        .toList();
+  }
+}
 
 class PermissionStatePage extends StatefulWidget {
   const PermissionStatePage({super.key});
@@ -9,12 +18,18 @@ class PermissionStatePage extends StatefulWidget {
 }
 
 class _PermissionStatePageState extends State<PermissionStatePage> {
-  List<RequestType> types = RequestType.values;
+  List<int> types = [
+    RequestType.image.value,
+    RequestType.video.value,
+  ];
+
   RequestType get _selectedType {
-    return RequestType.fromTypes(types);
+    return RequestType.fromTypes(types.map((e) => RequestType(e)).toList());
   }
 
   PermissionState? _permissionState;
+
+  IosAccessLevel _iosAccessLevel = IosAccessLevel.readWrite; // 添加这一行
 
   @override
   Widget build(BuildContext context) {
@@ -24,23 +39,44 @@ class _PermissionStatePageState extends State<PermissionStatePage> {
       ),
       body: ListView(
         children: [
-          Column(
-            children: RequestType.values.map((RequestType type) {
-              return CheckboxListTile(
-                title: Text(type.toString().split('.').last),
-                value: _selectedType.containsType(type),
-                onChanged: (bool? value) {
-                  setState(() {
-                    if (value == true) {
-                      types.add(type);
-                    } else {
-                      types.remove(type);
-                    }
-                  });
-                },
-              );
-            }).toList(),
-          ),
+          if (Platform.isAndroid)
+            Column(
+              children: RequestType.values.map((RequestType type) {
+                return CheckboxListTile(
+                  title: Text(type.toString().split('.').last),
+                  value: types.contains(type.value),
+                  onChanged: (bool? value) {
+                    setState(() {
+                      if (value == true) {
+                        types.add(type.value);
+                      } else {
+                        types.remove(type.value);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+          if (Platform.isIOS)
+            Column(
+              children: [
+                Text('iOS Access Level: $_iosAccessLevel'),
+                DropdownButton<IosAccessLevel>(
+                  value: _iosAccessLevel,
+                  onChanged: (IosAccessLevel? value) {
+                    setState(() {
+                      _iosAccessLevel = value!;
+                    });
+                  },
+                  items: IosAccessLevel.values.map((IosAccessLevel value) {
+                    return DropdownMenuItem<IosAccessLevel>(
+                      value: value,
+                      child: Text(value.toString()),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
           ElevatedButton(
             onPressed: _requestPermission,
             child: const Text('Request Permission'),
@@ -51,7 +87,7 @@ class _PermissionStatePageState extends State<PermissionStatePage> {
           ),
           if (_permissionState != null)
             Text('Current Permission State: $_permissionState'),
-        ],
+        ].paddingAll(16),
       ),
     );
   }
