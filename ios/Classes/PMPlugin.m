@@ -83,7 +83,15 @@
 }
 
 - (BOOL)isNotNeedPermissionMethod:(NSString *)method {
-    return [@[@"log", @"openSetting", @"clearFileCache", @"releaseMemoryCache", @"ignorePermissionCheck"] indexOfObject:method] != NSNotFound;
+    NSArray *notNeedPermissionMethods = @[
+        @"log", 
+        @"openSetting", 
+        @"clearFileCache", 
+        @"releaseMemoryCache",
+        @"ignorePermissionCheck",
+        @"getPermissionState"
+    ];
+    return [notNeedPermissionMethods containsObject:method];
 }
 
 - (BOOL)isAboutPermissionMethod:(NSString *)method {
@@ -121,7 +129,14 @@
     } else if ([call.method isEqualToString:@"releaseMemoryCache"]) {
         [manager clearCache];
         [handler reply:nil];
+    } else if ([method isEqualToString:@"getPermissionState"]) {
+        [self getPermissionState:handler];
     }
+}
+
+- (void)getPermissionState:(ResultHandler *)handler {
+    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+    [handler reply:@(status)];
 }
 
 - (void)handleAboutPermissionMethod:(ResultHandler *)handler {
