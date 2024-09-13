@@ -16,6 +16,7 @@ class PMConstants {
   static const String mPresentLimited = 'presentLimited';
   static const String mFetchEntityProperties = 'fetchEntityProperties';
   static const String mGetAssetCountFromPath = 'getAssetCountFromPath';
+  static const String mGetPermissionState = 'getPermissionState';
 
   /// These methods have [RequestType] params for Android 13+ (33+).
   static const String mFetchPathProperties = 'fetchPathProperties';

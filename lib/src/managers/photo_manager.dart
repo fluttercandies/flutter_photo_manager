@@ -57,6 +57,33 @@ class PhotoManager {
     return plugin.requestPermissionExtend(requestOption);
   }
 
+  /// Get the current permission state of the application
+  ///
+  /// This method returns a [Future] that resolves to the current [PermissionState] of the application.
+  ///
+  /// Possible values for [PermissionState] include:
+  /// - [PermissionState.notDetermined]: The user hasn't made a choice yet
+  /// - [PermissionState.restricted]: The application is restricted from accessing the photo library (iOS only)
+  /// - [PermissionState.denied]: The user has denied permission
+  /// - [PermissionState.authorized]: The user has granted full access permission
+  /// - [PermissionState.limited]: The user has granted limited access permission (iOS 14+ only)
+  ///
+  /// Example:
+  /// ```dart
+  /// PermissionState state = await PhotoManager.getPermissionState();
+  /// if (state == PermissionState.authorized) {
+  ///   print('The application has full access permission');
+  /// } else {
+  ///   print('The application does not have full access permission');
+  /// }
+  /// ```
+  ///
+  /// Note: On Android, this method may require an [Activity] context. If called in a background service,
+  /// make sure to call the [setIgnorePermissionCheck] method first.
+  static Future<PermissionState> getPermissionState() {
+    return plugin.getPermissionState();
+  }
+
   /// Prompts the limited assets selection modal on iOS.
   ///
   /// This method only supports from iOS 14.0, and will behave differently on

@@ -63,7 +63,7 @@ enum OrderOptionType {
 enum PMRequestState { prepare, loading, success, failed }
 
 /// Information about app’s authorization to access the user’s photo library.
-///  * Android: Only [authorized] and [denied] are valid.
+///  * Android: Have [authorized], [denied] and [limited]
 ///  * iOS/macOS: All valid.
 ///
 /// See also:

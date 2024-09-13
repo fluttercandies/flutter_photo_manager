@@ -8,7 +8,9 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+- Add `getPermissionState` method to `PhotoManager`.
+
+<!-- *None.* -->
 
 ## 3.3.0
 

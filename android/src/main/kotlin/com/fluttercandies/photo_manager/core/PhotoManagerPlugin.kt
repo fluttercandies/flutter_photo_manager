@@ -322,6 +322,13 @@ class PhotoManagerPlugin(
                 ignorePermissionCheck = ignore
                 resultHandler.reply(ignore)
             }
+
+            Methods.getPermissionState -> {
+                val type = call.argument<Int>("type")!!
+                permissionsUtils.getAuthValue(type, false).let {
+                    resultHandler.reply(it.value)
+                }
+            }
         }
     }
 
