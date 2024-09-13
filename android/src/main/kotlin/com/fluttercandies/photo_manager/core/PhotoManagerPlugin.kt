@@ -61,6 +61,7 @@ class PhotoManagerPlugin(
 
     fun bindActivity(activity: Activity?) {
         this.activity = activity
+        permissionsUtils.withActivity(activity)
         deleteManager.bindActivity(activity)
     }
 
