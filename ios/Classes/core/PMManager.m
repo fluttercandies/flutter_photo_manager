@@ -1475,7 +1475,9 @@
     if (!handler) {
         return;
     }
-
+    
+    NSString *log = [NSString stringWithFormat:@"PMProgress notify progress %f, %u", progress, state];
+    [[PMLogUtils sharedInstance] info:log];
     [handler notify:progress state:state];
 }
 
