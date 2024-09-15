@@ -293,7 +293,7 @@
           [self handleMethodResultHandler:handler manager:manager notificationManager:notificationManager];
       }
       @catch (NSException *exception) {
-          [handler replyError:exception.reason];
+          [handler replyError:exception];
       }
     }];
 }
@@ -347,20 +347,20 @@
             [PMConvertUtils convertAssetToMap:array optionGroup:option];
         [handler reply:dictionary];
     } else if ([call.method isEqualToString:@"getThumb"]) {
-        NSString *id = call.arguments[@"id"];
+        NSString *assetId = call.arguments[@"id"];
         NSDictionary *dict = call.arguments[@"option"];
         PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:call.arguments];
         PMThumbLoadOption *option = [PMThumbLoadOption optionDict:dict];
-        [manager getThumbWithId:id
+        [manager getThumbWithId:assetId
                          option:option
                   resultHandler:handler
                 progressHandler:progressHandler];
     } else if ([call.method isEqualToString:@"getFullFile"]) {
-        NSString *id = call.arguments[@"id"];
+        NSString *assetId = call.arguments[@"id"];
         BOOL isOrigin = [call.arguments[@"isOrigin"] boolValue];
         int subtype = [call.arguments[@"subtype"] intValue];
         PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:call.arguments];
-        [manager getFullSizeFileWithId:id
+        [manager getFullSizeFileWithId:assetId
                               isOrigin:isOrigin
                                subtype:subtype
                          resultHandler:handler

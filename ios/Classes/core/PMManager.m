@@ -402,13 +402,13 @@
     [cacheContainer clearCache];
 }
 
-- (void)getThumbWithId:(NSString *)id option:(PMThumbLoadOption *)option resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PMAssetEntity *entity = [self getAssetEntity:id];
+- (void)getThumbWithId:(NSString *)assetId option:(PMThumbLoadOption *)option resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+    PMAssetEntity *entity = [self getAssetEntity:assetId];
     if (entity && entity.phAsset) {
         PHAsset *asset = entity.phAsset;
         [self fetchThumb:asset option:option resultHandler:handler progressHandler:progressHandler];
     } else {
-        [handler replyError:@"asset is not found"];
+        [handler replyError:[NSString stringWithFormat:@"Asset %@ is not found", assetId]];
     }
 }
 
@@ -468,8 +468,8 @@
 
 }
 
-- (void)getFullSizeFileWithId:(NSString *)id isOrigin:(BOOL)isOrigin subtype:(int)subtype resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PMAssetEntity *entity = [self getAssetEntity:id];
+- (void)getFullSizeFileWithId:(NSString *)assetId isOrigin:(BOOL)isOrigin subtype:(int)subtype resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+    PMAssetEntity *entity = [self getAssetEntity:assetId];
     if (entity && entity.phAsset) {
         PHAsset *asset = entity.phAsset;
         if (@available(iOS 9.1, *)) {
@@ -499,7 +499,7 @@
         }
         return;
     }
-    [handler replyError:@"Asset file cannot be obtained."];
+    [handler replyError:[NSString stringWithFormat:@"Asset %@ file cannot be obtained.", assetId]];
 }
 
 - (void)fetchLivePhotosFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
@@ -535,7 +535,7 @@
         if (error) {
             NSLog(@"error = %@", error);
             [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
-            [handler replyError:[NSString stringWithFormat:@"%@", error]];
+            [handler replyError:error];
         } else {
             [handler reply:path];
             [self notifySuccess:progressHandler];
@@ -576,7 +576,7 @@
         if (error) {
             NSLog(@"error = %@", error);
             [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
-            [handler replyError:[NSString stringWithFormat:@"%@", error]];
+            [handler replyError:error];
         } else {
             [handler reply:path];
             [self notifySuccess:progressHandler];
@@ -656,7 +656,7 @@
                                                     toURL:destination
                                                     error:&error];
             if (error) {
-                [handler replyError:[NSString stringWithFormat:@"Could not cache the video file: %@", error]];
+                [handler replyError:error];
                 return;
             }
             if (withScheme) {
@@ -695,7 +695,7 @@
                 } else if (exportSession.status == AVAssetExportSessionStatusFailed ||
                            exportSession.status == AVAssetExportSessionStatusCancelled) {
                     [self notifyProgress:progressHandler progress:1.0 state:PMProgressStateFailed];
-                    [handler replyError:[NSString stringWithFormat:@"%@", exportSession.error]];
+                    [handler replyError:exportSession.error];
                 }
             }];
             return;
@@ -787,7 +787,7 @@
         if (error) {
             NSLog(@"error = %@", error);
             [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
-            [handler replyError:[NSString stringWithFormat:@"%@", error]];
+            [handler replyError:error];
         } else {
             [handler reply:path];
             [self notifySuccess:progressHandler];

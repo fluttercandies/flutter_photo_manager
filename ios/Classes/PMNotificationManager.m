@@ -62,7 +62,7 @@
     [PMLogUtils.sharedInstance
         info:[NSString stringWithFormat:@"on change result = %@", detailResult]];
     dispatch_async(dispatch_get_main_queue(), ^{
-      [channel invokeMethod:@"change" arguments:detailResult];
+        [self->channel invokeMethod:@"change" arguments:detailResult];
     });
 }
 

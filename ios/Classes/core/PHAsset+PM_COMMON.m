@@ -227,7 +227,6 @@
     if (resources.count == 1) {
         return resources[0];
     }
-    PHAssetResource *resource;
     
     if (@available(iOS 9.1, *)) {
         if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypePairedVideo) {
