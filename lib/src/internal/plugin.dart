@@ -144,7 +144,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       hasAll = true;
     }
     filterOption ??= FilterOptionGroup();
-    final result = await _channel.invokeMethod<Map>(
+    final Map result = await _channel.invokeMethod(
       PMConstants.mGetAssetPathList,
       <String, dynamic>{
         'type': type.value,
@@ -154,9 +154,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'pathOption': pathFilterOption.toMap(),
       },
     );
-    if (result == null) {
-      return <AssetPathEntity>[];
-    }
     return ConvertUtils.convertToPathList(
       result.cast(),
       type: type,
@@ -682,7 +679,7 @@ mixin IosPlugin on BasePlugin {
     if (!videoFile.existsSync()) {
       throw ArgumentError('The video file does not exists');
     }
-    final result = await _channel.invokeMethod(
+    final Map result = await _channel.invokeMethod(
       PMConstants.mSaveLivePhoto,
       <String, dynamic>{
         'imagePath': imageFile.absolute.path,
@@ -803,25 +800,19 @@ mixin AndroidPlugin on BasePlugin {
   }
 
   Future<List<String>> androidColumns() async {
-    final result = await _channel.invokeMethod(
+    final List result = await _channel.invokeMethod(
       PMConstants.mColumnNames,
     );
-    if (result is List<dynamic>) {
-      return result.map((e) => e.toString()).toList();
-    }
-    return result ?? <String>[];
+    return result.map((e) => e.toString()).toList();
   }
 }
 
 mixin OhosPlugin on BasePlugin {
   Future<List<String>> ohosColumns() async {
-    final result = await _channel.invokeMethod(
+    final List result = await _channel.invokeMethod(
       PMConstants.mColumnNames,
     );
-    if (result is List<dynamic>) {
-      return result.map((e) => e.toString()).toList();
-    }
-    return result ?? <String>[];
+    return result.map((e) => e.toString()).toList();
   }
 }
 
