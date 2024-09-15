@@ -1072,7 +1072,7 @@
     return nil;
 }
 
-- (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler {
+- (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
     PHAssetResource *resource;
     if (@available(iOS 9.1, *)) {
@@ -1089,9 +1089,10 @@
         return;
     }
     if (asset.isVideo) {
-        [self fetchFullSizeVideo:asset handler:handler progressHandler:nil withScheme:YES];
+        [self fetchFullSizeVideo:asset handler:handler progressHandler:progressHandler withScheme:YES];
     } else {
         [handler replyError:@"Only video type of assets can get a media url."];
+        [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
     }
 }
 

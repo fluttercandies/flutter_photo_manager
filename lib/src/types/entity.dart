@@ -714,8 +714,13 @@ class AssetEntity {
   /// See also:
   ///  * https://developer.android.com/reference/android/content/ContentUris
   ///  * https://developer.apple.com/documentation/avfoundation/avurlasset
-  Future<String?> getMediaUrl() {
-    return plugin.getMediaUrl(this);
+  Future<String?> getMediaUrl({
+    PMProgressHandler? progressHandler,
+  }) {
+    return plugin.getMediaUrl(
+      this,
+      progressHandler: progressHandler,
+    );
   }
 
   bool get _platformMatched =>

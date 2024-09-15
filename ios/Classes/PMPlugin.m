@@ -478,7 +478,8 @@
         NSString *mimeType = [manager getMimeTypeAsyncWithAssetId:assetId];
         [handler reply:mimeType];
     } else if ([@"getMediaUrl" isEqualToString:call.method]) {
-        [manager getMediaUrl:call.arguments[@"id"] resultHandler:handler];
+        PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:call.arguments];
+        [manager getMediaUrl:call.arguments[@"id"] resultHandler:handler progressHandler:progressHandler];
     } else if ([@"fetchEntityProperties" isEqualToString:call.method]) {
         NSString *assetId = call.arguments[@"id"];
         PMAssetEntity *entity = [manager getAssetEntity:assetId withCache:NO];

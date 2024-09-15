@@ -488,14 +488,16 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return entity.title ?? '';
   }
 
-  Future<String?> getMediaUrl(AssetEntity entity) async {
+  Future<String?> getMediaUrl(
+    AssetEntity entity, {
+    PMProgressHandler? progressHandler,
+  }) async {
     if (PlatformUtils.isOhos) {
       return entity.id;
     }
-    return _channel.invokeMethod(
-      PMConstants.mGetMediaUrl,
-      <String, dynamic>{'id': entity.id, 'type': entity.typeInt},
-    );
+    final params = <String, dynamic>{'id': entity.id, 'type': entity.typeInt};
+    _injectParams(params, progressHandler);
+    return _channel.invokeMethod(PMConstants.mGetMediaUrl, params);
   }
 
   Future<List<AssetPathEntity>> getSubPathEntities(
