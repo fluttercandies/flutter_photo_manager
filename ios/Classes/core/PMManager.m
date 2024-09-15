@@ -638,6 +638,7 @@
                 } else {
                     [handler reply:[videoURL path]];
                 }
+                [self notifySuccess:progressHandler];
                 return;
             }
             NSError *error;
@@ -649,6 +650,7 @@
                 } else {
                     [handler reply:destinationPath];
                 }
+                [self notifySuccess:progressHandler];
                 return;
             }
             [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Caching the video to %@", destination]];
@@ -657,6 +659,7 @@
                                                     error:&error];
             if (error) {
                 [handler replyError:error];
+                [self notifyProgress: progressHandler progress:0 state:PMProgressStateFailed];
                 return;
             }
             if (withScheme) {
@@ -664,6 +667,7 @@
             } else {
                 [handler reply:path];
             }
+            [self notifySuccess:progressHandler];
             return;
         }
 
@@ -694,12 +698,13 @@
                     [self notifySuccess:progressHandler];
                 } else if (exportSession.status == AVAssetExportSessionStatusFailed ||
                            exportSession.status == AVAssetExportSessionStatusCancelled) {
-                    [self notifyProgress:progressHandler progress:1.0 state:PMProgressStateFailed];
+                    [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
                     [handler replyError:exportSession.error];
                 }
             }];
             return;
         }
+        [self notifyProgress: progressHandler progress:0 state:PMProgressStateFailed];
         [handler replyError:@"Unable to initialize an export session."];
     }];
 }
