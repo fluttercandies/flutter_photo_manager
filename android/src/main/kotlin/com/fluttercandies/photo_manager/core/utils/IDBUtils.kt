@@ -38,6 +38,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
 import java.net.URLConnection
+import android.text.TextUtils
 
 @Suppress("Deprecation", "InlinedApi", "Range")
 interface IDBUtils {
@@ -428,11 +429,6 @@ interface IDBUtils {
         }
         refreshStream()
 
-        val shouldKeepPath = if (!isAboveAndroidQ) {
-            val dir = Environment.getExternalStorageDirectory()
-            file.absolutePath.startsWith(dir.path)
-        } else false
-
         val timestamp = System.currentTimeMillis() / 1000
         val values = ContentValues().apply {
             put(
@@ -454,13 +450,14 @@ interface IDBUtils {
                 if (relativePath.isNotBlank()) {
                     put(RELATIVE_PATH, relativePath)
                 }
+            } else {
+                val albumDir = File(getAlbumFolderPath(title))
+                val videoFilePath = File(albumDir, file.name).absolutePath
+                put(DATA, videoFilePath)
             }
             if (latLong != null) {
                 put(MediaStore.Video.VideoColumns.LATITUDE, latLong.first())
                 put(MediaStore.Video.VideoColumns.LONGITUDE, latLong.last())
-            }
-            if (shouldKeepPath) {
-                put(DATA, filePath)
             }
         }
 
@@ -469,7 +466,7 @@ interface IDBUtils {
             inputStream,
             MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
             values,
-            shouldKeepPath
+            false
         )?.copy(orientation = orientation ?: rotationDegrees)
     }
 
@@ -491,6 +488,37 @@ interface IDBUtils {
         }
         cr.notifyChange(uri, null)
         return getAssetEntity(context, id.toString())
+    }
+
+    private fun getAlbumFolderPath(
+        folderName: String?,
+    ): String {
+        var albumFolderPath: String = Environment.getExternalStorageDirectory().path
+        if (android.os.Build.VERSION.SDK_INT < 29) {
+            albumFolderPath += File.separator + Environment.DIRECTORY_DCIM;
+        }
+        albumFolderPath = if (TextUtils.isEmpty(folderName)) {
+            var baseFolderName = Environment.DIRECTORY_MOVIES
+            createDirIfNotExist(
+                Environment.getExternalStoragePublicDirectory(baseFolderName).path
+            ) ?: albumFolderPath
+        } else {
+            createDirIfNotExist(albumFolderPath + File.separator + folderName) ?: albumFolderPath
+        }
+        return albumFolderPath
+    }
+
+    private fun createDirIfNotExist(dirPath: String): String? {
+        val dir = File(dirPath)
+        return if (!dir.exists()) {
+            if (dir.mkdirs()) {
+                dir.path
+            } else {
+                null
+            }
+        } else {
+            dir.path
+        }
     }
 
     fun assetExists(context: Context, id: String): Boolean {
