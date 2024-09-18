@@ -39,6 +39,8 @@ import java.io.FileInputStream
 import java.io.InputStream
 import java.net.URLConnection
 
+import android.text.TextUtils
+
 @Suppress("Deprecation", "InlinedApi", "Range")
 interface IDBUtils {
     companion object {
@@ -82,8 +84,7 @@ interface IDBUtils {
         }
 
         val typeKeys = arrayOf(
-            MediaStore.Files.FileColumns.MEDIA_TYPE,
-            MediaStore.Images.Media.DISPLAY_NAME
+            MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.Images.Media.DISPLAY_NAME
         )
 
         val storeBucketKeys = arrayOf(BUCKET_ID, BUCKET_DISPLAY_NAME)
@@ -102,9 +103,7 @@ interface IDBUtils {
         get() = IDBUtils.allUri
 
     fun getAssetPathList(
-        context: Context,
-        requestType: Int = 0,
-        option: FilterOption
+        context: Context, requestType: Int = 0, option: FilterOption
     ): List<AssetPathEntity>
 
     fun getAssetListPaged(
@@ -214,8 +213,7 @@ interface IDBUtils {
                         ?.toInt() ?: 0
                     orientation =
                         mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)
-                            ?.toInt()
-                            ?: orientation
+                            ?.toInt() ?: orientation
                     if (isAboveAndroidQ) mmr.close() else mmr.release()
                 }
             } catch (e: Throwable) {
@@ -239,10 +237,7 @@ interface IDBUtils {
     }
 
     fun getAssetPathEntityFromId(
-        context: Context,
-        pathId: String,
-        type: Int,
-        option: FilterOption
+        context: Context, pathId: String, type: Int, option: FilterOption
     ): AssetPathEntity?
 
     fun getFilePath(context: Context, id: String, origin: Boolean): String?
@@ -261,13 +256,12 @@ interface IDBUtils {
             inputStream = ByteArrayInputStream(bytes)
         }
 
-        val typeFromStream: String = URLConnection.guessContentTypeFromName(filename)
-            ?: inputStream.let {
+        val typeFromStream: String =
+            URLConnection.guessContentTypeFromName(filename) ?: inputStream.let {
                 val type = URLConnection.guessContentTypeFromStream(inputStream)
                 refreshStream()
                 type
-            }
-            ?: "image/*"
+            } ?: "image/*"
 
         val exif = ExifInterface(inputStream)
         val (width, height) = Pair(
@@ -330,14 +324,14 @@ interface IDBUtils {
             inputStream = FileInputStream(file)
         }
 
-        val typeFromStream: String = URLConnection.guessContentTypeFromName(title)
-            ?: URLConnection.guessContentTypeFromName(filePath)
-            ?: inputStream.let {
+        val typeFromStream: String =
+            URLConnection.guessContentTypeFromName(title) ?: URLConnection.guessContentTypeFromName(
+                filePath
+            ) ?: inputStream.let {
                 val type = URLConnection.guessContentTypeFromStream(inputStream)
                 refreshStream()
                 type
-            }
-            ?: "image/*"
+            } ?: "image/*"
 
         val exif = ExifInterface(inputStream)
         val (width, height) = Pair(
@@ -402,24 +396,27 @@ interface IDBUtils {
         relativePath: String,
         orientation: Int?
     ): AssetEntity? {
-        filePath.checkDirs()
-        val file = File(filePath)
-        var inputStream = FileInputStream(file)
+        val inputFile = File(filePath)
+        var inputStream = FileInputStream(inputFile)
         fun refreshStream() {
-            inputStream = FileInputStream(file)
+            inputStream = FileInputStream(inputFile)
         }
 
-        val typeFromStream = URLConnection.guessContentTypeFromName(title)
-            ?: URLConnection.guessContentTypeFromName(filePath)
-            ?: inputStream.let {
+        var directory = Environment.DIRECTORY_MOVIES
+
+        val albumDir = File(getAlbumFolderPath(title))
+        val videoFilePath = File(albumDir, inputFile.name).absolutePath
+
+        val typeFromStream =
+            URLConnection.guessContentTypeFromName(title) ?: URLConnection.guessContentTypeFromName(
+                filePath
+            ) ?: inputStream.let {
                 val type = URLConnection.guessContentTypeFromStream(inputStream)
                 refreshStream()
                 type
-            }
-            ?: "video/*"
+            } ?: "video/*"
 
         val info = VideoUtils.getPropertiesUseMediaPlayer(filePath)
-
         val (rotationDegrees, latLong) = ExifInterface(inputStream).let { exif ->
             Pair(
                 orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
@@ -427,11 +424,6 @@ interface IDBUtils {
             )
         }
         refreshStream()
-
-        val shouldKeepPath = if (!isAboveAndroidQ) {
-            val dir = Environment.getExternalStorageDirectory()
-            file.absolutePath.startsWith(dir.path)
-        } else false
 
         val timestamp = System.currentTimeMillis() / 1000
         val values = ContentValues().apply {
@@ -448,29 +440,27 @@ interface IDBUtils {
             put(DURATION, info.duration)
             put(WIDTH, info.width)
             put(HEIGHT, info.height)
+            put(DATE_TAKEN, timestamp * 1000)
             if (isAboveAndroidQ) {
-                put(DATE_TAKEN, timestamp * 1000)
                 put(ORIENTATION, rotationDegrees)
                 if (relativePath.isNotBlank()) {
                     put(RELATIVE_PATH, relativePath)
                 }
+            } else {
+               put(DATA, videoFilePath)
             }
             if (latLong != null) {
                 put(MediaStore.Video.VideoColumns.LATITUDE, latLong.first())
                 put(MediaStore.Video.VideoColumns.LONGITUDE, latLong.last())
             }
-            if (shouldKeepPath) {
-                put(DATA, filePath)
-            }
         }
-
         return insertUri(
             context,
             inputStream,
             MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
             values,
-            shouldKeepPath
-        )?.copy(orientation = orientation ?: rotationDegrees)
+            false
+        )
     }
 
     private fun insertUri(
@@ -493,6 +483,37 @@ interface IDBUtils {
         return getAssetEntity(context, id.toString())
     }
 
+    private fun getAlbumFolderPath(
+        folderName: String?,
+    ): String {
+        var albumFolderPath: String = Environment.getExternalStorageDirectory().path
+        if (android.os.Build.VERSION.SDK_INT < 29) {
+            albumFolderPath += File.separator + Environment.DIRECTORY_DCIM;
+        }
+        albumFolderPath = if (TextUtils.isEmpty(folderName)) {
+            var baseFolderName = Environment.DIRECTORY_MOVIES
+            createDirIfNotExist(
+                Environment.getExternalStoragePublicDirectory(baseFolderName).path
+            ) ?: albumFolderPath
+        } else {
+            createDirIfNotExist(albumFolderPath + File.separator + folderName) ?: albumFolderPath
+        }
+        return albumFolderPath
+    }
+
+    private fun createDirIfNotExist(dirPath: String): String? {
+        val dir = File(dirPath)
+        return if (!dir.exists()) {
+            if (dir.mkdirs()) {
+                dir.path
+            } else {
+                null
+            }
+        } else {
+            dir.path
+        }
+    }
+
     fun assetExists(context: Context, id: String): Boolean {
         val columns = arrayOf(_ID)
         context.contentResolver.logQuery(allUri, columns, "$_ID = ?", arrayOf(id), null).use {
@@ -506,9 +527,7 @@ interface IDBUtils {
     fun getExif(context: Context, id: String): ExifInterface?
 
     fun getOriginBytes(
-        context: Context,
-        asset: AssetEntity,
-        needLocationPermission: Boolean
+        context: Context, asset: AssetEntity, needLocationPermission: Boolean
     ): ByteArray
 
     fun logRowWithId(context: Context, id: String) {
@@ -535,9 +554,7 @@ interface IDBUtils {
     }
 
     fun getMainAssetPathEntity(
-        context: Context,
-        requestType: Int,
-        option: FilterOption
+        context: Context, requestType: Int, option: FilterOption
     ): List<AssetPathEntity>
 
     fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String? {
@@ -599,11 +616,7 @@ interface IDBUtils {
         val idSelection = ids.joinToString(",") { "?" }
         val selection = "$_ID in ($idSelection)"
         val cursor = context.contentResolver.logQuery(
-            allUri,
-            key,
-            selection,
-            ids.toTypedArray(),
-            null
+            allUri, key, selection, ids.toTypedArray(), null
         ) ?: return emptyList()
         val list = ArrayList<String>()
         val map = HashMap<String, String>()
@@ -635,11 +648,7 @@ interface IDBUtils {
             context.contentResolver.logQuery(allUri, columns, null, null, sortOrder)
         } else {
             context.contentResolver.logQuery(
-                allUri,
-                columns,
-                "$BUCKET_ID = ?",
-                arrayOf(pathId),
-                sortOrder
+                allUri, columns, "$BUCKET_ID = ?", arrayOf(pathId), sortOrder
             )
         } ?: return null
         cursor.use {
@@ -733,11 +742,7 @@ interface IDBUtils {
 
 
     fun getAssetsByRange(
-        context: Context,
-        option: FilterOption,
-        start: Int,
-        end: Int,
-        requestType: Int
+        context: Context, option: FilterOption, start: Int, end: Int, requestType: Int
     ): List<AssetEntity> {
         val cr = context.contentResolver
         val args = ArrayList<String>()
