@@ -13,24 +13,39 @@
 #import <PhotosUI/PhotosUI.h>
 
 @implementation PMPlugin {
-    BOOL ignoreCheckPermission;
+    FlutterMethodChannel *channel;
     NSObject <FlutterPluginRegistrar> *privateRegistrar;
+    BOOL ignoreCheckPermission;
+    BOOL isDetach;
 }
 
 - (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar {
     privateRegistrar = registrar;
     [self initNotificationManager:registrar];
 
-    FlutterMethodChannel *channel =
-        [FlutterMethodChannel methodChannelWithName:@"com.fluttercandies/photo_manager"
+    channel = [FlutterMethodChannel methodChannelWithName:@"com.fluttercandies/photo_manager"
                                     binaryMessenger:[registrar messenger]];
     PMManager *manager = [PMManager new];
     manager.converter = [PMConverter new];
     [self setManager:manager];
-    [channel
-        setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
-          [self onMethodCall:call result:result];
-        }];
+
+    [channel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
+        [self onMethodCall:call result:result];
+    }];
+}
+
+- (void)dealloc {
+    privateRegistrar = nil;
+    isDetach = YES;
+    [channel setMethodCallHandler:nil];
+    [self.notificationManager detach];
+}
+
+- (void)applicationWillTerminate:(NSNotification *)notification {
+    privateRegistrar = nil;
+    isDetach = YES;
+    [channel setMethodCallHandler:nil];
+    [self.notificationManager detach];
 }
 
 - (void)initNotificationManager:(NSObject <FlutterPluginRegistrar> *)registrar {
@@ -91,6 +106,10 @@
 }
 
 - (void)onMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
+    if (isDetach) {
+        return;
+    }
+
     ResultHandler *handler = [ResultHandler handlerWithCall:call result:result];
 
     if ([self isNotNeedPermissionMethod:call.method]) {

@@ -9,6 +9,7 @@
     FlutterMethodChannel *channel;
     BOOL _notifying;
     PHFetchResult<PHAsset *> *result;
+    BOOL isDetach;
 }
 
 - (instancetype)initWithRegistrar:
@@ -21,7 +22,7 @@
                   binaryMessenger:[registrar messenger]];
         _notifying = NO;
     }
-
+    isDetach = NO;
     return self;
 }
 
@@ -29,29 +30,41 @@
     return [[self alloc] initWithRegistrar:registrar];
 }
 
+- (void)detach {
+    isDetach = YES;
+    if (_notifying) {
+        [self stopNotify];
+    }
+    [channel setMethodCallHandler:nil];
+}
+
 - (void)startNotify {
-    PHPhotoLibrary *library = PHPhotoLibrary.sharedPhotoLibrary;
-    [library registerChangeObserver:self];
+    if (isDetach) {
+        return;
+    }
+    [PHPhotoLibrary.sharedPhotoLibrary registerChangeObserver:self];
     _notifying = YES;
     [self refreshFetchResult];
 }
 
 - (void)stopNotify {
-    PHPhotoLibrary *library = PHPhotoLibrary.sharedPhotoLibrary;
-    [library unregisterChangeObserver:self];
+    if (!_notifying || isDetach) {
+        return;
+    }
+    [PHPhotoLibrary.sharedPhotoLibrary unregisterChangeObserver:self];
     _notifying = NO;
 }
 
 #pragma "photo library notify"
 
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
-    if (!result) {
+    if (isDetach || !result) {
         return;
     }
     PHFetchResultChangeDetails *details = [changeInstance changeDetailsForFetchResult:result];
     NSUInteger oldCount = result.count;
     [self refreshFetchResult];
-    if (!result) {
+    if (isDetach || !result) {
         return;
     }
     NSUInteger newCount = result.count;
@@ -59,14 +72,16 @@
     detailResult[@"oldCount"] = @(oldCount);
     detailResult[@"newCount"] = @(newCount);
 
-    [PMLogUtils.sharedInstance
-        info:[NSString stringWithFormat:@"on change result = %@", detailResult]];
+    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"on change result = %@", detailResult]];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->channel invokeMethod:@"change" arguments:detailResult];
     });
 }
 
 - (void)refreshFetchResult {
+    if (isDetach) {
+        return;
+    }
     result = [self getLastAssets];
 }
 
