@@ -12,6 +12,10 @@
     BOOL isDetach;
 }
 
+- (void)dealloc {
+    [self detach];
+}
+
 - (instancetype)initWithRegistrar:
     (NSObject <FlutterPluginRegistrar> *)registrar {
     self = [super init];

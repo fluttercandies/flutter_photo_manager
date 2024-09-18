@@ -34,18 +34,19 @@
     }];
 }
 
-- (void)dealloc {
+- (void)detach {
     privateRegistrar = nil;
     isDetach = YES;
     [channel setMethodCallHandler:nil];
     [self.notificationManager detach];
 }
 
+- (void)dealloc {
+    [self detach];
+}
+
 - (void)applicationWillTerminate:(NSNotification *)notification {
-    privateRegistrar = nil;
-    isDetach = YES;
-    [channel setMethodCallHandler:nil];
-    [self.notificationManager detach];
+    [self detach];
 }
 
 - (void)initNotificationManager:(NSObject <FlutterPluginRegistrar> *)registrar {
