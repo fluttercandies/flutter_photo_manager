@@ -21,7 +21,7 @@ typedef void (^ChangeIds)(NSArray<NSString *> *);
 #define PM_IMAGE_CACHE_PATH @".image"
 #define PM_FULL_IMAGE_CACHE_PATH @"flutter-images"
 
-typedef void (^AssetResult)(PMAssetEntity *);
+typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 
 @interface PMManager : NSObject
@@ -55,23 +55,23 @@ typedef void (^AssetResult)(PMAssetEntity *);
 - (void)saveImage:(NSData *)data
             filename:(NSString *)filename
             desc:(NSString *)desc
-            block:(AssetResult)block;
+            block:(AssetBlockResult)block;
 
 - (void)saveImageWithPath:(NSString *)path
             filename:(NSString *)filename
             desc:(NSString *)desc
-            block:(void (^)(PMAssetEntity *))block;
+            block:(AssetBlockResult)block;
 
 - (void)saveVideo:(NSString *)path
             filename:(NSString *)filename
             desc:(NSString *)desc
-            block:(AssetResult)block;
+            block:(AssetBlockResult)block;
 
 - (void)saveLivePhoto:(NSString *)imagePath
             videoPath:(NSString *)videoPath
             filename:(NSString *)filename
             desc:(NSString *)desc
-            block:(AssetResult)block;
+            block:(AssetBlockResult)block;
 
 - (BOOL)existsWithId:(NSString *)assetId;
 
@@ -85,15 +85,15 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(NSObject<PMBaseFilter> *)option;
 
-- (void)copyAssetWithId:(NSString *)id toGallery:(NSString *)gallery block:(void (^)(PMAssetEntity *entity, NSString *msg))block;
+- (void)copyAssetWithId:(NSString *)id toGallery:(NSString *)gallery block:(void (^)(PMAssetEntity *entity, NSObject *msg))block;
 
-- (void)createFolderWithName:(NSString *)name parentId:(NSString *)id block:(void (^)(NSString *, NSString *))block;
+- (void)createFolderWithName:(NSString *)name parentId:(NSString *)id block:(void (^)(NSString *newId, NSObject *error))block;
 
-- (void)createAlbumWithName:(NSString *)name parentId:(NSString *)id block:(void (^)(NSString *, NSString *))block;
+- (void)createAlbumWithName:(NSString *)name parentId:(NSString *)id block:(void (^)(NSString *newId, NSObject *error))block;
 
-- (void)removeInAlbumWithAssetId:(NSArray *)id albumId:(NSString *)albumId block:(void (^)(NSString *))block;
+- (void)removeInAlbumWithAssetId:(NSArray *)id albumId:(NSString *)albumId block:(void (^)(NSObject *error))block;
 
-- (void)removeCollectionWithId:(NSString *)id type:(int)type block:(void (^)(NSString *))block;
+- (void)removeCollectionWithId:(NSString *)id type:(int)type block:(void (^)(NSObject *))block;
 
 - (BOOL)favoriteWithId:(NSString *)id favorite:(BOOL)favorite;
 
