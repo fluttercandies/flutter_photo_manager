@@ -1056,8 +1056,8 @@
                 block:(AssetBlockResult)block {
     [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save LivePhoto with imagePath: %@, videoPath: %@, filename: %@, desc %@",
                                      imagePath, videoPath, filename, desc]];
-    NSURL *videoURL = [NSURL fileURLWithPath:videoPath];
     NSURL *imageURL = [NSURL fileURLWithPath:imagePath];
+    NSURL *videoURL = [NSURL fileURLWithPath:videoPath];
     __block NSString *assetId = nil;
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
@@ -1067,7 +1067,7 @@
         [request addResourceWithType:PHAssetResourceTypePhoto fileURL:imageURL options:imageOptions];
         PHAssetResourceCreationOptions *videoOptions = [PHAssetResourceCreationOptions new];
         [videoOptions setOriginalFilename:filename];
-        [request addResourceWithType:PHAssetResourceTypeFullSizePairedVideo fileURL:videoURL options:videoOptions];
+        [request addResourceWithType:PHAssetResourceTypePairedVideo fileURL:videoURL options:videoOptions];
         assetId = request.placeholderForCreatedAsset.localIdentifier;
     }
      completionHandler:^(BOOL success, NSError *error) {
