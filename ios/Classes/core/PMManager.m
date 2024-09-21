@@ -153,8 +153,7 @@
 }
 
 - (BOOL)entityIsLocallyAvailable:(NSString *)assetId resource:(PHAssetResource *)resource isOrigin:(BOOL)isOrigin subtype:(int)subtype {
-    PHFetchResult<PHAsset *> *result =
-    [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[PHFetchOptions new]];
+    PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[PHFetchOptions new]];
     if (!result) {
         return NO;
     }
@@ -170,11 +169,9 @@
         }
     }
     NSFileManager *fileManager = NSFileManager.defaultManager;
-    NSString *path = [self makeAssetOutputPath:asset resource:nil isOrigin:isOrigin manager:fileManager];
+    NSString *path = [self makeAssetOutputPath:asset resource:resource isOrigin:isOrigin manager:fileManager];
     BOOL isExist = [fileManager fileExistsAtPath:path];
-    [[PMLogUtils sharedInstance] info:[NSString
-                                       stringWithFormat:@"Locally available for path %@: %hhd",
-                                       path, isExist]];
+    [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Locally available for path %@: %hhd", path, isExist]];
     if (isExist) {
         return YES;
     }
@@ -185,7 +182,9 @@
         return NO;
     }
     // If this returns NO, then the asset is in iCloud or not saved locally yet.
-    return [[resource valueForKey:@"locallyAvailable"] boolValue];
+    isExist = [[resource valueForKey:@"locallyAvailable"] boolValue];
+    [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Locally available for asset %@ resource %@: %hhd", assetId, resource, isExist]];
+    return isExist;
 }
 
 #pragma clang diagnostic push
