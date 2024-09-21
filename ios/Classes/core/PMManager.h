@@ -75,7 +75,7 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 - (BOOL)existsWithId:(NSString *)assetId;
 
-- (BOOL)entityIsLocallyAvailable:(NSString *)assetId resource:(PHAssetResource *)resource isOrigin:(BOOL)isOrigin;
+- (BOOL)entityIsLocallyAvailable:(NSString *)assetId resource:(PHAssetResource *)resource isOrigin:(BOOL)isOrigin subtype:(int)subtype;
 
 - (NSString*)getTitleAsyncWithAssetId:(NSString *)assetId subtype:(int)subtype;
 

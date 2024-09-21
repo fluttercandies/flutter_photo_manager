@@ -495,8 +495,15 @@ class AssetEntity {
   ///  * Android: Always true.
   ///  * iOS/macOS: Whether the asset has been uploaded to iCloud
   ///    and locally exist (including cached or not).
-  Future<bool> isLocallyAvailable({bool isOrigin = false}) {
-    return plugin.isLocallyAvailable(id, isOrigin: isOrigin);
+  Future<bool> isLocallyAvailable({
+    bool isOrigin = false,
+    bool withSubtype = false,
+  }) {
+    return plugin.isLocallyAvailable(
+      id,
+      isOrigin: isOrigin,
+      subtype: withSubtype ? subtype : 0,
+    );
   }
 
   /// Obtain latitude and longitude.

@@ -152,13 +152,23 @@
     return result && result.count > 0;
 }
 
-- (BOOL)entityIsLocallyAvailable:(NSString *)assetId resource:(PHAssetResource *)resource isOrigin:(BOOL)isOrigin {
+- (BOOL)entityIsLocallyAvailable:(NSString *)assetId resource:(PHAssetResource *)resource isOrigin:(BOOL)isOrigin subtype:(int)subtype {
     PHFetchResult<PHAsset *> *result =
     [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[PHFetchOptions new]];
     if (!result) {
         return NO;
     }
     PHAsset *asset = result.firstObject;
+    if (@available(iOS 9.1, *)) {
+        if ((subtype & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
+            resource = [asset getLivePhotosResource];
+        }
+    }
+    if (@available(macOS 14.0, *)) {
+        if ((subtype & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
+            resource = [asset getLivePhotosResource];
+        }
+    }
     NSFileManager *fileManager = NSFileManager.defaultManager;
     NSString *path = [self makeAssetOutputPath:asset resource:nil isOrigin:isOrigin manager:fileManager];
     BOOL isExist = [fileManager fileExistsAtPath:path];

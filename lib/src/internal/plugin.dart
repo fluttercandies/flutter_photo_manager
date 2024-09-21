@@ -645,11 +645,19 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     });
   }
 
-  Future<bool> isLocallyAvailable(String id, {bool isOrigin = false}) async {
+  Future<bool> isLocallyAvailable(
+    String id, {
+    bool isOrigin = false,
+    int subtype = 0,
+  }) async {
     if (Platform.isIOS || Platform.isMacOS) {
       final bool result = await _channel.invokeMethod<bool>(
         PMConstants.mIsLocallyAvailable,
-        <String, dynamic>{'id': id, 'isOrigin': isOrigin},
+        <String, dynamic>{
+          'id': id,
+          'isOrigin': isOrigin,
+          'subtype': subtype,
+        },
       ) as bool;
       return result;
     }
