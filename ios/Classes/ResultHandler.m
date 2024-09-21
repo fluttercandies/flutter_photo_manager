@@ -48,9 +48,9 @@
     FlutterError *flutterError;
     if ([value isKindOfClass:[NSError class]]) {
         NSError *error = (NSError *)value;
-        NSString *code = [NSString stringWithFormat:@"%ld", (long)error.code];
-        NSString *message = error.userInfo[NSLocalizedDescriptionKey] ?: @"Unknown error";
-        NSString *details = error.userInfo[NSLocalizedFailureReasonErrorKey] ?: @"No failure reason provided";
+        NSString *code = [NSString stringWithFormat:@"%@ (%ld)", error.domain, (long)error.code];
+        NSString *message = error.userInfo[NSLocalizedDescriptionKey] ?: error.localizedDescription ?: @"Unknown error";
+        NSString *details = error.userInfo[NSLocalizedFailureReasonErrorKey] ?: error.localizedFailureReason ?: @"No failure reason provided";
         flutterError = [FlutterError errorWithCode:code message:message details:details];
     } else if ([value isKindOfClass:[NSException class]]) {
         NSException *exception = (NSException *)value;
