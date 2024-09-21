@@ -476,13 +476,13 @@
         PHAsset *asset = entity.phAsset;
         if (@available(iOS 9.1, *)) {
             if (asset.isLivePhoto && (subtype & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
-                [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler];
+                [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:NO];
                 return;
             }
         }
         if (@available(macOS 14.0, *)) {
             if (asset.isLivePhoto && (subtype & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
-                [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler];
+                [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:NO];
                 return;
             }
         }
@@ -504,7 +504,7 @@
     [handler replyError:[NSString stringWithFormat:@"Asset %@ file cannot be obtained.", assetId]];
 }
 
-- (void)fetchLivePhotosFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+- (void)fetchLivePhotosFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler withScheme:(BOOL)withScheme {
     PHAssetResource *resource = [asset getLivePhotosResource];
     if (!resource) {
         [handler replyError:[NSString stringWithFormat:@"Asset %@ does not have a Live-Photo resource.", asset.localIdentifier]];
@@ -514,7 +514,11 @@
     NSString *path = [self makeAssetOutputPath:asset resource:resource isOrigin:YES manager:fileManager];
     if ([fileManager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
-        [handler reply:path];
+        if (withScheme) {
+            [handler reply:[NSURL fileURLWithPath:path].absoluteString];
+        } else {
+            [handler reply:path];
+        }
         return;
     }
     
@@ -540,7 +544,11 @@
             [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
             [handler replyError:error];
         } else {
-            [handler reply:path];
+            if (withScheme) {
+                [handler reply:[NSURL fileURLWithPath:path].absoluteString];
+            } else {
+                [handler reply:path];
+            }
             [self notifySuccess:progressHandler];
         }
     }];
@@ -1054,17 +1062,20 @@
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
         PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
-        PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
-        [options setOriginalFilename:filename];
-        [request addResourceWithType:PHAssetResourceTypePhoto fileURL:imageURL options:options];
-        [request addResourceWithType:PHAssetResourceTypePairedVideo fileURL:videoURL options:options];
+        PHAssetResourceCreationOptions *imageOptions = [PHAssetResourceCreationOptions new];
+        [imageOptions setOriginalFilename:filename];
+        [request addResourceWithType:PHAssetResourceTypePhoto fileURL:imageURL options:imageOptions];
+        PHAssetResourceCreationOptions *videoOptions = [PHAssetResourceCreationOptions new];
+        [videoOptions setOriginalFilename:filename];
+        [request addResourceWithType:PHAssetResourceTypeFullSizePairedVideo fileURL:videoURL options:videoOptions];
         assetId = request.placeholderForCreatedAsset.localIdentifier;
     }
      completionHandler:^(BOOL success, NSError *error) {
         if (success) {
-            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"create asset : id = %@", assetId]];
+            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Createed Live Photo asset = %@", assetId]];
             block([self getAssetEntity:assetId], nil);
         } else {
+            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Create Live Photo asset failed = %@, %@", assetId, error]];
             block(nil, error);
         }
     }];
@@ -1089,20 +1100,32 @@
 
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
-    PHAssetResource *resource;
+    
     if (@available(iOS 9.1, *)) {
-        if (asset.mediaSubtypes & PHAssetMediaSubtypePhotoLive) {
-            resource = [asset getLivePhotosResource];
+        if ((asset.mediaSubtypes & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
+            PHAssetResource *resource = [asset getLivePhotosResource];
             NSURL *url = [resource valueForKey:@"privateFileURL"];
-            [handler reply:url.absoluteString];
+            if (url) {
+                [handler reply:url.absoluteString];
+                return;
+            }
+            [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:YES];
             return;
         }
     }
-    BOOL isLocallyAvailable = [self entityIsLocallyAvailable:assetId resource:resource isOrigin:NO];
-    if (!isLocallyAvailable) {
-        [handler replyError:@"Media url is unavailable when the asset is not locally available."];
-        return;
+    if (@available(macOS 14.0, *)) {
+        if ((asset.mediaSubtypes & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
+            PHAssetResource *resource = [asset getLivePhotosResource];
+            NSURL *url = [resource valueForKey:@"privateFileURL"];
+            if (url) {
+                [handler reply:url.absoluteString];
+                return;
+            }
+            [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:YES];
+            return;
+        }
     }
+    
     if (asset.isVideo) {
         [self fetchFullSizeVideo:asset handler:handler progressHandler:progressHandler withScheme:YES];
     } else {
