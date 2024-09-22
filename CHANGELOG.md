@@ -12,7 +12,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 `saveLivePhoto` now requires `title` rather than `filename`.
 
-### Featuers
+### Features
 
 - Add `getPermissionState` method to `PhotoManager`.
 
