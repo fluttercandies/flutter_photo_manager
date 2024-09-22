@@ -476,7 +476,7 @@ final File? originVideoFile = await entity.originFileWithSubtype;
 - 在不同平台和版本中，HEIC 文件并未被完全支持。
   我们建议你上传 JPEG 文件（HEIC 图片的 `.file`），
   以保持多个平台之间的一致行为。
-  查看 [flutter/flutter＃20522][] 了解更多细节。
+  查看 [flutter/flutter#20522][] 了解更多细节。
 - 视频将仅以原始格式获取，而不是组合过的格式，
   这可能会在播放视频时导致某些行为的差异。
 

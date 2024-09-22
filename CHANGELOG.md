@@ -8,15 +8,38 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+### Breaking changes
+
+`saveLivePhoto` now requires `title` rather than `filename`.
+
+### Featuers
+
 - Add `getPermissionState` method to `PhotoManager`.
 
-<!-- *None.* -->
+### Improvements
+
+- Adds a detached state for managers. Callers with those managers will first be aware of the detaching state
+  before any actual calls to avoid crashes.
+- Errors replied by the channel do not include detailed messages before.
+  Now the code will unwrap certain exceptions to extract details from them.
+- Expose `progressHandler` for `AssetEntity.getMediaUrl`.
+- Expose `withSubtype` for `AssetEntity.isLocallyAvailable` to request if a Live Photo resource is available.
+
+### Fixes
+
+- `PHAssetResource` with the type `PHAssetResourceTypeFullSizeVideo` does not count as a video type before,
+  making the resource obtain ignore them.
+- Fixes potential range exception when converting `NSTimeInterval` on Darwin.
+- Fixes progress not being updated when getting the non-original video file on iOS.
+- Fixes incorrect Live Photo resource being obtained which will result in a wrong aspect ratio.
+- Fixes Live Photos saving exceptions with the paired video.
+- Other lints and type promotion fixes.
 
 ## 3.3.0
 
 ### Breaking changes
 
-`saveImage` now requires `filename` rather than `title` other save methods do not require `title` anymore.
+`saveImage` now requires `filename` rather than `title`, other save methods do not require `title` anymore.
 
 ### Improvements
 

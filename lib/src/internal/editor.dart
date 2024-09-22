@@ -274,23 +274,23 @@ class DarwinEditor {
   /// Save Live Photo to the gallery from the given [imageFile] and [videoFile].
   ///
   /// {@macro photo_manager.Editor.TitleWhenSaving}
-  ///
-  /// {@macro photo_manager.Editor.DescriptionWhenSaving}
-  ///
-  /// {@macro photo_manager.Editor.RelativePathWhenSaving}
-  ///
-  /// {@macro photo_manager.Editor.OrientationWhenSaving}
+  /// For a Live Photo, [title] typically take place when saving the resources
+  /// and should not contain the extension. For example:
+  /// GOOD: "my_live_photo_20240123_123456"
+  /// BAD: "my_live_photo_20240123_123456.jpg"
+  /// BAD: "my_live_photo_20240123_123456.mov"
+  /// BAD: "my_live_photo_20240123_123456.heic"
   Future<AssetEntity?> saveLivePhoto({
     required File imageFile,
     required File videoFile,
-    required String filename,
+    required String title,
     String? desc,
     String? relativePath,
   }) {
     return plugin.saveLivePhoto(
       imageFile: imageFile,
       videoFile: videoFile,
-      filename: filename,
+      title: title,
       desc: desc,
       relativePath: relativePath,
     );
