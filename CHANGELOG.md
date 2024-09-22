@@ -8,6 +8,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+*None.*
+
+## 3.4.0
+
 ### Breaking changes
 
 `saveLivePhoto` now requires `title` rather than `filename`.
