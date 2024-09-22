@@ -1064,7 +1064,7 @@
                  desc:(NSString *)desc
                 block:(AssetBlockResult)block {
     [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save LivePhoto with imagePath: %@, videoPath: %@, filename: %@, desc %@",
-                                     imagePath, videoPath, filename, desc]];
+                                     imagePath, videoPath, title, desc]];
     NSURL *imageURL = [NSURL fileURLWithPath:imagePath];
     NSURL *videoURL = [NSURL fileURLWithPath:videoPath];
     __block NSString *assetId = nil;
