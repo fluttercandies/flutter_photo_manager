@@ -99,7 +99,15 @@
 }
 
 - (BOOL)isNotNeedPermissionMethod:(NSString *)method {
-    return [@[@"log", @"openSetting", @"clearFileCache", @"releaseMemoryCache", @"ignorePermissionCheck"] indexOfObject:method] != NSNotFound;
+    NSArray *notNeedPermissionMethods = @[
+        @"log", 
+        @"openSetting", 
+        @"clearFileCache", 
+        @"releaseMemoryCache",
+        @"ignorePermissionCheck",
+        @"getPermissionState"
+    ];
+    return [notNeedPermissionMethods containsObject:method];
 }
 
 - (BOOL)isAboutPermissionMethod:(NSString *)method {
@@ -141,7 +149,25 @@
     } else if ([call.method isEqualToString:@"releaseMemoryCache"]) {
         [manager clearCache];
         [handler reply:nil];
+    } else if ([method isEqualToString:@"getPermissionState"]) {
+        [self getPermissionState:handler];
     }
+}
+
+- (void)getPermissionState:(ResultHandler *)handler {
+    int requestAccessLevel = [handler.call.arguments[@"iosAccessLevel"] intValue];
+#if __IPHONE_14_0
+    if (@available(iOS 14, *)) {
+        PHAuthorizationStatus result = [PHPhotoLibrary authorizationStatusForAccessLevel: requestAccessLevel];
+        [handler reply: @(result)];
+    } else {
+        PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+        [handler reply:@(status)];
+    }
+#else
+    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+    [handler reply:@(status)];
+#endif
 }
 
 - (void)handleAboutPermissionMethod:(ResultHandler *)handler {

@@ -63,8 +63,10 @@ enum OrderOptionType {
 enum PMRequestState { prepare, loading, success, failed }
 
 /// Information about app’s authorization to access the user’s photo library.
-///  * Android: Only [authorized] and [denied] are valid.
-///  * iOS/macOS: All valid.
+///
+/// Possible values for platforms:
+///  * Android: [authorized], [denied], and [limited].
+///  * iOS/macOS: All.
 ///
 /// See also:
 ///  * [Apple documentation](https://developer.apple.com/documentation/photokit/phauthorizationstatus)
@@ -72,7 +74,8 @@ enum PermissionState {
   /// The user has not set the app’s authorization status.
   notDetermined,
 
-  /// The app isn’t authorized to access the photo library, and the user can’t grant such permission.
+  /// The app isn’t authorized to access the photo library,
+  /// and the user can’t grant such permission.
   restricted,
 
   /// The user explicitly denied this app access to the photo library.
@@ -82,8 +85,6 @@ enum PermissionState {
   authorized,
 
   /// The user authorized this app for limited photo library access.
-  ///
-  /// This state only supports iOS 14 and above.
   limited,
 }
 

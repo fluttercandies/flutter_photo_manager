@@ -672,6 +672,16 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
 
     return null;
   }
+
+  Future<PermissionState> getPermissionState(
+    PermissionRequestOption requestOption,
+  ) async {
+    final int result = await _channel.invokeMethod(
+      PMConstants.mGetPermissionState,
+      requestOption.toMap(),
+    );
+    return PermissionState.values[result];
+  }
 }
 
 mixin IosPlugin on BasePlugin {

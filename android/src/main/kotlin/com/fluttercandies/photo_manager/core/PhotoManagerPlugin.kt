@@ -61,6 +61,7 @@ class PhotoManagerPlugin(
 
     fun bindActivity(activity: Activity?) {
         this.activity = activity
+        permissionsUtils.withActivity(activity)
         deleteManager.bindActivity(activity)
     }
 
@@ -321,6 +322,15 @@ class PhotoManagerPlugin(
                 val ignore = call.argument<Boolean>("ignore")!!
                 ignorePermissionCheck = ignore
                 resultHandler.reply(ignore)
+            }
+
+            Methods.getPermissionState -> {
+                val androidPermission = call.argument<Map<*, *>>("androidPermission")!!
+                val requestType = androidPermission["type"] as Int
+                val mediaLocation = androidPermission["mediaLocation"] as Boolean
+                permissionsUtils.getAuthValue(requestType, mediaLocation).let {
+                    resultHandler.reply(it.value)
+                }
             }
         }
     }
