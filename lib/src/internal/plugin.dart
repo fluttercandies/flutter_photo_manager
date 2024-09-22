@@ -669,11 +669,11 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   Future<PermissionState> getPermissionState(
     PermissionRequestOption requestOption,
   ) async {
-    final int? result = await _channel.invokeMethod<int>(
+    final int result = await _channel.invokeMethod(
       PMConstants.mGetPermissionState,
       requestOption.toMap(),
     );
-    return PermissionState.values[result ?? 0];
+    return PermissionState.values[result];
   }
 }
 

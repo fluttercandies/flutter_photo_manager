@@ -57,20 +57,19 @@ class PhotoManager {
     return plugin.requestPermissionExtend(requestOption);
   }
 
-  /// Get the current permission state of the application
-  ///
-  /// This method returns a [Future] that resolves to the current [PermissionState] of the application.
-  ///
-  /// Possible values for [PermissionState] include:
-  /// - [PermissionState.notDetermined]: The user hasn't made a choice yet
-  /// - [PermissionState.restricted]: The application is restricted from accessing the photo library (iOS only)
-  /// - [PermissionState.denied]: The user has denied permission
-  /// - [PermissionState.authorized]: The user has granted full access permission
-  /// - [PermissionState.limited]: The user has granted limited access permission (iOS 14+ only)
+  /// Get the current [PermissionState] of the photo library
+  /// with the given [requestOption].
   ///
   /// Example:
   /// ```dart
-  /// PermissionState state = await PhotoManager.getPermissionState();
+  /// final PermissionState state = await PhotoManager.getPermissionState(
+  ///   requestOption: const PermissionRequestOption(
+  ///     androidPermission: AndroidPermission(
+  //        type: RequestType.image,
+  //        mediaLocation: false,
+  //      ),
+  ///   ),
+  /// );
   /// if (state == PermissionState.authorized) {
   ///   print('The application has full access permission');
   /// } else {
@@ -78,10 +77,10 @@ class PhotoManager {
   /// }
   /// ```
   ///
-  /// Note: On Android, this method may require an [Activity] context. If called in a background service,
-  /// make sure to call the [setIgnorePermissionCheck] method first.
+  /// Note: On Android, this method may require an `Activity` context.
+  /// Call [setIgnorePermissionCheck] if the call is from background service.
   static Future<PermissionState> getPermissionState({
-    PermissionRequestOption requestOption = const PermissionRequestOption(),
+    required PermissionRequestOption requestOption,
   }) {
     return plugin.getPermissionState(requestOption);
   }

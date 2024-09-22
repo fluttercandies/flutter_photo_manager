@@ -93,8 +93,7 @@ class RequestType {
     if (containsAudio()) {
       values.add('audio');
     }
-
-    return '$runtimeType(${values.join(', ')})';
+    return 'RequestType(${values.join(', ')})';
   }
 }
 
