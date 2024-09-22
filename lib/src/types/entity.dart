@@ -495,8 +495,15 @@ class AssetEntity {
   ///  * Android: Always true.
   ///  * iOS/macOS: Whether the asset has been uploaded to iCloud
   ///    and locally exist (including cached or not).
-  Future<bool> isLocallyAvailable({bool isOrigin = false}) {
-    return plugin.isLocallyAvailable(id, isOrigin: isOrigin);
+  Future<bool> isLocallyAvailable({
+    bool isOrigin = false,
+    bool withSubtype = false,
+  }) {
+    return plugin.isLocallyAvailable(
+      id,
+      isOrigin: isOrigin,
+      subtype: withSubtype ? subtype : 0,
+    );
   }
 
   /// Obtain latitude and longitude.
@@ -714,8 +721,13 @@ class AssetEntity {
   /// See also:
   ///  * https://developer.android.com/reference/android/content/ContentUris
   ///  * https://developer.apple.com/documentation/avfoundation/avurlasset
-  Future<String?> getMediaUrl() {
-    return plugin.getMediaUrl(this);
+  Future<String?> getMediaUrl({
+    PMProgressHandler? progressHandler,
+  }) {
+    return plugin.getMediaUrl(
+      this,
+      progressHandler: progressHandler,
+    );
   }
 
   bool get _platformMatched =>

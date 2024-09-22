@@ -2,7 +2,7 @@
 
 @protocol PMResultHandler <NSObject>
 
-- (void)replyError:(NSString *)errorCode;
+- (void)replyError:(NSObject *)value;
 
 - (void)reply:(id)obj;
 
