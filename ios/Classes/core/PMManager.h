@@ -69,7 +69,7 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 - (void)saveLivePhoto:(NSString *)imagePath
             videoPath:(NSString *)videoPath
-            filename:(NSString *)filename
+            title:(NSString *)title
             desc:(NSString *)desc
             block:(AssetBlockResult)block;
 

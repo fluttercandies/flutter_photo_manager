@@ -464,13 +464,13 @@
             [handler replyError:error];
         }];
     } else if ([call.method isEqualToString:@"saveLivePhoto"]) {
-        NSString *videoPath = call.arguments[@"videoPath"];
         NSString *imagePath = call.arguments[@"imagePath"];
-        NSString *filename = call.arguments[@"filename"];
+        NSString *videoPath = call.arguments[@"videoPath"];
+        NSString *title = call.arguments[@"title"];
         NSString *desc = call.arguments[@"desc"];
         [manager saveLivePhoto:imagePath
                      videoPath:videoPath
-                      filename:filename
+                         title:title
                           desc:desc
                          block:^(PMAssetEntity *asset, NSObject *error) {
             if (asset) {

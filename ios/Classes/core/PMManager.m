@@ -1060,7 +1060,7 @@
 
 - (void)saveLivePhoto:(NSString *)imagePath
             videoPath:(NSString *)videoPath
-             filename:(NSString *)filename
+                title:(NSString *)title
                  desc:(NSString *)desc
                 block:(AssetBlockResult)block {
     [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save LivePhoto with imagePath: %@, videoPath: %@, filename: %@, desc %@",
@@ -1072,10 +1072,10 @@
      performChanges:^{
         PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
         PHAssetResourceCreationOptions *imageOptions = [PHAssetResourceCreationOptions new];
-        [imageOptions setOriginalFilename:filename];
+        [imageOptions setOriginalFilename:title];
         [request addResourceWithType:PHAssetResourceTypePhoto fileURL:imageURL options:imageOptions];
         PHAssetResourceCreationOptions *videoOptions = [PHAssetResourceCreationOptions new];
-        [videoOptions setOriginalFilename:filename];
+        [videoOptions setOriginalFilename:title];
         [request addResourceWithType:PHAssetResourceTypePairedVideo fileURL:videoURL options:videoOptions];
         assetId = request.placeholderForCreatedAsset.localIdentifier;
     }
