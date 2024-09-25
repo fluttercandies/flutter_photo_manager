@@ -195,4 +195,32 @@
     return (double) i / 1000.0;
 }
 
+// TODO: Add macros.
++ (_Nullable AVFileType)convertNumberToAVFileType:(int)number {
+    if (number <= 0) {
+        return nil;
+    }
+    NSMutableDictionary *map = [NSMutableDictionary dictionary];
+    map[@1] = AVFileTypeQuickTimeMovie;
+    map[@2] = AVFileTypeMPEG4;
+    map[@3] = AVFileTypeAppleM4V;
+    map[@4] = AVFileTypeAppleM4A;
+    map[@5] = AVFileType3GPP;
+    map[@6] = AVFileType3GPP2;
+    map[@7] = AVFileTypeCoreAudioFormat;
+    map[@8] = AVFileTypeWAVE;
+    map[@9] = AVFileTypeAIFF;
+    map[@10] = AVFileTypeAIFC;
+    map[@11] = AVFileTypeAMR;
+    map[@12] = AVFileTypeMPEGLayer3;
+    map[@13] = AVFileTypeSunAU;
+    map[@14] = AVFileTypeAC3;
+    map[@15] = AVFileTypeEnhancedAC3;
+    AVFileType type = map[@(number)];
+    if (type == nil) {
+        return nil;
+    }
+    return type;
+}
+
 @end

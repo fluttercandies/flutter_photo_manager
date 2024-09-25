@@ -9,6 +9,7 @@ import 'package:photo_manager/platform_utils.dart';
 import '../filter/base_filter.dart';
 import '../filter/classical/filter_option_group.dart';
 import '../filter/path_filter.dart';
+import '../internal/enums.dart';
 import '../types/entity.dart';
 import '../types/types.dart';
 

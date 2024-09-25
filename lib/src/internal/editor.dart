@@ -7,8 +7,8 @@ import 'dart:typed_data' as typed_data;
 
 import 'package:photo_manager/platform_utils.dart';
 
-import '../filter/path_filter.dart';
 import '../types/entity.dart';
+import 'enums.dart';
 import 'plugin.dart';
 
 class Editor {
