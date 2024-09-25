@@ -1062,14 +1062,17 @@ PhotoManager.editor.darwin.deletePath();
 
 #### Features for OpenHarmony
 
-Currently, most functions are supported, except for those related to caching. and only support image and video types.
+> The photo library feature is disabled in OpenHarmony officially because of the security concern.
 
-| Feature                        | OpenHarmony |
-| :----------------------------- | :---------: |
-| releaseCache                   |      ❌      |
-| clearFileCache                 |      ❌      |
-| requestCacheAssetsThumbnail    |      ❌      |
-| getSubPathEntities             |      ❌      |
+Most functions are supported except caching,
+and only images/videos are supported.
+
+| Feature                     | OpenHarmony |
+|:----------------------------|:-----------:|
+| releaseCache                |      ❌      |
+| clearFileCache              |      ❌      |
+| requestCacheAssetsThumbnail |      ❌      |
+| getSubPathEntities          |      ❌      |
 
 
 [pub package]: https://pub.dev/packages/photo_manager
