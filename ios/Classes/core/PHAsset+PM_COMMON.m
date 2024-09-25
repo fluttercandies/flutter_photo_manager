@@ -64,17 +64,21 @@
     }
 }
 
-- (NSString *)originalFilenameWithSubtype:(int)subtype fileType:(AVFileType)fileType {
+- (NSString *)filenameWithOptions:(int)subtype isOrigin:(BOOL)isOrigin fileType:(AVFileType)fileType {
     PHAssetResource *resource;
     if (@available(iOS 9.1, *)) {
         BOOL isLivePhotoSubtype = (subtype & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive;
         if ([self isLivePhoto] && isLivePhotoSubtype) {
             resource = [self getLivePhotosResource];
-        } else {
+        } else if (isOrigin) {
             resource = [self getRawResource];
+        } else {
+            resource = [self getCurrentResource];
         }
-    } else {
+    } else if (isOrigin) {
         resource = [self getRawResource];
+    } else {
+        resource = [self getCurrentResource];
     }
     if (resource) {
         NSString *filename = resource.originalFilename;

@@ -1280,10 +1280,13 @@
     }];
 }
 
-- (NSString *)getTitleAsyncWithAssetId:(NSString *)assetId subtype:(int)subtype fileType:(AVFileType)fileType {
+- (NSString *)getTitleAsyncWithAssetId:(NSString *)assetId
+                               subtype:(int)subtype
+                              isOrigin:(BOOL)isOrigin
+                              fileType:(AVFileType)fileType {
     PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
     if (asset) {
-        return [asset originalFilenameWithSubtype:subtype fileType:fileType];
+        return [asset filenameWithOptions:subtype isOrigin:isOrigin fileType:fileType];
     }
     return @"";
 }

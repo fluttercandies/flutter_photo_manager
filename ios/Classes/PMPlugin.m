@@ -525,8 +525,12 @@
     } else if ([call.method isEqualToString:@"getTitleAsync"]) {
         NSString *assetId = call.arguments[@"id"];
         int subtype = [call.arguments[@"subtype"] intValue];
+        BOOL isOrigin = [call.arguments[@"isOrigin"] boolValue];
         AVFileType fileType = [PMConvertUtils convertNumberToAVFileType:[call.arguments[@"darwinFileType"] intValue]];
-        NSString *title = [manager getTitleAsyncWithAssetId:assetId subtype:subtype fileType:fileType];
+        NSString *title = [manager getTitleAsyncWithAssetId:assetId
+                                                    subtype:subtype
+                                                   isOrigin:isOrigin
+                                                   fileType:fileType];
         [handler reply:title];
     } else if ([call.method isEqualToString:@"getMimeTypeAsync"]) {
         NSString *assetId = call.arguments[@"id"];

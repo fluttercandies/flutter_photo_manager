@@ -480,6 +480,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
 
   Future<String> getTitleAsync(
     AssetEntity entity, {
+    bool isOrigin = true,
     int subtype = 0,
     PMDarwinAVFileType? darwinFileType,
   }) async {
@@ -489,6 +490,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         <String, dynamic>{
           'id': entity.id,
           'subtype': subtype,
+          'isOrigin': isOrigin,
           'darwinFileType': darwinFileType?.value ?? 0,
         },
       ) as String;
