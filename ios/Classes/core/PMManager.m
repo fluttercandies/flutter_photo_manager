@@ -457,11 +457,6 @@
                       contentMode:option.contentMode
                           options:requestOptions
                     resultHandler:^(PMImage *result, NSDictionary *info) {
-        BOOL downloadFinished = [PMManager isDownloadFinish:info];
-        if (!downloadFinished) {
-            return;
-        }
-        
         if ([handler isReplied]) {
             return;
         }
@@ -470,6 +465,11 @@
         if (error) {
             [handler replyError:error];
             [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            return;
+        }
+        
+        BOOL downloadFinished = [PMManager isDownloadFinish:info];
+        if (!downloadFinished) {
             return;
         }
         
@@ -754,8 +754,15 @@
      resultHandler:^(AVAsset *_Nullable asset,
                      AVAudioMix *_Nullable audioMix,
                      NSDictionary *_Nullable info) {
-        BOOL downloadFinish = [PMManager isDownloadFinish:info];
-        if (!downloadFinish) {
+        NSObject *error = info[PHImageErrorKey];
+        if (error) {
+            [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            block(nil, error);
+            return;
+        }
+        
+        BOOL downloadFinished = [PMManager isDownloadFinish:info];
+        if (!downloadFinished) {
             return;
         }
         
@@ -1046,11 +1053,6 @@
                           options:options
                     resultHandler:^(PMImage *_Nullable image,
                                     NSDictionary *_Nullable info) {
-        BOOL downloadFinished = [PMManager isDownloadFinish:info];
-        if (!downloadFinished) {
-            return;
-        }
-        
         if ([handler isReplied]) {
             return;
         }
@@ -1059,6 +1061,11 @@
         if (error) {
             [handler replyError:error];
             [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            return;
+        }
+        
+        BOOL downloadFinished = [PMManager isDownloadFinish:info];
+        if (!downloadFinished) {
             return;
         }
         
