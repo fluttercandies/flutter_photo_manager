@@ -516,15 +516,42 @@ final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
 );
 ```
 
+Or you can use the `CustomSqlFilter` to obtain live photos:
+
+```dart
+final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
+  type: RequestType.image,
+  filterOption: CustomFilter.sql(
+  where: '${CustomColumns.base.mediaType} = 1'
+      ' AND '
+      '${CustomColumns.darwin.mediaSubtypes} & (1 << 3) = (1 << 3)',
+  ),
+);
+```
+
 ##### Obtain the video from "Live Photos"
 
 ```dart
 final AssetEntity entity = livePhotoEntity;
+
+// To play Live Photo's video.
 final String? mediaUrl = await entity.getMediaUrl();
+
+// Get files for normal displays like thumbnails.
 final File? imageFile = await entity.file;
 final File? videoFile = await entity.fileWithSubtype;
+
+// Get files for the raw displays like detail preview.
 final File? originImageFile = await entity.originFile;
 final File? originVideoFile = await entity.originFileWithSubtype;
+
+// Additionally, you can convert Live Photo's (on iOS) video file
+// from `mov` to `mp4` using:
+final File? convertedFile = await entity.loadFile(
+  isOriginal: true,
+  withSubtye: true,
+  darwinFileType: PMDarwinAVFileType.mp4,
+);
 ```
 
 #### Limitations
