@@ -282,7 +282,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       'id': id,
       'isOrigin': isOrigin,
       'subtype': subtype,
-      'darwinFileType': darwinFileType,
+      'darwinFileType': darwinFileType?.value ?? 0,
     };
     _injectProgressHandlerParams(params, progressHandler);
     return _channel.invokeMethod(PMConstants.mGetFullFile, params);

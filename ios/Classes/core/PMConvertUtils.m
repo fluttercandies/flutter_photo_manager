@@ -196,7 +196,7 @@
 }
 
 // TODO: Add macros.
-+ (_Nullable AVFileType)convertNumberToAVFileType:(int)number {
++ (AVFileType)convertNumberToAVFileType:(int)number {
     if (number <= 0) {
         return nil;
     }

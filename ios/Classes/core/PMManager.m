@@ -479,7 +479,12 @@
     
 }
 
-- (void)getFullSizeFileWithId:(NSString *)assetId isOrigin:(BOOL)isOrigin subtype:(int)subtype resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+- (void)getFullSizeFileWithId:(NSString *)assetId
+                     isOrigin:(BOOL)isOrigin
+                      subtype:(int)subtype
+                     fileType:(AVFileType)fileType
+                resultHandler:(NSObject <PMResultHandler> *)handler
+              progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PMAssetEntity *entity = [self getAssetEntity:assetId];
     if (entity && entity.phAsset) {
         PHAsset *asset = entity.phAsset;
