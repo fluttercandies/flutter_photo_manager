@@ -424,9 +424,13 @@ final AssetEntity? entity = await PhotoManager.editor.darwin.saveLivePhoto(
 );
 ```
 
-Be aware that the created asset might have
-limited access or got deleted in anytime,
+Be aware that the created asset might have limited access or got deleted in anytime,
 so the result might be null.
+
+iOS and macOS might set extra limitations when saving assets, it seems only
+certain file types can be saved as a media assets. The limitation follows the definition of
+[`AVFileType`][], when you saw `PHPhotosErrorDomain Code=3302` (or `330x`),
+make sure the file type is supported.
 
 #### From iCloud
 
@@ -1031,6 +1035,7 @@ Currently, most functions are supported, except for those related to caching. an
 [`PhotoManager.getAssetListRange`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoManager/getAssetListRange.html
 [`AssetEntity.fromId`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetEntity/fromId.html
 
+[`AVFileType`]: https://developer.apple.com/documentation/avfoundation/avfiletype
 [`LocallyAvailableBuilder`]: https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/2055adfa74370339d10e6f09adef72f2130d2380/lib/src/widget/builder/locally_available_builder.dart
 
 [flutter/flutter#20522]: https://github.com/flutter/flutter/issues/20522
