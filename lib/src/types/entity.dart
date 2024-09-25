@@ -563,6 +563,9 @@ class AssetEntity {
   ///
   /// [withSubtype] only takes effect on iOS, typically for Live Photos.
   ///
+  /// [darwinFileType] will try to define the export format when
+  /// exporting assets, such as exporting a MOV file to MP4.
+  ///
   /// See also:
   ///  * [file] which can obtain the compressed file.
   ///  * [fileWithSubtype] which can obtain the compressed file with subtype.
@@ -572,11 +575,13 @@ class AssetEntity {
     bool isOrigin = true,
     bool withSubtype = false,
     PMProgressHandler? progressHandler,
+    PMDarwinAVFileType? darwinFileType,
   }) {
     return _getFile(
       isOrigin: isOrigin,
       subtype: withSubtype ? subtype : 0,
       progressHandler: progressHandler,
+      darwinFileType: darwinFileType,
     );
   }
 
@@ -740,6 +745,7 @@ class AssetEntity {
     bool isOrigin = false,
     PMProgressHandler? progressHandler,
     int subtype = 0,
+    PMDarwinAVFileType? darwinFileType,
   }) async {
     assert(
       _platformMatched,
@@ -753,6 +759,7 @@ class AssetEntity {
       isOrigin: isOrigin,
       progressHandler: progressHandler,
       subtype: subtype,
+      darwinFileType: darwinFileType,
     );
     if (path == null) {
       return null;
