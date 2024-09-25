@@ -915,6 +915,12 @@
             filename = [filenameWithoutExtension stringByAppendingPathExtension:[newExtension stringByReplacingOccurrencesOfString:@"." withString:@""]];
         }
     }
+    
+    // Convert the extension to lowercased.
+    NSString *extension = [filename pathExtension];
+    filename = [filename stringByDeletingPathExtension];
+    filename = [filename stringByAppendingPathExtension:[extension stringByReplacingOccurrencesOfString:@"." withString:@""]];
+    
     NSString *typeDirPath;
     if (resource) {
         if (resource.isImage) {
