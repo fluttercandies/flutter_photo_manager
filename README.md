@@ -444,6 +444,19 @@ The preferred implementation would be the [`LocallyAvailableBuilder`][]
 in the `wechat_asset_picker` package, which provides a progress indicator
 when the file is downloading.
 
+There are several methods that can combine with `PMProgressHandler`
+to provide responsive progress events, which are:
+* AssetEntity.thumbnailDataWithSize
+* AssetEntity.thumbnailDataWithOption
+* AssetEntity.getMediaUrl
+* AssetEntity.loadFile
+* PhotoManager.plugin.getOriginBytes
+
+iCloud files can only be obtained when the Apple ID on the device are correctly authorized.
+When the account requires to re-enter the password to verify, iCloud files that are not
+locally available are not allowed to be fetched. The photo library will throws
+`CloudPhotoLibraryErrorDomain` in this circumstance.
+
 #### Display assets
 
 > Starts from v3.0.0, `AssetEntityImage` and `AssetEntityImageProvider`
