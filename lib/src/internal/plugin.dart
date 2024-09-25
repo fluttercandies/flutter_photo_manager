@@ -484,12 +484,12 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     PMDarwinAVFileType? darwinFileType,
   }) async {
     if (Platform.isIOS || Platform.isMacOS) {
-      return await _channel.invokeMethod<String>(
+      return await _channel.invokeMethod(
         PMConstants.mGetTitleAsync,
         <String, dynamic>{
           'id': entity.id,
           'subtype': subtype,
-          'darwinFileType': darwinFileType,
+          'darwinFileType': darwinFileType?.value ?? 0,
         },
       ) as String;
     }
@@ -660,6 +660,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     String id, {
     bool isOrigin = false,
     int subtype = 0,
+    PMDarwinAVFileType? darwinFileType,
   }) async {
     if (Platform.isIOS || Platform.isMacOS) {
       final bool result = await _channel.invokeMethod<bool>(
@@ -668,6 +669,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
           'id': id,
           'isOrigin': isOrigin,
           'subtype': subtype,
+          'darwinFileType': darwinFileType?.value ?? 0,
         },
       ) as bool;
       return result;

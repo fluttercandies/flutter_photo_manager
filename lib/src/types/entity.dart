@@ -11,7 +11,6 @@ import 'package:flutter/rendering.dart';
 import '../../platform_utils.dart';
 import '../filter/base_filter.dart';
 import '../filter/classical/filter_option_group.dart';
-import '../filter/path_filter.dart';
 import '../internal/constants.dart';
 import '../internal/enums.dart';
 import '../internal/plugin.dart';
@@ -498,11 +497,13 @@ class AssetEntity {
   Future<bool> isLocallyAvailable({
     bool isOrigin = false,
     bool withSubtype = false,
+    PMDarwinAVFileType? darwinFileType,
   }) {
     return plugin.isLocallyAvailable(
       id,
       isOrigin: isOrigin,
       subtype: withSubtype ? subtype : 0,
+      darwinFileType: darwinFileType,
     );
   }
 

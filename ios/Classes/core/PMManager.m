@@ -152,7 +152,11 @@
     return result && result.count > 0;
 }
 
-- (BOOL)entityIsLocallyAvailable:(NSString *)assetId resource:(PHAssetResource *)resource isOrigin:(BOOL)isOrigin subtype:(int)subtype {
+- (BOOL)entityIsLocallyAvailable:(NSString *)assetId
+                        resource:(PHAssetResource *)resource
+                        isOrigin:(BOOL)isOrigin
+                         subtype:(int)subtype
+                        fileType:(AVFileType)fileType {
     PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[PHFetchOptions new]];
     if (!result) {
         return NO;
@@ -169,7 +173,11 @@
         }
     }
     NSFileManager *fileManager = NSFileManager.defaultManager;
-    NSString *path = [self makeAssetOutputPath:asset resource:resource isOrigin:isOrigin manager:fileManager];
+    NSString *path = [self makeAssetOutputPath:asset
+                                      resource:resource
+                                      isOrigin:isOrigin
+                                      fileType:fileType
+                                       manager:fileManager];
     BOOL isExist = [fileManager fileExistsAtPath:path];
     [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Locally available for path %@: %hhd", path, isExist]];
     if (isExist) {
@@ -490,21 +498,21 @@
         PHAsset *asset = entity.phAsset;
         if (@available(iOS 9.1, *)) {
             if (asset.isLivePhoto && (subtype & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
-                [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:NO];
+                [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:NO fileType:fileType];
                 return;
             }
         }
         if (@available(macOS 14.0, *)) {
             if (asset.isLivePhoto && (subtype & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
-                [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:NO];
+                [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:NO fileType:fileType];
                 return;
             }
         }
         if (asset.isVideo) {
             if (isOrigin) {
-                [self fetchOriginVideoFile:asset handler:handler progressHandler:progressHandler];
+                [self fetchOriginVideoFile:asset handler:handler progressHandler:progressHandler fileType:fileType];
             } else {
-                [self fetchFullSizeVideo:asset handler:handler progressHandler:progressHandler withScheme:NO];
+                [self fetchFullSizeVideo:asset handler:handler progressHandler:progressHandler withScheme:NO fileType:fileType];
             }
             return;
         }
@@ -518,94 +526,52 @@
     [handler replyError:[NSString stringWithFormat:@"Asset %@ file cannot be obtained.", assetId]];
 }
 
-- (void)fetchLivePhotosFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler withScheme:(BOOL)withScheme {
+- (void)fetchLivePhotosFile:(PHAsset *)asset
+                    handler:(NSObject <PMResultHandler> *)handler
+            progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
+                 withScheme:(BOOL)withScheme
+                   fileType:(AVFileType)fileType {
     PHAssetResource *resource = [asset getLivePhotosResource];
     if (!resource) {
         [handler replyError:[NSString stringWithFormat:@"Asset %@ does not have a Live-Photo resource.", asset.localIdentifier]];
         return;
     }
-    NSFileManager *fileManager = NSFileManager.defaultManager;
-    NSString *path = [self makeAssetOutputPath:asset resource:resource isOrigin:YES manager:fileManager];
-    if ([fileManager fileExistsAtPath:path]) {
-        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
-        if (withScheme) {
-            [handler reply:[NSURL fileURLWithPath:path].absoluteString];
-        } else {
+    
+    [self fetchResourceToFile:asset
+                     resource:resource
+              progressHandler:progressHandler
+                   withScheme:withScheme
+                     isOrigin:YES
+                     fileType:fileType
+                        block:^(NSString *path, NSObject *error) {
+        if (path) {
             [handler reply:path];
-        }
-        return;
-    }
-    
-    PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
-    [options setNetworkAccessAllowed:YES];
-    
-    __block double lastProgress = 0.0;
-    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
-    [options setProgressHandler:^(double progress) {
-        lastProgress = progress;
-        if (progress != 1) {
-            [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
-        }
-    }];
-    
-    PHAssetResourceManager *resourceManager = PHAssetResourceManager.defaultManager;
-    NSURL *fileUrl = [NSURL fileURLWithPath:path];
-    [resourceManager writeDataForAssetResource:resource
-                                        toFile:fileUrl
-                                       options:options
-                             completionHandler:^(NSError *_Nullable error) {
-        if (error) {
-            [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
-            [handler replyError:error];
         } else {
-            if (withScheme) {
-                [handler reply:[NSURL fileURLWithPath:path].absoluteString];
-            } else {
-                [handler reply:path];
-            }
-            [self notifySuccess:progressHandler];
+            [handler replyError:error];
         }
     }];
 }
 
-- (void)fetchOriginVideoFile:(PHAsset *)asset handler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+- (void)fetchOriginVideoFile:(PHAsset *)asset
+                     handler:(NSObject <PMResultHandler> *)handler
+             progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
+                    fileType:(AVFileType)fileType {
     PHAssetResource *resource = [asset getCurrentResource];
     if (!resource) {
         [handler replyError:[NSString stringWithFormat:@"Asset %@ does not have available resources.", asset.localIdentifier]];
         return;
     }
-    NSFileManager *fileManager = NSFileManager.defaultManager;
-    NSString *path = [self makeAssetOutputPath:asset resource:resource isOrigin:YES manager:fileManager];
-    if ([fileManager fileExistsAtPath:path]) {
-        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
-        [handler reply:path];
-        return;
-    }
-    
-    PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
-    [options setNetworkAccessAllowed:YES];
-    
-    __block double lastProgress = 0.0;
-    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
-    [options setProgressHandler:^(double progress) {
-        lastProgress = progress;
-        if (progress != 1) {
-            [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
-        }
-    }];
-    
-    PHAssetResourceManager *resourceManager = PHAssetResourceManager.defaultManager;
-    NSURL *fileUrl = [NSURL fileURLWithPath:path];
-    [resourceManager writeDataForAssetResource:resource
-                                        toFile:fileUrl
-                                       options:options
-                             completionHandler:^(NSError *_Nullable error) {
-        if (error) {
-            [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
-            [handler replyError:error];
-        } else {
+    [self fetchResourceToFile:asset
+                     resource:resource
+              progressHandler:progressHandler
+                   withScheme:NO
+                     isOrigin:YES
+                     fileType:fileType
+                        block:^(NSString *path, NSObject *error) {
+        if (path) {
             [handler reply:path];
-            [self notifySuccess:progressHandler];
+        } else {
+            [handler replyError:error];
         }
     }];
 }
@@ -613,24 +579,162 @@
 - (void)fetchFullSizeVideo:(PHAsset *)asset
                    handler:(NSObject <PMResultHandler> *)handler
            progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
-                withScheme:(BOOL)withScheme {
-    NSFileManager *manager = NSFileManager.defaultManager;
-    NSString *path = [self makeAssetOutputPath:asset resource:nil isOrigin:NO manager:manager];
-    if ([manager fileExistsAtPath:path]) {
-        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Read cache from %@", path]];
-        if (withScheme) {
-            [handler reply:[NSURL fileURLWithPath:path].absoluteString];
-        } else {
+                withScheme:(BOOL)withScheme
+                  fileType:(AVFileType)fileType {
+    [self exportAssetToFile:asset
+            progressHandler:progressHandler
+                 withScheme:withScheme
+                   fileType:fileType
+                      block:^(NSString *path, NSObject *error) {
+        if (path) {
             [handler reply:path];
+        } else {
+            [handler replyError:error];
+        }
+    }];
+}
+
+- (void)fetchResourceToFile:(PHAsset *)asset
+                   resource:(PHAssetResource *)resource
+            progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
+                 withScheme:(BOOL)withScheme
+                   isOrigin:(BOOL)isOrigin
+                   fileType:(AVFileType)fileType
+                      block:(void (^)(NSString *path, NSObject *error))block {
+    NSFileManager *fileManager = NSFileManager.defaultManager;
+    NSString *path = [self makeAssetOutputPath:asset
+                                      resource:resource
+                                      isOrigin:isOrigin
+                                      fileType:nil
+                                       manager:fileManager];
+    if ([fileManager fileExistsAtPath:path]) {
+        if (fileType) {
+            NSString *originalPath = path;
+            NSString *path = [self makeAssetOutputPath:asset
+                                              resource:resource
+                                              isOrigin:isOrigin
+                                              fileType:fileType
+                                               manager:fileManager];
+            if ([fileManager fileExistsAtPath:path]) {
+                [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
+                [self notifySuccess:progressHandler];
+                if (withScheme) {
+                    block([NSURL fileURLWithPath:path].absoluteString, nil);
+                } else {
+                    block(path, nil);
+                }
+                return;
+            }
+            [self exportAVAssetToFile:originalPath
+                          destination:path
+                      progressHandler:progressHandler
+                           withScheme:withScheme
+                             fileType:fileType
+                                block:^(NSString *path, NSObject *error) {
+                if (path) {
+                    if (withScheme) {
+                        block([NSURL fileURLWithPath:path].absoluteString, nil);
+                    } else {
+                        block(path, nil);
+                    }
+                } else {
+                    block(nil, error);
+                }
+            }];
+            return;
+        }
+        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
+        [self notifySuccess:progressHandler];
+        if (withScheme) {
+            block([NSURL fileURLWithPath:path].absoluteString, nil);
+        } else {
+            block(path, nil);
         }
         return;
     }
     
+    PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
+    [options setNetworkAccessAllowed:YES];
+    
+    __block double lastProgress = 0.0;
+    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+    [options setProgressHandler:^(double progress) {
+        lastProgress = progress;
+        if (progress != 1) {
+            [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+        }
+    }];
+    
+    PHAssetResourceManager *resourceManager = PHAssetResourceManager.defaultManager;
+    __block NSURL *fileUrl = [NSURL fileURLWithPath:path];
+    [resourceManager writeDataForAssetResource:resource
+                                        toFile:fileUrl
+                                       options:options
+                             completionHandler:^(NSError *_Nullable error) {
+        if (error) {
+            [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            block(nil, error);
+            return;
+        }
+        if (fileType) {
+            NSString *newPath = [self makeAssetOutputPath:asset
+                                                 resource:resource
+                                                 isOrigin:isOrigin
+                                                 fileType:fileType
+                                                  manager:fileManager];
+            fileUrl = [NSURL fileURLWithPath:newPath];
+            PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
+            [options setNetworkAccessAllowed:YES];
+            [resourceManager writeDataForAssetResource:resource
+                                                toFile:fileUrl
+                                               options:options
+                                     completionHandler:^(NSError *_Nullable error) {
+                if (path) {
+                    [self notifySuccess:progressHandler];
+                    if (withScheme) {
+                        block([NSURL fileURLWithPath:path].absoluteString, nil);
+                    } else {
+                        block(newPath, nil);
+                    }
+                } else {
+                    [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+                    block(nil, error);
+                }
+            }];
+            return;
+        }
+        [self notifySuccess:progressHandler];
+        if (withScheme) {
+            block([NSURL fileURLWithPath:path].absoluteString, nil);
+        } else {
+            block(path, nil);
+        }
+    }];
+}
+
+
+
+- (void)exportAssetToFile:(PHAsset *)asset
+          progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
+               withScheme:(BOOL)withScheme
+                 fileType:(AVFileType)fileType
+                    block:(void (^)(NSString *path, NSObject *error))block {
+    NSFileManager *manager = NSFileManager.defaultManager;
+    NSString *path = [self makeAssetOutputPath:asset resource:nil isOrigin:NO fileType:fileType manager:manager];
+    if ([manager fileExistsAtPath:path]) {
+        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Read cache from %@", path]];
+        if (withScheme) {
+            block([NSURL fileURLWithPath:path].absoluteString, nil);
+        } else {
+            block(path, nil);
+        }
+    }
+
     PHVideoRequestOptions *options = [PHVideoRequestOptions new];
     [options setDeliveryMode:PHVideoRequestOptionsDeliveryModeAutomatic];
     [options setNetworkAccessAllowed:YES];
     [options setVersion:PHVideoRequestOptionsVersionCurrent];
-    
+
     __block double lastProgress = 0.0;
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
     [options setProgressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
@@ -663,9 +767,9 @@
             NSURL *videoURL = urlAsset.URL;
             if ([[videoURL path] isEqualToString:[destination path]]) {
                 if (withScheme) {
-                    [handler reply:videoURL.absoluteString];
+                    block(videoURL.absoluteString, nil);
                 } else {
-                    [handler reply:[videoURL path]];
+                    block([videoURL path], nil);
                 }
                 [self notifySuccess:progressHandler];
                 return;
@@ -675,9 +779,9 @@
             if ([manager fileExistsAtPath:destinationPath]) {
                 [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Reading cache from %@", destinationPath]];
                 if (withScheme) {
-                    [handler reply:destination.absoluteString];
+                    block(destination.absoluteString, nil);
                 } else {
-                    [handler reply:destinationPath];
+                    block(destinationPath, nil);
                 }
                 [self notifySuccess:progressHandler];
                 return;
@@ -687,14 +791,14 @@
                                                     toURL:destination
                                                     error:&error];
             if (error) {
-                [handler replyError:error];
+                block(nil, error);
                 [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
                 return;
             }
             if (withScheme) {
-                [handler reply:destination.absoluteString];
+                block(destination.absoluteString, nil);
             } else {
-                [handler reply:path];
+                block(path, nil);
             }
             [self notifySuccess:progressHandler];
             return;
@@ -708,7 +812,9 @@
             NSString *extension = [[path pathExtension] lowercaseString];
             // Determine the output type for the fastest speed.
             AVFileType outputFileType;
-            if ([extension isEqualToString:@"mov"]) {
+            if (fileType) {
+                outputFileType = fileType;
+            } else if ([extension isEqualToString:@"mov"]) {
                 outputFileType = AVFileTypeQuickTimeMovie;
             } else if ([extension isEqualToString:@"m4v"]) {
                 outputFileType = AVFileTypeAppleM4V;
@@ -720,27 +826,75 @@
             [exportSession exportAsynchronouslyWithCompletionHandler:^{
                 if (exportSession.status == AVAssetExportSessionStatusCompleted) {
                     if (withScheme) {
-                        [handler reply:destination.absoluteString];
+                        block(destination.absoluteString, nil);
                     } else {
-                        [handler reply:path];
+                        block(path, nil);
                     }
                     [self notifySuccess:progressHandler];
                 } else if (exportSession.status == AVAssetExportSessionStatusFailed ||
                            exportSession.status == AVAssetExportSessionStatusCancelled) {
                     [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
-                    [handler replyError:exportSession.error];
+                    block(nil, exportSession.error);
                 }
             }];
             return;
         }
         [self notifyProgress: progressHandler progress:lastProgress state:PMProgressStateFailed];
-        [handler replyError:@"Unable to initialize an export session."];
+        block(nil, @"Unable to initialize an export session.");
     }];
+}
+
+- (void)exportAVAssetToFile:(NSString *)path
+                destination:(NSString *)destination
+            progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
+                 withScheme:(BOOL)withScheme
+                   fileType:(AVFileType)fileType
+                      block:(void (^)(NSString *path, NSObject *error))block {
+    AVAsset *asset = [AVAsset assetWithURL:[NSURL fileURLWithPath:path]];
+    
+    // Export the asset eventually, typically for `AVComposition`s.
+    AVAssetExportSession *exportSession = [AVAssetExportSession
+                                           exportSessionWithAsset:asset
+                                           presetName:AVAssetExportPresetHighestQuality];
+    if (exportSession) {
+        NSString *extension = [[path pathExtension] lowercaseString];
+        // Determine the output type for the fastest speed.
+        AVFileType outputFileType;
+        if (fileType != nil) {
+            outputFileType = fileType;
+        } else if ([extension isEqualToString:@"mov"]) {
+            outputFileType = AVFileTypeQuickTimeMovie;
+        } else if ([extension isEqualToString:@"m4v"]) {
+            outputFileType = AVFileTypeAppleM4V;
+        } else {
+            outputFileType = AVFileTypeMPEG4;
+        }
+        exportSession.outputFileType = outputFileType;
+        exportSession.outputURL = [NSURL fileURLWithPath:destination];
+        [exportSession exportAsynchronouslyWithCompletionHandler:^{
+            if (exportSession.status == AVAssetExportSessionStatusCompleted) {
+                [self notifySuccess:progressHandler];
+                if (withScheme) {
+                    block(destination, nil);
+                } else {
+                    block(path, nil);
+                }
+            } else if (exportSession.status == AVAssetExportSessionStatusFailed ||
+                       exportSession.status == AVAssetExportSessionStatusCancelled) {
+                [self notifyProgress:progressHandler progress:0.0 state:PMProgressStateFailed];
+                block(nil, exportSession.error);
+            }
+        }];
+        return;
+    }
+    [self notifyProgress: progressHandler progress:0.0 state:PMProgressStateFailed];
+    block(nil, @"Unable to initialize an export session.");
 }
 
 - (NSString *)makeAssetOutputPath:(PHAsset *)asset
                          resource:(PHAssetResource *)resource
                          isOrigin:(Boolean)isOrigin
+                         fileType:(AVFileType)fileType
                           manager:(NSFileManager *)manager {
     NSString *id = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
     NSString *modifiedDate = [NSString stringWithFormat:@"%f", asset.modificationDate.timeIntervalSince1970];
@@ -752,12 +906,36 @@
     } else {
         filename = [asset valueForKey:@"filename"];
     }
-    filename = [NSString stringWithFormat:@"%@_%@%@_%@", id, modifiedDate, isOrigin ? @"_o" : @"", filename];
+    filename = [NSString stringWithFormat:@"%@_%@%@_%@",
+                id, modifiedDate, isOrigin ? @"_o" : @"", filename];
+    if (fileType) {
+        NSString *newExtension = [PMConvertUtils convertAVFileTypeToExtension:fileType];
+        if (newExtension) {
+            NSString *filenameWithoutExtension = [filename stringByDeletingPathExtension];
+            filename = [filenameWithoutExtension stringByAppendingPathExtension:[newExtension stringByReplacingOccurrencesOfString:@"." withString:@""]];
+        }
+    }
     NSString *typeDirPath;
     if (resource) {
-        typeDirPath = resource.isImage ? PM_IMAGE_CACHE_PATH : PM_VIDEO_CACHE_PATH;
+        if (resource.isImage) {
+            typeDirPath = PM_IMAGE_CACHE_PATH;
+        } else if (resource.isVideo) {
+            typeDirPath = PM_VIDEO_CACHE_PATH;
+        } else if (resource.isAudio) {
+            typeDirPath = PM_AUDIO_CACHE_PATH;
+        } else {
+            typeDirPath = PM_OTHER_CACHE_PATH;
+        }
     } else {
-        typeDirPath = asset.isImage ? PM_IMAGE_CACHE_PATH : PM_VIDEO_CACHE_PATH;
+        if (asset.isImage) {
+            typeDirPath = PM_IMAGE_CACHE_PATH;
+        } else if (asset.isVideo) {
+            typeDirPath = PM_VIDEO_CACHE_PATH;
+        } else if (asset.isAudio) {
+            typeDirPath = PM_AUDIO_CACHE_PATH;
+        } else {
+            typeDirPath = PM_OTHER_CACHE_PATH;
+        }
     }
     NSString *dirPath = [NSString stringWithFormat:@"%@%@", homePath, typeDirPath];
     if (manager == nil) {
@@ -796,6 +974,7 @@
     NSString *path = [self makeAssetOutputPath:asset
                                       resource:imageResource
                                       isOrigin:YES
+                                      fileType:nil
                                        manager:fileManager];
     if ([fileManager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
@@ -1095,10 +1274,10 @@
     }];
 }
 
-- (NSString *)getTitleAsyncWithAssetId:(NSString *)assetId subtype:(int)subtype {
+- (NSString *)getTitleAsyncWithAssetId:(NSString *)assetId subtype:(int)subtype fileType:(AVFileType)fileType {
     PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
     if (asset) {
-        return [asset originalFilenameWithSubtype:subtype];
+        return [asset originalFilenameWithSubtype:subtype fileType:fileType];
     }
     return @"";
 }
@@ -1112,7 +1291,9 @@
     return nil;
 }
 
-- (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+- (void)getMediaUrl:(NSString *)assetId
+      resultHandler:(NSObject <PMResultHandler> *)handler
+    progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
     
     if (@available(iOS 9.1, *)) {
@@ -1123,7 +1304,7 @@
                 [handler reply:url.absoluteString];
                 return;
             }
-            [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:YES];
+            [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:YES fileType:nil];
             return;
         }
     }
@@ -1135,13 +1316,13 @@
                 [handler reply:url.absoluteString];
                 return;
             }
-            [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:YES];
+            [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:YES fileType:nil];
             return;
         }
     }
     
     if (asset.isVideo) {
-        [self fetchFullSizeVideo:asset handler:handler progressHandler:progressHandler withScheme:YES];
+        [self fetchFullSizeVideo:asset handler:handler progressHandler:progressHandler withScheme:YES fileType:nil];
     } else {
         [handler replyError:@"Only video type of assets can get a media url."];
         [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];

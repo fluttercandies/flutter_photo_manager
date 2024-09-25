@@ -5,6 +5,7 @@
 
 #import "PHAsset+PM_COMMON.h"
 #import "PHAssetResource+PM_COMMON.h"
+#import "PMConvertUtils.h"
 #if TARGET_OS_IOS || TARGET_OS_WATCH || TARGET_OS_TV
 #import <MobileCoreServices/MobileCoreServices.h>
 #else
@@ -63,16 +64,26 @@
     }
 }
 
-- (NSString *)originalFilenameWithSubtype:(int)subtype {
+- (NSString *)originalFilenameWithSubtype:(int)subtype fileType:(AVFileType)fileType {
+    PHAssetResource *resource;
     if (@available(iOS 9.1, *)) {
         BOOL isLivePhotoSubtype = (subtype & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive;
         if ([self isLivePhoto] && isLivePhotoSubtype) {
-            return [self getLivePhotosResource].originalFilename;
+            resource = [self getLivePhotosResource];
+        } else {
+            resource = [self getRawResource];
         }
+    } else {
+        resource = [self getRawResource];
     }
-    PHAssetResource *resource = [self getRawResource];
     if (resource) {
-        return resource.originalFilename;
+        NSString *filename = resource.originalFilename;
+        if (fileType) {
+            NSString *extension = [PMConvertUtils convertAVFileTypeToExtension:fileType];
+            filename = [filename stringByDeletingPathExtension];
+            filename = [filename stringByAppendingPathExtension:[extension stringByReplacingOccurrencesOfString:@"." withString:@""]];
+        }
+        return filename;
     }
     return @"";
 }
