@@ -68,6 +68,7 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
       * [From raw data](#from-raw-data)
       * [From iCloud](#from-icloud)
       * [Display assets](#display-assets)
+      * [Get asset files](#get-asset-files)
       * [Obtain "Live Photos"](#obtain-live-photos)
         * [Filtering only "Live Photos"](#filtering-only-live-photos)
         * [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
@@ -484,6 +485,21 @@ final Widget imageFromProvider = Image(
   ),
 );
 ```
+
+#### Get asset files
+
+There are several file getters and methods with an `AssetEntity`:
+* `.file`
+* `.fileWithSubtype`
+* `.originFile`
+* `.originFileWithSubtype`
+* `.loadFile`
+
+These getters and methods will fetch different types of file related to that asset.
+Read their comment (documentation) to know their abilities.
+
+Additionally, you can use the raw plugin method
+`PhotoManager.plugin.getFullFile` with more parameters.
 
 #### Obtain "Live Photos"
 
