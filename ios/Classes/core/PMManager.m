@@ -1278,7 +1278,7 @@
     }
      completionHandler:^(BOOL success, NSError *error) {
         if (success) {
-            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Createed Live Photo asset = %@", assetId]];
+            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Created Live Photo asset = %@", assetId]];
             block([self getAssetEntity:assetId], nil);
         } else {
             [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Create Live Photo asset failed = %@, %@", assetId, error]];
