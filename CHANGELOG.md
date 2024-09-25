@@ -8,7 +8,19 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+### Features
+
+- Provide `PMDarwinAVFileType` to help convert entities' files on iOS and macOS by making explicit exports.
+
+### Improvements
+
+- Improve cache output path equality on iOS and macOS.
+- Get the current resource filename rather than the raw one on iOS and macOS.
+  Also the plugin expands the ability when getting titles.
+
+### Fixes
+
+- Fix incorrect download finished predication during iCloud file downloading.
 
 ## 3.4.0
 
