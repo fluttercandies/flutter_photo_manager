@@ -8,6 +8,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+*None.*
+
+## 3.5.0
+
 ### Features
 
 - Provide `PMDarwinAVFileType` to help convert entities' files on iOS and macOS by making explicit exports.
@@ -17,11 +21,11 @@ To know more about breaking changes, see the [Migration Guide][].
 - Improve cache output path equality on iOS and macOS.
 - Get the current resource filename rather than the raw one on iOS and macOS.
   Also the plugin expands the ability when getting titles.
-- Use `PHCachingImageManager` to improve images memory caches on iOS and macOS.
+- Use `PHCachingImageManager` to improve image memory caches on iOS and macOS.
 
 ### Fixes
 
-- Fix incorrect download finished predication during iCloud file downloading.
+- Fix incorrect download finished prediction during iCloud file downloading.
 
 ## 3.4.0
 
