@@ -430,7 +430,6 @@
 }
 
 - (void)fetchThumb:(PHAsset *)asset option:(PMThumbLoadOption *)option resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PHImageManager *manager = PHImageManager.defaultManager;
     PHImageRequestOptions *requestOptions = [PHImageRequestOptions new];
     requestOptions.deliveryMode = option.deliveryMode;
     requestOptions.resizeMode = option.resizeMode;
@@ -452,11 +451,11 @@
     int width = option.width;
     int height = option.height;
     
-    [manager requestImageForAsset:asset
-                       targetSize:CGSizeMake(width, height)
-                      contentMode:option.contentMode
-                          options:requestOptions
-                    resultHandler:^(PMImage *result, NSDictionary *info) {
+    [self.cachingManager requestImageForAsset:asset
+                                   targetSize:CGSizeMake(width, height)
+                                  contentMode:option.contentMode
+                                      options:requestOptions
+                                resultHandler:^(PMImage *result, NSDictionary *info) {
         if ([handler isReplied]) {
             return;
         }
@@ -748,12 +747,10 @@
         }
     }];
     
-    [[PHImageManager defaultManager]
+    [self.cachingManager
      requestAVAssetForVideo:asset
      options:options
-     resultHandler:^(AVAsset *_Nullable asset,
-                     AVAudioMix *_Nullable audioMix,
-                     NSDictionary *_Nullable info) {
+     resultHandler:^(AVAsset *_Nullable asset, AVAudioMix *_Nullable audioMix, NSDictionary *_Nullable info) {
         NSObject *error = info[PHImageErrorKey];
         if (error) {
             [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
@@ -1023,9 +1020,9 @@
     }];
 }
 
-- (void)fetchFullSizeImageFile:(PHAsset *)asset resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PHImageManager *manager = PHImageManager.defaultManager;
-    
+- (void)fetchFullSizeImageFile:(PHAsset *)asset
+                 resultHandler:(NSObject <PMResultHandler> *)handler
+               progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PHImageRequestOptions *options = [PHImageRequestOptions new];
     [options setDeliveryMode:PHImageRequestOptionsDeliveryModeOpportunistic];
     [options setNetworkAccessAllowed:YES];
@@ -1047,12 +1044,11 @@
         }
     }];
     
-    [manager requestImageForAsset:asset
-                       targetSize:PHImageManagerMaximumSize
-                      contentMode:PHImageContentModeDefault
-                          options:options
-                    resultHandler:^(PMImage *_Nullable image,
-                                    NSDictionary *_Nullable info) {
+    [self.cachingManager requestImageForAsset:asset
+                                   targetSize:PHImageManagerMaximumSize
+                                  contentMode:PHImageContentModeDefault
+                                      options:options
+                                resultHandler:^(PMImage *_Nullable image, NSDictionary *_Nullable info) {
         if ([handler isReplied]) {
             return;
         }

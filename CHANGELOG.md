@@ -17,6 +17,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Improve cache output path equality on iOS and macOS.
 - Get the current resource filename rather than the raw one on iOS and macOS.
   Also the plugin expands the ability when getting titles.
+- Use `PHCachingImageManager` to improve images memory caches on iOS and macOS.
 
 ### Fixes
 
