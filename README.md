@@ -249,6 +249,10 @@ PhotoManager.setIgnorePermissionCheck(true);
 For background processing (such as when the app is not in the foreground),
 ignore permissions check would be proper solution.
 
+You can also read the current permission state with
+`PhotoManager.getPermissionState`. Make sure the same permission request option
+is used between this request and other asset requests.
+
 #### Limited entities access
 
 ##### Limited entities access on iOS
