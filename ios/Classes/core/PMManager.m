@@ -1078,9 +1078,10 @@
 }
 
 + (BOOL)isDownloadFinish:(NSDictionary *)info {
-    return ![info[PHImageCancelledKey] boolValue] &&      // No cancel.
-    !info[PHImageErrorKey] &&                      // Error.
-    ![info[PHImageResultIsDegradedKey] boolValue]; // thumbnail
+    BOOL finished;
+    finished = ![info[PHImageCancelledKey] boolValue]; // Not cancelled.
+    finished = ![info[PHImageResultIsDegradedKey] boolValue]; // Not thumbnail.
+    return finished;
 }
 
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type filterOption:(NSObject <PMBaseFilter> *)filterOption {
