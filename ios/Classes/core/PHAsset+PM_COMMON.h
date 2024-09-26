@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString*)title;
 
-- (NSString *)originalFilenameWithSubtype:(int) subtype;
+- (NSString *)filenameWithOptions:(int)subtype isOrigin:(BOOL)isOrigin fileType:(AVFileType)fileType;
 
 /**
  Get the MIME type for this asset from UTI (`PHAssetResource.uniformTypeIdentifier`), such as `image/jpeg`, `image/heic`, `video/quicktime`, etc.

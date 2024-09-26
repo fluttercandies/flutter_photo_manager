@@ -47,7 +47,6 @@ class _LivePhotosWidgetState extends State<LivePhotosWidget> {
       videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
     )
       ..initialize()
-      ..setVolume(0)
       ..addListener(() {
         if (mounted) {
           setState(() {});

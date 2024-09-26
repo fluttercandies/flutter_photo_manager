@@ -23,4 +23,8 @@
 + (PMFilterOption *)convertMapToPMFilterOption:(NSDictionary *)map;
 
 + (NSObject<PMBaseFilter> *)convertMapToOptionContainer:(NSDictionary *)map;
+
++ (AVFileType)convertNumberToAVFileType:(int)number;
+
++ (NSString *)convertAVFileTypeToExtension:(AVFileType)fileType;
 @end

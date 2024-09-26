@@ -68,6 +68,7 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
       * [From raw data](#from-raw-data)
       * [From iCloud](#from-icloud)
       * [Display assets](#display-assets)
+      * [Get asset files](#get-asset-files)
       * [Obtain "Live Photos"](#obtain-live-photos)
         * [Filtering only "Live Photos"](#filtering-only-live-photos)
         * [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
@@ -248,6 +249,10 @@ PhotoManager.setIgnorePermissionCheck(true);
 For background processing (such as when the app is not in the foreground),
 ignore permissions check would be proper solution.
 
+You can also read the current permission state with
+`PhotoManager.getPermissionState`. Make sure the same permission request option
+is used between this request and other asset requests.
+
 #### Limited entities access
 
 ##### Limited entities access on iOS
@@ -424,9 +429,13 @@ final AssetEntity? entity = await PhotoManager.editor.darwin.saveLivePhoto(
 );
 ```
 
-Be aware that the created asset might have
-limited access or got deleted in anytime,
+Be aware that the created asset might have limited access or got deleted in anytime,
 so the result might be null.
+
+iOS and macOS might set extra limitations when saving assets, it seems only
+certain file types can be saved as a media assets. The limitation follows the definition of
+[`AVFileType`][], when you saw `PHPhotosErrorDomain Code=3302` (or `330x`),
+make sure the file type is supported.
 
 #### From iCloud
 
@@ -439,6 +448,19 @@ to retrieve the progress when load a file.
 The preferred implementation would be the [`LocallyAvailableBuilder`][]
 in the `wechat_asset_picker` package, which provides a progress indicator
 when the file is downloading.
+
+There are several methods that can combine with `PMProgressHandler`
+to provide responsive progress events, which are:
+* AssetEntity.thumbnailDataWithSize
+* AssetEntity.thumbnailDataWithOption
+* AssetEntity.getMediaUrl
+* AssetEntity.loadFile
+* PhotoManager.plugin.getOriginBytes
+
+iCloud files can only be obtained when the Apple ID on the device are correctly authorized.
+When the account requires to re-enter the password to verify, iCloud files that are not
+locally available are not allowed to be fetched. The photo library will throws
+`CloudPhotoLibraryErrorDomain` in this circumstance.
 
 #### Display assets
 
@@ -468,6 +490,21 @@ final Widget imageFromProvider = Image(
 );
 ```
 
+#### Get asset files
+
+There are several file getters and methods with an `AssetEntity`:
+* `.file`
+* `.fileWithSubtype`
+* `.originFile`
+* `.originFileWithSubtype`
+* `.loadFile`
+
+These getters and methods will fetch different types of file related to that asset.
+Read their comment (documentation) to know their abilities.
+
+Additionally, you can use the raw plugin method
+`PhotoManager.plugin.getFullFile` with more parameters.
+
 #### Obtain "Live Photos"
 
 This plugin supports obtain live photos and filtering them:
@@ -483,15 +520,42 @@ final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
 );
 ```
 
+Or you can use the `CustomSqlFilter` to obtain live photos:
+
+```dart
+final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
+  type: RequestType.image,
+  filterOption: CustomFilter.sql(
+  where: '${CustomColumns.base.mediaType} = 1'
+      ' AND '
+      '${CustomColumns.darwin.mediaSubtypes} & (1 << 3) = (1 << 3)',
+  ),
+);
+```
+
 ##### Obtain the video from "Live Photos"
 
 ```dart
 final AssetEntity entity = livePhotoEntity;
+
+// To play Live Photo's video.
 final String? mediaUrl = await entity.getMediaUrl();
+
+// Get files for normal displays like thumbnails.
 final File? imageFile = await entity.file;
 final File? videoFile = await entity.fileWithSubtype;
+
+// Get files for the raw displays like detail preview.
 final File? originImageFile = await entity.originFile;
 final File? originVideoFile = await entity.originFileWithSubtype;
+
+// Additionally, you can convert Live Photo's (on iOS) video file
+// from `mov` to `mp4` using:
+final File? convertedFile = await entity.loadFile(
+  isOriginal: true,
+  withSubtye: true,
+  darwinFileType: PMDarwinAVFileType.mp4,
+);
 ```
 
 #### Limitations
@@ -1002,14 +1066,17 @@ PhotoManager.editor.darwin.deletePath();
 
 #### Features for OpenHarmony
 
-Currently, most functions are supported, except for those related to caching. and only support image and video types.
+> The photo library feature is disabled in OpenHarmony officially because of the security concern.
 
-| Feature                        | OpenHarmony |
-| :----------------------------- | :---------: |
-| releaseCache                   |      ❌      |
-| clearFileCache                 |      ❌      |
-| requestCacheAssetsThumbnail    |      ❌      |
-| getSubPathEntities             |      ❌      |
+Most functions are supported except caching,
+and only images/videos are supported.
+
+| Feature                     | OpenHarmony |
+|:----------------------------|:-----------:|
+| releaseCache                |      ❌      |
+| clearFileCache              |      ❌      |
+| requestCacheAssetsThumbnail |      ❌      |
+| getSubPathEntities          |      ❌      |
 
 
 [pub package]: https://pub.dev/packages/photo_manager
@@ -1031,6 +1098,7 @@ Currently, most functions are supported, except for those related to caching. an
 [`PhotoManager.getAssetListRange`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/PhotoManager/getAssetListRange.html
 [`AssetEntity.fromId`]: https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetEntity/fromId.html
 
+[`AVFileType`]: https://developer.apple.com/documentation/avfoundation/avfiletype
 [`LocallyAvailableBuilder`]: https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/2055adfa74370339d10e6f09adef72f2130d2380/lib/src/widget/builder/locally_available_builder.dart
 
 [flutter/flutter#20522]: https://github.com/flutter/flutter/issues/20522

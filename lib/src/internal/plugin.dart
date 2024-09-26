@@ -228,7 +228,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return ConvertUtils.convertToAssetList(map.cast<String, dynamic>());
   }
 
-  void _injectParams(
+  void _injectProgressHandlerParams(
     Map<String, dynamic> params,
     PMProgressHandler? progressHandler,
   ) {
@@ -247,16 +247,20 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       'id': id,
       'option': option.toMap(),
     };
-    _injectParams(params, progressHandler);
+    _injectProgressHandlerParams(params, progressHandler);
     return _channel.invokeMethod(PMConstants.mGetThumb, params);
   }
 
   Future<typed_data.Uint8List?> getOriginBytes(
     String id, {
     PMProgressHandler? progressHandler,
+    PMDarwinAVFileType? darwinFileType,
   }) {
-    final Map<String, dynamic> params = <String, dynamic>{'id': id};
-    _injectParams(params, progressHandler);
+    final Map<String, dynamic> params = <String, dynamic>{
+      'id': id,
+      'darwinFileType': darwinFileType,
+    };
+    _injectProgressHandlerParams(params, progressHandler);
     return _channel.invokeMethod(PMConstants.mGetOriginBytes, params);
   }
 
@@ -272,13 +276,15 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     required bool isOrigin,
     PMProgressHandler? progressHandler,
     int subtype = 0,
+    PMDarwinAVFileType? darwinFileType,
   }) async {
     final Map<String, dynamic> params = <String, dynamic>{
       'id': id,
       'isOrigin': isOrigin,
       'subtype': subtype,
+      'darwinFileType': darwinFileType?.value ?? 0,
     };
-    _injectParams(params, progressHandler);
+    _injectProgressHandlerParams(params, progressHandler);
     return _channel.invokeMethod(PMConstants.mGetFullFile, params);
   }
 
@@ -474,14 +480,18 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
 
   Future<String> getTitleAsync(
     AssetEntity entity, {
+    bool isOrigin = true,
     int subtype = 0,
+    PMDarwinAVFileType? darwinFileType,
   }) async {
     if (Platform.isIOS || Platform.isMacOS) {
-      return await _channel.invokeMethod<String>(
+      return await _channel.invokeMethod(
         PMConstants.mGetTitleAsync,
         <String, dynamic>{
           'id': entity.id,
           'subtype': subtype,
+          'isOrigin': isOrigin,
+          'darwinFileType': darwinFileType?.value ?? 0,
         },
       ) as String;
     }
@@ -495,8 +505,11 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     if (PlatformUtils.isOhos) {
       return entity.id;
     }
-    final params = <String, dynamic>{'id': entity.id, 'type': entity.typeInt};
-    _injectParams(params, progressHandler);
+    final params = <String, dynamic>{
+      'id': entity.id,
+      'type': entity.typeInt,
+    };
+    _injectProgressHandlerParams(params, progressHandler);
     return _channel.invokeMethod(PMConstants.mGetMediaUrl, params);
   }
 
@@ -649,6 +662,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     String id, {
     bool isOrigin = false,
     int subtype = 0,
+    PMDarwinAVFileType? darwinFileType,
   }) async {
     if (Platform.isIOS || Platform.isMacOS) {
       final bool result = await _channel.invokeMethod<bool>(
@@ -657,6 +671,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
           'id': id,
           'isOrigin': isOrigin,
           'subtype': subtype,
+          'darwinFileType': darwinFileType?.value ?? 0,
         },
       ) as bool;
       return result;

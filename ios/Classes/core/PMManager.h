@@ -17,8 +17,10 @@ typedef void (^ChangeIds)(NSArray<NSString *> *);
 #import "PMResultHandler.h"
 #import "PMConvertProtocol.h"
 
-#define PM_VIDEO_CACHE_PATH @".video"
 #define PM_IMAGE_CACHE_PATH @".image"
+#define PM_VIDEO_CACHE_PATH @".video"
+#define PM_AUDIO_CACHE_PATH @".audio"
+#define PM_OTHER_CACHE_PATH @".other"
 #define PM_FULL_IMAGE_CACHE_PATH @"flutter-images"
 
 typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
@@ -46,7 +48,12 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 - (void)getThumbWithId:(NSString *)assetId option:(PMThumbLoadOption *)option resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
 
-- (void)getFullSizeFileWithId:(NSString *)assetId isOrigin:(BOOL)isOrigin subtype:(int)subtype resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
+- (void)getFullSizeFileWithId:(NSString *)assetId
+                     isOrigin:(BOOL)isOrigin
+                      subtype:(int)subtype
+                     fileType:(AVFileType)fileType
+                resultHandler:(NSObject <PMResultHandler> *)handler
+              progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
 
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type filterOption:(NSObject<PMBaseFilter> *)filterOption;
 
@@ -75,13 +82,22 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 - (BOOL)existsWithId:(NSString *)assetId;
 
-- (BOOL)entityIsLocallyAvailable:(NSString *)assetId resource:(PHAssetResource *)resource isOrigin:(BOOL)isOrigin subtype:(int)subtype;
+- (BOOL)entityIsLocallyAvailable:(NSString *)assetId
+                        resource:(PHAssetResource *)resource
+                        isOrigin:(BOOL)isOrigin
+                         subtype:(int)subtype
+                        fileType:(AVFileType)fileType;
 
-- (NSString*)getTitleAsyncWithAssetId:(NSString *)assetId subtype:(int)subtype;
+- (NSString*)getTitleAsyncWithAssetId:(NSString *)assetId
+                              subtype:(int)subtype
+                             isOrigin:(BOOL)isOrigin
+                             fileType:(AVFileType)fileType;
 
 - (NSString*)getMimeTypeAsyncWithAssetId: (NSString *) assetId;
 
-- (void)getMediaUrl:(NSString *)assetId resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
+- (void)getMediaUrl:(NSString *)assetId
+      resultHandler:(NSObject <PMResultHandler> *)handler
+    progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
 
 - (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(NSObject<PMBaseFilter> *)option;
 
