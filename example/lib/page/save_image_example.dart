@@ -215,8 +215,7 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
       onDone: () async {
         Log.d('write image to file success: $file');
         await checkRequest(() async {
-          final AssetEntity asset =
-              await PhotoManager.editor.saveImageWithPath(
+          final AssetEntity asset = await PhotoManager.editor.saveImageWithPath(
             file.path,
             title: '${DateTime.now().millisecondsSinceEpoch}.jpg',
           );
