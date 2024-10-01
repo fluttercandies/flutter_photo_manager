@@ -7,7 +7,7 @@ import java.io.File
 
 data class AssetEntity(
     val id: Long,
-    var path: String,
+    val path: String,
     val duration: Long,
     val createDt: Long,
     val width: Int,
@@ -16,8 +16,8 @@ data class AssetEntity(
     val displayName: String,
     val modifiedDate: Long,
     val orientation: Int,
-    var lat: Double? = null,
-    var lng: Double? = null,
+    val lat: Double? = null,
+    val lng: Double? = null,
     val androidQRelativePath: String? = null,
     val mimeType: String? = null
 ) {
@@ -26,10 +26,9 @@ data class AssetEntity(
         MediaStoreUtils.convertTypeToMediaType(type)
     )
 
-    val relativePath: String?
-        get() = if (isAboveAndroidQ) {
-            androidQRelativePath
-        } else {
-            File(path).parent
-        }
+    val relativePath: String? = if (isAboveAndroidQ) {
+        androidQRelativePath
+    } else {
+        File(path).parent
+    }
 }

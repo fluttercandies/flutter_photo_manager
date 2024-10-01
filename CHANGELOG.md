@@ -10,6 +10,48 @@ To know more about breaking changes, see the [Migration Guide][].
 
 *None.*
 
+## 3.4.0
+
+### Breaking changes
+
+`saveLivePhoto` now requires `title` rather than `filename`.
+
+### Features
+
+- Add `getPermissionState` method to `PhotoManager`.
+
+### Improvements
+
+- Adds a detached state for managers. Callers with those managers will first be aware of the detaching state
+  before any actual calls to avoid crashes.
+- Errors replied by the channel do not include detailed messages before.
+  Now the code will unwrap certain exceptions to extract details from them.
+- Expose `progressHandler` for `AssetEntity.getMediaUrl`.
+- Expose `withSubtype` for `AssetEntity.isLocallyAvailable` to request if a Live Photo resource is available.
+
+### Fixes
+
+- `PHAssetResource` with the type `PHAssetResourceTypeFullSizeVideo` does not count as a video type before,
+  making the resource obtain ignore them.
+- Fixes potential range exception when converting `NSTimeInterval` on Darwin.
+- Fixes progress not being updated when getting the non-original video file on iOS.
+- Fixes incorrect Live Photo resource being obtained which will result in a wrong aspect ratio.
+- Fixes Live Photos saving exceptions with the paired video.
+- Other lints and type promotion fixes.
+
+## 3.3.0
+
+### Breaking changes
+
+`saveImage` now requires `filename` rather than `title`, other save methods do not require `title` anymore.
+
+### Improvements
+
+- Allows saving assets with a given orientation value.
+- Improves the reading sequence when saving assets, which likely fixes issues with wrong orientation value.
+- Reads image size from EXIF rather than decoding from the bitmap factory.
+- Upgrades Android EXIF library.
+
 ### Developer
 
 - Add verbose log for `MethodChannelPlugin`. (Use `PhotoManager.setLog` and pass `verboseFilePath` to enable it.)

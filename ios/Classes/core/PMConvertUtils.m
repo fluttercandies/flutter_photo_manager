@@ -70,13 +70,12 @@
     return @{@"data": data};
 }
 
-+ (NSDictionary *)convertPHAssetToMap:(PHAsset *)asset
-                            needTitle:(BOOL)needTitle {
-    long createDt = (int) asset.creationDate.timeIntervalSince1970;
-    long modifiedDt = (int) asset.modificationDate.timeIntervalSince1970;
++ (NSDictionary *)convertPHAssetToMap:(PHAsset *)asset needTitle:(BOOL)needTitle {
+    long createDt = (long) asset.creationDate.timeIntervalSince1970;
+    long modifiedDt = (long) asset.modificationDate.timeIntervalSince1970;
+    long duration = (long) asset.duration;
 
     int typeInt = 0;
-
     if (asset.isVideo) {
         typeInt = 2;
     } else if (asset.isImage) {
@@ -91,7 +90,7 @@
         @"width": @(asset.pixelWidth),
         @"height": @(asset.pixelHeight),
         @"favorite": @(asset.favorite),
-        @"duration": @((long) asset.duration),
+        @"duration": @(duration),
         @"type": @(typeInt),
         @"modifiedDt": @(modifiedDt),
         @"lng": @(asset.location.coordinate.longitude),

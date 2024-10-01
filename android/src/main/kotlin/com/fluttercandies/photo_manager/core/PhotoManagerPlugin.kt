@@ -31,9 +31,9 @@ class PhotoManagerPlugin(
     private val permissionsUtils: PermissionsUtils
 ) : MethodChannel.MethodCallHandler {
     companion object {
-        private const val poolSize = 8
+        private const val POOL_SIZE = 8
         private val threadPool: ThreadPoolExecutor = ThreadPoolExecutor(
-            poolSize,
+            POOL_SIZE,
             Int.MAX_VALUE,
             1,
             TimeUnit.MINUTES,
@@ -61,6 +61,7 @@ class PhotoManagerPlugin(
 
     fun bindActivity(activity: Activity?) {
         this.activity = activity
+        permissionsUtils.withActivity(activity)
         deleteManager.bindActivity(activity)
     }
 
@@ -227,7 +228,9 @@ class PhotoManagerPlugin(
                 permissionsUtils.withActivity(activity)
                     .setListener(object : PermissionsListener {
                         override fun onGranted(needPermissions: MutableList<String>) {
-                            resultHandler.reply(permissionsUtils.getAuthValue(requestType, mediaLocation).value)
+                            resultHandler.reply(
+                                permissionsUtils.getAuthValue(requestType, mediaLocation).value
+                            )
                         }
 
                         override fun onDenied(
@@ -319,6 +322,15 @@ class PhotoManagerPlugin(
                 val ignore = call.argument<Boolean>("ignore")!!
                 ignorePermissionCheck = ignore
                 resultHandler.reply(ignore)
+            }
+
+            Methods.getPermissionState -> {
+                val androidPermission = call.argument<Map<*, *>>("androidPermission")!!
+                val requestType = androidPermission["type"] as Int
+                val mediaLocation = androidPermission["mediaLocation"] as Boolean
+                permissionsUtils.getAuthValue(requestType, mediaLocation).let {
+                    resultHandler.reply(it.value)
+                }
             }
         }
     }
@@ -459,11 +471,20 @@ class PhotoManagerPlugin(
 
             Methods.saveImage -> {
                 try {
-                    val image = call.argument<ByteArray>("image")!!
+                    val bytes = call.argument<ByteArray>("image")!!
+                    val filename = call.argument<String>("filename") ?: ""
                     val title = call.argument<String>("title") ?: ""
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
-                    val entity = photoManager.saveImage(image, title, desc, relativePath)
+                    val orientation = call.argument<Int?>("orientation")
+                    val entity = photoManager.saveImage(
+                        bytes,
+                        filename,
+                        title,
+                        desc,
+                        relativePath,
+                        orientation,
+                    )
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
                 } catch (e: Exception) {
@@ -474,12 +495,18 @@ class PhotoManagerPlugin(
 
             Methods.saveImageWithPath -> {
                 try {
-                    val imagePath = call.argument<String>("path")!!
+                    val filePath = call.argument<String>("path")!!
                     val title = call.argument<String>("title") ?: ""
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
-                    val entity =
-                        photoManager.saveImage(imagePath, title, desc, relativePath)
+                    val orientation = call.argument<Int?>("orientation")
+                    val entity = photoManager.saveImage(
+                        filePath,
+                        title,
+                        desc,
+                        relativePath,
+                        orientation,
+                    )
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
                 } catch (e: Exception) {
@@ -490,12 +517,18 @@ class PhotoManagerPlugin(
 
             Methods.saveVideo -> {
                 try {
-                    val videoPath = call.argument<String>("path")!!
+                    val filePath = call.argument<String>("path")!!
                     val title = call.argument<String>("title")!!
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
-                    val entity =
-                        photoManager.saveVideo(videoPath, title, desc, relativePath)
+                    val orientation = call.argument<Int?>("orientation")
+                    val entity = photoManager.saveVideo(
+                        filePath,
+                        title,
+                        desc,
+                        relativePath,
+                        orientation,
+                    )
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
                 } catch (e: Exception) {

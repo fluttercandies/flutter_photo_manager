@@ -82,7 +82,19 @@ class RequestType {
   int get hashCode => value;
 
   @override
-  String toString() => '$runtimeType($value)';
+  String toString() {
+    final values = <String>[];
+    if (containsImage()) {
+      values.add('image');
+    }
+    if (containsVideo()) {
+      values.add('video');
+    }
+    if (containsAudio()) {
+      values.add('audio');
+    }
+    return 'RequestType(${values.join(', ')})';
+  }
 }
 
 /// See [PermissionState].

@@ -17,7 +17,7 @@ export 'src/filter/custom/order_by_item.dart';
 export 'src/filter/path_filter.dart';
 
 export 'src/internal/enums.dart';
-export 'src/internal/extensions.dart';
+export 'src/internal/extensions.dart' show PermissionStateExt;
 export 'src/internal/plugin.dart' show PhotoManagerPlugin;
 export 'src/internal/progress_handler.dart';
 

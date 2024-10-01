@@ -18,6 +18,7 @@ import 'dev_title_page.dart';
 import 'ios/create_folder_example.dart';
 import 'ios/edit_asset.dart';
 import 'issues_page/issue_index_page.dart';
+import 'permission_state_page.dart';
 import 'remove_all_android_not_exists_example.dart';
 import 'verbose_log_page.dart';
 
@@ -78,6 +79,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
               onPressed: () => navToWidget(const ColumnNamesPage()),
               child: const Text('Android: column names'),
             ),
+          ElevatedButton(
+            onPressed: () => navToWidget(const PermissionStatePage()),
+            child: const Text('Show permission state page'),
+          ),
           ElevatedButton(
             child: const Text('Show iOS create folder example.'),
             onPressed: () => navToWidget(const CreateFolderExample()),

@@ -1,5 +1,6 @@
 package com.fluttercandies.photo_manager.constant
 
+@Suppress("MemberVisibilityCanBePrivate", "ConstPropertyName")
 class Methods {
     companion object {
         // Not need permission methods
@@ -10,6 +11,7 @@ class Methods {
         const val clearFileCache = "clearFileCache"
         const val releaseMemoryCache = "releaseMemoryCache"
         const val ignorePermissionCheck = "ignorePermissionCheck"
+        const val getPermissionState = "getPermissionState"
 
         fun isNotNeedPermissionMethod(method: String): Boolean {
             return method in arrayOf(
@@ -20,6 +22,7 @@ class Methods {
                 clearFileCache,
                 releaseMemoryCache,
                 ignorePermissionCheck,
+                getPermissionState,
             )
         }
         // Not need permission methods end

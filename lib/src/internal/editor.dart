@@ -3,7 +3,7 @@
 // in the LICENSE file.
 
 import 'dart:io';
-import 'dart:typed_data';
+import 'dart:typed_data' as typed_data;
 
 import 'package:photo_manager/platform_utils.dart';
 
@@ -50,53 +50,67 @@ class Editor {
 
   /// Save image to gallery from the given [data].
   ///
+  /// [filename] will be helpful to evaluate the MIME type from the [data].
+  ///
   /// {@template photo_manager.Editor.TitleWhenSaving}
-  /// [title] typically means the filename of the saving entity, which can be
-  /// obtained by `basename(file.path)`.
+  /// [title] is the title field on Android, and the original filename on iOS.
   /// {@endtemplate}
   ///
   /// {@template photo_manager.Editor.DescriptionWhenSaving}
   /// [desc] is the description field that only works on Android.
   /// {@endtemplate}
   ///
-  /// {@template photo_manager.Editor.SavingAssets}
+  /// {@template photo_manager.Editor.RelativePathWhenSaving}
   /// On Android 29 and above, you can use [relativePath] to specify the
   /// `RELATIVE_PATH` used in the MediaStore.
   /// The MIME type will either be formed from the title if you pass one,
   /// or guessed by the system, which does not always work.
   /// {@endtemplate}
+  ///
+  /// {@template photo_manager.Editor.OrientationWhenSaving}
+  /// [orientation] is only available on Android. It could be useful when
+  /// some devices cannot recognizes the asset's size info well.
+  /// {@endtemplate}
   Future<AssetEntity?> saveImage(
-    Uint8List data, {
-    required String title,
+    typed_data.Uint8List data, {
+    required String filename,
+    String? title,
     String? desc,
     String? relativePath,
+    int? orientation,
   }) {
     return plugin.saveImage(
       data,
+      filename: filename,
       title: title,
       desc: desc,
       relativePath: relativePath,
+      orientation: orientation,
     );
   }
 
-  /// Save image to gallery from the given [path].
+  /// Save image to gallery from the given [filePath].
   ///
   /// {@macro photo_manager.Editor.TitleWhenSaving}
   ///
   /// {@macro photo_manager.Editor.DescriptionWhenSaving}
   ///
-  /// {@macro photo_manager.Editor.SavingAssets}
+  /// {@macro photo_manager.Editor.RelativePathWhenSaving}
+  ///
+  /// {@macro photo_manager.Editor.OrientationWhenSaving}
   Future<AssetEntity?> saveImageWithPath(
-    String path, {
-    required String title,
+    String filePath, {
+    String? title,
     String? desc,
     String? relativePath,
+    int? orientation,
   }) {
     return plugin.saveImageWithPath(
-      path,
+      filePath,
       title: title,
       desc: desc,
       relativePath: relativePath,
+      orientation: orientation,
     );
   }
 
@@ -106,18 +120,22 @@ class Editor {
   ///
   /// {@macro photo_manager.Editor.DescriptionWhenSaving}
   ///
-  /// {@macro photo_manager.Editor.SavingAssets}
+  /// {@macro photo_manager.Editor.RelativePathWhenSaving}
+  ///
+  /// {@macro photo_manager.Editor.OrientationWhenSaving}
   Future<AssetEntity?> saveVideo(
     File file, {
-    required String title,
+    String? title,
     String? desc,
     String? relativePath,
+    int? orientation,
   }) {
     return plugin.saveVideo(
       file,
       title: title,
       desc: desc,
       relativePath: relativePath,
+      orientation: orientation,
     );
   }
 
@@ -256,10 +274,12 @@ class DarwinEditor {
   /// Save Live Photo to the gallery from the given [imageFile] and [videoFile].
   ///
   /// {@macro photo_manager.Editor.TitleWhenSaving}
-  ///
-  /// {@macro photo_manager.Editor.DescriptionWhenSaving}
-  ///
-  /// {@macro photo_manager.Editor.SavingAssets}
+  /// For a Live Photo, [title] typically take place when saving the resources
+  /// and should not contain the extension. For example:
+  /// GOOD: "my_live_photo_20240123_123456"
+  /// BAD: "my_live_photo_20240123_123456.jpg"
+  /// BAD: "my_live_photo_20240123_123456.mov"
+  /// BAD: "my_live_photo_20240123_123456.heic"
   Future<AssetEntity?> saveLivePhoto({
     required File imageFile,
     required File videoFile,

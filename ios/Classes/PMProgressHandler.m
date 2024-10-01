@@ -33,6 +33,7 @@
             // Do nothing when it throws.
         } @finally {
             if (state == PMProgressStateSuccess || state == PMProgressStateFailed) {
+                [self->channel setMethodCallHandler:nil];
                 self->channel = nil;
             }
         }

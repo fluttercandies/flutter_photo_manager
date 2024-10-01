@@ -39,8 +39,12 @@ class CommonUtil {
               ),
               _buildInfoItem('create', entity.createDateTime.toString()),
               _buildInfoItem('modified', entity.modifiedDateTime.toString()),
-              _buildInfoItem('size', entity.size.toString()),
               _buildInfoItem('orientation', entity.orientation.toString()),
+              _buildInfoItem('size', entity.size.toString()),
+              _buildInfoItem(
+                'orientatedSize',
+                entity.orientatedSize.toString(),
+              ),
               _buildInfoItem('duration', entity.videoDuration.toString()),
               _buildInfoItemAsync('title', entity.titleAsync),
               _buildInfoItem('lat', lat.toString()),

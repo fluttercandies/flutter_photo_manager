@@ -5,7 +5,6 @@ import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
-import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
@@ -251,38 +250,37 @@ interface IDBUtils {
     fun saveImage(
         context: Context,
         bytes: ByteArray,
+        filename: String,
         title: String,
         desc: String,
-        relativePath: String?
+        relativePath: String,
+        orientation: Int?
     ): AssetEntity {
         var inputStream = ByteArrayInputStream(bytes)
-        fun refreshInputStream() {
+        fun refreshStream() {
             inputStream = ByteArrayInputStream(bytes)
         }
 
-        val timestamp = System.currentTimeMillis() / 1000
-        val (width, height) = try {
-            val bmp = BitmapFactory.decodeStream(inputStream)
-            Pair(bmp.width, bmp.height)
-        } catch (e: Exception) {
-            Pair(0, 0)
-        }
-        val typeFromStream: String = URLConnection.guessContentTypeFromName(title)
-            ?: URLConnection.guessContentTypeFromStream(inputStream)
-            ?: "image/*"
-        val (rotationDegrees, latLong) = kotlin.run {
-            try {
-                val exif = ExifInterface(inputStream)
-                Pair(
-                    if (isAboveAndroidQ) exif.rotationDegrees else 0,
-                    if (isAboveAndroidQ) null else exif.latLong
-                )
-            } catch (e: Exception) {
-                Pair(0, null)
+        val typeFromStream: String = URLConnection.guessContentTypeFromName(filename)
+            ?: inputStream.let {
+                val type = URLConnection.guessContentTypeFromStream(inputStream)
+                refreshStream()
+                type
             }
-        }
-        refreshInputStream()
+            ?: "image/*"
 
+        val exif = ExifInterface(inputStream)
+        val (width, height) = Pair(
+            exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0),
+            exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0)
+        )
+        val (rotationDegrees, latLong) = Pair(
+            orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
+            if (isAboveAndroidQ) null else exif.latLong
+        )
+        refreshStream()
+
+        val timestamp = System.currentTimeMillis() / 1000
         val values = ContentValues().apply {
             put(
                 MediaStore.Files.FileColumns.MEDIA_TYPE,
@@ -299,7 +297,7 @@ interface IDBUtils {
             if (isAboveAndroidQ) {
                 put(DATE_TAKEN, timestamp * 1000)
                 put(ORIENTATION, rotationDegrees)
-                if (relativePath != null) {
+                if (relativePath.isNotBlank()) {
                     put(RELATIVE_PATH, relativePath)
                 }
             }
@@ -314,50 +312,50 @@ interface IDBUtils {
             inputStream,
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             values,
-        )
+        )?.copy(orientation = orientation ?: rotationDegrees)
     }
 
     fun saveImage(
         context: Context,
-        fromPath: String,
+        filePath: String,
         title: String,
         desc: String,
-        relativePath: String?
+        relativePath: String,
+        orientation: Int?
     ): AssetEntity {
-        fromPath.checkDirs()
-        val file = File(fromPath)
+        filePath.checkDirs()
+        val file = File(filePath)
         var inputStream = FileInputStream(file)
-        fun refreshInputStream() {
+        fun refreshStream() {
             inputStream = FileInputStream(file)
         }
 
-        val timestamp = System.currentTimeMillis() / 1000
-        val (width, height) = try {
-            val bmp = BitmapFactory.decodeStream(inputStream)
-            Pair(bmp.width, bmp.height)
-        } catch (e: Exception) {
-            Pair(0, 0)
-        }
         val typeFromStream: String = URLConnection.guessContentTypeFromName(title)
-            ?: URLConnection.guessContentTypeFromName(fromPath)
-            ?: URLConnection.guessContentTypeFromStream(inputStream)
+            ?: URLConnection.guessContentTypeFromName(filePath)
+            ?: inputStream.let {
+                val type = URLConnection.guessContentTypeFromStream(inputStream)
+                refreshStream()
+                type
+            }
             ?: "image/*"
-        val (rotationDegrees, latLong) = try {
-            val exif = ExifInterface(inputStream)
-            Pair(
-                if (isAboveAndroidQ) exif.rotationDegrees else 0,
-                if (isAboveAndroidQ) null else exif.latLong
-            )
-        } catch (e: Exception) {
-            Pair(0, null)
-        }
-        refreshInputStream()
+
+        val exif = ExifInterface(inputStream)
+        val (width, height) = Pair(
+            exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0),
+            exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0)
+        )
+        val (rotationDegrees, latLong) = Pair(
+            orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
+            if (isAboveAndroidQ) null else exif.latLong
+        )
+        refreshStream()
 
         val shouldKeepPath = if (!isAboveAndroidQ) {
             val dir = Environment.getExternalStorageDirectory()
             file.absolutePath.startsWith(dir.path)
         } else false
 
+        val timestamp = System.currentTimeMillis() / 1000
         val values = ContentValues().apply {
             put(
                 MediaStore.Files.FileColumns.MEDIA_TYPE,
@@ -374,7 +372,7 @@ interface IDBUtils {
             if (isAboveAndroidQ) {
                 put(DATE_TAKEN, timestamp * 1000)
                 put(ORIENTATION, rotationDegrees)
-                if (relativePath != null) {
+                if (relativePath.isNotBlank()) {
                     put(RELATIVE_PATH, relativePath)
                 }
             }
@@ -383,7 +381,7 @@ interface IDBUtils {
                 put(MediaStore.Images.ImageColumns.LONGITUDE, latLong.last())
             }
             if (shouldKeepPath) {
-                put(DATA, fromPath)
+                put(DATA, filePath)
             }
         }
 
@@ -393,44 +391,49 @@ interface IDBUtils {
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             values,
             shouldKeepPath
-        )
+        )?.copy(orientation = orientation ?: rotationDegrees)
     }
 
     fun saveVideo(
         context: Context,
-        fromPath: String,
+        filePath: String,
         title: String,
         desc: String,
-        relativePath: String?
+        relativePath: String,
+        orientation: Int?
     ): AssetEntity {
-        fromPath.checkDirs()
-        val file = File(fromPath)
+        filePath.checkDirs()
+        val file = File(filePath)
         var inputStream = FileInputStream(file)
-        fun refreshInputStream() {
+        fun refreshStream() {
             inputStream = FileInputStream(file)
         }
 
-        val timestamp = System.currentTimeMillis() / 1000
-        val info = VideoUtils.getPropertiesUseMediaPlayer(fromPath)
         val typeFromStream = URLConnection.guessContentTypeFromName(title)
-            ?: URLConnection.guessContentTypeFromName(fromPath)
+            ?: URLConnection.guessContentTypeFromName(filePath)
+            ?: inputStream.let {
+                val type = URLConnection.guessContentTypeFromStream(inputStream)
+                refreshStream()
+                type
+            }
             ?: "video/*"
-        val (rotationDegrees, latLong) = try {
-            val exif = ExifInterface(inputStream)
+
+        val info = VideoUtils.getPropertiesUseMediaPlayer(filePath)
+
+        val (rotationDegrees, latLong) = ExifInterface(inputStream).let { exif ->
             Pair(
-                if (isAboveAndroidQ) exif.rotationDegrees else 0,
+                orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
                 if (isAboveAndroidQ) null else exif.latLong
             )
-        } catch (e: Exception) {
-            Pair(0, null)
         }
-        refreshInputStream()
+        refreshStream()
 
         val shouldKeepPath = if (!isAboveAndroidQ) {
             val dir = Environment.getExternalStorageDirectory()
             file.absolutePath.startsWith(dir.path)
         } else false
 
+        val timestamp = System.currentTimeMillis() / 1000
         val values = ContentValues().apply {
             put(
                 MediaStore.Files.FileColumns.MEDIA_TYPE,
@@ -448,7 +451,7 @@ interface IDBUtils {
             if (isAboveAndroidQ) {
                 put(DATE_TAKEN, timestamp * 1000)
                 put(ORIENTATION, rotationDegrees)
-                if (relativePath != null) {
+                if (relativePath.isNotBlank()) {
                     put(RELATIVE_PATH, relativePath)
                 }
             }
@@ -457,7 +460,7 @@ interface IDBUtils {
                 put(MediaStore.Video.VideoColumns.LONGITUDE, latLong.last())
             }
             if (shouldKeepPath) {
-                put(DATA, fromPath)
+                put(DATA, filePath)
             }
         }
 
@@ -467,7 +470,7 @@ interface IDBUtils {
             MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
             values,
             shouldKeepPath
-        )
+        )?.copy(orientation = orientation ?: rotationDegrees)
     }
 
     private fun insertUri(

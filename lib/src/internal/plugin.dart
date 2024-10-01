@@ -140,8 +140,8 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     PMFilter? filterOption,
     required PMPathFilter pathFilterOption,
   }) async {
-    if (onlyAll && !hasAll) {
-      throw ArgumentError('onlyAll = true must follow hasAll = true');
+    if (onlyAll) {
+      hasAll = true;
     }
     filterOption ??= FilterOptionGroup();
     final Map result = await _channel.invokeMethod(
@@ -342,40 +342,48 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
 
   Future<AssetEntity> saveImage(
     typed_data.Uint8List data, {
-    required String? title,
+    required String filename,
+    String? title,
     String? desc,
     String? relativePath,
+    int? orientation,
   }) async {
+    _throwIfOrientationInvalid(orientation);
     final Map result = await _channel.invokeMethod(
       PMConstants.mSaveImage,
       <String, dynamic>{
         'image': data,
+        'filename': filename,
         'title': title,
-        'desc': desc ?? '',
+        'desc': desc,
         'relativePath': relativePath,
+        'orientation': orientation,
         ...onlyAddPermission,
       },
     );
-    return ConvertUtils.convertMapToAsset(result.cast(), title: title);
+    return ConvertUtils.convertMapToAsset(result.cast(), title: filename);
   }
 
   Future<AssetEntity> saveImageWithPath(
     String inputFilePath, {
-    required String title,
+    String? title,
     String? desc,
     String? relativePath,
+    int? orientation,
   }) async {
+    _throwIfOrientationInvalid(orientation);
     final File file = File(inputFilePath);
     if (!file.existsSync()) {
-      throw ArgumentError('The input file does not exists.');
+      throw ArgumentError('The input file $inputFilePath does not exists.');
     }
     final Map result = await _channel.invokeMethod(
       PMConstants.mSaveImageWithPath,
       <String, dynamic>{
-        'path': inputFilePath,
+        'path': file.absolute.path,
         'title': title,
-        'desc': desc ?? '',
+        'desc': desc,
         'relativePath': relativePath,
+        'orientation': orientation,
         ...onlyAddPermission,
       },
     );
@@ -387,9 +395,11 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     required String? title,
     String? desc,
     String? relativePath,
+    int? orientation,
   }) async {
+    _throwIfOrientationInvalid(orientation);
     if (!inputFile.existsSync()) {
-      throw ArgumentError('The input file does not exists.');
+      throw ArgumentError('The input file ${inputFile.path} does not exists.');
     }
     final Map result = await _channel.invokeMethod(
       PMConstants.mSaveVideo,
@@ -398,6 +408,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'title': title,
         'desc': desc ?? '',
         'relativePath': relativePath,
+        'orientation': orientation,
         ...onlyAddPermission,
       },
     );
@@ -457,14 +468,16 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return entity.title ?? '';
   }
 
-  Future<String?> getMediaUrl(AssetEntity entity) async {
+  Future<String?> getMediaUrl(
+    AssetEntity entity, {
+    PMProgressHandler? progressHandler,
+  }) async {
     if (PlatformUtils.isOhos) {
       return entity.id;
     }
-    return _channel.invokeMethod(
-      PMConstants.mGetMediaUrl,
-      <String, dynamic>{'id': entity.id, 'type': entity.typeInt},
-    );
+    final params = <String, dynamic>{'id': entity.id, 'type': entity.typeInt};
+    _injectParams(params, progressHandler);
+    return _channel.invokeMethod(PMConstants.mGetMediaUrl, params);
   }
 
   Future<List<AssetPathEntity>> getSubPathEntities(
@@ -539,7 +552,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     if (PlatformUtils.isOhos) {
       return;
     }
-    assert(ids.isNotEmpty);
+    if (ids.isEmpty) {
+      throw ArgumentError('Empty IDs are not allowed');
+    }
     return _channel.invokeMethod(
       PMConstants.mRequestCacheAssetsThumb,
       <String, dynamic>{
@@ -550,7 +565,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   }
 
   Future<void> presentLimited(RequestType type) async {
-    assert(Platform.isIOS || Platform.isAndroid);
     if (Platform.isIOS || Platform.isAndroid) {
       return _channel.invokeMethod(PMConstants.mPresentLimited, {
         'type': type.value,
@@ -559,12 +573,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   }
 
   Future<String?> getMimeTypeAsync(AssetEntity entity) async {
-    assert(
-      Platform.isAndroid ||
-          Platform.isIOS ||
-          Platform.isMacOS ||
-          PlatformUtils.isOhos,
-    );
     if (Platform.isAndroid || PlatformUtils.isOhos) {
       return entity.mimeType;
     }
@@ -589,7 +597,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'option': filter.toMap(),
       },
     );
-    return count;
+    return count ?? 0;
   }
 
   Future<List<AssetEntity>> getAssetListWithRange({
@@ -611,11 +619,19 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return ConvertUtils.convertToAssetList(result.cast());
   }
 
-  Future<bool> isLocallyAvailable(String id, {bool isOrigin = false}) async {
+  Future<bool> isLocallyAvailable(
+    String id, {
+    bool isOrigin = false,
+    int subtype = 0,
+  }) async {
     if (Platform.isIOS || Platform.isMacOS) {
       return await _channel.invokeMethod(
         PMConstants.mIsLocallyAvailable,
-        <String, dynamic>{'id': id, 'isOrigin': isOrigin},
+        <String, dynamic>{
+          'id': id,
+          'isOrigin': isOrigin,
+          'subtype': subtype,
+        },
       );
     }
 
@@ -628,6 +644,16 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     }
 
     return null;
+  }
+
+  Future<PermissionState> getPermissionState(
+    PermissionRequestOption requestOption,
+  ) async {
+    final int result = await _channel.invokeMethod(
+      PMConstants.mGetPermissionState,
+      requestOption.toMap(),
+    );
+    return PermissionState.values[result];
   }
 }
 
@@ -652,7 +678,7 @@ mixin IosPlugin on BasePlugin {
         'imagePath': imageFile.absolute.path,
         'videoPath': videoFile.absolute.path,
         'title': title,
-        'desc': desc ?? '',
+        'desc': desc,
         'relativePath': relativePath,
         ...onlyAddPermission,
       },
@@ -773,7 +799,7 @@ mixin AndroidPlugin on BasePlugin {
     if (result is List) {
       return result.map((e) => e.toString()).toList();
     }
-    return result ?? <String>[];
+    return <String>[];
   }
 }
 
@@ -785,6 +811,20 @@ mixin OhosPlugin on BasePlugin {
     if (result is List) {
       return result.map((e) => e.toString()).toList();
     }
-    return result ?? <String>[];
+    return <String>[];
   }
+}
+
+void _throwIfOrientationInvalid(int? value) {
+  if (value == null ||
+      value == 0 ||
+      value == 90 ||
+      value == 180 ||
+      value == 270) {
+    return;
+  }
+  throw ArgumentError(
+    'The given orientation is invalid, '
+    'allowed values are 0, 90, 180, 270, and null.',
+  );
 }

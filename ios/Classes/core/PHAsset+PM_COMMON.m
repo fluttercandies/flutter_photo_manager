@@ -218,27 +218,24 @@
 }
 
 - (PHAssetResource *)getLivePhotosResource {
-    NSArray<PHAssetResource *> *resources =
-    [PHAssetResource assetResourcesForAsset:self];
+    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:self];
     if (resources.count == 0) {
         return nil;
     }
-    
-    if (resources.count == 1) {
-        return resources[0];
-    }
-    PHAssetResource *resource;
-    
     if (@available(iOS 9.1, *)) {
-        if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypePairedVideo) {
-            return resources.lastObject;
-        }
+        PHAssetResource *paired;
+        PHAssetResource *fullSizePaired;
         for (PHAssetResource *r in resources) {
-            // Iterate to find the paired video.
-            if (r.type == PHAssetResourceTypePairedVideo) {
-                return r;
+            if (r.type == PHAssetResourceTypePairedVideo && !paired) {
+                paired = r;
+                continue;
+            }
+            if (r.type == PHAssetResourceTypeFullSizePairedVideo && !fullSizePaired) {
+                fullSizePaired = r;
+                continue;
             }
         }
+        return fullSizePaired ?: paired;
     }
     return nil;
 }
