@@ -405,10 +405,12 @@
         NSString *assetId = call.arguments[@"id"];
         BOOL isOrigin = [call.arguments[@"isOrigin"] boolValue];
         int subtype = [call.arguments[@"subtype"] intValue];
+        AVFileType fileType = [PMConvertUtils convertNumberToAVFileType:[call.arguments[@"darwinFileType"] intValue]];
         PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:call.arguments];
         [manager getFullSizeFileWithId:assetId
                               isOrigin:isOrigin
                                subtype:subtype
+                              fileType:fileType
                          resultHandler:handler
                        progressHandler:progressHandler];
     } else if ([call.method isEqualToString:@"fetchPathProperties"]) {
@@ -513,12 +515,22 @@
         NSString *assetId = call.arguments[@"id"];
         BOOL isOrigin = [call.arguments[@"isOrigin"] boolValue];
         int subtype = [call.arguments[@"subtype"] intValue];
-        BOOL exists = [manager entityIsLocallyAvailable:assetId resource:nil isOrigin:isOrigin subtype:subtype];
+        AVFileType fileType = [PMConvertUtils convertNumberToAVFileType:[call.arguments[@"darwinFileType"] intValue]];
+        BOOL exists = [manager entityIsLocallyAvailable:assetId
+                                               resource:nil
+                                               isOrigin:isOrigin
+                                                subtype:subtype
+                                               fileType:fileType];
         [handler reply:@(exists)];
     } else if ([call.method isEqualToString:@"getTitleAsync"]) {
         NSString *assetId = call.arguments[@"id"];
         int subtype = [call.arguments[@"subtype"] intValue];
-        NSString *title = [manager getTitleAsyncWithAssetId:assetId subtype:subtype];
+        BOOL isOrigin = [call.arguments[@"isOrigin"] boolValue];
+        AVFileType fileType = [PMConvertUtils convertNumberToAVFileType:[call.arguments[@"darwinFileType"] intValue]];
+        NSString *title = [manager getTitleAsyncWithAssetId:assetId
+                                                    subtype:subtype
+                                                   isOrigin:isOrigin
+                                                   fileType:fileType];
         [handler reply:title];
     } else if ([call.method isEqualToString:@"getMimeTypeAsync"]) {
         NSString *assetId = call.arguments[@"id"];
@@ -526,7 +538,9 @@
         [handler reply:mimeType];
     } else if ([@"getMediaUrl" isEqualToString:call.method]) {
         PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:call.arguments];
-        [manager getMediaUrl:call.arguments[@"id"] resultHandler:handler progressHandler:progressHandler];
+        [manager getMediaUrl:call.arguments[@"id"]
+               resultHandler:handler
+             progressHandler:progressHandler];
     } else if ([@"fetchEntityProperties" isEqualToString:call.method]) {
         NSString *assetId = call.arguments[@"id"];
         PMAssetEntity *entity = [manager getAssetEntity:assetId withCache:NO];

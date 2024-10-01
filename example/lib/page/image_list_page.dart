@@ -161,6 +161,10 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                 },
               ),
             ElevatedButton(
+              child: const Text('Get file'),
+              onPressed: () => getFile(entity),
+            ),
+            ElevatedButton(
               child: const Text('Show detail page'),
               onPressed: () => routeToDetailPage(entity),
             ),
@@ -241,6 +245,11 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     required List<AssetEntity> assets,
   }) {
     return assets.indexWhere((AssetEntity e) => e.id == id);
+  }
+
+  Future<void> getFile(AssetEntity entity) async {
+    final file = await entity.file;
+    print(file);
   }
 
   Future<void> routeToDetailPage(AssetEntity entity) async {
