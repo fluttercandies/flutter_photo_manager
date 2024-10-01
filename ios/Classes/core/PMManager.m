@@ -1175,14 +1175,10 @@
     
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
-        PHAssetCreationRequest *request =
-        [PHAssetCreationRequest creationRequestForAsset];
-        PHAssetResourceCreationOptions *options =
-        [PHAssetResourceCreationOptions new];
+        PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
+        PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
         [options setOriginalFilename:filename];
-        [request addResourceWithType:PHAssetResourceTypePhoto
-                                data:data
-                             options:options];
+        [request addResourceWithType:PHAssetResourceTypePhoto data:data options:options];
         assetId = request.placeholderForCreatedAsset.localIdentifier;
     }
      completionHandler:^(BOOL success, NSError *error) {
@@ -1200,20 +1196,24 @@
                  filename:(NSString *)filename
                      desc:(NSString *)desc
                     block:(AssetBlockResult)block {
+    NSFileManager *manager = [NSFileManager defaultManager];
+    if (![manager fileExistsAtPath:path]) {
+        block(nil, [NSString stringWithFormat:@"File does not exist at %@", path]);
+        return;
+    }
+    
     [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save image with path: %@ filename:%@, desc: %@", path, filename, desc]];
     
+    NSURL *fileURL = [NSURL fileURLWithPath:path];
     __block NSString *assetId = nil;
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
-        PHAssetCreationRequest *request =
-        [PHAssetCreationRequest creationRequestForAsset];
-        PHAssetResourceCreationOptions *options =
-        [PHAssetResourceCreationOptions new];
-        [options setOriginalFilename:filename];
-        NSData *data = [NSData dataWithContentsOfFile:path];
-        [request addResourceWithType:PHAssetResourceTypePhoto
-                                data:data
-                             options:options];
+        PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
+        PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
+        if (filename) {
+            [options setOriginalFilename:filename];
+        }
+        [request addResourceWithType:PHAssetResourceTypePhoto fileURL:fileURL options:options];
         assetId = request.placeholderForCreatedAsset.localIdentifier;
     }
      completionHandler:^(BOOL success, NSError *error) {
@@ -1230,14 +1230,23 @@
          filename:(NSString *)filename
              desc:(NSString *)desc
             block:(AssetBlockResult)block {
+    NSFileManager *manager = [NSFileManager defaultManager];
+    if (![manager fileExistsAtPath:path]) {
+        block(nil, [NSString stringWithFormat:@"File does not exist at %@", path]);
+        return;
+    }
+    
     [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save video with path: %@, filename: %@, desc %@", path, filename, desc]];
+    
     NSURL *fileURL = [NSURL fileURLWithPath:path];
     __block NSString *assetId = nil;
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
         PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
         PHAssetResourceCreationOptions *options = [PHAssetResourceCreationOptions new];
-        [options setOriginalFilename:filename];
+        if (filename) {
+            [options setOriginalFilename:filename];
+        }
         [request addResourceWithType:PHAssetResourceTypeVideo fileURL:fileURL options:options];
         assetId = request.placeholderForCreatedAsset.localIdentifier;
     }
