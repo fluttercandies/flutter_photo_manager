@@ -377,8 +377,7 @@ class AssetEntity {
 
   /// Refresh the property of [AssetPathEntity] from the given ID.
   static Future<AssetEntity?> _obtainAssetFromId(String id) async {
-    final Map<dynamic, dynamic>? result =
-        await plugin.fetchEntityProperties(id);
+    final Map? result = await plugin.fetchEntityProperties(id);
     if (result == null) {
       return null;
     }

@@ -223,7 +223,7 @@ object AndroidQDBUtils : IDBUtils {
         context: Context,
         id: String,
         checkIfExists: Boolean
-    ): AssetEntity {
+    ): AssetEntity? {
         val selection = "$_ID = ?"
         val args = arrayOf(id)
         val cursor = context.contentResolver.logQuery(
@@ -235,7 +235,7 @@ object AndroidQDBUtils : IDBUtils {
         )
         cursor.use {
             return if (it.moveToNext()) it.toAssetEntity(context, checkIfExists)
-            else throwMsg("Failed to find asset $id")
+            else null
         }
     }
 
@@ -244,7 +244,7 @@ object AndroidQDBUtils : IDBUtils {
         pathId: String,
         type: Int,
         option: FilterOption
-    ): AssetPathEntity {
+    ): AssetPathEntity? {
         val isAll = pathId == ""
         val args = ArrayList<String>()
         val where = option.makeWhere(type, args)
@@ -270,7 +270,7 @@ object AndroidQDBUtils : IDBUtils {
                 name = it.getString(1) ?: ""
                 assetCount = it.count
             } else {
-                throwMsg("Failed to find the path $pathId")
+                return null
             }
         }
         return AssetPathEntity(pathId, name, assetCount, type, isAll)
@@ -278,7 +278,7 @@ object AndroidQDBUtils : IDBUtils {
 
     override fun getExif(context: Context, id: String): ExifInterface? {
         return try {
-            val asset = getAssetEntity(context, id)
+            val asset = getAssetEntity(context, id) ?: return null
             val uri = getUri(asset)
             val originalUri = MediaStore.setRequireOriginal(uri)
             val inputStream = context.contentResolver.openInputStream(originalUri) ?: return null
@@ -289,11 +289,11 @@ object AndroidQDBUtils : IDBUtils {
         }
     }
 
-    override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
-        val assetEntity = getAssetEntity(context, id)
+    override fun getFilePath(context: Context, id: String, origin: Boolean): String {
+        val assetEntity = getAssetEntity(context, id) ?: throwIdNotFound(id)
         val filePath = if (shouldUseScopedCache) {
             val file = scopedCache.getCacheFileFromEntity(context, assetEntity, origin)
-            file?.absolutePath
+            file.absolutePath
         } else {
             assetEntity.path
         }
@@ -325,7 +325,7 @@ object AndroidQDBUtils : IDBUtils {
         if (galleryId == currentGalleryId) {
             throwMsg("No copy required, because the target gallery is the same as the current one.")
         }
-        val asset = getAssetEntity(context, assetId)
+        val asset = getAssetEntity(context, assetId) ?: throwIdNotFound(assetId)
         val copyKeys = arrayListOf(
             DISPLAY_NAME,
             TITLE,
@@ -380,7 +380,7 @@ object AndroidQDBUtils : IDBUtils {
 
         val insertedId = insertedUri.lastPathSegment
             ?: throwMsg("Cannot open output stream for $insertedUri.")
-        return getAssetEntity(context, insertedId)
+        return getAssetEntity(context, insertedId) ?: throwIdNotFound(assetId)
     }
 
     override fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity {
@@ -398,7 +398,7 @@ object AndroidQDBUtils : IDBUtils {
         }
         val count = cr.update(allUri, contentValues, idSelection, arrayOf(assetId))
         if (count > 0) {
-            return getAssetEntity(context, assetId)
+            return getAssetEntity(context, assetId) ?: throwIdNotFound(assetId)
         }
         throwMsg("Cannot update $assetId relativePath")
     }

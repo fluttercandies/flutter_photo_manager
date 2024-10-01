@@ -38,17 +38,14 @@ class _Issue979State extends State<Issue979> with IssueBase {
     try {
       final file = await AssetsUtils.downloadJpeg();
       final name = file.path.split('/').last;
-      final asset =
-          await PhotoManager.editor.saveImageWithPath(file.path, title: name);
-
-      if (asset != null) {
-        final id = asset.id;
-        final width = asset.width;
-        final height = asset.height;
-        addLog('The save id = $id, width = $width, height = $height');
-      } else {
-        addLog('The save asset is null');
-      }
+      final asset = await PhotoManager.editor.saveImageWithPath(
+        file.path,
+        title: name,
+      );
+      final id = asset.id;
+      final width = asset.width;
+      final height = asset.height;
+      addLog('The save id = $id, width = $width, height = $height');
     } catch (e) {
       addLog('Save error : $e');
     }

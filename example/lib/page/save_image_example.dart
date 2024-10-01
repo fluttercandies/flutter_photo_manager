@@ -161,7 +161,7 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
       },
       onDone: () async {
         await checkRequest(() async {
-          final AssetEntity? asset =
+          final AssetEntity asset =
               await PhotoManager.editor.saveVideo(file, title: name);
           showToast('saved asset: $asset');
           Log.d('saved asset: $asset');
@@ -193,7 +193,7 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
 
   Future<void> saveImage(typed_data.Uint8List uint8List) async {
     await checkRequest(() async {
-      final AssetEntity? asset = await PhotoManager.editor.saveImage(
+      final AssetEntity asset = await PhotoManager.editor.saveImage(
         uint8List,
         filename: '${DateTime.now().millisecondsSinceEpoch}.jpg',
       );
@@ -215,7 +215,7 @@ class _SaveMediaExampleState extends State<SaveMediaExample> {
       onDone: () async {
         Log.d('write image to file success: $file');
         await checkRequest(() async {
-          final AssetEntity? asset =
+          final AssetEntity asset =
               await PhotoManager.editor.saveImageWithPath(
             file.path,
             title: '${DateTime.now().millisecondsSinceEpoch}.jpg',

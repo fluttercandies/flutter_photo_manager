@@ -219,13 +219,11 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
       onDone: () async {
         client.close();
         Log.d('the video file length = ${f.lengthSync()}');
-        final AssetEntity? result =
-            await PhotoManager.editor.saveVideo(f, title: title);
-        if (result != null) {
-          Log.d('result : ${(await result.originFile)?.path}');
-        } else {
-          Log.d('result is null');
-        }
+        final AssetEntity result = await PhotoManager.editor.saveVideo(
+          f,
+          title: title,
+        );
+        Log.d('result : ${(await result.originFile)?.path}');
       },
     );
   }
@@ -269,7 +267,7 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
         videoFile: videoFile,
         title: 'preview_0',
       );
-      print('save live photo result : ${assets?.id}');
+      print('save live photo result : ${assets.id}');
     } finally {
       imgFile?.deleteSync();
       videoFile?.deleteSync();

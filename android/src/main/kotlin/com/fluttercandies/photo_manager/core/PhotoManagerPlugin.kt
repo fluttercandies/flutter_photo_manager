@@ -435,7 +435,11 @@ class PhotoManagerPlugin(
             Methods.fetchEntityProperties -> {
                 val id = call.argument<String>("id")!!
                 val asset = photoManager.fetchEntityProperties(id)
-                val assetResult = ConvertUtils.convertAsset(asset)
+                val assetResult = if (asset != null) {
+                    ConvertUtils.convertAsset(asset)
+                } else {
+                    null
+                }
                 resultHandler.reply(assetResult)
             }
 

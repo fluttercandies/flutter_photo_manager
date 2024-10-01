@@ -91,11 +91,15 @@ class PhotoManager(private val context: Context) {
         val frame = option.frame
         try {
             val asset = dbUtils.getAssetEntity(context, id)
+            if (asset == null) {
+                resultHandler.replyError("201", "Failed to find the asset $id")
+                return;
+            }
             ThumbnailUtil.getThumbnail(
                 context,
                 asset,
-                option.width,
-                option.height,
+                width,
+                height,
                 format,
                 quality,
                 frame,
@@ -110,6 +114,10 @@ class PhotoManager(private val context: Context) {
 
     fun getOriginBytes(id: String, resultHandler: ResultHandler, needLocationPermission: Boolean) {
         val asset = dbUtils.getAssetEntity(context, id)
+        if (asset == null) {
+            resultHandler.replyError("202", "Failed to find the asset $id")
+            return;
+        }
         try {
             val byteArray = dbUtils.getOriginBytes(context, asset, needLocationPermission)
             resultHandler.reply(byteArray)
@@ -127,28 +135,24 @@ class PhotoManager(private val context: Context) {
     fun fetchPathProperties(id: String, type: Int, option: FilterOption): AssetPathEntity? {
         if (id == ALL_ID) {
             val allGalleryList = dbUtils.getAssetPathList(context, type, option)
-            return if (allGalleryList.isEmpty()) {
-                null
-            } else {
-                // make is all to the gallery list
-                allGalleryList.run {
-                    var assetCount = 0
-                    for (item in this) {
-                        assetCount += item.assetCount
-                    }
-                    AssetPathEntity(ALL_ID, ALL_ALBUM_NAME, assetCount, type, true).apply {
-                        if (option.containsPathModified) {
-                            dbUtils.injectModifiedDate(context, this)
-                        }
+            return if (allGalleryList.isEmpty()) null
+            else allGalleryList.run {
+                var assetCount = 0
+                for (item in this) {
+                    assetCount += item.assetCount
+                }
+                AssetPathEntity(ALL_ID, ALL_ALBUM_NAME, assetCount, type, true).apply {
+                    if (option.containsPathModified) {
+                        dbUtils.injectModifiedDate(context, this)
                     }
                 }
             }
         }
-        val galleryEntity = dbUtils.getAssetPathEntityFromId(context, id, type, option)
+        val galleryEntity =
+            dbUtils.getAssetPathEntityFromId(context, id, type, option) ?: return null
         if (option.containsPathModified) {
             dbUtils.injectModifiedDate(context, galleryEntity)
         }
-
         return galleryEntity
     }
 
@@ -165,7 +169,15 @@ class PhotoManager(private val context: Context) {
         relativePath: String,
         orientation: Int?
     ): AssetEntity {
-        return dbUtils.saveImage(context, bytes, filename, title, description, relativePath, orientation)
+        return dbUtils.saveImage(
+            context,
+            bytes,
+            filename,
+            title,
+            description,
+            relativePath,
+            orientation
+        )
     }
 
     fun saveImage(
@@ -232,12 +244,13 @@ class PhotoManager(private val context: Context) {
         resultHandler.reply(result)
     }
 
-    fun fetchEntityProperties(id: String): AssetEntity {
+    fun fetchEntityProperties(id: String): AssetEntity? {
         return dbUtils.getAssetEntity(context, id)
     }
 
     fun getUri(id: String): Uri {
         val asset = dbUtils.getAssetEntity(context, id)
+            ?: throw RuntimeException("Failed to find asset $id")
         return asset.getUri()
     }
 

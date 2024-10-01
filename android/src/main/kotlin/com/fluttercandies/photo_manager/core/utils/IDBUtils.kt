@@ -125,7 +125,7 @@ interface IDBUtils {
         option: FilterOption
     ): List<AssetEntity>
 
-    fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean = true): AssetEntity
+    fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean = true): AssetEntity?
 
     fun getMediaType(type: Int): Int {
         return when (type) {
@@ -165,9 +165,9 @@ interface IDBUtils {
         return getLong(getColumnIndex(columnName))
     }
 
-//    fun Cursor.getDouble(columnName: String): Double {
-//        return getDouble(getColumnIndex(columnName))
-//    }
+    fun Cursor.getDouble(columnName: String): Double {
+        return getDouble(getColumnIndex(columnName))
+    }
 
     fun Cursor.toAssetEntity(context: Context, checkIfExists: Boolean = true): AssetEntity {
         val id = getLong(_ID)
@@ -243,9 +243,7 @@ interface IDBUtils {
         pathId: String,
         type: Int,
         option: FilterOption
-    ): AssetPathEntity
-
-    fun getFilePath(context: Context, id: String, origin: Boolean): String?
+    ): AssetPathEntity?
 
     fun saveImage(
         context: Context,
@@ -481,16 +479,15 @@ interface IDBUtils {
         shouldKeepPath: Boolean = false,
     ): AssetEntity {
         val cr = context.contentResolver
-        val uri =
-            cr.insert(contentUri, values) ?: throw RuntimeException("Cannot insert the new asset.")
+        val uri = cr.insert(contentUri, values) ?: throwMsg("Cannot insert new asset.")
         val id = ContentUris.parseId(uri)
         if (!shouldKeepPath) {
             val outputStream = cr.openOutputStream(uri)
-                ?: throw RuntimeException("Cannot open the output stream for $uri.")
+                ?: throwMsg("Cannot open the output stream for $uri.")
             outputStream.use { os -> inputStream.use { it.copyTo(os) } }
         }
         cr.notifyChange(uri, null)
-        return getAssetEntity(context, id.toString())
+        return getAssetEntity(context, id.toString()) ?: throwIdNotFound(id)
     }
 
     fun assetExists(context: Context, id: String): Boolean {
@@ -500,6 +497,8 @@ interface IDBUtils {
         }
     }
 
+    fun getFilePath(context: Context, id: String, origin: Boolean): String
+
     fun getExif(context: Context, id: String): ExifInterface?
 
     fun getOriginBytes(
@@ -507,29 +506,6 @@ interface IDBUtils {
         asset: AssetEntity,
         needLocationPermission: Boolean
     ): ByteArray
-
-    fun logRowWithId(context: Context, id: String) {
-        if (LogUtils.isLog) {
-            val splitter = "".padStart(40, '-')
-            LogUtils.info("log error row $id start $splitter")
-            val cursor = context.contentResolver.logQuery(
-                allUri,
-                null,
-                "$_ID = ?",
-                arrayOf(id),
-                null
-            )
-            cursor.use {
-                val names = it.columnNames
-                if (it.moveToNext()) {
-                    for (i in 0 until names.count()) {
-                        LogUtils.info("${names[i]} : ${it.getString(i)}")
-                    }
-                }
-            }
-            LogUtils.info("log error row $id end $splitter")
-        }
-    }
 
     fun getMediaUri(context: Context, id: Long, type: Int): String {
         val uri = getUri(id, type, false)
@@ -542,6 +518,7 @@ interface IDBUtils {
         option: FilterOption
     ): List<AssetPathEntity>
 
+    // Nullable for implementations.
     fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String? {
         val orderBy = filterOption.orderByCondString()
         return "$orderBy LIMIT $pageSize OFFSET $start"
@@ -558,17 +535,13 @@ interface IDBUtils {
             1 -> ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
             2 -> ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
             3 -> ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-            else -> return Uri.EMPTY
+            else -> throwMsg("Unexpected asset type $type")
         }
 
         if (isOrigin) {
             uri = MediaStore.setRequireOriginal(uri)
         }
         return uri
-    }
-
-    fun throwMsg(msg: String): Nothing {
-        throw RuntimeException(msg)
     }
 
     fun removeAllExistsAssets(context: Context): Boolean
@@ -659,40 +632,6 @@ interface IDBUtils {
         }
     }
 
-    fun ContentResolver.logQuery(
-        uri: Uri,
-        projection: Array<String>?,
-        selection: String?,
-        selectionArgs: Array<String>?,
-        sortOrder: String?
-    ): Cursor {
-        fun log(logFunc: (log: String) -> Unit, cursor: Cursor?) {
-            if (LogUtils.isLog) {
-                val sb = StringBuilder()
-                sb.appendLine("uri: $uri")
-                sb.appendLine("projection: ${projection?.joinToString(", ")}")
-                sb.appendLine("selection: $selection")
-                sb.appendLine("selectionArgs: ${selectionArgs?.joinToString(", ")}")
-                sb.appendLine("sortOrder: $sortOrder")
-                // format ? in selection and selectionArgs to display in log
-                val sql = selection?.replace("?", "%s")?.format(*selectionArgs ?: emptyArray())
-                sb.appendLine("sql: $sql")
-                sb.appendLine("cursor count: ${cursor?.count}")
-                logFunc(sb.toString())
-            }
-        }
-
-        try {
-            val cursor = query(uri, projection, selection, selectionArgs, sortOrder)
-            log(LogUtils::info, cursor)
-            return cursor ?: throw RuntimeException("Failed to obtain the cursor.")
-        } catch (e: Exception) {
-            log(LogUtils::error, null)
-            LogUtils.error("happen query error", e)
-            throw e
-        }
-    }
-
     fun getAssetCount(context: Context, option: FilterOption, requestType: Int): Int {
         val cr = context.contentResolver
         val args = ArrayList<String>()
@@ -756,5 +695,72 @@ interface IDBUtils {
             }
             return result
         }
+    }
+
+    fun ContentResolver.logQuery(
+        uri: Uri,
+        projection: Array<String>?,
+        selection: String?,
+        selectionArgs: Array<String>?,
+        sortOrder: String?
+    ): Cursor {
+        fun log(logFunc: (log: String) -> Unit, cursor: Cursor?) {
+            if (LogUtils.isLog) {
+                val sb = StringBuilder()
+                sb.appendLine("uri: $uri")
+                sb.appendLine("projection: ${projection?.joinToString(", ")}")
+                sb.appendLine("selection: $selection")
+                sb.appendLine("selectionArgs: ${selectionArgs?.joinToString(", ")}")
+                sb.appendLine("sortOrder: $sortOrder")
+                // format ? in selection and selectionArgs to display in log
+                val sql = selection?.replace("?", "%s")?.format(*selectionArgs ?: emptyArray())
+                sb.appendLine("sql: $sql")
+                sb.appendLine("cursor count: ${cursor?.count}")
+                logFunc(sb.toString())
+            }
+        }
+
+        try {
+            val cursor = query(uri, projection, selection, selectionArgs, sortOrder)
+            log(LogUtils::info, cursor)
+            return cursor ?: throwMsg("Failed to obtain the cursor.")
+        } catch (e: Exception) {
+            log(LogUtils::error, null)
+            LogUtils.error("happen query error", e)
+            throw e
+        }
+    }
+
+    fun logRowWithId(context: Context, id: String) {
+        if (LogUtils.isLog) {
+            val splitter = "".padStart(40, '-')
+            LogUtils.info("log error row $id start $splitter")
+            val cursor = context.contentResolver.logQuery(
+                allUri,
+                null,
+                "$_ID = ?",
+                arrayOf(id),
+                null
+            )
+            cursor.use {
+                val names = it.columnNames
+                if (it.moveToNext()) {
+                    for (i in 0 until names.count()) {
+                        LogUtils.info("${names[i]} : ${it.getString(i)}")
+                    }
+                }
+            }
+            LogUtils.info("log error row $id end $splitter")
+        }
+    }
+
+    @Throws(RuntimeException::class)
+    fun throwMsg(msg: String): Nothing {
+        throw RuntimeException(msg)
+    }
+
+    @Throws(RuntimeException::class)
+    fun throwIdNotFound(id: Any): Nothing {
+        throwMsg("Failed to find asset $id")
     }
 }

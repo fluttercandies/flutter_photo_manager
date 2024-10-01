@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.utils.AndroidQDBUtils
+import com.fluttercandies.photo_manager.core.utils.AndroidQDBUtils.throwIdNotFound
 import com.fluttercandies.photo_manager.util.LogUtils
 import java.io.File
 import java.io.FileOutputStream
@@ -20,7 +21,7 @@ class ScopedCache {
         context: Context,
         assetEntity: AssetEntity,
         isOrigin: Boolean
-    ): File? {
+    ): File {
         val assetId = assetEntity.id
         val targetFile = getCacheFile(context, assetEntity, isOrigin)
         if (targetFile.exists()) {
@@ -29,7 +30,7 @@ class ScopedCache {
         val contentResolver = context.contentResolver
         val uri = AndroidQDBUtils.getUri(assetId, assetEntity.type, isOrigin)
         if (uri == Uri.EMPTY) {
-            return null
+            throwIdNotFound(assetId)
         }
         try {
             LogUtils.info(
@@ -42,7 +43,7 @@ class ScopedCache {
             }
         } catch (e: Exception) {
             LogUtils.error("Caching $assetId [origin: $isOrigin] error", e)
-            return null
+            throw e
         }
         return targetFile
     }
