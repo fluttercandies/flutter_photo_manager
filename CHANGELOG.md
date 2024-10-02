@@ -8,7 +8,9 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+### Improvements
+
+- Reuse files when saving images on Darwin.
 
 ## 3.5.0
 
