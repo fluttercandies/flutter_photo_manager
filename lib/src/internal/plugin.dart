@@ -164,22 +164,22 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   Future<PermissionState> requestPermissionExtend(
     PermissionRequestOption requestOption,
   ) async {
-    final int result = await _channel.invokeMethod<int>(
+    final int result = await _channel.invokeMethod(
       PMConstants.mRequestPermissionExtend,
       requestOption.toMap(),
-    ) as int;
+    );
     return PermissionState.values[result];
   }
 
   Future<int> getAssetCountFromPath(AssetPathEntity path) async {
-    final int result = await _channel.invokeMethod<int>(
+    final int result = await _channel.invokeMethod(
       PMConstants.mGetAssetCountFromPath,
       <String, dynamic>{
         'id': path.id,
         'type': path.type.value,
         'option': path.filterOption.toMap(),
       },
-    ) as int;
+    );
     return result;
   }
 
@@ -191,8 +191,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     int size = 15,
     RequestType type = RequestType.common,
   }) async {
-    final Map<dynamic, dynamic> result =
-        await _channel.invokeMethod<Map<dynamic, dynamic>>(
+    final Map result = await _channel.invokeMethod(
       PMConstants.mGetAssetListPaged,
       <String, dynamic>{
         'id': id,
@@ -201,8 +200,8 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'size': size,
         'option': optionGroup.toMap(),
       },
-    ) as Map<dynamic, dynamic>;
-    return ConvertUtils.convertToAssetList(result.cast<String, dynamic>());
+    );
+    return ConvertUtils.convertToAssetList(result.cast());
   }
 
   /// Asset in the specified range.
@@ -213,8 +212,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     required int end,
     required PMFilter optionGroup,
   }) async {
-    final Map<dynamic, dynamic> map =
-        await _channel.invokeMethod<Map<dynamic, dynamic>>(
+    final Map map = await _channel.invokeMethod(
       PMConstants.mGetAssetListRange,
       <String, dynamic>{
         'id': id,
@@ -223,9 +221,8 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'end': end,
         'option': optionGroup.toMap(),
       },
-    ) as Map<dynamic, dynamic>;
-
-    return ConvertUtils.convertToAssetList(map.cast<String, dynamic>());
+    );
+    return ConvertUtils.convertToAssetList(map.cast());
   }
 
   void _injectProgressHandlerParams(
@@ -278,7 +275,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     int subtype = 0,
     PMDarwinAVFileType? darwinFileType,
   }) async {
-    final Map<String, dynamic> params = <String, dynamic>{
+    final params = <String, dynamic>{
       'id': id,
       'isOrigin': isOrigin,
       'subtype': subtype,
@@ -296,14 +293,14 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return _channel.invokeMethod(PMConstants.mOpenSetting);
   }
 
-  Future<Map<dynamic, dynamic>?> fetchEntityProperties(String id) {
+  Future<Map?> fetchEntityProperties(String id) {
     return _channel.invokeMethod(
       PMConstants.mFetchEntityProperties,
       <String, dynamic>{'id': id},
     );
   }
 
-  Future<Map<dynamic, dynamic>?> fetchPathProperties(
+  Future<Map?> fetchPathProperties(
     String id,
     RequestType type,
     PMFilter optionGroup,
@@ -334,21 +331,22 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   }
 
   Future<List<String>> deleteWithIds(List<String> ids) async {
-    final List<dynamic> deleted = await _channel.invokeMethod<List<dynamic>>(
+    final List deleted = await _channel.invokeMethod(
       PMConstants.mDeleteWithIds,
       <String, dynamic>{'ids': ids},
-    ) as List<dynamic>;
+    );
     return deleted.cast<String>();
   }
 
-  Future<List<String>> moveToTrash(List<AssetEntity> list) {
-    return _channel.invokeMethod(
+  Future<List<String>> moveToTrash(List<AssetEntity> list) async {
+    final List result = await _channel.invokeMethod(
       PMConstants.mMoveToTrash,
       <String, dynamic>{'ids': list.map((e) => e.id).toList()},
-    ).then((value) => value.cast<String>());
+    );
+    return result.cast();
   }
 
-  Future<AssetEntity?> saveImage(
+  Future<AssetEntity> saveImage(
     typed_data.Uint8List data, {
     required String filename,
     String? title,
@@ -357,7 +355,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     int? orientation,
   }) async {
     _throwIfOrientationInvalid(orientation);
-    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
+    final Map result = await _channel.invokeMethod(
       PMConstants.mSaveImage,
       <String, dynamic>{
         'image': data,
@@ -369,28 +367,22 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         ...onlyAddPermission,
       },
     );
-    if (result == null) {
-      return null;
-    }
-    return ConvertUtils.convertMapToAsset(
-      result.cast<String, dynamic>(),
-      title: filename,
-    );
+    return ConvertUtils.convertMapToAsset(result.cast(), title: filename);
   }
 
-  Future<AssetEntity?> saveImageWithPath(
-    String filePath, {
+  Future<AssetEntity> saveImageWithPath(
+    String inputFilePath, {
     String? title,
     String? desc,
     String? relativePath,
     int? orientation,
   }) async {
     _throwIfOrientationInvalid(orientation);
-    final File file = File(filePath);
+    final File file = File(inputFilePath);
     if (!file.existsSync()) {
-      throw ArgumentError('$filePath does not exists');
+      throw ArgumentError('The input file $inputFilePath does not exists.');
     }
-    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
+    final Map result = await _channel.invokeMethod(
       PMConstants.mSaveImageWithPath,
       <String, dynamic>{
         'path': file.absolute.path,
@@ -401,30 +393,24 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         ...onlyAddPermission,
       },
     );
-    if (result == null) {
-      return null;
-    }
-    return ConvertUtils.convertMapToAsset(
-      result.cast<String, dynamic>(),
-      title: title,
-    );
+    return ConvertUtils.convertMapToAsset(result.cast(), title: title);
   }
 
-  Future<AssetEntity?> saveVideo(
-    File file, {
-    String? title,
+  Future<AssetEntity> saveVideo(
+    File inputFile, {
+    required String? title,
     String? desc,
     String? relativePath,
     int? orientation,
   }) async {
     _throwIfOrientationInvalid(orientation);
-    if (!file.existsSync()) {
-      throw ArgumentError('${file.path} does not exists');
+    if (!inputFile.existsSync()) {
+      throw ArgumentError('The input file ${inputFile.path} does not exists.');
     }
-    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
+    final Map result = await _channel.invokeMethod(
       PMConstants.mSaveVideo,
       <String, dynamic>{
-        'path': file.absolute.path,
+        'path': inputFile.absolute.path,
         'title': title,
         'desc': desc ?? '',
         'relativePath': relativePath,
@@ -432,13 +418,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         ...onlyAddPermission,
       },
     );
-    if (result == null) {
-      return null;
-    }
-    return ConvertUtils.convertMapToAsset(
-      result.cast<String, dynamic>(),
-      title: title,
-    );
+    return ConvertUtils.convertMapToAsset(result.cast(), title: title);
   }
 
   /// Check whether the asset has been deleted.
@@ -454,24 +434,24 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     if (PlatformUtils.isOhos) {
       return '';
     }
-    return await _channel.invokeMethod<String>(
+    return await _channel.invokeMethod(
       PMConstants.mSystemVersion,
-    ) as String;
+    );
   }
 
   Future<LatLng> getLatLngAsync(AssetEntity entity) async {
     if (Platform.isAndroid) {
       final int version = int.parse(await getSystemVersion());
       if (version >= 29) {
-        final Map<dynamic, dynamic>? map = await _channel.invokeMethod(
+        final Map map = await _channel.invokeMethod(
           PMConstants.mGetLatLngAndroidQ,
           <String, dynamic>{'id': entity.id},
         );
 
         // 将返回的数据传入map
         return LatLng(
-          latitude: map?['lat'] as double?,
-          longitude: map?['lng'] as double?,
+          latitude: (map['lat'] as num?)?.toDouble(),
+          longitude: (map['lng'] as num?)?.toDouble(),
         );
       }
     }
@@ -493,7 +473,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
           'isOrigin': isOrigin,
           'darwinFileType': darwinFileType?.value ?? 0,
         },
-      ) as String;
+      );
     }
     return entity.title ?? '';
   }
@@ -519,8 +499,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     if (PlatformUtils.isOhos) {
       return <AssetPathEntity>[];
     }
-    final Map<dynamic, dynamic> result =
-        await _channel.invokeMethod<Map<dynamic, dynamic>>(
+    final Map result = await _channel.invokeMethod(
       PMConstants.mGetSubPath,
       <String, dynamic>{
         'id': pathEntity.id,
@@ -528,35 +507,29 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'albumType': pathEntity.albumType,
         'option': pathEntity.filterOption.toMap(),
       },
-    ) as Map<dynamic, dynamic>;
-    final Map<dynamic, dynamic> items = result['list'] as Map<dynamic, dynamic>;
+    );
+    final items = result['list'] as Map;
     return ConvertUtils.convertToPathList(
-      items.cast<String, dynamic>(),
+      items.cast(),
       type: pathEntity.type,
       filterOption: pathEntity.filterOption,
     );
   }
 
-  Future<AssetEntity?> copyAssetToGallery(
+  Future<AssetEntity> copyAssetToGallery(
     AssetEntity asset,
     AssetPathEntity pathEntity,
   ) async {
     if (pathEntity.isAll) {
       throw ArgumentError(
-        'Cannot copy into the album containing all the assets.',
+        "You can't copy the asset into the album containing all the pictures.",
       );
     }
-    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
+    final Map result = await _channel.invokeMethod(
       PMConstants.mCopyAsset,
       <String, dynamic>{'assetId': asset.id, 'galleryId': pathEntity.id},
     );
-    if (result == null) {
-      return null;
-    }
-    return ConvertUtils.convertMapToAsset(
-      result.cast<String, dynamic>(),
-      title: asset.title,
-    );
+    return ConvertUtils.convertMapToAsset(result.cast(), title: asset.title);
   }
 
   Future<bool> favoriteAsset(String id, bool favorite) async {
@@ -617,7 +590,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       return entity.mimeType;
     }
     if (Platform.isIOS || Platform.isMacOS) {
-      return _channel.invokeMethod<String>(
+      return _channel.invokeMethod(
         PMConstants.mGetMimeTypeAsync,
         <String, dynamic>{'id': entity.id},
       );
@@ -628,12 +601,16 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   Future<int> getAssetCount({
     PMFilter? filterOption,
     RequestType type = RequestType.common,
-  }) {
+  }) async {
     final filter = filterOption ?? PMFilter.defaultValue();
-    return _channel.invokeMethod<int>(PMConstants.mGetAssetCount, {
-      'type': type.value,
-      'option': filter.toMap(),
-    }).then((v) => v ?? 0);
+    final count = await _channel.invokeMethod(
+      PMConstants.mGetAssetCount,
+      <String, dynamic>{
+        'type': type.value,
+        'option': filter.toMap(),
+      },
+    );
+    return count ?? 0;
   }
 
   Future<List<AssetEntity>> getAssetListWithRange({
@@ -641,21 +618,18 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     required int end,
     RequestType type = RequestType.common,
     PMFilter? filterOption,
-  }) {
+  }) async {
     final filter = filterOption ?? PMFilter.defaultValue();
-    return _channel.invokeMethod<Map>(PMConstants.mGetAssetsByRange, {
-      'type': type.value,
-      'start': start,
-      'end': end,
-      'option': filter.toMap(),
-    }).then((value) {
-      if (value == null) {
-        return [];
-      }
-      return ConvertUtils.convertToAssetList(
-        value.cast<String, dynamic>(),
-      );
-    });
+    final Map result = await _channel.invokeMethod(
+      PMConstants.mGetAssetsByRange,
+      <String, dynamic>{
+        'type': type.value,
+        'start': start,
+        'end': end,
+        'option': filter.toMap(),
+      },
+    );
+    return ConvertUtils.convertToAssetList(result.cast());
   }
 
   Future<bool> isLocallyAvailable(
@@ -665,7 +639,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     PMDarwinAVFileType? darwinFileType,
   }) async {
     if (Platform.isIOS || Platform.isMacOS) {
-      final bool result = await _channel.invokeMethod<bool>(
+      return await _channel.invokeMethod(
         PMConstants.mIsLocallyAvailable,
         <String, dynamic>{
           'id': id,
@@ -673,8 +647,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
           'subtype': subtype,
           'darwinFileType': darwinFileType?.value ?? 0,
         },
-      ) as bool;
-      return result;
+      );
     }
 
     return true;
@@ -700,7 +673,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
 }
 
 mixin IosPlugin on BasePlugin {
-  Future<AssetEntity?> saveLivePhoto({
+  Future<AssetEntity> saveLivePhoto({
     required File imageFile,
     required File videoFile,
     required String? title,
@@ -709,10 +682,10 @@ mixin IosPlugin on BasePlugin {
   }) async {
     assert(Platform.isIOS || Platform.isMacOS);
     if (!imageFile.existsSync()) {
-      throw ArgumentError('The image file does not exists');
+      throw ArgumentError('The image file does not exists.');
     }
     if (!videoFile.existsSync()) {
-      throw ArgumentError('The video file does not exists');
+      throw ArgumentError('The video file does not exists.');
     }
     final Map result = await _channel.invokeMethod(
       PMConstants.mSaveLivePhoto,
@@ -728,7 +701,7 @@ mixin IosPlugin on BasePlugin {
     return ConvertUtils.convertMapToAsset(result.cast(), title: title);
   }
 
-  Future<AssetPathEntity?> iosCreateAlbum(
+  Future<AssetPathEntity> iosCreateAlbum(
     String name,
     bool isRoot,
     AssetPathEntity? parent,
@@ -741,20 +714,20 @@ mixin IosPlugin on BasePlugin {
     if (!isRoot && parent != null) {
       map['folderId'] = parent.id;
     }
-    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
+    final Map result = await _channel.invokeMethod(
       PMConstants.mCreateAlbum,
       map,
     );
-    if (result == null) {
-      return null;
-    }
     if (result['errorMsg'] != null) {
-      return null;
+      throw PlatformException(
+        code: PMConstants.mCreateAlbum,
+        message: result['errorMsg'],
+      );
     }
     return AssetPathEntity.fromId(result['id'] as String);
   }
 
-  Future<AssetPathEntity?> iosCreateFolder(
+  Future<AssetPathEntity> iosCreateFolder(
     String name,
     bool isRoot,
     AssetPathEntity? parent,
@@ -767,15 +740,15 @@ mixin IosPlugin on BasePlugin {
     if (!isRoot && parent != null) {
       map['folderId'] = parent.id;
     }
-    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
+    final Map result = await _channel.invokeMethod(
       PMConstants.mCreateFolder,
       map,
     );
-    if (result == null) {
-      return null;
-    }
     if (result['errorMsg'] != null) {
-      return null;
+      throw PlatformException(
+        code: PMConstants.mCreateFolder,
+        message: result['errorMsg'],
+      );
     }
     return AssetPathEntity.fromId(result['id'] as String, albumType: 2);
   }
@@ -785,26 +758,26 @@ mixin IosPlugin on BasePlugin {
     AssetPathEntity path,
   ) async {
     assert(Platform.isIOS || Platform.isMacOS);
-    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
+    final Map result = await _channel.invokeMethod(
       PMConstants.mRemoveInAlbum,
-      <dynamic, dynamic>{
+      <String, dynamic>{
         'assetId': entities.map((AssetEntity e) => e.id).toList(),
         'pathId': path.id,
       },
     );
-    return result?['msg'] == null;
+    return result['msg'] == null;
   }
 
   Future<bool> iosDeleteCollection(AssetPathEntity path) async {
     assert(Platform.isIOS || Platform.isMacOS);
-    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
+    final Map result = await _channel.invokeMethod(
       PMConstants.mDeleteAlbum,
       <String, dynamic>{
         'id': path.id,
         'type': path.albumType,
       },
     );
-    return result?['errorMsg'] == null;
+    return result['errorMsg'] == null;
   }
 }
 
@@ -820,7 +793,7 @@ mixin AndroidPlugin on BasePlugin {
     AssetEntity entity,
     AssetPathEntity target,
   ) async {
-    final Map<dynamic, dynamic>? result = await _channel.invokeMethod(
+    final result = await _channel.invokeMethod(
       PMConstants.mMoveAssetToPath,
       <String, dynamic>{'assetId': entity.id, 'albumId': target.id},
     );
@@ -835,19 +808,25 @@ mixin AndroidPlugin on BasePlugin {
   }
 
   Future<List<String>> androidColumns() async {
-    final List result = await _channel.invokeMethod(
+    final result = await _channel.invokeMethod(
       PMConstants.mColumnNames,
     );
-    return result.map((e) => e.toString()).toList();
+    if (result is List) {
+      return result.map((e) => e.toString()).toList();
+    }
+    return <String>[];
   }
 }
 
 mixin OhosPlugin on BasePlugin {
   Future<List<String>> ohosColumns() async {
-    final List result = await _channel.invokeMethod(
+    final result = await _channel.invokeMethod(
       PMConstants.mColumnNames,
     );
-    return result.map((e) => e.toString()).toList();
+    if (result is List) {
+      return result.map((e) => e.toString()).toList();
+    }
+    return <String>[];
   }
 }
 

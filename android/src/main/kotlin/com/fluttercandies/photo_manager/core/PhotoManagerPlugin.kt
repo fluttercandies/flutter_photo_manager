@@ -489,10 +489,6 @@ class PhotoManagerPlugin(
                         relativePath,
                         orientation,
                     )
-                    if (entity == null) {
-                        resultHandler.reply(null)
-                        return
-                    }
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
                 } catch (e: Exception) {
@@ -515,10 +511,6 @@ class PhotoManagerPlugin(
                         relativePath,
                         orientation,
                     )
-                    if (entity == null) {
-                        resultHandler.reply(null)
-                        return
-                    }
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
                 } catch (e: Exception) {
@@ -541,10 +533,6 @@ class PhotoManagerPlugin(
                         relativePath,
                         orientation,
                     )
-                    if (entity == null) {
-                        resultHandler.reply(null)
-                        return
-                    }
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
                 } catch (e: Exception) {

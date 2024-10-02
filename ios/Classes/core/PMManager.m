@@ -1170,9 +1170,9 @@
          filename:(NSString *)filename
              desc:(NSString *)desc
             block:(AssetBlockResult)block {
+    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"Saving image with data, length: %lu, filename: %@, desc: %@", (unsigned long)data.length, filename, desc]];
+
     __block NSString *assetId = nil;
-    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save image with data, length: %lu, filename:%@, desc: %@", (unsigned long)data.length, filename, desc]];
-    
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
         PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
@@ -1183,10 +1183,10 @@
     }
      completionHandler:^(BOOL success, NSError *error) {
         if (success) {
-            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"create asset : id = %@", assetId]];
+            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Created image %@", assetId]];
             block([self getAssetEntity:assetId], nil);
         } else {
-            NSLog(@"create fail");
+            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Save image with data failed %@, reason = %@", assetId, error]];
             block(nil, error);
         }
     }];
@@ -1201,8 +1201,8 @@
         block(nil, [NSString stringWithFormat:@"File does not exist at %@", path]);
         return;
     }
-    
-    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save image with path: %@ filename:%@, desc: %@", path, filename, desc]];
+
+    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"Saving image with path: %@ filename: %@, desc: %@", path, filename, desc]];
     
     NSURL *fileURL = [NSURL fileURLWithPath:path];
     __block NSString *assetId = nil;
@@ -1221,6 +1221,7 @@
             [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"create asset : id = %@", assetId]];
             block([self getAssetEntity:assetId], nil);
         } else {
+            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Save image with path failed %@, reason = %@", assetId, error]];
             block(nil, error);
         }
     }];
@@ -1235,9 +1236,9 @@
         block(nil, [NSString stringWithFormat:@"File does not exist at %@", path]);
         return;
     }
-    
-    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save video with path: %@, filename: %@, desc %@", path, filename, desc]];
-    
+
+    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"Saving video with path: %@, filename: %@, desc %@", path, filename, desc]];
+
     NSURL *fileURL = [NSURL fileURLWithPath:path];
     __block NSString *assetId = nil;
     [[PHPhotoLibrary sharedPhotoLibrary]
@@ -1255,7 +1256,7 @@
             [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"create asset : id = %@", assetId]];
             block([self getAssetEntity:assetId], nil);
         } else {
-            NSLog(@"create fail, error: %@", error);
+            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Save video with path failed %@, reason = %@", assetId, error]];
             block(nil, error);
         }
     }];
@@ -1266,10 +1267,10 @@
                 title:(NSString *)title
                  desc:(NSString *)desc
                 block:(AssetBlockResult)block {
-    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"save LivePhoto with imagePath: %@, videoPath: %@, filename: %@, desc %@",
-                                     imagePath, videoPath, title, desc]];
+    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"Saving Live Photo with imagePath: %@, videoPath: %@, filename: %@, desc: %@", imagePath, videoPath, title, desc]];
     NSURL *imageURL = [NSURL fileURLWithPath:imagePath];
     NSURL *videoURL = [NSURL fileURLWithPath:videoPath];
+
     __block NSString *assetId = nil;
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
@@ -1414,8 +1415,8 @@
 }
 
 - (void)copyAssetWithId:(NSString *)id
-toGallery:(NSString *)gallery
-block:(void (^)(PMAssetEntity *entity, NSObject *error))block {
+              toGallery:(NSString *)gallery
+                  block:(void (^)(PMAssetEntity *entity, NSObject *error))block {
     PMAssetEntity *assetEntity = [self getAssetEntity:id];
     
     if (!assetEntity) {
@@ -1424,15 +1425,16 @@ block:(void (^)(PMAssetEntity *entity, NSObject *error))block {
         return;
     }
     
-    __block PHAssetCollection *collection = [self getCollectionWithId:gallery];
+    PHAssetCollection *collection = [self getCollectionWithId:gallery];
     
     if (!collection) {
         block(nil, [NSString stringWithFormat:@"Collection [%@] not found.", gallery]);
         return;
     }
     
+    NSString *collectionId = collection.localIdentifier;
     if (![collection canPerformEditOperation:PHCollectionEditOperationAddContent]) {
-        block(nil, @"The collection cannot perform content adding operation.");
+        block(nil, [NSString stringWithFormat:@"The collection %@ cannot perform content adding operation.", collectionId]);
         return;
     }
     

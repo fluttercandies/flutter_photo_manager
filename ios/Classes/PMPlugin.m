@@ -613,8 +613,12 @@
     } else if ([@"favoriteAsset" isEqualToString:call.method]) {
         NSString *id = call.arguments[@"id"];
         BOOL favorite = [call.arguments[@"favorite"] boolValue];
-        BOOL favoriteResult = [manager favoriteWithId:id favorite:favorite];
-        [handler reply:@(favoriteResult)];
+        @try {
+            BOOL favoriteResult = [manager favoriteWithId:id favorite:favorite];
+            [handler reply:@(favoriteResult)];
+        } @catch (NSObject *error) {
+            [handler replyError:error];
+        }
     } else if ([@"requestCacheAssetsThumb" isEqualToString:call.method]) {
         NSArray *ids = call.arguments[@"ids"];
         PMThumbLoadOption *option = [PMThumbLoadOption optionDict:call.arguments[@"option"]];

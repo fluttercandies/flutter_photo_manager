@@ -170,15 +170,15 @@ class FilterCond {
     lateinit var durationConstraint: DurationConstraint
 
     companion object {
-        private const val widthKey = MediaStore.Files.FileColumns.WIDTH
-        private const val heightKey = MediaStore.Files.FileColumns.HEIGHT
+        private const val WIDTH_KEY = MediaStore.Files.FileColumns.WIDTH
+        private const val HEIGHT_KEY = MediaStore.Files.FileColumns.HEIGHT
 
         @SuppressLint("InlinedApi")
-        private const val durationKey = MediaStore.Video.VideoColumns.DURATION
+        private const val DURATION_KEY = MediaStore.Video.VideoColumns.DURATION
     }
 
     fun sizeCond(): String =
-        "$widthKey >= ? AND $widthKey <= ? AND $heightKey >= ? AND $heightKey <=?"
+        "$WIDTH_KEY >= ? AND $WIDTH_KEY <= ? AND $HEIGHT_KEY >= ? AND $HEIGHT_KEY <=?"
 
     fun sizeArgs(): Array<String> {
         return arrayOf(
@@ -192,9 +192,9 @@ class FilterCond {
     }
 
     fun durationCond(): String {
-        val baseCond = "$durationKey >=? AND $durationKey <=?"
+        val baseCond = "$DURATION_KEY >=? AND $DURATION_KEY <=?"
         if (durationConstraint.allowNullable) {
-            return "( $durationKey IS NULL OR ( $baseCond ) )"
+            return "( $DURATION_KEY IS NULL OR ( $baseCond ) )"
         }
         return baseCond
     }
