@@ -173,7 +173,7 @@ interface IDBUtils {
         val id = getLong(_ID)
         val path = getString(DATA)
         if (checkIfExists && path.isNotBlank() && !File(path).exists()) {
-            throw RuntimeException("Asset ($id) does not exists at its path ($path).")
+            throwMsg("Asset ($id) does not exists at its path ($path).")
         }
 
         val date = if (isAboveAndroidQ) {
