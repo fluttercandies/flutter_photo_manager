@@ -15,6 +15,7 @@ To know more about breaking changes, see the [Migration Guide][].
 ### Improvements
 
 - Reuse files when saving images on Darwin.
+- Returns non-nullable results as much as possible.
 - Fix export session file type with videos at the first time on Darwin.
 
 ## 3.5.0
