@@ -16,6 +16,11 @@ To know more about breaking changes, see the [Migration Guide][].
 
 - Get rid of `@try` `@catch` when toggling favorite on Darwin.
 
+### Fixes
+
+- Fix no returned ids after successful deletion on Android API 29+.
+- Fix mediaLocation = true does not work on Android API 34.
+
 ## 3.5.1
 
 ### Improvements
