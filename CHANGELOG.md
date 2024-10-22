@@ -10,6 +10,12 @@ To know more about breaking changes, see the [Migration Guide][].
 
 *None.*
 
+## 3.5.2
+
+### Improvements
+
+- Get rid of `@try` `@catch` when toggling favorite on Darwin.
+
 ## 3.5.1
 
 ### Improvements
