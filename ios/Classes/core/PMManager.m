@@ -1625,30 +1625,33 @@
     }
 }
 
-- (BOOL)favoriteWithId:(NSString *)id favorite:(BOOL)favorite {
+- (void)favoriteWithId:(NSString *)id favorite:(BOOL)favorite block:(void (^)(BOOL result, NSObject *error))block {
     PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:nil];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (!asset) {
-        @throw [NSString stringWithFormat:@"Asset %@ not found.", id];
+        block(NO, [NSString stringWithFormat:@"Asset %@ not found.", id]);
+        return;
     }
     
     if (![asset canPerformEditOperation:PHAssetEditOperationProperties]) {
-        @throw [NSString stringWithFormat:@"The asset %@ cannot perform edit operation.", id];
+        block(NO, [NSString stringWithFormat:@"The asset %@ cannot perform edit operation.", id]);
+        return;
     }
     
     NSError *error;
-    BOOL succeed = [PHPhotoLibrary.sharedPhotoLibrary
-                    performChangesAndWait:^{
+    BOOL succeed = [PHPhotoLibrary.sharedPhotoLibrary performChangesAndWait:^{
         PHAssetChangeRequest *request = [PHAssetChangeRequest changeRequestForAsset:asset];
         request.favorite = favorite;
     } error:&error];
     if (!succeed) {
-        @throw [NSString stringWithFormat:@"Favouring asset %@ failed: Request not succeed.", id];
+        block(NO, [NSString stringWithFormat:@"Favouring asset %@ failed: Request not succeed.", id]);
+        return;
     }
     if (error) {
-        @throw error;
+        block(NO, error);
+        return;
     }
-    return YES;
+    block(YES, nil);
 }
 
 - (NSString *)getCachePath:(NSString *)type {
