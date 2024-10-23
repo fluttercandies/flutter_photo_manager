@@ -10,6 +10,7 @@
 #import "PMManager.h"
 #import "PMMD5Utils.h"
 #import "PMPathFilterOption.h"
+#import "PMCacheManager.h"
 
 @implementation PMManager {
     PMCacheContainer *cacheContainer;
