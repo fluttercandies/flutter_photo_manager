@@ -452,6 +452,14 @@ interface IDBUtils {
                 if (relativePath.isNotBlank()) {
                     put(RELATIVE_PATH, relativePath)
                 }
+            }else{
+                val albumDir = "${Environment.getExternalStorageDirectory().path}${File.separator}${Environment.DIRECTORY_MOVIES}"
+                // check if the directories exist
+                "$albumDir${File.separator}$title".checkDirs()
+                val timestamp = System.currentTimeMillis().toString()
+                // Create a video file. If you use file.name, assetEntity may be empty.
+                val videoFilePath = File(albumDir, "$timestamp.${file.extension}").absolutePath
+                put(DATA, videoFilePath)
             }
             if (latLong != null) {
                 put(MediaStore.Video.VideoColumns.LATITUDE, latLong.first())
