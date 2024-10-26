@@ -457,7 +457,7 @@ interface IDBUtils {
                 // check if the directories exist
                 "$albumDir${File.separator}$title".checkDirs()
                 val timestamp = System.currentTimeMillis().toString()
-                // Create a video file. If you use file.name, assetEntity may be empty.
+                // Using a duplicate file name that already exists on the device will cause inserts to fail on less than Android API 30.
                 val videoFilePath = File(albumDir, "$timestamp.${file.extension}").absolutePath
                 put(DATA, videoFilePath)
             }
