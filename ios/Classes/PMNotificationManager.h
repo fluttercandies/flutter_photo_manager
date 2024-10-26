@@ -16,4 +16,6 @@
 
 - (BOOL)isNotifying;
 
+- (void)detach;
+
 @end

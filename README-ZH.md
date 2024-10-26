@@ -67,6 +67,7 @@ that can be found in the LICENSE file. -->
       * [通过原始数据获取](#通过原始数据获取)
       * [通过 iCloud 获取](#通过-icloud-获取)
       * [展示资源](#展示资源)
+      * [获取文件](#获取文件)
       * [获取「实况照片」](#获取实况照片)
         * [仅过滤「实况照片」](#仅过滤实况照片)
         * [获取「实况照片」的视频](#获取实况照片的视频)
@@ -236,6 +237,9 @@ PhotoManager.setIgnorePermissionCheck(true);
 
 对于一些后台操作（应用未启动等）而言，忽略检查是比较合适的做法。
 
+同时你还可以调用 `PhotoManager.getPermissionState` 来获取权限状态。
+请确保调用该方法使用的权限设置与调用其他方法的权限设置相同。
+
 #### 受限的资源权限
 
 ##### iOS 受限的资源权限
@@ -397,6 +401,11 @@ final AssetEntity? entity = await PhotoManager.editor.darwin.saveLivePhoto(
 
 请留意资源可能访问受限，或随时被删除，所以结果可能为空。
 
+iOS 和 macOS 可能会对资源保存附加额外的限制，目前仅部分资源类型可以保存为图库资源。
+该限制由 [`AVFileType`][] 定义，当你在保存时看到
+`PHPhotosErrorDomain Code=3302` (或者 `330x`) 错误时，
+确保你的文件类型受支持。
+
 #### 通过 iCloud 获取
 
 iOS 为了节省磁盘空间，可能将资源仅保存在 iCloud 上。
@@ -405,6 +414,17 @@ iOS 为了节省磁盘空间，可能将资源仅保存在 iCloud 上。
 
 推荐参考的实践是 `wechat_asset_picker` 中的
 [`LocallyAvailableBuilder`][]，它会在下载文件时提供进度的展示。
+
+有数个方法可以结合 `PMProgressHandler` 来提供进度反馈：
+* AssetEntity.thumbnailDataWithSize
+* AssetEntity.thumbnailDataWithOption
+* AssetEntity.getMediaUrl
+* AssetEntity.loadFile
+* PhotoManager.plugin.getOriginBytes
+
+iCloud 文件只能在设备上的 Apple ID 正常登录时获取。
+当账号要求重新输入密码验证时，未缓存在本地的 iCloud 文件将无法访问，
+此时相关方法会抛出 `CloudPhotoLibraryErrorDomain` 错误。
 
 #### 展示资源
 
@@ -436,6 +456,19 @@ final Widget imageFromProvider = Image(
 );
 ```
 
+#### 获取文件
+
+`AssetEntity` 包含数个获取文件的 getter 和方法：
+* `.file`
+* `.fileWithSubtype`
+* `.originFile`
+* `.originFileWithSubtype`
+* `.loadFile`
+
+这些方法会获取与该资源关联的不同类型的文件。阅读它们的文档以了解具体的用途。
+
+另外，你可以使用 `PhotoManager.plugin.getFullFile` 来获取文件，该方法有完整的获取参数。
+
 #### 获取「实况照片」
 
 该插件支持获取和过滤 iOS 上的实况照片。
@@ -450,15 +483,41 @@ final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
 );
 ```
 
+或者你也可以使用 `CustomSqlFilter` 来获取「实况照片」：
+
+```dart
+final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
+  type: RequestType.image,
+  filterOption: CustomFilter.sql(
+  where: '${CustomColumns.base.mediaType} = 1'
+      ' AND '
+      '${CustomColumns.darwin.mediaSubtypes} & (1 << 3) = (1 << 3)',
+  ),
+);
+```
+
 ##### 获取「实况照片」的视频
 
 ```dart
 final AssetEntity entity = livePhotoEntity;
+
+// 播放实况照片的视频
 final String? mediaUrl = await entity.getMediaUrl();
+
+// 获取缩略图和视频
 final File? imageFile = await entity.file;
 final File? videoFile = await entity.fileWithSubtype;
+
+// 获取原图和原视频
 final File? originImageFile = await entity.originFile;
 final File? originVideoFile = await entity.originFileWithSubtype;
+
+// 将实况照片的视频从 mov 转换为 mp4
+final File? convertedFile = await entity.loadFile(
+  isOriginal: true,
+  withSubtye: true,
+  darwinFileType: PMDarwinAVFileType.mp4,
+);
 ```
 
 #### 限制
@@ -476,7 +535,7 @@ final File? originVideoFile = await entity.originFileWithSubtype;
 - 在不同平台和版本中，HEIC 文件并未被完全支持。
   我们建议你上传 JPEG 文件（HEIC 图片的 `.file`），
   以保持多个平台之间的一致行为。
-  查看 [flutter/flutter＃20522][] 了解更多细节。
+  查看 [flutter/flutter#20522][] 了解更多细节。
 - 视频将仅以原始格式获取，而不是组合过的格式，
   这可能会在播放视频时导致某些行为的差异。
 
@@ -934,14 +993,16 @@ PhotoManager.editor.darwin.deletePath();
 
 #### 适用于 OpenHarmony 的功能
 
-目前支持大部分的功能，除了跟缓存相关。目前鸿蒙只支持图片和视频 2 种资源类型。
+> 鸿蒙官方处于安全考虑已禁止相关资源能力。
 
-| Feature                        | OpenHarmony |
-| :----------------------------- | :---------: |
-| releaseCache                   |      ❌      |
-| clearFileCache                 |      ❌      |
-| requestCacheAssetsThumbnail    |      ❌      |
-| getSubPathEntities             |      ❌      |
+目前以支持除缓存相关的其他功能，且只支持图片和视频类型资源。
+
+| Feature                     | OpenHarmony |
+|:----------------------------|:-----------:|
+| releaseCache                |      ❌      |
+| clearFileCache              |      ❌      |
+| requestCacheAssetsThumbnail |      ❌      |
+| getSubPathEntities          |      ❌      |
 
 
 [pub package]: https://pub.flutter-io.cn/packages/photo_manager
@@ -963,6 +1024,7 @@ PhotoManager.editor.darwin.deletePath();
 [`PhotoManager.getAssetListRange`]: https://pub.flutter-io.cn/documentation/photo_manager/latest/photo_manager/PhotoManager/getAssetListRange.html
 [`AssetEntity.fromId`]: https://pub.flutter-io.cn/documentation/photo_manager/latest/photo_manager/AssetEntity/fromId.html
 
+[`AVFileType`]: https://developer.apple.com/documentation/avfoundation/avfiletype
 [`LocallyAvailableBuilder`]: https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/2055adfa74370339d10e6f09adef72f2130d2380/lib/src/widget/builder/locally_available_builder.dart
 
 [flutter/flutter#20522]: https://github.com/flutter/flutter/issues/20522

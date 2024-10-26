@@ -25,6 +25,7 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
     private var androidQDeleteRequestCode = 40070
     private val androidQUriMap = mutableMapOf<String, Uri?>()
     private val androidQSuccessIds = mutableListOf<String>()
+    private val androidQRemovedIds = mutableListOf<String>()
 
     @RequiresApi(Build.VERSION_CODES.Q)
     inner class AndroidQDeleteTask(
@@ -149,6 +150,7 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
         androidQUriMap.clear()
         androidQUriMap.putAll(uris)
         androidQSuccessIds.clear()
+        androidQRemovedIds.clear()
         waitPermissionQueue.clear()
 
         for (entry in uris) {
@@ -156,6 +158,7 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
             val id = entry.key
             try {
                 cr.delete(uri, null, null)
+                androidQRemovedIds.add(id)
             } catch (e: Exception) {
                 // request delete permission
                 if (e is RecoverableSecurityException) {
@@ -181,8 +184,9 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
             }
         }
 
-        androidQHandler?.reply(androidQSuccessIds.toList())
+        androidQHandler?.reply(androidQSuccessIds.toList() + androidQRemovedIds.toList())
         androidQSuccessIds.clear()
+        androidQRemovedIds.clear()
         androidQHandler = null
     }
 

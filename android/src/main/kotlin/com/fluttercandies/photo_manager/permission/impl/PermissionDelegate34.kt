@@ -32,7 +32,7 @@ class PermissionDelegate34 : PermissionDelegate() {
         requestType: Int,
         mediaLocation: Boolean
     ) {
-        if (havePermissions(context, requestType)) {
+        if (havePermissions(context, requestType) && (!mediaLocation || haveMediaLocation(context))) {
             permissionsUtils.permissionsListener?.onGranted(mutableListOf())
             return
         }

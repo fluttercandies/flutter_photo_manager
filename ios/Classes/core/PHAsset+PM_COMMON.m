@@ -5,6 +5,7 @@
 
 #import "PHAsset+PM_COMMON.h"
 #import "PHAssetResource+PM_COMMON.h"
+#import "PMConvertUtils.h"
 #if TARGET_OS_IOS || TARGET_OS_WATCH || TARGET_OS_TV
 #import <MobileCoreServices/MobileCoreServices.h>
 #else
@@ -63,16 +64,30 @@
     }
 }
 
-- (NSString *)originalFilenameWithSubtype:(int)subtype {
+- (NSString *)filenameWithOptions:(int)subtype isOrigin:(BOOL)isOrigin fileType:(AVFileType)fileType {
+    PHAssetResource *resource;
     if (@available(iOS 9.1, *)) {
         BOOL isLivePhotoSubtype = (subtype & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive;
         if ([self isLivePhoto] && isLivePhotoSubtype) {
-            return [self getLivePhotosResource].originalFilename;
+            resource = [self getLivePhotosResource];
+        } else if (isOrigin) {
+            resource = [self getRawResource];
+        } else {
+            resource = [self getCurrentResource];
         }
+    } else if (isOrigin) {
+        resource = [self getRawResource];
+    } else {
+        resource = [self getCurrentResource];
     }
-    PHAssetResource *resource = [self getRawResource];
     if (resource) {
-        return resource.originalFilename;
+        NSString *filename = resource.originalFilename;
+        if (fileType) {
+            NSString *extension = [PMConvertUtils convertAVFileTypeToExtension:fileType];
+            filename = [filename stringByDeletingPathExtension];
+            filename = [filename stringByAppendingPathExtension:[extension stringByReplacingOccurrencesOfString:@"." withString:@""]];
+        }
+        return filename;
     }
     return @"";
 }
@@ -218,27 +233,24 @@
 }
 
 - (PHAssetResource *)getLivePhotosResource {
-    NSArray<PHAssetResource *> *resources =
-    [PHAssetResource assetResourcesForAsset:self];
+    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:self];
     if (resources.count == 0) {
         return nil;
     }
-    
-    if (resources.count == 1) {
-        return resources[0];
-    }
-    PHAssetResource *resource;
-    
     if (@available(iOS 9.1, *)) {
-        if (resources.lastObject && resources.lastObject.type == PHAssetResourceTypePairedVideo) {
-            return resources.lastObject;
-        }
+        PHAssetResource *paired;
+        PHAssetResource *fullSizePaired;
         for (PHAssetResource *r in resources) {
-            // Iterate to find the paired video.
-            if (r.type == PHAssetResourceTypePairedVideo) {
-                return r;
+            if (r.type == PHAssetResourceTypePairedVideo && !paired) {
+                paired = r;
+                continue;
+            }
+            if (r.type == PHAssetResourceTypeFullSizePairedVideo && !fullSizePaired) {
+                fullSizePaired = r;
+                continue;
             }
         }
+        return fullSizePaired ?: paired;
     }
     return nil;
 }

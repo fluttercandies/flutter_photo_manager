@@ -11,7 +11,6 @@ import 'package:flutter/rendering.dart';
 import '../../platform_utils.dart';
 import '../filter/base_filter.dart';
 import '../filter/classical/filter_option_group.dart';
-import '../filter/path_filter.dart';
 import '../internal/constants.dart';
 import '../internal/enums.dart';
 import '../internal/plugin.dart';
@@ -217,14 +216,6 @@ class AssetPathEntity {
     assert(start >= 0, 'The start must be greater than 0.');
     assert(end > start, 'The end must be greater than start.');
     final filterOption = this.filterOption;
-
-    if (filterOption is FilterOptionGroup) {
-      assert(
-        type == RequestType.image || !filterOption.onlyLivePhotos,
-        'Filtering only Live Photos is only supported '
-        'when the request type contains image.',
-      );
-    }
     final int count = await assetCountAsync;
     if (end > count) {
       end = count;
@@ -386,8 +377,7 @@ class AssetEntity {
 
   /// Refresh the property of [AssetPathEntity] from the given ID.
   static Future<AssetEntity?> _obtainAssetFromId(String id) async {
-    final Map<dynamic, dynamic>? result =
-        await plugin.fetchEntityProperties(id);
+    final Map? result = await plugin.fetchEntityProperties(id);
     if (result == null) {
       return null;
     }
@@ -495,8 +485,17 @@ class AssetEntity {
   ///  * Android: Always true.
   ///  * iOS/macOS: Whether the asset has been uploaded to iCloud
   ///    and locally exist (including cached or not).
-  Future<bool> isLocallyAvailable({bool isOrigin = false}) {
-    return plugin.isLocallyAvailable(id, isOrigin: isOrigin);
+  Future<bool> isLocallyAvailable({
+    bool isOrigin = false,
+    bool withSubtype = false,
+    PMDarwinAVFileType? darwinFileType,
+  }) {
+    return plugin.isLocallyAvailable(
+      id,
+      isOrigin: isOrigin,
+      subtype: withSubtype ? subtype : 0,
+      darwinFileType: darwinFileType,
+    );
   }
 
   /// Obtain latitude and longitude.
@@ -556,6 +555,9 @@ class AssetEntity {
   ///
   /// [withSubtype] only takes effect on iOS, typically for Live Photos.
   ///
+  /// [darwinFileType] will try to define the export format when
+  /// exporting assets, such as exporting a MOV file to MP4.
+  ///
   /// See also:
   ///  * [file] which can obtain the compressed file.
   ///  * [fileWithSubtype] which can obtain the compressed file with subtype.
@@ -565,11 +567,13 @@ class AssetEntity {
     bool isOrigin = true,
     bool withSubtype = false,
     PMProgressHandler? progressHandler,
+    PMDarwinAVFileType? darwinFileType,
   }) {
     return _getFile(
       isOrigin: isOrigin,
       subtype: withSubtype ? subtype : 0,
       progressHandler: progressHandler,
+      darwinFileType: darwinFileType,
     );
   }
 
@@ -714,8 +718,13 @@ class AssetEntity {
   /// See also:
   ///  * https://developer.android.com/reference/android/content/ContentUris
   ///  * https://developer.apple.com/documentation/avfoundation/avurlasset
-  Future<String?> getMediaUrl() {
-    return plugin.getMediaUrl(this);
+  Future<String?> getMediaUrl({
+    PMProgressHandler? progressHandler,
+  }) {
+    return plugin.getMediaUrl(
+      this,
+      progressHandler: progressHandler,
+    );
   }
 
   bool get _platformMatched =>
@@ -728,6 +737,7 @@ class AssetEntity {
     bool isOrigin = false,
     PMProgressHandler? progressHandler,
     int subtype = 0,
+    PMDarwinAVFileType? darwinFileType,
   }) async {
     assert(
       _platformMatched,
@@ -741,6 +751,7 @@ class AssetEntity {
       isOrigin: isOrigin,
       progressHandler: progressHandler,
       subtype: subtype,
+      darwinFileType: darwinFileType,
     );
     if (path == null) {
       return null;

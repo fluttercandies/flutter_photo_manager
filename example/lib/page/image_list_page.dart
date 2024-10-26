@@ -161,6 +161,15 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
                 },
               ),
             ElevatedButton(
+              child: const Text('Get file'),
+              onPressed: () => getFile(entity),
+            ),
+            if (entity.type == AssetType.video || entity.isLivePhoto)
+              ElevatedButton(
+                child: const Text('Get MP4 file'),
+                onPressed: () => getFileWithMP4(entity),
+              ),
+            ElevatedButton(
               child: const Text('Show detail page'),
               onPressed: () => routeToDetailPage(entity),
             ),
@@ -241,6 +250,20 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
     required List<AssetEntity> assets,
   }) {
     return assets.indexWhere((AssetEntity e) => e.id == id);
+  }
+
+  Future<void> getFile(AssetEntity entity) async {
+    final file = await entity.file;
+    print(file);
+  }
+
+  Future<void> getFileWithMP4(AssetEntity entity) async {
+    final file = await entity.loadFile(
+      isOrigin: false,
+      withSubtype: true,
+      darwinFileType: PMDarwinAVFileType.mp4,
+    );
+    print(file);
   }
 
   Future<void> routeToDetailPage(AssetEntity entity) async {

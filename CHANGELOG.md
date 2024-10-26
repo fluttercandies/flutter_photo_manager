@@ -10,11 +10,76 @@ To know more about breaking changes, see the [Migration Guide][].
 
 *None.*
 
+## 3.5.2
+
+### Improvements
+
+- Get rid of `@try` `@catch` when toggling favorite on Darwin.
+
+### Fixes
+
+- Fix no returned ids after successful deletion on Android API 29+.
+- Fix mediaLocation = true does not work on Android API 34.
+
+## 3.5.1
+
+### Improvements
+
+- Reuse files when saving images on Darwin.
+- Returns non-nullable results as much as possible.
+- Fix export session file type with videos at the first time on Darwin.
+
+## 3.5.0
+
+### Features
+
+- Provide `PMDarwinAVFileType` to help convert entities' files on iOS and macOS by making explicit exports.
+
+### Improvements
+
+- Improve cache output path equality on iOS and macOS.
+- Get the current resource filename rather than the raw one on iOS and macOS.
+  Also the plugin expands the ability when getting titles.
+- Use `PHCachingImageManager` to improve image memory caches on iOS and macOS.
+
+### Fixes
+
+- Fix incorrect download finished prediction during iCloud file downloading.
+
+## 3.4.0
+
+### Breaking changes
+
+`saveLivePhoto` now requires `title` rather than `filename`.
+
+### Features
+
+- Add `getPermissionState` method to `PhotoManager`.
+
+### Improvements
+
+- Adds a detached state for managers. Callers with those managers will first be aware of the detaching state
+  before any actual calls to avoid crashes.
+- Errors replied by the channel do not include detailed messages before.
+  Now the code will unwrap certain exceptions to extract details from them.
+- Expose `progressHandler` for `AssetEntity.getMediaUrl`.
+- Expose `withSubtype` for `AssetEntity.isLocallyAvailable` to request if a Live Photo resource is available.
+
+### Fixes
+
+- `PHAssetResource` with the type `PHAssetResourceTypeFullSizeVideo` does not count as a video type before,
+  making the resource obtain ignore them.
+- Fixes potential range exception when converting `NSTimeInterval` on Darwin.
+- Fixes progress not being updated when getting the non-original video file on iOS.
+- Fixes incorrect Live Photo resource being obtained which will result in a wrong aspect ratio.
+- Fixes Live Photos saving exceptions with the paired video.
+- Other lints and type promotion fixes.
+
 ## 3.3.0
 
 ### Breaking changes
 
-`saveImage` now requires `filename` rather than `title` other save methods do not require `title` anymore.
+`saveImage` now requires `filename` rather than `title`, other save methods do not require `title` anymore.
 
 ### Improvements
 

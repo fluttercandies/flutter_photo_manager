@@ -57,6 +57,34 @@ class PhotoManager {
     return plugin.requestPermissionExtend(requestOption);
   }
 
+  /// Get the current [PermissionState] of the photo library
+  /// with the given [requestOption].
+  ///
+  /// Example:
+  /// ```dart
+  /// final PermissionState state = await PhotoManager.getPermissionState(
+  ///   requestOption: const PermissionRequestOption(
+  ///     androidPermission: AndroidPermission(
+  //        type: RequestType.image,
+  //        mediaLocation: false,
+  //      ),
+  ///   ),
+  /// );
+  /// if (state == PermissionState.authorized) {
+  ///   print('The application has full access permission');
+  /// } else {
+  ///   print('The application does not have full access permission');
+  /// }
+  /// ```
+  ///
+  /// Note: On Android, this method may require an `Activity` context.
+  /// Call [setIgnorePermissionCheck] if the call is from background service.
+  static Future<PermissionState> getPermissionState({
+    required PermissionRequestOption requestOption,
+  }) {
+    return plugin.getPermissionState(requestOption);
+  }
+
   /// Prompts the limited assets selection modal on iOS.
   ///
   /// This method only supports from iOS 14.0, and will behave differently on

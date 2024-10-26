@@ -61,6 +61,7 @@ class PhotoManagerPlugin(
 
     fun bindActivity(activity: Activity?) {
         this.activity = activity
+        permissionsUtils.withActivity(activity)
         deleteManager.bindActivity(activity)
     }
 
@@ -322,6 +323,15 @@ class PhotoManagerPlugin(
                 ignorePermissionCheck = ignore
                 resultHandler.reply(ignore)
             }
+
+            Methods.getPermissionState -> {
+                val androidPermission = call.argument<Map<*, *>>("androidPermission")!!
+                val requestType = androidPermission["type"] as Int
+                val mediaLocation = androidPermission["mediaLocation"] as Boolean
+                permissionsUtils.getAuthValue(requestType, mediaLocation).let {
+                    resultHandler.reply(it.value)
+                }
+            }
         }
     }
 
@@ -479,10 +489,6 @@ class PhotoManagerPlugin(
                         relativePath,
                         orientation,
                     )
-                    if (entity == null) {
-                        resultHandler.reply(null)
-                        return
-                    }
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
                 } catch (e: Exception) {
@@ -505,10 +511,6 @@ class PhotoManagerPlugin(
                         relativePath,
                         orientation,
                     )
-                    if (entity == null) {
-                        resultHandler.reply(null)
-                        return
-                    }
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
                 } catch (e: Exception) {
@@ -531,10 +533,6 @@ class PhotoManagerPlugin(
                         relativePath,
                         orientation,
                     )
-                    if (entity == null) {
-                        resultHandler.reply(null)
-                        return
-                    }
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
                 } catch (e: Exception) {

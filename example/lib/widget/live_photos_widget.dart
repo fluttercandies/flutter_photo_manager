@@ -31,7 +31,7 @@ class _LivePhotosWidgetState extends State<LivePhotosWidget> {
   }
 
   Future<void> _initializeController() async {
-    if (!await widget.entity.isLocallyAvailable()) {
+    if (!await widget.entity.isLocallyAvailable(withSubtype: true)) {
       if (widget.useOrigin) {
         await widget.entity.originFileWithSubtype;
       } else {
@@ -47,7 +47,6 @@ class _LivePhotosWidgetState extends State<LivePhotosWidget> {
       videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
     )
       ..initialize()
-      ..setVolume(0)
       ..addListener(() {
         if (mounted) {
           setState(() {});

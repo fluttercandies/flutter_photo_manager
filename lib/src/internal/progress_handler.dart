@@ -11,7 +11,10 @@ import 'package:flutter/services.dart';
 import 'constants.dart';
 import 'enums.dart';
 
-/// Manages the progress of asset downloads from cloud storage services, such as iCloud.
+/// {@template photo_manager.PMProgressHandler}
+/// Manages the progress of asset downloads from cloud storage services,
+/// such as iCloud.
+/// {@endtemplate}
 class PMProgressHandler {
   /// Creates a new [PMProgressHandler] object.
   ///

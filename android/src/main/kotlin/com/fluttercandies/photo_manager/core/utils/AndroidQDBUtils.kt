@@ -50,7 +50,7 @@ object AndroidQDBUtils : IDBUtils {
             selections,
             args.toTypedArray(),
             option.orderByCondString()
-        ) ?: return list
+        )
         val nameMap = HashMap<String, String>()
         val countMap = HashMap<String, Int>()
         cursor.use {
@@ -96,7 +96,7 @@ object AndroidQDBUtils : IDBUtils {
             selections,
             args.toTypedArray(),
             option.orderByCondString()
-        ) ?: return list
+        )
         cursor.use {
             val assetPathEntity = AssetPathEntity(
                 PhotoManager.ALL_ID,
@@ -160,10 +160,10 @@ object AndroidQDBUtils : IDBUtils {
             selection,
             args.toTypedArray(),
             sortOrder
-        ) ?: return list
+        )
         cursor.use {
             cursorWithRange(it, page * size, size) { cursor ->
-                cursor.toAssetEntity(context)?.apply {
+                cursor.toAssetEntity(context).apply {
                     list.add(this)
                 }
             }
@@ -200,10 +200,10 @@ object AndroidQDBUtils : IDBUtils {
             selection,
             args.toTypedArray(),
             sortOrder
-        ) ?: return list
+        )
         cursor.use {
             cursorWithRange(it, start, pageSize) { cursor ->
-                cursor.toAssetEntity(context)?.apply {
+                cursor.toAssetEntity(context).apply {
                     list.add(this)
                 }
             }
@@ -232,7 +232,7 @@ object AndroidQDBUtils : IDBUtils {
             selection,
             args,
             null
-        ) ?: return null
+        )
         cursor.use {
             return if (it.moveToNext()) it.toAssetEntity(context, checkIfExists)
             else null
@@ -247,9 +247,7 @@ object AndroidQDBUtils : IDBUtils {
     ): AssetPathEntity? {
         val isAll = pathId == ""
         val args = ArrayList<String>()
-
         val where = option.makeWhere(type, args)
-
         val idSelection: String
         if (isAll) {
             idSelection = ""
@@ -257,7 +255,6 @@ object AndroidQDBUtils : IDBUtils {
             idSelection = "AND $BUCKET_ID = ?"
             args.add(pathId)
         }
-
         val selection =
             "$BUCKET_ID IS NOT NULL $where $idSelection"
         val cursor = context.contentResolver.logQuery(
@@ -265,7 +262,7 @@ object AndroidQDBUtils : IDBUtils {
             IDBUtils.storeBucketKeys,
             selection, args.toTypedArray(),
             null
-        ) ?: return null
+        )
         val name: String
         val assetCount: Int
         cursor.use {
@@ -287,19 +284,19 @@ object AndroidQDBUtils : IDBUtils {
             val inputStream = context.contentResolver.openInputStream(originalUri) ?: return null
             ExifInterface(inputStream)
         } catch (e: Exception) {
+            LogUtils.error(e)
             null
         }
     }
 
-    override fun getFilePath(context: Context, id: String, origin: Boolean): String? {
-        val assetEntity = getAssetEntity(context, id) ?: return null
-        val filePath =
-            if (shouldUseScopedCache) {
-                val file = scopedCache.getCacheFileFromEntity(context, assetEntity, origin)
-                file?.absolutePath
-            } else {
-                assetEntity.path
-            }
+    override fun getFilePath(context: Context, id: String, origin: Boolean): String {
+        val assetEntity = getAssetEntity(context, id) ?: throwIdNotFound(id)
+        val filePath = if (shouldUseScopedCache) {
+            val file = scopedCache.getCacheFileFromEntity(context, assetEntity, origin)
+            file.absolutePath
+        } else {
+            assetEntity.path
+        }
         return filePath
     }
 
@@ -317,22 +314,18 @@ object AndroidQDBUtils : IDBUtils {
         outputStream.use { os ->
             inputStream?.use { os.write(it.readBytes()) }
             val byteArray = os.toByteArray()
-            if (LogUtils.isLog) {
-                LogUtils.info("The asset ${asset.id} origin byte length : ${byteArray.count()}")
-            }
+            LogUtils.info("The asset ${asset.id} origin byte length : ${byteArray.count()}")
             return byteArray
         }
     }
 
-    override fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity? {
+    override fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity {
         val (currentGalleryId, _) = getSomeInfo(context, assetId)
             ?: throwMsg("Cannot get gallery id of $assetId")
         if (galleryId == currentGalleryId) {
             throwMsg("No copy required, because the target gallery is the same as the current one.")
         }
-        val asset = getAssetEntity(context, assetId)
-            ?: throwMsg("No copy required, because the target gallery is the same as the current one.")
-
+        val asset = getAssetEntity(context, assetId) ?: throwIdNotFound(assetId)
         val copyKeys = arrayListOf(
             DISPLAY_NAME,
             TITLE,
@@ -357,7 +350,7 @@ object AndroidQDBUtils : IDBUtils {
             idSelection,
             arrayOf(assetId),
             null
-        ) ?: throwMsg("Cannot find asset.")
+        )
         if (!cursor.moveToNext()) {
             throwMsg("Cannot find asset.")
         }
@@ -387,10 +380,10 @@ object AndroidQDBUtils : IDBUtils {
 
         val insertedId = insertedUri.lastPathSegment
             ?: throwMsg("Cannot open output stream for $insertedUri.")
-        return getAssetEntity(context, insertedId)
+        return getAssetEntity(context, insertedId) ?: throwIdNotFound(assetId)
     }
 
-    override fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity? {
+    override fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity {
         val (currentGalleryId, _) = getSomeInfo(context, assetId)
             ?: throwMsg("Cannot get gallery id of $assetId")
 
@@ -405,7 +398,7 @@ object AndroidQDBUtils : IDBUtils {
         }
         val count = cr.update(allUri, contentValues, idSelection, arrayOf(assetId))
         if (count > 0) {
-            return getAssetEntity(context, assetId)
+            return getAssetEntity(context, assetId) ?: throwIdNotFound(assetId)
         }
         throwMsg("Cannot update $assetId relativePath")
     }
@@ -436,7 +429,7 @@ object AndroidQDBUtils : IDBUtils {
                 ).map { it.toString() }
                     .toTypedArray(),
                 null
-            ) ?: return false
+            )
             cursor.use {
                 var count = 0
                 while (it.moveToNext()) {
@@ -485,7 +478,7 @@ object AndroidQDBUtils : IDBUtils {
             "$BUCKET_ID = ?",
             arrayOf(galleryId),
             null
-        ) ?: return null
+        )
         cursor.use {
             if (!cursor.moveToNext()) {
                 return null
@@ -502,7 +495,7 @@ object AndroidQDBUtils : IDBUtils {
             "$_ID = ?",
             arrayOf(assetId),
             null
-        ) ?: return null
+        )
         cursor.use {
             if (!cursor.moveToNext()) {
                 return null
