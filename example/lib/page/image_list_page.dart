@@ -164,10 +164,15 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               child: const Text('Get file'),
               onPressed: () => getFile(entity),
             ),
-            if (entity.type == AssetType.video || entity.isLivePhoto)
+            if (entity.isLivePhoto)
               ElevatedButton(
                 child: const Text('Get MP4 file'),
                 onPressed: () => getFileWithMP4(entity),
+              ),
+            if (entity.isLivePhoto)
+              ElevatedButton(
+                child: const Text('Get Live Photo duration'),
+                onPressed: () => getDurationOfLivePhoto(entity),
               ),
             ElevatedButton(
               child: const Text('Show detail page'),
@@ -264,6 +269,11 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
       darwinFileType: PMDarwinAVFileType.mp4,
     );
     print(file);
+  }
+
+  Future<void> getDurationOfLivePhoto(AssetEntity entity) async {
+    final duration = await entity.durationWithOptions(withSubtype: true);
+    print(duration);
   }
 
   Future<void> routeToDetailPage(AssetEntity entity) async {
