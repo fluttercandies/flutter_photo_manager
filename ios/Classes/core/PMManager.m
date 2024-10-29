@@ -33,6 +33,12 @@
     return __cachingManager;
 }
 
+- (PHFetchOptions *)singleFetchOptions {
+    PHFetchOptions *options = [PHFetchOptions new];
+    options.fetchLimit = 1;
+    return options;
+}
+
 - (NSArray<PMAssetPathEntity *> *)getAssetPathList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(NSObject <PMBaseFilter> *)option pathFilterOption:(PMPathFilterOption *)pathFilterOption {
     NSMutableArray<PMAssetPathEntity *> *array = [NSMutableArray new];
     PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:option];
@@ -147,9 +153,8 @@
 }
 
 - (BOOL)existsWithId:(NSString *)assetId {
-    PHFetchResult<PHAsset *> *result =
-    [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[PHFetchOptions new]];
-    return result && result.count > 0;
+    PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    return result && result.count == 1;
 }
 
 - (BOOL)entityIsLocallyAvailable:(NSString *)assetId
@@ -157,7 +162,7 @@
                         isOrigin:(BOOL)isOrigin
                          subtype:(int)subtype
                         fileType:(AVFileType)fileType {
-    PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[PHFetchOptions new]];
+    PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
     if (!result) {
         return NO;
     }
@@ -403,13 +408,11 @@
             return entity;
         }
     }
-    PHFetchResult<PHAsset *> *result =
-    [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil];
-    if (result == nil || result.count == 0) {
+    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
+    if (!asset) {
         return nil;
     }
-    
-    PHAsset *asset = result[0];
     entity = [self convertPHAssetToAssetEntity:asset needTitle:NO];
     [cacheContainer putAssetEntity:entity];
     return entity;
@@ -895,7 +898,7 @@
     if (resource) {
         filename = resource.originalFilename;
     } else {
-        filename = [asset valueForKey:@"filename"];
+        filename = [asset title];
     }
     filename = [NSString stringWithFormat:@"%@_%@%@_%@",
                 id, modifiedDate, isOrigin ? @"_o" : @"", filename];
@@ -1139,9 +1142,9 @@
 - (void)deleteWithIds:(NSArray<NSString *> *)ids changedBlock:(ChangeIds)block {
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
-        PHFetchResult<PHAsset *> *result =
-        [PHAsset fetchAssetsWithLocalIdentifiers:ids
-                                         options:[PHFetchOptions new]];
+        PHFetchOptions *options = [PHFetchOptions new];
+        options.fetchLimit = ids.count;
+        PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:ids options:options];
         [PHAssetChangeRequest deleteAssets:result];
     }
      completionHandler:^(BOOL success, NSError *error) {
@@ -1323,7 +1326,8 @@
                                subtype:(int)subtype
                               isOrigin:(BOOL)isOrigin
                               fileType:(AVFileType)fileType {
-    PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
+    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (asset) {
         return [asset filenameWithOptions:subtype isOrigin:isOrigin fileType:fileType];
     }
@@ -1331,7 +1335,7 @@
 }
 
 - (NSString *)getMimeTypeAsyncWithAssetId:(NSString *)assetId {
-    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil];
+    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (asset) {
         return [asset mimeType];
@@ -1342,7 +1346,7 @@
 - (void)getMediaUrl:(NSString *)assetId
       resultHandler:(NSObject <PMResultHandler> *)handler
     progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
+    PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]].firstObject;
     
     if (@available(iOS 9.1, *)) {
         if ((asset.mediaSubtypes & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
@@ -1463,20 +1467,17 @@
         return;
     }
     
-    __block PHFetchResult<PHAsset *> *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:nil];
+    __block PHFetchResult<PHAsset *> *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:[self singleFetchOptions]];
     NSError *error;
-    
     [PHPhotoLibrary.sharedPhotoLibrary performChangesAndWait:^{
         PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
         [request addAssets:asset];
     } error:&error];
-    
     if (error) {
         block(nil, error);
-        return;
+    } else {
+        block(assetEntity, nil);
     }
-    
-    block(assetEntity, nil);
 }
 
 - (void)createFolderWithName:(NSString *)name parentId:(NSString *)id block:(void (^)(NSString *newId, NSObject *error))block {
@@ -1579,7 +1580,7 @@
     }
 }
 
-- (void)removeInAlbumWithAssetId:(NSArray *)id albumId:(NSString *)albumId block:(void (^)(NSObject *error))block {
+- (void)removeInAlbumWithAssetId:(NSArray *)ids albumId:(NSString *)albumId block:(void (^)(NSObject *error))block {
     PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[albumId] options:nil];
     PHAssetCollection *collection;
     if (result && result.count > 0) {
@@ -1594,7 +1595,9 @@
         return;
     }
     
-    PHFetchResult<PHAsset *> *assetResult = [PHAsset fetchAssetsWithLocalIdentifiers:id options:nil];
+    PHFetchOptions *options = [PHFetchOptions new];
+    options.fetchLimit = ids.count;
+    PHFetchResult<PHAsset *> *assetResult = [PHAsset fetchAssetsWithLocalIdentifiers:ids options:options];
     NSError *error;
     [PHPhotoLibrary.sharedPhotoLibrary
      performChangesAndWait:^{
@@ -1664,7 +1667,7 @@
 }
 
 - (void)favoriteWithId:(NSString *)id favorite:(BOOL)favorite block:(void (^)(BOOL result, NSObject *error))block {
-    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:nil];
+    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:[self singleFetchOptions]];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (!asset) {
         block(NO, [NSString stringWithFormat:@"Asset %@ not found.", id]);
@@ -1726,19 +1729,24 @@
 
 #pragma mark cache thumb
 
-- (void)requestCacheAssetsThumb:(NSArray *)identifiers option:(PMThumbLoadOption *)option {
-    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:identifiers options:nil];
+- (void)requestCacheAssetsThumb:(NSArray *)ids option:(PMThumbLoadOption *)option {
+    PHFetchOptions *fetchOptions = [PHFetchOptions new];
+    fetchOptions.fetchLimit = ids.count;
+    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:ids options:fetchOptions];
     NSMutableArray *array = [NSMutableArray new];
     
     for (id asset in fetchResult) {
         [array addObject:asset];
     }
     
-    PHImageRequestOptions *options = [PHImageRequestOptions new];
-    options.resizeMode = options.resizeMode;
-    options.deliveryMode = option.deliveryMode;
+    PHImageRequestOptions *requestOptions = [PHImageRequestOptions new];
+    requestOptions.resizeMode = option.resizeMode;
+    requestOptions.deliveryMode = option.deliveryMode;
     
-    [self.cachingManager startCachingImagesForAssets:array targetSize:[option makeSize] contentMode:option.contentMode options:options];
+    [self.cachingManager startCachingImagesForAssets:array
+                                          targetSize:[option makeSize]
+                                         contentMode:option.contentMode
+                                             options:requestOptions];
 }
 
 - (void)cancelCacheRequests {
