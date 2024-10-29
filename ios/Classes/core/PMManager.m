@@ -1281,6 +1281,44 @@
     }];
 }
 
+- (void)getDurationWithOptions:(NSString *)assetId
+                       subtype:(int)subtype
+                 resultHandler:(NSObject<PMResultHandler> *)handler {
+    PMAssetEntity *entity = [self getAssetEntity:assetId];
+    if (!entity) {
+        [handler replyError:@"Not exists."];
+        return;
+    }
+    PHAsset *asset = entity.phAsset;
+    if (!asset) {
+        [handler replyError:@"Not exists."];
+        return;
+    }
+    
+    if (asset.isLivePhoto) {
+        PHContentEditingInputRequestOptions *options = [PHContentEditingInputRequestOptions new];
+        options.networkAccessAllowed = YES;
+        [asset requestContentEditingInputWithOptions:options completionHandler:^(PHContentEditingInput * _Nullable contentEditingInput, NSDictionary * _Nonnull info) {
+            if (!contentEditingInput) {
+                [handler replyError:@"Failed to obtain the content request."];
+                return;
+            }
+            PHLivePhotoEditingContext *context = [[PHLivePhotoEditingContext alloc] initWithLivePhotoEditingInput:contentEditingInput];
+            if (!context) {
+                [handler replyError:@"Failed to obtain the Live Photo's context."];
+                return;
+            }
+            NSTimeInterval time = CMTimeGetSeconds(context.duration);
+            [handler reply:@(time)];
+        }];
+        return;
+    }
+    
+    [handler reply:@(entity.duration)];
+    return;
+}
+
+
 - (NSString *)getTitleAsyncWithAssetId:(NSString *)assetId
                                subtype:(int)subtype
                               isOrigin:(BOOL)isOrigin

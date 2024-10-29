@@ -88,6 +88,10 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
                          subtype:(int)subtype
                         fileType:(AVFileType)fileType;
 
+- (void)getDurationWithOptions:(NSString *)assetId
+                       subtype:(int)subtype
+                 resultHandler:(NSObject <PMResultHandler> *)handler;
+
 - (NSString*)getTitleAsyncWithAssetId:(NSString *)assetId
                               subtype:(int)subtype
                              isOrigin:(BOOL)isOrigin
