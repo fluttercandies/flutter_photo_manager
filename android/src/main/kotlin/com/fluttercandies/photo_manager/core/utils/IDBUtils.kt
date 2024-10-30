@@ -452,6 +452,18 @@ interface IDBUtils {
                 if (relativePath.isNotBlank()) {
                     put(RELATIVE_PATH, relativePath)
                 }
+            } else {
+                val albumDir = File(
+                    Environment.getExternalStorageDirectory().path,
+                    Environment.DIRECTORY_MOVIES
+                )
+                // Check if the directory exist.
+                File(albumDir, title).path.checkDirs()
+                // Using a duplicate file name that already exists on the device will cause
+                // inserts to fail on Android API 29-.
+                val basename = System.currentTimeMillis().toString()
+                val newFilePath = File(albumDir, "$basename.${file.extension}").absolutePath
+                put(DATA, newFilePath)
             }
             if (latLong != null) {
                 put(MediaStore.Video.VideoColumns.LATITUDE, latLong.first())

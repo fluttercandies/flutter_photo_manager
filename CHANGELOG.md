@@ -19,6 +19,8 @@ To know more about breaking changes, see the [Migration Guide][].
 ### Fixes
 
 - Do not use `privateFileURL` on iOS 18+.
+- Fixes saving MP4 videos will result in 3GP on Android API 30-.
+- Fixes nullable result returned when saving images and videos on Android.
 
 ## 3.5.2
 

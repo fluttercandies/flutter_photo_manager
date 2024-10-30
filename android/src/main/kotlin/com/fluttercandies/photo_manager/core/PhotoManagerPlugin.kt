@@ -493,7 +493,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(map)
                 } catch (e: Exception) {
                     LogUtils.error("save image error", e)
-                    resultHandler.reply(null)
+                    resultHandler.replyError(call.method, message = null, obj = e)
                 }
             }
 
@@ -515,7 +515,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(map)
                 } catch (e: Exception) {
                     LogUtils.error("save image error", e)
-                    resultHandler.reply(null)
+                    resultHandler.replyError(call.method, message = null, obj = e)
                 }
             }
 
@@ -537,7 +537,7 @@ class PhotoManagerPlugin(
                     resultHandler.reply(map)
                 } catch (e: Exception) {
                     LogUtils.error("save video error", e)
-                    resultHandler.reply(null)
+                    resultHandler.replyError(call.method, message = null, obj = e)
                 }
             }
 
