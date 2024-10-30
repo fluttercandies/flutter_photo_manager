@@ -632,6 +632,23 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return ConvertUtils.convertToAssetList(result.cast());
   }
 
+  Future<int> getDurationWithOptions(String id, {int? subtype}) async {
+    if (Platform.isIOS || Platform.isMacOS) {
+      if (subtype != null) {
+        final result = await _channel.invokeMethod(
+          PMConstants.mGetDurationWithOptions,
+          <String, dynamic>{
+            'id': id,
+            'subtype': subtype,
+          },
+        );
+        return result as int;
+      }
+    }
+    final entity = await AssetEntity.fromId(id);
+    return entity!.duration;
+  }
+
   Future<bool> isLocallyAvailable(
     String id, {
     bool isOrigin = false,

@@ -34,6 +34,9 @@
     if (@available(iOS 9.1, *)) {
         return (self.mediaSubtypes & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive;
     }
+    if (@available(macOS 14.0, *)) {
+        return (self.mediaSubtypes & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive;
+    }
     return NO;
 }
 

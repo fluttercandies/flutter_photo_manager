@@ -522,6 +522,10 @@
                                                 subtype:subtype
                                                fileType:fileType];
         [handler reply:@(exists)];
+    } else if ([call.method isEqualToString:@"getDurationWithOptions"]) {
+        NSString *assetId = call.arguments[@"id"];
+        int subtype = [call.arguments[@"subtype"] intValue];
+        [manager getDurationWithOptions:assetId subtype:subtype resultHandler:handler];
     } else if ([call.method isEqualToString:@"getTitleAsync"]) {
         NSString *assetId = call.arguments[@"id"];
         int subtype = [call.arguments[@"subtype"] intValue];
