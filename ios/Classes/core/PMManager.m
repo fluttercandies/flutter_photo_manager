@@ -1350,6 +1350,11 @@
     
     if (@available(iOS 9.1, *)) {
         if ((asset.mediaSubtypes & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
+            // https://github.com/fluttercandies/flutter_photo_manager/issues/1196
+            if (@available(iOS 18.0, *)) {
+                [self fetchLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:YES fileType:nil];
+                return;
+            }
             PHAssetResource *resource = [asset getLivePhotosResource];
             NSURL *url = [resource valueForKey:@"privateFileURL"];
             if (url) {
