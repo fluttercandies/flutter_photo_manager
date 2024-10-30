@@ -460,7 +460,7 @@ interface IDBUtils {
                 // Check if the directory exist.
                 File(albumDir, title).path.checkDirs()
                 // Using a duplicate file name that already exists on the device will cause
-                // inserts to fail on Android API 30-.
+                // inserts to fail on Android API 29-.
                 val basename = System.currentTimeMillis().toString()
                 val newFilePath = File(albumDir, "$basename.${file.extension}").absolutePath
                 put(DATA, newFilePath)
