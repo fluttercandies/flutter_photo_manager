@@ -54,6 +54,7 @@ class PMConstants {
   static const String mCancelCacheRequests = 'cancelCacheRequests';
   static const String mRequestCacheAssetsThumb = 'requestCacheAssetsThumb';
   static const String mIsLocallyAvailable = 'isLocallyAvailable';
+  static const String mGetDurationWithOptions = 'getDurationWithOptions';
   static const String mCreateAlbum = 'createAlbum';
   static const String mCreateFolder = 'createFolder';
   static const String mRemoveInAlbum = 'removeInAlbum';

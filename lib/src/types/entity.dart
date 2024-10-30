@@ -435,6 +435,16 @@ class AssetEntity {
   ///  * [videoDuration] which is a duration getter for videos.
   final int duration;
 
+  /// Obtain the duration with the given options.
+  ///
+  /// [withSubtype] only works on iOS/macOS.
+  Future<int> durationWithOptions({bool withSubtype = false}) async {
+    if (withSubtype) {
+      return plugin.getDurationWithOptions(id, subtype: subtype);
+    }
+    return duration;
+  }
+
   /// The width of the asset.
   ///
   /// This field could be 0 in cases that EXIF info is failed to parse.
