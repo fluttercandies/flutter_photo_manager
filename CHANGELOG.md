@@ -16,6 +16,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 - Improves the options when fetching fixed number of assets on iOS and macOS.
 
+### Fixes
+
+- Do not use `privateFileURL` on iOS 18+.
+
 ## 3.5.2
 
 ### Improvements
