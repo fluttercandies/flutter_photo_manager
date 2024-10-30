@@ -8,7 +8,13 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+### Features
+
+- Allows to get the duration of a Live Photo with `AssetEntity.durationWithOptions` on iOS and macOS.
+
+### Improvements
+
+- Improves the options when fetching fixed number of assets on iOS and macOS.
 
 ## 3.5.2
 

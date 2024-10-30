@@ -88,6 +88,10 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
                          subtype:(int)subtype
                         fileType:(AVFileType)fileType;
 
+- (void)getDurationWithOptions:(NSString *)assetId
+                       subtype:(int)subtype
+                 resultHandler:(NSObject <PMResultHandler> *)handler;
+
 - (NSString*)getTitleAsyncWithAssetId:(NSString *)assetId
                               subtype:(int)subtype
                              isOrigin:(BOOL)isOrigin
@@ -101,13 +105,13 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 - (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(NSObject<PMBaseFilter> *)option;
 
-- (void)copyAssetWithId:(NSString *)id toGallery:(NSString *)gallery block:(void (^)(PMAssetEntity *entity, NSObject *msg))block;
+- (void)copyAssetWithId:(NSString *)id toGallery:(NSString *)gallery block:(AssetBlockResult)block;
 
 - (void)createFolderWithName:(NSString *)name parentId:(NSString *)id block:(void (^)(NSString *newId, NSObject *error))block;
 
 - (void)createAlbumWithName:(NSString *)name parentId:(NSString *)id block:(void (^)(NSString *newId, NSObject *error))block;
 
-- (void)removeInAlbumWithAssetId:(NSArray *)id albumId:(NSString *)albumId block:(void (^)(NSObject *error))block;
+- (void)removeInAlbumWithAssetId:(NSArray *)ids albumId:(NSString *)albumId block:(void (^)(NSObject *error))block;
 
 - (void)removeCollectionWithId:(NSString *)id type:(int)type block:(void (^)(NSObject *))block;
 
@@ -115,7 +119,7 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 - (void)clearFileCache;
 
-- (void)requestCacheAssetsThumb:(NSArray *)identifiers option:(PMThumbLoadOption *)option;
+- (void)requestCacheAssetsThumb:(NSArray *)ids option:(PMThumbLoadOption *)option;
 
 - (void)cancelCacheRequests;
 
