@@ -8,6 +8,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+*None.*
+
+## 3.6.0
+
 ### Features
 
 - Allows to get the duration of a Live Photo with `AssetEntity.durationWithOptions` on iOS and macOS.
