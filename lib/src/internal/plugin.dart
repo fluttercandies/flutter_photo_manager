@@ -183,7 +183,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return result;
   }
 
-  /// Use pagination to get album content.
+  /// Obtain assets with the pagination.
+  ///
+  /// The length of returned assets might be less than requested.
+  /// Not existing assets will be excluded from the result.
   Future<List<AssetEntity>> getAssetListPaged(
     String id, {
     required PMFilter optionGroup,
@@ -204,7 +207,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return ConvertUtils.convertToAssetList(result.cast());
   }
 
-  /// Asset in the specified range.
+  /// Obtain assets in the specified range.
+  ///
+  /// The length of returned assets might be less than requested.
+  /// Not existing assets will be excluded from the result.
   Future<List<AssetEntity>> getAssetListRange(
     String id, {
     required RequestType type,
