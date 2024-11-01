@@ -1,0 +1,37 @@
+# For more information, see
+# https://github.com/fluttercandies/triage_bot_for_flutter_photo_manager
+name: Issue Triage Bot
+
+# Run when an issue is created.
+on:
+  issues:
+    types:
+      - opened
+
+# All permissions not specified are set to 'none'.
+permissions:
+  issues: write
+
+jobs:
+  triage-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: fluttercandies/triage_bot_for_flutter_photo_manager
+      - uses: dart-lang/setup-dart@v1
+      - run: dart pub get
+        working-directory: pkgs/issue_triage_bot
+
+      # Delay 2 minutes to allow a grace period between opening or transferring
+      # an issue and assigning a label.
+      - name: sleep 2m
+        run: sleep 120
+
+      - name: triage issue
+        working-directory: pkgs/issue_triage_bot
+        env:
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          GITHUB_TOKEN: ${{ secrets.TRIAGE_BOT_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.TRIAGE_BOT_API_KEY }}
+        run: dart bin/triage.dart $ISSUE_URL --release
