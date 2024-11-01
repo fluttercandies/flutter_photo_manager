@@ -169,11 +169,18 @@ interface IDBUtils {
         return getDouble(getColumnIndex(columnName))
     }
 
-    fun Cursor.toAssetEntity(context: Context, checkIfExists: Boolean = true): AssetEntity {
+    fun Cursor.toAssetEntity(
+        context: Context,
+        checkIfExists: Boolean = true,
+        throwIfNotExists: Boolean = true,
+    ): AssetEntity? {
         val id = getLong(_ID)
         val path = getString(DATA)
         if (checkIfExists && path.isNotBlank() && !File(path).exists()) {
-            throwMsg("Asset ($id) does not exists at its path ($path).")
+            if (throwIfNotExists) {
+                throwMsg("Asset ($id) does not exists at its path ($path).")
+            }
+            return null
         }
 
         val date = if (isAboveAndroidQ) {
@@ -699,7 +706,7 @@ interface IDBUtils {
             val result = ArrayList<AssetEntity>()
             it.moveToPosition(start - 1)
             while (it.moveToNext()) {
-                val asset = it.toAssetEntity(context, false)
+                val asset = it.toAssetEntity(context, false) ?: continue
                 result.add(asset)
                 if (result.count() == end - start) {
                     break

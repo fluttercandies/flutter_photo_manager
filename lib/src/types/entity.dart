@@ -188,6 +188,9 @@ class AssetPathEntity {
   ///
   /// [page] should starts with and greater than 0.
   /// [size] is item count of current [page].
+  ///
+  /// The length of returned assets might be less than requested.
+  /// Not existing assets will be excluded from the result.
   Future<List<AssetEntity>> getAssetListPaged({
     required int page,
     required int size,
@@ -206,8 +209,11 @@ class AssetPathEntity {
   /// Getting assets in range using [start] and [end].
   ///
   /// The [start] and [end] are similar to [String.substring], but it'll return
-  /// the maxmium assets if the total count of assets is fewer than the range,
+  /// the maximum assets if the total count of assets is fewer than the range,
   /// instead of throwing a [RangeError] like [String.substring].
+  ///
+  /// The length of returned assets might be less than requested.
+  /// Not existing assets will be excluded from the result.
   Future<List<AssetEntity>> getAssetListRange({
     required int start,
     required int end,

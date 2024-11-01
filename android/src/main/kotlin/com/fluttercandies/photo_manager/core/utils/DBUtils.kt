@@ -160,7 +160,7 @@ object DBUtils : IDBUtils {
         )
         cursor.use {
             while (it.moveToNext()) {
-                it.toAssetEntity(context).apply {
+                it.toAssetEntity(context, throwIfNotExists = false)?.apply {
                     list.add(this)
                 }
             }
@@ -201,7 +201,7 @@ object DBUtils : IDBUtils {
         )
         cursor.use {
             while (it.moveToNext()) {
-                it.toAssetEntity(context).apply {
+                it.toAssetEntity(context, throwIfNotExists = false)?.apply {
                     list.add(this)
                 }
             }

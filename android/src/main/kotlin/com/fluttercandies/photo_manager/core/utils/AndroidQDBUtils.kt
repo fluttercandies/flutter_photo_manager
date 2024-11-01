@@ -163,7 +163,7 @@ object AndroidQDBUtils : IDBUtils {
         )
         cursor.use {
             cursorWithRange(it, page * size, size) { cursor ->
-                cursor.toAssetEntity(context).apply {
+                cursor.toAssetEntity(context, throwIfNotExists = false)?.apply {
                     list.add(this)
                 }
             }
@@ -203,7 +203,7 @@ object AndroidQDBUtils : IDBUtils {
         )
         cursor.use {
             cursorWithRange(it, start, pageSize) { cursor ->
-                cursor.toAssetEntity(context).apply {
+                cursor.toAssetEntity(context, throwIfNotExists = false)?.apply {
                     list.add(this)
                 }
             }

@@ -10,6 +10,12 @@ To know more about breaking changes, see the [Migration Guide][].
 
 *None.*
 
+## 3.6.1
+
+### Fixes
+
+- Do not throw when querying not existing assets in bulk on Android.
+
 ## 3.6.0
 
 ### Features
