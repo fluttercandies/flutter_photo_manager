@@ -13,7 +13,6 @@ import com.fluttercandies.photo_manager.util.ResultHandler
 
 @RequiresApi(34)
 class PermissionDelegate34 : PermissionDelegate() {
-
     companion object {
         private const val mediaVideo = Manifest.permission.READ_MEDIA_VIDEO
         private const val mediaImage = Manifest.permission.READ_MEDIA_IMAGES
@@ -32,55 +31,39 @@ class PermissionDelegate34 : PermissionDelegate() {
         requestType: Int,
         mediaLocation: Boolean
     ) {
-        if (havePermissions(context, requestType) && (!mediaLocation || haveMediaLocation(context))) {
+        if (havePermissions(
+                context,
+                requestType
+            ) && (!mediaLocation || haveMediaLocation(context))
+        ) {
             permissionsUtils.permissionsListener?.onGranted(mutableListOf())
             return
         }
 
-        LogUtils.info("requestPermission")
-        var havePermission = true
+        val permissions = mutableListOf<String>()
 
         val containsImage = RequestTypeUtils.containsImage(requestType)
         val containsVideo = RequestTypeUtils.containsVideo(requestType)
         val containsAudio = RequestTypeUtils.containsAudio(requestType)
 
-        val requiredPermissions = mutableListOf<String>()
-
-        if (containsVideo || containsImage) {
-            requiredPermissions.add(mediaVisualUserSelected)
-            // check have media visual user selected permission, the permission does not need to be defined in the manifest.
-            val haveMediaVisualUserSelected =
-                havePermissionForUser(context, mediaVisualUserSelected)
-
-            havePermission = haveMediaVisualUserSelected
+        if (containsImage || containsVideo) {
+            permissions.add(mediaImage)
+            permissions.add(mediaVideo)
+            permissions.add(mediaVisualUserSelected)
 
             if (mediaLocation) {
-                requiredPermissions.add(mediaLocationPermission)
-                havePermission = havePermission && havePermission(context, mediaLocationPermission)
+                permissions.add(mediaLocationPermission)
             }
-
-            if (containsVideo) {
-                requiredPermissions.add(mediaVideo)
-            }
-
-            if (containsImage) {
-                requiredPermissions.add(mediaImage)
-            }
-
         }
 
         if (containsAudio) {
-            requiredPermissions.add(mediaAudio)
-            havePermission = havePermission && havePermission(context, mediaAudio)
+            permissions.add(mediaAudio)
         }
 
-        LogUtils.info("Current permissions: $requiredPermissions")
-        LogUtils.info("havePermission: $havePermission")
-
-        if (havePermission) {
-            permissionsUtils.permissionsListener?.onGranted(requiredPermissions)
+        if (havePermissions(context, *permissions.toTypedArray())) {
+            permissionsUtils.permissionsListener?.onGranted(permissions)
         } else {
-            requestPermission(permissionsUtils, requiredPermissions)
+            requestPermission(permissionsUtils, permissions)
         }
     }
 
@@ -89,17 +72,20 @@ class PermissionDelegate34 : PermissionDelegate() {
         val containsVideo = RequestTypeUtils.containsVideo(requestType)
         val containsAudio = RequestTypeUtils.containsAudio(requestType)
 
-        var result = true
+        var granted = true
 
-        if (containsVideo || containsImage) {
-            result = result && havePermission(context, mediaVisualUserSelected)
+        if (containsImage || containsVideo) {
+            var hasPermission = havePermission(context, mediaImage)
+            hasPermission = hasPermission || havePermission(context, mediaVideo)
+            hasPermission = hasPermission || havePermission(context, mediaVisualUserSelected)
+            granted = granted && hasPermission
         }
 
         if (containsAudio) {
-            result = result && havePermission(context, mediaAudio)
+            granted = granted && havePermission(context, mediaAudio)
         }
 
-        return result
+        return granted
     }
 
     override fun haveMediaLocation(context: Context): Boolean {
@@ -132,28 +118,27 @@ class PermissionDelegate34 : PermissionDelegate() {
         val needMediaVisualUserSelected =
             needToRequestPermissionsList.contains(mediaVisualUserSelected)
 
-        var result = true
+        var granted = true
 
         if (needImage || needVideo || needMediaVisualUserSelected) {
             val haveVideoOrImagePermission = haveAnyPermissionForUser(
                 context,
                 mediaVisualUserSelected, mediaImage, mediaVideo
             )
-
-            result = haveVideoOrImagePermission
+            granted = haveVideoOrImagePermission
         }
 
         if (needAudio) {
-            result = result && havePermission(context, mediaAudio)
+            granted = granted && havePermission(context, mediaAudio)
         }
 
         if (needMediaLocation) {
-            result = result && havePermissionForUser(context, mediaLocationPermission)
+            granted = granted && havePermissionForUser(context, mediaLocationPermission)
         }
 
         val listener = permissionsUtils.permissionsListener ?: return
 
-        if (result) {
+        if (granted) {
             listener.onGranted(needToRequestPermissionsList)
         } else {
             listener.onDenied(
@@ -172,21 +157,11 @@ class PermissionDelegate34 : PermissionDelegate() {
     ) {
         this.resultHandler = resultHandler
 
-        val containsImage = RequestTypeUtils.containsImage(type)
-        val containsVideo = RequestTypeUtils.containsVideo(type)
-
         val permissions = mutableListOf<String>()
-
-        if (containsVideo || containsImage) {
-            permissions.add(mediaVisualUserSelected)
-        }
-
-        if (containsVideo) {
-            permissions.add(mediaVideo)
-        }
-
-        if (containsImage) {
+        if (RequestTypeUtils.containsImage(type) || RequestTypeUtils.containsVideo(type)) {
             permissions.add(mediaImage)
+            permissions.add(mediaVideo)
+            permissions.add(mediaVisualUserSelected)
         }
 
         requestPermission(permissionsUtils, permissions, limitedRequestCode)
@@ -219,8 +194,8 @@ class PermissionDelegate34 : PermissionDelegate() {
                 }
 
                 PermissionResult.Limited -> result = PermissionResult.Limited
-                else -> {
-                }
+
+                else -> {}
             }
         }
 

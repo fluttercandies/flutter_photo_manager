@@ -11,7 +11,6 @@ import com.fluttercandies.photo_manager.permission.PermissionsUtils
 
 @RequiresApi(33)
 class PermissionDelegate33 : PermissionDelegate() {
-
     companion object {
         private const val mediaVideo = Manifest.permission.READ_MEDIA_VIDEO
         private const val mediaImage = Manifest.permission.READ_MEDIA_IMAGES
@@ -26,24 +25,19 @@ class PermissionDelegate33 : PermissionDelegate() {
         requestType: Int,
         mediaLocation: Boolean
     ) {
-        val containsVideo = RequestTypeUtils.containsVideo(requestType)
-        val containsImage = RequestTypeUtils.containsImage(requestType)
-        val containsAudio = RequestTypeUtils.containsAudio(requestType)
-
         val permissions = mutableListOf<String>()
 
-        if (containsVideo) {
+        val containsImage = RequestTypeUtils.containsImage(requestType)
+        val containsVideo = RequestTypeUtils.containsVideo(requestType)
+        val containsAudio = RequestTypeUtils.containsAudio(requestType)
+
+        if (containsImage || containsVideo) {
+            permissions.add(mediaImage)
             permissions.add(mediaVideo)
         }
-
-        if (containsImage) {
-            permissions.add(mediaImage)
-        }
-
         if (containsAudio) {
             permissions.add(mediaAudio)
         }
-
         if (mediaLocation) {
             permissions.add(mediaLocationPermission)
         }
@@ -60,21 +54,19 @@ class PermissionDelegate33 : PermissionDelegate() {
         val containsImage = RequestTypeUtils.containsImage(requestType)
         val containsAudio = RequestTypeUtils.containsAudio(requestType)
 
-        var result = true
-
-        if (containsVideo) {
-            result = result && havePermission(context, mediaVideo)
-        }
+        var granted = true
 
         if (containsImage) {
-            result = result && havePermission(context, mediaImage)
+            granted = granted && havePermission(context, mediaImage)
         }
-
+        if (containsVideo) {
+            granted = granted && havePermission(context, mediaVideo)
+        }
         if (containsAudio) {
-            result = result && havePermission(context, mediaAudio)
+            granted = granted && havePermission(context, mediaAudio)
         }
 
-        return result
+        return granted
     }
 
     override fun haveMediaLocation(context: Context): Boolean {
