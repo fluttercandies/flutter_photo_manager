@@ -8,7 +8,9 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+### Fixes
+
+- Fix request permissions for images and videos on Android API 33+.
 
 ## 3.6.1
 
