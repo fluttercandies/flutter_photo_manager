@@ -866,10 +866,12 @@ When running on Android 13 (API level 33),
 the following permissions needs to be added to the manifest
 even if your `targetSdkVersion` and `compileSdkVersion` is not `33`:
 
+> Note: `READ_MEDIA_IMAGES` and `READ_MEDIA_VIDEO` are both required whether requesting images or videos.
+
 ```xml
 <manifest>
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" /> <!-- If you want to read images-->
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" /> <!-- If you want to read videos-->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" /> <!-- If you want to read images or videos-->
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" /> <!-- If you want to read videos or images-->
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" /> <!-- If you want to read audio-->
 </manifest>
 ```

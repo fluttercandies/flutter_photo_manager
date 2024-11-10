@@ -3,9 +3,10 @@ package com.fluttercandies.photo_manager.permission.impl
 import android.app.Application
 import android.content.Context
 import com.fluttercandies.photo_manager.core.entity.PermissionResult
+import com.fluttercandies.photo_manager.permission.PermissionDelegate
 import com.fluttercandies.photo_manager.permission.PermissionsUtils
 
-class PermissionDelegate19 : com.fluttercandies.photo_manager.permission.PermissionDelegate() {
+class PermissionDelegate19 : PermissionDelegate() {
     override fun requestPermission(
         permissionsUtils: PermissionsUtils,
         context: Context,

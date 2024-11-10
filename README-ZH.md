@@ -806,10 +806,12 @@ rootProject.allprojects {
 就算你的 `targetSdkVersion` 和 `compileSdkVersion` 不是 `33`，
 你也需要在清单文件中添加以下权限配置：
 
+> 注意：`READ_MEDIA_IMAGES` 和 `READ_MEDIA_VIDEO` 无论在请求图片还是请求视频时都需要。
+
 ```xml
 <manifest>
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" /> <!-- 如果需要读取图片 -->
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" /> <!-- 如果需要读取视频 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" /> <!-- 如果需要读取图片或视频 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" /> <!-- 如果需要读取视频或图片 -->
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" /> <!-- 如果需要读取音频 -->
 </manifest>
 ```

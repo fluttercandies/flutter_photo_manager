@@ -5,11 +5,11 @@ import android.app.Application
 import android.content.Context
 import androidx.annotation.RequiresApi
 import com.fluttercandies.photo_manager.core.entity.PermissionResult
+import com.fluttercandies.photo_manager.permission.PermissionDelegate
 import com.fluttercandies.photo_manager.permission.PermissionsUtils
 
 @RequiresApi(23)
-open class PermissionDelegate23 : com.fluttercandies.photo_manager.permission.PermissionDelegate() {
-
+class PermissionDelegate23 : PermissionDelegate() {
     companion object {
         private const val readPermission = Manifest.permission.READ_EXTERNAL_STORAGE
         private const val writePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE
