@@ -30,6 +30,7 @@ class PMConstants {
   static const String mReleaseMemoryCache = 'releaseMemoryCache';
   static const String mLog = 'log';
   static const String mOpenSetting = 'openSetting';
+  static const String mOpenUrl = 'openUrl';
   static const String mNotify = 'notify';
   static const String mForceOldApi = 'forceOldApi';
   static const String mDeleteWithIds = 'deleteWithIds';

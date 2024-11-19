@@ -299,6 +299,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return _channel.invokeMethod(PMConstants.mOpenSetting);
   }
 
+  Future<void> openUrl(int issueNumber) {
+    return _channel.invokeMethod(PMConstants.mOpenUrl, issueNumber);
+  }
+
   Future<Map?> fetchEntityProperties(String id) {
     return _channel.invokeMethod(
       PMConstants.mFetchEntityProperties,
