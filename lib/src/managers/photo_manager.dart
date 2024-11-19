@@ -158,11 +158,6 @@ class PhotoManager {
   /// Open the system settings page of the current app.
   static Future<void> openSetting() => plugin.openSetting();
 
-  /// Open the preset path of the current application in the system browser
-  static Future<void> openUrl(int issueNumber) {
-    return plugin.openUrl(issueNumber);
-  }
-
   /// Release native caches, there are no common use case for this method,
   /// so this method is not recommended.
   ///

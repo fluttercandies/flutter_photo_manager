@@ -6,7 +6,7 @@ import { Permissions, abilityAccessCtrl, Want, PermissionRequestResult } from '@
 
 export class PermissionHandler extends HandlerBase implements MethodCallHandlerBase {
   private static ignoreCheck: boolean = false;
-  private static number: number | null = null;
+
   async onMethodCall(call: MethodCall, result: MethodResult): Promise<boolean> {
     if (this.context == null || this.uiContext == null) {
       result.error('100', 'context and uiContext are null', 'They should not be null');
@@ -27,19 +27,6 @@ export class PermissionHandler extends HandlerBase implements MethodCallHandlerB
         result.success(true);
       }
         break;
-      case 'openUrl': {
-        PermissionHandler.number = call.args;
-        let applicationInfo = this.context!.applicationInfo;
-        let wantInfo: Want = {
-          action: 'ohos.want.action.viewData',
-          entities: ['entity.system.browsable'],
-          uri: `https://github.com/fluttercandies/flutter_photo_manager/issues/${PermissionHandler.number}`,
-          parameters: { pushParams: applicationInfo.name },
-        }
-        await this.uiContext!.startAbility(wantInfo);
-        result.success(true);
-      }
-        break;
       case 'requestPermissionExtend': {
         let args: Map<string, ESObject> = call.args;
         let ohosPermissions: Array<Permissions> = args.get('ohosPermissions');
@@ -48,7 +35,8 @@ export class PermissionHandler extends HandlerBase implements MethodCallHandlerB
           let granted = await PermissionHandler.permissionCheck(ohosPermissions);
           if (granted) {
             result.success(3);
-          } else {
+          }
+          else {
             result.success(2);
           }
         } else {
@@ -77,8 +65,7 @@ export class PermissionHandler extends HandlerBase implements MethodCallHandlerB
     return PermissionHandler.permissionCheck(['ohos.permission.WRITE_IMAGEVIDEO']);
   }
 
-  static async permissionCheck(permissions: Array<Permissions> = ['ohos.permission.READ_IMAGEVIDEO',
-    'ohos.permission.WRITE_IMAGEVIDEO']): Promise<boolean> {
+  static async permissionCheck(permissions: Array<Permissions> = ['ohos.permission.READ_IMAGEVIDEO', 'ohos.permission.WRITE_IMAGEVIDEO']): Promise<boolean> {
     if (permissions.length == 0 || PermissionHandler.ignoreCheck) {
       // result.error('101', 'permissions is empty', 'make sure you pass the permissions');
       return true;
@@ -113,8 +100,7 @@ export class PermissionHandler extends HandlerBase implements MethodCallHandlerB
 
     /// Invalid request.
     /// invalid(2)
-    let data: PermissionRequestResult =
-      await atManager.requestPermissionsFromUser(PhotoManagerPlugin.uiContext!, permissions,);
+    let data: PermissionRequestResult = await atManager.requestPermissionsFromUser(PhotoManagerPlugin.uiContext!, permissions,);
     let grantStatus: Array<number> = data.authResults;
     let length: number = grantStatus.length;
     for (let i = 0; i < length; i++) {

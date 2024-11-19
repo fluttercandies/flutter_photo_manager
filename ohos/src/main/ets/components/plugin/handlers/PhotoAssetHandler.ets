@@ -10,8 +10,6 @@ import { image } from '@kit.ImageKit';
 import fs from '@ohos.file.fs';
 import { FilterOption } from '../filter/FilterOption';
 import { PermissionHandler } from './PermissionHandler';
-import { common } from '@kit.AbilityKit';
-import fileIo from '@ohos.file.fs';
 
 export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerBase {
   async onMethodCall(call: MethodCall, result: MethodResult): Promise<boolean> {
@@ -50,15 +48,9 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
         let photoAsset: photoAccessHelper.PhotoAsset | null = await PhotoAssetHandler.getPhotoAsset(id);
         // this.photoAssets.get(id);
         if (photoAsset != null) {
-          let context = getContext(this) as common.UIAbilityContext;
-          let file: fileIo.File | undefined;
-          file = fileIo.openSync(photoAsset.uri, fileIo.OpenMode.READ_ONLY);
-          let timeStamp = Date.now();
-          fileIo.copyFileSync(file.fd, context.filesDir + `/original-${timeStamp}`);
-          fileIo.closeSync(file);
-          let filePath = context.filesDir + `/original-${timeStamp}`;
-          result.success(filePath);
-        } else {
+          result.success(photoAsset.uri);
+        }
+        else {
           result.error(`${call.method} failed`, `not find asset by ${id}`, null);
         }
       }

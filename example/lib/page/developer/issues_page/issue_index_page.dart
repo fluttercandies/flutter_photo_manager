@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:photo_manager/photo_manager.dart';
-import 'package:photo_manager/platform_utils.dart';
 import 'package:photo_manager_example/widget/nav_column.dart';
 import 'package:photo_manager_example/widget/theme_button.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -160,13 +158,6 @@ mixin IssueBase<T extends StatefulWidget> on State<T> {
   }
 
   Widget _buildOpenButton() {
-    if (PlatformUtils.isOhos) {
-      return IconButton(
-        icon: const Icon(Icons.open_in_new),
-        onPressed: _openUrl,
-        tooltip: 'Copy issue url to clipboard.',
-      );
-    }
     return IconButton(
       icon: const Icon(Icons.open_in_new),
       onPressed: () {
@@ -209,9 +200,5 @@ mixin IssueBase<T extends StatefulWidget> on State<T> {
       appBar: buildAppBar(),
       body: buildBody(children),
     );
-  }
-
-  Future<void> _openUrl() async {
-    await PhotoManager.openUrl(issueNumber);
   }
 }

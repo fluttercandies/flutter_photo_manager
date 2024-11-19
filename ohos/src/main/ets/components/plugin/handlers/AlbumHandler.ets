@@ -156,16 +156,18 @@ export class AlbumHandler extends HandlerBase implements MethodCallHandlerBase {
     if (!(await PermissionHandler.permissionReadCheck())) {
       return [];
     }
+    if (onlyAll) {
+      return [await AlbumHandler.getAllAlbum(RequestType.all)];
+    }
+
     let requestType: RequestType = new RequestType(args.get('type'));
-    if (onlyAll || !(requestType.containsImage() && requestType.containsVideo())) {
-      if (!(requestType.containsImage() && requestType.containsVideo())) {
-        if (requestType.containsImage()) {
-          return [await AlbumHandler.getAllAlbum(RequestType.image)];
-        } else if (requestType.containsVideo()) {
-          return [await AlbumHandler.getAllAlbum(RequestType.video)];
-        }
-      } else {
-        return [await AlbumHandler.getAllAlbum(RequestType.all)];
+
+    if (!(requestType.containsImage() && requestType.containsVideo())) {
+      if (requestType.containsImage()) {
+        return [await AlbumHandler.getAllAlbum(RequestType.image)];
+      }
+      else if (requestType.containsVideo()) {
+        return [await AlbumHandler.getAllAlbum(RequestType.video)];
       }
     }
 
