@@ -10,6 +10,12 @@ To know more about breaking changes, see the [Migration Guide][].
 
 *None.*
 
+## 3.6.3
+
+### Improvements
+
+- Optimize task priority handling on iOS by automatically assigning QoS levels based on method types.
+
 ## 3.6.2
 
 ### Fixes
