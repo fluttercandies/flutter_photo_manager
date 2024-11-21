@@ -271,6 +271,7 @@
     
     PHAssetCollection *collection = fetchResult.firstObject;
     PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:filterOption];
+    NSArray<NSSortDescriptor *> *sortDescriptors = assetOptions.sortDescriptors;
     PHFetchResult<PHAsset *> *assetArray = [PHAsset fetchAssetsInAssetCollection:collection
                                                                          options:assetOptions];
     
@@ -291,7 +292,7 @@
     
     for (NSUInteger i = startIndex; i <= endIndex; i++) {
         NSUInteger index = i;
-        if (assetOptions.sortDescriptors == nil) {
+        if (sortDescriptors == nil || sortDescriptors.count == 0) {
             index = count - i - 1;
         }
         PHAsset *asset = assetArray[index];
@@ -323,6 +324,7 @@
     
     PHAssetCollection *collection = fetchResult.firstObject;
     PHFetchOptions *assetOptions = [self getAssetOptions:(int) type filterOption:filterOption];
+    NSArray<NSSortDescriptor *> *sortDescriptors = assetOptions.sortDescriptors;
     PHFetchResult<PHAsset *> *assetArray = [PHAsset fetchAssetsInAssetCollection:collection
                                                                          options:assetOptions];
     
@@ -340,7 +342,7 @@
     
     for (NSUInteger i = startIndex; i <= endIndex; i++) {
         NSUInteger index = i;
-        if (assetOptions.sortDescriptors == nil) {
+        if (sortDescriptors == nil || sortDescriptors.count == 0) {
             index = count - i - 1;
         }
         PHAsset *asset = assetArray[index];
@@ -1312,7 +1314,7 @@
                 return;
             }
             NSTimeInterval time = CMTimeGetSeconds(context.duration);
-            [handler reply:@(time)];
+            [handler reply:@((long) time)];
         }];
         return;
     }
