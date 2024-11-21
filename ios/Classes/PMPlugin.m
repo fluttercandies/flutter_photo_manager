@@ -326,8 +326,45 @@
 
 #endif
 
-- (void)runInBackground:(dispatch_block_t)block {
-    dispatch_async(dispatch_get_global_queue(0, 0), block);
+- (void)runInBackground:(dispatch_block_t)block withHandler:(ResultHandler *)handler {
+    dispatch_qos_class_t priority = [self getQosPriorityForMethod:handler.call.method];
+    dispatch_async(dispatch_get_global_queue(priority, 0), block);
+}
+
+- (dispatch_qos_class_t)getQosPriorityForMethod:(NSString *)method {
+    if ([method isEqualToString:@"getThumb"] ||
+        [method isEqualToString:@"assetExists"] ||
+        [method isEqualToString:@"isLocallyAvailable"]) {
+        return QOS_CLASS_USER_INTERACTIVE;
+    }
+    
+    if ([method isEqualToString:@"getAssetListPaged"] ||
+        [method isEqualToString:@"getAssetListRange"] ||
+        [method isEqualToString:@"getFullFile"] ||
+        [method isEqualToString:@"getMediaUrl"] ||
+        [method isEqualToString:@"fetchEntityProperties"]) {
+        return QOS_CLASS_USER_INITIATED;
+    }
+    
+    if ([method isEqualToString:@"saveImage"] ||
+        [method isEqualToString:@"saveVideo"] ||
+        [method isEqualToString:@"saveLivePhoto"] ||
+        [method isEqualToString:@"requestCacheAssetsThumb"] ||
+        [method isEqualToString:@"copyAsset"] ||
+        [method isEqualToString:@"createFolder"] ||
+        [method isEqualToString:@"createAlbum"]) {
+        return QOS_CLASS_UTILITY;
+    }
+    
+    if ([method isEqualToString:@"clearFileCache"] ||
+        [method isEqualToString:@"releaseMemoryCache"] ||
+        [method isEqualToString:@"deleteWithIds"] ||
+        [method isEqualToString:@"removeInAlbum"] ||
+        [method isEqualToString:@"deleteAlbum"]) {
+        return QOS_CLASS_BACKGROUND;
+    }
+    
+    return QOS_CLASS_DEFAULT;
 }
 
 - (void)onAuth:(ResultHandler *)handler {
@@ -341,7 +378,7 @@
       @catch (NSException *exception) {
           [handler replyError:exception];
       }
-    }];
+    } withHandler:handler];
 }
 
 - (void)handleMethodResultHandler:(ResultHandler *)handler manager:(PMManager *)manager notificationManager:(PMNotificationManager *)notificationManager {

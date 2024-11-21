@@ -10,6 +10,8 @@
 .svn/
 **/Podfile.lock
 
+!pubspec.lock
+
 # IntelliJ related
 *.iml
 *.ipr
