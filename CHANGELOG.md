@@ -19,7 +19,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ### Fixes
 
-- Fix incorrect type conversion with the Live-Photo's duration on Darwin.
+- Fix the incorrect type of conversion with the Live-Photo's duration on Darwin.
 
 ## 3.6.2
 
@@ -31,7 +31,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ### Fixes
 
-- Do not throw when querying not existing assets in bulk on Android.
+- Do not throw when querying non-existing assets in bulk on Android.
 
 ## 3.6.0
 
@@ -41,13 +41,13 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ### Improvements
 
-- Improves the options when fetching fixed number of assets on iOS and macOS.
+- Improves the options when fetching a fixed number of assets on iOS and macOS.
 
 ### Fixes
 
 - Do not use `privateFileURL` on iOS 18+.
 - Fixes saving MP4 videos will result in 3GP on Android API 30-.
-- Fixes nullable result returned when saving images and videos on Android.
+- Fixes nullable results returned when saving images and videos on Android.
 
 ## 3.5.2
 
@@ -57,7 +57,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ### Fixes
 
-- Fix no returned ids after successful deletion on Android API 29+.
+- Fix no returned IDs after successful deletion on Android API 29+.
 - Fix mediaLocation = true does not work on Android API 34.
 
 ## 3.5.1
@@ -66,7 +66,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 - Reuse files when saving images on Darwin.
 - Returns non-nullable results as much as possible.
-- Fix export session file type with videos at the first time on Darwin.
+- Fix export session file type with videos for the first time on Darwin.
 
 ## 3.5.0
 
@@ -143,7 +143,7 @@ To know more about breaking changes, see the [Migration Guide][].
 ### Fixes
 
 - Do not require `WRITE_EXTERNAL_STORAGE` if not declared in the manifest with Android 29-.
-- Fix `fetchPathProperties` exception on android of API 28.
+- Fix `fetchPathProperties` exception on Android of API 28.
 
 ## 3.2.1
 
@@ -161,7 +161,7 @@ To know more about breaking changes, see the [Migration Guide][].
 ### Improvements
 
 * Restores `containsLivePhotos` to `true` by default and deprecates it.
-* Use the main resource's filename for title by default on iOS.
+* Use the main resource's filename for the title by default on iOS.
 * Support more methods on the OpenHarmony.
 
 ### Fixes
@@ -190,7 +190,7 @@ See the [Migration Guide][] for details of breaking changes.
 
 ### Fixes
 
-- Do not predicate subtypes images as adjusted on Darwin.
+- Do not predicate subtype images as adjusted on Darwin.
 - Fix `PMProgressHandler` not getting notified when failed on Darwin.
 - Merge Android API 29 and 30 `PermissionDelegate`s
   which allows Android API 29 to grant permissions without `WRITE_EXTERNAL_STORAGE`.
@@ -221,7 +221,7 @@ See the [Migration Guide][] for details of breaking changes.
 
 ### Fixes
 
-- Upgrade android/build.gradle to load current java version from some environment variables.
+- Upgrade android/build.gradle to load the current java version from some environment variables.
 - Fix the `setIgnorePermissionCheck` method not working on Android.
 
 ## 2.8.0
@@ -232,7 +232,7 @@ See the [Migration Guide][] for details of breaking changes.
 
 ### Features
 
-- Support Android 14 limited access to assets.
+- Support Android 14 with limited access to assets.
 
 ### Fixes
 
