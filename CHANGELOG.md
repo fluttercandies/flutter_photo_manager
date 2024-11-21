@@ -17,6 +17,10 @@ To know more about breaking changes, see the [Migration Guide][].
 - Optimize task priority handling on Darwin by automatically assigning QoS levels based on method types.
 - Optimize the default sort descriptors on Darwin.
 
+### Fixes
+
+- Fix incorrect type conversion with the Live-Photo's duration on Darwin.
+
 ## 3.6.2
 
 ### Fixes

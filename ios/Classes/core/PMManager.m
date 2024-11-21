@@ -1314,7 +1314,7 @@
                 return;
             }
             NSTimeInterval time = CMTimeGetSeconds(context.duration);
-            [handler reply:@(time)];
+            [handler reply:@((long) time)];
         }];
         return;
     }
