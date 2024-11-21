@@ -14,7 +14,8 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ### Improvements
 
-- Optimize task priority handling on iOS by automatically assigning QoS levels based on method types.
+- Optimize task priority handling on Darwin by automatically assigning QoS levels based on method types.
+- Optimize the default sort descriptors on Darwin.
 
 ## 3.6.2
 
