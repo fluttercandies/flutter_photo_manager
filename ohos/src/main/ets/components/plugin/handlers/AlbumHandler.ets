@@ -156,21 +156,18 @@ export class AlbumHandler extends HandlerBase implements MethodCallHandlerBase {
     if (!(await PermissionHandler.permissionReadCheck())) {
       return [];
     }
-    if (onlyAll) {
-      return [await AlbumHandler.getAllAlbum(RequestType.all)];
-    }
-
     let requestType: RequestType = new RequestType(args.get('type'));
-
-    if (!(requestType.containsImage() && requestType.containsVideo())) {
-      if (requestType.containsImage()) {
-        return [await AlbumHandler.getAllAlbum(RequestType.image)];
-      }
-      else if (requestType.containsVideo()) {
-        return [await AlbumHandler.getAllAlbum(RequestType.video)];
+    if (onlyAll || !(requestType.containsImage() && requestType.containsVideo())) {
+      if (!(requestType.containsImage() && requestType.containsVideo())) {
+        if (requestType.containsImage()) {
+          return [await AlbumHandler.getAllAlbum(RequestType.image)];
+        } else if (requestType.containsVideo()) {
+          return [await AlbumHandler.getAllAlbum(RequestType.video)];
+        }
+      } else {
+        return [await AlbumHandler.getAllAlbum(RequestType.all)];
       }
     }
-
     // hasAll 返回的列表里有一个代表所有的相册
     // onlyAll 只返回这个代表所有的相册
     // 在鸿蒙这边 这个相册 应该是 从 system 这个类型里面获取到的相册的集合
