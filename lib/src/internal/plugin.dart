@@ -258,7 +258,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   }
 
   void _setCancelToken(
-      Map<String, dynamic> params, PMCancelToken? cancelToken) {
+    Map<String, dynamic> params,
+    PMCancelToken? cancelToken,
+  ) {
     if (cancelToken != null) {
       params[PMConstants.cancelTokenKey] = cancelToken.key;
     }
