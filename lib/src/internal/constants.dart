@@ -64,7 +64,8 @@ class PMConstants {
   static const String mGetAssetCount = 'getAssetCount';
   static const String mGetAssetsByRange = 'getAssetsByRange';
 
-  static const String mCancelRequestWithCancelToken = 'cancelRequestWithCancelToken';
+  static const String mCancelRequestWithCancelToken =
+      'cancelRequestWithCancelToken';
   static const String mCancelAllRequest = 'cancelAllRequest';
 
   /// Constant value.

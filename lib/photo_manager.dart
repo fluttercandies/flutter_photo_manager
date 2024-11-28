@@ -25,6 +25,7 @@ export 'src/managers/caching_manager.dart';
 export 'src/managers/notify_manager.dart';
 export 'src/managers/photo_manager.dart';
 
+export 'src/types/cancel_token.dart';
 export 'src/types/entity.dart';
 export 'src/types/thumbnail.dart';
 export 'src/types/types.dart';

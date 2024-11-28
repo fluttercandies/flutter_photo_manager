@@ -426,6 +426,25 @@ iCloud 文件只能在设备上的 Apple ID 正常登录时获取。
 当账号要求重新输入密码验证时，未缓存在本地的 iCloud 文件将无法访问，
 此时相关方法会抛出 `CloudPhotoLibraryErrorDomain` 错误。
 
+**取消加载** (Since 3.7.0)
+
+上述的 `AssetEntity` 方法均添加了 `cancelToken` 参数，
+可以用于取消加载过程。
+
+其他方法如果也添加了 `cancelToken` 参数，同样可以用于取消加载过程。
+
+```dart
+final PMCancelToken cancelToken = PMCancelToken();
+final File? file = await yourAssetEntity.loadFile(cancelToken: cancelToken);
+await cancelToken.cancel();
+```
+
+`PhotoManager` 也有一个方法可以取消所有加载：
+
+```dart
+await PhotoManager.cancelAllRequest();
+```
+
 #### 展示资源
 
 从 v3.0.0 开始，插件不再提供任何 UI 组件。
