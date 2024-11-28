@@ -7,14 +7,13 @@ typedef void (^ChangeIds)(NSArray<NSString *> *);
 
 @class PMAssetPathEntity;
 @class PMAssetEntity;
-@class ResultHandler;
+@class PMResultHandler;
 @class PMFilterOption;
 @class PMFilterOptionGroup;
 @class PMThumbLoadOption;
 @class PMPathFilterOption;
 
 #import "PMProgressHandlerProtocol.h"
-#import "PMResultHandler.h"
 #import "PMConvertProtocol.h"
 
 #define PM_IMAGE_CACHE_PATH @".image"
@@ -30,7 +29,7 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 @property(nonatomic, strong) NSObject <PMConvertProtocol> *converter;
 
-+ (void)openSetting:(NSObject<PMResultHandler>*)result;
++ (void)openSetting:(PMResultHandler*)result;
 
 - (NSArray<PMAssetPathEntity *> *)getAssetPathList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(NSObject <PMBaseFilter> *)option pathFilterOption:(PMPathFilterOption *)pathFilterOption;
 
@@ -46,13 +45,13 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 - (void)clearCache;
 
-- (void)getThumbWithId:(NSString *)assetId option:(PMThumbLoadOption *)option resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
+- (void)getThumbWithId:(NSString *)assetId option:(PMThumbLoadOption *)option resultHandler:(PMResultHandler *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
 
 - (void)getFullSizeFileWithId:(NSString *)assetId
                      isOrigin:(BOOL)isOrigin
                       subtype:(int)subtype
                      fileType:(AVFileType)fileType
-                resultHandler:(NSObject <PMResultHandler> *)handler
+                resultHandler:(PMResultHandler *)handler
               progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
 
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type filterOption:(NSObject<PMBaseFilter> *)filterOption;
@@ -90,7 +89,7 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 - (void)getDurationWithOptions:(NSString *)assetId
                        subtype:(int)subtype
-                 resultHandler:(NSObject <PMResultHandler> *)handler;
+                 resultHandler:(PMResultHandler *)handler;
 
 - (NSString*)getTitleAsyncWithAssetId:(NSString *)assetId
                               subtype:(int)subtype
@@ -100,7 +99,7 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 - (NSString*)getMimeTypeAsyncWithAssetId: (NSString *) assetId;
 
 - (void)getMediaUrl:(NSString *)assetId
-      resultHandler:(NSObject <PMResultHandler> *)handler
+      resultHandler:(PMResultHandler *)handler
     progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
 
 - (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(NSObject<PMBaseFilter> *)option;

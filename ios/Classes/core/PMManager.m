@@ -10,6 +10,7 @@
 #import "PMManager.h"
 #import "PMMD5Utils.h"
 #import "PMPathFilterOption.h"
+#import "PMResultHandler.h"
 
 @implementation PMManager {
     PMCacheContainer *cacheContainer;
@@ -424,7 +425,7 @@
     [cacheContainer clearCache];
 }
 
-- (void)getThumbWithId:(NSString *)assetId option:(PMThumbLoadOption *)option resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+- (void)getThumbWithId:(NSString *)assetId option:(PMThumbLoadOption *)option resultHandler:(PMResultHandler *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PMAssetEntity *entity = [self getAssetEntity:assetId];
     if (entity && entity.phAsset) {
         PHAsset *asset = entity.phAsset;
@@ -434,7 +435,7 @@
     }
 }
 
-- (void)fetchThumb:(PHAsset *)asset option:(PMThumbLoadOption *)option resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+- (void)fetchThumb:(PHAsset *)asset option:(PMThumbLoadOption *)option resultHandler:(PMResultHandler *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PHImageRequestOptions *requestOptions = [PHImageRequestOptions new];
     requestOptions.deliveryMode = option.deliveryMode;
     requestOptions.resizeMode = option.resizeMode;
@@ -456,12 +457,18 @@
     int width = option.width;
     int height = option.height;
     
-    [self.cachingManager requestImageForAsset:asset
+    PHImageRequestID requestId = [self.cachingManager requestImageForAsset:asset
                                    targetSize:CGSizeMake(width, height)
                                   contentMode:option.contentMode
                                       options:requestOptions
                                 resultHandler:^(PMImage *result, NSDictionary *info) {
         if ([handler isReplied]) {
+            return;
+        }
+        
+        PHImageRequestID currentReqID = [[info objectForKey:PHImageResultRequestIDKey] intValue];
+        if (currentReqID == PHInvalidImageRequestID) {
+            [self handleCancelRequest:handler progressHandler:progressHandler];
             return;
         }
         
@@ -495,7 +502,7 @@
                      isOrigin:(BOOL)isOrigin
                       subtype:(int)subtype
                      fileType:(AVFileType)fileType
-                resultHandler:(NSObject <PMResultHandler> *)handler
+                resultHandler:(PMResultHandler *)handler
               progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PMAssetEntity *entity = [self getAssetEntity:assetId];
     if (entity && entity.phAsset) {
@@ -531,7 +538,7 @@
 }
 
 - (void)fetchLivePhotosFile:(PHAsset *)asset
-                    handler:(NSObject <PMResultHandler> *)handler
+                    handler:(PMResultHandler *)handler
             progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
                  withScheme:(BOOL)withScheme
                    fileType:(AVFileType)fileType {
@@ -557,7 +564,7 @@
 }
 
 - (void)fetchOriginVideoFile:(PHAsset *)asset
-                     handler:(NSObject <PMResultHandler> *)handler
+                     handler:(PMResultHandler *)handler
              progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
                     fileType:(AVFileType)fileType {
     PHAssetResource *resource = [asset getCurrentResource];
@@ -581,7 +588,7 @@
 }
 
 - (void)fetchFullSizeVideo:(PHAsset *)asset
-                   handler:(NSObject <PMResultHandler> *)handler
+                   handler:(PMResultHandler *)handler
            progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
                 withScheme:(BOOL)withScheme
                   fileType:(AVFileType)fileType {
@@ -669,7 +676,7 @@
     }];
     
     PHAssetResourceManager *resourceManager = PHAssetResourceManager.defaultManager;
-    __block NSURL *fileUrl = [NSURL fileURLWithPath:path];
+    NSURL *fileUrl = [NSURL fileURLWithPath:path];
     [resourceManager writeDataForAssetResource:resource
                                         toFile:fileUrl
                                        options:options
@@ -746,7 +753,7 @@
         }
     }];
     
-    [self.cachingManager
+    PHImageRequestID requestId = [self.cachingManager
      requestAVAssetForVideo:asset
      options:options
      resultHandler:^(AVAsset *_Nullable asset, AVAudioMix *_Nullable audioMix, NSDictionary *_Nullable info) {
@@ -966,7 +973,7 @@
     return resource.type == PHAssetResourceTypePhoto || resource.type == PHAssetResourceTypeFullSizePhoto;
 }
 
-- (void)fetchOriginImageFile:(PHAsset *)asset resultHandler:(NSObject <PMResultHandler> *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+- (void)fetchOriginImageFile:(PHAsset *)asset resultHandler:(PMResultHandler *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PHAssetResource *imageResource = [asset getCurrentResource];
     if (!imageResource) {
         [handler replyError:[NSString stringWithFormat:@"Asset %@ does not have available resources.", asset.localIdentifier]];
@@ -1013,7 +1020,7 @@
 }
 
 - (void)fetchFullSizeImageFile:(PHAsset *)asset
-                 resultHandler:(NSObject <PMResultHandler> *)handler
+                 resultHandler:(PMResultHandler *)handler
                progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PHImageRequestOptions *options = [PHImageRequestOptions new];
     [options setDeliveryMode:PHImageRequestOptionsDeliveryModeOpportunistic];
@@ -1036,12 +1043,20 @@
         }
     }];
     
-    [self.cachingManager requestImageForAsset:asset
+    PHImageRequestID requestId = [self.cachingManager requestImageForAsset:asset
                                    targetSize:PHImageManagerMaximumSize
                                   contentMode:PHImageContentModeDefault
                                       options:options
                                 resultHandler:^(PMImage *_Nullable image, NSDictionary *_Nullable info) {
         if ([handler isReplied]) {
+            return;
+        }
+        
+        PHImageRequestID currentReqID = [[info objectForKey:PHImageResultRequestIDKey] intValue];
+        
+        if (currentReqID == PHInvalidImageRequestID) {
+            [handler replyError:@"Failed to fetch full size image."];
+            [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
             return;
         }
         
@@ -1110,7 +1125,7 @@
 
 #if TARGET_OS_OSX
 
-+ (void)openSetting:(NSObject<PMResultHandler>*)result {
++ (void)openSetting:(ResultHandler*)result {
     NSTask *task = [[NSTask alloc] init];
     task.launchPath = @"/bin/sh";
     task.arguments = @[@"-c" , @"open x-apple.systempreferences:com.apple.preference.security?Privacy_Photos"];
@@ -1122,7 +1137,7 @@
 
 #if TARGET_OS_IOS
 
-+ (void)openSetting:(NSObject<PMResultHandler>*)result {
++ (void)openSetting:(PMResultHandler*)result {
     if (@available(iOS 10, *)) {
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]
                                            options:[[NSDictionary alloc] init]
@@ -1288,7 +1303,7 @@
 
 - (void)getDurationWithOptions:(NSString *)assetId
                        subtype:(int)subtype
-                 resultHandler:(NSObject<PMResultHandler> *)handler {
+                 resultHandler:(PMResultHandler *)handler {
     PMAssetEntity *entity = [self getAssetEntity:assetId];
     if (!entity) {
         [handler replyError:@"Not exists."];
@@ -1346,7 +1361,7 @@
 }
 
 - (void)getMediaUrl:(NSString *)assetId
-      resultHandler:(NSObject <PMResultHandler> *)handler
+      resultHandler:(PMResultHandler *)handler
     progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]].firstObject;
     
@@ -1760,6 +1775,18 @@
     [self.cachingManager stopCachingImagesForAllAssets];
 }
 
+# pragma mark handle cancel request
+
+- (void)handleCancelRequest:(PMResultHandler *)handler
+            progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+    [self notifyProgress:progressHandler progress:0 state:PMProgressStateCancel];
+    [handler replyError:@"Request canceled"];
+}
+
+- (void) addRequstId:(PHImageRequestID)requestId {
+}
+
+# pragma mark progress
 - (void)notifyProgress:(NSObject <PMProgressHandlerProtocol> *)handler progress:(double)progress state:(PMProgressState)state {
     if (!handler) {
         return;
