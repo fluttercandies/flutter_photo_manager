@@ -341,7 +341,9 @@
 - (dispatch_qos_class_t)getQosPriorityForMethod:(NSString *)method {
     if ([method isEqualToString:@"getThumb"] ||
         [method isEqualToString:@"assetExists"] ||
-        [method isEqualToString:@"isLocallyAvailable"]) {
+        [method isEqualToString:@"isLocallyAvailable"] ||
+        [method isEqualToString:@"cancelRequestWithCancelToken"] ||
+        [method isEqualToString:@"cancelAllRequest"]) {
         return QOS_CLASS_USER_INTERACTIVE;
     }
     
@@ -675,6 +677,13 @@
         [handler reply:@YES];
     } else if ([@"cancelCacheRequests" isEqualToString:call.method]) {
         [manager cancelCacheRequests];
+        [handler reply:@YES];
+    } else if ([@"cancelRequestWithCancelToken" isEqualToString:call.method]) {
+        NSString *cancelToken = call.arguments[@"cancelToken"];
+        [manager cancelRequestWithCancelToken:cancelToken];
+        [handler reply:@YES];
+    } else if ([@"cancelAllRequest" isEqualToString:call.method]) {
+        [manager cancelAllRequest];
         [handler reply:@YES];
     } else {
         [handler notImplemented];

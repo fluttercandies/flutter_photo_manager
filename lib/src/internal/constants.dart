@@ -64,6 +64,9 @@ class PMConstants {
   static const String mGetAssetCount = 'getAssetCount';
   static const String mGetAssetsByRange = 'getAssetsByRange';
 
+  static const String mCancelRequestWithCancelToken = 'cancelRequestWithCancelToken';
+  static const String mCancelAllRequest = 'cancelAllRequest';
+
   /// Constant value.
   static const int vDefaultThumbnailSize = 150;
   static const int vDefaultThumbnailQuality = 95;
@@ -74,4 +77,5 @@ class PMConstants {
     'ohos.permission.READ_IMAGEVIDEO',
     'ohos.permission.WRITE_IMAGEVIDEO',
   ];
+
 }

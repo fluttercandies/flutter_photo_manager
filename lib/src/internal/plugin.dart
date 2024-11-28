@@ -22,6 +22,31 @@ import 'progress_handler.dart';
 
 PhotoManagerPlugin plugin = PhotoManagerPlugin();
 
+/// The cancel token is used to cancel the request.
+class PMCancelToken {
+  PMCancelToken({this.debugLabel}) : index = getIndex();
+
+  static int _index = 0;
+
+  static int getIndex() {
+    final res = _index;
+    _index++;
+    return res;
+  }
+
+  final String? debugLabel;
+  final int index;
+
+  /// The key of cancel token, usually to use by [PhotoManagerPlugin.cancelRequest].
+  /// User don't need to use this.
+  String get key => _index.toString();
+
+  /// Cancel the request.
+  Future<void> cancelRequest() async {
+    await plugin.cancelRequest(this);
+  }
+}
+
 mixin BasePlugin {
   MethodChannel _channel = const MethodChannel(PMConstants.channelPrefix);
 
@@ -692,6 +717,18 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       requestOption.toMap(),
     );
     return PermissionState.values[result];
+  }
+
+  Future<void> cancelRequest(PMCancelToken pmCancelToken) {
+    return _channel.invokeMethod(PMConstants.mCancelRequestWithCancelToken, {
+      'cancelToken': pmCancelToken.key,
+    });
+  }
+
+  Future<void> cancelAllRequest() {
+    return _channel.invokeMethod(
+      PMConstants.mCancelAllRequest,
+    );
   }
 }
 

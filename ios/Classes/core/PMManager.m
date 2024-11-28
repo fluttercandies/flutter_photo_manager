@@ -16,12 +16,16 @@
     PMCacheContainer *cacheContainer;
     
     PHCachingImageManager *__cachingManager;
+
+    // dict, key: cancelToken, value: PHImageRequestID
+    NSMutableDictionary<NSString *, NSNumber*> *requestIdMap;
 }
 
 - (instancetype)init {
     self = [super init];
     if (self) {
         cacheContainer = [PMCacheContainer new];
+        requestIdMap = [NSMutableDictionary new];
     }
     return self;
 }
@@ -469,6 +473,7 @@
         PHImageRequestID currentReqID = [[info objectForKey:PHImageResultRequestIDKey] intValue];
         if (currentReqID == PHInvalidImageRequestID) {
             [self handleCancelRequest:handler progressHandler:progressHandler];
+            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
@@ -476,11 +481,13 @@
         if (error) {
             [handler replyError:error];
             [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
         BOOL downloadFinished = [PMManager isDownloadFinish:info];
         if (!downloadFinished) {
+            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
@@ -496,6 +503,7 @@
         
     }];
     
+    [self addRequstId:[handler getCancelToken] requestId:requestId];
 }
 
 - (void)getFullSizeFileWithId:(NSString *)assetId
@@ -593,6 +601,7 @@
                 withScheme:(BOOL)withScheme
                   fileType:(AVFileType)fileType {
     [self exportAssetToFile:asset
+            resultHandler:handler
             progressHandler:progressHandler
                  withScheme:withScheme
                    fileType:fileType
@@ -720,6 +729,7 @@
 }
 
 - (void)exportAssetToFile:(PHAsset *)asset
+          resultHandler:(PMResultHandler *)handler
           progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
                withScheme:(BOOL)withScheme
                  fileType:(AVFileType)fileType
@@ -761,11 +771,13 @@
         if (error) {
             [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
             block(nil, error);
+            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
         BOOL downloadFinished = [PMManager isDownloadFinish:info];
         if (!downloadFinished) {
+            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
@@ -811,6 +823,7 @@
                 block(path, nil);
             }
             [self notifySuccess:progressHandler];
+            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
@@ -829,8 +842,11 @@
             } else {
                 block(nil, error);
             }
+            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
         }];
     }];
+
+    [self addRequstId:[handler getCancelToken] requestId:requestId];
 }
 
 - (void)exportAVAssetToFile:(AVAsset *)asset
@@ -1057,6 +1073,7 @@
         if (currentReqID == PHInvalidImageRequestID) {
             [handler replyError:@"Failed to fetch full size image."];
             [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
@@ -1064,11 +1081,13 @@
         if (error) {
             [handler replyError:error];
             [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
         BOOL downloadFinished = [PMManager isDownloadFinish:info];
         if (!downloadFinished) {
+            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
@@ -1081,7 +1100,10 @@
             [handler replyError:[NSString stringWithFormat:@"Failed to convert %@ to a JPEG file.", asset.localIdentifier]];
             [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
         }
+        [self removeRequstIdWithCancelToken:[handler getCancelToken]];
     }];
+
+    [self addRequstId:[handler getCancelToken] requestId:requestId];
 }
 
 + (BOOL)isDownloadFinish:(NSDictionary *)info {
@@ -1783,7 +1805,33 @@
     [handler replyError:@"Request canceled"];
 }
 
-- (void) addRequstId:(PHImageRequestID)requestId {
+- (void) addRequstId:(NSString *)cancelToken
+            requestId:(PHImageRequestID)requestId {
+    requestIdMap[cancelToken] = @(requestId);
+}
+
+// When the request is finished
+- (void) removeRequstIdWithCancelToken:(NSString *)cancelToken {
+    NSNumber *requestId = requestIdMap[cancelToken];
+    if (requestId) {
+        [requestIdMap removeObjectForKey:cancelToken];
+    }
+}
+
+- (void) cancelRequestWithCancelToken:(NSString *)cancelToken {
+    NSNumber *requestId = requestIdMap[cancelToken];
+    if (requestId) {
+        [self.cachingManager cancelImageRequest:requestId.intValue];
+        [requestIdMap removeObjectForKey:cancelToken];
+    }
+}
+
+- (void) cancelAllRequest {
+    for (NSString *key in requestIdMap) {
+        NSNumber *requestId = requestIdMap[key];
+        [self.cachingManager cancelImageRequest:requestId.intValue];
+    }
+    [requestIdMap removeAllObjects];
 }
 
 # pragma mark progress

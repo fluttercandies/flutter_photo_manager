@@ -20,4 +20,6 @@
 
 - (BOOL)isReplied;
 
+- (NSString *)getCancelToken;
+
 @end

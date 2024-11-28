@@ -128,4 +128,9 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 - (NSArray<PMAssetEntity*>*) getAssetsWithType:(int)type option:(NSObject<PMBaseFilter> *)option start:(int)start end:(int)end;
 
+// cancelRequestWithCancelToken
+- (void)cancelRequestWithCancelToken:(NSString *)cancelToken;
+
+// cancelAllRequest
+- (void)cancelAllRequest;
 @end

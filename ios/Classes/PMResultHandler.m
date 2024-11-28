@@ -87,4 +87,8 @@
     return isReply;
 }
 
+- (NSString *)getCancelToken {
+    return self.call.arguments[@"cancelToken"];
+}
+
 @end
