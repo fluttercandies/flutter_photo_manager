@@ -19,6 +19,12 @@
     BOOL isDetach;
 }
 
+
++ (void)registerWithRegistrar:(nonnull NSObject<FlutterPluginRegistrar> *)registrar {
+    PMPlugin *plugin = [PMPlugin new];
+    [plugin registerPlugin:registrar];
+}
+
 - (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar {
     privateRegistrar = registrar;
     [self initNotificationManager:registrar];
