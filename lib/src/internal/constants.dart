@@ -78,4 +78,5 @@ class PMConstants {
     'ohos.permission.WRITE_IMAGEVIDEO',
   ];
 
+  static const cancelTokenKey = 'cancelToken';
 }

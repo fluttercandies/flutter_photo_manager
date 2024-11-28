@@ -48,11 +48,27 @@ class PMCancelToken {
 }
 
 mixin BasePlugin {
-  MethodChannel _channel = const MethodChannel(PMConstants.channelPrefix);
+  MethodChannel _channel = const PMMethodChannel(PMConstants.channelPrefix);
 
   final Map<String, dynamic> onlyAddPermission = <String, dynamic>{
     'onlyAddPermission': true,
   };
+}
+
+class PMMethodChannel extends MethodChannel {
+  const PMMethodChannel(String name) : super(name);
+
+  @override
+  Future<T?> invokeMethod<T>(String method, [dynamic arguments]) {
+    if (arguments is! Map) {
+      return super.invokeMethod<T>(method, arguments);
+    }
+    final cancelToken = arguments[PMConstants.cancelTokenKey];
+    if (cancelToken == null) {
+      arguments[PMConstants.cancelTokenKey] = PMCancelToken().key;
+    }
+    return super.invokeMethod<T>(method, arguments);
+  }
 }
 
 class VerboseLogMethodChannel extends MethodChannel {
@@ -154,7 +170,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         logFilePath: logPath,
       );
     } else {
-      _channel = const MethodChannel(PMConstants.channelPrefix);
+      _channel = const PMMethodChannel(PMConstants.channelPrefix);
     }
   }
 
@@ -265,17 +281,26 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     }
   }
 
+  void _setCancelToken(
+      Map<String, dynamic> params, PMCancelToken? cancelToken) {
+    if (cancelToken != null) {
+      params[PMConstants.cancelTokenKey] = cancelToken.key;
+    }
+  }
+
   /// Get thumbnail of asset id.
   Future<typed_data.Uint8List?> getThumbnail({
     required String id,
     required ThumbnailOption option,
     PMProgressHandler? progressHandler,
+    PMCancelToken? cancelToken,
   }) {
     final Map<String, dynamic> params = <String, dynamic>{
       'id': id,
       'option': option.toMap(),
     };
     _injectProgressHandlerParams(params, progressHandler);
+    _setCancelToken(params, cancelToken);
     return _channel.invokeMethod(PMConstants.mGetThumb, params);
   }
 
@@ -283,12 +308,14 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     String id, {
     PMProgressHandler? progressHandler,
     PMDarwinAVFileType? darwinFileType,
+    PMCancelToken? cancelToken,
   }) {
     final Map<String, dynamic> params = <String, dynamic>{
       'id': id,
       'darwinFileType': darwinFileType,
     };
     _injectProgressHandlerParams(params, progressHandler);
+    _setCancelToken(params, cancelToken);
     return _channel.invokeMethod(PMConstants.mGetOriginBytes, params);
   }
 
@@ -305,6 +332,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     PMProgressHandler? progressHandler,
     int subtype = 0,
     PMDarwinAVFileType? darwinFileType,
+    PMCancelToken? cancelToken,
   }) async {
     final params = <String, dynamic>{
       'id': id,
@@ -313,6 +341,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       'darwinFileType': darwinFileType?.value ?? 0,
     };
     _injectProgressHandlerParams(params, progressHandler);
+    _setCancelToken(params, cancelToken);
     return _channel.invokeMethod(PMConstants.mGetFullFile, params);
   }
 
@@ -512,6 +541,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   Future<String?> getMediaUrl(
     AssetEntity entity, {
     PMProgressHandler? progressHandler,
+    PMCancelToken? cancelToken,
   }) async {
     if (PlatformUtils.isOhos) {
       return entity.id;
@@ -521,6 +551,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       'type': entity.typeInt,
     };
     _injectProgressHandlerParams(params, progressHandler);
+    _setCancelToken(params, cancelToken);
     return _channel.invokeMethod(PMConstants.mGetMediaUrl, params);
   }
 

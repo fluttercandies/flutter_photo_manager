@@ -583,6 +583,7 @@ class AssetEntity {
     bool isOrigin = true,
     bool withSubtype = false,
     PMProgressHandler? progressHandler,
+    PMCancelToken? cancelToken,
     PMDarwinAVFileType? darwinFileType,
   }) {
     return _getFile(
@@ -590,6 +591,7 @@ class AssetEntity {
       subtype: withSubtype ? subtype : 0,
       progressHandler: progressHandler,
       darwinFileType: darwinFileType,
+      cancelToken: cancelToken,
     );
   }
 
@@ -625,6 +627,7 @@ class AssetEntity {
     ThumbnailFormat format = ThumbnailFormat.jpeg,
     int quality = 100,
     PMProgressHandler? progressHandler,
+    PMCancelToken? cancelToken,
     int frame = 0,
   }) {
     assert(() {
@@ -655,7 +658,11 @@ class AssetEntity {
       return true;
     }());
 
-    return thumbnailDataWithOption(option, progressHandler: progressHandler);
+    return thumbnailDataWithOption(
+      option,
+      progressHandler: progressHandler,
+      cancelToken: cancelToken,
+    );
   }
 
   /// Obtain the thumbnail data with the given customized [ThumbnailOption].
@@ -666,6 +673,7 @@ class AssetEntity {
   Future<typed_data.Uint8List?> thumbnailDataWithOption(
     ThumbnailOption option, {
     PMProgressHandler? progressHandler,
+    PMCancelToken? cancelToken,
   }) {
     assert(() {
       _checkThumbnailAssertion();
@@ -683,6 +691,7 @@ class AssetEntity {
       id: id,
       option: option,
       progressHandler: progressHandler,
+      cancelToken: cancelToken,
     );
   }
 
@@ -736,10 +745,12 @@ class AssetEntity {
   ///  * https://developer.apple.com/documentation/avfoundation/avurlasset
   Future<String?> getMediaUrl({
     PMProgressHandler? progressHandler,
+    PMCancelToken? cancelToken,
   }) {
     return plugin.getMediaUrl(
       this,
       progressHandler: progressHandler,
+      cancelToken: cancelToken,
     );
   }
 
@@ -754,6 +765,7 @@ class AssetEntity {
     PMProgressHandler? progressHandler,
     int subtype = 0,
     PMDarwinAVFileType? darwinFileType,
+    PMCancelToken? cancelToken,
   }) async {
     assert(
       _platformMatched,
@@ -768,6 +780,7 @@ class AssetEntity {
       progressHandler: progressHandler,
       subtype: subtype,
       darwinFileType: darwinFileType,
+      cancelToken: cancelToken,
     );
     if (path == null) {
       return null;
@@ -777,6 +790,7 @@ class AssetEntity {
 
   Future<typed_data.Uint8List?> _getOriginBytes({
     PMProgressHandler? progressHandler,
+    PMCancelToken? cancelToken,
   }) async {
     assert(
       _platformMatched,
@@ -788,11 +802,19 @@ class AssetEntity {
     if (Platform.isAndroid) {
       final sdkInt = int.parse(await plugin.getSystemVersion());
       if (sdkInt > 29) {
-        return plugin.getOriginBytes(id, progressHandler: progressHandler);
+        return plugin.getOriginBytes(
+          id,
+          progressHandler: progressHandler,
+          cancelToken: cancelToken,
+        );
       }
     }
     if (PlatformUtils.isOhos) {
-      return plugin.getOriginBytes(id, progressHandler: progressHandler);
+      return plugin.getOriginBytes(
+        id,
+        progressHandler: progressHandler,
+        cancelToken: cancelToken,
+      );
     }
     final File? file = await originFile;
     return file?.readAsBytes();
