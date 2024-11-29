@@ -10,7 +10,13 @@ To know more about breaking changes, see the [Migration Guide][].
 
 *None.*
 
-## 3.6.3
+## 3.7.0
+
+### Features
+
+- Add `cancelToken` parameter to `AssetEntity.loadFile`.
+- Add `cancelAllRequest` method to `PhotoManager`.
+- The `getFile` and `getOriginBytes` methods are public.
 
 ### Improvements
 
