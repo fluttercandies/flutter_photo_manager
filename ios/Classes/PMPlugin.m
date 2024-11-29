@@ -163,7 +163,7 @@
 
 - (void)getPermissionState:(PMResultHandler *)handler {
     int requestAccessLevel = [handler.call.arguments[@"iosAccessLevel"] intValue];
-#if __IPHONE_14_0
+#if TARGET_OS_IOS
     if (@available(iOS 14, *)) {
         PHAuthorizationStatus result = [PHPhotoLibrary authorizationStatusForAccessLevel: requestAccessLevel];
         [handler reply: @(result)];
@@ -172,8 +172,13 @@
         [handler reply:@(status)];
     }
 #else
-    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
-    [handler reply:@(status)];
+    if (@available(macOS 11.0, *)) {
+        PHAuthorizationStatus result = [PHPhotoLibrary authorizationStatusForAccessLevel: requestAccessLevel];
+        [handler reply: @(result)];
+    } else {
+        PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+        [handler reply:@(status)];
+    }
 #endif
 }
 
@@ -289,7 +294,7 @@
 
 #if TARGET_OS_OSX
 - (void)handlePermission:(PMManager *)manager
-                 handler:(ResultHandler*)handler
+                 handler:(PMResultHandler*)handler
       requestAccessLevel:(int)requestAccessLevel {
 #if __MAC_11_0
     if (@available(macOS 11.0, *)) {
@@ -327,7 +332,7 @@
 #endif
 }
 
-- (void)presentLimited:(ResultHandler*)handler {
+- (void)presentLimited:(PMResultHandler*)handler {
     [handler replyError:@"Not supported on macOS."];
 }
 

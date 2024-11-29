@@ -1147,7 +1147,7 @@
 
 #if TARGET_OS_OSX
 
-+ (void)openSetting:(ResultHandler*)result {
++ (void)openSetting:(PMResultHandler*)result {
     NSTask *task = [[NSTask alloc] init];
     task.launchPath = @"/bin/sh";
     task.arguments = @[@"-c" , @"open x-apple.systempreferences:com.apple.preference.security?Privacy_Photos"];
