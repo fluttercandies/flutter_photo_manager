@@ -39,15 +39,15 @@ class PMMethodChannel extends MethodChannel {
     if (arguments is! Map) {
       return super.invokeMethod<T>(method, arguments);
     }
-    final cancelToken = arguments[PMConstants.cancelTokenKey];
-    if (cancelToken == null) {
-      arguments[PMConstants.cancelTokenKey] = PMCancelToken().key;
-    }
+    arguments.putIfAbsent(
+      PMConstants.cancelTokenKey,
+      () => PMCancelToken().key,
+    );
     return super.invokeMethod<T>(method, arguments);
   }
 }
 
-class VerboseLogMethodChannel extends MethodChannel {
+class VerboseLogMethodChannel extends PMMethodChannel {
   VerboseLogMethodChannel({
     required String name,
     required this.logFilePath,
