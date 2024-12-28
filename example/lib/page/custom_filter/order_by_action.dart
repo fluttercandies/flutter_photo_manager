@@ -38,36 +38,34 @@ class OrderByAction extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Align(
-          alignment: Alignment.center,
-          child: IconButton(
-            onPressed: () async {
-              await changeOrderBy(context, items, onChanged);
-            },
-            icon: const Icon(Icons.sort),
-          ),
+        IconButton(
+          onPressed: () async {
+            await changeOrderBy(context, items, onChanged);
+          },
+          icon: const Icon(Icons.sort),
         ),
-        Positioned(
-          right: 5,
-          top: 5,
-          child: Container(
-            width: 15,
-            height: 15,
-            decoration: const BoxDecoration(
-              color: Colors.red,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                items.length.toString(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 8,
+        if (items.isNotEmpty)
+          Positioned(
+            right: 5,
+            top: 5,
+            child: Container(
+              width: 15,
+              height: 15,
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  items.length.toString(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 8,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -81,6 +79,7 @@ class OrderByActionPage extends StatefulWidget {
 
   final List<OrderByItem> items;
   static List<OrderByItem>? _saveItems;
+
   @override
   State<OrderByActionPage> createState() => _OrderByActionPageState();
 }

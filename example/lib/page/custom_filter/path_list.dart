@@ -11,9 +11,13 @@ class FilterPathList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<AssetPathEntity>>(
-      future: PhotoManager.getAssetPathList(
-        filterOption: filter,
-      ),
+      future: Future(() async {
+        final ps = await PhotoManager.requestPermissionExtend();
+        if (!ps.hasAccess) {
+          throw StateError('No access');
+        }
+        return PhotoManager.getAssetPathList(filterOption: filter);
+      }),
       builder: (
         BuildContext context,
         AsyncSnapshot<List<AssetPathEntity>> snapshot,

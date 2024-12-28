@@ -46,10 +46,8 @@ jobs:
 #        run: flutter analyze example_ohos
       - name: Run tests
         run: flutter test
-      - name: Generate docs
-        run: |
-          dart pub global activate dartdoc
-          dart pub global run dartdoc .
+      - name: Dry run docs generate
+        run: dart doc --dry-run .
 
   publishable:
     if: github.repository == 'fluttercandies/flutter_photo_manager'
@@ -87,7 +85,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-    permissions: 
+    permissions:
       pull-requests: write
       issues: write
     steps:

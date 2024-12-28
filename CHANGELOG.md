@@ -8,15 +8,17 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
-
-## 3.7.0
-
 ### Features
 
 - Add `cancelToken` parameter to `AssetEntity.loadFile`.
 - Add `cancelAllRequest` method to `PhotoManager`.
 - The `getFile` and `getOriginBytes` methods are public.
+
+### Fixes
+
+- Fix potential nil class value when unwrapping caught exceptions on Darwin.
+
+## 3.6.3
 
 ### Improvements
 
