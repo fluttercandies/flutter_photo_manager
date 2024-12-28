@@ -5,7 +5,7 @@
 @class PMManager;
 @class PMNotificationManager;
 
-@interface PMPlugin : NSObject
+@interface PMPlugin : NSObject<FlutterPlugin>
 @property(nonatomic, strong) PMManager *manager;
 @property(nonatomic, strong) PMNotificationManager *notificationManager;
 - (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar;
