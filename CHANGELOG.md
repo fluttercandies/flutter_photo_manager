@@ -10,6 +10,12 @@ To know more about breaking changes, see the [Migration Guide][].
 
 *None.*
 
+## 3.6.4
+
+### Fixes
+
+- Fix potential nil class value when unwrapping caught exceptions on Darwin.
+
 ## 3.6.3
 
 ### Improvements

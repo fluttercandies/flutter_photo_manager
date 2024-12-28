@@ -59,7 +59,7 @@
         NSString *details = exception.callStackSymbols ? [exception.callStackSymbols componentsJoinedByString:@"\n"] : @"No stack trace available.";
         flutterError = [FlutterError errorWithCode:code message:message details:details];
     } else {
-        NSString *code = NSStringFromClass([value class]);
+        NSString *code = NSStringFromClass([value class]) ?: @"UnknownException";
         NSString *message = [NSString stringWithFormat:@"%@", [value description]];
         flutterError = [FlutterError errorWithCode:code message:message details:nil];
     }

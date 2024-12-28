@@ -124,11 +124,12 @@ class _VerboseLogPageState extends State<VerboseLogPage> {
                 final item = logList[index];
                 return ListTile(
                   title: content(item.log),
-                  tileColor: item.isResultLog
-                      ? Colors.green.withOpacity(0.1)
-                      : item.isInvokeLog
-                          ? Colors.blue.withOpacity(0.1)
-                          : null,
+                  tileColor: (item.isResultLog
+                          ? Colors.green
+                          : item.isInvokeLog
+                              ? Colors.blue
+                              : null)
+                      ?.withAlpha(16),
                   subtitle: item.swTime != null
                       ? Text('Time: ${item.swTime}ms')
                       : null,
