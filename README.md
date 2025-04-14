@@ -931,7 +931,7 @@ and Glide's file cache on Android.
 #### Delete entities
 
 **This method will delete the asset completely from your device.
-Use it with extra cautious.**
+Use it with extra caution.**
 
 ```dart
 // Deleted IDs will returned, if it fails, the result will be an empty list.
