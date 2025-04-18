@@ -322,7 +322,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     );
   }
 
-  /// Return [true] if the invoke succeed.
+  /// Return true if the invoke succeed.
   Future<bool> notifyChange({required bool start}) async {
     await _channel.invokeMethod(
       PMConstants.mNotify,
