@@ -12,6 +12,7 @@ import '../../platform_utils.dart';
 import '../filter/base_filter.dart';
 import '../filter/classical/filter_option_group.dart';
 import '../internal/constants.dart';
+import '../internal/editor.dart';
 import '../internal/enums.dart';
 import '../internal/plugin.dart';
 import '../internal/progress_handler.dart';
@@ -812,7 +813,7 @@ class AssetEntity {
   ///  * iOS/macOS: `PHAsset.isFavorite`.
   ///
   /// See also:
-  ///  * [IosEditor.favoriteAsset] to update the favorite status.
+  ///  * [DarwinEditor.favoriteAsset] to update the favorite status.
   final bool isFavorite;
 
   /// The relative path abstraction of the asset.

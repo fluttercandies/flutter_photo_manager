@@ -387,7 +387,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "3.6.3"
+    version: "3.6.4"
   photo_manager_image_provider:
     dependency: "direct main"
     description:

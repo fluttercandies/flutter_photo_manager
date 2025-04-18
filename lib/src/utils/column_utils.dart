@@ -11,7 +11,10 @@ class ColumnUtils {
   /// An instance of the [ColumnUtils] class.
   static const instance = ColumnUtils._internal();
 
-  /// Converts a [DateTime] object to the format used by [MediaStore] on Android or [NSPredicate] on iOS/macOS.
+  /// Converts a [DateTime] object to the format used by [MediaStore][] on Android or [NSPredicate][] on iOS/macOS.
+  ///
+  /// [MediaStore]: https://developer.android.com/reference/android/provider/MediaStore
+  /// [NSPredicate]: https://developer.apple.com/documentation/foundation/nspredicate
   String convertDateTimeToSql(DateTime date, {bool isSeconds = true}) {
     final unix = date.millisecondsSinceEpoch;
 

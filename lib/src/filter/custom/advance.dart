@@ -95,7 +95,7 @@ extension LogicalTypeExtension on LogicalType {
   }
 }
 
-/// {@template PM.column_where_condition}
+/// {@template PM.where_condition_item}
 ///
 /// The where condition item for custom filter.
 ///
