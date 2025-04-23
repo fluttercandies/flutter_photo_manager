@@ -4,7 +4,7 @@
 #import "PMLogUtils.h"
 #import "PMManager.h"
 #import "PMNotificationManager.h"
-#import "ResultHandler.h"
+#import "PMResultHandler.h"
 #import "PMThumbLoadOption.h"
 #import "PMProgressHandler.h"
 #import "PMConverter.h"
@@ -19,6 +19,12 @@
     BOOL isDetach;
 }
 
+
++ (void)registerWithRegistrar:(nonnull NSObject<FlutterPluginRegistrar> *)registrar {
+    PMPlugin *plugin = [PMPlugin new];
+    [plugin registerPlugin:registrar];
+}
+
 - (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar {
     privateRegistrar = registrar;
     [self initNotificationManager:registrar];
@@ -29,8 +35,9 @@
     manager.converter = [PMConverter new];
     [self setManager:manager];
 
+    __block PMPlugin *weakSelf = self;  // avoid retain cycle
     [channel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
-        [self onMethodCall:call result:result];
+        [weakSelf onMethodCall:call result:result];
     }];
 }
 
@@ -119,7 +126,7 @@
         return;
     }
 
-    ResultHandler *handler = [ResultHandler handlerWithCall:call result:result];
+    PMResultHandler *handler = [PMResultHandler handlerWithCall:call result:result];
 
     if ([self isNotNeedPermissionMethod:call.method]) {
         [self handleNotNeedPermissionMethod:handler];
@@ -130,7 +137,7 @@
     }
 }
 
-- (void)handleNotNeedPermissionMethod:(ResultHandler *)handler {
+- (void)handleNotNeedPermissionMethod:(PMResultHandler *)handler {
     FlutterMethodCall *call = handler.call;
     NSString *method = call.method;
     PMManager *manager = self.manager;
@@ -154,9 +161,9 @@
     }
 }
 
-- (void)getPermissionState:(ResultHandler *)handler {
+- (void)getPermissionState:(PMResultHandler *)handler {
     int requestAccessLevel = [handler.call.arguments[@"iosAccessLevel"] intValue];
-#if __IPHONE_14_0
+#if TARGET_OS_IOS
     if (@available(iOS 14, *)) {
         PHAuthorizationStatus result = [PHPhotoLibrary authorizationStatusForAccessLevel: requestAccessLevel];
         [handler reply: @(result)];
@@ -165,12 +172,17 @@
         [handler reply:@(status)];
     }
 #else
-    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
-    [handler reply:@(status)];
+    if (@available(macOS 11.0, *)) {
+        PHAuthorizationStatus result = [PHPhotoLibrary authorizationStatusForAccessLevel: requestAccessLevel];
+        [handler reply: @(result)];
+    } else {
+        PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+        [handler reply:@(status)];
+    }
 #endif
 }
 
-- (void)handleAboutPermissionMethod:(ResultHandler *)handler {
+- (void)handleAboutPermissionMethod:(PMResultHandler *)handler {
     FlutterMethodCall *call = handler.call;
     PMManager *manager = self.manager;
 
@@ -182,7 +194,7 @@
     }
 }
 
-- (void)replyPermssionResult:(ResultHandler *)handler status:(PHAuthorizationStatus)status isOnlyAdd:(BOOL)isOnlyAdd {
+- (void)replyPermssionResult:(PMResultHandler *)handler status:(PHAuthorizationStatus)status isOnlyAdd:(BOOL)isOnlyAdd {
     [handler reply:@(status)];
 }
 
@@ -207,7 +219,7 @@
 #endif
 
 - (void)handlePermission:(PMManager *)manager
-                 handler:(ResultHandler *)handler
+                 handler:(PMResultHandler *)handler
       requestAccessLevel:(int)requestAccessLevel {
 #if __IPHONE_14_0
     if (@available(iOS 14, *)) {
@@ -245,7 +257,7 @@
 #endif
 }
 
-- (void)presentLimited:(ResultHandler *)handler {
+- (void)presentLimited:(PMResultHandler *)handler {
 #if __IPHONE_14_0
     if (@available(iOS 14, *)) {
         UIViewController *controller = [self getCurrentViewController];
@@ -282,7 +294,7 @@
 
 #if TARGET_OS_OSX
 - (void)handlePermission:(PMManager *)manager
-                 handler:(ResultHandler*)handler
+                 handler:(PMResultHandler*)handler
       requestAccessLevel:(int)requestAccessLevel {
 #if __MAC_11_0
     if (@available(macOS 11.0, *)) {
@@ -320,13 +332,13 @@
 #endif
 }
 
-- (void)presentLimited:(ResultHandler*)handler {
+- (void)presentLimited:(PMResultHandler*)handler {
     [handler replyError:@"Not supported on macOS."];
 }
 
 #endif
 
-- (void)runInBackground:(dispatch_block_t)block withHandler:(ResultHandler *)handler {
+- (void)runInBackground:(dispatch_block_t)block withHandler:(PMResultHandler *)handler {
     dispatch_qos_class_t priority = [self getQosPriorityForMethod:handler.call.method];
     dispatch_async(dispatch_get_global_queue(priority, 0), block);
 }
@@ -334,7 +346,9 @@
 - (dispatch_qos_class_t)getQosPriorityForMethod:(NSString *)method {
     if ([method isEqualToString:@"getThumb"] ||
         [method isEqualToString:@"assetExists"] ||
-        [method isEqualToString:@"isLocallyAvailable"]) {
+        [method isEqualToString:@"isLocallyAvailable"] ||
+        [method isEqualToString:@"cancelRequestWithCancelToken"] ||
+        [method isEqualToString:@"cancelAllRequest"]) {
         return QOS_CLASS_USER_INTERACTIVE;
     }
     
@@ -367,7 +381,7 @@
     return QOS_CLASS_DEFAULT;
 }
 
-- (void)onAuth:(ResultHandler *)handler {
+- (void)onAuth:(PMResultHandler *)handler {
     PMManager *manager = self.manager;
     __block PMNotificationManager *notificationManager = self.notificationManager;
 
@@ -381,7 +395,7 @@
     } withHandler:handler];
 }
 
-- (void)handleMethodResultHandler:(ResultHandler *)handler manager:(PMManager *)manager notificationManager:(PMNotificationManager *)notificationManager {
+- (void)handleMethodResultHandler:(PMResultHandler *)handler manager:(PMManager *)manager notificationManager:(PMNotificationManager *)notificationManager {
     FlutterMethodCall *call = handler.call;
 
     if ([call.method isEqualToString:@"getAssetPathList"]) {
@@ -669,6 +683,13 @@
     } else if ([@"cancelCacheRequests" isEqualToString:call.method]) {
         [manager cancelCacheRequests];
         [handler reply:@YES];
+    } else if ([@"cancelRequestWithCancelToken" isEqualToString:call.method]) {
+        NSString *cancelToken = call.arguments[@"cancelToken"];
+        [manager cancelRequestWithCancelToken:cancelToken];
+        [handler reply:@YES];
+    } else if ([@"cancelAllRequest" isEqualToString:call.method]) {
+        [manager cancelAllRequest];
+        [handler reply:@YES];
     } else {
         [handler notImplemented];
     }
@@ -692,7 +713,7 @@
     return handler;
 }
 
-- (void)createFolder:(FlutterMethodCall *)call manager:(PMManager *)manager handler:(ResultHandler *)handler {
+- (void)createFolder:(FlutterMethodCall *)call manager:(PMManager *)manager handler:(PMResultHandler *)handler {
     NSString *name = call.arguments[@"name"];
     BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
     NSString *parentId = call.arguments[@"folderId"];
@@ -709,7 +730,7 @@
     }];
 }
 
-- (void)createAlbum:(FlutterMethodCall *)call manager:(PMManager *)manager handler:(ResultHandler *)handler {
+- (void)createAlbum:(FlutterMethodCall *)call manager:(PMManager *)manager handler:(PMResultHandler *)handler {
     NSString *name = call.arguments[@"name"];
     BOOL isRoot = [call.arguments[@"isRoot"] boolValue];
     NSString *parentId = call.arguments[@"folderId"];
