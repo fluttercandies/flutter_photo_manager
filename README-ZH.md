@@ -6,15 +6,15 @@ that can be found in the LICENSE file. -->
 
 [English](README.md) | 中文
 
-[![pub package](https://img.shields.io/pub/v/photo_manager?label=%E7%A8%B3%E5%AE%9A%E7%89%88)][pub package]
-[![pub pre-release package](https://img.shields.io/pub/v/photo_manager?color=9d00ff&include_prereleases&label=%E6%B5%8B%E8%AF%95%E7%89%88)][pub package]
-[![Build status](https://img.shields.io/github/actions/workflow/status/fluttercandies/flutter_photo_manager/runnable.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/actions/workflows/runnable.yml)
-[![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager)](https://github.com/fluttercandies/flutter_photo_manager/blob/main/LICENSE)
+[![pub package](https://img.shields.io/pub/v/photo_manager?label=%E7%A8%B3%E5%AE%9A%E7%89%88&style=flat)][pub package]
+[![pub pre-release package](https://img.shields.io/pub/v/photo_manager?color=9d00ff&include_prereleases&label=%E6%B5%8B%E8%AF%95%E7%89%88&style=flat)][pub package]
+[![Build status](https://img.shields.io/github/actions/workflow/status/fluttercandies/flutter_photo_manager/runnable.yml?branch=main&label=CI&logo=github&style=flat)](https://github.com/fluttercandies/flutter_photo_manager/actions/workflows/runnable.yml)
+[![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager?style=flat)](https://github.com/fluttercandies/flutter_photo_manager/blob/main/LICENSE)
 
-[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/network)
+[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?logo=github&style=flat)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_photo_manager?logo=github&style=flat)](https://github.com/fluttercandies/flutter_photo_manager/network)
 [![Awesome Flutter](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/Solido/awesome-flutter)
-<a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
+<a href="https://qm.qq.com/q/ZyJbSVjfSU"><img src="https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Ffluttercandies%2F.github%2Frefs%2Fheads%2Fmain%2Fdata.yml&query=%24.qq_group_number&label=QQ%E7%BE%A4&logo=qq&style=flat&color=1DACE8" /></a>
 
 通过相册的抽象 API 对设备中的资源（图片、视频、音频）进行管理，不需要集成 UI。
 在 Android、iOS、macOS and OpenHarmony上可用。
