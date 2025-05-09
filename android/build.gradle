@@ -1,5 +1,3 @@
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 group 'com.fluttercandies.photo_manager'
 version '1.0-SNAPSHOT'
@@ -26,96 +24,6 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
-void log(Object msg) {
-    logger.log(LogLevel.INFO, "[PhotoManager] $msg")
-}
-
-/**
- * Get java version from JAVA_HOME
- * @param path JAVA_HOME path
- * @return java version
- */
-JavaVersion getJavaFromHome(String path) {
-    def releaseFile = new File(path, "release")
-
-    if (releaseFile.exists()) {
-        def pattern = Pattern.compile("JAVA_VERSION=\"(\\d+)\"")
-        def matcher = pattern.matcher(releaseFile.text)
-        if (matcher.find()) {
-            def version = matcher.group(1)
-            log("Get java version from release file: $version")
-            return JavaVersion.toVersion(version)
-        }
-    } else {
-        def javaBin = new File("${path}/bin/java")
-        if (javaBin.exists()) {
-            return JavaVersion.VERSION_1_8
-        } else if (new File("${path}/bin/java.exe").exists()) {
-            return JavaVersion.VERSION_1_8
-        }
-
-        return null
-    }
-}
-
-JavaVersion getJavaVersion() {
-    try {
-        // 0. Get java.version property from project's gradle.properties
-        // The version value is like 1.8, 11, 17, 21, etc.
-        // Also see: https://docs.gradle.org/current/javadoc/org/gradle/api/JavaVersion.html#toVersion-java.lang.Object-
-        JavaVersion res
-
-        def javaVersion = project.rootProject.findProperty("java.version")
-        if (javaVersion != null) {
-            res = JavaVersion.toVersion(javaVersion)
-            log("Get java version from project's gradle.properties: $javaVersion")
-            if (res != null) {
-                return res
-            }
-        }
-
-        String javaHome
-        // 1. read from JAVA_HOME environment variable
-        javaHome = System.getenv("JAVA_HOME")
-        if (res == null && javaHome != null) {
-            res = getJavaFromHome(javaHome)
-            log("Get java version from JAVA_HOME: $javaHome")
-            if (res != null) {
-                return res
-            }
-        }
-
-        // 2. read gradle.properties
-        javaHome = project.rootProject.findProperty("java.home")
-        if (res == null && javaHome != null) {
-            res = getJavaFromHome(javaHome)
-            log("Get java version from gradle.properties: $javaHome")
-            if (res != null) {
-                return res
-            }
-        }
-
-        // 3. read from property with java.home
-        javaHome = System.getProperty("java.home")
-        if (res == null && javaHome != null) {
-            res = getJavaFromHome(javaHome)
-            log("Get java version from java.home: $javaHome")
-            if (res != null) {
-                return res
-            }
-        }
-
-        if (res != null) {
-            return res
-        }
-    } catch (Exception e) {
-        e.printStackTrace()
-    }
-
-    // last, use default version with current
-    return JavaVersion.current()
-}
-
 android {
     if (project.android.hasProperty('namespace') ||
             getGradle().getGradleVersion().substring(0, 1).toInteger() >= 8) {
@@ -124,19 +32,12 @@ android {
 
     compileSdkVersion 34
 
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
-
-    compileOptions {
-        def version = getJavaVersion()
-        sourceCompatibility = version
-        targetCompatibility = version
-    }
-
     defaultConfig {
         minSdkVersion 16
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
     }
 }
 
