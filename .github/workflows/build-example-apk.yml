@@ -7,7 +7,7 @@ on:
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  NDK_VERSION: r27.0.12077973
+  NDK_VERSION: r27
 
 jobs:
   build-apk:
