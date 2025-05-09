@@ -12,9 +12,6 @@ on:
     paths-ignore:
       - "**.md"
 
-env:
-  NDK_VERSION: r27
-
 jobs:
   analyze:
     name: Analyze on ${{ matrix.os }}
@@ -98,10 +95,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
-      - uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: ${{ env.NDK_VERSION }}
-          link-to-sdk: true
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
@@ -144,10 +137,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
-      - uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: ${{ env.NDK_VERSION }}
-          link-to-sdk: true
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
@@ -169,10 +158,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
-      - uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: ${{ env.NDK_VERSION }}
-          link-to-sdk: true
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
@@ -194,10 +179,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
-      - uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: ${{ env.NDK_VERSION }}
-          link-to-sdk: true
       - uses: flutter-actions/setup-flutter@v4
         with:
           channel: 'stable'
