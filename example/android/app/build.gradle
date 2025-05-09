@@ -13,28 +13,9 @@ if (localPropertiesFile.exists()) {
     }
 }
 
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
-
 android {
     namespace 'com.fluttercandies.photo_manager_example'
 
-
-    signingConfigs {
-        release {
-            storeFile file("${rootDir.absolutePath}/photo-manager-keystore")
-            storePassword '123456'
-            keyAlias 'key0'
-            keyPassword '123456'
-        }
-    }
     compileSdk flutter.compileSdkVersion
 
     kotlinOptions {
@@ -50,29 +31,33 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-
     defaultConfig {
         applicationId "com.fluttercandies.photo_manager_example"
         minSdkVersion 21
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
-        multiDexEnabled true
         targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+    }
+
+    signingConfigs {
+        forAll {
+            storeFile file("${rootDir.absolutePath}/photo-manager-keystore")
+            storePassword '123456'
+            keyAlias 'key0'
+            keyPassword '123456'
+        }
     }
 
     buildTypes {
         debug {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.forAll
         }
         profile {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.forAll
         }
         release {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.forAll
         }
-    }
-    lint {
-        disable 'InvalidPackage'
     }
 }
 
