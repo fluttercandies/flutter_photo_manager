@@ -5,6 +5,9 @@ on:
     types:
       - created
 
+permissions:
+  contents: write
+
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   NDK_VERSION: r27
@@ -16,13 +19,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          distribution: 'adopt'
+          distribution: 'zulu'
           java-version: '17'
       - uses: nttld/setup-ndk@v1
         with:
           ndk-version: ${{ env.NDK_VERSION }}
           link-to-sdk: true
-      - uses: subosito/flutter-action@v2
+      - uses: flutter-actions/setup-flutter@v4
         with:
           channel: 'stable'
           cache: true
@@ -37,6 +40,3 @@ jobs:
           echo "Show apk download url: "
           gh release view ${{ github.event.release.tag_name }} --json assets --jq '.assets.[].url'
         working-directory: ${{ github.workspace }}/example
-
-permissions:
-  contents: write
