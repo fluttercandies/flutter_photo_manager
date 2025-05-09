@@ -7,6 +7,7 @@ on:
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  NDK_VERSION: r27.0.12077973
 
 jobs:
   build-apk:
@@ -17,6 +18,10 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
+      - uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: ${{ env.NDK_VERSION }}
+          link-to-sdk: true
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
