@@ -29,9 +29,6 @@ jobs:
           java-version: '17'
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-      - name: Install NDK
-        run: |
-          echo "y" | sdkmanager --install "ndk;27.0.12077973"
       - run: flutter doctor -v
         name: Flutter info
       - run: flutter create new_project --platforms=android
