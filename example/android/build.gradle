@@ -3,35 +3,7 @@ allprojects {
         google()
         mavenCentral()
     }
-    subprojects {
-        afterEvaluate { project ->
-            if (project.plugins.hasPlugin("com.android.application") ||
-                    project.plugins.hasPlugin("com.android.library")) {
-                project.android {
-                    compileSdkVersion 35
-                    buildToolsVersion "35.0.0"
-                    if (namespace == null) {
-                        namespace project.group
-                    }
-
-                    ndkVersion = "27.0.12077973"
-
-                    compileOptions {
-                        sourceCompatibility JavaVersion.VERSION_17
-                        targetCompatibility JavaVersion.VERSION_17
-                    }
-
-                    if(project.android.hasProperty("kotlinOptions")) {
-                        kotlinOptions {
-                            jvmTarget = '17'
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
-
 
 rootProject.buildDir = '../build'
 subprojects {

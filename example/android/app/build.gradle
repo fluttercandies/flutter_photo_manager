@@ -13,23 +13,35 @@ if (localPropertiesFile.exists()) {
     }
 }
 
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
-
 android {
     namespace 'com.fluttercandies.photo_manager_example'
 
-    compileSdk 35
+    compileSdk flutter.compileSdkVersion
+    ndkVersion = "27.0.12077973"
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        applicationId "com.fluttercandies.photo_manager_example"
+        minSdkVersion 21
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+    }
 
     signingConfigs {
-        release {
+        forAll {
             storeFile file("${rootDir.absolutePath}/photo-manager-keystore")
             storePassword '123456'
             keyAlias 'key0'
@@ -37,41 +49,16 @@ android {
         }
     }
 
-    kotlinOptions {
-        jvmTarget = '17'
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.current()
-        targetCompatibility JavaVersion.current()
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
-
-
-    defaultConfig {
-        applicationId "com.fluttercandies.photo_manager_example"
-        minSdkVersion 21
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
-        multiDexEnabled true
-    }
-
     buildTypes {
         debug {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.forAll
         }
         profile {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.forAll
         }
         release {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.forAll
         }
-    }
-    lint {
-        disable 'InvalidPackage'
     }
 }
 
