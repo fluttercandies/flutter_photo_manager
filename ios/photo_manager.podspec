@@ -1,6 +1,9 @@
+pubspec = YAML.load_file(File.join('..', 'pubspec.yaml'))
+library_version = pubspec['version'].gsub('+', '-')
+
 Pod::Spec.new do |s|
   s.name             = 'photo_manager'
-  s.version          = '2.0.0'
+  s.version          = library_version
   s.summary          = 'Photo management APIs for Flutter.'
   s.description      = <<-DESC
 A Flutter plugin that provides assets abstraction management APIs.

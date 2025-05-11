@@ -1,6 +1,11 @@
+File pubspec = new File(project.projectDir.parentFile, 'pubspec.yaml')
+String yaml = pubspec.text
+java.util.regex.Matcher versionMatcher = java.util.regex.Pattern.compile("^version:\\s*['|\"]?([^\\n|'|\"]*)['|\"]?\$", java.util.regex.Pattern.MULTILINE).matcher(yaml)
+versionMatcher.find()
+String library_version = versionMatcher.group(1).replaceAll("\\+", "-")
 
 group 'com.fluttercandies.photo_manager'
-version '1.0-SNAPSHOT'
+version library_version
 
 buildscript {
     ext.kotlin_version = '1.9.23'
