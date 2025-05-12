@@ -5,6 +5,7 @@ typedef enum PMProgressState{
     PMProgressStateLoading = 1,
     PMProgressStateSuccess = 2,
     PMProgressStateFailed = 3,
+    PMProgressStateCancel = 4,
 } PMProgressState;
 
 

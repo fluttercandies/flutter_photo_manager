@@ -462,6 +462,23 @@ When the account requires to re-enter the password to verify, iCloud files that 
 locally available are not allowed to be fetched. The photo library will throws
 `CloudPhotoLibraryErrorDomain` in this circumstance.
 
+**Cancel loading** (Since 3.7.0)
+
+The methods in `AssetEntity` to add `cancelToken` parameter,
+which can be used to cancel the loading process.
+
+```dart
+final PMCancelToken cancelToken = PMCancelToken();
+final File? file = await yourAssetEntity.loadFile(cancelToken: cancelToken);
+await cancelToken.cancel();
+```
+
+The `PhotoManager` also has a method to cancel all loading:
+
+```dart
+await PhotoManager.cancelAllRequest();
+```
+
 #### Display assets
 
 > Starts from v3.0.0, `AssetEntityImage` and `AssetEntityImageProvider`

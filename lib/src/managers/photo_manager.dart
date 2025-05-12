@@ -10,6 +10,8 @@ import '../filter/path_filter.dart';
 import '../internal/editor.dart';
 import '../internal/enums.dart';
 import '../internal/plugin.dart' as base;
+import '../internal/plugin.dart';
+import '../types/cancel_token.dart';
 import '../types/entity.dart';
 import '../types/types.dart';
 import 'notify_manager.dart';
@@ -289,4 +291,11 @@ class PhotoManager {
       type: type,
     );
   }
+
+  /// Cancel the request with the given [cancelToken].
+  static Future<void> cancelRequest(PMCancelToken cancelToken) =>
+      plugin.cancelRequest(cancelToken);
+
+  /// Cancel all loading.
+  static Future<void> cancelAllRequest() => plugin.cancelAllRequest();
 }
