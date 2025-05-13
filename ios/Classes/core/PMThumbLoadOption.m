@@ -69,7 +69,10 @@
             resizeContentMode = PHImageContentModeDefault;
             break;
         default:
-            resizeContentMode = PHImageContentModeAspectFit;
+            // 修改默认值为 PHImageContentModeAspectFill，使 iOS 行为与 Android 一致
+            // 原来是 PHImageContentModeAspectFit，这会将图片的最大边缩放到指定尺寸
+            // 现在改为 PHImageContentModeAspectFill，这会将图片的最小边缩放到指定尺寸
+            resizeContentMode = PHImageContentModeAspectFill;
             
     }
     option.contentMode = resizeContentMode;
