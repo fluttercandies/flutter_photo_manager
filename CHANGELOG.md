@@ -672,28 +672,27 @@ and applied multiple ### Fixes which make this plugin as the most solid ever.
 
 ### Fixes
 
-- Delete assets in androidQ.
+- Fix `open` setting for macOS.
+- Fix `setLog` for iOS and macOS.
 
 ## 1.2.4
 
 ### Fixes
 
-- Compatibility code, when the width and height of the video is empty, it can still be scanned.
-- Add a default value to `type` of `getAssetPathList`.
+- `saveImage` method missing file extension for the fallback title.
+- `openSettings` method.
 
 ## 1.2.3
 
 ### Features
 
-- Delete asset.
-- Add Image.
-- Add Video.
-- Add modifyDate property.
-- Fix videoDuration error.
+- Add assets count change when notify on iOS.
+- Add some properties and methods for change notify.
 
 ### Fixes
 
-- CreateDate error.
+- Change notify issue on remove callback.
+- Reply result for `presentLimited` method.
 
 ## 1.2.2
 
