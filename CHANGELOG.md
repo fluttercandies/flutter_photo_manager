@@ -8,7 +8,9 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+### Fixes
+
+- Fix `SizeConstraint` not working for videos on Android. (#1275)
 
 ## 3.6.4
 
@@ -669,27 +671,28 @@ and applied multiple ### Fixes which make this plugin as the most solid ever.
 
 ### Fixes
 
-- Fix `open` setting for macOS.
-- Fix `setLog` for iOS and macOS.
+- Delete assets in androidQ.
 
 ## 1.2.4
 
 ### Fixes
 
-- `saveImage` method missing file extension for the fallback title.
-- `openSettings` method.
+- Compatibility code, when the width and height of the video is empty, it can still be scanned.
+- Add a default value to `type` of `getAssetPathList`.
 
 ## 1.2.3
 
 ### Features
 
-- Add assets count change when notify on iOS.
-- Add some properties and methods for change notify.
+- Delete asset.
+- Add Image.
+- Add Video.
+- Add modifyDate property.
+- Fix videoDuration error.
 
 ### Fixes
 
-- Change notify issue on remove callback.
-- Reply result for `presentLimited` method.
+- CreateDate error.
 
 ## 1.2.2
 

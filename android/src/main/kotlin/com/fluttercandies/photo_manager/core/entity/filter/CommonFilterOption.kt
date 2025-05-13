@@ -106,6 +106,14 @@ class CommonFilterOption(map: Map<*, *>) : FilterOption() {
             videoCondString = "$typeKey = ? AND $durationCond"
             args.add(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString())
             args.addAll(durationArgs)
+            
+            // 添加对视频的尺寸约束
+            if (!videoCond.sizeConstraint.ignoreSize) {
+                val sizeCond = videoCond.sizeCond()
+                val sizeArgs = videoCond.sizeArgs()
+                videoCondString = "$videoCondString AND $sizeCond"
+                args.addAll(sizeArgs)
+            }
         }
 
         if (haveAudio) {
