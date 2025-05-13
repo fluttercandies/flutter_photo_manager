@@ -11,6 +11,7 @@ To know more about breaking changes, see the [Migration Guide][].
 ### Fixes
 
 - Fix `SizeConstraint` not working for videos on Android. (#1275)
+- Fix inconsistent resizing behavior between iOS and Android in `thumbnailDataWithSize`. (#1271)
 
 ## 3.6.4
 

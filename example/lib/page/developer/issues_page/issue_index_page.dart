@@ -12,6 +12,7 @@ import 'issue_1031.dart';
 import 'issue_1051.dart';
 import 'issue_1053.dart';
 import 'issue_1152.dart';
+import 'issue_1271_demo.dart';
 import 'issue_734.dart';
 import 'issue_918.dart';
 import 'issue_962.dart';
@@ -75,6 +76,7 @@ class IssuePage extends StatelessWidget {
             Issus1051(),
             Issus1053(),
             Issus1152(),
+            Issue1271DemoPage(),
           ],
         ),
       ),
