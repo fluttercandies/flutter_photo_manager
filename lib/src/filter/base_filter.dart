@@ -62,6 +62,9 @@ abstract class PMFilter {
   /// Whether to include hidden assets in the results.
   ///
   /// This option only takes effect on iOS.
+  /// Beginning with iOS 16, users can require authentication to view the
+  /// hidden album, and the user setting is true by default. When true,
+  /// the system doesn’t return hidden assets even if the option is true.
   ///
   /// See also:
   ///  * [PHFetchOptions.includeHiddenAssets](https://developer.apple.com/documentation/photos/phfetchoptions/includehiddenassets).
