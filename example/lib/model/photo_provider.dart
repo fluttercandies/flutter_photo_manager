@@ -56,6 +56,15 @@ class PhotoProvider extends ChangeNotifier {
     _onlyLivePhotos = value;
     notifyListeners();
   }
+  
+  bool _includeHiddenAssets = false;
+  
+  bool get includeHiddenAssets => _includeHiddenAssets;
+  
+  set includeHiddenAssets(bool value) {
+    _includeHiddenAssets = value;
+    notifyListeners();
+  }
 
   DateTime _startDt = DateTime(2005); // Default Before 8 years
 
@@ -191,13 +200,13 @@ class PhotoProvider extends ChangeNotifier {
   }
 
   FilterOptionGroup makeOption() {
-    final FilterOption option = FilterOption(
+    final FilterOption filterOption = FilterOption(
       sizeConstraint: SizeConstraint(
         minWidth: int.tryParse(minWidth) ?? 0,
         maxWidth: int.tryParse(maxWidth) ?? 100000,
         minHeight: int.tryParse(minHeight) ?? 0,
         maxHeight: int.tryParse(maxHeight) ?? 100000,
-        ignoreSize: ignoreSize,
+        ignoreSize: _ignoreSize,
       ),
       durationConstraint: DurationConstraint(
         min: minDuration,
@@ -211,15 +220,20 @@ class PhotoProvider extends ChangeNotifier {
       max: endDt,
     );
 
-    return FilterOptionGroup()
-      ..setOption(AssetType.video, option)
-      ..setOption(AssetType.image, option)
-      ..setOption(AssetType.audio, option)
-      ..createTimeCond = createDtCond
-      ..containsPathModified = _containsPathModified
-      // ignore: deprecated_member_use
-      ..containsLivePhotos = _containsLivePhotos
-      ..onlyLivePhotos = onlyLivePhotos;
+    final FilterOptionGroup optionGroup = FilterOptionGroup(
+      imageOption: filterOption,
+      videoOption: filterOption,
+      audioOption: filterOption,
+      containsPathModified: containsPathModified,
+      containsLivePhotos: containsLivePhotos,
+      onlyLivePhotos: onlyLivePhotos,
+      createTimeCond: createDtCond,
+    );
+    
+    // 设置 includeHiddenAssets 属性（iOS 平台特有）
+    optionGroup.includeHiddenAssets = includeHiddenAssets;
+    
+    return optionGroup;
   }
 
   Future<void> refreshAllGalleryProperties() async {

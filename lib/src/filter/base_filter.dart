@@ -38,6 +38,7 @@ abstract class PMFilter {
   /// Construct a default filter.
   factory PMFilter.defaultValue({
     bool containsPathModified = false,
+    bool includeHiddenAssets = false,
   }) {
     return CustomFilter.sql(
       where: '',
@@ -57,6 +58,14 @@ abstract class PMFilter {
   /// See also:
   ///  * [AssetPathEntity.lastModified].
   bool containsPathModified = false;
+
+  /// Whether to include hidden assets in the results.
+  /// 
+  /// This option only takes effect on iOS.
+  /// 
+  /// See also:
+  ///  * [PHFetchOptions.includeHiddenAssets](https://developer.apple.com/documentation/photos/phfetchoptions/includehiddenassets).
+  bool includeHiddenAssets = false;
 
   /// The type of the filter.
   BaseFilterType get type;
@@ -83,6 +92,7 @@ abstract class PMFilter {
   Map<String, dynamic> _paramMap() {
     return <String, dynamic>{
       'containsPathModified': containsPathModified,
+      'includeHiddenAssets': includeHiddenAssets,
     };
   }
 }
