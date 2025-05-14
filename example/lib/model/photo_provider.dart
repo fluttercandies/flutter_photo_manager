@@ -56,11 +56,11 @@ class PhotoProvider extends ChangeNotifier {
     _onlyLivePhotos = value;
     notifyListeners();
   }
-  
+
   bool _includeHiddenAssets = false;
-  
+
   bool get includeHiddenAssets => _includeHiddenAssets;
-  
+
   set includeHiddenAssets(bool value) {
     _includeHiddenAssets = value;
     notifyListeners();
@@ -177,6 +177,13 @@ class PhotoProvider extends ChangeNotifier {
     containsPathModified = value;
   }
 
+  void changeIncludeHiddenAssets(bool? value) {
+    if (value == null) {
+      return;
+    }
+    includeHiddenAssets = value;
+  }
+
   void reset() {
     list.clear();
   }
@@ -228,11 +235,9 @@ class PhotoProvider extends ChangeNotifier {
       containsLivePhotos: containsLivePhotos,
       onlyLivePhotos: onlyLivePhotos,
       createTimeCond: createDtCond,
+      includeHiddenAssets: includeHiddenAssets, // iOS 平台特有
     );
-    
-    // 设置 includeHiddenAssets 属性（iOS 平台特有）
-    optionGroup.includeHiddenAssets = includeHiddenAssets;
-    
+
     return optionGroup;
   }
 
