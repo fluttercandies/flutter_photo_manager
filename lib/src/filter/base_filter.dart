@@ -60,9 +60,9 @@ abstract class PMFilter {
   bool containsPathModified = false;
 
   /// Whether to include hidden assets in the results.
-  /// 
+  ///
   /// This option only takes effect on iOS.
-  /// 
+  ///
   /// See also:
   ///  * [PHFetchOptions.includeHiddenAssets](https://developer.apple.com/documentation/photos/phfetchoptions/includehiddenassets).
   bool includeHiddenAssets = false;

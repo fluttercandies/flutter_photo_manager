@@ -205,9 +205,9 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
       },
     );
   }
-  
+
   /// 构建包含隐藏资源的复选框
-  /// 
+  ///
   /// 此选项仅在 iOS 平台上有效
   Widget buildIncludeHiddenAssetsCheck(PhotoProvider provider) {
     return AnimatedBuilder(
