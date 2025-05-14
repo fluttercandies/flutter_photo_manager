@@ -232,6 +232,7 @@ class PhotoProvider extends ChangeNotifier {
       videoOption: filterOption,
       audioOption: filterOption,
       containsPathModified: containsPathModified,
+      // ignore: deprecated_member_use
       containsLivePhotos: containsLivePhotos,
       onlyLivePhotos: onlyLivePhotos,
       createTimeCond: createDtCond,
