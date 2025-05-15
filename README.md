@@ -558,6 +558,41 @@ final File? convertedFile = await entity.loadFile(
 );
 ```
 
+#### Include hidden assets (iOS only)
+
+Beginning with iOS 16, users can require authentication to view the hidden album, and the user setting is true by default. When this setting is enabled, the system doesn't return hidden assets in standard queries.
+
+This plugin now supports including hidden assets in the results on iOS platforms through the `includeHiddenAssets` option:
+
+##### Using with FilterOptionGroup
+
+```dart
+final FilterOptionGroup filterOption = FilterOptionGroup(
+  // other options...
+  includeHiddenAssets: true, // Set to true to include hidden assets
+);
+
+// Use the filter option when getting assets
+final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
+  filterOption: filterOption,
+);
+```
+
+##### Using with CustomFilter
+
+```dart
+final filter = CustomFilter.sql(
+  where: '${CustomColumns.base.width} > 100',
+  // other options...
+);
+filter.includeHiddenAssets = true; // Set to true to include hidden assets
+
+// Use the filter when getting assets
+final int count = await PhotoManager.getAssetCount(filterOption: filter);
+```
+
+Note: This option only takes effect on iOS platforms. On other platforms, it will be ignored. If the user has enabled authentication for the hidden album on iOS 16+ (which is the default), third-party apps won't be able to access hidden assets even if this option is set to true.
+
 #### Limitations
 
 ##### Android 10 media location permission
@@ -692,6 +727,8 @@ final FilterOptionGroup filterOption = FilterOptionGroup(
       asc: false,
     ),
   ],
+  /// Include hidden assets in the results (iOS only)
+  includeHiddenAssets: false,
   /// other options
 );
 ```
@@ -713,10 +750,13 @@ An example for how to construct a `CustomFilter`:
 
 ```dart
 CustomFilter createFilter() {
-  return CustomFilter.sql(
+  final filter = CustomFilter.sql(
     where: '${CustomColumns.base.width} > 100 AND ${CustomColumns.base.height} > 200',
     orderBy: [OrderByItem.desc(CustomColumns.base.createDate)],
   );
+  // Include hidden assets in the results (iOS only)
+  filter.includeHiddenAssets = true;
+  return filter;
 }
 ```
 
