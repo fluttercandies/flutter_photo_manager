@@ -52,6 +52,9 @@
 
     PHFetchOptions *options = [PHFetchOptions new];
     options.sortDescriptors = [optionGroup sortCond];
+    
+    // 获取 includeHiddenAssets 属性
+    options.includeHiddenAssets = optionGroup.includeHiddenAssets;
 
     NSMutableString *cond = [NSMutableString new];
     NSMutableArray *args = [NSMutableArray new];
@@ -255,6 +258,9 @@
 
 - (PHFetchOptions *)getFetchOptions:(int)type {
     PHFetchOptions *options = [PHFetchOptions new];
+    
+    // 从 params 中获取 includeHiddenAssets 属性
+    options.includeHiddenAssets = self.params[@"includeHiddenAssets"] ? [self.params[@"includeHiddenAssets"] boolValue] : NO;
 
     BOOL containsImage = [PMRequestTypeUtils containsImage:type];
     BOOL containsVideo = [PMRequestTypeUtils containsVideo:type];

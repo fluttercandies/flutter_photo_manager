@@ -58,6 +58,7 @@ typedef struct PMDurationConstraint {
 @property(nonatomic, assign) BOOL containsLivePhotos;
 @property(nonatomic, assign) BOOL onlyLivePhotos;
 @property(nonatomic, assign) BOOL containsModified;
+@property(nonatomic, assign) BOOL includeHiddenAssets;
 @property(nonatomic, strong) NSArray<NSSortDescriptor *> *sortArray;
 
 - (NSArray<NSSortDescriptor *> *)sortCond;

@@ -64,6 +64,8 @@ class _NewHomePageState extends State<NewHomePage> {
             _buildContainsLivePhotos(),
             _buildOnlyLivePhotos(),
             _buildPathContainsModifiedDateCheck(),
+            if (Platform.isIOS || Platform.isMacOS)
+              _buildIncludeHiddenAssetsCheck(),
             _buildPngCheck(),
             _buildNotifyCheck(),
             _buildFilterOption(watchProvider),
@@ -210,7 +212,17 @@ class _NewHomePageState extends State<NewHomePage> {
       onChanged: (bool? value) {
         readProvider.changeContainsPathModified(value);
       },
-      title: const Text('contains path modified date'),
+      title: const Text('Contains path modified date'),
+    );
+  }
+
+  Widget _buildIncludeHiddenAssetsCheck() {
+    return CheckboxListTile(
+      value: watchProvider.includeHiddenAssets,
+      onChanged: (bool? value) {
+        readProvider.changeIncludeHiddenAssets(value);
+      },
+      title: const Text('Include hidden assets'),
     );
   }
 

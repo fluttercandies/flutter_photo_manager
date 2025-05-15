@@ -34,6 +34,7 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
           }),
           buildIgnoreSize(provider),
           buildNeedTitleCheck(provider),
+          buildIncludeHiddenAssetsCheck(provider),
           buildDurationWidget(
             provider,
             'minDuration',
@@ -201,6 +202,27 @@ class _FilterOptionPageState extends State<FilterOptionPage> {
       value: provider.asc,
       onChanged: (bool? value) {
         provider.asc = value;
+      },
+    );
+  }
+
+  /// 构建包含隐藏资源的复选框
+  ///
+  /// 此选项仅在 iOS 平台上有效
+  Widget buildIncludeHiddenAssetsCheck(PhotoProvider provider) {
+    return AnimatedBuilder(
+      animation: provider,
+      builder: (BuildContext context, Widget? snapshot) {
+        return CheckboxListTile(
+          title: const Text('Include hidden assets (iOS only)'),
+          subtitle: const Text('包含隐藏的资源（仅 iOS 平台有效）'),
+          onChanged: (bool? value) {
+            if (value != null) {
+              provider.includeHiddenAssets = value;
+            }
+          },
+          value: provider.includeHiddenAssets,
+        );
       },
     );
   }
