@@ -8,6 +8,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+### Features
+
+- Add `includeHiddenAssets` option to `PMFilter` and `FilterOptionGroup` to include hidden assets in the results on iOS. (#TBD)
+
 ### Fixes
 
 - Fix `SizeConstraint` not working for videos on Android. (#1275)

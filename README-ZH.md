@@ -520,6 +520,41 @@ final File? convertedFile = await entity.loadFile(
 );
 ```
 
+#### 包含隐藏资源（仅 iOS 平台有效）
+
+在 iOS 16 及以上版本中，用户可以要求验证才能查看隐藏相册，并且该设置默认为开启。在标准查询中，系统不会返回隐藏的资源。
+
+本插件现在支持通过 `includeHiddenAssets` 选项在 iOS 平台上包含隐藏资源：
+
+##### 与 FilterOptionGroup 一起使用
+
+```dart
+final FilterOptionGroup filterOption = FilterOptionGroup(
+  // 其他选项...
+  includeHiddenAssets: true, // 设置为 true 以包含隐藏资源
+);
+
+// 在获取资源时使用过滤选项
+final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
+  filterOption: filterOption,
+);
+```
+
+##### 与 CustomFilter 一起使用
+
+```dart
+final filter = CustomFilter.sql(
+  where: '${CustomColumns.base.width} > 100',
+  // 其他选项...
+);
+filter.includeHiddenAssets = true; // 设置为 true 以包含隐藏资源
+
+// 在获取资源时使用过滤器
+final int count = await PhotoManager.getAssetCount(filterOption: filter);
+```
+
+注意：此选项仅在 iOS 平台上生效。在其他平台上，它将被忽略。如果用户在 iOS 16+ 上为隐藏相册启用了验证（默认开启），即使设置了 includeHiddenAssets 为 true，第三方应用也无法访问隐藏的资源。
+
 #### 限制
 
 ##### Android 10 媒体位置权限
@@ -637,6 +672,8 @@ final FilterOptionGroup filterOption = FilterOptionGroup(
       asc: false,
     ),
   ],
+  /// 包含隐藏资源（仅 iOS 平台有效）
+  includeHiddenAssets: false,
   /// 其他选项
 );
 ```
@@ -656,10 +693,13 @@ SQL 筛选的字段名称在不同平台上是不一致的，
 构造一个 `CustomFilter` 的例子：
 ```dart
 CustomFilter createFilter() {
-  return CustomFilter.sql(
+  final filter = CustomFilter.sql(
     where: '${CustomColumns.base.width} > 100 AND ${CustomColumns.base.height} > 200',
     orderBy: [OrderByItem.desc(CustomColumns.base.createDate)],
   );
+  // 包含隐藏资源（仅 iOS 平台有效）
+  filter.includeHiddenAssets = true;
+  return filter;
 }
 ```
 
