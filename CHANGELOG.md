@@ -10,7 +10,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ### Features
 
-- Add `includeHiddenAssets` option to `PMFilter` and `FilterOptionGroup` to include hidden assets in the results on iOS. (#TBD)
+- Add `includeHiddenAssets` option to `PMFilter` and `FilterOptionGroup` to include hidden assets in the results on iOS.
+- Add `cancelToken` parameter to `AssetEntity.loadFile`.
+- Add `cancelAllRequest` method to `PhotoManager`.
+- The `getFile` and `getOriginBytes` methods are public.
 
 ### Fixes
 
