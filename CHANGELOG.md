@@ -19,6 +19,11 @@ To know more about breaking changes, see the [Migration Guide][].
 - Fix `SizeConstraint` not working for videos on Android. (#1275)
 - Fix inconsistent resizing behavior between iOS and Android in `thumbnailDataWithSize`. (#1271)
 
+### Improvements
+
+- No longer set `sourceCompatibility` and `targetCompatibility` for Android dynamically.
+- Make native library's version parsed from the yaml.
+
 ## 3.6.4
 
 ### Fixes
