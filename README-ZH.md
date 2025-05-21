@@ -6,15 +6,15 @@ that can be found in the LICENSE file. -->
 
 [English](README.md) | 中文
 
-[![pub package](https://img.shields.io/pub/v/photo_manager?label=%E7%A8%B3%E5%AE%9A%E7%89%88)][pub package]
-[![pub pre-release package](https://img.shields.io/pub/v/photo_manager?color=9d00ff&include_prereleases&label=%E6%B5%8B%E8%AF%95%E7%89%88)][pub package]
-[![Build status](https://img.shields.io/github/actions/workflow/status/fluttercandies/flutter_photo_manager/runnable.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/actions/workflows/runnable.yml)
-[![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager)](https://github.com/fluttercandies/flutter_photo_manager/blob/main/LICENSE)
+[![pub package](https://img.shields.io/pub/v/photo_manager?label=%E7%A8%B3%E5%AE%9A%E7%89%88&style=flat)][pub package]
+[![pub pre-release package](https://img.shields.io/pub/v/photo_manager?color=9d00ff&include_prereleases&label=%E6%B5%8B%E8%AF%95%E7%89%88&style=flat)][pub package]
+[![Build status](https://img.shields.io/github/actions/workflow/status/fluttercandies/flutter_photo_manager/runnable.yml?branch=main&label=CI&logo=github&style=flat)](https://github.com/fluttercandies/flutter_photo_manager/actions/workflows/runnable.yml)
+[![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager?style=flat)](https://github.com/fluttercandies/flutter_photo_manager/blob/main/LICENSE)
 
-[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/network)
+[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?logo=github&style=flat)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_photo_manager?logo=github&style=flat)](https://github.com/fluttercandies/flutter_photo_manager/network)
 [![Awesome Flutter](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/Solido/awesome-flutter)
-<a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
+<a href="https://qm.qq.com/q/ZyJbSVjfSU"><img src="https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Ffluttercandies%2F.github%2Frefs%2Fheads%2Fmain%2Fdata.yml&query=%24.qq_group_number&label=QQ%E7%BE%A4&logo=qq&style=flat&color=1DACE8" /></a>
 
 通过相册的抽象 API 对设备中的资源（图片、视频、音频）进行管理，不需要集成 UI。
 在 Android、iOS、macOS and OpenHarmony上可用。
@@ -539,6 +539,41 @@ final File? convertedFile = await entity.loadFile(
 );
 ```
 
+#### 包含隐藏资源（仅 iOS 平台有效）
+
+在 iOS 16 及以上版本中，用户可以要求验证才能查看隐藏相册，并且该设置默认为开启。在标准查询中，系统不会返回隐藏的资源。
+
+本插件现在支持通过 `includeHiddenAssets` 选项在 iOS 平台上包含隐藏资源：
+
+##### 与 FilterOptionGroup 一起使用
+
+```dart
+final FilterOptionGroup filterOption = FilterOptionGroup(
+  // 其他选项...
+  includeHiddenAssets: true, // 设置为 true 以包含隐藏资源
+);
+
+// 在获取资源时使用过滤选项
+final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
+  filterOption: filterOption,
+);
+```
+
+##### 与 CustomFilter 一起使用
+
+```dart
+final filter = CustomFilter.sql(
+  where: '${CustomColumns.base.width} > 100',
+  // 其他选项...
+);
+filter.includeHiddenAssets = true; // 设置为 true 以包含隐藏资源
+
+// 在获取资源时使用过滤器
+final int count = await PhotoManager.getAssetCount(filterOption: filter);
+```
+
+注意：此选项仅在 iOS 平台上生效。在其他平台上，它将被忽略。如果用户在 iOS 16+ 上为隐藏相册启用了验证（默认开启），即使设置了 includeHiddenAssets 为 true，第三方应用也无法访问隐藏的资源。
+
 #### 限制
 
 ##### Android 10 媒体位置权限
@@ -656,6 +691,8 @@ final FilterOptionGroup filterOption = FilterOptionGroup(
       asc: false,
     ),
   ],
+  /// 包含隐藏资源（仅 iOS 平台有效）
+  includeHiddenAssets: false,
   /// 其他选项
 );
 ```
@@ -675,10 +712,13 @@ SQL 筛选的字段名称在不同平台上是不一致的，
 构造一个 `CustomFilter` 的例子：
 ```dart
 CustomFilter createFilter() {
-  return CustomFilter.sql(
+  final filter = CustomFilter.sql(
     where: '${CustomColumns.base.width} > 100 AND ${CustomColumns.base.height} > 200',
     orderBy: [OrderByItem.desc(CustomColumns.base.createDate)],
   );
+  // 包含隐藏资源（仅 iOS 平台有效）
+  filter.includeHiddenAssets = true;
+  return filter;
 }
 ```
 

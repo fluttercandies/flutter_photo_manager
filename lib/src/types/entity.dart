@@ -12,6 +12,7 @@ import '../../platform_utils.dart';
 import '../filter/base_filter.dart';
 import '../filter/classical/filter_option_group.dart';
 import '../internal/constants.dart';
+import '../internal/editor.dart';
 import '../internal/enums.dart';
 import '../internal/plugin.dart';
 import '../internal/progress_handler.dart';
@@ -598,7 +599,7 @@ class AssetEntity {
 
   /// Obtain the raw data of the asset.
   ///
-  /// **Use it with cautious** since the original data might be epic large.
+  /// **Use it with caution** since the original data might be epic large.
   /// Generally use this method only for images.
   Future<typed_data.Uint8List?> get originBytes => getOriginBytes();
 
@@ -646,6 +647,7 @@ class AssetEntity {
         size: size,
         format: format,
         quality: quality,
+        resizeContentMode: ResizeContentMode.fill,
       );
     } else {
       option = ThumbnailOption(
@@ -855,7 +857,7 @@ class AssetEntity {
   ///  * iOS/macOS: `PHAsset.isFavorite`.
   ///
   /// See also:
-  ///  * [IosEditor.favoriteAsset] to update the favorite status.
+  ///  * [DarwinEditor.favoriteAsset] to update the favorite status.
   final bool isFavorite;
 
   /// The relative path abstraction of the asset.

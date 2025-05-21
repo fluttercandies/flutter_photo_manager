@@ -133,6 +133,7 @@
         container.containsModified = [map[@"containsPathModified"] boolValue];
         container.containsLivePhotos = [map[@"containsLivePhotos"] boolValue];
         container.onlyLivePhotos = [map[@"onlyLivePhotos"] boolValue];
+        container.includeHiddenAssets = [map[@"includeHiddenAssets"] boolValue];
         
         NSArray *sortArray = map[@"orders"];
         [container injectSortArray:sortArray];

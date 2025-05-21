@@ -6,15 +6,15 @@ that can be found in the LICENSE file. -->
 
 English | [中文](README-ZH.md)
 
-[![pub package](https://img.shields.io/pub/v/photo_manager?label=stable)][pub package]
-[![pub pre-release package](https://img.shields.io/pub/v/photo_manager?color=9d00ff&include_prereleases&label=dev)](https://pub.dev/packages/photo_manager)
-[![Build status](https://img.shields.io/github/actions/workflow/status/fluttercandies/flutter_photo_manager/runnable.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/actions/workflows/runnable.yml)
+[![pub package](https://img.shields.io/pub/v/photo_manager?label=stable&style=flat)][pub package]
+[![pub pre-release package](https://img.shields.io/pub/v/photo_manager?color=9d00ff&include_prereleases&label=dev&style=flat)](https://pub.dev/packages/photo_manager)
+[![Build status](https://img.shields.io/github/actions/workflow/status/fluttercandies/flutter_photo_manager/runnable.yml?branch=main&label=CI&logo=github&style=flat)](https://github.com/fluttercandies/flutter_photo_manager/actions/workflows/runnable.yml)
 [![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_photo_manager)](https://github.com/fluttercandies/flutter_photo_manager/blob/main/LICENSE)
 
-[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_photo_manager?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_photo_manager/network)
+[![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_photo_manager?logo=github&style=flat)](https://github.com/fluttercandies/flutter_photo_manager/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_photo_manager?logo=github&style=flat)](https://github.com/fluttercandies/flutter_photo_manager/network)
 [![Awesome Flutter](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/Solido/awesome-flutter)
-<a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
+<a href="https://qm.qq.com/q/ZyJbSVjfSU"><img src="https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Ffluttercandies%2F.github%2Frefs%2Fheads%2Fmain%2Fdata.yml&query=%24.qq_group_number&label=QQ%E7%BE%A4&logo=qq&style=flat&color=1DACE8" /></a>
 
 A Flutter plugin that provides assets abstraction management APIs without UI integration,
 you can get assets (image/video/audio) on Android, iOS, macOS and OpenHarmony.
@@ -575,6 +575,41 @@ final File? convertedFile = await entity.loadFile(
 );
 ```
 
+#### Include hidden assets (iOS only)
+
+Beginning with iOS 16, users can require authentication to view the hidden album, and the user setting is true by default. When this setting is enabled, the system doesn't return hidden assets in standard queries.
+
+This plugin now supports including hidden assets in the results on iOS platforms through the `includeHiddenAssets` option:
+
+##### Using with FilterOptionGroup
+
+```dart
+final FilterOptionGroup filterOption = FilterOptionGroup(
+  // other options...
+  includeHiddenAssets: true, // Set to true to include hidden assets
+);
+
+// Use the filter option when getting assets
+final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
+  filterOption: filterOption,
+);
+```
+
+##### Using with CustomFilter
+
+```dart
+final filter = CustomFilter.sql(
+  where: '${CustomColumns.base.width} > 100',
+  // other options...
+);
+filter.includeHiddenAssets = true; // Set to true to include hidden assets
+
+// Use the filter when getting assets
+final int count = await PhotoManager.getAssetCount(filterOption: filter);
+```
+
+Note: This option only takes effect on iOS platforms. On other platforms, it will be ignored. If the user has enabled authentication for the hidden album on iOS 16+ (which is the default), third-party apps won't be able to access hidden assets even if this option is set to true.
+
 #### Limitations
 
 ##### Android 10 media location permission
@@ -709,6 +744,8 @@ final FilterOptionGroup filterOption = FilterOptionGroup(
       asc: false,
     ),
   ],
+  /// Include hidden assets in the results (iOS only)
+  includeHiddenAssets: false,
   /// other options
 );
 ```
@@ -730,10 +767,13 @@ An example for how to construct a `CustomFilter`:
 
 ```dart
 CustomFilter createFilter() {
-  return CustomFilter.sql(
+  final filter = CustomFilter.sql(
     where: '${CustomColumns.base.width} > 100 AND ${CustomColumns.base.height} > 200',
     orderBy: [OrderByItem.desc(CustomColumns.base.createDate)],
   );
+  // Include hidden assets in the results (iOS only)
+  filter.includeHiddenAssets = true;
+  return filter;
 }
 ```
 
@@ -948,7 +988,7 @@ and Glide's file cache on Android.
 #### Delete entities
 
 **This method will delete the asset completely from your device.
-Use it with extra cautious.**
+Use it with extra caution.**
 
 ```dart
 // Deleted IDs will returned, if it fails, the result will be an empty list.

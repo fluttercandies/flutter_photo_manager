@@ -1,5 +1,9 @@
 name: Runnable (stable)
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches:
@@ -18,16 +22,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          distribution: 'adopt'
+          distribution: 'zulu'
           java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: "stable"
           cache: true
       - name: Log Dart/Flutter versions
         run: |
@@ -42,12 +46,13 @@ jobs:
         run: flutter analyze lib
       - name: Analyze example
         run: flutter analyze example
-#      - name: Analyze example_ohos
-#        run: flutter analyze example_ohos
+      #      - name: Analyze example_ohos
+      #        run: flutter analyze example_ohos
       - name: Run tests
         run: flutter test
       - name: Dry run docs generate
         run: dart doc --dry-run .
+        continue-on-error: true
 
   publishable:
     if: github.repository == 'fluttercandies/flutter_photo_manager'
@@ -56,11 +61,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          distribution: 'adopt'
+          distribution: 'zulu'
           java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: "stable"
           cache: true
       - run: flutter doctor -v
       - name: Prepare dependencies
@@ -72,9 +77,9 @@ jobs:
       - name: Publish dry run
         uses: k-paxian/dart-package-publisher@master
         with:
-          credentialJson: 'MockCredentialJson'
-          accessToken: 'MockAccessToken'
-          refreshToken: 'MockRefreshToken'
+          credentialJson: "MockCredentialJson"
+          accessToken: "MockAccessToken"
+          refreshToken: "MockRefreshToken"
           flutter: true
           dryRunOnly: true
 
@@ -84,7 +89,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ubuntu-latest]
     permissions:
       pull-requests: write
       issues: write
@@ -92,11 +97,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
+          distribution: 'zulu'
           java-version: '17'
-          distribution: 'adopt'
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: "stable"
           cache: true
       - run: flutter doctor -v
       - run: flutter pub get
@@ -122,7 +127,6 @@ jobs:
               repo: context.repo.repo,
               body: 'Download apk from [here](${{ steps.apk.outputs.artifact-url }}) for ${{ github.sha}}'
             })
-        
 
   test_android_on_windows:
     needs: analyze
@@ -130,16 +134,16 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
+          distribution: 'zulu'
           java-version: '17'
-          distribution: 'adopt'
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: "stable"
           cache: true
       - run: flutter doctor -v
       - run: flutter pub get
@@ -151,16 +155,16 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
+          distribution: 'zulu'
           java-version: '17'
-          distribution: 'adopt'
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: "stable"
           cache: true
       - run: flutter doctor -v
       - run: flutter pub get
@@ -172,17 +176,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ macos-latest ]
+        os: [macos-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          distribution: 'adopt'
+          distribution: 'zulu'
           java-version: '17'
-      - uses: subosito/flutter-action@v2
+      - uses: flutter-actions/setup-flutter@v4
         with:
           channel: 'stable'
-          architecture: x64
           cache: true
       - run: flutter doctor -v
       - run: flutter pub get

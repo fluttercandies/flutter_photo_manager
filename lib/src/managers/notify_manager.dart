@@ -29,18 +29,18 @@ class NotifyManager {
   /// {@template photo_manager.NotifyManager.addChangeCallback}
   /// Adds a callback function to be executed upon asset changes.
   ///
-  /// * [c]: A required parameter. The function to be executed upon asset changes.
+  /// * [callback]: A required parameter. The function to be executed upon asset changes.
   /// {@endtemplate}
-  void addChangeCallback(foundation.ValueChanged<MethodCall> c) =>
-      _notifyCallback.add(c);
+  void addChangeCallback(foundation.ValueChanged<MethodCall> callback) =>
+      _notifyCallback.add(callback);
 
   /// {@template photo_manager.NotifyManager.removeChangeCallback}
   /// Removes a callback function from the list to be executed upon asset changes.
   ///
-  /// * [c]: A required parameter. The function to remove.
+  /// * [callback]: A required parameter. The function to remove.
   /// {@endtemplate}
-  void removeChangeCallback(foundation.ValueChanged<MethodCall> c) =>
-      _notifyCallback.remove(c);
+  void removeChangeCallback(foundation.ValueChanged<MethodCall> callback) =>
+      _notifyCallback.remove(callback);
 
   /// {@template photo_manager.NotifyManager.startChangeNotify}
   /// Enables asset change notifications.

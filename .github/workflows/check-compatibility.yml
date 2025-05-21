@@ -1,11 +1,15 @@
 name: Add library to new flutter project
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   pull_request:
-    branches: 
+    branches:
       - main
   push:
-    branches: 
+    branches:
       - main
       - 2.x
 
@@ -15,14 +19,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: flutter-actions/setup-flutter@v4
         with:
           channel: 'stable'
           cache: true
       - uses: actions/setup-java@v4
         with:
-          distribution: 'adopt'
+          distribution: 'zulu'
           java-version: '17'
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
       - run: flutter doctor -v
         name: Flutter info
       - run: flutter create new_project --platforms=android
@@ -41,7 +47,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: flutter-actions/setup-flutter@v4
         with:
           channel: 'stable'
           cache: true
@@ -68,7 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: flutter-actions/setup-flutter@v4
         with:
           channel: 'stable'
           cache: true
@@ -90,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: flutter-actions/setup-flutter@v4
         with:
           channel: 'stable'
           cache: true
@@ -118,7 +124,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: flutter-actions/setup-flutter@v4
         with:
           channel: 'stable'
           cache: true
@@ -145,7 +151,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: flutter-actions/setup-flutter@v4
         with:
           channel: 'stable'
           cache: true

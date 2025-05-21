@@ -57,6 +57,15 @@ class PhotoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _includeHiddenAssets = false;
+
+  bool get includeHiddenAssets => _includeHiddenAssets;
+
+  set includeHiddenAssets(bool value) {
+    _includeHiddenAssets = value;
+    notifyListeners();
+  }
+
   DateTime _startDt = DateTime(2005); // Default Before 8 years
 
   DateTime get startDt => _startDt;
@@ -168,6 +177,13 @@ class PhotoProvider extends ChangeNotifier {
     containsPathModified = value;
   }
 
+  void changeIncludeHiddenAssets(bool? value) {
+    if (value == null) {
+      return;
+    }
+    includeHiddenAssets = value;
+  }
+
   void reset() {
     list.clear();
   }
@@ -191,13 +207,13 @@ class PhotoProvider extends ChangeNotifier {
   }
 
   FilterOptionGroup makeOption() {
-    final FilterOption option = FilterOption(
+    final FilterOption filterOption = FilterOption(
       sizeConstraint: SizeConstraint(
         minWidth: int.tryParse(minWidth) ?? 0,
         maxWidth: int.tryParse(maxWidth) ?? 100000,
         minHeight: int.tryParse(minHeight) ?? 0,
         maxHeight: int.tryParse(maxHeight) ?? 100000,
-        ignoreSize: ignoreSize,
+        ignoreSize: _ignoreSize,
       ),
       durationConstraint: DurationConstraint(
         min: minDuration,
@@ -211,15 +227,19 @@ class PhotoProvider extends ChangeNotifier {
       max: endDt,
     );
 
-    return FilterOptionGroup()
-      ..setOption(AssetType.video, option)
-      ..setOption(AssetType.image, option)
-      ..setOption(AssetType.audio, option)
-      ..createTimeCond = createDtCond
-      ..containsPathModified = _containsPathModified
+    final FilterOptionGroup optionGroup = FilterOptionGroup(
+      imageOption: filterOption,
+      videoOption: filterOption,
+      audioOption: filterOption,
+      containsPathModified: containsPathModified,
       // ignore: deprecated_member_use
-      ..containsLivePhotos = _containsLivePhotos
-      ..onlyLivePhotos = onlyLivePhotos;
+      containsLivePhotos: containsLivePhotos,
+      onlyLivePhotos: onlyLivePhotos,
+      createTimeCond: createDtCond,
+      includeHiddenAssets: includeHiddenAssets, // iOS 平台特有
+    );
+
+    return optionGroup;
   }
 
   Future<void> refreshAllGalleryProperties() async {
