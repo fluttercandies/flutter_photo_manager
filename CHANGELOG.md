@@ -8,11 +8,19 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+*None.*
+
+## 3.7.1
+
+### Fixes
+
+- Fix inconsistent `jvmTarget` compatibility on Android.
+
 ## 3.7.0
 
 ### Features
 
-- Add `includeHiddenAssets` option to `PMFilter` and `FilterOptionGroup` to include hidden assets in the results on iOS. (#TBD)
+- Add `includeHiddenAssets` option to `PMFilter` and `FilterOptionGroup` to include hidden assets in the results on iOS.
 
 ### Fixes
 
