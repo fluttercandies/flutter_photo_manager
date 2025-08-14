@@ -259,37 +259,71 @@
 
 - (NSArray<PMAssetEntity *> *)getAssetListPaged:(NSString *)id type:(int)type page:(NSUInteger)page size:(NSUInteger)size filterOption:(NSObject<PMBaseFilter> *)filterOption {
     NSMutableArray<PMAssetEntity *> *result = [NSMutableArray new];
-    
+
     PHFetchOptions *options = [PHFetchOptions new];
-    
+
     PHFetchResult<PHAssetCollection *> *fetchResult =
     [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[id]
                                                          options:options];
     if (fetchResult && fetchResult.count == 0) {
         return result;
     }
-    
+
     PHAssetCollection *collection = fetchResult.firstObject;
     PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:filterOption];
+
+    // --- PATCH: enforce type filtering explicitly ---
+    // 'type' here is a bitmask based on PhotoManager's RequestType enum:
+    //   1 = image
+    //   2 = video
+    //   3 = common  (image + video)  <-- THIS IS THE "COMMON" CASE
+    //   4 = audio
+    if (type > 0) {
+       NSMutableArray *predicates = [NSMutableArray array];
+
+       // Bitmask logic for RequestType:
+       // 1 = image, 2 = video, 4 = audio
+       if (type & 1) { // image
+           [predicates addObject:[NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeImage]];
+       }
+       if (type & 2) { // video
+           [predicates addObject:[NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeVideo]];
+       }
+       if (type & 4) { // audio
+           [predicates addObject:[NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeAudio]];
+       }
+
+       // Combine predicates with OR: fetch assets matching any of the selected types
+       if (predicates.count > 0) {
+           NSPredicate *typePredicate = [NSCompoundPredicate orPredicateWithSubpredicates:predicates];
+           // If there is already a predicate (from filterOption), combine with AND
+           if (assetOptions.predicate) {
+               assetOptions.predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[assetOptions.predicate, typePredicate]];
+           } else {
+               assetOptions.predicate = typePredicate;
+           }
+       }
+    }
+    // --- end patch ---
+
     NSArray<NSSortDescriptor *> *sortDescriptors = assetOptions.sortDescriptors;
     PHFetchResult<PHAsset *> *assetArray = [PHAsset fetchAssetsInAssetCollection:collection
                                                                          options:assetOptions];
-    
     if (assetArray.count == 0) {
         return result;
     }
-    
+
     NSUInteger startIndex = page * size;
     NSUInteger endIndex = startIndex + size - 1;
-    
+
     NSUInteger count = assetArray.count;
     if (endIndex >= count) {
         endIndex = count - 1;
     }
-    
+
     BOOL imageNeedTitle = filterOption.needTitle;
     BOOL videoNeedTitle = filterOption.needTitle;
-    
+
     for (NSUInteger i = startIndex; i <= endIndex; i++) {
         NSUInteger index = i;
         if (sortDescriptors == nil || sortDescriptors.count == 0) {
@@ -306,7 +340,7 @@
         [result addObject:entity];
         [cacheContainer putAssetEntity:entity];
     }
-    
+
     return result;
 }
 
