@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:photo_manager/platform_utils.dart';
 
 import '../filter/base_filter.dart';
-import '../filter/classical/filter_option_group.dart';
 import '../filter/path_filter.dart';
 import '../types/entity.dart';
 import '../types/thumbnail.dart';
@@ -68,7 +67,7 @@ class VerboseLogMethodChannel extends MethodChannel {
     );
   }
 
-  String _formatArgs(args) {
+  String _formatArgs(Object? args) {
     if (args == null) {
       return 'null';
     }
@@ -79,7 +78,10 @@ class VerboseLogMethodChannel extends MethodChannel {
       }).join(', ');
       return 'Map{ $res }';
     }
-    if (args is Uint8List || args is List<int>) {
+    if (args is Uint8List) {
+      return 'IntList(${args.length})';
+    }
+    if (args is List<int>) {
       return 'IntList(${args.length})';
     }
     if (args is List) {
@@ -143,14 +145,13 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     if (onlyAll) {
       hasAll = true;
     }
-    filterOption ??= FilterOptionGroup();
     final Map result = await _channel.invokeMethod(
       PMConstants.mGetAssetPathList,
       <String, dynamic>{
         'type': type.value,
         'hasAll': hasAll,
         'onlyAll': onlyAll,
-        'option': filterOption.toMap(),
+        'option': filterOption?.toMap(),
         'pathOption': pathFilterOption.toMap(),
       },
     );
@@ -177,7 +178,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       <String, dynamic>{
         'id': path.id,
         'type': path.type.value,
-        'option': path.filterOption.toMap(),
+        'option': path.filterOption?.toMap(),
       },
     );
     return result;
@@ -189,7 +190,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   /// Not existing assets will be excluded from the result.
   Future<List<AssetEntity>> getAssetListPaged(
     String id, {
-    required PMFilter optionGroup,
+    required PMFilter? optionGroup,
     int page = 0,
     int size = 15,
     RequestType type = RequestType.common,
@@ -201,7 +202,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'type': type.value,
         'page': page,
         'size': size,
-        'option': optionGroup.toMap(),
+        'option': optionGroup?.toMap(),
       },
     );
     return ConvertUtils.convertToAssetList(result.cast());
@@ -216,7 +217,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     required RequestType type,
     required int start,
     required int end,
-    required PMFilter optionGroup,
+    required PMFilter? optionGroup,
   }) async {
     final Map map = await _channel.invokeMethod(
       PMConstants.mGetAssetListRange,
@@ -225,7 +226,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'type': type.value,
         'start': start,
         'end': end,
-        'option': optionGroup.toMap(),
+        'option': optionGroup?.toMap(),
       },
     );
     return ConvertUtils.convertToAssetList(map.cast());
@@ -309,7 +310,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   Future<Map?> fetchPathProperties(
     String id,
     RequestType type,
-    PMFilter optionGroup,
+    PMFilter? optionGroup,
   ) {
     return _channel.invokeMethod(
       PMConstants.mFetchPathProperties,
@@ -317,7 +318,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'id': id,
         'timestamp': 0,
         'type': type.value,
-        'option': optionGroup.toMap(),
+        'option': optionGroup?.toMap(),
       },
     );
   }
@@ -511,7 +512,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'id': pathEntity.id,
         'type': pathEntity.type.value,
         'albumType': pathEntity.albumType,
-        'option': pathEntity.filterOption.toMap(),
+        'option': pathEntity.filterOption?.toMap(),
       },
     );
     final items = result['list'] as Map;
