@@ -36,20 +36,22 @@ object AndroidQDBUtils : IDBUtils {
     override fun getAssetPathList(
         context: Context,
         requestType: Int,
-        option: FilterOption
+        option: FilterOption?
     ): List<AssetPathEntity> {
         val list = ArrayList<AssetPathEntity>()
         val args = ArrayList<String>()
-        val where = option.makeWhere(requestType, args)
-        val selections =
-            "$BUCKET_ID IS NOT NULL $where"
+        val where = option?.makeWhere(requestType, args)
+        var selections = "$BUCKET_ID IS NOT NULL"
+        if (where != null) {
+            selections += " $where"
+        }
 
         val cursor = context.contentResolver.logQuery(
             allUri,
             IDBUtils.storeBucketKeys,
             selections,
             args.toTypedArray(),
-            option.orderByCondString()
+            option?.orderByCondString()
         )
         val nameMap = HashMap<String, String>()
         val countMap = HashMap<String, Int>()
@@ -71,7 +73,7 @@ object AndroidQDBUtils : IDBUtils {
             val name = it.value
             val assetCount = countMap[id]!!
             val entity = AssetPathEntity(id, name, assetCount, requestType, false)
-            if (option.containsPathModified) {
+            if (option?.containsPathModified == true) {
                 injectModifiedDate(context, entity)
             }
             list.add(entity)
@@ -82,20 +84,22 @@ object AndroidQDBUtils : IDBUtils {
     override fun getMainAssetPathEntity(
         context: Context,
         requestType: Int,
-        option: FilterOption
+        option: FilterOption?
     ): List<AssetPathEntity> {
         val list = ArrayList<AssetPathEntity>()
         val args = ArrayList<String>()
-        val where = option.makeWhere(requestType, args)
-        val selections =
-            "$BUCKET_ID IS NOT NULL $where"
+        val where = option?.makeWhere(requestType, args)
+        var selections = "$BUCKET_ID IS NOT NULL"
+        if (where != null) {
+            selections += " $where"
+        }
 
         val cursor = context.contentResolver.logQuery(
             allUri,
             IDBUtils.storeBucketKeys,
             selections,
             args.toTypedArray(),
-            option.orderByCondString()
+            option?.orderByCondString()
         )
         cursor.use {
             val assetPathEntity = AssetPathEntity(
@@ -110,11 +114,11 @@ object AndroidQDBUtils : IDBUtils {
         return list
     }
 
-    override fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String? {
+    override fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption?): String? {
         if (isQStorageLegacy) {
             return super.getSortOrder(start, pageSize, filterOption)
         }
-        return filterOption.orderByCondString()
+        return filterOption?.orderByCondString()
     }
 
     private fun cursorWithRange(
@@ -139,7 +143,7 @@ object AndroidQDBUtils : IDBUtils {
         page: Int,
         size: Int,
         requestType: Int,
-        option: FilterOption
+        option: FilterOption?
     ): List<AssetEntity> {
         val isAll = pathId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -147,11 +151,14 @@ object AndroidQDBUtils : IDBUtils {
         if (!isAll) {
             args.add(pathId)
         }
-        val where = option.makeWhere(requestType, args)
-        val selection = if (isAll) {
-            "$BUCKET_ID IS NOT NULL $where"
+        val where = option?.makeWhere(requestType, args)
+        var selection = if (isAll) {
+            "$BUCKET_ID IS NOT NULL"
         } else {
-            "$BUCKET_ID = ? $where"
+            "$BUCKET_ID = ?"
+        }
+        if (where != null) {
+            selection += " $where"
         }
         val sortOrder = getSortOrder(page * size, size, option)
         val cursor = context.contentResolver.logQuery(
@@ -178,7 +185,7 @@ object AndroidQDBUtils : IDBUtils {
         start: Int,
         end: Int,
         requestType: Int,
-        option: FilterOption
+        option: FilterOption?
     ): List<AssetEntity> {
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -186,11 +193,14 @@ object AndroidQDBUtils : IDBUtils {
         if (!isAll) {
             args.add(galleryId)
         }
-        val where = option.makeWhere(requestType, args)
-        val selection = if (isAll) {
-            "$BUCKET_ID IS NOT NULL $where"
+        val where = option?.makeWhere(requestType, args)
+        var selection = if (isAll) {
+            "$BUCKET_ID IS NOT NULL"
         } else {
-            "$BUCKET_ID = ? $where"
+            "$BUCKET_ID = ?"
+        }
+        if (where != null) {
+            selection += " $where"
         }
         val pageSize = end - start
         val sortOrder = getSortOrder(start, pageSize, option)
@@ -243,11 +253,11 @@ object AndroidQDBUtils : IDBUtils {
         context: Context,
         pathId: String,
         type: Int,
-        option: FilterOption
+        option: FilterOption?
     ): AssetPathEntity? {
         val isAll = pathId == ""
         val args = ArrayList<String>()
-        val where = option.makeWhere(type, args)
+        val where = option?.makeWhere(type, args)
         val idSelection: String
         if (isAll) {
             idSelection = ""
@@ -255,8 +265,11 @@ object AndroidQDBUtils : IDBUtils {
             idSelection = "AND $BUCKET_ID = ?"
             args.add(pathId)
         }
-        val selection =
-            "$BUCKET_ID IS NOT NULL $where $idSelection"
+        var selection = "$BUCKET_ID IS NOT NULL"
+        if (where != null) {
+            selection += " $where"
+        }
+        selection += " $idSelection"
         val cursor = context.contentResolver.logQuery(
             allUri,
             IDBUtils.storeBucketKeys,
