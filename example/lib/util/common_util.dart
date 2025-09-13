@@ -49,6 +49,7 @@ class CommonUtil {
               _buildInfoItemAsync('title', entity.titleAsync),
               _buildInfoItem('lat', lat.toString()),
               _buildInfoItem('lng', lng.toString()),
+              _buildInfoItem('is favorite', entity.isFavorite.toString()),
               _buildInfoItem('relative path', entity.relativePath ?? 'null'),
               _buildInfoItemAsync('mimeType', entity.mimeTypeAsync),
             ],
