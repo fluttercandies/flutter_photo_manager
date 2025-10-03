@@ -1,3 +1,4 @@
+#import "NSObject+SafeCheck.h"
 #import "PMConvertUtils.h"
 #import "PHAsset+PM_COMMON.h"
 #import "PMAssetPathEntity.h"
@@ -115,6 +116,10 @@
 }
 
 + (NSObject <PMBaseFilter> *)convertMapToOptionContainer:(NSDictionary *)map {
+    if ([map isNilOrNull]) {
+        return nil;
+    }
+    
     int type = [map[@"type"] intValue];
     
     if (type == 0) {

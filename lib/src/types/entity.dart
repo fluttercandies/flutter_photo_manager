@@ -33,7 +33,7 @@ class AssetPathEntity {
     this.lastModified,
     this.type = RequestType.common,
     this.isAll = false,
-    PMFilter? filterOption,
+    this.filterOption,
     @Deprecated(
       'Use `albumTypeEx.darwin.type` instead. '
       'This feature was deprecated after v3.1.0',
@@ -45,7 +45,7 @@ class AssetPathEntity {
     )
     this.darwinType,
     this.albumTypeEx,
-  }) : filterOption = filterOption ??= FilterOptionGroup();
+  });
 
   /// Obtain an entity from ID.
   ///
@@ -104,7 +104,7 @@ class AssetPathEntity {
   final bool isAll;
 
   /// The collection of filter options of the album.
-  final PMFilter filterOption;
+  final PMFilter? filterOption;
 
   /// The darwin collection type, in android, the value is always null.
   ///
@@ -135,7 +135,6 @@ class AssetPathEntity {
     PMFilter? optionGroup,
     bool maxDateTimeToNow = true,
   }) async {
-    optionGroup ??= FilterOptionGroup();
     final StateError error = StateError(
       'Unable to fetch properties for path $id.',
     );

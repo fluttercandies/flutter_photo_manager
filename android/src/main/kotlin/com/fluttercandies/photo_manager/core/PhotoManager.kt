@@ -40,7 +40,7 @@ class PhotoManager(private val context: Context) {
         type: Int,
         hasAll: Boolean,
         onlyAll: Boolean,
-        option: FilterOption
+        option: FilterOption?
     ): List<AssetPathEntity> {
         if (onlyAll) {
             return dbUtils.getMainAssetPathEntity(context, type, option)
@@ -66,7 +66,7 @@ class PhotoManager(private val context: Context) {
         typeInt: Int = 0,
         page: Int,
         size: Int,
-        option: FilterOption
+        option: FilterOption?
     ): List<AssetEntity> {
         val gId = if (id == ALL_ID) "" else id
         return dbUtils.getAssetListPaged(context, gId, page, size, typeInt, option)
@@ -77,7 +77,7 @@ class PhotoManager(private val context: Context) {
         type: Int,
         start: Int,
         end: Int,
-        option: FilterOption
+        option: FilterOption?
     ): List<AssetEntity> {
         val gId = if (galleryId == ALL_ID) "" else galleryId
         return dbUtils.getAssetListRange(context, gId, start, end, type, option)
@@ -132,7 +132,11 @@ class PhotoManager(private val context: Context) {
         dbUtils.clearFileCache(context)
     }
 
-    fun fetchPathProperties(id: String, type: Int, option: FilterOption): AssetPathEntity? {
+    fun fetchPathProperties(
+        id: String,
+        type: Int,
+        option: FilterOption?
+    ): AssetPathEntity? {
         if (id == ALL_ID) {
             val allGalleryList = dbUtils.getAssetPathList(context, type, option)
             return if (allGalleryList.isEmpty()) null
@@ -142,7 +146,7 @@ class PhotoManager(private val context: Context) {
                     assetCount += item.assetCount
                 }
                 AssetPathEntity(ALL_ID, ALL_ALBUM_NAME, assetCount, type, true).apply {
-                    if (option.containsPathModified) {
+                    if (option?.containsPathModified == true) {
                         dbUtils.injectModifiedDate(context, this)
                     }
                 }
@@ -150,7 +154,7 @@ class PhotoManager(private val context: Context) {
         }
         val galleryEntity =
             dbUtils.getAssetPathEntityFromId(context, id, type, option) ?: return null
-        if (option.containsPathModified) {
+        if (option?.containsPathModified == true) {
             dbUtils.injectModifiedDate(context, galleryEntity)
         }
         return galleryEntity
@@ -292,14 +296,18 @@ class PhotoManager(private val context: Context) {
         resultHandler.reply(columnNames)
     }
 
-    fun getAssetCount(resultHandler: ResultHandler, option: FilterOption, requestType: Int) {
+    fun getAssetCount(
+        resultHandler: ResultHandler,
+        option: FilterOption?,
+        requestType: Int
+    ) {
         val assetCount = dbUtils.getAssetCount(context, option, requestType)
         resultHandler.reply(assetCount)
     }
 
     fun getAssetCount(
         resultHandler: ResultHandler,
-        option: FilterOption,
+        option: FilterOption?,
         requestType: Int,
         galleryId: String,
     ) {
@@ -309,7 +317,7 @@ class PhotoManager(private val context: Context) {
 
     fun getAssetsByRange(
         resultHandler: ResultHandler,
-        option: FilterOption,
+        option: FilterOption?,
         start: Int,
         end: Int,
         requestType: Int
