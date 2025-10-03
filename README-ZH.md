@@ -59,18 +59,22 @@ that can be found in the LICENSE file. -->
         * [Android 受限的资源权限](#android-受限的资源权限)
     * [获取相簿或图集 (`AssetPathEntity`)](#获取相簿或图集-assetpathentity)
       * [`getAssetPathList` 方法的参数](#getassetpathlist-方法的参数)
-      * [PMPathFilterOption](#pmpathfilteroption)
+      * [PMPathFilterOption (2.7.0 新增)](#pmpathfilteroption-270-新增)
     * [获取资源 (`AssetEntity`)](#获取资源-assetentity)
       * [通过 `AssetPathEntity` 获取](#通过-assetpathentity-获取)
       * [通过 `PhotoManager` 方法 (2.6.0+) 获取](#通过-photomanager-方法-260-获取)
       * [通过 ID 获取](#通过-id-获取)
       * [通过原始数据获取](#通过原始数据获取)
       * [通过 iCloud 获取](#通过-icloud-获取)
+      * [取消加载 (3.8.0 新增)](#取消加载-380-新增)
       * [展示资源](#展示资源)
       * [获取文件](#获取文件)
       * [获取「实况照片」](#获取实况照片)
         * [仅过滤「实况照片」](#仅过滤实况照片)
         * [获取「实况照片」的视频](#获取实况照片的视频)
+      * [包含隐藏资源（仅 iOS 平台有效）](#包含隐藏资源仅-ios-平台有效)
+        * [与 FilterOptionGroup 一起使用](#与-filteroptiongroup-一起使用)
+        * [与 CustomFilter 一起使用](#与-customfilter-一起使用)
       * [限制](#限制)
         * [Android 10 媒体位置权限](#android-10-媒体位置权限)
         * [原始数据的使用](#原始数据的使用)
@@ -290,23 +294,24 @@ final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList();
 | filterOption     | 用于筛选 AssetEntity，详情请参阅 [过滤资源](#过滤资源)                                         | FilterOptionGroup() |
 | pathFilterOption | 只对 iOS 和 macOS生效，对应原生中的相册类型，详情请参阅 [PMPathFilterOption](#pmpathfilteroption)。 | 默认为包含所有             |
 
-#### PMPathFilterOption
+#### PMPathFilterOption (2.7.0 新增)
 
-自 2.7.0 版本开始提供，当前仅支持 iOS 和 macOS。
+> [!NOTE]
+> 当前仅在 iOS 和 macOS 上可用.
 
 ```dart
 final List<PMDarwinAssetCollectionType> pathTypeList = []; // 配置为你需要的类型
 final List<PMDarwinAssetCollectionSubtype> pathSubTypeList = []; // 配置为你需要的子类型
 final darwinPathFilterOption = PMDarwinPathFilter(
-      type: pathTypeList,
-      subType: pathSubTypeList,
-    );
+  type: pathTypeList,
+  subType: pathSubTypeList,
+);
 PMPathFilter pathFilter = PMPathFilter();
 ```
 
- `PMDarwinAssetCollectionType`的枚举值一一对应 [PHAssetCollectionType | 苹果官网文档](https://developer.apple.com/documentation/photokit/phassetcollectiontype?language=objc).
+`PMDarwinAssetCollectionType`的枚举值一一对应 [PHAssetCollectionType | 苹果官网文档](https://developer.apple.com/documentation/photokit/phassetcollectiontype?language=objc).
 
- `PMDarwinAssetCollectionSubtype` 的枚举值一一对应 [PHAssetCollectionSubType | 苹果官网文档](https://developer.apple.com/documentation/photokit/phassetcollectionsubtype?language=objc).
+`PMDarwinAssetCollectionSubtype` 的枚举值一一对应 [PHAssetCollectionSubType | 苹果官网文档](https://developer.apple.com/documentation/photokit/phassetcollectionsubtype?language=objc).
 
 ### 获取资源 (`AssetEntity`)
 
@@ -425,6 +430,28 @@ iOS 为了节省磁盘空间，可能将资源仅保存在 iCloud 上。
 iCloud 文件只能在设备上的 Apple ID 正常登录时获取。
 当账号要求重新输入密码验证时，未缓存在本地的 iCloud 文件将无法访问，
 此时相关方法会抛出 `CloudPhotoLibraryErrorDomain` 错误。
+
+#### 取消加载 (3.8.0 新增)
+
+> [!NOTE]
+> 当前仅在 iOS 和 macOS 上可用.
+
+上述的 `AssetEntity` 方法均添加了 `cancelToken` 参数，
+可以用于取消加载过程。
+
+其他方法如果也添加了 `cancelToken` 参数，同样可以用于取消加载过程。
+
+```dart
+final PMCancelToken cancelToken = PMCancelToken();
+final File? file = await yourAssetEntity.loadFile(cancelToken: cancelToken);
+await cancelToken.cancel();
+```
+
+`PhotoManager` 也有一个方法可以取消所有加载：
+
+```dart
+await PhotoManager.cancelAllRequest();
+```
 
 #### 展示资源
 

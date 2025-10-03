@@ -62,7 +62,7 @@ enum OrderOptionType {
 /// {@template photo_manager.PMRequestState}
 /// Indicate the current state when an asset is loading with [PMProgressHandler].
 /// {@endtemplate}
-enum PMRequestState { prepare, loading, success, failed }
+enum PMRequestState { prepare, loading, success, failed, cancel }
 
 /// Information about app’s authorization to access the user’s photo library.
 ///

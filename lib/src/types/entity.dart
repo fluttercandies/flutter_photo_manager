@@ -17,6 +17,7 @@ import '../internal/enums.dart';
 import '../internal/plugin.dart';
 import '../internal/progress_handler.dart';
 import '../utils/convert_utils.dart';
+import 'cancel_token.dart';
 import 'thumbnail.dart';
 import 'types.dart';
 
@@ -528,7 +529,7 @@ class AssetEntity {
   ///  * [originFile] which can obtain the origin file.
   ///  * [originFileWithSubtype] which can obtain the origin file with subtype.
   ///  * [loadFile] which can obtain file with [PMProgressHandler].
-  Future<File?> get file => _getFile();
+  Future<File?> get file => getFile();
 
   /// Obtain the compressed file of the asset with subtype.
   ///
@@ -539,7 +540,7 @@ class AssetEntity {
   ///  * [originFile] which can obtain the origin file.
   ///  * [originFileWithSubtype] which can obtain the origin file with subtype.
   ///  * [loadFile] which can obtain file with [PMProgressHandler].
-  Future<File?> get fileWithSubtype => _getFile(subtype: subtype);
+  Future<File?> get fileWithSubtype => getFile(subtype: subtype);
 
   /// Obtain the original file that contain all EXIF information.
   ///
@@ -552,7 +553,7 @@ class AssetEntity {
   ///  * [fileWithSubtype] which can obtain the compressed file with subtype.
   ///  * [originFileWithSubtype] which can obtain the origin file with subtype.
   ///  * [loadFile] which can obtain file with [PMProgressHandler].
-  Future<File?> get originFile => _getFile(isOrigin: true);
+  Future<File?> get originFile => getFile(isOrigin: true);
 
   /// Obtain the origin file with subtype.
   ///
@@ -563,9 +564,8 @@ class AssetEntity {
   ///  * [fileWithSubtype] which can obtain the compressed file with subtype.
   ///  * [originFile] which can obtain the origin file.
   ///  * [loadFile] which can obtain file with [PMProgressHandler].
-  Future<File?> get originFileWithSubtype {
-    return _getFile(isOrigin: true, subtype: subtype);
-  }
+  Future<File?> get originFileWithSubtype =>
+      getFile(isOrigin: true, subtype: subtype);
 
   /// Obtain file of the asset with a [PMProgressHandler].
   ///
@@ -579,17 +579,20 @@ class AssetEntity {
   ///  * [fileWithSubtype] which can obtain the compressed file with subtype.
   ///  * [originFile] which can obtain the original file.
   ///  * [originFileWithSubtype] which can obtain the origin file with subtype.
+  ///  * [cancelToken] is used to cancel the file loading process.
   Future<File?> loadFile({
     bool isOrigin = true,
     bool withSubtype = false,
     PMProgressHandler? progressHandler,
+    PMCancelToken? cancelToken,
     PMDarwinAVFileType? darwinFileType,
   }) {
-    return _getFile(
+    return getFile(
       isOrigin: isOrigin,
       subtype: withSubtype ? subtype : 0,
       progressHandler: progressHandler,
       darwinFileType: darwinFileType,
+      cancelToken: cancelToken,
     );
   }
 
@@ -597,7 +600,7 @@ class AssetEntity {
   ///
   /// **Use it with caution** since the original data might be epic large.
   /// Generally use this method only for images.
-  Future<typed_data.Uint8List?> get originBytes => _getOriginBytes();
+  Future<typed_data.Uint8List?> get originBytes => getOriginBytes();
 
   /// Obtain the thumbnail data with [PMConstants.vDefaultThumbnailSize]
   /// size of the asset, typically use it for preview displays.
@@ -620,11 +623,13 @@ class AssetEntity {
   /// See also:
   ///  * [thumbnailData] which obtain the thumbnail data with fixed size.
   ///  * [thumbnailDataWithOption] which accepts customized [ThumbnailOption].
+  ///  * [cancelToken] is used to cancel the thumbnail loading process.
   Future<typed_data.Uint8List?> thumbnailDataWithSize(
     ThumbnailSize size, {
     ThumbnailFormat format = ThumbnailFormat.jpeg,
     int quality = 100,
     PMProgressHandler? progressHandler,
+    PMCancelToken? cancelToken,
     int frame = 0,
   }) {
     assert(() {
@@ -656,7 +661,11 @@ class AssetEntity {
       return true;
     }());
 
-    return thumbnailDataWithOption(option, progressHandler: progressHandler);
+    return thumbnailDataWithOption(
+      option,
+      progressHandler: progressHandler,
+      cancelToken: cancelToken,
+    );
   }
 
   /// Obtain the thumbnail data with the given customized [ThumbnailOption].
@@ -664,9 +673,11 @@ class AssetEntity {
   /// See also:
   ///  * [thumbnailData] which obtain the thumbnail data with fixed size.
   ///  * [thumbnailDataWithSize] which is a common method to obtain thumbnails.
+  ///  * [cancelToken] is used to cancel the thumbnail loading process.
   Future<typed_data.Uint8List?> thumbnailDataWithOption(
     ThumbnailOption option, {
     PMProgressHandler? progressHandler,
+    PMCancelToken? cancelToken,
   }) {
     assert(() {
       _checkThumbnailAssertion();
@@ -684,6 +695,7 @@ class AssetEntity {
       id: id,
       option: option,
       progressHandler: progressHandler,
+      cancelToken: cancelToken,
     );
   }
 
@@ -732,15 +744,20 @@ class AssetEntity {
   ///  * iOS/macOS: File URL. e.g.
   ///    `file:///var/mobile/Media/DCIM/118APPLE/IMG_8371.MOV`.
   ///
+  ///  * [progressHandler] is used to handle the progress of the media URL loading process.
+  ///  * [cancelToken] is used to cancel the media URL loading process.
+  ///
   /// See also:
   ///  * https://developer.android.com/reference/android/content/ContentUris
   ///  * https://developer.apple.com/documentation/avfoundation/avurlasset
   Future<String?> getMediaUrl({
     PMProgressHandler? progressHandler,
+    PMCancelToken? cancelToken,
   }) {
     return plugin.getMediaUrl(
       this,
       progressHandler: progressHandler,
+      cancelToken: cancelToken,
     );
   }
 
@@ -750,11 +767,20 @@ class AssetEntity {
       Platform.isAndroid ||
       PlatformUtils.isOhos;
 
-  Future<File?> _getFile({
+  /// Obtain the file of the asset.
+  ///
+  ///  * [isOrigin] is used to obtain the origin file.
+  ///  * [progressHandler] is used to handle the progress of the file loading process.
+  ///  * [subtype] is used to obtain the file with subtype.
+  ///  * [darwinFileType] will try to define the export format when
+  ///    exporting assets, such as exporting a MOV file to MP4.
+  ///  * [cancelToken] is used to cancel the file loading process.
+  Future<File?> getFile({
     bool isOrigin = false,
     PMProgressHandler? progressHandler,
     int subtype = 0,
     PMDarwinAVFileType? darwinFileType,
+    PMCancelToken? cancelToken,
   }) async {
     assert(
       _platformMatched,
@@ -769,6 +795,7 @@ class AssetEntity {
       progressHandler: progressHandler,
       subtype: subtype,
       darwinFileType: darwinFileType,
+      cancelToken: cancelToken,
     );
     if (path == null) {
       return null;
@@ -776,8 +803,16 @@ class AssetEntity {
     return File(path);
   }
 
-  Future<typed_data.Uint8List?> _getOriginBytes({
+  /// Obtain the raw data of the asset.
+  ///
+  /// **Use it with caution** since the original data might be epic large.
+  /// Generally use this method only for images.
+  ///
+  ///  * [progressHandler] is used to handle the progress of the raw data loading process.
+  ///  * [cancelToken] is used to cancel the raw data loading process.
+  Future<typed_data.Uint8List?> getOriginBytes({
     PMProgressHandler? progressHandler,
+    PMCancelToken? cancelToken,
   }) async {
     assert(
       _platformMatched,
@@ -789,11 +824,19 @@ class AssetEntity {
     if (Platform.isAndroid) {
       final sdkInt = int.parse(await plugin.getSystemVersion());
       if (sdkInt > 29) {
-        return plugin.getOriginBytes(id, progressHandler: progressHandler);
+        return plugin.getOriginBytes(
+          id,
+          progressHandler: progressHandler,
+          cancelToken: cancelToken,
+        );
       }
     }
     if (PlatformUtils.isOhos) {
-      return plugin.getOriginBytes(id, progressHandler: progressHandler);
+      return plugin.getOriginBytes(
+        id,
+        progressHandler: progressHandler,
+        cancelToken: cancelToken,
+      );
     }
     final File? file = await originFile;
     return file?.readAsBytes();

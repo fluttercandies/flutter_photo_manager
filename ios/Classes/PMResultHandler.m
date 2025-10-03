@@ -1,8 +1,9 @@
-#import "ResultHandler.h"
+#import "PMResultHandler.h"
 
-@implementation ResultHandler {
+@implementation PMResultHandler {
     BOOL isReply;
 }
+
 - (instancetype)initWithResult:(FlutterResult)result {
     self = [super init];
     if (self) {
@@ -26,7 +27,6 @@
 + (instancetype)handlerWithCall:(FlutterMethodCall *)call result:(FlutterResult)result {
     return [[self alloc] initWithCall:call result:result];
 }
-
 
 - (void)reply:(id)obj {
     if (isReply) {
@@ -63,6 +63,7 @@
         NSString *message = [NSString stringWithFormat:@"%@", [value description]];
         flutterError = [FlutterError errorWithCode:code message:message details:nil];
     }
+
     if ([NSThread isMainThread]) {
         self.result(flutterError);
     } else {
@@ -80,10 +81,14 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         self.result(FlutterMethodNotImplemented);
     });
-    
 }
 
 - (BOOL)isReplied {
     return isReply;
 }
+
+- (NSString *)getCancelToken {
+    return self.call.arguments[@"cancelToken"];
+}
+
 @end
