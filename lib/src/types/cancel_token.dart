@@ -11,15 +11,17 @@ class PMCancelToken {
   final int index;
   final String? debugLabel;
 
-  /// The key of cancel token, usually to use by
+  /// The key of cancel token, typically used in
   /// [PhotoManagerPlugin.cancelRequest].
-  /// User don't need to use this.
+  ///
+  /// This field is useless to the user end.
   @nonVirtual
-  String get key => _index.toString();
+  String get key => index.toString();
 
   /// Cancel the request.
   Future<void> cancelRequest() => plugin.cancelRequest(this);
 
   @override
-  String toString() => 'PMCancelToken($key)';
+  String toString() =>
+      'PMCancelToken($key${debugLabel != null ? ', $debugLabel' : ''})';
 }

@@ -806,7 +806,7 @@ class AssetEntity {
 
   /// Obtain the raw data of the asset.
   ///
-  /// **Use it with cautious** since the original data might be epic large.
+  /// **Use it with caution** since the original data might be epic large.
   /// Generally use this method only for images.
   ///
   ///  * [progressHandler] is used to handle the progress of the raw data loading process.
