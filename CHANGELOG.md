@@ -8,9 +8,17 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+### Features
+
 - Add `cancelToken` parameter to `AssetEntity.loadFile`.
 - Add `cancelAllRequest` method to `PhotoManager`.
 - The `AssetEntity.getFile` and `AssetEntity.getOriginBytes` methods are public.
+
+### Improvements
+
+- Remove implied `FilterOptionGroup`s when querying paths and assets.
+  This fixes assets finding when they were created in the future.
+  Some edge cases regarding performance drops caused by the complicated sort queries might also get fixed.
 
 ## 3.7.1
 
