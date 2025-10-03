@@ -68,7 +68,7 @@ class VerboseLogMethodChannel extends MethodChannel {
     );
   }
 
-  String _formatArgs(args) {
+  String _formatArgs(dynamic args) {
     if (args == null) {
       return 'null';
     }

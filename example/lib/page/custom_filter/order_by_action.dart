@@ -182,15 +182,14 @@ class _OrderByActionPageState extends State<OrderByActionPage> {
                   ),
                 )
                 .toList(),
+            // ignore: deprecated_member_use
+            value: columns.first,
             onChanged: (value) {
               if (value != null) {
                 column = value;
               }
             },
-            decoration: const InputDecoration(
-              labelText: 'Column',
-            ),
-            value: columns.first,
+            decoration: const InputDecoration(labelText: 'Column'),
           ),
           DropdownButtonFormField<bool>(
             items: const [
@@ -203,15 +202,14 @@ class _OrderByActionPageState extends State<OrderByActionPage> {
                 child: Text('DESC'),
               ),
             ],
+            // ignore: deprecated_member_use
+            value: true,
             onChanged: (value) {
               if (value != null) {
                 isAsc = value;
               }
             },
-            decoration: const InputDecoration(
-              labelText: 'Order',
-            ),
-            value: true,
+            decoration: const InputDecoration(labelText: 'Order'),
           ),
         ],
       ),
