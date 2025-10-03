@@ -85,7 +85,7 @@ class VerboseLogMethodChannel extends PMMethodChannel {
     );
   }
 
-  String _formatArgs(args) {
+  String _formatArgs(dynamic args) {
     if (args == null) {
       return 'null';
     }
