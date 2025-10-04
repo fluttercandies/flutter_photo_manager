@@ -125,6 +125,7 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
     final List<AssetEntity> entities = await _path!.getAssetListPaged(
       page: 0,
       size: _sizePerPage,
+      type: RequestType.common, // Switch to .video or .image to filter album assets by format
     );
     if (!mounted) {
       return;
@@ -140,6 +141,7 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
     final List<AssetEntity> entities = await _path!.getAssetListPaged(
       page: _page + 1,
       size: _sizePerPage,
+      type: RequestType.common,  // Switch to .video or .image to filter album assets by format
     );
     if (!mounted) {
       return;
