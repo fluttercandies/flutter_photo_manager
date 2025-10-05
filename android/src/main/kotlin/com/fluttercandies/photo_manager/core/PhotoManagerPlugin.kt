@@ -1,6 +1,7 @@
 package com.fluttercandies.photo_manager.core
 
 import android.app.Activity
+import android.app.RecoverableSecurityException
 import android.content.Context
 import android.net.Uri
 import android.os.Build
@@ -58,11 +59,13 @@ class PhotoManagerPlugin(
     }
 
     val deleteManager = PhotoManagerDeleteManager(applicationContext, activity)
+    val favoriteManager = PhotoManagerFavoriteManager(applicationContext)
 
     fun bindActivity(activity: Activity?) {
         this.activity = activity
         permissionsUtils.withActivity(activity)
         deleteManager.bindActivity(activity)
+        favoriteManager.bindActivity(activity)
     }
 
     private val notifyChannel = PhotoManagerNotifyChannel(
@@ -539,6 +542,17 @@ class PhotoManagerPlugin(
                     LogUtils.error("save video error", e)
                     resultHandler.replyError(call.method, message = null, obj = e)
                 }
+            }
+
+            Methods.favoriteAsset -> {
+                val assetId = call.argument<String>("id")!!
+                val isFavorite = call.argument<Boolean>("favorite")!!
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                    LogUtils.error("The API 30 or lower have no IS_FAVORITE row in MediaStore.")
+                    resultHandler.reply(false)
+                    return
+                }
+                favoriteManager.favoriteAsset(photoManager.getUri(assetId), isFavorite, resultHandler)
             }
 
             Methods.copyAsset -> {

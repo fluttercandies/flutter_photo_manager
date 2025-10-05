@@ -259,19 +259,12 @@ class DarwinEditor {
 
   /// Sets the favorite status of the given [entity].
   ///
-  /// Returns the updated [AssetEntity] if the operation was successful; otherwise, `null`.
-  Future<AssetEntity> favoriteAsset({
+  /// Returns `true` if the operation was successful; otherwise, `false`.
+  Future<bool> favoriteAsset({
     required AssetEntity entity,
     required bool favorite,
   }) async {
-    final bool result = await plugin.favoriteAsset(entity.id, favorite);
-    if (result) {
-      return entity.copyWith(isFavorite: favorite);
-    }
-    throw StateError(
-      'Failed to favorite the asset '
-      '${entity.id} for unknown reason',
-    );
+    return plugin.favoriteAsset(entity.id, favorite);
   }
 
   /// Save Live Photo to the gallery from the given [imageFile] and [videoFile].
@@ -304,6 +297,16 @@ class DarwinEditor {
 class AndroidEditor {
   /// Creates a new [AndroidEditor] object.
   const AndroidEditor();
+
+  /// Sets the favorite status of the given [entity].
+  ///
+  /// Returns `true` if the operation was successful; otherwise, `false`.
+  Future<bool> favoriteAsset({
+    required AssetEntity entity,
+    required bool favorite,
+  }) async {
+    return plugin.favoriteAsset(entity.id, favorite);
+  }
 
   /// Moves the given [entity] to the specified [target] path.
   ///
@@ -341,18 +344,11 @@ class OhosEditor {
 
   /// Sets the favorite status of the given [entity].
   ///
-  /// Returns the updated [AssetEntity] if the operation was successful; otherwise, `null`.
-  Future<AssetEntity> favoriteAsset({
+  /// Returns `true` if the operation was successful; otherwise, `false`.
+  Future<bool> favoriteAsset({
     required AssetEntity entity,
     required bool favorite,
   }) async {
-    final bool result = await plugin.favoriteAsset(entity.id, favorite);
-    if (result) {
-      return entity.copyWith(isFavorite: favorite);
-    }
-    throw StateError(
-      'Failed to favorite the asset '
-      '${entity.id} for unknown reason',
-    );
+    return plugin.favoriteAsset(entity.id, favorite);
   }
 }
