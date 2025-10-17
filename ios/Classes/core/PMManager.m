@@ -447,15 +447,20 @@
     
     __block double lastProgress = 0.0;
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+    __weak typeof(self) weakSelf = self;
     [requestOptions setProgressHandler:^(double progress, NSError *error, BOOL *stop,
                                          NSDictionary *info) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
         if (error) {
-            [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
+            [strongSelf notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
             return;
         }
         lastProgress = progress;
         if (progress != 1) {
-            [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+            [strongSelf notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
         }
     }];
     int width = option.width;
@@ -466,39 +471,44 @@
                                   contentMode:option.contentMode
                                       options:requestOptions
                                 resultHandler:^(PMImage *result, NSDictionary *info) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+        
         if ([handler isReplied]) {
             return;
         }
         
         PHImageRequestID currentReqID = [[info objectForKey:PHImageResultRequestIDKey] intValue];
         if (currentReqID == PHInvalidImageRequestID) {
-            [self handleCancelRequest:handler progressHandler:progressHandler];
-            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
+            [strongSelf handleCancelRequest:handler progressHandler:progressHandler];
+            [strongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
         NSObject *error = info[PHImageErrorKey];
         if (error) {
             [handler replyError:error];
-            [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
-            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
+            [strongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            [strongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
         BOOL downloadFinished = [PMManager isDownloadFinish:info];
         if (!downloadFinished) {
-            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
+            [strongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
         NSData *imageData = [PMImageUtil convertToData:result formatType:option.format quality:option.quality];
         if (imageData) {
-            id data = [self.converter convertData:imageData];
+            id data = [strongSelf.converter convertData:imageData];
             [handler reply:data];
-            [self notifySuccess:progressHandler];
+            [strongSelf notifySuccess:progressHandler];
         } else {
             [handler replyError:[NSString stringWithFormat:@"Failed to convert %@ to %u format.", asset.localIdentifier, option.format]];
-            [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            [strongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
         }
         
     }];
@@ -752,14 +762,19 @@
 
     __block double lastProgress = 0.0;
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+    __weak typeof(self) weakSelf = self;
     [options setProgressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
         lastProgress = progress;
         if (error) {
-            [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
+            [strongSelf notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
             return;
         }
         if (progress != 1) {
-            [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+            [strongSelf notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
         }
     }];
     
@@ -767,17 +782,22 @@
      requestAVAssetForVideo:asset
      options:options
      resultHandler:^(AVAsset *_Nullable asset, AVAudioMix *_Nullable audioMix, NSDictionary *_Nullable info) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+        
         NSObject *error = info[PHImageErrorKey];
         if (error) {
-            [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            [strongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
             block(nil, error);
-            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
+            [strongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
         BOOL downloadFinished = [PMManager isDownloadFinish:info];
         if (!downloadFinished) {
-            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
+            [strongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
@@ -793,7 +813,7 @@
                 } else {
                     block([videoURL path], nil);
                 }
-                [self notifySuccess:progressHandler];
+                [strongSelf notifySuccess:progressHandler];
                 return;
             }
             NSError *error;
@@ -805,7 +825,7 @@
                 } else {
                     block(destinationPath, nil);
                 }
-                [self notifySuccess:progressHandler];
+                [strongSelf notifySuccess:progressHandler];
                 return;
             }
             [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Caching the video to %@", destination]];
@@ -814,7 +834,7 @@
                                                     error:&error];
             if (error) {
                 block(nil, error);
-                [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+                [strongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
                 return;
             }
             if (withScheme) {
@@ -822,12 +842,12 @@
             } else {
                 block(path, nil);
             }
-            [self notifySuccess:progressHandler];
-            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
+            [strongSelf notifySuccess:progressHandler];
+            [strongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
-        [self exportAVAssetToFile:asset
+        [strongSelf exportAVAssetToFile:asset
                       destination:path
                   progressHandler:progressHandler
                        withScheme:withScheme
@@ -842,7 +862,7 @@
             } else {
                 block(nil, error);
             }
-            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
+            [strongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
         }];
     }];
 
@@ -1047,15 +1067,20 @@
     
     __block double lastProgress = 0.0;
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+    __weak typeof(self) weakSelf = self;
     [options setProgressHandler:^(double progress, NSError *error, BOOL *stop,
                                   NSDictionary *info) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
         if (error) {
-            [self notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
+            [strongSelf notifyProgress:progressHandler progress:progress state:PMProgressStateFailed];
             return;
         }
         lastProgress = progress;
         if (progress != 1) {
-            [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+            [strongSelf notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
         }
     }];
     
@@ -1064,6 +1089,11 @@
                                   contentMode:PHImageContentModeDefault
                                       options:options
                                 resultHandler:^(PMImage *_Nullable image, NSDictionary *_Nullable info) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+        
         if ([handler isReplied]) {
             return;
         }
@@ -1072,35 +1102,35 @@
         
         if (currentReqID == PHInvalidImageRequestID) {
             [handler replyError:@"Failed to fetch full size image."];
-            [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
-            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
+            [strongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            [strongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
         NSObject *error = info[PHImageErrorKey];
         if (error) {
             [handler replyError:error];
-            [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
-            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
+            [strongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            [strongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
         BOOL downloadFinished = [PMManager isDownloadFinish:info];
         if (!downloadFinished) {
-            [self removeRequstIdWithCancelToken:[handler getCancelToken]];
+            [strongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
             return;
         }
         
         NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
         if (data) {
-            NSString *path = [self writeFullFileWithAssetId:asset imageData: data];
+            NSString *path = [strongSelf writeFullFileWithAssetId:asset imageData: data];
             [handler reply:path];
-            [self notifySuccess:progressHandler];
+            [strongSelf notifySuccess:progressHandler];
         } else {
             [handler replyError:[NSString stringWithFormat:@"Failed to convert %@ to a JPEG file.", asset.localIdentifier]];
-            [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            [strongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
         }
-        [self removeRequstIdWithCancelToken:[handler getCancelToken]];
+        [strongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
     }];
 
     [self addRequstId:[handler getCancelToken] requestId:requestId];
