@@ -84,6 +84,7 @@ class PhotoManagerPlugin : FlutterPlugin, ActivityAware {
         binding.addRequestPermissionsResultListener(listener)
         plugin?.let {
             binding.addActivityResultListener(it.deleteManager)
+            binding.addActivityResultListener(it.writeManager)
         }
     }
 
@@ -93,6 +94,7 @@ class PhotoManagerPlugin : FlutterPlugin, ActivityAware {
         }
         plugin?.let { p ->
             oldBinding.removeActivityResultListener(p.deleteManager)
+            oldBinding.removeActivityResultListener(p.writeManager)
         }
     }
 }

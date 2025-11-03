@@ -83,6 +83,7 @@ class Methods {
         const val saveVideo = "saveVideo"
         const val copyAsset = "copyAsset"
         const val moveAssetToPath = "moveAssetToPath"
+        const val moveAssetsToPath = "moveAssetsToPath"
         const val removeNoExistsAssets = "removeNoExistsAssets"
         const val getColumnNames = "getColumnNames"
 
