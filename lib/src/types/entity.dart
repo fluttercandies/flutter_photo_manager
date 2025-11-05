@@ -127,6 +127,15 @@ class AssetPathEntity {
   /// The extra information of the album type.
   final AlbumType? albumTypeEx;
 
+  /// Get the relative path of the album asynchronously.
+  ///  * Android: The relative path where the album's assets are stored.
+  ///    For Android 10 (API 29) and above, this is derived from
+  ///    `MediaStore.MediaColumns.RELATIVE_PATH`.
+  ///    For Android 9 and below, this is the parent directory path.
+  ///  * iOS/macOS: Always null. iOS uses logical albums (PHAssetCollection)
+  ///    which don't have physical file system paths.
+  Future<String?> get relativePathAsync => plugin.getPathRelativePath(this);
+
   /// Call this method to obtain new path entity.
   static Future<AssetPathEntity> obtainPathFromProperties({
     required String id,

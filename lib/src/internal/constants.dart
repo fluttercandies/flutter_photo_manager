@@ -43,6 +43,7 @@ class PMConstants {
   static const String mGetLatLngAndroidQ = 'getLatLngAndroidQ';
   static const String mGetTitleAsync = 'getTitleAsync';
   static const String mGetMimeTypeAsync = 'getMimeTypeAsync';
+  static const String mGetPathRelativePath = 'getPathRelativePath';
   static const String mGetMediaUrl = 'getMediaUrl';
   static const String mGetSubPath = 'getSubPath';
   static const String mCopyAsset = 'copyAsset';

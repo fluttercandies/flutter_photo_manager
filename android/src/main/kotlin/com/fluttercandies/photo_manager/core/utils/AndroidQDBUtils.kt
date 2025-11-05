@@ -483,7 +483,10 @@ object AndroidQDBUtils : IDBUtils {
         return true
     }
 
-    private fun getRelativePath(context: Context, galleryId: String): String? {
+    override fun getRelativePath(context: Context, galleryId: String): String? {
+        if (galleryId == PhotoManager.ALL_ID) {
+            return null
+        }
         val cr = context.contentResolver
         val cursor = cr.logQuery(
             allUri,

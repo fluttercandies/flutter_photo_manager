@@ -71,6 +71,7 @@ class Methods {
         const val getOriginBytes = "getOriginBytes"
         const val getMediaUrl = "getMediaUrl"
         const val fetchEntityProperties = "fetchEntityProperties"
+        const val getPathRelativePath = "getPathRelativePath"
 
         const val getLatLng = "getLatLngAndroidQ"
         const val notify = "notify"
