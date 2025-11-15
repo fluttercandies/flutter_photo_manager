@@ -22,7 +22,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ### Fixes
 
-- Fix PHImageManager crash caused by accessing deallocated memory in async blocks on iOS.
+- Fix EXC_BAD_ACCESS crash caused by accessing deallocated memory in async blocks on iOS.
+  - Fixed PHCachingImageManager methods: `fetchThumb`, `exportAssetToFile`, `fetchFullSizeImageFile`.
+  - Fixed PHAssetResourceManager methods: `fetchVideoResourceToFile`, `fetchOriginImageFile`.
+  - Fixed PHPhotoLibrary save methods: `saveImage`, `saveImageWithPath`, `saveVideo`, `saveLivePhoto`.
 
 ## 3.7.1
 
