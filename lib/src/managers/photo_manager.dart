@@ -37,6 +37,13 @@ class PhotoManager {
   /// The global singleton of the [PhotoManagerPlugin] class that handles all method channels.
   static base.PhotoManagerPlugin get plugin => base.plugin;
 
+  static Future<List<AssetEntity>> getAssetEntityWithNative({
+    required int maxCount,
+    RequestType type = RequestType.common,
+  }) {
+    return plugin.getAssetEntityWithNative(maxCount: maxCount, type: type);
+  }
+
   /// ### Android (AndroidManifest.xml)
   ///  * READ_EXTERNAL_STORAGE (REQUIRED)
   ///  * WRITE_EXTERNAL_STORAGE
@@ -215,6 +222,18 @@ class PhotoManager {
 
   /// Get the system version.
   static Future<String> systemVersion() => plugin.getSystemVersion();
+
+  static Future<List<AssetEntity>> pickAssets({
+    int maxCount = 9,
+    RequestType requestType = RequestType.common,
+    bool useItemProvider = false,
+  }) {
+    return plugin.pickAssets(
+      maxCount: maxCount,
+      requestType: requestType,
+      useItemProvider: useItemProvider,
+    );
+  }
 
   /// Clear all file caches.
   /// The method does not supported on OpenHarmony.

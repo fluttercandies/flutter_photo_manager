@@ -6,12 +6,12 @@ class ImageItemWidget extends StatelessWidget {
   const ImageItemWidget({
     super.key,
     required this.entity,
-    required this.option,
+    this.option,
     this.onTap,
   });
 
   final AssetEntity entity;
-  final ThumbnailOption option;
+  final ThumbnailOption? option;
   final GestureTapCallback? onTap;
 
   Widget buildContent(BuildContext context) {
@@ -26,16 +26,16 @@ class ImageItemWidget extends StatelessWidget {
   Widget _buildImageWidget(
     BuildContext context,
     AssetEntity entity,
-    ThumbnailOption option,
+    ThumbnailOption? option,
   ) {
     return Stack(
       children: <Widget>[
         Positioned.fill(
           child: AssetEntityImage(
             entity,
-            isOriginal: false,
-            thumbnailSize: option.size,
-            thumbnailFormat: option.format,
+            isOriginal: option == null,
+            thumbnailSize: option?.size,
+            thumbnailFormat: option?.format ?? ThumbnailFormat.jpeg,
             fit: BoxFit.cover,
           ),
         ),

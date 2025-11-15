@@ -46,7 +46,9 @@
     isReply = YES;
     
     FlutterError *flutterError;
-    if ([value isKindOfClass:[NSError class]]) {
+    if ([value isKindOfClass:[FlutterError class]]) {
+        flutterError = (FlutterError *)value;
+    } else if ([value isKindOfClass:[NSError class]]) {
         NSError *error = (NSError *)value;
         NSString *code = [NSString stringWithFormat:@"%@ (%ld)", error.domain, (long)error.code];
         NSString *message = error.userInfo[NSLocalizedDescriptionKey] ?: error.localizedDescription ?: @"Unknown error";

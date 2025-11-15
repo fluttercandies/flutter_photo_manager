@@ -9,11 +9,14 @@
 #import "PMProgressHandler.h"
 #import "PMConverter.h"
 #import "PMPathFilterOption.h"
+#import "PMItemProviderHelper.h"
 
-#import <PhotosUI/PhotosUI.h>
+@interface PMPlugin ()
+@property(nonatomic, strong) FlutterMethodChannel *channel;
+@property(nonatomic, strong) PMItemProviderHelper *itemProviderHelper;
+@end
 
 @implementation PMPlugin {
-    FlutterMethodChannel *channel;
     NSObject <FlutterPluginRegistrar> *privateRegistrar;
     BOOL ignoreCheckPermission;
     BOOL isDetach;
@@ -27,16 +30,18 @@
 
 - (void)registerPlugin:(NSObject <FlutterPluginRegistrar> *)registrar {
     privateRegistrar = registrar;
-    [self initNotificationManager:registrar];
 
-    channel = [FlutterMethodChannel methodChannelWithName:@"com.fluttercandies/photo_manager"
-                                    binaryMessenger:[registrar messenger]];
+    self.channel = [FlutterMethodChannel methodChannelWithName:@"com.fluttercandies/photo_manager"
+              binaryMessenger:[registrar messenger]];
+    self.notificationManager = [PMNotificationManager managerWithRegistrar:registrar];
+    self.itemProviderHelper = [PMItemProviderHelper new];
+
     PMManager *manager = [PMManager new];
     manager.converter = [PMConverter new];
     [self setManager:manager];
 
     __block PMPlugin *weakSelf = self;  // avoid retain cycle
-    [channel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
+    [self.channel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
         [weakSelf onMethodCall:call result:result];
     }];
 }
@@ -44,7 +49,7 @@
 - (void)detach {
     privateRegistrar = nil;
     isDetach = YES;
-    [channel setMethodCallHandler:nil];
+    [self.channel setMethodCallHandler:nil];
     [self.notificationManager detach];
 }
 
@@ -53,11 +58,8 @@
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
+    [self.manager saveItemProviderAssetCache];
     [self detach];
-}
-
-- (void)initNotificationManager:(NSObject <FlutterPluginRegistrar> *)registrar {
-    self.notificationManager = [PMNotificationManager managerWithRegistrar:registrar];
 }
 
 - (void)requestOnlyAddPermission:(void(^)(PHAuthorizationStatus status))handler {
@@ -107,12 +109,13 @@
 
 - (BOOL)isNotNeedPermissionMethod:(NSString *)method {
     NSArray *notNeedPermissionMethods = @[
-        @"log", 
-        @"openSetting", 
-        @"clearFileCache", 
+        @"log",
+        @"openSetting",
+        @"clearFileCache",
         @"releaseMemoryCache",
         @"ignorePermissionCheck",
-        @"getPermissionState"
+        @"getPermissionState",
+        @"picker"
     ];
     return [notNeedPermissionMethods containsObject:method];
 }
@@ -158,8 +161,63 @@
         [handler reply:nil];
     } else if ([method isEqualToString:@"getPermissionState"]) {
         [self getPermissionState:handler];
+    } else if ([method isEqualToString:@"picker"]) {
+        [self openPicker:handler];
     }
 }
+
+- (void)openPicker:(PMResultHandler *)handler {
+    if (@available(iOS 14, *)) {
+        PHPickerConfiguration *configuration = [[PHPickerConfiguration alloc] init];
+        int maxCount = [handler.call.arguments[@"maxCount"] intValue];
+        configuration.selectionLimit = maxCount;
+        int requestType = [handler.call.arguments[@"type"] intValue];
+        if (requestType == 1) {
+            configuration.filter = [PHPickerFilter imagesFilter];
+        } else if (requestType == 2) {
+            configuration.filter = [PHPickerFilter videosFilter];
+        }
+
+        PHPickerViewController *picker = [[PHPickerViewController alloc] initWithConfiguration:configuration];
+        picker.delegate = self;
+        self.pickerResultHandler = handler;
+        [[self getViewController] presentViewController:picker animated:YES completion:nil];
+    } else {
+        [handler replyError:@"The picker is only available on iOS 14 or above."];
+    }
+}
+
+- (void)picker:(PHPickerViewController *)picker didFinishPicking:(NSArray<PHPickerResult *> *)results API_AVAILABLE(ios(14)) {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+    if (!self.pickerResultHandler) {
+        return;
+    }
+
+    dispatch_group_t group = dispatch_group_create();
+    NSMutableArray<NSDictionary *> *entities = [NSMutableArray new];
+    NSMutableArray<PMItemProviderAsset *> *itemProviderAssets = [NSMutableArray new];
+
+    for (PHPickerResult *result in results) {
+        dispatch_group_enter(group);
+        NSItemProvider *itemProvider = result.itemProvider;
+        [self.itemProviderHelper handleItemProvider:itemProvider
+                                             result:result
+                                            manager:self.manager
+                                           entities:entities
+                                 itemProviderAssets:itemProviderAssets
+                                              group:group];
+    }
+
+    dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+        [self.manager addAssets:itemProviderAssets];
+        NSDictionary *result = @{
+            @"data": entities,
+        };
+        [self.pickerResultHandler reply:result];
+        self.pickerResultHandler = nil;
+    });
+}
+
 
 - (void)getPermissionState:(PMResultHandler *)handler {
     int requestAccessLevel = [handler.call.arguments[@"iosAccessLevel"] intValue];
@@ -201,7 +259,7 @@
 #if TARGET_OS_IOS
 #if __IPHONE_14_0
 
-- (UIViewController *)getCurrentViewController {
+- (UIViewController *)getViewController {
     UIViewController *controller = UIApplication.sharedApplication.keyWindow.rootViewController;
     if (controller) {
         UIViewController *result = controller;
@@ -260,7 +318,7 @@
 - (void)presentLimited:(PMResultHandler *)handler {
 #if __IPHONE_14_0
     if (@available(iOS 14, *)) {
-        UIViewController *controller = [self getCurrentViewController];
+        UIViewController *controller = [self getViewController];
         if (!controller) {
             [handler reply:[FlutterError
                 errorWithCode:@"UIViewController is nil"
@@ -351,7 +409,7 @@
         [method isEqualToString:@"cancelAllRequest"]) {
         return QOS_CLASS_USER_INTERACTIVE;
     }
-    
+
     if ([method isEqualToString:@"getAssetListPaged"] ||
         [method isEqualToString:@"getAssetListRange"] ||
         [method isEqualToString:@"getFullFile"] ||
@@ -359,7 +417,7 @@
         [method isEqualToString:@"fetchEntityProperties"]) {
         return QOS_CLASS_USER_INITIATED;
     }
-    
+
     if ([method isEqualToString:@"saveImage"] ||
         [method isEqualToString:@"saveVideo"] ||
         [method isEqualToString:@"saveLivePhoto"] ||
@@ -369,7 +427,7 @@
         [method isEqualToString:@"createAlbum"]) {
         return QOS_CLASS_UTILITY;
     }
-    
+
     if ([method isEqualToString:@"clearFileCache"] ||
         [method isEqualToString:@"releaseMemoryCache"] ||
         [method isEqualToString:@"deleteWithIds"] ||
@@ -377,7 +435,7 @@
         [method isEqualToString:@"deleteAlbum"]) {
         return QOS_CLASS_BACKGROUND;
     }
-    
+
     return QOS_CLASS_DEFAULT;
 }
 

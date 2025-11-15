@@ -152,6 +152,20 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     }
   }
 
+  Future<List<AssetEntity>> getAssetEntityWithNative({
+    int maxCount = 1,
+    RequestType type = RequestType.common,
+  }) async {
+    final Map result = await _channel.invokeMethod(
+      PMConstants.mGetAssetEntityWithNative,
+      <String, dynamic>{
+        'maxCount': maxCount,
+        'type': type.value,
+      },
+    );
+    return ConvertUtils.convertToAssetList(result.cast());
+  }
+
   Future<List<AssetPathEntity>> getAssetPathList({
     bool hasAll = true,
     bool onlyAll = false,
@@ -727,6 +741,22 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       requestOption.toMap(),
     );
     return PermissionState.values[result];
+  }
+
+  Future<List<AssetEntity>> pickAssets({
+    int maxCount = 1,
+    RequestType requestType = RequestType.common,
+    bool useItemProvider = false,
+  }) async {
+    final Map result = await _channel.invokeMethod(
+      PMConstants.mPicker,
+      <String, dynamic>{
+        'maxCount': maxCount,
+        'type': requestType.value,
+        'useItemProvider': useItemProvider,
+      },
+    );
+    return ConvertUtils.convertToAssetList(result.cast());
   }
 
   Future<void> cancelRequest(PMCancelToken pmCancelToken) {

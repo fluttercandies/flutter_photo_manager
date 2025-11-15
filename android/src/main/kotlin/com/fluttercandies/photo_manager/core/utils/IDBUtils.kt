@@ -125,6 +125,8 @@ interface IDBUtils {
         option: FilterOption?
     ): List<AssetEntity>
 
+    fun getAssetFromUri(context: Context, uri: Uri): AssetEntity?
+
     fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean = true): AssetEntity?
 
     fun getMediaType(type: Int): Int {

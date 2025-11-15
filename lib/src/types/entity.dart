@@ -367,6 +367,7 @@ class AssetEntity {
     double? longitude,
     this.mimeType,
     this.subtype = 0,
+    this.isLocal = false,
   })  : _latitude = latitude,
         _longitude = longitude;
 
@@ -874,6 +875,9 @@ class AssetEntity {
   ///  * https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#MIME_TYPE
   final String? mimeType;
 
+  /// Whether the asset is from a local item provider.
+  final bool isLocal;
+
   /// Get the mime type async.
   ///  * Android: `MediaStore.MediaColumns.MIME_TYPE`.
   ///  * iOS/macOS: MIME type from `PHAssetResource.uniformTypeIdentifier`.
@@ -902,6 +906,7 @@ class AssetEntity {
     double? longitude,
     String? mimeType,
     int? subtype,
+    bool? isLocal,
   }) {
     return AssetEntity(
       id: id ?? this.id,
@@ -919,6 +924,7 @@ class AssetEntity {
       longitude: longitude ?? this.longitude,
       mimeType: mimeType ?? this.mimeType,
       subtype: subtype ?? this.subtype,
+      isLocal: isLocal ?? this.isLocal,
     );
   }
 

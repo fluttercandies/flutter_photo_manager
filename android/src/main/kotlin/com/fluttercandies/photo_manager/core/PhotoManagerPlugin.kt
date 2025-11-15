@@ -24,12 +24,14 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
+import io.flutter.plugin.common.PluginRegistry
+
 class PhotoManagerPlugin(
     private val applicationContext: Context,
     messenger: BinaryMessenger,
     private var activity: Activity?,
     private val permissionsUtils: PermissionsUtils
-) : MethodChannel.MethodCallHandler {
+) : MethodChannel.MethodCallHandler, PluginRegistry.ActivityResultListener {
     companion object {
         private const val POOL_SIZE = 8
         private val threadPool: ThreadPoolExecutor = ThreadPoolExecutor(
@@ -74,6 +76,29 @@ class PhotoManagerPlugin(
     private val photoManager = PhotoManager(applicationContext)
 
     private var ignorePermissionCheck = false
+
+    private val PICKER_REQUEST_CODE = 8342
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        if (requestCode == PICKER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            val uris = data?.clipData?.let { clipData ->
+                (0 until clipData.itemCount).map { clipData.getItemAt(it).uri }
+            } ?: data?.data?.let { listOf(it) }
+            if (uris != null) {
+                runOnBackground {
+                    val assets = photoManager.getAssetsFromUris(uris)
+                    val result = ConvertUtils.convertAssets(assets)
+                    Handler(Looper.getMainLooper()).post {
+                        pickerResultHandler?.reply(result)
+                    }
+                }
+            }
+            return true
+        }
+        return false
+    }
+
+    private var pickerResultHandler: ResultHandler? = null
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result, call)
@@ -331,6 +356,21 @@ class PhotoManagerPlugin(
                 permissionsUtils.getAuthValue(requestType, mediaLocation).let {
                     resultHandler.reply(it.value)
                 }
+            }
+
+            Methods.picker -> {
+                pickerResultHandler = resultHandler
+                val maxCount = call.argument<Int>("maxCount")!!
+                val requestType = call.argument<Int>("type")!!
+                val intent = Intent(Intent.ACTION_PICK)
+                val mimeType = when (requestType) {
+                    1 -> "image/*"
+                    2 -> "video/*"
+                    else -> "*/*"
+                }
+                intent.type = mimeType
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, maxCount > 1)
+                activity?.startActivityForResult(intent, PICKER_REQUEST_CODE)
             }
         }
     }

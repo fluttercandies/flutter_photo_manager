@@ -152,6 +152,25 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
     });
   }
 
+  Future<void> _pickAssets() async {
+    final List<AssetEntity> assets = await PhotoManager.pickAssets(
+      maxCount: 9,
+      requestType: RequestType.common,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (assets.isNotEmpty) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => PickedAssetsPage(assets: assets),
+        ),
+      );
+    }
+  }
+
   Widget _buildBody(BuildContext context) {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator.adaptive());
@@ -220,9 +239,56 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
           child: const Text('Advanced usages'),
         ),
       ],
-      floatingActionButton: FloatingActionButton(
-        onPressed: _requestAssets,
-        child: const Icon(Icons.developer_board),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: _requestAssets,
+            heroTag: 'request_assets',
+            child: const Icon(Icons.developer_board),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            onPressed: _pickAssets,
+            heroTag: 'pick_assets',
+            child: const Icon(Icons.photo_library),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PickedAssetsPage extends StatelessWidget {
+  const PickedAssetsPage({super.key, required this.assets});
+
+  final List<AssetEntity> assets;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Picked Assets')),
+      body: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+        ),
+        itemBuilder: (context, index) {
+          final asset = assets[index];
+          return GestureDetector(
+            onTap: () async {
+              final file = await asset.originFile;
+              print(file);
+            },
+            child: ImageItemWidget(
+              key: ValueKey<int>(index),
+              entity: asset,
+              option: const ThumbnailOption(
+                size: ThumbnailSize.square(200),
+              ),
+            ),
+          );
+        },
+        itemCount: assets.length,
       ),
     );
   }

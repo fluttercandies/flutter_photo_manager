@@ -325,4 +325,9 @@ class PhotoManager(private val context: Context) {
         val list = dbUtils.getAssetsByRange(context, option, start, end, requestType)
         resultHandler.reply(ConvertUtils.convertAssets(list))
     }
+
+    fun getAssetsFromUris(uris: List<Uri>): List<AssetEntity> {
+        val assets = uris.mapNotNull { dbUtils.getAssetFromUri(context, it) }
+        return assets
+    }
 }

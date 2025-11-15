@@ -7,6 +7,7 @@ typedef void (^ChangeIds)(NSArray<NSString *> *);
 
 @class PMAssetPathEntity;
 @class PMAssetEntity;
+@class PMItemProviderAsset;
 @class PMResultHandler;
 @class PMFilterOption;
 @class PMFilterOptionGroup;
@@ -133,4 +134,16 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 // cancelAllRequest
 - (void)cancelAllRequest;
+
+- (void)addAssets:(NSArray<PMItemProviderAsset *> *)assets;
+
+- (void)saveItemProviderAssetCache;
+
+- (PMItemProviderAsset *)itemProviderAssetWithId:(NSString *)assetId;
+
+- (void)addItemProviderAsset:(PMItemProviderAsset *)asset;
+
+- (PMItemProviderAsset *)itemProviderAssetWithId:(NSString *)assetId;
+
+- (void)addItemProviderAsset:(PMItemProviderAsset *)asset;
 @end

@@ -249,6 +249,20 @@ object AndroidQDBUtils : IDBUtils {
         }
     }
 
+    override fun getAssetFromUri(context: Context, uri: Uri): AssetEntity? {
+        val cursor = context.contentResolver.logQuery(
+            uri,
+            keys(),
+            null,
+            null,
+            null
+        )
+        cursor.use {
+            return if (it.moveToNext()) it.toAssetEntity(context, false)
+            else null
+        }
+    }
+
     override fun getAssetPathEntityFromId(
         context: Context,
         pathId: String,

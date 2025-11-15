@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <Photos/Photos.h>
 #import "PMImport.h"
 
 @protocol FlutterPluginRegistrar;
@@ -11,6 +12,8 @@
 - (void)startNotify;
 
 - (void)stopNotify;
+
+- (void)photoLibraryDidChange:(PHChange *)changeInstance;
 
 + (instancetype)managerWithRegistrar:(NSObject <FlutterPluginRegistrar> *)registrar;
 

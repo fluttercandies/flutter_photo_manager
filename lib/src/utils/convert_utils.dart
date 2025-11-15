@@ -40,11 +40,10 @@ class ConvertUtils {
   }
 
   static List<AssetEntity> convertToAssetList(Map<String, dynamic> data) {
-    final List<AssetEntity> result = <AssetEntity>[];
-    final List<Map<dynamic, dynamic>> list =
-        (data['data'] as List<dynamic>).cast<Map<dynamic, dynamic>>();
-    for (final Map<dynamic, dynamic> item in list) {
-      result.add(convertMapToAsset(item.cast<String, dynamic>()));
+    final result = <AssetEntity>[];
+    final list = (data['data'] as List).cast<Map>();
+    for (final item in list) {
+      result.add(convertMapToAsset(item.cast()));
     }
     return result;
   }
@@ -124,6 +123,7 @@ class ConvertUtils {
       latitude: data['lat'] as double?,
       longitude: data['lng'] as double?,
       mimeType: data['mimeType'] as String?,
+      isLocal: data['isLocal'] as bool? ?? false,
     );
     return result;
   }

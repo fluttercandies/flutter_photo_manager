@@ -12,10 +12,12 @@ class PMConstants {
   static const String libraryName = 'photo_manager';
 
   /// Keys for [MethodCall]s.
+  static const String mGetAssetEntityWithNative = 'getAssetEntityWithNative';
   static const String mRequestPermissionExtend = 'requestPermissionExtend';
   static const String mPresentLimited = 'presentLimited';
   static const String mFetchEntityProperties = 'fetchEntityProperties';
   static const String mGetAssetCountFromPath = 'getAssetCountFromPath';
+  static const String mPicker = 'picker';
   static const String mGetPermissionState = 'getPermissionState';
 
   /// These methods have [RequestType] params for Android 13+ (33+).

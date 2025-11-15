@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSData *)convertToData:(PMImage *)image formatType:(PMThumbFormatType)type quality:(float)quality;
 
++ (PMImage *)scaleImage:(PMImage *)image withSize:(CGSize)size contentMode:(PHImageContentMode)contentMode;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -84,6 +84,10 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
             child: const Text('Show permission state page'),
           ),
           ElevatedButton(
+            onPressed: () => PhotoManager.getAssetEntityWithNative(maxCount: 3),
+            child: const Text('Get AssetEntity with native'),
+          ),
+          ElevatedButton(
             child: const Text('Show iOS create folder example.'),
             onPressed: () => navToWidget(const CreateFolderExample()),
           ),
