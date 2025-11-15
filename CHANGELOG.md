@@ -30,6 +30,8 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ### Fixes
 
+- Fix PHImageManager crash on iOS by ensuring all PHImageManager/PHCachingImageManager methods are called on the main thread.
+  This resolves race conditions and deadlocks when thumbnail operations are dispatched to QoS background queues.
 - Fix EXC_BAD_ACCESS crash caused by accessing deallocated memory in async blocks on iOS.
   - Fixed PHCachingImageManager methods: `fetchThumb`, `exportAssetToFile`, `fetchFullSizeImageFile`.
   - Fixed PHAssetResourceManager methods: `fetchVideoResourceToFile`, `fetchOriginImageFile`.
