@@ -22,7 +22,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ### Fixes
 
-- Fix PHImageManager crash caused by accessing deallocated memory in async blocks on iOS.
+- Fix PHImageManager crash on iOS by ensuring all PHImageManager/PHCachingImageManager methods are called on the main thread. This resolves race conditions and deadlocks when thumbnail operations are dispatched to QoS background queues.
 
 ## 3.7.1
 
