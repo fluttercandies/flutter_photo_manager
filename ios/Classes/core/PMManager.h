@@ -2,6 +2,7 @@
 #import "PMImport.h"
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
+#import <CoreLocation/CoreLocation.h>
 
 typedef void (^ChangeIds)(NSArray<NSString *> *);
 
