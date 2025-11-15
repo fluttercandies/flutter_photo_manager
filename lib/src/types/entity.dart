@@ -852,11 +852,13 @@ class AssetEntity {
   final int orientation;
 
   /// Whether the asset is favorite on the device.
-  ///  * Android: Always false.
+  ///  * Android 11 and above: `MediaStore.MediaColumns.IS_FAVORITE`.
+  ///  * Android 10 and below: Always false.
   ///  * iOS/macOS: `PHAsset.isFavorite`.
   ///
   /// See also:
   ///  * [DarwinEditor.favoriteAsset] to update the favorite status.
+  ///  * [AndroidEditor.favoriteAsset] to update the favorite status.
   final bool isFavorite;
 
   /// The relative path abstraction of the asset.

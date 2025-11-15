@@ -81,6 +81,7 @@ class Methods {
         const val saveImage = "saveImage"
         const val saveImageWithPath = "saveImageWithPath"
         const val saveVideo = "saveVideo"
+        const val favoriteAsset = "favoriteAsset"
         const val copyAsset = "copyAsset"
         const val moveAssetToPath = "moveAssetToPath"
         const val removeNoExistsAssets = "removeNoExistsAssets"

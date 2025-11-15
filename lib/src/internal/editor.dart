@@ -305,6 +305,23 @@ class AndroidEditor {
   /// Creates a new [AndroidEditor] object.
   const AndroidEditor();
 
+  /// Sets the favorite status of the given [entity].
+  ///
+  /// Returns the updated [AssetEntity] if the operation was successful; otherwise, throws a state error to indicate the failure.
+  Future<AssetEntity> favoriteAsset({
+    required AssetEntity entity,
+    required bool favorite,
+  }) async {
+    final bool result = await plugin.favoriteAsset(entity.id, favorite);
+    if (result) {
+      return entity.copyWith(isFavorite: favorite);
+    }
+    throw StateError(
+      'Failed to favorite the asset '
+      '${entity.id} for unknown reason',
+    );
+  }
+
   /// Moves the given [entity] to the specified [target] path.
   ///
   /// Returns `true` if the move was successful; otherwise, `false`.
