@@ -1286,13 +1286,14 @@
         [request addResourceWithType:PHAssetResourceTypePhoto data:data options:options];
         
         // Set location if provided
-        if (latitude != nil && longitude != nil) {
+        if (latitude != nil && longitude != nil && 
+            ![latitude isKindOfClass:[NSNull class]] && ![longitude isKindOfClass:[NSNull class]]) {
             CLLocation *location = [[CLLocation alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]];
             [request setLocation:location];
         }
         
         // Set creation date if provided
-        if (creationDate != nil) {
+        if (creationDate != nil && ![creationDate isKindOfClass:[NSNull class]]) {
             NSDate *date = [NSDate dateWithTimeIntervalSince1970:[creationDate doubleValue] / 1000.0];
             [request setCreationDate:date];
         }
@@ -1342,13 +1343,14 @@
         [request addResourceWithType:PHAssetResourceTypePhoto fileURL:fileURL options:options];
         
         // Set location if provided
-        if (latitude != nil && longitude != nil) {
+        if (latitude != nil && longitude != nil && 
+            ![latitude isKindOfClass:[NSNull class]] && ![longitude isKindOfClass:[NSNull class]]) {
             CLLocation *location = [[CLLocation alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]];
             [request setLocation:location];
         }
         
         // Set creation date if provided
-        if (creationDate != nil) {
+        if (creationDate != nil && ![creationDate isKindOfClass:[NSNull class]]) {
             NSDate *date = [NSDate dateWithTimeIntervalSince1970:[creationDate doubleValue] / 1000.0];
             [request setCreationDate:date];
         }
@@ -1398,13 +1400,14 @@
         [request addResourceWithType:PHAssetResourceTypeVideo fileURL:fileURL options:options];
         
         // Set location if provided
-        if (latitude != nil && longitude != nil) {
+        if (latitude != nil && longitude != nil && 
+            ![latitude isKindOfClass:[NSNull class]] && ![longitude isKindOfClass:[NSNull class]]) {
             CLLocation *location = [[CLLocation alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]];
             [request setLocation:location];
         }
         
         // Set creation date if provided
-        if (creationDate != nil) {
+        if (creationDate != nil && ![creationDate isKindOfClass:[NSNull class]]) {
             NSDate *date = [NSDate dateWithTimeIntervalSince1970:[creationDate doubleValue] / 1000.0];
             [request setCreationDate:date];
         }
