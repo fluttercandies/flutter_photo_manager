@@ -21,6 +21,9 @@ To know more about breaking changes, see the [Migration Guide][].
   - `smartAlbumHandwriting` - For handwriting in the Utilities section
   - `smartAlbumIllustrations` - For illustrations in the Utilities section
   - `smartAlbumQRCodes` - For QR codes in the Utilities section
+- Add optional `latitude`, `longitude`, and `creationDate` parameters to `saveImage`, `saveImageWithPath`, and `saveVideo` methods.
+  - On iOS: Sets location and creation date metadata for saved assets.
+  - On Android Q+: Sets DATE_TAKEN field and location metadata for saved assets.
 
 ### Improvements
 
