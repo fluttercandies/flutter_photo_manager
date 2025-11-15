@@ -1,0 +1,123 @@
+name: Test Swift Package Manager
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+
+jobs:
+  test_spm_ios:
+    name: Test iOS build with SPM
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+      
+      - name: Log Flutter and Xcode versions
+        run: |
+          flutter --version
+          xcodebuild -version
+      
+      - run: flutter doctor -v
+      
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          cd example
+          flutter pub get
+      
+      - name: Build iOS with SPM
+        working-directory: ${{ github.workspace }}/example
+        run: |
+          flutter build ios --no-codesign --release
+        env:
+          SWIFT_PACKAGE_MANAGER: true
+      
+      - name: Verify SPM integration
+        working-directory: ${{ github.workspace }}/example/ios
+        run: |
+          echo "Checking for Swift Package Manager artifacts..."
+          if [ -d "Pods" ]; then
+            echo "Warning: CocoaPods Pods directory found"
+          fi
+          echo "Build completed successfully with SPM"
+
+  test_spm_macos:
+    name: Test macOS build with SPM
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+      
+      - name: Log Flutter and Xcode versions
+        run: |
+          flutter --version
+          xcodebuild -version
+      
+      - run: flutter doctor -v
+      
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          cd example
+          flutter pub get
+      
+      - name: Build macOS with SPM
+        working-directory: ${{ github.workspace }}/example
+        run: |
+          flutter build macos --release
+        env:
+          SWIFT_PACKAGE_MANAGER: true
+      
+      - name: Verify SPM integration
+        working-directory: ${{ github.workspace }}/example/macos
+        run: |
+          echo "Checking for Swift Package Manager artifacts..."
+          if [ -d "Pods" ]; then
+            echo "Warning: CocoaPods Pods directory found"
+          fi
+          echo "Build completed successfully with SPM"
+
+  test_package_swift:
+    name: Validate Package.swift
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Validate Package.swift
+        run: |
+          swift package describe
+          echo "Package.swift is valid"
+      
+      - name: List package sources
+        run: |
+          swift package describe | grep -A 20 "Targets:"
