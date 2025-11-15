@@ -202,6 +202,22 @@ extension PMDarwinAssetCollectionTypeExt on PMDarwinAssetCollectionType {
 ///     PHAssetCollectionSubtypeSmartAlbumUnableToUpload API_AVAILABLE(macos(10.15), ios(13), tvos(13)) = 216,
 ///     PHAssetCollectionSubtypeSmartAlbumRAW API_AVAILABLE(macos(12), ios(15), tvos(15)) = 217,
 ///     PHAssetCollectionSubtypeSmartAlbumCinematic API_AVAILABLE(macos(12), ios(15), tvos(15)) = 218,
+///     PHAssetCollectionSubtypeSmartAlbumSpatial
+///       API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 219,
+///     PHAssetCollectionSubtypeSmartAlbumProRes
+///       API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 220,
+///     PHAssetCollectionSubtypeSmartAlbumScreenRecordings
+///       API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 221,
+///
+///     // iOS 18 Utilities section smart albums (FourCC/OSType values)
+///     PHAssetCollectionSubtypeSmartAlbumReceipts
+///       API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 1552066158,
+///     PHAssetCollectionSubtypeSmartAlbumHandwriting
+///       API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 1752199278,
+///     PHAssetCollectionSubtypeSmartAlbumIllustrations
+///       API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 1768190318,
+///     PHAssetCollectionSubtypeSmartAlbumQRCodes
+///       API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 1903258994,
 ///
 ///
 ///     // Used for fetching, if you don't care about the exact subtype
@@ -240,6 +256,17 @@ enum PMDarwinAssetCollectionSubtype {
   smartAlbumUnableToUpload,
   smartAlbumRAW,
   smartAlbumCinematic,
+
+  // iOS 18+ smart albums
+  smartAlbumSpatial,
+  smartAlbumProRes,
+  smartAlbumScreenRecordings,
+
+  // iOS 18+ Utilities section smart albums
+  smartAlbumReceipts,
+  smartAlbumHandwriting,
+  smartAlbumIllustrations,
+  smartAlbumQRCodes,
 
   // Used for fetching, if you don't care about the exact subtype
   any,
@@ -300,6 +327,20 @@ extension PMDarwinAssetCollectionSubtypeExt on PMDarwinAssetCollectionSubtype {
         return 217;
       case PMDarwinAssetCollectionSubtype.smartAlbumCinematic:
         return 218;
+      case PMDarwinAssetCollectionSubtype.smartAlbumSpatial:
+        return 219;
+      case PMDarwinAssetCollectionSubtype.smartAlbumProRes:
+        return 220;
+      case PMDarwinAssetCollectionSubtype.smartAlbumScreenRecordings:
+        return 221;
+      case PMDarwinAssetCollectionSubtype.smartAlbumReceipts:
+        return 1552066158;
+      case PMDarwinAssetCollectionSubtype.smartAlbumHandwriting:
+        return 1752199278;
+      case PMDarwinAssetCollectionSubtype.smartAlbumIllustrations:
+        return 1768190318;
+      case PMDarwinAssetCollectionSubtype.smartAlbumQRCodes:
+        return 1903258994;
       case PMDarwinAssetCollectionSubtype.any:
         return (math.pow(2, 63) - 1).toInt();
     }
