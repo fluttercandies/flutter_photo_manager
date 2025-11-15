@@ -20,6 +20,10 @@ To know more about breaking changes, see the [Migration Guide][].
   This fixes assets finding when they were created in the future.
   Some edge cases regarding performance drops caused by the complicated sort queries might also get fixed.
 
+### Fixes
+
+- Fix PHImageManager crash caused by accessing deallocated memory in async blocks on iOS.
+
 ## 3.7.1
 
 ### Fixes
