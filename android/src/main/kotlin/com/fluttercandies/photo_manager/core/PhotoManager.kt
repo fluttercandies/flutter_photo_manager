@@ -1,12 +1,9 @@
 package com.fluttercandies.photo_manager.core
 
-import android.app.Activity
-import android.app.RecoverableSecurityException
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
-import android.provider.MediaStore
 import android.util.Log
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.FutureTarget

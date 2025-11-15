@@ -259,12 +259,19 @@ class DarwinEditor {
 
   /// Sets the favorite status of the given [entity].
   ///
-  /// Returns `true` if the operation was successful; otherwise, `false`.
-  Future<bool> favoriteAsset({
+  /// Returns the updated [AssetEntity] if the operation was successful; otherwise, `null`.
+  Future<AssetEntity> favoriteAsset({
     required AssetEntity entity,
     required bool favorite,
   }) async {
-    return plugin.favoriteAsset(entity.id, favorite);
+    final bool result = await plugin.favoriteAsset(entity.id, favorite);
+    if (result) {
+      return entity.copyWith(isFavorite: favorite);
+    }
+    throw StateError(
+      'Failed to favorite the asset '
+      '${entity.id} for unknown reason',
+    );
   }
 
   /// Save Live Photo to the gallery from the given [imageFile] and [videoFile].
@@ -300,12 +307,19 @@ class AndroidEditor {
 
   /// Sets the favorite status of the given [entity].
   ///
-  /// Returns `true` if the operation was successful; otherwise, `false`.
-  Future<bool> favoriteAsset({
+  /// Returns the updated [AssetEntity] if the operation was successful; otherwise, `null`.
+  Future<AssetEntity> favoriteAsset({
     required AssetEntity entity,
     required bool favorite,
   }) async {
-    return plugin.favoriteAsset(entity.id, favorite);
+    final bool result = await plugin.favoriteAsset(entity.id, favorite);
+    if (result) {
+      return entity.copyWith(isFavorite: favorite);
+    }
+    throw StateError(
+      'Failed to favorite the asset '
+      '${entity.id} for unknown reason',
+    );
   }
 
   /// Moves the given [entity] to the specified [target] path.
@@ -344,11 +358,18 @@ class OhosEditor {
 
   /// Sets the favorite status of the given [entity].
   ///
-  /// Returns `true` if the operation was successful; otherwise, `false`.
-  Future<bool> favoriteAsset({
+  /// Returns the updated [AssetEntity] if the operation was successful; otherwise, `null`.
+  Future<AssetEntity> favoriteAsset({
     required AssetEntity entity,
     required bool favorite,
   }) async {
-    return plugin.favoriteAsset(entity.id, favorite);
+    final bool result = await plugin.favoriteAsset(entity.id, favorite);
+    if (result) {
+      return entity.copyWith(isFavorite: favorite);
+    }
+    throw StateError(
+      'Failed to favorite the asset '
+      '${entity.id} for unknown reason',
+    );
   }
 }

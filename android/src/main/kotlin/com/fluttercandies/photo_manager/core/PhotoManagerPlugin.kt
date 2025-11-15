@@ -1,7 +1,6 @@
 package com.fluttercandies.photo_manager.core
 
 import android.app.Activity
-import android.app.RecoverableSecurityException
 import android.content.Context
 import android.net.Uri
 import android.os.Build
