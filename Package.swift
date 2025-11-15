@@ -17,8 +17,9 @@ let package = Package(
         .target(
             name: "photo_manager",
             dependencies: [],
+            path: "ios/Classes",
             resources: [
-                .process("Resources")
+                .process("../Resources")
             ],
             publicHeadersPath: "include",
             cSettings: [
