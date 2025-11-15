@@ -1,6 +1,1 @@
-#import <Foundation/Foundation.h>
-#import "PMConvertProtocol.h"
-
-@interface PMConverter : NSObject <PMConvertProtocol>
-
-@end
+../../ios/Classes/PMConverter.h
