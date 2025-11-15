@@ -695,10 +695,15 @@
     
     __block double lastProgress = 0.0;
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+    __weak typeof(self) weakSelf = self;
     [options setProgressHandler:^(double progress) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
         lastProgress = progress;
         if (progress != 1) {
-            [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+            [strongSelf notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
         }
     }];
     
@@ -708,18 +713,22 @@
                                         toFile:fileUrl
                                        options:options
                              completionHandler:^(NSError *_Nullable error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
         if (error) {
-            [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            [strongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
             block(nil, error);
             return;
         }
         if (fileType) {
-            NSString *newPath = [self makeAssetOutputPath:asset
+            NSString *newPath = [strongSelf makeAssetOutputPath:asset
                                               resource:resource
                                               isOrigin:isOrigin
                                               fileType:fileType
                                                manager:fileManager];
-            [self exportAVAssetToFile:[AVAsset assetWithURL:[NSURL fileURLWithPath:path]]
+            [strongSelf exportAVAssetToFile:[AVAsset assetWithURL:[NSURL fileURLWithPath:path]]
                           destination:newPath
                       progressHandler:progressHandler
                            withScheme:withScheme
@@ -737,7 +746,7 @@
             }];
             return;
         }
-        [self notifySuccess:progressHandler];
+        [strongSelf notifySuccess:progressHandler];
         if (withScheme) {
             block([NSURL fileURLWithPath:path].absoluteString, nil);
         } else {
@@ -1048,10 +1057,15 @@
     
     __block double lastProgress = 0.0;
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+    __weak typeof(self) weakSelf = self;
     [options setProgressHandler:^(double progress) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
         lastProgress = progress;
         if (progress != 1) {
-            [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+            [strongSelf notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
         }
     }];
     
@@ -1061,12 +1075,16 @@
                                         toFile:fileUrl
                                        options:options
                              completionHandler:^(NSError *_Nullable error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
         if (error) {
-            [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            [strongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
             [handler replyError:error];
         } else {
             [handler reply:path];
-            [self notifySuccess:progressHandler];
+            [strongSelf notifySuccess:progressHandler];
         }
     }];
 }
@@ -1256,6 +1274,7 @@
     [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"Saving image with data, length: %lu, filename: %@, desc: %@", (unsigned long)data.length, filename, desc]];
 
     __block NSString *assetId = nil;
+    __weak typeof(self) weakSelf = self;
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
         PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
@@ -1265,9 +1284,13 @@
         assetId = request.placeholderForCreatedAsset.localIdentifier;
     }
      completionHandler:^(BOOL success, NSError *error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
         if (success) {
             [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Created image %@", assetId]];
-            block([self getAssetEntity:assetId], nil);
+            block([strongSelf getAssetEntity:assetId], nil);
         } else {
             [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Save image with data failed %@, reason = %@", assetId, error]];
             block(nil, error);
@@ -1289,6 +1312,7 @@
     
     NSURL *fileURL = [NSURL fileURLWithPath:path];
     __block NSString *assetId = nil;
+    __weak typeof(self) weakSelf = self;
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
         PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
@@ -1300,9 +1324,13 @@
         assetId = request.placeholderForCreatedAsset.localIdentifier;
     }
      completionHandler:^(BOOL success, NSError *error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
         if (success) {
             [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"create asset : id = %@", assetId]];
-            block([self getAssetEntity:assetId], nil);
+            block([strongSelf getAssetEntity:assetId], nil);
         } else {
             [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Save image with path failed %@, reason = %@", assetId, error]];
             block(nil, error);
@@ -1324,6 +1352,7 @@
 
     NSURL *fileURL = [NSURL fileURLWithPath:path];
     __block NSString *assetId = nil;
+    __weak typeof(self) weakSelf = self;
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
         PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
@@ -1335,9 +1364,13 @@
         assetId = request.placeholderForCreatedAsset.localIdentifier;
     }
      completionHandler:^(BOOL success, NSError *error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
         if (success) {
             [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"create asset : id = %@", assetId]];
-            block([self getAssetEntity:assetId], nil);
+            block([strongSelf getAssetEntity:assetId], nil);
         } else {
             [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Save video with path failed %@, reason = %@", assetId, error]];
             block(nil, error);
@@ -1355,6 +1388,7 @@
     NSURL *videoURL = [NSURL fileURLWithPath:videoPath];
 
     __block NSString *assetId = nil;
+    __weak typeof(self) weakSelf = self;
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
         PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
@@ -1367,9 +1401,13 @@
         assetId = request.placeholderForCreatedAsset.localIdentifier;
     }
      completionHandler:^(BOOL success, NSError *error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
         if (success) {
             [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Created Live Photo asset = %@", assetId]];
-            block([self getAssetEntity:assetId], nil);
+            block([strongSelf getAssetEntity:assetId], nil);
         } else {
             [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Create Live Photo asset failed = %@, %@", assetId, error]];
             block(nil, error);
