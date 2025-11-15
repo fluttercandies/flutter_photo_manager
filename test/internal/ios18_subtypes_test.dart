@@ -96,11 +96,15 @@ void main() {
       expect(filter.type.length, equals(1));
       expect(filter.subType.length, equals(4));
       expect(
-        filter.subType.contains(PMDarwinAssetCollectionSubtype.smartAlbumHandwriting),
+        filter.subType.contains(
+          PMDarwinAssetCollectionSubtype.smartAlbumHandwriting,
+        ),
         isTrue,
       );
       expect(
-        filter.subType.contains(PMDarwinAssetCollectionSubtype.smartAlbumQRCodes),
+        filter.subType.contains(
+          PMDarwinAssetCollectionSubtype.smartAlbumQRCodes,
+        ),
         isTrue,
       );
     });

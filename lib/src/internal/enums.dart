@@ -202,15 +202,22 @@ extension PMDarwinAssetCollectionTypeExt on PMDarwinAssetCollectionType {
 ///     PHAssetCollectionSubtypeSmartAlbumUnableToUpload API_AVAILABLE(macos(10.15), ios(13), tvos(13)) = 216,
 ///     PHAssetCollectionSubtypeSmartAlbumRAW API_AVAILABLE(macos(12), ios(15), tvos(15)) = 217,
 ///     PHAssetCollectionSubtypeSmartAlbumCinematic API_AVAILABLE(macos(12), ios(15), tvos(15)) = 218,
-///     PHAssetCollectionSubtypeSmartAlbumSpatial API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 219,
-///     PHAssetCollectionSubtypeSmartAlbumProRes API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 220,
-///     PHAssetCollectionSubtypeSmartAlbumScreenRecordings API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 221,
+///     PHAssetCollectionSubtypeSmartAlbumSpatial
+///       API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 219,
+///     PHAssetCollectionSubtypeSmartAlbumProRes
+///       API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 220,
+///     PHAssetCollectionSubtypeSmartAlbumScreenRecordings
+///       API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 221,
 ///
 ///     // iOS 18 Utilities section smart albums (FourCC/OSType values)
-///     PHAssetCollectionSubtypeSmartAlbumReceipts API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 1552066158,
-///     PHAssetCollectionSubtypeSmartAlbumHandwriting API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 1752199278,
-///     PHAssetCollectionSubtypeSmartAlbumIllustrations API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 1768190318,
-///     PHAssetCollectionSubtypeSmartAlbumQRCodes API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 1903258994,
+///     PHAssetCollectionSubtypeSmartAlbumReceipts
+///       API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 1552066158,
+///     PHAssetCollectionSubtypeSmartAlbumHandwriting
+///       API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 1752199278,
+///     PHAssetCollectionSubtypeSmartAlbumIllustrations
+///       API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 1768190318,
+///     PHAssetCollectionSubtypeSmartAlbumQRCodes
+///       API_AVAILABLE(macos(15.0), ios(18.0), tvos(18.0)) = 1903258994,
 ///
 ///
 ///     // Used for fetching, if you don't care about the exact subtype
