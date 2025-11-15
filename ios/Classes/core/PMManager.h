@@ -1,8 +1,8 @@
 #import "PMFileHelper.h"
 #import "PMImport.h"
+#import <CoreLocation/CoreLocation.h>
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
-#import <CoreLocation/CoreLocation.h>
 
 typedef void (^ChangeIds)(NSArray<NSString *> *);
 
