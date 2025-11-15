@@ -259,7 +259,10 @@ interface IDBUtils {
         title: String,
         desc: String,
         relativePath: String,
-        orientation: Int?
+        orientation: Int?,
+        latitude: Double?,
+        longitude: Double?,
+        creationDate: Long?
     ): AssetEntity {
         var inputStream = ByteArrayInputStream(bytes)
         fun refreshStream() {
@@ -281,7 +284,11 @@ interface IDBUtils {
         )
         val (rotationDegrees, latLong) = Pair(
             orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
-            if (isAboveAndroidQ) null else exif.latLong
+            if (isAboveAndroidQ) {
+                if (latitude != null && longitude != null) {
+                    floatArrayOf(latitude.toFloat(), longitude.toFloat())
+                } else null
+            } else exif.latLong
         )
         refreshStream()
 
@@ -300,7 +307,7 @@ interface IDBUtils {
             put(WIDTH, width)
             put(HEIGHT, height)
             if (isAboveAndroidQ) {
-                put(DATE_TAKEN, timestamp * 1000)
+                put(DATE_TAKEN, creationDate ?: (timestamp * 1000))
                 put(ORIENTATION, rotationDegrees)
                 if (relativePath.isNotBlank()) {
                     put(RELATIVE_PATH, relativePath)
@@ -326,7 +333,10 @@ interface IDBUtils {
         title: String,
         desc: String,
         relativePath: String,
-        orientation: Int?
+        orientation: Int?,
+        latitude: Double?,
+        longitude: Double?,
+        creationDate: Long?
     ): AssetEntity {
         filePath.checkDirs()
         val file = File(filePath)
@@ -351,7 +361,11 @@ interface IDBUtils {
         )
         val (rotationDegrees, latLong) = Pair(
             orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
-            if (isAboveAndroidQ) null else exif.latLong
+            if (isAboveAndroidQ) {
+                if (latitude != null && longitude != null) {
+                    floatArrayOf(latitude.toFloat(), longitude.toFloat())
+                } else null
+            } else exif.latLong
         )
         refreshStream()
 
@@ -375,7 +389,7 @@ interface IDBUtils {
             put(WIDTH, width)
             put(HEIGHT, height)
             if (isAboveAndroidQ) {
-                put(DATE_TAKEN, timestamp * 1000)
+                put(DATE_TAKEN, creationDate ?: (timestamp * 1000))
                 put(ORIENTATION, rotationDegrees)
                 if (relativePath.isNotBlank()) {
                     put(RELATIVE_PATH, relativePath)
@@ -405,7 +419,10 @@ interface IDBUtils {
         title: String,
         desc: String,
         relativePath: String,
-        orientation: Int?
+        orientation: Int?,
+        latitude: Double?,
+        longitude: Double?,
+        creationDate: Long?
     ): AssetEntity {
         filePath.checkDirs()
         val file = File(filePath)
@@ -428,7 +445,11 @@ interface IDBUtils {
         val (rotationDegrees, latLong) = ExifInterface(inputStream).let { exif ->
             Pair(
                 orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
-                if (isAboveAndroidQ) null else exif.latLong
+                if (isAboveAndroidQ) {
+                    if (latitude != null && longitude != null) {
+                        floatArrayOf(latitude.toFloat(), longitude.toFloat())
+                    } else null
+                } else exif.latLong
             )
         }
         refreshStream()
@@ -454,7 +475,7 @@ interface IDBUtils {
             put(WIDTH, info.width)
             put(HEIGHT, info.height)
             if (isAboveAndroidQ) {
-                put(DATE_TAKEN, timestamp * 1000)
+                put(DATE_TAKEN, creationDate ?: (timestamp * 1000))
                 put(ORIENTATION, rotationDegrees)
                 if (relativePath.isNotBlank()) {
                     put(RELATIVE_PATH, relativePath)

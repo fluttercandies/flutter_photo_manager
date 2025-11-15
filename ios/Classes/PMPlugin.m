@@ -504,9 +504,15 @@
         NSData *data = [call.arguments[@"image"] data];
         NSString *filename = call.arguments[@"filename"];
         NSString *desc = call.arguments[@"desc"];
+        NSNumber *latitude = call.arguments[@"latitude"];
+        NSNumber *longitude = call.arguments[@"longitude"];
+        NSNumber *creationDate = call.arguments[@"creationDate"];
         [manager saveImage:data
                   filename:filename
                       desc:desc
+                  latitude:latitude
+                 longitude:longitude
+              creationDate:creationDate
                      block:^(PMAssetEntity *asset, NSObject *error) {
             if (asset) {
                 [handler reply:[PMConvertUtils convertPMAssetToMap:asset needTitle:NO]];
@@ -518,9 +524,15 @@
         NSString *path = call.arguments[@"path"];
         NSString *filename = call.arguments[@"title"];
         NSString *desc = call.arguments[@"desc"];
+        NSNumber *latitude = call.arguments[@"latitude"];
+        NSNumber *longitude = call.arguments[@"longitude"];
+        NSNumber *creationDate = call.arguments[@"creationDate"];
         [manager saveImageWithPath:path
                           filename:filename
                               desc:desc
+                          latitude:latitude
+                         longitude:longitude
+                      creationDate:creationDate
                              block:^(PMAssetEntity *asset, NSObject *error) {
             if (asset) {
                 [handler reply:[PMConvertUtils convertPMAssetToMap:asset needTitle:NO]];
@@ -532,9 +544,15 @@
         NSString *videoPath = call.arguments[@"path"];
         NSString *filename = call.arguments[@"title"];
         NSString *desc = call.arguments[@"desc"];
+        NSNumber *latitude = call.arguments[@"latitude"];
+        NSNumber *longitude = call.arguments[@"longitude"];
+        NSNumber *creationDate = call.arguments[@"creationDate"];
         [manager saveVideo:videoPath
                   filename:filename
                       desc:desc
+                  latitude:latitude
+                 longitude:longitude
+              creationDate:creationDate
                      block:^(PMAssetEntity *asset, NSObject *error) {
             if (asset) {
                 [handler reply:[PMConvertUtils convertPMAssetToMap:asset needTitle:NO]];

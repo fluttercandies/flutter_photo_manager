@@ -481,6 +481,9 @@ class PhotoManagerPlugin(
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
+                    val latitude = call.argument<Double?>("latitude")
+                    val longitude = call.argument<Double?>("longitude")
+                    val creationDate = call.argument<Long?>("creationDate")
                     val entity = photoManager.saveImage(
                         bytes,
                         filename,
@@ -488,6 +491,9 @@ class PhotoManagerPlugin(
                         desc,
                         relativePath,
                         orientation,
+                        latitude,
+                        longitude,
+                        creationDate,
                     )
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
@@ -504,12 +510,18 @@ class PhotoManagerPlugin(
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
+                    val latitude = call.argument<Double?>("latitude")
+                    val longitude = call.argument<Double?>("longitude")
+                    val creationDate = call.argument<Long?>("creationDate")
                     val entity = photoManager.saveImage(
                         filePath,
                         title,
                         desc,
                         relativePath,
                         orientation,
+                        latitude,
+                        longitude,
+                        creationDate,
                     )
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
@@ -526,12 +538,18 @@ class PhotoManagerPlugin(
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
+                    val latitude = call.argument<Double?>("latitude")
+                    val longitude = call.argument<Double?>("longitude")
+                    val creationDate = call.argument<Long?>("creationDate")
                     val entity = photoManager.saveVideo(
                         filePath,
                         title,
                         desc,
                         relativePath,
                         orientation,
+                        latitude,
+                        longitude,
+                        creationDate,
                     )
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
