@@ -16,3 +16,4 @@ doc/
 .env
 *.iml
 .metadata
+_codeql_detected_source_root
