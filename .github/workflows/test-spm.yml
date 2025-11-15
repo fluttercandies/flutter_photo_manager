@@ -42,6 +42,9 @@ jobs:
       
       - run: flutter doctor -v
       
+      - name: Enable Swift Package Manager
+        run: flutter config --enable-swift-package-manager
+      
       - name: Install dependencies
         run: |
           flutter pub get
@@ -88,6 +91,9 @@ jobs:
           xcodebuild -version
       
       - run: flutter doctor -v
+      
+      - name: Enable Swift Package Manager
+        run: flutter config --enable-swift-package-manager
       
       - name: Install dependencies
         run: |
