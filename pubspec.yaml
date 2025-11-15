@@ -24,7 +24,9 @@ flutter:
         pluginClass: PhotoManagerPlugin
       ios:
         pluginClass: PhotoManagerPlugin
+        sharedDarwinSource: true
       macos:
         pluginClass: PhotoManagerPlugin
+        sharedDarwinSource: true
       ohos:
         pluginClass: PhotoManagerPlugin
