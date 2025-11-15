@@ -630,8 +630,8 @@ class PhotoManagerPlugin(
         return this.argument<Int>(key)!!
     }
 
-    private fun MethodCall.getOption(): FilterOption {
-        val arguments = argument<Map<*, *>>("option")!!
+    private fun MethodCall.getOption(): FilterOption? {
+        val arguments = argument<Map<*, *>>("option")
         return ConvertUtils.convertToFilterOptions(arguments)
     }
 }

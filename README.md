@@ -60,18 +60,22 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
         * [Limited entities access on Android](#limited-entities-access-on-android)
     * [Get albums/folders (`AssetPathEntity`)](#get-albumsfolders-assetpathentity)
       * [Params of `getAssetPathList`](#params-of-getassetpathlist)
-      * [PMPathFilterOption](#pmpathfilteroption)
+      * [PMPathFilterOption (Since 2.7.0)](#pmpathfilteroption-since-270)
     * [Get assets (`AssetEntity`)](#get-assets-assetentity)
       * [From `AssetPathEntity`](#from-assetpathentity)
       * [From `PhotoManager` (Since 2.6)](#from-photomanager-since-26)
       * [From ID](#from-id)
       * [From raw data](#from-raw-data)
       * [From iCloud](#from-icloud)
+      * [Cancel loading (Since 3.8.0)](#cancel-loading-since-380)
       * [Display assets](#display-assets)
       * [Get asset files](#get-asset-files)
       * [Obtain "Live Photos"](#obtain-live-photos)
         * [Filtering only "Live Photos"](#filtering-only-live-photos)
         * [Obtain the video from "Live Photos"](#obtain-the-video-from-live-photos)
+      * [Include hidden assets (iOS only)](#include-hidden-assets-ios-only)
+        * [Using with FilterOptionGroup](#using-with-filteroptiongroup)
+        * [Using with CustomFilter](#using-with-customfilter)
       * [Limitations](#limitations)
         * [Android 10 media location permission](#android-10-media-location-permission)
         * [Usage of the original data](#usage-of-the-original-data)
@@ -309,17 +313,18 @@ See [`getAssetPathList`][] for more detail.
 | filterOption     | Used to filter resource files, see [Filtering](#filtering) for details                                                         | FilterOptionGroup()     |
 | pathFilterOption | Only valid for iOS and macOS, for the corresponding album type. See [PMPathFilterOption](#pmpathfilteroption) for more detail. | Include all by default. |
 
-#### PMPathFilterOption
+#### PMPathFilterOption (Since 2.7.0)
 
-Provide since 2.7.0, currently only valid for iOS and macOS.
+> [!NOTE]
+> This option is only valid for iOS and macOS.
 
 ```dart
 final List<PMDarwinAssetCollectionType> pathTypeList = []; // use your need type
 final List<PMDarwinAssetCollectionSubtype> pathSubTypeList = []; // use your need type
 final darwinPathFilterOption = PMDarwinPathFilter(
-      type: pathTypeList,
-      subType: pathSubTypeList,
-    );
+  type: pathTypeList,
+  subType: pathSubTypeList,
+);
 PMPathFilter pathFilter = PMPathFilter();
 ```
 
@@ -349,7 +354,7 @@ final List<AssetEntity> entities = await path.getAssetListRange(start: 0, end: 8
 
 #### From `PhotoManager` (Since 2.6)
 
-First, You need get count of assets:
+First, You need to get count of assets:
 
 ```dart
 final int count = await PhotoManager.getAssetCount();
@@ -461,6 +466,26 @@ iCloud files can only be obtained when the Apple ID on the device are correctly 
 When the account requires to re-enter the password to verify, iCloud files that are not
 locally available are not allowed to be fetched. The photo library will throws
 `CloudPhotoLibraryErrorDomain` in this circumstance.
+
+#### Cancel loading (Since 3.8.0)
+
+> [!NOTE]
+> This is only valid for iOS and macOS.
+
+The `cancelToken` parameter has been added to various of methods for `AssetEntity`,
+which can be used to cancel the loading process.
+
+```dart
+final PMCancelToken cancelToken = PMCancelToken();
+final File? file = await yourAssetEntity.loadFile(cancelToken: cancelToken);
+await cancelToken.cancel();
+```
+
+The `PhotoManager` also has a method to cancel all loading:
+
+```dart
+await PhotoManager.cancelAllRequest();
+```
 
 #### Display assets
 

@@ -103,7 +103,10 @@ object ConvertUtils {
         return DateCond(min, max, ignore)
     }
 
-    fun convertToFilterOptions(map: Map<*, *>): FilterOption {
+    fun convertToFilterOptions(map: Map<*, *>?): FilterOption? {
+        if (map == null) {
+            return null
+        }
         val type = map["type"] as Int
         val childMap = map["child"] as Map<*, *>
         if (type == 0) {

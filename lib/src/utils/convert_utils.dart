@@ -7,7 +7,6 @@ import 'dart:io';
 import 'package:photo_manager/platform_utils.dart';
 
 import '../filter/base_filter.dart';
-import '../filter/classical/filter_option_group.dart';
 import '../filter/path_filter.dart';
 import '../internal/enums.dart';
 import '../types/entity.dart';
@@ -33,7 +32,7 @@ class ConvertUtils {
         convertMapToPath(
           item.cast<String, dynamic>(),
           type: type,
-          filterOption: filterOption ?? FilterOptionGroup(),
+          filterOption: filterOption,
         ),
       );
     }
@@ -88,7 +87,7 @@ class ConvertUtils {
       name: data['name'] as String,
       // ignore: deprecated_member_use_from_same_package
       albumType: data['albumType'] as int? ?? 1,
-      filterOption: filterOption ?? FilterOptionGroup(),
+      filterOption: filterOption,
       lastModified: lastModified,
       type: type,
       isAll: data['isAll'] as bool,

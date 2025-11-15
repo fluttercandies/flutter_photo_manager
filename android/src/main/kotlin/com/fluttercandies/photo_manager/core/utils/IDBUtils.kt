@@ -104,7 +104,7 @@ interface IDBUtils {
     fun getAssetPathList(
         context: Context,
         requestType: Int = 0,
-        option: FilterOption
+        option: FilterOption?
     ): List<AssetPathEntity>
 
     fun getAssetListPaged(
@@ -113,7 +113,7 @@ interface IDBUtils {
         page: Int,
         size: Int,
         requestType: Int = 0,
-        option: FilterOption,
+        option: FilterOption?
     ): List<AssetEntity>
 
     fun getAssetListRange(
@@ -122,7 +122,7 @@ interface IDBUtils {
         start: Int,
         end: Int,
         requestType: Int,
-        option: FilterOption
+        option: FilterOption?
     ): List<AssetEntity>
 
     fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean = true): AssetEntity?
@@ -249,7 +249,7 @@ interface IDBUtils {
         context: Context,
         pathId: String,
         type: Int,
-        option: FilterOption
+        option: FilterOption?
     ): AssetPathEntity?
 
     fun saveImage(
@@ -534,13 +534,18 @@ interface IDBUtils {
     fun getMainAssetPathEntity(
         context: Context,
         requestType: Int,
-        option: FilterOption
+        option: FilterOption?
     ): List<AssetPathEntity>
 
     // Nullable for implementations.
-    fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption): String? {
-        val orderBy = filterOption.orderByCondString()
-        return "$orderBy LIMIT $pageSize OFFSET $start"
+    fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption?): String? {
+        val builder = StringBuilder()
+        if (filterOption != null) {
+            builder.append(filterOption.orderByCondString())
+            builder.append("")
+        }
+        builder.append("LIMIT $pageSize OFFSET $start")
+        return builder.toString()
     }
 
     fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity
@@ -651,11 +656,15 @@ interface IDBUtils {
         }
     }
 
-    fun getAssetCount(context: Context, option: FilterOption, requestType: Int): Int {
+    fun getAssetCount(
+        context: Context,
+        option: FilterOption?,
+        requestType: Int
+    ): Int {
         val cr = context.contentResolver
         val args = ArrayList<String>()
-        val where = option.makeWhere(requestType, args, false)
-        val order = option.orderByCondString()
+        val where = option?.makeWhere(requestType, args, false)
+        val order = option?.orderByCondString()
         cr.logQuery(allUri, arrayOf(_ID), where, args.toTypedArray(), order).use {
             return it.count
         }
@@ -663,16 +672,19 @@ interface IDBUtils {
 
     fun getAssetCount(
         context: Context,
-        option: FilterOption,
+        option: FilterOption?,
         requestType: Int,
         galleryId: String,
     ): Int {
         val cr = context.contentResolver
         val args = ArrayList<String>()
-        var where = option.makeWhere(requestType, args, false)
+        var where = option?.makeWhere(requestType, args, false)
 
         run {
-            val result = StringBuilder(where)
+            val result = StringBuilder()
+            if (where != null) {
+                result.append(where)
+            }
             if (galleryId != PhotoManager.ALL_ID) {
                 if (result.trim().isNotEmpty()) {
                     result.append(" AND ")
@@ -684,7 +696,7 @@ interface IDBUtils {
             where = result.toString()
         }
 
-        val order = option.orderByCondString()
+        val order = option?.orderByCondString()
         cr.logQuery(allUri, arrayOf(_ID), where, args.toTypedArray(), order).use {
             return it.count
         }
@@ -693,15 +705,15 @@ interface IDBUtils {
 
     fun getAssetsByRange(
         context: Context,
-        option: FilterOption,
+        option: FilterOption?,
         start: Int,
         end: Int,
         requestType: Int
     ): List<AssetEntity> {
         val cr = context.contentResolver
         val args = ArrayList<String>()
-        val where = option.makeWhere(requestType, args, false)
-        val order = option.orderByCondString()
+        val where = option?.makeWhere(requestType, args, false)
+        val order = option?.orderByCondString()
         cr.logQuery(allUri, keys(), where, args.toTypedArray(), order).use {
             val result = ArrayList<AssetEntity>()
             it.moveToPosition(start - 1)
