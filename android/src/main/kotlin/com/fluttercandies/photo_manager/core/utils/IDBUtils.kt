@@ -286,7 +286,7 @@ interface IDBUtils {
             orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
             if (isAboveAndroidQ) {
                 if (latitude != null && longitude != null) {
-                    floatArrayOf(latitude.toFloat(), longitude.toFloat())
+                    doubleArrayOf(latitude, longitude)
                 } else null
             } else exif.latLong
         )
@@ -363,7 +363,7 @@ interface IDBUtils {
             orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
             if (isAboveAndroidQ) {
                 if (latitude != null && longitude != null) {
-                    floatArrayOf(latitude.toFloat(), longitude.toFloat())
+                    doubleArrayOf(latitude, longitude)
                 } else null
             } else exif.latLong
         )
@@ -447,7 +447,7 @@ interface IDBUtils {
                 orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
                 if (isAboveAndroidQ) {
                     if (latitude != null && longitude != null) {
-                        floatArrayOf(latitude.toFloat(), longitude.toFloat())
+                        doubleArrayOf(latitude, longitude)
                     } else null
                 } else exif.latLong
             )
