@@ -307,7 +307,7 @@ class AndroidEditor {
 
   /// Sets the favorite status of the given [entity].
   ///
-  /// Returns the updated [AssetEntity] if the operation was successful; otherwise, `null`.
+  /// Returns the updated [AssetEntity] if the operation was successful; otherwise, throws a state error to indicate the failure.
   Future<AssetEntity> favoriteAsset({
     required AssetEntity entity,
     required bool favorite,
