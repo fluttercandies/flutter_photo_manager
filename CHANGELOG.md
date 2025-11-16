@@ -24,6 +24,9 @@ To know more about breaking changes, see the [Migration Guide][].
 - Add optional `latitude`, `longitude`, and `creationDate` parameters to `saveImage`, `saveImageWithPath`, and `saveVideo` methods.
   - On iOS: Sets location and creation date metadata for saved assets.
   - On Android Q+: Sets DATE_TAKEN field and location metadata for saved assets.
+- Add `updateDateTaken` method to `DarwinEditor` and `AndroidEditor` for modifying asset creation time.
+  - On iOS/macOS: Updates the `creationDate` property of the asset.
+  - On Android Q (API 29)+: Updates the `DATE_TAKEN` field in MediaStore.
 
 ### Improvements
 

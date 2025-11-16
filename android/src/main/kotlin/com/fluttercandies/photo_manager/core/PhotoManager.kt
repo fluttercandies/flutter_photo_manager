@@ -255,6 +255,16 @@ class PhotoManager(private val context: Context) {
         }
     }
 
+    fun updateDateTaken(assetId: String, timestamp: Int, resultHandler: ResultHandler) {
+        try {
+            val result = dbUtils.updateDateTaken(context, assetId, timestamp)
+            resultHandler.reply(result)
+        } catch (e: Exception) {
+            LogUtils.error(e)
+            resultHandler.reply(false)
+        }
+    }
+
     fun removeAllExistsAssets(resultHandler: ResultHandler) {
         val result = dbUtils.removeAllExistsAssets(context)
         resultHandler.reply(result)
