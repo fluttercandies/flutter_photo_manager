@@ -28,7 +28,6 @@ import android.provider.MediaStore.MediaColumns.WIDTH
 import android.provider.MediaStore.MediaColumns._ID
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import androidx.annotation.ChecksSdkIntAtLeast
-import androidx.annotation.RequiresApi
 import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
@@ -547,7 +546,73 @@ interface IDBUtils {
 
     fun getExif(context: Context, id: String): ExifInterface?
 
-    fun getLatLong(context: Context, id: String): DoubleArray?
+    fun getLatLong(context: Context, id: String): DoubleArray? {
+        val asset = getAssetEntity(context, id) ?: return null
+
+        // For videos, use MediaMetadataRetriever to extract location
+        if (asset.type == getMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)) {
+            return try {
+                val retriever = MediaMetadataRetriever()
+                retriever.setDataSource(asset.path)
+                val location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION)
+                retriever.release()
+
+                if (location != null) {
+                    // Location format is typically: "+37.4219-122.0840/" or "+37.4219-122.0840"
+                    // Parse the ISO 6709 format
+                    parseLocationString(location)
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                LogUtils.error(e)
+                null
+            }
+        }
+
+        // For images, use ExifInterface
+        return try {
+            val exifInfo = getExif(context, id)
+            exifInfo?.latLong
+        } catch (e: Exception) {
+            LogUtils.error(e)
+            null
+        }
+    }
+
+    private fun parseLocationString(location: String): DoubleArray? {
+        // ISO 6709 format: ±DD.DDDD±DDD.DDDD or ±DD.DDDD±DDD.DDDD/
+        // Example: "+37.4219-122.0840/" or "+37.4219-122.0840"
+        try {
+            val cleanLocation = location.trimEnd('/')
+
+            // Find where longitude starts (second + or -)
+            var longitudeStartIndex = -1
+            var signCount = 0
+            for (i in cleanLocation.indices) {
+                if (cleanLocation[i] == '+' || cleanLocation[i] == '-') {
+                    signCount++
+                    if (signCount == 2) {
+                        longitudeStartIndex = i
+                        break
+                    }
+                }
+            }
+
+            if (longitudeStartIndex > 0) {
+                val latStr = cleanLocation.take(longitudeStartIndex)
+                val lngStr = cleanLocation.substring(longitudeStartIndex)
+
+                val latitude = latStr.toDoubleOrNull() ?: return null
+                val longitude = lngStr.toDoubleOrNull() ?: return null
+
+                return doubleArrayOf(latitude, longitude)
+            }
+        } catch (e: Exception) {
+            LogUtils.error(e)
+        }
+        return null
+    }
 
     fun getOriginBytes(
         context: Context,

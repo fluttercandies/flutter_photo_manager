@@ -3,7 +3,6 @@ package com.fluttercandies.photo_manager.core.utils
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -303,75 +302,6 @@ object AndroidQDBUtils : IDBUtils {
         }
     }
 
-    override fun getLatLong(context: Context, id: String): DoubleArray? {
-        val asset = getAssetEntity(context, id) ?: return null
-        
-        // For videos, use MediaMetadataRetriever to extract location
-        if (asset.type == 2) {
-            return try {
-                val retriever = MediaMetadataRetriever()
-                val uri = getUri(asset)
-                retriever.setDataSource(context, uri)
-                val location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION)
-                retriever.close()
-                
-                if (location != null) {
-                    // Location format is typically: "+37.4219-122.0840/" or "+37.4219-122.0840"
-                    // Parse the ISO 6709 format
-                    parseLocationString(location)
-                } else {
-                    null
-                }
-            } catch (e: Exception) {
-                LogUtils.error(e)
-                null
-            }
-        }
-        
-        // For images, use ExifInterface
-        return try {
-            val exifInfo = getExif(context, id)
-            exifInfo?.latLong
-        } catch (e: Exception) {
-            LogUtils.error(e)
-            null
-        }
-    }
-
-    private fun parseLocationString(location: String): DoubleArray? {
-        // ISO 6709 format: ±DD.DDDD±DDD.DDDD or ±DD.DDDD±DDD.DDDD/
-        // Example: "+37.4219-122.0840/" or "+37.4219-122.0840"
-        try {
-            val cleanLocation = location.trimEnd('/')
-            
-            // Find where longitude starts (second + or -)
-            var longitudeStartIndex = -1
-            var signCount = 0
-            for (i in cleanLocation.indices) {
-                if (cleanLocation[i] == '+' || cleanLocation[i] == '-') {
-                    signCount++
-                    if (signCount == 2) {
-                        longitudeStartIndex = i
-                        break
-                    }
-                }
-            }
-            
-            if (longitudeStartIndex > 0) {
-                val latStr = cleanLocation.substring(0, longitudeStartIndex)
-                val lngStr = cleanLocation.substring(longitudeStartIndex)
-                
-                val latitude = latStr.toDoubleOrNull() ?: return null
-                val longitude = lngStr.toDoubleOrNull() ?: return null
-                
-                return doubleArrayOf(latitude, longitude)
-            }
-        } catch (e: Exception) {
-            LogUtils.error(e)
-        }
-        return null
-    }
-
     override fun getFilePath(context: Context, id: String, origin: Boolean): String {
         val assetEntity = getAssetEntity(context, id) ?: throwIdNotFound(id)
         val filePath = if (shouldUseScopedCache) {
@@ -524,7 +454,7 @@ object AndroidQDBUtils : IDBUtils {
                     val exists = try {
                         cr.openInputStream(uri)?.close()
                         true
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         false
                     }
                     if (!exists) {
