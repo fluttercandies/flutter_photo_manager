@@ -2,6 +2,7 @@ package com.fluttercandies.photo_manager.core
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -222,6 +223,33 @@ class PhotoManager(private val context: Context) {
     }
 
     fun getLocation(id: String): Map<String, Double> {
+        val asset = dbUtils.getAssetEntity(context, id)
+        if (asset == null) {
+            return mapOf("lat" to 0.0, "lng" to 0.0)
+        }
+
+        // For videos, use MediaMetadataRetriever to extract location
+        if (asset.type == 2) {
+            return try {
+                val retriever = MediaMetadataRetriever()
+                retriever.setDataSource(asset.path)
+                val location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION)
+                if (IDBUtils.isAboveAndroidQ) retriever.close() else retriever.release()
+                
+                if (location != null) {
+                    // Location format is typically: "+37.4219-122.0840/" or "+37.4219-122.0840"
+                    // Parse the ISO 6709 format
+                    parseLocationString(location)
+                } else {
+                    mapOf("lat" to 0.0, "lng" to 0.0)
+                }
+            } catch (e: Exception) {
+                LogUtils.error(e)
+                mapOf("lat" to 0.0, "lng" to 0.0)
+            }
+        }
+
+        // For images, use ExifInterface
         val exifInfo = dbUtils.getExif(context, id)
         val latLong = exifInfo?.latLong
         return if (latLong == null) {
@@ -229,6 +257,40 @@ class PhotoManager(private val context: Context) {
         } else {
             mapOf("lat" to latLong[0], "lng" to latLong[1])
         }
+    }
+
+    private fun parseLocationString(location: String): Map<String, Double> {
+        // ISO 6709 format: ±DD.DDDD±DDD.DDDD or ±DD.DDDD±DDD.DDDD/
+        // Example: "+37.4219-122.0840/" or "+37.4219-122.0840"
+        try {
+            val cleanLocation = location.trimEnd('/')
+            
+            // Find where longitude starts (second + or -)
+            var longitudeStartIndex = -1
+            var signCount = 0
+            for (i in cleanLocation.indices) {
+                if (cleanLocation[i] == '+' || cleanLocation[i] == '-') {
+                    signCount++
+                    if (signCount == 2) {
+                        longitudeStartIndex = i
+                        break
+                    }
+                }
+            }
+            
+            if (longitudeStartIndex > 0) {
+                val latStr = cleanLocation.substring(0, longitudeStartIndex)
+                val lngStr = cleanLocation.substring(longitudeStartIndex)
+                
+                val latitude = latStr.toDoubleOrNull() ?: 0.0
+                val longitude = lngStr.toDoubleOrNull() ?: 0.0
+                
+                return mapOf("lat" to latitude, "lng" to longitude)
+            }
+        } catch (e: Exception) {
+            LogUtils.error(e)
+        }
+        return mapOf("lat" to 0.0, "lng" to 0.0)
     }
 
     fun getMediaUri(id: Long, type: Int): String {

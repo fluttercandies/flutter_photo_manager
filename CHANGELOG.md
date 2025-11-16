@@ -39,6 +39,7 @@ To know more about breaking changes, see the [Migration Guide][].
   - Fixed PHCachingImageManager methods: `fetchThumb`, `exportAssetToFile`, `fetchFullSizeImageFile`.
   - Fixed PHAssetResourceManager methods: `fetchVideoResourceToFile`, `fetchOriginImageFile`.
   - Fixed PHPhotoLibrary save methods: `saveImage`, `saveImageWithPath`, `saveVideo`, `saveLivePhoto`.
+- Fix `AssetEntity.latlngAsync()` returning zero location for videos on Android by using `MediaMetadataRetriever` to extract location data from video files.
 
 ## 3.7.1
 
