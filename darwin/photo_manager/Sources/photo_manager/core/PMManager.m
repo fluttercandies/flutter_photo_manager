@@ -1593,6 +1593,45 @@
     return [self convertPHCollectionToPMAssetPathArray:phCollectionArray option:options];
 }
 
+- (NSArray<PMAssetPathEntity *> *)getParentPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(NSObject<PMBaseFilter> *)option {
+    PHFetchOptions *options = [self getAssetOptions:type filterOption:option];
+    
+    // Recent/All Photos collection has no parent folders
+    if ([PMFolderUtils isRecentCollection:id]) {
+        return @[];
+    }
+    
+    PHCollection *collection = nil;
+    
+    // Try to fetch as an album (PHAssetCollection) first
+    PHFetchResult<PHAssetCollection *> *assetCollectionResult = [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[id] options:nil];
+    if (assetCollectionResult && assetCollectionResult.count > 0) {
+        collection = assetCollectionResult.firstObject;
+    }
+    
+    // If not found as an album, try to fetch as a folder (PHCollectionList)
+    if (!collection) {
+        PHFetchResult<PHCollectionList *> *collectionListResult = [PHCollectionList fetchCollectionListsWithLocalIdentifiers:@[id] options:nil];
+        if (collectionListResult && collectionListResult.count > 0) {
+            collection = collectionListResult.firstObject;
+        }
+    }
+    
+    if (!collection) {
+        return @[];
+    }
+    
+    // Fetch parent collection lists containing this collection
+    PHFetchResult<PHCollectionList *> *parentCollectionLists = [PHCollectionList fetchCollectionListsContainingCollection:collection options:nil];
+    
+    NSMutableArray<PHCollection *> *parentArray = [NSMutableArray new];
+    for (PHCollectionList *parentList in parentCollectionLists) {
+        [parentArray addObject:parentList];
+    }
+    
+    return [self convertPHCollectionToPMAssetPathArray:parentArray option:options];
+}
+
 - (NSArray<PMAssetPathEntity *> *)convertPHCollectionToPMAssetPathArray:(NSArray<PHCollection *> *)phArray
                                                                  option:(PHFetchOptions *)option {
     NSMutableArray<PMAssetPathEntity *> *result = [NSMutableArray new];
