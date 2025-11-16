@@ -574,7 +574,7 @@ class PhotoManagerPlugin(
 
             Methods.updateDateTaken -> {
                 val assetId = call.argument<String>("id")!!
-                val timestamp = call.argument<Int>("timestamp")!!
+                val timestamp = call.argument<Long>("timestamp")!!
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                     LogUtils.error("The API 29 or lower do not support updating DATE_TAKEN.")
                     resultHandler.reply(false)

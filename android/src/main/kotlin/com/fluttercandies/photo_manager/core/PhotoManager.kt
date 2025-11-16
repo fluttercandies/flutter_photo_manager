@@ -255,7 +255,7 @@ class PhotoManager(private val context: Context) {
         }
     }
 
-    fun updateDateTaken(assetId: String, timestamp: Int, resultHandler: ResultHandler) {
+    fun updateDateTaken(assetId: String, timestamp: Long, resultHandler: ResultHandler) {
         try {
             val result = dbUtils.updateDateTaken(context, assetId, timestamp)
             resultHandler.reply(result)

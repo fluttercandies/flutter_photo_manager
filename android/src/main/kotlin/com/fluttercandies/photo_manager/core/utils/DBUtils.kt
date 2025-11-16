@@ -379,11 +379,11 @@ object DBUtils : IDBUtils {
         throwMsg("Cannot update $assetId relativePath")
     }
 
-    override fun updateDateTaken(context: Context, assetId: String, timestamp: Int): Boolean {
+    override fun updateDateTaken(context: Context, assetId: String, timestamp: Long): Boolean {
         val cr = context.contentResolver
-        val timestampMillis = timestamp.toLong() * 1000
+        val timestampMillis = timestamp * 1000
         val contentValues = ContentValues().apply {
-            put(MediaStore.Images.ImageColumns.DATE_TAKEN, timestampMillis)
+            put(DATE_TAKEN, timestampMillis)
         }
         
         val count = cr.update(allUri, contentValues, idSelection, arrayOf(assetId))
