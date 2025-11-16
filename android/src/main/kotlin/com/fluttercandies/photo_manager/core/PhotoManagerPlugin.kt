@@ -536,7 +536,7 @@ class PhotoManagerPlugin(
             Methods.saveVideo -> {
                 try {
                     val filePath = call.argument<String>("path")!!
-                    val title = call.argument<String>("title")!!
+                    val title = call.argument<String>("title") ?: ""
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")

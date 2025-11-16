@@ -39,6 +39,8 @@ To know more about breaking changes, see the [Migration Guide][].
   - Fixed PHCachingImageManager methods: `fetchThumb`, `exportAssetToFile`, `fetchFullSizeImageFile`.
   - Fixed PHAssetResourceManager methods: `fetchVideoResourceToFile`, `fetchOriginImageFile`.
   - Fixed PHPhotoLibrary save methods: `saveImage`, `saveImageWithPath`, `saveVideo`, `saveLivePhoto`.
+- Fix nullability mismatch for `title` parameter in `saveVideo` method on Android.
+  The parameter is now properly handled as nullable, matching `saveImage` and `saveImageWithPath` behavior.
 
 ## 3.7.1
 
