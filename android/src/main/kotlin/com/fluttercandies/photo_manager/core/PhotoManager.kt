@@ -232,7 +232,13 @@ class PhotoManager(private val context: Context) {
         if (asset.type == 2) {
             return try {
                 val retriever = MediaMetadataRetriever()
-                retriever.setDataSource(asset.path)
+                // For Android Q+, use URI-based access; otherwise use file path
+                if (IDBUtils.isAboveAndroidQ) {
+                    val uri = asset.getUri()
+                    retriever.setDataSource(context, uri)
+                } else {
+                    retriever.setDataSource(asset.path)
+                }
                 val location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION)
                 if (IDBUtils.isAboveAndroidQ) retriever.close() else retriever.release()
                 
