@@ -888,6 +888,40 @@ class AssetEntity {
   ///  * https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_conc/understand_utis_conc.html#//apple_ref/doc/uid/TP40001319-CH202-SW1
   Future<String?> get mimeTypeAsync => plugin.getMimeTypeAsync(this);
 
+  /// Get the cloud identifier for this asset (iOS 15+ and macOS 12+ only).
+  ///
+  /// This method retrieves the cloud identifier for this asset which is stable
+  /// across devices that share the same iCloud Photo Library. This is useful
+  /// for identifying the same asset on different devices.
+  ///
+  /// Returns the cloud identifier string, or null if the asset doesn't have
+  /// a cloud identifier (e.g., not synced to iCloud) or if the platform
+  /// doesn't support this feature.
+  ///
+  /// **Important:** This method is only available on iOS 15+ and macOS 12+.
+  /// On other platforms or older versions, it will return null.
+  ///
+  /// Example:
+  /// ```dart
+  /// final cloudId = await asset.cloudIdentifier;
+  /// if (cloudId != null) {
+  ///   print('Cloud ID: $cloudId');
+  ///   // Save this ID to sync with other devices
+  /// }
+  /// ```
+  ///
+  /// See also:
+  ///  * [PhotoManager.getCloudIdentifiers] to get cloud identifiers for multiple assets efficiently.
+  ///  * https://developer.apple.com/documentation/photokit/phphotolibrary/3750728-cloudidentifiermappingsforlocali
+  Future<String?> get cloudIdentifier async {
+    if (Platform.isIOS || Platform.isMacOS) {
+      final Map<String, String?> result =
+          await plugin.iosGetCloudIdentifiers(<String>[id]);
+      return result[id];
+    }
+    return null;
+  }
+
   AssetEntity copyWith({
     String? id,
     int? typeInt,

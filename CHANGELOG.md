@@ -28,6 +28,7 @@ To know more about breaking changes, see the [Migration Guide][].
   - Retrieves cloud identifiers for assets that are stable across devices with the same iCloud Photo Library.
   - Returns a map of local identifiers to their corresponding cloud identifiers.
   - Useful for identifying the same asset across different devices sharing an iCloud account.
+- Add `cloudIdentifier` getter to `AssetEntity` for convenient access to a single asset's cloud identifier.
 
 ### Improvements
 
