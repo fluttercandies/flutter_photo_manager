@@ -89,6 +89,7 @@ class Methods {
         const val moveAssetsToPath = "moveAssetsToPath"
         const val removeNoExistsAssets = "removeNoExistsAssets"
         const val getColumnNames = "getColumnNames"
+        const val updateDateTaken = "updateDateTaken"
 
         private val needMediaLocationMethods = arrayOf(
             getLatLng,
