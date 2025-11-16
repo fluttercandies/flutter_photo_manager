@@ -584,10 +584,16 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         "You can't copy the asset into the album containing all the pictures.",
       );
     }
-    final Map result = await _channel.invokeMethod(
+    final Map? result = await _channel.invokeMethod(
       PMConstants.mCopyAsset,
       <String, dynamic>{'assetId': asset.id, 'galleryId': pathEntity.id},
     );
+    if (result == null) {
+      throw PlatformException(
+        code: PMConstants.mCopyAsset,
+        message: 'Failed to copy asset ${asset.id} to path ${pathEntity.id}',
+      );
+    }
     return ConvertUtils.convertMapToAsset(result.cast(), title: asset.title);
   }
 

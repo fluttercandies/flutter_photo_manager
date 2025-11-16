@@ -241,7 +241,7 @@ class PhotoManager(private val context: Context) {
             resultHandler.reply(ConvertUtils.convertAsset(assetEntity))
         } catch (e: Exception) {
             LogUtils.error(e)
-            resultHandler.reply(null)
+            resultHandler.replyError("copyAsset", "Failed to copy asset $assetId to gallery $galleryId: ${e.message}", e)
         }
     }
 
@@ -251,7 +251,7 @@ class PhotoManager(private val context: Context) {
             resultHandler.reply(ConvertUtils.convertAsset(assetEntity))
         } catch (e: Exception) {
             LogUtils.error(e)
-            resultHandler.reply(null)
+            resultHandler.replyError("moveAsset", "Failed to move asset $assetId to album $albumId: ${e.message}", e)
         }
     }
 
