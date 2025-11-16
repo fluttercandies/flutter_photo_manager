@@ -24,6 +24,10 @@ To know more about breaking changes, see the [Migration Guide][].
 - Add optional `latitude`, `longitude`, and `creationDate` parameters to `saveImage`, `saveImageWithPath`, and `saveVideo` methods.
   - On iOS: Sets location and creation date metadata for saved assets.
   - On Android Q+: Sets DATE_TAKEN field and location metadata for saved assets.
+- Add `getCloudIdentifiers` method to `PhotoManager` for iOS 15+ and macOS 12+.
+  - Retrieves cloud identifiers for assets that are stable across devices with the same iCloud Photo Library.
+  - Returns a map of local identifiers to their corresponding cloud identifiers.
+  - Useful for identifying the same asset across different devices sharing an iCloud account.
 
 ### Improvements
 

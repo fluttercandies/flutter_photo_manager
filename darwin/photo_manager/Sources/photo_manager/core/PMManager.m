@@ -2021,4 +2021,80 @@
     }
 }
 
+#pragma mark cloud identifiers
+
+- (NSDictionary<NSString *, NSString *> *)getCloudIdentifiersForLocalIdentifiers:(NSArray<NSString *> *)localIdentifiers {
+    NSMutableDictionary<NSString *, NSString *> *result = [NSMutableDictionary dictionary];
+    
+    // Check if the API is available (iOS 15+, macOS 12+)
+#if TARGET_OS_IOS
+    if (@available(iOS 15.0, *)) {
+        // API is available, proceed
+    } else {
+        // Return empty dictionary for older versions
+        return result;
+    }
+#elif TARGET_OS_OSX
+    if (@available(macOS 12.0, *)) {
+        // API is available, proceed
+    } else {
+        // Return empty dictionary for older versions
+        return result;
+    }
+#else
+    // Unsupported platform
+    return result;
+#endif
+    
+    // Use dispatch_semaphore to wait for the async call
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    __block NSDictionary<PHLocalIdentifier, PHCloudIdentifierMapping *> *mappings = nil;
+    
+    // Must call on main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+#if TARGET_OS_IOS
+        if (@available(iOS 15.0, *)) {
+            [[PHPhotoLibrary sharedPhotoLibrary] cloudIdentifierMappingsForLocalIdentifiers:localIdentifiers
+                                                                           completionHandler:^(NSDictionary<PHLocalIdentifier, PHCloudIdentifierMapping *> * _Nonnull cloudIdentifierMappings) {
+                mappings = cloudIdentifierMappings;
+                dispatch_semaphore_signal(semaphore);
+            }];
+        } else {
+            dispatch_semaphore_signal(semaphore);
+        }
+#elif TARGET_OS_OSX
+        if (@available(macOS 12.0, *)) {
+            [[PHPhotoLibrary sharedPhotoLibrary] cloudIdentifierMappingsForLocalIdentifiers:localIdentifiers
+                                                                           completionHandler:^(NSDictionary<PHLocalIdentifier, PHCloudIdentifierMapping *> * _Nonnull cloudIdentifierMappings) {
+                mappings = cloudIdentifierMappings;
+                dispatch_semaphore_signal(semaphore);
+            }];
+        } else {
+            dispatch_semaphore_signal(semaphore);
+        }
+#else
+        dispatch_semaphore_signal(semaphore);
+#endif
+    });
+    
+    // Wait for the async call to complete
+    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    
+    // Convert the mappings to a dictionary
+    if (mappings) {
+        for (NSString *localId in mappings) {
+            PHCloudIdentifierMapping *mapping = mappings[localId];
+            PHCloudIdentifier *cloudIdentifier = mapping.cloudIdentifier;
+            if (cloudIdentifier && cloudIdentifier.stringValue) {
+                result[localId] = cloudIdentifier.stringValue;
+            } else {
+                // If no cloud identifier, set to NSNull which will become null in Dart
+                result[localId] = (NSString *)[NSNull null];
+            }
+        }
+    }
+    
+    return result;
+}
+
 @end

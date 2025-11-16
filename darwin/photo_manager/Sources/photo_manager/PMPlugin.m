@@ -708,6 +708,10 @@
     } else if ([@"cancelAllRequest" isEqualToString:call.method]) {
         [manager cancelAllRequest];
         [handler reply:@YES];
+    } else if ([@"getCloudIdentifiers" isEqualToString:call.method]) {
+        NSArray<NSString *> *localIdentifiers = call.arguments[@"localIdentifiers"];
+        NSDictionary<NSString *, NSString *> *cloudIdentifiers = [manager getCloudIdentifiersForLocalIdentifiers:localIdentifiers];
+        [handler reply:cloudIdentifiers];
     } else {
         [handler notImplemented];
     }

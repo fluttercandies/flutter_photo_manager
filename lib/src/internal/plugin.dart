@@ -867,6 +867,29 @@ mixin IosPlugin on BasePlugin {
     );
     return result['errorMsg'] == null;
   }
+
+  /// Get cloud identifiers for the given local identifiers.
+  ///
+  /// This method retrieves cloud identifier mappings for assets with the same
+  /// iCloud account across different devices. Only available on iOS 15+ and macOS 12+.
+  ///
+  /// Returns a map of local identifiers to their corresponding cloud identifiers.
+  /// If an asset doesn't have a cloud identifier (e.g., not in iCloud), the value will be null.
+  ///
+  /// See also:
+  ///  * https://developer.apple.com/documentation/photokit/phphotolibrary/3750728-cloudidentifiermappingsforlocali
+  Future<Map<String, String?>> iosGetCloudIdentifiers(
+    List<String> localIdentifiers,
+  ) async {
+    assert(Platform.isIOS || Platform.isMacOS);
+    final Map result = await _channel.invokeMethod(
+      PMConstants.mGetCloudIdentifiers,
+      <String, dynamic>{
+        'localIdentifiers': localIdentifiers,
+      },
+    );
+    return result.cast<String, String?>();
+  }
 }
 
 mixin AndroidPlugin on BasePlugin {
