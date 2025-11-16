@@ -4,6 +4,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIImage.h>
 #import "PMThumbLoadOption.h"
 
 #if TARGET_OS_IOS

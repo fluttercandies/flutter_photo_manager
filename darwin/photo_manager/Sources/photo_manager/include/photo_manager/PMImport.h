@@ -1,8 +1,3 @@
-//
-//  PMImport.h
-//  Pods
-//
-
 #ifndef PMImport_h
 #define PMImport_h
 
@@ -12,4 +7,4 @@
 #import <Flutter/Flutter.h>
 #endif
 
-#endif /* PMImport_h */
+#endif
