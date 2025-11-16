@@ -39,8 +39,9 @@ To know more about breaking changes, see the [Migration Guide][].
   - Fixed PHCachingImageManager methods: `fetchThumb`, `exportAssetToFile`, `fetchFullSizeImageFile`.
   - Fixed PHAssetResourceManager methods: `fetchVideoResourceToFile`, `fetchOriginImageFile`.
   - Fixed PHPhotoLibrary save methods: `saveImage`, `saveImageWithPath`, `saveVideo`, `saveLivePhoto`.
-- Fix nullability mismatch for `title` parameter in `saveVideo` method on Android.
-  The parameter is now properly handled as nullable, matching `saveImage` and `saveImageWithPath` behavior.
+- Fix nullability mismatch for `title` parameter in `saveVideo` and `saveImageWithPath` methods on Android.
+  When `title` is null or empty, the filename is now automatically derived from the file path.
+  This ensures proper MediaStore metadata and prevents directory creation issues on Android API 28 and below.
 
 ## 3.7.1
 

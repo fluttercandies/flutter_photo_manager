@@ -20,6 +20,7 @@ import com.fluttercandies.photo_manager.util.ResultHandler
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import java.io.File
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -508,7 +509,12 @@ class PhotoManagerPlugin(
             Methods.saveImageWithPath -> {
                 try {
                     val filePath = call.argument<String>("path")!!
-                    val title = call.argument<String>("title") ?: ""
+                    val titleArg = call.argument<String>("title")
+                    val title = if (titleArg.isNullOrBlank()) {
+                        File(filePath).name
+                    } else {
+                        titleArg
+                    }
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
@@ -536,7 +542,12 @@ class PhotoManagerPlugin(
             Methods.saveVideo -> {
                 try {
                     val filePath = call.argument<String>("path")!!
-                    val title = call.argument<String>("title") ?: ""
+                    val titleArg = call.argument<String>("title")
+                    val title = if (titleArg.isNullOrBlank()) {
+                        File(filePath).name
+                    } else {
+                        titleArg
+                    }
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
