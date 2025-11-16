@@ -2,6 +2,7 @@ package com.fluttercandies.photo_manager.core.utils
 
 import android.content.ContentValues
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import android.provider.BaseColumns._ID
 import android.provider.MediaStore
 import android.util.Log
@@ -10,6 +11,7 @@ import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
 import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
+import com.fluttercandies.photo_manager.util.LogUtils
 import java.io.File
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -263,6 +265,74 @@ object DBUtils : IDBUtils {
         val asset = getAssetEntity(context, id) ?: return null
         val file = File(asset.path)
         return if (file.exists()) ExifInterface(asset.path) else null
+    }
+
+    override fun getLatLong(context: Context, id: String): DoubleArray? {
+        val asset = getAssetEntity(context, id) ?: return null
+        
+        // For videos, use MediaMetadataRetriever to extract location
+        if (asset.type == 2) {
+            return try {
+                val retriever = MediaMetadataRetriever()
+                retriever.setDataSource(asset.path)
+                val location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION)
+                retriever.release()
+                
+                if (location != null) {
+                    // Location format is typically: "+37.4219-122.0840/" or "+37.4219-122.0840"
+                    // Parse the ISO 6709 format
+                    parseLocationString(location)
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                LogUtils.error(e)
+                null
+            }
+        }
+        
+        // For images, use ExifInterface
+        return try {
+            val exifInfo = getExif(context, id)
+            exifInfo?.latLong
+        } catch (e: Exception) {
+            LogUtils.error(e)
+            null
+        }
+    }
+
+    private fun parseLocationString(location: String): DoubleArray? {
+        // ISO 6709 format: ±DD.DDDD±DDD.DDDD or ±DD.DDDD±DDD.DDDD/
+        // Example: "+37.4219-122.0840/" or "+37.4219-122.0840"
+        try {
+            val cleanLocation = location.trimEnd('/')
+            
+            // Find where longitude starts (second + or -)
+            var longitudeStartIndex = -1
+            var signCount = 0
+            for (i in cleanLocation.indices) {
+                if (cleanLocation[i] == '+' || cleanLocation[i] == '-') {
+                    signCount++
+                    if (signCount == 2) {
+                        longitudeStartIndex = i
+                        break
+                    }
+                }
+            }
+            
+            if (longitudeStartIndex > 0) {
+                val latStr = cleanLocation.substring(0, longitudeStartIndex)
+                val lngStr = cleanLocation.substring(longitudeStartIndex)
+                
+                val latitude = latStr.toDoubleOrNull() ?: return null
+                val longitude = lngStr.toDoubleOrNull() ?: return null
+                
+                return doubleArrayOf(latitude, longitude)
+            }
+        } catch (e: Exception) {
+            LogUtils.error(e)
+        }
+        return null
     }
 
     override fun getFilePath(context: Context, id: String, origin: Boolean): String {

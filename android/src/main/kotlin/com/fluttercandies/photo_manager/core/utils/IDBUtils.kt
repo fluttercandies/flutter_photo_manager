@@ -547,6 +547,8 @@ interface IDBUtils {
 
     fun getExif(context: Context, id: String): ExifInterface?
 
+    fun getLatLong(context: Context, id: String): DoubleArray?
+
     fun getOriginBytes(
         context: Context,
         asset: AssetEntity,
