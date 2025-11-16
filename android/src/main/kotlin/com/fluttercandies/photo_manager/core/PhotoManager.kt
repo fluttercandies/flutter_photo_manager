@@ -200,7 +200,17 @@ class PhotoManager(private val context: Context) {
         longitude: Double?,
         creationDate: Long?
     ): AssetEntity {
-        return dbUtils.saveImage(context, filePath, title, description, relativePath, orientation, latitude, longitude, creationDate)
+        return dbUtils.saveImage(
+            context,
+            filePath,
+            title,
+            description,
+            relativePath,
+            orientation,
+            latitude,
+            longitude,
+            creationDate
+        )
     }
 
     fun saveVideo(
@@ -213,7 +223,17 @@ class PhotoManager(private val context: Context) {
         longitude: Double?,
         creationDate: Long?
     ): AssetEntity {
-        return dbUtils.saveVideo(context, filePath, title, desc, relativePath, orientation, latitude, longitude, creationDate)
+        return dbUtils.saveVideo(
+            context,
+            filePath,
+            title,
+            desc,
+            relativePath,
+            orientation,
+            latitude,
+            longitude,
+            creationDate
+        )
     }
 
     fun assetExists(id: String, resultHandler: ResultHandler) {
@@ -241,7 +261,11 @@ class PhotoManager(private val context: Context) {
             resultHandler.reply(ConvertUtils.convertAsset(assetEntity))
         } catch (e: Exception) {
             LogUtils.error(e)
-            resultHandler.replyError("copyAsset", "Failed to copy asset $assetId to gallery $galleryId: ${e.message}", e)
+            resultHandler.replyError(
+                "copyAsset",
+                "Failed to copy asset $assetId to gallery $galleryId",
+                e
+            )
         }
     }
 
@@ -251,7 +275,11 @@ class PhotoManager(private val context: Context) {
             resultHandler.reply(ConvertUtils.convertAsset(assetEntity))
         } catch (e: Exception) {
             LogUtils.error(e)
-            resultHandler.replyError("moveAsset", "Failed to move asset $assetId to album $albumId: ${e.message}", e)
+            resultHandler.replyError(
+                "moveAsset",
+                "Failed to move asset $assetId to album $albumId",
+                e
+            )
         }
     }
 
