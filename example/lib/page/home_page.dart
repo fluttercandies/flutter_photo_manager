@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -50,6 +51,11 @@ class _NewHomePageState extends State<NewHomePage> {
               CustomButton(
                 title: 'Change limited photos with PhotosUI',
                 onPressed: _changeLimitPhotos,
+              ),
+            if (Platform.isIOS || Platform.isAndroid)
+              CustomButton(
+                title: 'Pick assets with native picker (no permission)',
+                onPressed: _pickAssetsWithNativePicker,
               ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -269,5 +275,60 @@ class _NewHomePageState extends State<NewHomePage> {
 
   Future<void> _changeLimitPhotos() async {
     await PhotoManager.presentLimited();
+  }
+
+  Future<void> _pickAssetsWithNativePicker() async {
+    try {
+      // Launch native picker to select up to 9 assets
+      final List<AssetEntity> assets = await PhotoManager.pickAssets(
+        maxCount: 9,
+        requestType: RequestType.common, // Allow both images and videos
+      );
+
+      if (assets.isEmpty) {
+        showToast('No assets selected');
+        return;
+      }
+
+      showToast('Selected ${assets.length} asset(s)');
+
+      // You can now use these AssetEntity objects just like any other assets
+      // For example, navigate to an image list page
+      if (mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => Scaffold(
+              appBar: AppBar(title: const Text('Picked Assets')),
+              body: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 4,
+                  crossAxisSpacing: 4,
+                ),
+                itemCount: assets.length,
+                itemBuilder: (context, index) {
+                  final asset = assets[index];
+                  return FutureBuilder<Uint8List?>(
+                    future: asset.thumbnailData,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return Image.memory(
+                          snapshot.data!,
+                          fit: BoxFit.cover,
+                        );
+                      }
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      showToast('Error picking assets: $e');
+      debugPrint('Error picking assets: $e');
+    }
   }
 }
