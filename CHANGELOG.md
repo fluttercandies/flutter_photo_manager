@@ -24,6 +24,10 @@ To know more about breaking changes, see the [Migration Guide][].
 - Add optional `latitude`, `longitude`, and `creationDate` parameters to `saveImage`, `saveImageWithPath`, and `saveVideo` methods.
   - On iOS: Sets location and creation date metadata for saved assets.
   - On Android Q+: Sets DATE_TAKEN field and location metadata for saved assets.
+- Add native photo picker support for iOS/macOS and Android:
+  - iOS 14+: Uses `PHPickerViewController` without requiring photo library permissions.
+  - Android 11+: Uses native Photo Picker API.
+  - New `PhotoManager.pickAssets()` method with `maxCount`, `requestType`, and `useItemProvider` parameters.
 
 ### Improvements
 
