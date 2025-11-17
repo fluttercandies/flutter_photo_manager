@@ -7,6 +7,7 @@ import 'dart:io';
 import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/services.dart';
+import 'package:path/path.dart' as path;
 import 'package:photo_manager/platform_utils.dart';
 
 import '../filter/base_filter.dart';
@@ -430,11 +431,15 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     if (!file.existsSync()) {
       throw ArgumentError('The input file $inputFilePath does not exists.');
     }
+    // Derive filename from path if title is not provided
+    final String effectiveTitle = (title?.isNotEmpty ?? false)
+        ? title!
+        : path.basename(file.absolute.path);
     final Map result = await _channel.invokeMethod(
       PMConstants.mSaveImageWithPath,
       <String, dynamic>{
         'path': file.absolute.path,
-        'title': title,
+        'title': effectiveTitle,
         'desc': desc,
         'relativePath': relativePath,
         'orientation': orientation,
@@ -461,11 +466,15 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     if (!inputFile.existsSync()) {
       throw ArgumentError('The input file ${inputFile.path} does not exists.');
     }
+    // Derive filename from path if title is not provided
+    final String effectiveTitle = (title?.isNotEmpty ?? false)
+        ? title!
+        : path.basename(inputFile.absolute.path);
     final Map result = await _channel.invokeMethod(
       PMConstants.mSaveVideo,
       <String, dynamic>{
         'path': inputFile.absolute.path,
-        'title': title,
+        'title': effectiveTitle,
         'desc': desc ?? '',
         'relativePath': relativePath,
         'orientation': orientation,
