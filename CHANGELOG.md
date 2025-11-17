@@ -13,6 +13,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Add `cancelToken` parameter to `AssetEntity.loadFile`.
 - Add `cancelAllRequest` method to `PhotoManager`.
 - The `AssetEntity.getFile` and `AssetEntity.getOriginBytes` methods are public.
+- Add `relativePathAsync` getter to `AssetPathEntity`.
 
 ### Improvements
 
