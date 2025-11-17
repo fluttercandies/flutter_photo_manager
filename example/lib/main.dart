@@ -43,6 +43,7 @@ class _SimpleExampleApp extends StatelessWidget {
         theme: ThemeData(
           colorSchemeSeed: Colors.blue,
         ),
+        themeMode: ThemeMode.system,
         builder: (context, child) {
           if (child == null) {
             return const SizedBox.shrink();

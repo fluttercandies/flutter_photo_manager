@@ -50,6 +50,7 @@ object ConvertUtils {
             "width" to entity.width,
             "height" to entity.height,
             "orientation" to entity.orientation,
+            "is_favorite" to entity.isFavorite,
             "modifiedDt" to entity.modifiedDate,
             "lat" to entity.lat,
             "lng" to entity.lng,

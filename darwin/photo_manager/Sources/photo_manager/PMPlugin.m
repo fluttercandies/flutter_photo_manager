@@ -1,14 +1,14 @@
 #import "PMPlugin.h"
-#import "PMConvertUtils.h"
-#import "PMAssetPathEntity.h"
-#import "PMLogUtils.h"
-#import "PMManager.h"
+#import "core/PMConvertUtils.h"
+#import "core/PMAssetPathEntity.h"
+#import "core/PMLogUtils.h"
+#import "core/PMManager.h"
 #import "PMNotificationManager.h"
 #import "PMResultHandler.h"
-#import "PMThumbLoadOption.h"
+#import "core/PMThumbLoadOption.h"
 #import "PMProgressHandler.h"
 #import "PMConverter.h"
-#import "PMPathFilterOption.h"
+#import "core/PMPathFilterOption.h"
 
 #import <PhotosUI/PhotosUI.h>
 
@@ -107,9 +107,9 @@
 
 - (BOOL)isNotNeedPermissionMethod:(NSString *)method {
     NSArray *notNeedPermissionMethods = @[
-        @"log", 
-        @"openSetting", 
-        @"clearFileCache", 
+        @"log",
+        @"openSetting",
+        @"clearFileCache",
         @"releaseMemoryCache",
         @"ignorePermissionCheck",
         @"getPermissionState"
@@ -351,7 +351,7 @@
         [method isEqualToString:@"cancelAllRequest"]) {
         return QOS_CLASS_USER_INTERACTIVE;
     }
-    
+
     if ([method isEqualToString:@"getAssetListPaged"] ||
         [method isEqualToString:@"getAssetListRange"] ||
         [method isEqualToString:@"getFullFile"] ||
@@ -359,7 +359,7 @@
         [method isEqualToString:@"fetchEntityProperties"]) {
         return QOS_CLASS_USER_INITIATED;
     }
-    
+
     if ([method isEqualToString:@"saveImage"] ||
         [method isEqualToString:@"saveVideo"] ||
         [method isEqualToString:@"saveLivePhoto"] ||
@@ -369,7 +369,7 @@
         [method isEqualToString:@"createAlbum"]) {
         return QOS_CLASS_UTILITY;
     }
-    
+
     if ([method isEqualToString:@"clearFileCache"] ||
         [method isEqualToString:@"releaseMemoryCache"] ||
         [method isEqualToString:@"deleteWithIds"] ||
@@ -377,7 +377,7 @@
         [method isEqualToString:@"deleteAlbum"]) {
         return QOS_CLASS_BACKGROUND;
     }
-    
+
     return QOS_CLASS_DEFAULT;
 }
 
@@ -504,9 +504,15 @@
         NSData *data = [call.arguments[@"image"] data];
         NSString *filename = call.arguments[@"filename"];
         NSString *desc = call.arguments[@"desc"];
+        NSNumber *latitude = call.arguments[@"latitude"];
+        NSNumber *longitude = call.arguments[@"longitude"];
+        NSNumber *creationDate = call.arguments[@"creationDate"];
         [manager saveImage:data
                   filename:filename
                       desc:desc
+                  latitude:latitude
+                 longitude:longitude
+              creationDate:creationDate
                      block:^(PMAssetEntity *asset, NSObject *error) {
             if (asset) {
                 [handler reply:[PMConvertUtils convertPMAssetToMap:asset needTitle:NO]];
@@ -518,9 +524,15 @@
         NSString *path = call.arguments[@"path"];
         NSString *filename = call.arguments[@"title"];
         NSString *desc = call.arguments[@"desc"];
+        NSNumber *latitude = call.arguments[@"latitude"];
+        NSNumber *longitude = call.arguments[@"longitude"];
+        NSNumber *creationDate = call.arguments[@"creationDate"];
         [manager saveImageWithPath:path
                           filename:filename
                               desc:desc
+                          latitude:latitude
+                         longitude:longitude
+                      creationDate:creationDate
                              block:^(PMAssetEntity *asset, NSObject *error) {
             if (asset) {
                 [handler reply:[PMConvertUtils convertPMAssetToMap:asset needTitle:NO]];
@@ -532,9 +544,15 @@
         NSString *videoPath = call.arguments[@"path"];
         NSString *filename = call.arguments[@"title"];
         NSString *desc = call.arguments[@"desc"];
+        NSNumber *latitude = call.arguments[@"latitude"];
+        NSNumber *longitude = call.arguments[@"longitude"];
+        NSNumber *creationDate = call.arguments[@"creationDate"];
         [manager saveVideo:videoPath
                   filename:filename
                       desc:desc
+                  latitude:latitude
+                 longitude:longitude
+              creationDate:creationDate
                      block:^(PMAssetEntity *asset, NSObject *error) {
             if (asset) {
                 [handler reply:[PMConvertUtils convertPMAssetToMap:asset needTitle:NO]];

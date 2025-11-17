@@ -1,5 +1,6 @@
 #import "PMFileHelper.h"
 #import "PMImport.h"
+#import <CoreLocation/CoreLocation.h>
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
 
@@ -61,16 +62,25 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 - (void)saveImage:(NSData *)data
             filename:(NSString *)filename
             desc:(NSString *)desc
+            latitude:(NSNumber *)latitude
+            longitude:(NSNumber *)longitude
+            creationDate:(NSNumber *)creationDate
             block:(AssetBlockResult)block;
 
 - (void)saveImageWithPath:(NSString *)path
             filename:(NSString *)filename
             desc:(NSString *)desc
+            latitude:(NSNumber *)latitude
+            longitude:(NSNumber *)longitude
+            creationDate:(NSNumber *)creationDate
             block:(AssetBlockResult)block;
 
 - (void)saveVideo:(NSString *)path
             filename:(NSString *)filename
             desc:(NSString *)desc
+            latitude:(NSNumber *)latitude
+            longitude:(NSNumber *)longitude
+            creationDate:(NSNumber *)creationDate
             block:(AssetBlockResult)block;
 
 - (void)saveLivePhoto:(NSString *)imagePath

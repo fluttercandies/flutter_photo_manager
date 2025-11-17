@@ -3,6 +3,13 @@
 //  path_provider_macos
 //
 
+#if TARGET_OS_OSX
+#import <AppKit/NSBitmapImageRep.h> // NSBitmapImageRep
+#import <AppKit/NSImage.h> // NSImage
+#elif TARGET_OS_IOS
+#import <UIKit/UIImage.h> // UIImage*Representation
+#endif
+
 #import <Foundation/Foundation.h>
 #import "PMThumbLoadOption.h"
 

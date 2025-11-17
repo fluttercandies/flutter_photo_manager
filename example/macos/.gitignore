@@ -4,5 +4,6 @@
 
 # Xcode-related
 **/xcuserdata/
+**/DerivedData/
 
 Flutter/GeneratedPluginRegistrant.swift
