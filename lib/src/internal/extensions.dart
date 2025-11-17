@@ -11,9 +11,11 @@ extension PermissionStateExt on PermissionState {
     return this == PermissionState.authorized;
   }
 
-  /// Returns `true` if the permission grants partial or full access to assets; otherwise, `false`.
+  /// Returns `true` if the permission grants partial or full access to assets;
+  /// otherwise, `false`.
   bool get hasAccess {
-    return this == PermissionState.authorized || this == PermissionState.limited;
+    return this == PermissionState.authorized ||
+        this == PermissionState.limited;
   }
 
   bool get isLimited {

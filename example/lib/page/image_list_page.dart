@@ -182,6 +182,14 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               onPressed: () => CommonUtil.showInfoDialog(context, entity),
             ),
             ElevatedButton(
+              child: const Text('latLngAsync'),
+              onPressed: () => CommonUtil.showResultDialog(
+                context,
+                'latLngAsync',
+                entity.latlngAsync().then((r) => r.toString()),
+              ),
+            ),
+            ElevatedButton(
               child: const Text('show 500 size thumb '),
               onPressed: () => showThumb(entity, 500),
             ),
