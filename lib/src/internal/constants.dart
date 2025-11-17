@@ -68,6 +68,8 @@ class PMConstants {
       'cancelRequestWithCancelToken';
   static const String mCancelAllRequest = 'cancelAllRequest';
 
+  static const String mPickAssets = 'picker';
+
   /// Constant value.
   static const int vDefaultThumbnailSize = 150;
   static const int vDefaultThumbnailQuality = 95;

@@ -85,6 +85,7 @@ class PhotoManagerPlugin : FlutterPlugin, ActivityAware {
         plugin?.let {
             binding.addActivityResultListener(it.deleteManager)
             binding.addActivityResultListener(it.favoriteManager)
+            binding.addActivityResultListener(it.pickerManager)
         }
     }
 
@@ -95,6 +96,7 @@ class PhotoManagerPlugin : FlutterPlugin, ActivityAware {
         plugin?.let { p ->
             oldBinding.removeActivityResultListener(p.deleteManager)
             oldBinding.removeActivityResultListener(p.favoriteManager)
+            oldBinding.removeActivityResultListener(p.pickerManager)
         }
     }
 }

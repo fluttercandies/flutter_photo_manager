@@ -337,4 +337,12 @@ class PhotoManager(private val context: Context) {
         val list = dbUtils.getAssetsByRange(context, option, start, end, requestType)
         resultHandler.reply(ConvertUtils.convertAssets(list))
     }
+
+    /**
+     * Convert URIs from the photo picker to AssetEntity objects.
+     * This method queries the MediaStore to get asset information from the URIs.
+     */
+    fun getAssetsFromUris(uris: List<Uri>): List<AssetEntity> {
+        return dbUtils.getAssetsFromUris(context, uris)
+    }
 }

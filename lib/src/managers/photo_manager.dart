@@ -220,6 +220,69 @@ class PhotoManager {
   /// The method does not supported on OpenHarmony.
   static Future<void> clearFileCache() => plugin.clearFileCache();
 
+  /// Pick assets using the native system picker without requiring storage permissions.
+  ///
+  /// This method launches the native photo picker:
+  /// - **iOS/macOS**: Uses `PHPickerViewController` for a permission-less picker experience
+  /// - **Android**: Uses the Photo Picker API (available on Android 11+) for permission-less access
+  ///
+  /// The picked assets are returned as standard [AssetEntity] objects,
+  /// allowing you to use all the same APIs as assets from the photo library.
+  ///
+  /// ### Parameters:
+  /// - [maxCount]: Maximum number of assets that can be selected. Default is 9.
+  /// - [requestType]: The type of media to allow picking.
+  ///   - `RequestType.common`: Allow both images and videos (default)
+  ///   - `RequestType.image`: Only allow images
+  ///   - `RequestType.video`: Only allow videos
+  /// - [useItemProvider]: **iOS/macOS only**. If true, uses `NSItemProvider` to handle
+  ///   assets that may not be in the local photo library (e.g., iCloud photos).
+  ///   This provides better support for cloud-backed assets but may have slower loading.
+  ///   Default is false.
+  ///
+  /// ### Returns:
+  /// A list of [AssetEntity] objects representing the selected assets.
+  /// Returns an empty list if the user cancels the picker.
+  ///
+  /// ### Platform Requirements:
+  /// - **iOS/macOS**: Available on iOS 14+ and macOS 11+
+  /// - **Android**: Uses Photo Picker API on Android 11+ (API 30+),
+  ///   falls back to traditional picker on older versions
+  ///
+  /// ### Example:
+  /// ```dart
+  /// // Pick up to 5 images
+  /// final assets = await PhotoManager.pickAssets(
+  ///   maxCount: 5,
+  ///   requestType: RequestType.image,
+  /// );
+  ///
+  /// if (assets.isNotEmpty) {
+  ///   for (final asset in assets) {
+  ///     final file = await asset.file;
+  ///     // Use the file...
+  ///   }
+  /// }
+  /// ```
+  ///
+  /// ### Notes:
+  /// - This method does not require `requestPermissionExtend()` to be called first
+  /// - On Android, this works without READ_MEDIA_IMAGES or READ_MEDIA_VIDEO permissions
+  /// - On iOS/macOS, this works without photo library access permissions
+  /// - The returned [AssetEntity] objects have full functionality including thumbnails,
+  ///   file access, and metadata
+  static Future<List<AssetEntity>> pickAssets({
+    int maxCount = 9,
+    RequestType requestType = RequestType.common,
+    bool useItemProvider = false,
+  }) {
+    return plugin.pickAssets(
+      maxCount: maxCount,
+      requestType: requestType,
+      useItemProvider: useItemProvider,
+    );
+  }
+
   /// Returns the count of assets.
   ///
   /// This static method invokes the `getAssetCount()` method of the `plugin`

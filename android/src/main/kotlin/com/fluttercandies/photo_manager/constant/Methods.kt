@@ -12,6 +12,7 @@ class Methods {
         const val releaseMemoryCache = "releaseMemoryCache"
         const val ignorePermissionCheck = "ignorePermissionCheck"
         const val getPermissionState = "getPermissionState"
+        const val picker = "picker"
 
         fun isNotNeedPermissionMethod(method: String): Boolean {
             return method in arrayOf(
@@ -23,6 +24,7 @@ class Methods {
                 releaseMemoryCache,
                 ignorePermissionCheck,
                 getPermissionState,
+                picker,
             )
         }
         // Not need permission methods end

@@ -59,12 +59,14 @@ class PhotoManagerPlugin(
 
     val deleteManager = PhotoManagerDeleteManager(applicationContext, activity)
     val favoriteManager = PhotoManagerFavoriteManager(applicationContext)
+    val pickerManager = PhotoManagerPickerManager(applicationContext)
 
     fun bindActivity(activity: Activity?) {
         this.activity = activity
         permissionsUtils.withActivity(activity)
         deleteManager.bindActivity(activity)
         favoriteManager.bindActivity(activity)
+        pickerManager.bindActivity(activity)
     }
 
     private val notifyChannel = PhotoManagerNotifyChannel(
@@ -334,6 +336,29 @@ class PhotoManagerPlugin(
                     resultHandler.reply(it.value)
                 }
             }
+
+            Methods.picker -> {
+                handlePickerMethod(resultHandler)
+            }
+        }
+    }
+
+    private fun handlePickerMethod(resultHandler: ResultHandler) {
+        if (activity == null) {
+            resultHandler.replyError("Activity is null. Cannot launch picker.")
+            return
+        }
+
+        val call = resultHandler.call
+        val maxCount = call.argument<Int>("maxCount") ?: 9
+        val type = call.argument<Int>("type") ?: 0
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11+ (API 30+): Use Photo Picker API
+            pickerManager.launchPicker(activity!!, maxCount, type, resultHandler)
+        } else {
+            // Fallback for older Android versions
+            resultHandler.replyError("Photo Picker is only available on Android 11 (API 30) and above.")
         }
     }
 
