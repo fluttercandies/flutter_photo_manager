@@ -41,7 +41,9 @@ jobs:
       - name: Prepare dependencies
         run: flutter pub get
       - name: Check Dart code formatting
-        run: dart format . --output=show --set-exit-if-changed
+        run: |
+          dart format . --output=write
+          git --no-pager diff --exit-code .
       - name: Analyze lib
         run: flutter analyze lib
       - name: Analyze example
