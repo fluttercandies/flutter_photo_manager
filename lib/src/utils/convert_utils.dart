@@ -109,6 +109,11 @@ class ConvertUtils {
     Map<String, dynamic> data, {
     String? title,
   }) {
+    final rawLat = data['lat'];
+    final lat = rawLat is num && rawLat != 0 ? rawLat.toDouble() : null;
+    final rawLng = data['lng'];
+    final lng = rawLng is num && rawLng != 0 ? rawLng.toDouble() : null;
+
     final AssetEntity result = AssetEntity(
       id: data['id'] as String,
       typeInt: data['type'] as int,
@@ -122,9 +127,9 @@ class ConvertUtils {
       createDateSecond: data['createDt'] as int?,
       modifiedDateSecond: data['modifiedDt'] as int?,
       relativePath: data['relativePath'] as String?,
-      latitude: data['lat'] as double?,
-      longitude: data['lng'] as double?,
       mimeType: data['mimeType'] as String?,
+      latitude: lat,
+      longitude: lng,
     );
     return result;
   }

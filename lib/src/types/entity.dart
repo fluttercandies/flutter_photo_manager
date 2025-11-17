@@ -518,9 +518,7 @@ class AssetEntity {
   /// Obtain latitude and longitude.
   ///  * Android: Obtain from `MediaStore` or EXIF (Android 10).
   ///  * iOS/macOS: Obtain from photos.
-  ///
-  /// [LatLng.latitude] and [LatLng.longitude] might be 0.
-  Future<LatLng> latlngAsync() => plugin.getLatLngAsync(this);
+  Future<LatLng?> latlngAsync() => plugin.getLatLngAsync(this);
 
   /// Obtain the compressed file of the asset.
   ///
@@ -943,13 +941,13 @@ class AssetEntity {
 @immutable
 class LatLng {
   /// Creates a new [LatLng] object with the given latitude and longitude.
-  const LatLng({this.latitude, this.longitude});
+  const LatLng({required this.latitude, required this.longitude});
 
   /// The latitude of this location in degrees.
-  final double? latitude;
+  final double latitude;
 
   /// The longitude of this location in degrees.
-  final double? longitude;
+  final double longitude;
 
   @override
   bool operator ==(Object other) {
@@ -961,6 +959,9 @@ class LatLng {
 
   @override
   int get hashCode => latitude.hashCode ^ longitude.hashCode;
+
+  @override
+  String toString() => '$latitude,$longitude'; // y,x
 }
 
 /// The subtype value for Live Photos.
