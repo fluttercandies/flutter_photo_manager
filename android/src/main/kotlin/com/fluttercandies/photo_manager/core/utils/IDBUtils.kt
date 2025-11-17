@@ -549,21 +549,23 @@ interface IDBUtils {
     fun getLatLong(context: Context, id: String): DoubleArray? {
         val asset = getAssetEntity(context, id) ?: return null
 
+        /// Apparently no LatLng for audios.
+        if (asset.type == getMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO)) {
+            return null;
+        }
+
         // For videos, use MediaMetadataRetriever to extract location
         if (asset.type == getMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)) {
             return try {
                 val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(asset.path)
-                val location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION)
+                val location =
+                    retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION)
                 retriever.release()
 
-                if (location != null) {
-                    // Location format is typically: "+37.4219-122.0840/" or "+37.4219-122.0840"
-                    // Parse the ISO 6709 format
-                    parseLocationString(location)
-                } else {
-                    null
-                }
+                // Location format is typically: "+37.4219-122.0840/" or "+37.4219-122.0840"
+                // Parse the ISO 6709 format
+                if (location != null) parseLocationString(location) else null
             } catch (e: Exception) {
                 LogUtils.error(e)
                 null
@@ -571,13 +573,17 @@ interface IDBUtils {
         }
 
         // For images, use ExifInterface
-        return try {
-            val exifInfo = getExif(context, id)
-            exifInfo?.latLong
-        } catch (e: Exception) {
-            LogUtils.error(e)
-            null
+        if (asset.type == getMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)) {
+            return try {
+                val exifInfo = getExif(context, id)
+                exifInfo?.latLong
+            } catch (e: Exception) {
+                LogUtils.error(e)
+                null
+            }
         }
+
+        return null
     }
 
     private fun parseLocationString(location: String): DoubleArray? {
