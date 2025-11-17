@@ -30,6 +30,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Remove implied `FilterOptionGroup`s when querying paths and assets.
   This fixes assets finding when they were created in the future.
   Some edge cases regarding performance drops caused by the complicated sort queries might also get fixed.
+- Add `PermissionState.isLimited`.
 
 ### Fixes
 
