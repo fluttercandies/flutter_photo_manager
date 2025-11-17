@@ -19,5 +19,9 @@ void main() {
               permission == PermissionState.limited),
       true,
     );
+    expect(
+      permission.isLimited == (permission == PermissionState.limited),
+      true,
+    );
   });
 }
