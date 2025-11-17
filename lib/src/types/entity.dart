@@ -952,13 +952,19 @@ class AssetEntity {
 @immutable
 class LatLng {
   /// Creates a new [LatLng] object with the given latitude and longitude.
-  const LatLng({required this.latitude, required this.longitude});
+  const LatLng._({
+    required this.latitude,
+    required this.longitude,
+  }) : assert(latitude != 0.0 && longitude != 0.0);
 
   static LatLng? fromValues({double? latitude, double? longitude}) {
-    if (latitude == null || longitude == null) {
+    if (latitude == null ||
+        latitude == 0.0 ||
+        longitude == null ||
+        longitude == 0.0) {
       return null;
     }
-    return LatLng(latitude: latitude, longitude: longitude);
+    return LatLng._(latitude: latitude, longitude: longitude);
   }
 
   /// The latitude of this location in degrees.

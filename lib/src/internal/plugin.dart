@@ -507,7 +507,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
 
         // 将返回的数据传入map
         if (map['lat'] is num && map['lng'] is num) {
-          return LatLng(
+          return LatLng.fromValues(
             latitude: (map['lat'] as num).toDouble(),
             longitude: (map['lng'] as num).toDouble(),
           );
@@ -515,11 +515,10 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       }
     }
 
-    if (entity.latitude != null && entity.longitude != null) {
-      return LatLng(latitude: entity.latitude!, longitude: entity.longitude!);
-    }
-
-    return null;
+    return LatLng.fromValues(
+      latitude: entity.latitude,
+      longitude: entity.longitude,
+    );
   }
 
   Future<String> getTitleAsync(
