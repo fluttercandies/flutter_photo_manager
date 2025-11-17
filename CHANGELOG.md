@@ -24,6 +24,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Add optional `latitude`, `longitude`, and `creationDate` parameters to `saveImage`, `saveImageWithPath`, and `saveVideo` methods.
   - On iOS: Sets location and creation date metadata for saved assets.
   - On Android Q+: Sets DATE_TAKEN field and location metadata for saved assets.
+- Add batch asset move functionality using `createWriteRequest` API for Android 11+.
 
 ### Improvements
 
