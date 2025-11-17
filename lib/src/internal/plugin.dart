@@ -644,11 +644,14 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       // iOS/macOS use logical albums (PHAssetCollection) without physical paths
       return null;
     }
-    if (Platform.isAndroid || PlatformUtils.isOhos) {
+    if (Platform.isAndroid) {
       return _channel.invokeMethod(
         PMConstants.mGetPathRelativePath,
         <String, dynamic>{'id': pathEntity.id},
       );
+    }
+    if (PlatformUtils.isOhos) {
+      return null;
     }
     return null;
   }
