@@ -478,10 +478,10 @@ class PhotoManagerPlugin(
             Methods.saveImage -> {
                 try {
                     val bytes = call.argument<ByteArray>("image")!!
-                    val filename = call.argument<String>("filename") ?: ""
-                    val title = call.argument<String>("title") ?: ""
-                    val desc = call.argument<String>("desc") ?: ""
-                    val relativePath = call.argument<String>("relativePath") ?: ""
+                    val filename = call.argument<String>("filename")!!
+                    val title = call.argument<String?>("title") ?: ""
+                    val desc = call.argument<String?>("desc") ?: ""
+                    val relativePath = call.argument<String?>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
                     val latitude = call.argument<Double?>("latitude")
                     val longitude = call.argument<Double?>("longitude")
@@ -508,9 +508,9 @@ class PhotoManagerPlugin(
             Methods.saveImageWithPath -> {
                 try {
                     val filePath = call.argument<String>("path")!!
-                    val title = call.argument<String>("title") ?: ""
-                    val desc = call.argument<String>("desc") ?: ""
-                    val relativePath = call.argument<String>("relativePath") ?: ""
+                    val title = call.argument<String>("title")!!
+                    val desc = call.argument<String?>("desc") ?: ""
+                    val relativePath = call.argument<String?>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
                     val latitude = call.argument<Double?>("latitude")
                     val longitude = call.argument<Double?>("longitude")
@@ -536,9 +536,9 @@ class PhotoManagerPlugin(
             Methods.saveVideo -> {
                 try {
                     val filePath = call.argument<String>("path")!!
-                    val title = call.argument<String>("title") ?: ""
-                    val desc = call.argument<String>("desc") ?: ""
-                    val relativePath = call.argument<String>("relativePath") ?: ""
+                    val title = call.argument<String>("title")!!
+                    val desc = call.argument<String?>("desc") ?: ""
+                    val relativePath = call.argument<String?>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
                     val latitude = call.argument<Double?>("latitude")
                     val longitude = call.argument<Double?>("longitude")
