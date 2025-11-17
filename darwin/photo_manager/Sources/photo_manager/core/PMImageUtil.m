@@ -8,9 +8,7 @@
 @implementation PMImageUtil
 
 + (NSData *)convertToData:(PMImage *)image formatType:(PMThumbFormatType)type quality:(float)quality {
-    
 #if TARGET_OS_OSX
-    
     NSData *imageData = [image TIFFRepresentation];
     NSBitmapImageRep *imageRep = [NSBitmapImageRep imageRepWithData:imageData];
     NSData *resultData;
@@ -23,9 +21,7 @@
     }
     
     return resultData;
-    
 #endif
-    
 #if TARGET_OS_IOS
     NSData *resultData;
     if (type == PMThumbFormatTypePNG) {
@@ -35,9 +31,7 @@
     }
     
     return resultData;
-    
 #endif
 }
-
 
 @end

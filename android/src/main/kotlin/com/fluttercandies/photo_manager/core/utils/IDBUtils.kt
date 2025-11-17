@@ -19,6 +19,7 @@ import android.provider.MediaStore.MediaColumns.DATE_TAKEN
 import android.provider.MediaStore.MediaColumns.DISPLAY_NAME
 import android.provider.MediaStore.MediaColumns.DURATION
 import android.provider.MediaStore.MediaColumns.HEIGHT
+import android.provider.MediaStore.MediaColumns.IS_FAVORITE
 import android.provider.MediaStore.MediaColumns.MIME_TYPE
 import android.provider.MediaStore.MediaColumns.ORIENTATION
 import android.provider.MediaStore.MediaColumns.RELATIVE_PATH
@@ -27,6 +28,7 @@ import android.provider.MediaStore.MediaColumns.WIDTH
 import android.provider.MediaStore.MediaColumns._ID
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import androidx.annotation.ChecksSdkIntAtLeast
+import androidx.annotation.RequiresApi
 import androidx.exifinterface.media.ExifInterface
 import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
@@ -61,6 +63,7 @@ interface IDBUtils {
             DATE_TAKEN //日期
         ).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(DATE_TAKEN) // 拍摄时间
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) add(IS_FAVORITE)
         }
 
         val storeVideoKeys = mutableListOf(
@@ -79,6 +82,7 @@ interface IDBUtils {
             DURATION //时长
         ).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(DATE_TAKEN) // 拍摄时间
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) add(IS_FAVORITE)
         }
 
         val typeKeys = arrayOf(
@@ -199,6 +203,7 @@ interface IDBUtils {
         val displayName = getString(DISPLAY_NAME)
         val modifiedDate = getLong(DATE_MODIFIED)
         var orientation: Int = getInt(ORIENTATION)
+        val isFavorite = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && getInt(IS_FAVORITE) == 1
         val relativePath: String? = if (isAboveAndroidQ) {
             getString(RELATIVE_PATH)
         } else null
@@ -240,6 +245,7 @@ interface IDBUtils {
             displayName,
             modifiedDate,
             orientation,
+            isFavorite,
             androidQRelativePath = relativePath,
             mimeType = mimeType
         )
@@ -259,7 +265,10 @@ interface IDBUtils {
         title: String,
         desc: String,
         relativePath: String,
-        orientation: Int?
+        orientation: Int?,
+        latitude: Double?,
+        longitude: Double?,
+        creationDate: Long?
     ): AssetEntity {
         var inputStream = ByteArrayInputStream(bytes)
         fun refreshStream() {
@@ -281,7 +290,11 @@ interface IDBUtils {
         )
         val (rotationDegrees, latLong) = Pair(
             orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
-            if (isAboveAndroidQ) null else exif.latLong
+            if (isAboveAndroidQ) {
+                if (latitude != null && longitude != null) {
+                    doubleArrayOf(latitude, longitude)
+                } else null
+            } else exif.latLong
         )
         refreshStream()
 
@@ -300,7 +313,7 @@ interface IDBUtils {
             put(WIDTH, width)
             put(HEIGHT, height)
             if (isAboveAndroidQ) {
-                put(DATE_TAKEN, timestamp * 1000)
+                put(DATE_TAKEN, creationDate ?: (timestamp * 1000))
                 put(ORIENTATION, rotationDegrees)
                 if (relativePath.isNotBlank()) {
                     put(RELATIVE_PATH, relativePath)
@@ -326,7 +339,10 @@ interface IDBUtils {
         title: String,
         desc: String,
         relativePath: String,
-        orientation: Int?
+        orientation: Int?,
+        latitude: Double?,
+        longitude: Double?,
+        creationDate: Long?
     ): AssetEntity {
         filePath.checkDirs()
         val file = File(filePath)
@@ -351,7 +367,11 @@ interface IDBUtils {
         )
         val (rotationDegrees, latLong) = Pair(
             orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
-            if (isAboveAndroidQ) null else exif.latLong
+            if (isAboveAndroidQ) {
+                if (latitude != null && longitude != null) {
+                    doubleArrayOf(latitude, longitude)
+                } else null
+            } else exif.latLong
         )
         refreshStream()
 
@@ -375,7 +395,7 @@ interface IDBUtils {
             put(WIDTH, width)
             put(HEIGHT, height)
             if (isAboveAndroidQ) {
-                put(DATE_TAKEN, timestamp * 1000)
+                put(DATE_TAKEN, creationDate ?: (timestamp * 1000))
                 put(ORIENTATION, rotationDegrees)
                 if (relativePath.isNotBlank()) {
                     put(RELATIVE_PATH, relativePath)
@@ -405,7 +425,10 @@ interface IDBUtils {
         title: String,
         desc: String,
         relativePath: String,
-        orientation: Int?
+        orientation: Int?,
+        latitude: Double?,
+        longitude: Double?,
+        creationDate: Long?
     ): AssetEntity {
         filePath.checkDirs()
         val file = File(filePath)
@@ -428,7 +451,11 @@ interface IDBUtils {
         val (rotationDegrees, latLong) = ExifInterface(inputStream).let { exif ->
             Pair(
                 orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
-                if (isAboveAndroidQ) null else exif.latLong
+                if (isAboveAndroidQ) {
+                    if (latitude != null && longitude != null) {
+                        doubleArrayOf(latitude, longitude)
+                    } else null
+                } else exif.latLong
             )
         }
         refreshStream()
@@ -454,7 +481,7 @@ interface IDBUtils {
             put(WIDTH, info.width)
             put(HEIGHT, info.height)
             if (isAboveAndroidQ) {
-                put(DATE_TAKEN, timestamp * 1000)
+                put(DATE_TAKEN, creationDate ?: (timestamp * 1000))
                 put(ORIENTATION, rotationDegrees)
                 if (relativePath.isNotBlank()) {
                     put(RELATIVE_PATH, relativePath)

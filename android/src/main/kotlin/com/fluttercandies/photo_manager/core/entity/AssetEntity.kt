@@ -16,6 +16,7 @@ data class AssetEntity(
     val displayName: String,
     val modifiedDate: Long,
     val orientation: Int,
+    val isFavorite: Boolean = false,
     val lat: Double? = null,
     val lng: Double? = null,
     val androidQRelativePath: String? = null,

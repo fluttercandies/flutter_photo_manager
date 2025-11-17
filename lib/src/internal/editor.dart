@@ -71,6 +71,17 @@ class Editor {
   /// [orientation] is only available on Android. It could be useful when
   /// some devices cannot recognizes the asset's size info well.
   /// {@endtemplate}
+  ///
+  /// {@template photo_manager.Editor.LocationWhenSaving}
+  /// [latitude] and [longitude] specify the location metadata for the asset.
+  /// Both parameters must be provided together or not at all.
+  /// {@endtemplate}
+  ///
+  /// {@template photo_manager.Editor.CreationDateWhenSaving}
+  /// [creationDate] specifies the creation date for the asset.
+  /// On iOS, this sets the creation date of the asset.
+  /// On Android Q and above, this sets the DATE_TAKEN field (in milliseconds since epoch).
+  /// {@endtemplate}
   Future<AssetEntity> saveImage(
     typed_data.Uint8List data, {
     required String filename,
@@ -78,6 +89,9 @@ class Editor {
     String? desc,
     String? relativePath,
     int? orientation,
+    double? latitude,
+    double? longitude,
+    DateTime? creationDate,
   }) {
     return plugin.saveImage(
       data,
@@ -86,6 +100,9 @@ class Editor {
       desc: desc,
       relativePath: relativePath,
       orientation: orientation,
+      latitude: latitude,
+      longitude: longitude,
+      creationDate: creationDate,
     );
   }
 
@@ -98,12 +115,19 @@ class Editor {
   /// {@macro photo_manager.Editor.RelativePathWhenSaving}
   ///
   /// {@macro photo_manager.Editor.OrientationWhenSaving}
+  ///
+  /// {@macro photo_manager.Editor.LocationWhenSaving}
+  ///
+  /// {@macro photo_manager.Editor.CreationDateWhenSaving}
   Future<AssetEntity> saveImageWithPath(
     String filePath, {
     String? title,
     String? desc,
     String? relativePath,
     int? orientation,
+    double? latitude,
+    double? longitude,
+    DateTime? creationDate,
   }) {
     return plugin.saveImageWithPath(
       filePath,
@@ -111,6 +135,9 @@ class Editor {
       desc: desc,
       relativePath: relativePath,
       orientation: orientation,
+      latitude: latitude,
+      longitude: longitude,
+      creationDate: creationDate,
     );
   }
 
@@ -123,12 +150,19 @@ class Editor {
   /// {@macro photo_manager.Editor.RelativePathWhenSaving}
   ///
   /// {@macro photo_manager.Editor.OrientationWhenSaving}
+  ///
+  /// {@macro photo_manager.Editor.LocationWhenSaving}
+  ///
+  /// {@macro photo_manager.Editor.CreationDateWhenSaving}
   Future<AssetEntity> saveVideo(
     File file, {
     String? title,
     String? desc,
     String? relativePath,
     int? orientation,
+    double? latitude,
+    double? longitude,
+    DateTime? creationDate,
   }) {
     return plugin.saveVideo(
       file,
@@ -136,6 +170,9 @@ class Editor {
       desc: desc,
       relativePath: relativePath,
       orientation: orientation,
+      latitude: latitude,
+      longitude: longitude,
+      creationDate: creationDate,
     );
   }
 
@@ -304,6 +341,23 @@ class DarwinEditor {
 class AndroidEditor {
   /// Creates a new [AndroidEditor] object.
   const AndroidEditor();
+
+  /// Sets the favorite status of the given [entity].
+  ///
+  /// Returns the updated [AssetEntity] if the operation was successful; otherwise, throws a state error to indicate the failure.
+  Future<AssetEntity> favoriteAsset({
+    required AssetEntity entity,
+    required bool favorite,
+  }) async {
+    final bool result = await plugin.favoriteAsset(entity.id, favorite);
+    if (result) {
+      return entity.copyWith(isFavorite: favorite);
+    }
+    throw StateError(
+      'Failed to favorite the asset '
+      '${entity.id} for unknown reason',
+    );
+  }
 
   /// Moves the given [entity] to the specified [target] path.
   ///

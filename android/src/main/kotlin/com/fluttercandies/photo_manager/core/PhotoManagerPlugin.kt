@@ -58,11 +58,13 @@ class PhotoManagerPlugin(
     }
 
     val deleteManager = PhotoManagerDeleteManager(applicationContext, activity)
+    val favoriteManager = PhotoManagerFavoriteManager(applicationContext)
 
     fun bindActivity(activity: Activity?) {
         this.activity = activity
         permissionsUtils.withActivity(activity)
         deleteManager.bindActivity(activity)
+        favoriteManager.bindActivity(activity)
     }
 
     private val notifyChannel = PhotoManagerNotifyChannel(
@@ -487,6 +489,9 @@ class PhotoManagerPlugin(
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
+                    val latitude = call.argument<Double?>("latitude")
+                    val longitude = call.argument<Double?>("longitude")
+                    val creationDate = call.argument<Long?>("creationDate")
                     val entity = photoManager.saveImage(
                         bytes,
                         filename,
@@ -494,6 +499,9 @@ class PhotoManagerPlugin(
                         desc,
                         relativePath,
                         orientation,
+                        latitude,
+                        longitude,
+                        creationDate,
                     )
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
@@ -510,12 +518,18 @@ class PhotoManagerPlugin(
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
+                    val latitude = call.argument<Double?>("latitude")
+                    val longitude = call.argument<Double?>("longitude")
+                    val creationDate = call.argument<Long?>("creationDate")
                     val entity = photoManager.saveImage(
                         filePath,
                         title,
                         desc,
                         relativePath,
                         orientation,
+                        latitude,
+                        longitude,
+                        creationDate,
                     )
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
@@ -532,12 +546,18 @@ class PhotoManagerPlugin(
                     val desc = call.argument<String>("desc") ?: ""
                     val relativePath = call.argument<String>("relativePath") ?: ""
                     val orientation = call.argument<Int?>("orientation")
+                    val latitude = call.argument<Double?>("latitude")
+                    val longitude = call.argument<Double?>("longitude")
+                    val creationDate = call.argument<Long?>("creationDate")
                     val entity = photoManager.saveVideo(
                         filePath,
                         title,
                         desc,
                         relativePath,
                         orientation,
+                        latitude,
+                        longitude,
+                        creationDate,
                     )
                     val map = ConvertUtils.convertAsset(entity)
                     resultHandler.reply(map)
@@ -545,6 +565,17 @@ class PhotoManagerPlugin(
                     LogUtils.error("save video error", e)
                     resultHandler.replyError(call.method, message = null, obj = e)
                 }
+            }
+
+            Methods.favoriteAsset -> {
+                val assetId = call.argument<String>("id")!!
+                val isFavorite = call.argument<Boolean>("favorite")!!
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                    LogUtils.error("The API 30 or lower have no IS_FAVORITE row in MediaStore.")
+                    resultHandler.reply(false)
+                    return
+                }
+                favoriteManager.favoriteAsset(photoManager.getUri(assetId), isFavorite, resultHandler)
             }
 
             Methods.copyAsset -> {

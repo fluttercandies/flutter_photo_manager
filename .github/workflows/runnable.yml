@@ -191,3 +191,8 @@ jobs:
       - run: flutter pub get
       - run: cd example; flutter build ios --no-codesign
       - run: cd example; flutter build macos --debug
+      # With Swift Package Manager
+      - run: flutter config --enable-swift-package-manager
+      - run: flutter pub get
+      - run: cd example; flutter build ios --no-codesign
+      - run: cd example; flutter build macos --debug

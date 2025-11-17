@@ -171,7 +171,10 @@ class PhotoManager(private val context: Context) {
         title: String,
         description: String,
         relativePath: String,
-        orientation: Int?
+        orientation: Int?,
+        latitude: Double?,
+        longitude: Double?,
+        creationDate: Long?
     ): AssetEntity {
         return dbUtils.saveImage(
             context,
@@ -180,7 +183,10 @@ class PhotoManager(private val context: Context) {
             title,
             description,
             relativePath,
-            orientation
+            orientation,
+            latitude,
+            longitude,
+            creationDate
         )
     }
 
@@ -189,9 +195,12 @@ class PhotoManager(private val context: Context) {
         title: String,
         description: String,
         relativePath: String,
-        orientation: Int?
+        orientation: Int?,
+        latitude: Double?,
+        longitude: Double?,
+        creationDate: Long?
     ): AssetEntity {
-        return dbUtils.saveImage(context, filePath, title, description, relativePath, orientation)
+        return dbUtils.saveImage(context, filePath, title, description, relativePath, orientation, latitude, longitude, creationDate)
     }
 
     fun saveVideo(
@@ -199,9 +208,12 @@ class PhotoManager(private val context: Context) {
         title: String,
         desc: String,
         relativePath: String,
-        orientation: Int?
+        orientation: Int?,
+        latitude: Double?,
+        longitude: Double?,
+        creationDate: Long?
     ): AssetEntity {
-        return dbUtils.saveVideo(context, filePath, title, desc, relativePath, orientation)
+        return dbUtils.saveVideo(context, filePath, title, desc, relativePath, orientation, latitude, longitude, creationDate)
     }
 
     fun assetExists(id: String, resultHandler: ResultHandler) {

@@ -392,6 +392,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     String? desc,
     String? relativePath,
     int? orientation,
+    double? latitude,
+    double? longitude,
+    DateTime? creationDate,
   }) async {
     _throwIfOrientationInvalid(orientation);
     final Map result = await _channel.invokeMethod(
@@ -403,6 +406,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'desc': desc,
         'relativePath': relativePath,
         'orientation': orientation,
+        'latitude': latitude,
+        'longitude': longitude,
+        'creationDate': creationDate?.millisecondsSinceEpoch,
         ...onlyAddPermission,
       },
     );
@@ -415,6 +421,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     String? desc,
     String? relativePath,
     int? orientation,
+    double? latitude,
+    double? longitude,
+    DateTime? creationDate,
   }) async {
     _throwIfOrientationInvalid(orientation);
     final File file = File(inputFilePath);
@@ -429,6 +438,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'desc': desc,
         'relativePath': relativePath,
         'orientation': orientation,
+        'latitude': latitude,
+        'longitude': longitude,
+        'creationDate': creationDate?.millisecondsSinceEpoch,
         ...onlyAddPermission,
       },
     );
@@ -441,6 +453,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     String? desc,
     String? relativePath,
     int? orientation,
+    double? latitude,
+    double? longitude,
+    DateTime? creationDate,
   }) async {
     _throwIfOrientationInvalid(orientation);
     if (!inputFile.existsSync()) {
@@ -454,6 +469,9 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'desc': desc ?? '',
         'relativePath': relativePath,
         'orientation': orientation,
+        'latitude': latitude,
+        'longitude': longitude,
+        'creationDate': creationDate?.millisecondsSinceEpoch,
         ...onlyAddPermission,
       },
     );

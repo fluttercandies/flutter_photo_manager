@@ -3,6 +3,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <Photos/Photos.h>
 
 @protocol PMBaseFilter <NSObject>
 

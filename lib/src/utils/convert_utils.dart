@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:photo_manager/platform_utils.dart';
 
 import '../filter/base_filter.dart';
+import '../filter/custom/custom_columns.dart';
 import '../filter/path_filter.dart';
 import '../internal/enums.dart';
 import '../types/entity.dart';
@@ -115,7 +116,7 @@ class ConvertUtils {
       height: data['height'] as int,
       duration: data['duration'] as int? ?? 0,
       orientation: data['orientation'] as int? ?? 0,
-      isFavorite: data['favorite'] as bool? ?? false,
+      isFavorite: data[CustomColumns.base.isFavorite] as bool? ?? false,
       title: data['title'] as String? ?? title,
       subtype: data['subtype'] as int? ?? 0,
       createDateSecond: data['createDt'] as int?,

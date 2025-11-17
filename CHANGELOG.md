@@ -14,12 +14,32 @@ To know more about breaking changes, see the [Migration Guide][].
 - Add `cancelAllRequest` method to `PhotoManager`.
 - The `AssetEntity.getFile` and `AssetEntity.getOriginBytes` methods are public.
 - Add `relativePathAsync` getter to `AssetPathEntity`.
+- Add iOS 18 smart album subtypes support:
+  - `smartAlbumSpatial` - For spatial/3D photos
+  - `smartAlbumProRes` - For ProRes videos
+  - `smartAlbumScreenRecordings` - For screen recordings
+  - `smartAlbumReceipts` - For receipts in the Utilities section
+  - `smartAlbumHandwriting` - For handwriting in the Utilities section
+  - `smartAlbumIllustrations` - For illustrations in the Utilities section
+  - `smartAlbumQRCodes` - For QR codes in the Utilities section
+- Add optional `latitude`, `longitude`, and `creationDate` parameters to `saveImage`, `saveImageWithPath`, and `saveVideo` methods.
+  - On iOS: Sets location and creation date metadata for saved assets.
+  - On Android Q+: Sets DATE_TAKEN field and location metadata for saved assets.
 
 ### Improvements
 
 - Remove implied `FilterOptionGroup`s when querying paths and assets.
   This fixes assets finding when they were created in the future.
   Some edge cases regarding performance drops caused by the complicated sort queries might also get fixed.
+
+### Fixes
+
+- Fix PHImageManager crash on iOS by ensuring all PHImageManager/PHCachingImageManager methods are called on the main thread.
+  This resolves race conditions and deadlocks when thumbnail operations are dispatched to QoS background queues.
+- Fix EXC_BAD_ACCESS crash caused by accessing deallocated memory in async blocks on iOS.
+  - Fixed PHCachingImageManager methods: `fetchThumb`, `exportAssetToFile`, `fetchFullSizeImageFile`.
+  - Fixed PHAssetResourceManager methods: `fetchVideoResourceToFile`, `fetchOriginImageFile`.
+  - Fixed PHPhotoLibrary save methods: `saveImage`, `saveImageWithPath`, `saveVideo`, `saveLivePhoto`.
 
 ## 3.7.1
 
