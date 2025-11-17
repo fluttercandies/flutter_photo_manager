@@ -10,16 +10,50 @@ import 'log.dart';
 class CommonUtil {
   const CommonUtil._();
 
+  static Future<void> showResultDialog(
+    BuildContext context,
+    String title,
+    Future<String> result,
+  ) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return FutureBuilder<String>(
+          future: result,
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            Widget w;
+            if (snapshot.hasError) {
+              w = Text(snapshot.error!.toString());
+            } else if (snapshot.hasData) {
+              w = Text(snapshot.data!);
+            } else {
+              w = const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return AlertDialog(
+              title: Text(title),
+              content: w,
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   static Future<void> showInfoDialog(
     BuildContext context,
     AssetEntity entity,
   ) async {
-    final LatLng latlng = await entity.latlngAsync();
-
-    final double? lat =
-        entity.latitude == 0 ? latlng.latitude : entity.latitude;
-    final double? lng =
-        entity.longitude == 0 ? latlng.longitude : entity.longitude;
+    final LatLng? latlng = await entity.latlngAsync();
+    final double? lat = latlng?.latitude ?? entity.latitude;
+    final double? lng = latlng?.longitude ?? entity.longitude;
 
     final Widget w = Center(
       child: Container(

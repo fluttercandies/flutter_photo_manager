@@ -511,7 +511,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     );
   }
 
-  Future<LatLng> getLatLngAsync(AssetEntity entity) async {
+  Future<LatLng?> getLatLngAsync(AssetEntity entity) async {
     if (Platform.isAndroid) {
       final int version = int.parse(await getSystemVersion());
       if (version >= 29) {
@@ -521,13 +521,19 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         );
 
         // 将返回的数据传入map
-        return LatLng(
-          latitude: (map['lat'] as num?)?.toDouble(),
-          longitude: (map['lng'] as num?)?.toDouble(),
-        );
+        if (map['lat'] is num && map['lng'] is num) {
+          return LatLng.fromValues(
+            latitude: (map['lat'] as num).toDouble(),
+            longitude: (map['lng'] as num).toDouble(),
+          );
+        }
       }
     }
-    return LatLng(latitude: entity.latitude, longitude: entity.longitude);
+
+    return LatLng.fromValues(
+      latitude: entity.latitude,
+      longitude: entity.longitude,
+    );
   }
 
   Future<String> getTitleAsync(

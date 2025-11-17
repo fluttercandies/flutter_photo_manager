@@ -7,16 +7,21 @@ import 'package:photo_manager/photo_manager.dart';
 
 void main() {
   test('Permission extensions equality test', () async {
-    const PermissionState permission = PermissionState.limited;
+    const permission = PermissionState.authorized;
+
     expect(
       permission.isAuth == (permission == PermissionState.authorized),
-      equals(true),
+      true,
     );
     expect(
       permission.hasAccess ==
           (permission == PermissionState.authorized ||
               permission == PermissionState.limited),
-      equals(true),
+      true,
+    );
+    expect(
+      permission.isLimited == (permission == PermissionState.limited),
+      true,
     );
   });
 }

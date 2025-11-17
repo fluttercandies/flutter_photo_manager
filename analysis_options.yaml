@@ -1,5 +1,9 @@
 include: package:flutter_lints/flutter.yaml
 
+formatter:
+  page_width: 80
+  trailing_commas: preserve
+
 analyzer:
   errors:
     always_declare_return_types: error

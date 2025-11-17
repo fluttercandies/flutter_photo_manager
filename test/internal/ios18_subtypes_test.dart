@@ -83,9 +83,9 @@ void main() {
     });
 
     test('PMDarwinPathFilter can be created with iOS 18 subtypes', () {
-      final filter = PMDarwinPathFilter(
-        type: const [PMDarwinAssetCollectionType.smartAlbum],
-        subType: const [
+      final filter = const PMDarwinPathFilter(
+        type: [PMDarwinAssetCollectionType.smartAlbum],
+        subType: [
           PMDarwinAssetCollectionSubtype.smartAlbumHandwriting,
           PMDarwinAssetCollectionSubtype.smartAlbumQRCodes,
           PMDarwinAssetCollectionSubtype.smartAlbumIllustrations,
@@ -110,10 +110,10 @@ void main() {
     });
 
     test('PMPathFilter can be created with iOS 18 utilities subtypes', () {
-      final pathFilter = PMPathFilter(
+      final pathFilter = const PMPathFilter(
         darwin: PMDarwinPathFilter(
-          type: const [PMDarwinAssetCollectionType.smartAlbum],
-          subType: const [
+          type: [PMDarwinAssetCollectionType.smartAlbum],
+          subType: [
             PMDarwinAssetCollectionSubtype.smartAlbumReceipts,
             PMDarwinAssetCollectionSubtype.smartAlbumHandwriting,
             PMDarwinAssetCollectionSubtype.smartAlbumIllustrations,
@@ -149,10 +149,10 @@ void main() {
     });
 
     test('iOS 18 media subtypes can be used in path filter', () {
-      final pathFilter = PMPathFilter(
+      final pathFilter = const PMPathFilter(
         darwin: PMDarwinPathFilter(
-          type: const [PMDarwinAssetCollectionType.smartAlbum],
-          subType: const [
+          type: [PMDarwinAssetCollectionType.smartAlbum],
+          subType: [
             PMDarwinAssetCollectionSubtype.smartAlbumSpatial,
             PMDarwinAssetCollectionSubtype.smartAlbumProRes,
             PMDarwinAssetCollectionSubtype.smartAlbumScreenRecordings,
