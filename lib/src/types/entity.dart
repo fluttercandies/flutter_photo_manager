@@ -351,7 +351,7 @@ class AssetPathEntity {
 /// {@endtemplate}
 @immutable
 class AssetEntity {
-  const AssetEntity({
+  AssetEntity({
     required this.id,
     required this.typeInt,
     required this.width,
@@ -363,12 +363,21 @@ class AssetEntity {
     this.createDateSecond,
     this.modifiedDateSecond,
     this.relativePath,
+    @Deprecated(
+      'Use `latLng` instead. '
+      'This feature was deprecated after v3.8.0',
+    )
     double? latitude,
+    @Deprecated(
+      'Use `latLng` instead. '
+      'This feature was deprecated after v3.8.0',
+    )
     double? longitude,
+    LatLng? latLng,
     this.mimeType,
     this.subtype = 0,
-  })  : _latitude = latitude,
-        _longitude = longitude;
+  }) : _latLng = latLng ??
+            LatLng.fromValues(latitude: latitude, longitude: longitude);
 
   /// Obtain an entity from ID.
   ///
@@ -474,6 +483,15 @@ class AssetEntity {
   /// The orientated size according to the orientation.
   Size get orientatedSize => _isFlipping ? size.flipped : size;
 
+  /// Location of the asset in latitude and longitude.
+  LatLng? get latLng => _latLng;
+  final LatLng? _latLng;
+
+  /// Obtain latitude and longitude.
+  ///  * Android: Obtain from `MediaStore` or EXIF (Android 10).
+  ///  * iOS/macOS: Obtain from photos.
+  Future<LatLng?> latlngAsync() => plugin.getLatLngAsync(this);
+
   /// Latitude value of the location when shooting.
   ///  * Android: `MediaStore.Images.ImageColumns.LATITUDE`.
   ///  * iOS/macOS: `PHAsset.location.coordinate.latitude`.
@@ -483,8 +501,7 @@ class AssetEntity {
   /// See also:
   ///  * https://developer.android.com/reference/android/provider/MediaStore.Images.ImageColumns#LATITUDE
   ///  * https://developer.apple.com/documentation/corelocation/cllocation?language=objc#declaration
-  double? get latitude => _latitude;
-  final double? _latitude;
+  double? get latitude => _latLng?.latitude;
 
   /// Latitude value of the location when shooting.
   ///  * Android: `MediaStore.Images.ImageColumns.LONGITUDE`.
@@ -495,8 +512,7 @@ class AssetEntity {
   /// See also:
   ///  * https://developer.android.com/reference/android/provider/MediaStore.Images.ImageColumns#LATITUDE
   ///  * https://developer.apple.com/documentation/corelocation/cllocation?language=objc#declaration
-  double? get longitude => _longitude;
-  final double? _longitude;
+  double? get longitude => _latLng?.longitude;
 
   /// Whether this asset is locally available.
   ///  * Android: Always true.
@@ -514,13 +530,6 @@ class AssetEntity {
       darwinFileType: darwinFileType,
     );
   }
-
-  /// Obtain latitude and longitude.
-  ///  * Android: Obtain from `MediaStore` or EXIF (Android 10).
-  ///  * iOS/macOS: Obtain from photos.
-  ///
-  /// [LatLng.latitude] and [LatLng.longitude] might be 0.
-  Future<LatLng> latlngAsync() => plugin.getLatLngAsync(this);
 
   /// Obtain the compressed file of the asset.
   ///
@@ -943,13 +952,26 @@ class AssetEntity {
 @immutable
 class LatLng {
   /// Creates a new [LatLng] object with the given latitude and longitude.
-  const LatLng({this.latitude, this.longitude});
+  const LatLng({
+    required this.latitude,
+    required this.longitude,
+  }) : assert(latitude != 0.0 && longitude != 0.0);
+
+  static LatLng? fromValues({double? latitude, double? longitude}) {
+    if (latitude == null ||
+        latitude == 0.0 ||
+        longitude == null ||
+        longitude == 0.0) {
+      return null;
+    }
+    return LatLng(latitude: latitude, longitude: longitude);
+  }
 
   /// The latitude of this location in degrees.
-  final double? latitude;
+  final double latitude;
 
   /// The longitude of this location in degrees.
-  final double? longitude;
+  final double longitude;
 
   @override
   bool operator ==(Object other) {
@@ -961,6 +983,9 @@ class LatLng {
 
   @override
   int get hashCode => latitude.hashCode ^ longitude.hashCode;
+
+  @override
+  String toString() => '$latitude,$longitude'; // y,x
 }
 
 /// The subtype value for Live Photos.

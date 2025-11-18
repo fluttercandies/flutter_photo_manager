@@ -222,8 +222,7 @@ class PhotoManager(private val context: Context) {
     }
 
     fun getLocation(id: String): Map<String, Double> {
-        val exifInfo = dbUtils.getExif(context, id)
-        val latLong = exifInfo?.latLong
+        val latLong = dbUtils.getLatLong(context, id)
         return if (latLong == null) {
             mapOf("lat" to 0.0, "lng" to 0.0)
         } else {

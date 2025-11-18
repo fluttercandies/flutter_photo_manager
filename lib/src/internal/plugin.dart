@@ -7,6 +7,7 @@ import 'dart:io';
 import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/services.dart';
+import 'package:path/path.dart' as path;
 import 'package:photo_manager/platform_utils.dart';
 
 import '../filter/base_filter.dart';
@@ -430,10 +431,17 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     if (!file.existsSync()) {
       throw ArgumentError('The input file $inputFilePath does not exists.');
     }
+
+    final filePath = file.absolute.path;
+    title = title?.trim();
+    if (title == null || title.isEmpty) {
+      title = path.basename(filePath);
+    }
+
     final Map result = await _channel.invokeMethod(
       PMConstants.mSaveImageWithPath,
       <String, dynamic>{
-        'path': file.absolute.path,
+        'path': filePath,
         'title': title,
         'desc': desc,
         'relativePath': relativePath,
@@ -461,10 +469,17 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     if (!inputFile.existsSync()) {
       throw ArgumentError('The input file ${inputFile.path} does not exists.');
     }
+
+    final filePath = inputFile.absolute.path;
+    title = title?.trim();
+    if (title == null || title.isEmpty) {
+      title = path.basename(filePath);
+    }
+
     final Map result = await _channel.invokeMethod(
       PMConstants.mSaveVideo,
       <String, dynamic>{
-        'path': inputFile.absolute.path,
+        'path': filePath,
         'title': title,
         'desc': desc ?? '',
         'relativePath': relativePath,
@@ -496,7 +511,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     );
   }
 
-  Future<LatLng> getLatLngAsync(AssetEntity entity) async {
+  Future<LatLng?> getLatLngAsync(AssetEntity entity) async {
     if (Platform.isAndroid) {
       final int version = int.parse(await getSystemVersion());
       if (version >= 29) {
@@ -506,13 +521,19 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         );
 
         // 将返回的数据传入map
-        return LatLng(
-          latitude: (map['lat'] as num?)?.toDouble(),
-          longitude: (map['lng'] as num?)?.toDouble(),
-        );
+        if (map['lat'] is num && map['lng'] is num) {
+          return LatLng.fromValues(
+            latitude: (map['lat'] as num).toDouble(),
+            longitude: (map['lng'] as num).toDouble(),
+          );
+        }
       }
     }
-    return LatLng(latitude: entity.latitude, longitude: entity.longitude);
+
+    return LatLng.fromValues(
+      latitude: entity.latitude,
+      longitude: entity.longitude,
+    );
   }
 
   Future<String> getTitleAsync(

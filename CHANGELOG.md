@@ -31,6 +31,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Remove implied `FilterOptionGroup`s when querying paths and assets.
   This fixes assets finding when they were created in the future.
   Some edge cases regarding performance drops caused by the complicated sort queries might also get fixed.
+- Add `PermissionState.isLimited`.
 
 ### Fixes
 
@@ -40,6 +41,8 @@ To know more about breaking changes, see the [Migration Guide][].
   - Fixed PHCachingImageManager methods: `fetchThumb`, `exportAssetToFile`, `fetchFullSizeImageFile`.
   - Fixed PHAssetResourceManager methods: `fetchVideoResourceToFile`, `fetchOriginImageFile`.
   - Fixed PHPhotoLibrary save methods: `saveImage`, `saveImageWithPath`, `saveVideo`, `saveLivePhoto`.
+- Fix `AssetEntity.latlngAsync()` returning zero location for videos on Android by using `MediaMetadataRetriever` to extract location data from video files.
+- Fix nullability mismatch for `title` parameter in `saveVideo` and `saveImageWithPath` methods.
 
 ## 3.7.1
 
