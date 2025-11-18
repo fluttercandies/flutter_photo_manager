@@ -60,6 +60,7 @@ class PMConstants {
   static const String mRemoveInAlbum = 'removeInAlbum';
   static const String mMoveAssetToPath = 'moveAssetToPath';
   static const String mColumnNames = 'getColumnNames';
+  static const String mUpdateDateTaken = 'updateDateTaken';
 
   static const String mGetAssetCount = 'getAssetCount';
   static const String mGetAssetsByRange = 'getAssetsByRange';

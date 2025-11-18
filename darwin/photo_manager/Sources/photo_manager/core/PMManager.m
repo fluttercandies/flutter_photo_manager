@@ -1880,6 +1880,38 @@
     block(YES, nil);
 }
 
+- (void)updateDateTakenWithId:(NSString *)id timestamp:(NSNumber *)timestamp block:(void (^)(BOOL result, NSObject *error))block {
+    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:[self singleFetchOptions]];
+    PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
+    if (!asset) {
+        block(NO, [NSString stringWithFormat:@"Asset %@ not found.", id]);
+        return;
+    }
+    
+    if (![asset canPerformEditOperation:PHAssetEditOperationProperties]) {
+        block(NO, [NSString stringWithFormat:@"The asset %@ cannot perform edit operation.", id]);
+        return;
+    }
+    
+    NSTimeInterval timeInterval = [timestamp doubleValue];
+    NSDate *newDate = [NSDate dateWithTimeIntervalSince1970:timeInterval];
+    
+    NSError *error;
+    BOOL succeed = [PHPhotoLibrary.sharedPhotoLibrary performChangesAndWait:^{
+        PHAssetChangeRequest *request = [PHAssetChangeRequest changeRequestForAsset:asset];
+        request.creationDate = newDate;
+    } error:&error];
+    if (!succeed) {
+        block(NO, [NSString stringWithFormat:@"Updating creation date for asset %@ failed: Request not succeed.", id]);
+        return;
+    }
+    if (error) {
+        block(NO, error);
+        return;
+    }
+    block(YES, nil);
+}
+
 - (NSString *)getCachePath:(NSString *)type {
     NSString *homePath = NSTemporaryDirectory();
     NSString *cachePath = type;

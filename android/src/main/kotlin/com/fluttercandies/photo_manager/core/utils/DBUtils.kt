@@ -379,6 +379,17 @@ object DBUtils : IDBUtils {
         throwMsg("Cannot update $assetId relativePath")
     }
 
+    override fun updateDateTaken(context: Context, assetId: String, timestamp: Long): Boolean {
+        val cr = context.contentResolver
+        val timestampMillis = timestamp * 1000
+        val contentValues = ContentValues().apply {
+            put(DATE_TAKEN, timestampMillis)
+        }
+        
+        val count = cr.update(allUri, contentValues, idSelection, arrayOf(assetId))
+        return count > 0
+    }
+
     private val deleteLock = ReentrantLock()
 
     override fun removeAllExistsAssets(context: Context): Boolean {

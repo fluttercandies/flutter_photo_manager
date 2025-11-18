@@ -572,6 +572,17 @@ class PhotoManagerPlugin(
                 favoriteManager.favoriteAsset(photoManager.getUri(assetId), isFavorite, resultHandler)
             }
 
+            Methods.updateDateTaken -> {
+                val assetId = call.argument<String>("id")!!
+                val timestamp = call.argument<Long>("timestamp")!!
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                    LogUtils.error("The API 29 or lower do not support updating DATE_TAKEN.")
+                    resultHandler.reply(false)
+                    return
+                }
+                photoManager.updateDateTaken(assetId, timestamp, resultHandler)
+            }
+
             Methods.copyAsset -> {
                 val assetId = call.argument<String>("assetId")!!
                 val galleryId = call.argument<String>("galleryId")!!
