@@ -5,6 +5,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import '../../platform_utils.dart';
 import '../filter/base_filter.dart';
 import '../filter/path_filter.dart';
 import '../internal/editor.dart';
@@ -332,7 +333,7 @@ class PhotoManager {
   static Future<Map<String, String?>> getCloudIdentifiers(
     List<String> localIdentifiers,
   ) async {
-    if (Platform.isIOS || Platform.isMacOS) {
+    if (PlatformUtils.isIOS || PlatformUtils.isMacOS) {
       return plugin.iosGetCloudIdentifiers(localIdentifiers);
     }
     return <String, String?>{};

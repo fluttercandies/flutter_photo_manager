@@ -914,7 +914,7 @@ class AssetEntity {
   ///  * [PhotoManager.getCloudIdentifiers] to get cloud identifiers for multiple assets efficiently.
   ///  * https://developer.apple.com/documentation/photokit/phphotolibrary/3750728-cloudidentifiermappingsforlocali
   Future<String?> get cloudIdentifier async {
-    if (Platform.isIOS || Platform.isMacOS) {
+    if (PlatformUtils.isIOS || PlatformUtils.isMacOS) {
       final Map<String, String?> result =
           await plugin.iosGetCloudIdentifiers(<String>[id]);
       return result[id];

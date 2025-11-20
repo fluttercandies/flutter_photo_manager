@@ -881,7 +881,7 @@ mixin IosPlugin on BasePlugin {
   Future<Map<String, String?>> iosGetCloudIdentifiers(
     List<String> localIdentifiers,
   ) async {
-    assert(Platform.isIOS || Platform.isMacOS);
+    assert(PlatformUtils.isIOS || PlatformUtils.isMacOS);
     final Map result = await _channel.invokeMethod(
       PMConstants.mGetCloudIdentifiers,
       <String, dynamic>{

@@ -13,4 +13,10 @@ class PlatformUtils {
   /// Whether the operating system is a version of
   /// [ohos](https://en.wikipedia.org/wiki/OpenHarmony).
   static final isOhos = Platform.operatingSystem == 'ohos';
+
+  /// Whether the operating system is iOS.
+  static final isIOS = Platform.isIOS;
+
+  /// Whether the operating system is macOS.
+  static final isMacOS = Platform.isMacOS;
 }
