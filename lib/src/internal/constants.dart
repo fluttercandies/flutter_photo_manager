@@ -27,6 +27,8 @@ class PMConstants {
   static const String mGetThumb = 'getThumb';
   static const String mGetOriginBytes = 'getOriginBytes';
   static const String mGetFullFile = 'getFullFile';
+  static const String mGetAdjustmentBaseFile = 'getAdjustmentBaseFile';
+  static const String mGetAdjustmentBaseLivePhotoFile = 'getAdjustmentBaseLivePhotoFile';
   static const String mReleaseMemoryCache = 'releaseMemoryCache';
   static const String mLog = 'log';
   static const String mOpenSetting = 'openSetting';
@@ -43,6 +45,7 @@ class PMConstants {
   static const String mGetLatLngAndroidQ = 'getLatLngAndroidQ';
   static const String mGetTitleAsync = 'getTitleAsync';
   static const String mGetMimeTypeAsync = 'getMimeTypeAsync';
+  static const String mGetHasAdjustmentsAsync = 'getHasAdjustmentsAsync';
   static const String mGetMediaUrl = 'getMediaUrl';
   static const String mGetSubPath = 'getSubPath';
   static const String mCopyAsset = 'copyAsset';

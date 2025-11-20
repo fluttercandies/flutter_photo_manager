@@ -28,8 +28,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable NSString*)mimeType;
 - (PHAssetResource *)getCurrentResource;
+- (PHAssetResource *)getAdjustmentBaseResource;
 - (void)requestCurrentResourceData:(void (^)(NSData *_Nullable result))block;
 - (PHAssetResource *)getLivePhotosResource;
+- (PHAssetResource *)getAdjustmentBaseLivePhotosResource;
 
 @end
 

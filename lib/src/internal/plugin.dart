@@ -325,6 +325,39 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return _channel.invokeMethod(PMConstants.mGetFullFile, params);
   }
 
+  Future<String?> getAdjustmentBaseFile(
+    String id, {
+    PMProgressHandler? progressHandler,
+    int subtype = 0,
+    PMDarwinAVFileType? darwinFileType,
+    PMCancelToken? cancelToken,
+  }) async {
+    final params = <String, dynamic>{
+      'id': id,
+      'subtype': subtype,
+      'darwinFileType': darwinFileType?.value ?? 0,
+    };
+    _injectProgressHandlerParams(params, progressHandler);
+    _setCancelToken(params, cancelToken);
+    return _channel.invokeMethod(PMConstants.mGetAdjustmentBaseFile, params);
+  }
+
+    Future<String?> getAdjustmentBaseLivePhotoFile(
+    String id, {
+    PMProgressHandler? progressHandler,
+    int subtype = 0,
+    PMDarwinAVFileType? darwinFileType,
+    PMCancelToken? cancelToken,
+  }) async {
+    final params = <String, dynamic>{
+      'id': id,
+      'darwinFileType': darwinFileType?.value ?? 0,
+    };
+    _injectProgressHandlerParams(params, progressHandler);
+    _setCancelToken(params, cancelToken);
+    return _channel.invokeMethod(PMConstants.mGetAdjustmentBaseLivePhotoFile, params);
+  }
+
   Future<void> setLog(bool isLog) {
     return _channel.invokeMethod(PMConstants.mLog, isLog);
   }
@@ -683,6 +716,18 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     }
     return null;
   }
+
+  Future<bool> getHasAdjustmentsAsync(AssetEntity entity) async {    
+    if (Platform.isIOS || Platform.isMacOS) {
+      return await _channel.invokeMethod(
+        PMConstants.mGetHasAdjustmentsAsync,
+        <String, dynamic>{'id': entity.id},
+      );          
+    }
+
+    return false;
+  }
+
 
   Future<int> getAssetCount({
     PMFilter? filterOption,
