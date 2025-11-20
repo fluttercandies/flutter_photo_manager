@@ -925,18 +925,14 @@ mixin AndroidPlugin on BasePlugin {
     List<String> assetIds,
     String targetPath,
   ) async {
-    try {
-      final result = await _channel.invokeMethod(
-        PMConstants.mMoveAssetsToPath,
-        <String, dynamic>{
-          'assetIds': assetIds,
-          'targetPath': targetPath,
-        },
-      );
-      return result == true;
-    } catch (e) {
-      return false;
-    }
+    final result = await _channel.invokeMethod(
+      PMConstants.mMoveAssetsToPath,
+      <String, dynamic>{
+        'assetIds': assetIds,
+        'targetPath': targetPath,
+      },
+    );
+    return result == true;
   }
 
   Future<bool> androidRemoveNoExistsAssets() async {
