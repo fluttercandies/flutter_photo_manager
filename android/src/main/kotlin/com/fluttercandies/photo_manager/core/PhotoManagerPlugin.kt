@@ -58,12 +58,14 @@ class PhotoManagerPlugin(
     }
 
     val deleteManager = PhotoManagerDeleteManager(applicationContext, activity)
+    val writeManager = PhotoManagerWriteManager(applicationContext, activity)
     val favoriteManager = PhotoManagerFavoriteManager(applicationContext)
 
     fun bindActivity(activity: Activity?) {
         this.activity = activity
         permissionsUtils.withActivity(activity)
         deleteManager.bindActivity(activity)
+        writeManager.bindActivity(activity)
         favoriteManager.bindActivity(activity)
     }
 
@@ -588,6 +590,32 @@ class PhotoManagerPlugin(
                 val assetId = call.argument<String>("assetId")!!
                 val albumId = call.argument<String>("albumId")!!
                 photoManager.moveToGallery(assetId, albumId, resultHandler)
+            }
+
+            Methods.moveAssetsToPath -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    try {
+                        val assetIds = call.argument<List<String>>("assetIds")!!
+                        val targetPath = call.argument<String>("targetPath")!!
+                        
+                        val uris = assetIds.mapNotNull { photoManager.getUri(it) }
+                        if (uris.isEmpty()) {
+                            resultHandler.replyError("No valid URIs found for the given asset IDs")
+                            return
+                        }
+                        
+                        writeManager.moveToPathWithPermission(uris, targetPath, resultHandler)
+                    } catch (e: Exception) {
+                        LogUtils.error("moveAssetsToPath failed", e)
+                        resultHandler.replyError("moveAssetsToPath failed", message = e.message)
+                    }
+                } else {
+                    LogUtils.error("moveAssetsToPath requires Android 11+ (API 30+)")
+                    resultHandler.replyError(
+                        "moveAssetsToPath requires Android 11+ (API 30+)",
+                        message = "Current API level: ${Build.VERSION.SDK_INT}"
+                    )
+                }
             }
 
             Methods.deleteWithIds -> {

@@ -85,6 +85,7 @@ class Methods {
         const val favoriteAsset = "favoriteAsset"
         const val copyAsset = "copyAsset"
         const val moveAssetToPath = "moveAssetToPath"
+        const val moveAssetsToPath = "moveAssetsToPath"
         const val removeNoExistsAssets = "removeNoExistsAssets"
         const val getColumnNames = "getColumnNames"
 

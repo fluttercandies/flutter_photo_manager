@@ -369,6 +369,34 @@ class AndroidEditor {
     return plugin.androidMoveAssetToPath(entity, target);
   }
 
+  /// Moves multiple assets to a different path/album on Android 11+ (API 30+) with user permission.
+  ///
+  /// This method uses MediaStore.createWriteRequest() to request user permission
+  /// for batch modifications, showing a single system dialog for all assets.
+  ///
+  /// [entities] List of assets to move
+  /// [targetPath] Target RELATIVE_PATH (e.g., "Pictures/MyAlbum")
+  ///
+  /// Returns `true` if the operation was successful; otherwise, `false`.
+  ///
+  /// Note: This method requires Android 11 (API 30) or higher.
+  /// For Android 10 and below, use [moveAssetToAnother] instead.
+  ///
+  /// Example:
+  /// ```dart
+  /// final success = await PhotoManager.editor.android.moveAssetsToPath(
+  ///   entities: [asset1, asset2, asset3],
+  ///   targetPath: 'Pictures/MyAlbum',
+  /// );
+  /// ```
+  Future<bool> moveAssetsToPath({
+    required List<AssetEntity> entities,
+    required String targetPath,
+  }) {
+    final assetIds = entities.map((e) => e.id).toList();
+    return plugin.androidMoveAssetsToPath(assetIds, targetPath);
+  }
+
   /// Removes all assets from the gallery that are no longer available on disk.
   ///
   /// This method is intended to be used after manually deleting files from the

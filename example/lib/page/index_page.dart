@@ -5,6 +5,7 @@ import 'package:photo_manager_example/widget/nav_button.dart';
 import 'change_notify_page.dart';
 import 'developer/develop_index_page.dart';
 import 'home_page.dart';
+import 'move_assets_page.dart';
 import 'save_image_example.dart';
 
 class IndexPage extends StatefulWidget {
@@ -28,6 +29,7 @@ class _IndexPageState extends State<IndexPage> {
           routePage('Custom filter example', const CustomFilterExamplePage()),
           routePage('Save media example', const SaveMediaExample()),
           routePage('Change notify example', const ChangeNotifyExample()),
+          routePage('Move Assets example', const MoveAssetsBatchTestPage()),
           routePage('For Developer page', const DeveloperIndexPage()),
         ],
       ),
