@@ -802,6 +802,46 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       PMConstants.mCancelAllRequest,
     );
   }
+
+  /// Pick assets using the native system picker.
+  ///
+  /// This method launches the native photo picker on iOS/macOS (PHPickerViewController)
+  /// or Android (Photo Picker API) without requiring storage permissions.
+  ///
+  /// Parameters:
+  /// - [maxCount]: Maximum number of assets that can be selected (default: 9)
+  /// - [requestType]: Type of media to pick (common, image, video, audio)
+  /// - [useItemProvider]: iOS/macOS only - whether to use NSItemProvider for assets
+  ///   not in the photo library (e.g., iCloud items). Default: false
+  ///
+  /// Returns a list of [AssetEntity] objects representing the selected assets.
+  ///
+  /// Example:
+  /// ```dart
+  /// final assets = await PhotoManager.pickAssets(
+  ///   maxCount: 5,
+  ///   requestType: RequestType.image,
+  /// );
+  /// ```
+  Future<List<AssetEntity>> pickAssets({
+    int maxCount = 9,
+    RequestType requestType = RequestType.common,
+    bool useItemProvider = false,
+  }) async {
+    final Map result = await _channel.invokeMethod(
+      PMConstants.mPickAssets,
+      <String, dynamic>{
+        'maxCount': maxCount,
+        'type': requestType.value,
+        'useItemProvider': useItemProvider,
+      },
+    );
+    final List data = result['data'] as List? ?? [];
+    return data
+        .cast<Map>()
+        .map((e) => ConvertUtils.convertMapToAsset(e.cast<String, dynamic>()))
+        .toList();
+  }
 }
 
 mixin IosPlugin on BasePlugin {

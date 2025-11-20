@@ -830,6 +830,41 @@ interface IDBUtils {
         }
     }
 
+    /**
+     * Get AssetEntity objects from URIs returned by the photo picker.
+     * This method queries the MediaStore for asset information corresponding to the given URIs.
+     *
+     * @param context The Android context
+     * @param uris List of URIs from the photo picker
+     * @return List of AssetEntity objects corresponding to the URIs
+     */
+    fun getAssetsFromUris(context: Context, uris: List<Uri>): List<AssetEntity> {
+        if (uris.isEmpty()) {
+            return emptyList()
+        }
+
+        val result = ArrayList<AssetEntity>()
+        val cr = context.contentResolver
+
+        for (uri in uris) {
+            try {
+                // Query the media store to get asset information
+                cr.logQuery(uri, keys(), null, null, null).use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        val asset = cursor.toAssetEntity(context, false)
+                        if (asset != null) {
+                            result.add(asset)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                LogUtils.error("Failed to get asset from URI: $uri", e)
+            }
+        }
+
+        return result
+    }
+
     fun ContentResolver.logQuery(
         uri: Uri,
         projection: Array<String>?,

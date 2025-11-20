@@ -54,6 +54,7 @@ see the [migration guide](MIGRATION_GUIDE.md) for detailed info.
         * [Glide](#glide)
       * [iOS config preparation](#ios-config-preparation)
   * [Usage](#usage)
+    * [Native photo picker (no permissions required)](#native-photo-picker-no-permissions-required)
     * [Request for permission](#request-for-permission)
       * [Limited entities access](#limited-entities-access)
         * [Limited entities access on iOS](#limited-entities-access-on-ios)
@@ -226,6 +227,48 @@ It's pretty much the same as the `NSPhotoLibraryUsageDescription`.
 ![permissions in Xcode](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/flutter_photo2.png)
 
 ## Usage
+
+### Native photo picker (no permissions required)
+
+Starting from version 3.8.0, `photo_manager` provides a native photo picker that doesn't require storage permissions. This is perfect for apps that only need to let users select photos/videos without needing full library access.
+
+```dart
+// Pick up to 9 assets (images and videos)
+final List<AssetEntity> assets = await PhotoManager.pickAssets(
+  maxCount: 9,
+  requestType: RequestType.common, // or RequestType.image, RequestType.video
+);
+
+if (assets.isNotEmpty) {
+  // Use the selected assets
+  for (final asset in assets) {
+    final file = await asset.file;
+    // Do something with the file
+  }
+}
+```
+
+**Platform Support:**
+- **Android 11+ (API 30+)**: Uses the native Photo Picker API
+- **iOS 14+**: Uses `PHPickerViewController`
+- Returns an error on older Android versions and iOS < 14
+
+**Key Benefits:**
+- ✅ No storage permissions required
+- ✅ Native OS picker UI
+- ✅ Returns standard `AssetEntity` objects
+- ✅ Full compatibility with other photo_manager APIs
+- ✅ Works even when permission is denied
+
+**Parameters:**
+- `maxCount`: Maximum number of assets to select (default: 9)
+- `requestType`: Type of media to allow:
+  - `RequestType.common`: Both images and videos (default)
+  - `RequestType.image`: Only images
+  - `RequestType.video`: Only videos
+- `useItemProvider`: (iOS only) Handle iCloud assets. Default: false
+
+> **Note**: This method does not require calling `requestPermissionExtend()` first. It works independently of the app's permission status.
 
 ### Request for permission
 

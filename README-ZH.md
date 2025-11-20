@@ -53,6 +53,7 @@ that can be found in the LICENSE file. -->
         * [Glide](#glide)
       * [iOS 配置准备](#ios-配置准备)
   * [使用方法](#使用方法)
+    * [原生照片选择器（无需权限）](#原生照片选择器无需权限)
     * [请求权限](#请求权限)
       * [受限的资源权限](#受限的资源权限)
         * [iOS 受限的资源权限](#ios-受限的资源权限)
@@ -216,6 +217,48 @@ Android 10 引入了 **Scoped Storage**，导致原始资源文件不能通过�
 ![permissions in Xcode](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/flutter_photo2.png)
 
 ## 使用方法
+
+### 原生照片选择器（无需权限）
+
+从 3.8.0 版本开始，`photo_manager` 提供了原生照片选择器，无需存储权限。这非常适合只需要让用户选择照片/视频而不需要完整相册访问权限的应用。
+
+```dart
+// 选择最多 9 个资源（图片和视频）
+final List<AssetEntity> assets = await PhotoManager.pickAssets(
+  maxCount: 9,
+  requestType: RequestType.common, // 或者 RequestType.image, RequestType.video
+);
+
+if (assets.isNotEmpty) {
+  // 使用选中的资源
+  for (final asset in assets) {
+    final file = await asset.file;
+    // 处理文件
+  }
+}
+```
+
+**平台支持：**
+- **Android 11+ (API 30+)**：使用原生照片选择器 API
+- **iOS 14+**：使用 `PHPickerViewController`
+- 在较旧的 Android 版本和 iOS < 14 上会返回错误
+
+**主要优势：**
+- ✅ 无需存储权限
+- ✅ 原生系统选择器界面
+- ✅ 返回标准的 `AssetEntity` 对象
+- ✅ 与其他 photo_manager API 完全兼容
+- ✅ 即使权限被拒绝也能工作
+
+**参数说明：**
+- `maxCount`：可选择的最大资源数量（默认：9）
+- `requestType`：允许的媒体类型：
+  - `RequestType.common`：图片和视频（默认）
+  - `RequestType.image`：仅图片
+  - `RequestType.video`：仅视频
+- `useItemProvider`：（仅 iOS）处理 iCloud 资源。默认：false
+
+> **注意**：此方法不需要先调用 `requestPermissionExtend()`。它独立于应用的权限状态工作。
 
 ### 请求权限
 
