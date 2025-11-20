@@ -454,7 +454,7 @@ object AndroidQDBUtils : IDBUtils {
                     val exists = try {
                         cr.openInputStream(uri)?.close()
                         true
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         false
                     }
                     if (!exists) {

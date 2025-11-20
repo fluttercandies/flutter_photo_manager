@@ -26,20 +26,20 @@ class ResultHandler(var result: MethodChannel.Result, val call: MethodCall) {
         handler.post {
             try {
                 result.success(any)
-            } catch (e: IllegalStateException) {
+            } catch (_: IllegalStateException) {
                 // Do nothing
             }
         }
     }
 
-    fun replyError(code: String, message: String? = null, obj: Any? = null) {
+    fun replyError(code: String, message: String? = null, details: Any? = null) {
         if (isReplied) {
             return
         }
         isReplied = true
         val result = this.result
         handler.post {
-            result.error(code, message, obj)
+            result.error(code, message, details)
         }
     }
 
@@ -52,9 +52,5 @@ class ResultHandler(var result: MethodChannel.Result, val call: MethodCall) {
         handler.post {
             result.notImplemented()
         }
-    }
-
-    fun isReplied(): Boolean {
-        return isReplied
     }
 }

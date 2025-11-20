@@ -31,15 +31,21 @@ To know more about breaking changes, see the [Migration Guide][].
 - Remove implied `FilterOptionGroup`s when querying paths and assets.
   This fixes assets finding when they were created in the future.
   Some edge cases regarding performance drops caused by the complicated sort queries might also get fixed.
+- Add `PermissionState.isLimited`.
 
 ### Fixes
 
+- Fix `type 'Null' is not a subtype of type 'Map<dynamic, dynamic>'` error on Android when copying or moving assets fails.
+  - Android now properly throws exceptions instead of returning null when `copyAssetToGallery` or `moveAssetToGallery` operations fail.
+  - Dart side now handles null responses gracefully by throwing a `PlatformException`.
 - Fix PHImageManager crash on iOS by ensuring all PHImageManager/PHCachingImageManager methods are called on the main thread.
   This resolves race conditions and deadlocks when thumbnail operations are dispatched to QoS background queues.
 - Fix EXC_BAD_ACCESS crash caused by accessing deallocated memory in async blocks on iOS.
   - Fixed PHCachingImageManager methods: `fetchThumb`, `exportAssetToFile`, `fetchFullSizeImageFile`.
   - Fixed PHAssetResourceManager methods: `fetchVideoResourceToFile`, `fetchOriginImageFile`.
   - Fixed PHPhotoLibrary save methods: `saveImage`, `saveImageWithPath`, `saveVideo`, `saveLivePhoto`.
+- Fix `AssetEntity.latlngAsync()` returning zero location for videos on Android by using `MediaMetadataRetriever` to extract location data from video files.
+- Fix nullability mismatch for `title` parameter in `saveVideo` and `saveImageWithPath` methods.
 
 ## 3.7.1
 
