@@ -69,14 +69,18 @@ Future<void> moveAssetsToAlbumExample() async {
 Future<void> moveSpecificAssetsExample() async {
   final PermissionState permission =
       await PhotoManager.requestPermissionExtend();
-  if (!permission.isAuth) return;
+  if (!permission.isAuth) {
+    return;
+  }
 
   // Get all images
   final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
     type: RequestType.image,
   );
 
-  if (paths.isEmpty) return;
+  if (paths.isEmpty) {
+    return;
+  }
 
   final AssetPathEntity allPhotos = paths.first;
   final List<AssetEntity> allAssets = await allPhotos.getAssetListRange(
@@ -99,7 +103,8 @@ Future<void> moveSpecificAssetsExample() async {
   }
 
   print(
-      'Found ${filteredAssets.length} assets from ${targetDate.toString().split(' ')[0]}');
+    'Found ${filteredAssets.length} assets from ${targetDate.toString().split(' ')[0]}',
+  );
 
   // Move to a date-specific album
   final String targetPath = 'Pictures/2024-11-01';
