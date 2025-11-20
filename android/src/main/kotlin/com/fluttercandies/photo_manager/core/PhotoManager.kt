@@ -250,6 +250,10 @@ class PhotoManager(private val context: Context) {
         }
     }
 
+    fun getPathRelativePath(galleryId: String): String? {
+        return dbUtils.getPathRelativePath(context, galleryId)
+    }
+
     fun getMediaUri(id: Long, type: Int): String {
         return dbUtils.getMediaUri(context, id, type)
     }

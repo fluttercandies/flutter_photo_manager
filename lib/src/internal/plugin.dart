@@ -684,6 +684,23 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return null;
   }
 
+  Future<String?> getPathRelativePath(AssetPathEntity pathEntity) async {
+    if (Platform.isIOS || Platform.isMacOS) {
+      // iOS/macOS use logical albums (PHAssetCollection) without physical paths
+      return null;
+    }
+    if (Platform.isAndroid) {
+      return _channel.invokeMethod(
+        PMConstants.mGetPathRelativePath,
+        <String, dynamic>{'id': pathEntity.id},
+      );
+    }
+    if (PlatformUtils.isOhos) {
+      return null;
+    }
+    return null;
+  }
+
   Future<int> getAssetCount({
     PMFilter? filterOption,
     RequestType type = RequestType.common,

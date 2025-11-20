@@ -465,5 +465,27 @@ object DBUtils : IDBUtils {
         }
     }
 
+    override fun getPathRelativePath(context: Context, galleryId: String): String? {
+        if (galleryId == PhotoManager.ALL_ID) {
+            return null
+        }
+        val cursor = context.contentResolver.logQuery(
+            allUri,
+            arrayOf(MediaStore.MediaColumns.DATA),
+            "${MediaStore.MediaColumns.BUCKET_ID} = ?",
+            arrayOf(galleryId),
+            null
+        )
+        cursor.use {
+            if (!it.moveToNext()) {
+                return null
+            }
+            val dataPath = it.getStringOrNull(MediaStore.MediaColumns.DATA)
+            return dataPath?.let { path ->
+                File(path).parent
+            }
+        }
+    }
+
     private data class GalleryInfo(val path: String, val galleryId: String, val galleryName: String)
 }

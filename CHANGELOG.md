@@ -13,6 +13,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Add `cancelToken` parameter to `AssetEntity.loadFile`.
 - Add `cancelAllRequest` method to `PhotoManager`.
 - The `AssetEntity.getFile` and `AssetEntity.getOriginBytes` methods are public.
+- Add `relativePathAsync` getter to `AssetPathEntity`.
 - Add iOS 18 smart album subtypes support:
   - `smartAlbumSpatial` - For spatial/3D photos
   - `smartAlbumProRes` - For ProRes videos

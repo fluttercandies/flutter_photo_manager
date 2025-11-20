@@ -458,6 +458,12 @@ class PhotoManagerPlugin(
                 }
             }
 
+            Methods.getPathRelativePath -> {
+                val id = call.argument<String>("id")!!
+                val relativePath = photoManager.getPathRelativePath(id)
+                resultHandler.reply(relativePath)
+            }
+
             Methods.getLatLng -> {
                 val id = call.argument<String>("id")!!
                 // 读取id

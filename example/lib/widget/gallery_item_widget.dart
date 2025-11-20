@@ -81,7 +81,12 @@ class GalleryItemWidget extends StatelessWidget {
                   sb.writeln('assetCount = ${await item.assetCountAsync}');
                   sb.writeln('id = ${item.id}');
 
+                  // Test relativePath
+                  final relativePath = await item.relativePathAsync;
+                  sb.writeln('relativePath = $relativePath');
+
                   print(sb.toString());
+                  showToast('Properties logged to console');
                 },
               ),
             ],
@@ -101,7 +106,31 @@ class GalleryItemWidget extends StatelessWidget {
           future: item.assetCountAsync,
           builder: (_, AsyncSnapshot<int> data) {
             if (data.hasData) {
-              return Text('count : ${data.data}');
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('count : ${data.data}'),
+                  FutureBuilder<String?>(
+                    future: item.relativePathAsync,
+                    builder: (_, AsyncSnapshot<String?> pathData) {
+                      if (pathData.connectionState == ConnectionState.done) {
+                        final path = pathData.data;
+                        if (path != null) {
+                          return Text(
+                            'path: $path',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          );
+                        }
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                ],
+              );
             }
             return const SizedBox.shrink();
           },

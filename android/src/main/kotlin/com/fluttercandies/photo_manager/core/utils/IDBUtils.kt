@@ -727,6 +727,8 @@ interface IDBUtils {
         }
     }
 
+    fun getPathRelativePath(context: Context, galleryId: String): String?
+
     fun getPathModifiedDate(context: Context, pathId: String): Long? {
         val columns = arrayOf(DATE_MODIFIED)
         val sortOrder = "$DATE_MODIFIED desc"
