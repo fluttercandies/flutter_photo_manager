@@ -910,15 +910,15 @@ mixin AndroidPlugin on BasePlugin {
   }
 
   /// Move multiple assets to a different path/album on Android 11+ (API 30+) with user permission.
-  /// 
+  ///
   /// This method uses MediaStore.createWriteRequest() to request user permission
   /// for batch modifications, showing a single system dialog for all assets.
-  /// 
+  ///
   /// [assetIds] List of asset IDs to move
   /// [targetPath] Target RELATIVE_PATH (e.g., "Pictures/MyAlbum")
-  /// 
+  ///
   /// Returns true if the operation was successful, false otherwise.
-  /// 
+  ///
   /// Note: This method requires Android 11 (API 30) or higher.
   /// For Android 10 and below, use [androidMoveAssetToPath] instead.
   Future<bool> androidMoveAssetsToPath(
