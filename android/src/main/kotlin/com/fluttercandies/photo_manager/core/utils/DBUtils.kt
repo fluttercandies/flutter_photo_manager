@@ -465,7 +465,7 @@ object DBUtils : IDBUtils {
         }
     }
 
-    override fun getRelativePath(context: Context, galleryId: String): String? {
+    override fun getPathRelativePath(context: Context, galleryId: String): String? {
         if (galleryId == PhotoManager.ALL_ID) {
             return null
         }
