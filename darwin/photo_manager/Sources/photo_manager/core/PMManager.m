@@ -564,6 +564,54 @@
     [handler replyError:[NSString stringWithFormat:@"Asset %@ file cannot be obtained.", assetId]];
 }
 
+- (void)getAdjustmentBaseFileWithId:(NSString *)assetId
+                        subtype:(int)subtype
+                        fileType:(AVFileType)fileType
+                    resultHandler:(PMResultHandler *)handler
+                progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+        PMAssetEntity *entity = [self getAssetEntity:assetId];
+        if (entity && entity.phAsset) {
+            PHAsset *asset = entity.phAsset;
+            if (@available(iOS 9.1, *)) {
+                if (asset.isLivePhoto && (subtype & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
+                    [self fetchAdjustmentBaseLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:NO fileType:fileType];
+                    return;
+                }
+            }
+            if (@available(macOS 14.0, *)) {
+                if (asset.isLivePhoto && (subtype & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
+                    [self fetchAdjustmentBaseLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:NO fileType:fileType];
+                    return;
+                }
+            }
+            if (asset.isVideo) {
+                [self fetchAdjustmentBaseVideoFile:asset handler:handler progressHandler:progressHandler withScheme:NO fileType:fileType];
+                return;
+            }      
+            [self fetchAdjustmentBaseImageFile:asset resultHandler:handler progressHandler:progressHandler];
+            return;
+    
+    [handler replyError:[NSString stringWithFormat:@"Asset %@ file cannot be obtained.", assetId]];
+    }
+}
+
+- (void)getAdjustmentBaseLivePhotosFileWithId:(NSString *)assetId
+                        fileType:(AVFileType)fileType
+                    resultHandler:(PMResultHandler *)handler
+                progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+        PMAssetEntity *entity = [self getAssetEntity:assetId];
+        if (entity && entity.phAsset) {
+            PHAsset *asset = entity.phAsset;
+            
+            [self fetchAdjustmentBaseLivePhotosFile:asset handler:handler progressHandler:progressHandler withScheme:NO fileType:fileType];                    
+            return;
+    
+    [handler replyError:[NSString stringWithFormat:@"Asset %@ file cannot be obtained.", assetId]];
+    }
+}
+
+
+
 - (void)fetchLivePhotosFile:(PHAsset *)asset
                     handler:(PMResultHandler *)handler
             progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
@@ -590,6 +638,31 @@
     }];
 }
 
+- (void)fetchAdjustmentBaseLivePhotosFile:(PHAsset *)asset
+                    handler:(PMResultHandler *)handler
+            progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
+                 withScheme:(BOOL)withScheme
+                   fileType:(AVFileType)fileType {
+    PHAssetResource *adjustmentResource = [asset getAdjustmentBaseLivePhotosResource];
+    if (!adjustmentResource) {
+        [handler replyError:[NSString stringWithFormat:@"Asset %@ does not have Adjustment Base Live-Photo resource.", asset.localIdentifier]];
+        return;
+    }
+    [self fetchVideoResourceToFile:asset
+                          resource:adjustmentResource
+                   progressHandler:progressHandler
+                        withScheme:withScheme
+                          isOrigin:YES
+                          fileType:fileType
+                             block:^(NSString *path, NSObject *error) {
+        if (path) {
+            [handler reply:path];
+        } else {
+            [handler replyError:error];
+        }
+    }];
+}
+
 - (void)fetchOriginVideoFile:(PHAsset *)asset
                      handler:(PMResultHandler *)handler
              progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
@@ -603,6 +676,31 @@
                           resource:resource
                    progressHandler:progressHandler
                         withScheme:NO
+                          isOrigin:YES
+                          fileType:fileType
+                             block:^(NSString *path, NSObject *error) {
+        if (path) {
+            [handler reply:path];
+        } else {
+            [handler replyError:error];
+        }
+    }];
+}
+
+-(void)fetchAdjustmentBaseVideoFile:(PHAsset *)asset
+                    handler:(PMResultHandler *)handler
+            progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
+                 withScheme:(BOOL)withScheme
+                fileType:(AVFileType)fileType {
+    PHAssetResource *adjustmentResource = [asset getAdjustmentBaseResource];
+    if (!adjustmentResource) {
+        [handler replyError:[NSString stringWithFormat:@"Asset %@ does not have Adjustment Base Video resource.", asset.localIdentifier]];
+        return;
+    }
+    [self fetchVideoResourceToFile:asset
+                          resource:adjustmentResource
+                   progressHandler:progressHandler
+                        withScheme:withScheme
                           isOrigin:YES
                           fileType:fileType
                              block:^(NSString *path, NSObject *error) {
@@ -1090,6 +1188,52 @@
     }];
 }
 
+- (void)fetchAdjustmentBaseImageFile:(PHAsset *)asset resultHandler:(PMResultHandler *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+    PHAssetResource *imageResource = [asset getAdjustmentBaseResource];
+    if (!imageResource) {
+        [handler replyError:[NSString stringWithFormat:@"Asset %@ does not have available resources.", asset.localIdentifier]];
+        return;
+    }
+    NSFileManager *fileManager = NSFileManager.defaultManager;
+    NSString *path = [self makeAssetOutputPath:asset
+                                      resource:imageResource
+                                      isOrigin:YES
+                                      fileType:nil
+                                       manager:fileManager];
+    if ([fileManager fileExistsAtPath:path]) {
+        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
+        [handler reply:path];
+        return;
+    }
+    
+    PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
+    [options setNetworkAccessAllowed:YES];
+    
+    __block double lastProgress = 0.0;
+    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+    [options setProgressHandler:^(double progress) {
+        lastProgress = progress;
+        if (progress != 1) {
+            [self notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+        }
+    }];
+    
+    PHAssetResourceManager *resourceManager = PHAssetResourceManager.defaultManager;
+    NSURL *fileUrl = [NSURL fileURLWithPath:path];
+    [resourceManager writeDataForAssetResource:imageResource
+                                        toFile:fileUrl
+                                       options:options
+                             completionHandler:^(NSError *_Nullable error) {
+        if (error) {
+            [self notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            [handler replyError:error];
+        } else {
+            [handler reply:path];
+            [self notifySuccess:progressHandler];
+        }
+    }];
+}
+
 - (void)fetchFullSizeImageFile:(PHAsset *)asset
                  resultHandler:(PMResultHandler *)handler
                progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
@@ -1522,6 +1666,39 @@
     }
     return nil;
 }
+
+- (BOOL)getHasAdjustmentsAsyncWithAssetId:(NSString *)assetId {
+    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
+
+    // hasAdjustments only available on iOS and macOS 15.0+
+    if (@available(iOS 15.0, macOS 15.0, *)) {
+        if (asset.hasAdjustments != nil) {
+            return YES;
+        } else {
+            return NO;
+        }
+
+    } else {
+        // Fallback for earlier versions of iOS and macOS.
+        // This method is very inefficient as it requires fetching all the resources for the asset and iterating through each of them.
+        // Older devices (generally slower) that can't upgrade to iOS/macOS 15.0+ (e.g. iPhone 5s) may face performance issues.
+        // https://developer.apple.com/documentation/photos/phadjustmentdata
+
+        NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:asset];
+
+        for (PHAssetResource *res in resources) {
+            if (res.type == PHAssetResourceTypeAdjustmentData) {
+                return YES;
+            }
+        }
+    
+        return NO;
+
+    }
+  
+}
+
 
 - (void)getMediaUrl:(NSString *)assetId
       resultHandler:(PMResultHandler *)handler

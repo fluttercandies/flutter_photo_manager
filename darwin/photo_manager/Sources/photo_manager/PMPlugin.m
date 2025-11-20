@@ -355,6 +355,8 @@
     if ([method isEqualToString:@"getAssetListPaged"] ||
         [method isEqualToString:@"getAssetListRange"] ||
         [method isEqualToString:@"getFullFile"] ||
+        [method isEqualToString:@"getAdjustmentBaseFile"] ||
+        [method isEqualToString:@"getAdjustmentBaseLivePhotoFile"] ||
         [method isEqualToString:@"getMediaUrl"] ||
         [method isEqualToString:@"fetchEntityProperties"]) {
         return QOS_CLASS_USER_INITIATED;
@@ -461,6 +463,24 @@
         [manager getFullSizeFileWithId:assetId
                               isOrigin:isOrigin
                                subtype:subtype
+                              fileType:fileType
+                         resultHandler:handler
+                       progressHandler:progressHandler];
+    } else if ([call.method isEqualToString:@"getAdjustmentBaseFile"]) {
+        NSString *assetId = call.arguments[@"id"];
+        int subtype = [call.arguments[@"subtype"] intValue];
+        AVFileType fileType = [PMConvertUtils convertNumberToAVFileType:[call.arguments[@"darwinFileType"] intValue]];
+        PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:call.arguments];
+        [manager getAdjustmentBaseFileWithId:assetId
+                               subtype:subtype
+                              fileType:fileType
+                         resultHandler:handler
+                       progressHandler:progressHandler];
+    } else if ([call.method isEqualToString:@"getAdjustmentBaseLivePhotoFile"]) {
+        NSString *assetId = call.arguments[@"id"];
+        AVFileType fileType = [PMConvertUtils convertNumberToAVFileType:[call.arguments[@"darwinFileType"] intValue]];
+        PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:call.arguments];
+        [manager getAdjustmentBaseLivePhotosFileWithId:assetId
                               fileType:fileType
                          resultHandler:handler
                        progressHandler:progressHandler];
@@ -609,6 +629,10 @@
         NSString *assetId = call.arguments[@"id"];
         NSString *mimeType = [manager getMimeTypeAsyncWithAssetId:assetId];
         [handler reply:mimeType];
+    } else if ([call.method isEqualToString:@"getHasAdjustmentsAsync"]) {
+        NSString *assetId = call.arguments[@"id"];
+        BOOL hasAdjustments = [manager getHasAdjustmentsAsyncWithAssetId:assetId];
+        [handler reply:@(hasAdjustments)];
     } else if ([@"getMediaUrl" isEqualToString:call.method]) {
         PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:call.arguments];
         [manager getMediaUrl:call.arguments[@"id"]

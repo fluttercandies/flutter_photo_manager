@@ -209,6 +209,43 @@
     return nil;
 }
 
+// As of the writing of this (20/11/2025 - iOS 26.0.1), the resource type 
+// PHAssetResourceTypeAdjustmentBasePhoto and PHAssetResourceTypeAdjustmentBaseVideo return nil.
+// iOS still uses the PHAssetResourceTypePhoto and PHAssetResourceTypeVideo type to store the base adjustment resources.
+// To be compatible with future versions, we first try to get the AdjustmentBase types and if not found, we fallback to Photo/Video types.
+// https://developer.apple.com/documentation/photos/phassetresourcetype
+- (PHAssetResource *)getAdjustmentBaseResource {
+    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:self];
+
+    PHAssetResource *fallbackOriginalResource = nil;
+
+    for (PHAssetResource *res in resources) {        
+
+        if (self.isImage && res.isImage) {            
+            if (res.type == PHAssetResourceTypeAdjustmentBasePhoto) {
+                return res; 
+
+            } else if (res.type == PHAssetResourceTypePhoto) {
+                fallbackOriginalResource = res; 
+            }
+        }
+
+
+        if (self.isVideo && res.isVideo) {            
+            if ( res.type == PHAssetResourceTypeAdjustmentBaseVideo) {
+                return res; 
+
+            } else if (res.type == PHAssetResourceTypeVideo) {
+                fallbackOriginalResource = res; 
+            }
+        }
+    }
+
+    return fallbackOriginalResource;
+    
+}
+
+
 - (void)requestCurrentResourceData:(void (^)(NSData *_Nullable))block {
     PHAssetResource *res = [self getCurrentResource];
     
@@ -256,6 +293,29 @@
         return fullSizePaired ?: paired;
     }
     return nil;
+}
+
+- (PHAssetResource *)getAdjustmentBaseLivePhotosResource {
+    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:self];
+    if (resources.count == 0) {
+        return nil;
+    }
+    if (@available(iOS 9.1, *)) {
+        PHAssetResource *paired;
+        PHAssetResource *adjustmentBasedPaired;
+        for (PHAssetResource *r in resources) {
+            if (r.type == PHAssetResourceTypePairedVideo && !paired) {
+                paired = r;
+                continue;
+            }
+            if (r.type == PHAssetResourceTypeAdjustmentBasePairedVideo && !adjustmentBasedPaired) {
+                adjustmentBasedPaired = r;
+                continue;
+            }
+        }
+        return adjustmentBasedPaired ?: paired;
+    }
+    return nil;    
 }
 
 @end

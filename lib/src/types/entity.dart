@@ -851,6 +851,68 @@ class AssetEntity {
     return file?.readAsBytes();
   }
 
+  /// Obtain the 'adjustment base' of the asset.
+  /// This is the unaltered version of the asset before any edits were applied.
+  ///  * Android: Always null.
+  ///  * iOS/macOS: `PHAssetResource` with type:
+  ///  * TypeAdjustmentBasePhoto || TypePhoto
+  ///  * TypeAdjustmentBaseVideo || TypeVideo
+  Future<File?> getAdjustmentBaseFile({
+    PMProgressHandler? progressHandler,
+    int subtype = 0,
+    PMDarwinAVFileType? darwinFileType,
+    PMCancelToken? cancelToken,
+  }) async {
+
+    if (Platform.operatingSystem != 'ios' &&
+        Platform.operatingSystem != 'macos') {
+      return null;
+    }
+    
+    final String? path = await plugin.getAdjustmentBaseFile(
+      id,
+      progressHandler: progressHandler,
+      subtype: subtype,
+      darwinFileType: darwinFileType,
+      cancelToken: cancelToken,
+    );
+    if (path == null) {
+      return null;
+    }
+    return File(path);
+  }
+
+  /// Obtain the 'adjustment base' of the live photo video paired with the asset.
+  /// This is the unaltered version of the live photo video before any edits were applied.
+  ///  * Android: Always null.
+  ///  * iOS/macOS: `PHAssetResource` with type:
+  ///  * TypeAdjustmentBasePairedVideo || TypePairedVideo
+  Future<File?> getAdjustmentBaseLivePhotoFile({
+    PMProgressHandler? progressHandler,
+    PMDarwinAVFileType? darwinFileType,
+    PMCancelToken? cancelToken,
+  }) async {
+
+    if (Platform.operatingSystem != 'ios' &&
+        Platform.operatingSystem != 'macos') {
+      return null;
+    }
+
+    final String? path = await plugin.getAdjustmentBaseLivePhotoFile(
+      id,
+      progressHandler: progressHandler,
+      darwinFileType: darwinFileType,
+      cancelToken: cancelToken,
+    );
+    if (path == null) {
+      return null;
+    }
+    return File(path);
+  }
+  
+  Future<File?> get adjustmentBaseFile => getAdjustmentBaseFile();
+  Future<File?> get adjustmentBaseLivePhotoFile => getAdjustmentBaseLivePhotoFile();  
+
   /// The orientation of the asset.
   ///  * Android: `MediaStore.MediaColumns.ORIENTATION`,
   ///    could be 0, 90, 180, 270.
@@ -896,6 +958,16 @@ class AssetEntity {
   ///  * [mimeType] which is the synchronized getter of the MIME type.
   ///  * https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_conc/understand_utis_conc.html#//apple_ref/doc/uid/TP40001319-CH202-SW1
   Future<String?> get mimeTypeAsync => plugin.getMimeTypeAsync(this);
+
+
+  /// Whether the asset contains adjustment data (i.e. when the asset is edited).
+  ///  * Android: Always false.
+  ///  * iOS/macOS: `PHAsset.hasAdjustments`.
+  ///
+  /// See also:
+  ///  * https://developer.apple.com/documentation/photos/phasset/hasadjustments
+  ///  * https://developer.apple.com/documentation/photos/phadjustmentdata
+  Future<bool> get hasAdjustmentsAsync => plugin.getHasAdjustmentsAsync(this);
 
   AssetEntity copyWith({
     String? id,

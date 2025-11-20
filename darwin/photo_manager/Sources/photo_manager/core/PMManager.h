@@ -55,6 +55,17 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
                 resultHandler:(PMResultHandler *)handler
               progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
 
+- (void)getAdjustmentBaseFileWithId:(NSString *)assetId
+                      subtype:(int)subtype
+                     fileType:(AVFileType)fileType
+                resultHandler:(PMResultHandler *)handler
+              progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
+
+- (void)getAdjustmentBaseLivePhotosFileWithId:(NSString *)assetId
+                     fileType:(AVFileType)fileType
+                resultHandler:(PMResultHandler *)handler
+              progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;              
+
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type filterOption:(NSObject<PMBaseFilter> *)filterOption;
 
 - (void)deleteWithIds:(NSArray<NSString *> *)ids changedBlock:(ChangeIds)block;
@@ -107,6 +118,7 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
                              fileType:(AVFileType)fileType;
 
 - (NSString*)getMimeTypeAsyncWithAssetId: (NSString *) assetId;
+- (BOOL)getHasAdjustmentsAsyncWithAssetId: (NSString *) assetId;
 
 - (void)getMediaUrl:(NSString *)assetId
       resultHandler:(PMResultHandler *)handler
