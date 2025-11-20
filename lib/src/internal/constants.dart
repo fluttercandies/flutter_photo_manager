@@ -46,6 +46,7 @@ class PMConstants {
   static const String mGetPathRelativePath = 'getPathRelativePath';
   static const String mGetMediaUrl = 'getMediaUrl';
   static const String mGetSubPath = 'getSubPath';
+  static const String mGetParentPath = 'getParentPath';
   static const String mCopyAsset = 'copyAsset';
   static const String mDeleteAlbum = 'deleteAlbum';
   static const String mFavoriteAsset = 'favoriteAsset';

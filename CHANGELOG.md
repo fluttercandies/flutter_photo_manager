@@ -10,6 +10,8 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ### Features
 
+- Add `AssetPathEntity.getParentPathList()` method for iOS/macOS to retrieve parent folders for user-created albums.
+  This enables navigation up the folder hierarchy, allowing users to browse nested album structures.
 - Add `cancelToken` parameter to `AssetEntity.loadFile`.
 - Add `cancelAllRequest` method to `PhotoManager`.
 - The `AssetEntity.getFile` and `AssetEntity.getOriginBytes` methods are public.

@@ -255,6 +255,21 @@ class AssetPathEntity {
     return <AssetPathEntity>[];
   }
 
+  /// Request parent folders for the album.
+  ///
+  /// This method returns a list of parent folders (PHCollectionList) that
+  /// contain the current album or folder. It allows navigation up the
+  /// folder hierarchy for user-created albums and folders.
+  ///
+  /// An empty list will always be returned on Android.
+  /// An empty list will be returned for system albums like "Recent" or "All Photos".
+  Future<List<AssetPathEntity>> getParentPathList() async {
+    if (Platform.isIOS || Platform.isMacOS) {
+      return plugin.getParentPathEntities(this);
+    }
+    return <AssetPathEntity>[];
+  }
+
   /// Obtain a new [AssetPathEntity] from the current one
   /// with refreshed properties.
   Future<AssetPathEntity?> fetchPathProperties({

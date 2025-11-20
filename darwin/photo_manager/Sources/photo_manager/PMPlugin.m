@@ -633,6 +633,17 @@
         NSDictionary *pathData = [PMConvertUtils convertPathToMap:array];
 
         [handler reply:@{@"list": pathData}];
+    } else if ([@"getParentPath" isEqualToString:call.method]) {
+        NSString *galleryId = call.arguments[@"id"];
+        int type = [call.arguments[@"type"] intValue];
+        int albumType = [call.arguments[@"albumType"] intValue];
+        NSDictionary *optionMap = call.arguments[@"option"];
+        NSObject <PMBaseFilter> *option = [PMConvertUtils convertMapToOptionContainer:optionMap];
+
+        NSArray<PMAssetPathEntity *> *array = [manager getParentPathWithId:galleryId type:type albumType:albumType option:option];
+        NSDictionary *pathData = [PMConvertUtils convertPathToMap:array];
+
+        [handler reply:@{@"list": pathData}];
     } else if ([@"copyAsset" isEqualToString:call.method]) {
         NSString *assetId = call.arguments[@"assetId"];
         NSString *galleryId = call.arguments[@"galleryId"];

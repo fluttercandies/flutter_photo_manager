@@ -596,6 +596,29 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     );
   }
 
+  Future<List<AssetPathEntity>> getParentPathEntities(
+    AssetPathEntity pathEntity,
+  ) async {
+    if (PlatformUtils.isOhos) {
+      return <AssetPathEntity>[];
+    }
+    final Map result = await _channel.invokeMethod(
+      PMConstants.mGetParentPath,
+      <String, dynamic>{
+        'id': pathEntity.id,
+        'type': pathEntity.type.value,
+        'albumType': pathEntity.albumType,
+        'option': pathEntity.filterOption?.toMap(),
+      },
+    );
+    final items = result['list'] as Map;
+    return ConvertUtils.convertToPathList(
+      items.cast(),
+      type: pathEntity.type,
+      filterOption: pathEntity.filterOption,
+    );
+  }
+
   Future<AssetEntity> copyAssetToGallery(
     AssetEntity asset,
     AssetPathEntity pathEntity,
