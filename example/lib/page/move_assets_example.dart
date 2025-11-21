@@ -46,7 +46,7 @@ Future<void> moveAssetsToAlbumExample() async {
   //   - "Pictures/MyAlbum"
   //   - "DCIM/Camera"
   //   - "Pictures/Vacation2024"
-  final String targetPath = 'Pictures/MyAlbum';
+  const String targetPath = 'Pictures/MyAlbum';
 
   // Step 4: Move assets with permission
   print('Moving ${assets.length} assets to $targetPath...');
@@ -107,7 +107,7 @@ Future<void> moveSpecificAssetsExample() async {
   );
 
   // Move to a date-specific album
-  final String targetPath = 'Pictures/2024-11-01';
+  const String targetPath = 'Pictures/2024-11-01';
   final bool success = await PhotoManager.editor.android.moveAssetsToPath(
     entities: filteredAssets,
     targetPath: targetPath,

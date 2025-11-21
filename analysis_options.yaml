@@ -29,6 +29,7 @@ linter:
     directives_ordering: true
     prefer_const_constructors: true
     prefer_const_constructors_in_immutables: false
+    prefer_const_declarations: true
     prefer_final_fields: true
     prefer_final_in_for_each: true
     prefer_final_locals: true

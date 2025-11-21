@@ -83,7 +83,7 @@ void main() {
     });
 
     test('PMDarwinPathFilter can be created with iOS 18 subtypes', () {
-      final filter = const PMDarwinPathFilter(
+      const filter = PMDarwinPathFilter(
         type: [PMDarwinAssetCollectionType.smartAlbum],
         subType: [
           PMDarwinAssetCollectionSubtype.smartAlbumHandwriting,
@@ -110,7 +110,7 @@ void main() {
     });
 
     test('PMPathFilter can be created with iOS 18 utilities subtypes', () {
-      final pathFilter = const PMPathFilter(
+      const pathFilter = PMPathFilter(
         darwin: PMDarwinPathFilter(
           type: [PMDarwinAssetCollectionType.smartAlbum],
           subType: [
@@ -149,7 +149,7 @@ void main() {
     });
 
     test('iOS 18 media subtypes can be used in path filter', () {
-      final pathFilter = const PMPathFilter(
+      const pathFilter = PMPathFilter(
         darwin: PMDarwinPathFilter(
           type: [PMDarwinAssetCollectionType.smartAlbum],
           subType: [
