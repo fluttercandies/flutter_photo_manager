@@ -2048,14 +2048,14 @@
     
     // Use dispatch_semaphore to wait for the async call
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    __block NSDictionary<PHLocalIdentifier, PHCloudIdentifierMapping *> *mappings = nil;
+    __block NSDictionary *mappings = nil;
     
     // Must call on main thread
     dispatch_async(dispatch_get_main_queue(), ^{
 #if TARGET_OS_IOS
         if (@available(iOS 15.0, *)) {
             [[PHPhotoLibrary sharedPhotoLibrary] cloudIdentifierMappingsForLocalIdentifiers:localIdentifiers
-                                                                           completionHandler:^(NSDictionary<PHLocalIdentifier, PHCloudIdentifierMapping *> * _Nonnull cloudIdentifierMappings) {
+                                                                           completionHandler:^(NSDictionary * _Nonnull cloudIdentifierMappings) {
                 mappings = cloudIdentifierMappings;
                 dispatch_semaphore_signal(semaphore);
             }];
@@ -2065,7 +2065,7 @@
 #elif TARGET_OS_OSX
         if (@available(macOS 12.0, *)) {
             [[PHPhotoLibrary sharedPhotoLibrary] cloudIdentifierMappingsForLocalIdentifiers:localIdentifiers
-                                                                           completionHandler:^(NSDictionary<PHLocalIdentifier, PHCloudIdentifierMapping *> * _Nonnull cloudIdentifierMappings) {
+                                                                           completionHandler:^(NSDictionary * _Nonnull cloudIdentifierMappings) {
                 mappings = cloudIdentifierMappings;
                 dispatch_semaphore_signal(semaphore);
             }];
@@ -2083,12 +2083,21 @@
     // Convert the mappings to a dictionary
     if (mappings) {
         for (NSString *localId in mappings) {
-            PHCloudIdentifierMapping *mapping = mappings[localId];
-            PHCloudIdentifier *cloudIdentifier = mapping.cloudIdentifier;
-            if (cloudIdentifier && cloudIdentifier.stringValue) {
-                result[localId] = cloudIdentifier.stringValue;
+            id mapping = mappings[localId];
+            // Use runtime method lookup to get cloudIdentifier
+            if ([mapping respondsToSelector:@selector(cloudIdentifier)]) {
+                id cloudIdentifier = [mapping valueForKey:@"cloudIdentifier"];
+                if (cloudIdentifier && [cloudIdentifier respondsToSelector:@selector(stringValue)]) {
+                    NSString *stringValue = [cloudIdentifier valueForKey:@"stringValue"];
+                    if (stringValue) {
+                        result[localId] = stringValue;
+                    } else {
+                        result[localId] = (NSString *)[NSNull null];
+                    }
+                } else {
+                    result[localId] = (NSString *)[NSNull null];
+                }
             } else {
-                // If no cloud identifier, set to NSNull which will become null in Dart
                 result[localId] = (NSString *)[NSNull null];
             }
         }
