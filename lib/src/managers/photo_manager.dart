@@ -5,6 +5,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import '../../platform_utils.dart';
 import '../filter/base_filter.dart';
 import '../filter/path_filter.dart';
 import '../internal/editor.dart';
@@ -298,4 +299,43 @@ class PhotoManager {
 
   /// Cancel all loading.
   static Future<void> cancelAllRequest() => plugin.cancelAllRequest();
+
+  /// Get cloud identifiers for the given local identifiers (iOS 15+ and macOS 12+ only).
+  ///
+  /// This method retrieves cloud identifier mappings for assets with the same
+  /// iCloud account across different devices. Cloud identifiers are stable
+  /// across devices that share the same iCloud Photo Library.
+  ///
+  /// **Important:** This method is only available on iOS 15+ and macOS 12+.
+  /// On other platforms or older versions, an empty map will be returned.
+  ///
+  /// The [localIdentifiers] parameter should contain the [AssetEntity.id] values
+  /// of the assets you want to get cloud identifiers for.
+  ///
+  /// Returns a map where keys are local identifiers and values are cloud identifiers.
+  /// If an asset doesn't have a cloud identifier (e.g., not synced to iCloud),
+  /// the value will be null.
+  ///
+  /// Example:
+  /// ```dart
+  /// final List<AssetEntity> assets = await path.getAssetListPaged(page: 0, size: 10);
+  /// final localIds = assets.map((e) => e.id).toList();
+  /// final cloudIds = await PhotoManager.getCloudIdentifiers(localIds);
+  ///
+  /// for (final asset in assets) {
+  ///   final cloudId = cloudIds[asset.id];
+  ///   print('Local: ${asset.id}, Cloud: $cloudId');
+  /// }
+  /// ```
+  ///
+  /// See also:
+  ///  * https://developer.apple.com/documentation/photokit/phphotolibrary/3750728-cloudidentifiermappingsforlocali
+  static Future<Map<String, String?>> getCloudIdentifiers(
+    List<String> localIdentifiers,
+  ) async {
+    if (PlatformUtils.isIOS || PlatformUtils.isMacOS) {
+      return plugin.iosGetCloudIdentifiers(localIdentifiers);
+    }
+    return <String, String?>{};
+  }
 }

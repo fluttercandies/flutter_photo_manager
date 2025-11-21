@@ -467,6 +467,41 @@ When the account requires to re-enter the password to verify, iCloud files that 
 locally available are not allowed to be fetched. The photo library will throws
 `CloudPhotoLibraryErrorDomain` in this circumstance.
 
+#### Get cloud identifiers for cross-device asset identification (iOS 15+ / macOS 12+)
+
+> [!NOTE]
+> This feature is only available on iOS 15+ and macOS 12+.
+
+When using iCloud Photo Library, the same asset can appear on multiple devices
+but with different local identifiers. Cloud identifiers provide a stable way
+to identify the same asset across devices that share the same iCloud account.
+
+```dart
+// Get cloud identifiers for multiple assets efficiently
+final List<AssetEntity> assets = await path.getAssetListPaged(page: 0, size: 10);
+final localIds = assets.map((e) => e.id).toList();
+final cloudIds = await PhotoManager.getCloudIdentifiers(localIds);
+
+for (final asset in assets) {
+  final cloudId = cloudIds[asset.id];
+  if (cloudId != null) {
+    print('Asset ${asset.id} has cloud ID: $cloudId');
+    // Store cloudId to identify the same asset on other devices
+  }
+}
+
+// Or get cloud identifier for a single asset
+final cloudId = await asset.cloudIdentifier;
+```
+
+Cloud identifiers are useful when you need to:
+- Sync user preferences (e.g., favorites, edits) across devices
+- Track which assets a user has already processed
+- Match assets between devices with the same iCloud Photo Library
+
+Note that assets not synced to iCloud or on devices not signed into iCloud
+will have null cloud identifiers.
+
 #### Cancel loading (Since 3.8.0)
 
 > [!NOTE]

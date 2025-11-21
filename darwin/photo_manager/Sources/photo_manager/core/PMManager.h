@@ -143,4 +143,7 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 // cancelAllRequest
 - (void)cancelAllRequest;
+
+// getCloudIdentifiers
+- (NSDictionary<NSString *, NSString *> *)getCloudIdentifiersForLocalIdentifiers:(NSArray<NSString *> *)localIdentifiers;
 @end

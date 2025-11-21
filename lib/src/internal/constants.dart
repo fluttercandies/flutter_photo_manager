@@ -69,6 +69,7 @@ class PMConstants {
   static const String mCancelRequestWithCancelToken =
       'cancelRequestWithCancelToken';
   static const String mCancelAllRequest = 'cancelAllRequest';
+  static const String mGetCloudIdentifiers = 'getCloudIdentifiers';
 
   /// Constant value.
   static const int vDefaultThumbnailSize = 150;

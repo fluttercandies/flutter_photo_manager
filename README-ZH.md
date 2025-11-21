@@ -431,6 +431,41 @@ iCloud 文件只能在设备上的 Apple ID 正常登录时获取。
 当账号要求重新输入密码验证时，未缓存在本地的 iCloud 文件将无法访问，
 此时相关方法会抛出 `CloudPhotoLibraryErrorDomain` 错误。
 
+#### 获取云标识符用于跨设备资源识别 (iOS 15+ / macOS 12+)
+
+> [!NOTE]
+> 此功能仅在 iOS 15+ 和 macOS 12+ 上可用。
+
+当使用 iCloud 照片图库时，相同的资源可能会出现在多个设备上，
+但具有不同的本地标识符。云标识符提供了一种稳定的方式来识别
+共享同一 iCloud 账户的设备上的相同资源。
+
+```dart
+// 批量高效获取多个资源的云标识符
+final List<AssetEntity> assets = await path.getAssetListPaged(page: 0, size: 10);
+final localIds = assets.map((e) => e.id).toList();
+final cloudIds = await PhotoManager.getCloudIdentifiers(localIds);
+
+for (final asset in assets) {
+  final cloudId = cloudIds[asset.id];
+  if (cloudId != null) {
+    print('资源 ${asset.id} 的云标识符为: $cloudId');
+    // 存储 cloudId 以便在其他设备上识别相同的资源
+  }
+}
+
+// 或者获取单个资源的云标识符
+final cloudId = await asset.cloudIdentifier;
+```
+
+云标识符在以下场景中很有用：
+- 在多个设备之间同步用户偏好（例如，收藏、编辑）
+- 跟踪用户已处理过的资源
+- 在使用相同 iCloud 照片图库的设备之间匹配资源
+
+请注意，未同步到 iCloud 或未登录 iCloud 的设备上的资源
+将具有 null 值的云标识符。
+
 #### 取消加载 (3.8.0 新增)
 
 > [!NOTE]
