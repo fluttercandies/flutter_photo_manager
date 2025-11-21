@@ -8,6 +8,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+*None*.
+
+## 3.8.0
+
 ### Features
 
 - Add `cancelToken` parameter to `AssetEntity.loadFile`.
