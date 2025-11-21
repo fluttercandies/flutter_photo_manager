@@ -369,7 +369,7 @@ object AndroidQDBUtils : IDBUtils {
         }
 
         val insertUri = MediaStoreUtils.getInsertUri(mediaType)
-        val relativePath = getRelativePath(context, galleryId)
+        val relativePath = getPathRelativePath(context, galleryId)
         val cv = ContentValues().apply {
             for (key in copyKeys) {
                 put(key, cursor.getString(key))
@@ -405,7 +405,7 @@ object AndroidQDBUtils : IDBUtils {
         }
 
         val cr = context.contentResolver
-        val targetPath = getRelativePath(context, galleryId)
+        val targetPath = getPathRelativePath(context, galleryId)
         val contentValues = ContentValues().apply {
             put(RELATIVE_PATH, targetPath)
         }
@@ -454,7 +454,7 @@ object AndroidQDBUtils : IDBUtils {
                     val exists = try {
                         cr.openInputStream(uri)?.close()
                         true
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         false
                     }
                     if (!exists) {
@@ -483,9 +483,11 @@ object AndroidQDBUtils : IDBUtils {
         return true
     }
 
-    private fun getRelativePath(context: Context, galleryId: String): String? {
-        val cr = context.contentResolver
-        val cursor = cr.logQuery(
+    override fun getPathRelativePath(context: Context, galleryId: String): String? {
+        if (galleryId == PhotoManager.ALL_ID) {
+            return null
+        }
+        val cursor = context.contentResolver.logQuery(
             allUri,
             arrayOf(BUCKET_ID, RELATIVE_PATH),
             "$BUCKET_ID = ?",

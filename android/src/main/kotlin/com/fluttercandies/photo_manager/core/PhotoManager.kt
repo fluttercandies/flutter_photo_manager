@@ -200,7 +200,17 @@ class PhotoManager(private val context: Context) {
         longitude: Double?,
         creationDate: Long?
     ): AssetEntity {
-        return dbUtils.saveImage(context, filePath, title, description, relativePath, orientation, latitude, longitude, creationDate)
+        return dbUtils.saveImage(
+            context,
+            filePath,
+            title,
+            description,
+            relativePath,
+            orientation,
+            latitude,
+            longitude,
+            creationDate
+        )
     }
 
     fun saveVideo(
@@ -213,7 +223,17 @@ class PhotoManager(private val context: Context) {
         longitude: Double?,
         creationDate: Long?
     ): AssetEntity {
-        return dbUtils.saveVideo(context, filePath, title, desc, relativePath, orientation, latitude, longitude, creationDate)
+        return dbUtils.saveVideo(
+            context,
+            filePath,
+            title,
+            desc,
+            relativePath,
+            orientation,
+            latitude,
+            longitude,
+            creationDate
+        )
     }
 
     fun assetExists(id: String, resultHandler: ResultHandler) {
@@ -222,13 +242,16 @@ class PhotoManager(private val context: Context) {
     }
 
     fun getLocation(id: String): Map<String, Double> {
-        val exifInfo = dbUtils.getExif(context, id)
-        val latLong = exifInfo?.latLong
+        val latLong = dbUtils.getLatLong(context, id)
         return if (latLong == null) {
             mapOf("lat" to 0.0, "lng" to 0.0)
         } else {
             mapOf("lat" to latLong[0], "lng" to latLong[1])
         }
+    }
+
+    fun getPathRelativePath(galleryId: String): String? {
+        return dbUtils.getPathRelativePath(context, galleryId)
     }
 
     fun getMediaUri(id: Long, type: Int): String {
@@ -241,7 +264,11 @@ class PhotoManager(private val context: Context) {
             resultHandler.reply(ConvertUtils.convertAsset(assetEntity))
         } catch (e: Exception) {
             LogUtils.error(e)
-            resultHandler.reply(null)
+            resultHandler.replyError(
+                "copyAsset",
+                "Failed to copy asset $assetId to gallery $galleryId",
+                e
+            )
         }
     }
 
@@ -251,7 +278,11 @@ class PhotoManager(private val context: Context) {
             resultHandler.reply(ConvertUtils.convertAsset(assetEntity))
         } catch (e: Exception) {
             LogUtils.error(e)
-            resultHandler.reply(null)
+            resultHandler.replyError(
+                "moveAsset",
+                "Failed to move asset $assetId to album $albumId",
+                e
+            )
         }
     }
 
