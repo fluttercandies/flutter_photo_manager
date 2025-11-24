@@ -8,7 +8,13 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None*.
+**Features**
+
+- Add `getCloudIdentifiers` method to `PhotoManager` for iOS 15+ and macOS 12+.
+  - Retrieves cloud identifiers for assets that are stable across devices with the same iCloud Photo Library.
+  - Returns a map of local identifiers to their corresponding cloud identifiers.
+  - Useful for identifying the same asset across different devices sharing an iCloud account.
+- Add `cloudIdentifier` getter to `AssetEntity` for convenient access to a single asset's cloud identifier.
 
 ## 3.8.0
 
