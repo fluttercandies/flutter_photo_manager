@@ -13,7 +13,9 @@ void main() {
       equals(true),
     );
     expect(
-      permission.hasAccess == (permission == PermissionState.authorized || permission == PermissionState.limited),
+      permission.hasAccess ==
+          (permission == PermissionState.authorized ||
+              permission == PermissionState.limited),
       equals(true),
     );
     expect(
