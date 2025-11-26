@@ -8,7 +8,9 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None*.
+**Fixes**
+
+- Fix SQL syntax error on Android when querying assets with pagination. This caused "Failed to obtain the cursor" errors on some devices (e.g., Huawei, realme) due to missing space between ORDER BY clause and LIMIT clause.
 
 ## 3.8.0
 

@@ -641,8 +641,11 @@ interface IDBUtils {
     fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption?): String? {
         val builder = StringBuilder()
         if (filterOption != null) {
-            builder.append(filterOption.orderByCondString())
-            builder.append("")
+            val orderBy = filterOption.orderByCondString()
+            if (orderBy != null) {
+                builder.append(orderBy)
+                builder.append(" ")
+            }
         }
         builder.append("LIMIT $pageSize OFFSET $start")
         return builder.toString()
