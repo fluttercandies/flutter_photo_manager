@@ -107,12 +107,12 @@ jobs:
           cache: true
       - run: flutter doctor -v
       - run: flutter pub get
-      - name: Run Android unit tests
-        run: ./gradlew test
-        working-directory: ${{ github.workspace }}/example/android
       - run: flutter build apk --release
         name: Build apk
         working-directory: ${{ github.workspace }}/example
+      - name: Run Android unit tests
+        run: ./gradlew photo_manager:test
+        working-directory: ${{ github.workspace }}/example/android
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         id: apk
