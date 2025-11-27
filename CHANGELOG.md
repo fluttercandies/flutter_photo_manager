@@ -6,7 +6,7 @@ that can be found in the LICENSE file. -->
 
 To know more about breaking changes, see the [Migration Guide][].
 
-## Unreleased
+## 3.8.1
 
 **Fixes**
 
