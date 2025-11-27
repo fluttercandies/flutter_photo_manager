@@ -8,6 +8,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+*None.*
+
+## 3.8.1
+
 **Fixes**
 
 - Fix SQL syntax error on Android when querying assets with pagination. This caused "Failed to obtain the cursor" errors on some devices (e.g., Huawei, realme) due to missing space between ORDER BY clause and LIMIT clause.
@@ -286,9 +290,6 @@ See the [Migration Guide][] for details of breaking changes.
 - Dispatch channel calls in main thread on Darwin.
 - Fix `presentLimit` did not finish on Android. (#1052)
 - Fix `requestPermissionExtend` returns the incorrect status on Android API 34.
-
-<details>
-  <summary>2.x</summary>
 
 ## 2.8.1
 
@@ -614,11 +615,6 @@ See the [Migration Guide][] for details of breaking changes.
 - Fix `PhotoManager.editor.copyAssetToPath` returns `null`. (#619)
 - Fix sort order issues on iOS/macOS. (#603, #655)
 
-</details>
-
-<details>
-  <summary>1.x</summary>
-
 ## 1.3.10
 
 **Improvements**
@@ -851,11 +847,6 @@ and applied multiple **Fixes** which make this plugin as the most solid ever.
 
 - Migrate to null safety.
 - Correct type in `PMRequestState` .
-
-</details>
-
-<details>
-  <summary>0.x</summary>
 
 ## 0.6.0
 
@@ -1178,7 +1169,5 @@ and applied multiple **Fixes** which make this plugin as the most solid ever.
 First version.
 
 - API for photo.
-
-</details>
 
 [Migration Guide]: MIGRATION_GUIDE.md
