@@ -8,6 +8,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+*None.*
+
+## 3.8.2
+
 **Fixes**
 
 - Fix type error when calling `presentLimited` due to map type inference issue with `putIfAbsent`.
