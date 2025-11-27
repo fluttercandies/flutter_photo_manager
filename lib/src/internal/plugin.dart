@@ -39,11 +39,14 @@ class PMMethodChannel extends MethodChannel {
     if (arguments is! Map) {
       return super.invokeMethod<T>(method, arguments);
     }
-    arguments.putIfAbsent(
+    // Cast to Map<String, dynamic> to avoid type mismatch when the original map
+    // has a narrow value type (e.g., Map<String, int>)
+    final Map<String, dynamic> args = Map<String, dynamic>.from(arguments);
+    args.putIfAbsent(
       PMConstants.cancelTokenKey,
       () => PMCancelToken().key,
     );
-    return super.invokeMethod<T>(method, arguments);
+    return super.invokeMethod<T>(method, args);
   }
 }
 
