@@ -110,6 +110,9 @@ jobs:
       - run: flutter build apk --release
         name: Build apk
         working-directory: ${{ github.workspace }}/example
+      - name: Run Android unit tests
+        run: ./gradlew photo_manager:test
+        working-directory: ${{ github.workspace }}/example/android
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         id: apk
