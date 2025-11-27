@@ -8,7 +8,13 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+**Features**
+
+- Add `openAndroidPhotoPicker` method to open Android's native photo picker without requiring READ_MEDIA_IMAGES or READ_MEDIA_VIDEO permissions.
+  - Uses `MediaStore.ACTION_PICK_IMAGES` on Android 13+ (API 33+)
+  - Falls back to `Intent.ACTION_OPEN_DOCUMENT` on older Android versions
+  - Supports single and multiple selection via `maxCount` parameter
+  - Supports filtering by media type via `type` parameter
 
 ## 3.8.2
 

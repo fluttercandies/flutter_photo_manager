@@ -63,6 +63,8 @@ class PMConstants {
   static const String mMoveAssetsToPath = 'moveAssetsToPath';
   static const String mColumnNames = 'getColumnNames';
 
+  static const String mOpenPhotoPicker = 'openPhotoPicker';
+
   static const String mGetAssetCount = 'getAssetCount';
   static const String mGetAssetsByRange = 'getAssetsByRange';
 

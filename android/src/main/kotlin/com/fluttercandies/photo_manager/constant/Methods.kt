@@ -23,6 +23,7 @@ class Methods {
                 releaseMemoryCache,
                 ignorePermissionCheck,
                 getPermissionState,
+                openPhotoPicker,
             )
         }
         // Not need permission methods end
@@ -88,6 +89,7 @@ class Methods {
         const val moveAssetsToPath = "moveAssetsToPath"
         const val removeNoExistsAssets = "removeNoExistsAssets"
         const val getColumnNames = "getColumnNames"
+        const val openPhotoPicker = "openPhotoPicker"
 
         private val needMediaLocationMethods = arrayOf(
             getLatLng,

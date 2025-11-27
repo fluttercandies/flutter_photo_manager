@@ -60,6 +60,7 @@ class PhotoManagerPlugin(
     val deleteManager = PhotoManagerDeleteManager(applicationContext, activity)
     val writeManager = PhotoManagerWriteManager(applicationContext, activity)
     val favoriteManager = PhotoManagerFavoriteManager(applicationContext)
+    val pickerManager = PhotoManagerPickerManager(applicationContext, activity)
 
     fun bindActivity(activity: Activity?) {
         this.activity = activity
@@ -67,6 +68,7 @@ class PhotoManagerPlugin(
         deleteManager.bindActivity(activity)
         writeManager.bindActivity(activity)
         favoriteManager.bindActivity(activity)
+        pickerManager.bindActivity(activity)
     }
 
     private val notifyChannel = PhotoManagerNotifyChannel(
@@ -335,6 +337,12 @@ class PhotoManagerPlugin(
                 permissionsUtils.getAuthValue(requestType, mediaLocation).let {
                     resultHandler.reply(it.value)
                 }
+            }
+
+            Methods.openPhotoPicker -> {
+                val requestType = call.argument<Int>("type") ?: 3 // Default to both images and videos
+                val maxCount = call.argument<Int>("maxCount") ?: 1
+                pickerManager.openPhotoPicker(requestType, maxCount, resultHandler)
             }
         }
     }

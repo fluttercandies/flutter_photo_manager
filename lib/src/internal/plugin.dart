@@ -977,6 +977,67 @@ mixin AndroidPlugin on BasePlugin {
     }
     return <String>[];
   }
+
+  /// Opens the Android native photo picker to select photos/videos.
+  ///
+  /// This method uses Android's native photo picker API which does NOT require
+  /// READ_MEDIA_IMAGES or READ_MEDIA_VIDEO permissions. This helps avoid
+  /// Google Play app rejections for apps that don't need full media library access.
+  ///
+  /// On Android 13+ (API 33+), uses `MediaStore.ACTION_PICK_IMAGES`.
+  /// On older Android versions, falls back to `Intent.ACTION_OPEN_DOCUMENT`.
+  ///
+  /// [type] specifies what type of media can be picked:
+  ///   - [RequestType.image] for images only
+  ///   - [RequestType.video] for videos only
+  ///   - [RequestType.common] for both images and videos (default)
+  ///
+  /// [maxCount] limits how many items can be selected:
+  ///   - Use 1 for single selection
+  ///   - Use values > 1 for multiple selection
+  ///   - On Android 13+, there's a system limit (usually 100)
+  ///
+  /// Returns a list of [AssetEntity] objects representing the picked assets.
+  /// Returns an empty list if the user cancels the picker.
+  ///
+  /// Note: The returned [AssetEntity] objects have limited metadata compared
+  /// to assets obtained through the regular permission-based API. Some
+  /// properties may be missing or have default values.
+  ///
+  /// Throws [UnsupportedError] on non-Android platforms.
+  ///
+  /// Example:
+  /// ```dart
+  /// // Pick a single image
+  /// final assets = await PhotoManager.plugin.openAndroidPhotoPicker(
+  ///   type: RequestType.image,
+  ///   maxCount: 1,
+  /// );
+  ///
+  /// // Pick up to 10 images or videos
+  /// final assets = await PhotoManager.plugin.openAndroidPhotoPicker(
+  ///   type: RequestType.common,
+  ///   maxCount: 10,
+  /// );
+  /// ```
+  Future<List<AssetEntity>> openAndroidPhotoPicker({
+    RequestType type = RequestType.common,
+    int maxCount = 1,
+  }) async {
+    if (!Platform.isAndroid) {
+      throw UnsupportedError(
+        'openAndroidPhotoPicker is only available on Android.',
+      );
+    }
+    final Map result = await _channel.invokeMethod(
+      PMConstants.mOpenPhotoPicker,
+      <String, dynamic>{
+        'type': type.value,
+        'maxCount': maxCount,
+      },
+    );
+    return ConvertUtils.convertToAssetList(result.cast<String, dynamic>());
+  }
 }
 
 mixin OhosPlugin on BasePlugin {
