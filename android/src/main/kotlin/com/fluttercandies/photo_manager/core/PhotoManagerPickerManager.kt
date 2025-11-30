@@ -53,17 +53,22 @@ class PhotoManagerPickerManager(
             return false
         }
 
-        if (resultCode == Activity.RESULT_OK && data != null) {
-            handlePickerResult(data)
-        } else {
-            // User cancelled or no result
-            pickerHandler?.reply(mapOf("data" to emptyList<Map<String, Any?>>()))
+        val handler = pickerHandler
+        if (handler == null) {
+            return false
         }
         pickerHandler = null
+
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            handlePickerResult(data, handler)
+        } else {
+            // User cancelled or no result
+            handler.reply(mapOf("data" to emptyList<Map<String, Any?>>()))
+        }
         return true
     }
 
-    private fun handlePickerResult(data: Intent) {
+    private fun handlePickerResult(data: Intent, handler: ResultHandler) {
         PhotoManagerPlugin.runOnBackground {
             try {
                 val uris = mutableListOf<Uri>()
@@ -90,10 +95,10 @@ class PhotoManagerPickerManager(
                 }
 
                 val result = ConvertUtils.convertAssets(assets)
-                pickerHandler?.reply(result)
+                handler.reply(result)
             } catch (e: Exception) {
                 LogUtils.error("Failed to handle picker result", e)
-                pickerHandler?.replyError(
+                handler.replyError(
                     "PICKER_ERROR",
                     "Failed to process picked files: ${e.message}"
                 )
