@@ -70,7 +70,6 @@ class PermissionsUtils {
      *
      * @param applicationContext [Application.getApplicationContext]
      * @param requestType type of request, see [com.fluttercandies.photo_manager.core.utils.RequestTypeUtils]
-     * @param permissions A mutable list of permission to request, the method will be modified in the method.
      * @param mediaLocation Whether to request media location permission.
      *
      * @return 返回 [PermissionsUtils] 自身，进行链式调用
@@ -116,7 +115,7 @@ class PermissionsUtils {
         permissions: Array<String>,
         grantResults: IntArray
     ): PermissionsUtils {
-        if (requestCode == PermissionDelegate.requestCode || requestCode == PermissionDelegate.limitedRequestCode) {
+        if (requestCode == PermissionDelegate.CODE_REQUEST || requestCode == PermissionDelegate.CODE_REQUEST_LIMITED) {
             for (i in permissions.indices) {
                 LogUtils.info("Returned permissions: " + permissions[i])
                 if (grantResults[i] == PackageManager.PERMISSION_DENIED) {

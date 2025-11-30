@@ -10,6 +10,7 @@ import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
 import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
+import com.fluttercandies.photo_manager.extension.*
 import java.io.File
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -294,7 +295,7 @@ object DBUtils : IDBUtils {
             MediaStore.MediaColumns.WIDTH,
             MediaStore.MediaColumns.HEIGHT
         )
-        val mediaType = convertTypeToMediaType(asset.type)
+        val mediaType = MediaStoreUtils.convertTypeToMediaType(asset.type)
         if (mediaType != MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO) {
             copyKeys.add(MediaStore.Video.VideoColumns.DESCRIPTION)
         }

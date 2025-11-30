@@ -148,6 +148,7 @@ class PhotoManagerWriteManager(val context: Context, private var activity: Activ
      * Perform a generic update operation after permission is granted
      * This can be extended for other types of modifications
      */
+    @Suppress("unused")
     private fun performUpdate(uris: List<Uri>, updateData: String): Boolean {
         // Placeholder for generic update operations
         // Can be extended based on specific needs
@@ -163,6 +164,7 @@ class PhotoManagerWriteManager(val context: Context, private var activity: Activ
      * @param resultHandler Callback with result (true if permission granted, false otherwise)
      */
     @RequiresApi(Build.VERSION_CODES.R)
+    @Suppress("unused")
     fun requestWritePermission(uris: List<Uri>, resultHandler: ResultHandler) {
         if (activity == null) {
             LogUtils.error("Activity is null, cannot request write permission")

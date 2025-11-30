@@ -93,7 +93,7 @@ class PhotoManager(private val context: Context) {
             val asset = dbUtils.getAssetEntity(context, id)
             if (asset == null) {
                 resultHandler.replyError("201", "Failed to find the asset $id")
-                return;
+                return
             }
             ThumbnailUtil.getThumbnail(
                 context,
@@ -116,7 +116,7 @@ class PhotoManager(private val context: Context) {
         val asset = dbUtils.getAssetEntity(context, id)
         if (asset == null) {
             resultHandler.replyError("202", "Failed to find the asset $id")
-            return;
+            return
         }
         try {
             val byteArray = dbUtils.getOriginBytes(context, asset, needLocationPermission)

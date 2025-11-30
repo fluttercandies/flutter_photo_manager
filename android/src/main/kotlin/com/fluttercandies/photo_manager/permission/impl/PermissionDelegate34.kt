@@ -8,7 +8,6 @@ import com.fluttercandies.photo_manager.core.entity.PermissionResult
 import com.fluttercandies.photo_manager.core.utils.RequestTypeUtils
 import com.fluttercandies.photo_manager.permission.PermissionDelegate
 import com.fluttercandies.photo_manager.permission.PermissionsUtils
-import com.fluttercandies.photo_manager.util.LogUtils
 import com.fluttercandies.photo_manager.util.ResultHandler
 
 @RequiresApi(34)
@@ -104,7 +103,7 @@ class PermissionDelegate34 : PermissionDelegate() {
         grantedPermissionsList: MutableList<String>,
         requestCode: Int
     ) {
-        if (requestCode == limitedRequestCode) {
+        if (requestCode == CODE_REQUEST_LIMITED) {
             val handler = resultHandler ?: return
             resultHandler = null
             handler.reply(1)
@@ -164,7 +163,7 @@ class PermissionDelegate34 : PermissionDelegate() {
             permissions.add(mediaVisualUserSelected)
         }
 
-        requestPermission(permissionsUtils, permissions, limitedRequestCode)
+        requestPermission(permissionsUtils, permissions, CODE_REQUEST_LIMITED)
     }
 
     override fun getAuthValue(
