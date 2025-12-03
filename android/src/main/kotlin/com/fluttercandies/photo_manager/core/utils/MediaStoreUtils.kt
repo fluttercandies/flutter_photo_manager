@@ -26,4 +26,13 @@ object MediaStoreUtils {
             else -> 0
         }
     }
+
+    fun convertMediaTypeToType(mediaType: Int): Int {
+        return when (mediaType) {
+            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE -> 1
+            MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> 2
+            MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO -> 3
+            else -> 0
+        }
+    }
 }

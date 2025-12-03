@@ -3,15 +3,15 @@ package com.fluttercandies.photo_manager.core.utils
 import android.provider.MediaStore
 
 object RequestTypeUtils {
-    private const val typeImage = 1
-    private const val typeVideo = 1.shl(1)
-    private const val typeAudio = 1.shl(2)
+    private const val TYPE_IMAGE = 1
+    private const val TYPE_VIDEO = 1.shl(1)
+    private const val TYPE_AUDIO = 1.shl(2)
 
-    fun containsImage(type: Int): Boolean = checkType(type, typeImage)
+    fun containsImage(type: Int): Boolean = checkType(type, TYPE_IMAGE)
 
-    fun containsVideo(type: Int): Boolean = checkType(type, typeVideo)
+    fun containsVideo(type: Int): Boolean = checkType(type, TYPE_VIDEO)
 
-    fun containsAudio(type: Int): Boolean = checkType(type, typeAudio)
+    fun containsAudio(type: Int): Boolean = checkType(type, TYPE_AUDIO)
 
     private fun checkType(type: Int, targetType: Int): Boolean {
         return type and targetType == targetType

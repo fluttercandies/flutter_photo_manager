@@ -11,7 +11,7 @@ object VideoUtils {
         mediaPlayer.setOnErrorListener { _, _, _ -> true }
         try {
             mediaPlayer.prepare()
-        } catch (e: Throwable) {
+        } catch (_: Throwable) {
             mediaPlayer.release()
             return VideoInfo(null, null, null)
         }

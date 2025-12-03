@@ -25,7 +25,7 @@ abstract class PermissionDelegate {
     protected fun requestPermission(
         permissionsUtils: PermissionsUtils,
         permission: MutableList<String>,
-        requestCode: Int = PermissionDelegate.requestCode
+        requestCode: Int = PermissionDelegate.CODE_REQUEST
     ) {
         val activity = permissionsUtils.getActivity()
             ?: throw NullPointerException("Activity for the permission request is not exist.")
@@ -113,13 +113,13 @@ abstract class PermissionDelegate {
     abstract fun havePermissions(context: Context, requestType: Int): Boolean
 
     /**
-     * Check if the [mediaLocation] is granted for the user and it is in the manifest.
+     * Check if the media location permission is granted for the user and it is in the manifest.
      */
     abstract fun haveMediaLocation(context: Context): Boolean
 
     companion object {
-        const val requestCode = 3001
-        const val limitedRequestCode = 3002
+        const val CODE_REQUEST = 3001
+        const val CODE_REQUEST_LIMITED = 3002
 
         /**
          * Create a [PermissionDelegate] by the sdk version.
