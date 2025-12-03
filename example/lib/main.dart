@@ -157,10 +157,11 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator.adaptive());
     }
-    if (_path == null) {
-      return const Center(child: Text('Request paths first.'));
+    final entities = _entities;
+    if (entities == null) {
+      return const Center(child: Text('Click buttons to request assets.'));
     }
-    if (_entities?.isNotEmpty != true) {
+    if (entities.isEmpty) {
       return const Center(child: Text('No assets found on this device.'));
     }
     return GridView.custom(
@@ -169,19 +170,19 @@ class _SimpleExamplePageState extends State<_SimpleExamplePage> {
       ),
       childrenDelegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
-          if (index == _entities!.length - 8 &&
+          if (index == entities.length - 8 &&
               !_isLoadingMore &&
               _hasMoreToLoad) {
             _loadMoreAsset();
           }
-          final AssetEntity entity = _entities![index];
+          final AssetEntity entity = entities[index];
           return ImageItemWidget(
             key: ValueKey<int>(index),
             entity: entity,
             option: const ThumbnailOption(size: ThumbnailSize.square(200)),
           );
         },
-        childCount: _entities!.length,
+        childCount: entities.length,
         findChildIndexCallback: (Key key) {
           // Re-use elements.
           if (key is ValueKey<int>) {

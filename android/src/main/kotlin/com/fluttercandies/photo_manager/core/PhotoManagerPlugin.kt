@@ -339,14 +339,6 @@ class PhotoManagerPlugin(
         }
     }
 
-    private fun replyPermissionError(resultHandler: ResultHandler) {
-        resultHandler.replyError(
-            "Request for permission failed.",
-            "User denied permission.",
-            null
-        )
-    }
-
     private fun handleMethodResult(
         resultHandler: ResultHandler,
         needLocationPermission: Boolean
@@ -598,7 +590,7 @@ class PhotoManagerPlugin(
                         val assetIds = call.argument<List<String>>("assetIds")!!
                         val targetPath = call.argument<String>("targetPath")!!
                         
-                        val uris = assetIds.mapNotNull { photoManager.getUri(it) }
+                        val uris = assetIds.map { photoManager.getUri(it) }
                         if (uris.isEmpty()) {
                             resultHandler.replyError("No valid URIs found for the given asset IDs")
                             return

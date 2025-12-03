@@ -14,6 +14,7 @@ import com.fluttercandies.photo_manager.core.utils.IDBUtils
 import com.fluttercandies.photo_manager.util.LogUtils
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
+import androidx.core.net.toUri
 
 @Suppress("Range")
 class PhotoManagerNotifyChannel(
@@ -94,7 +95,7 @@ class PhotoManagerNotifyChannel(
         val type: Int,
         handler: Handler = Handler(Looper.getMainLooper())
     ) : ContentObserver(handler) {
-        var uri: Uri = Uri.parse("content://${MediaStore.AUTHORITY}")
+        var uri: Uri = "content://${MediaStore.AUTHORITY}".toUri()
 
         val context: Context
             get() = applicationContext

@@ -17,6 +17,7 @@ import com.fluttercandies.photo_manager.core.cache.ScopedCache
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
 import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
+import com.fluttercandies.photo_manager.extension.*
 import com.fluttercandies.photo_manager.util.LogUtils
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -351,7 +352,7 @@ object AndroidQDBUtils : IDBUtils {
             ORIENTATION
         )
 
-        val mediaType = convertTypeToMediaType(asset.type)
+        val mediaType = MediaStoreUtils.convertTypeToMediaType(asset.type)
         if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
             copyKeys.add(MediaStore.Video.VideoColumns.DESCRIPTION)
         }
@@ -449,7 +450,7 @@ object AndroidQDBUtils : IDBUtils {
                     val id = it.getString(BaseColumns._ID)
                     val mediaType = it.getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
                     val path = it.getStringOrNull(DATA)
-                    val type = getTypeFromMediaType(mediaType)
+                    val type = MediaStoreUtils.convertMediaTypeToType(mediaType)
                     val uri = getUri(id.toLong(), type)
                     val exists = try {
                         cr.openInputStream(uri)?.close()

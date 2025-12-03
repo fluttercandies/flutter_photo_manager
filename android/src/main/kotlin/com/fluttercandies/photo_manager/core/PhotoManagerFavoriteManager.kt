@@ -24,9 +24,6 @@ class PhotoManagerFavoriteManager(val context: Context) :
 
     private var resultHandler: ResultHandler? = null
 
-    private val cr: ContentResolver
-        get() = context.contentResolver
-
     @RequiresApi(Build.VERSION_CODES.R)
     fun favoriteAsset(assetUri: Uri, isFavorite: Boolean, resultHandler: ResultHandler) {
         this.resultHandler = resultHandler

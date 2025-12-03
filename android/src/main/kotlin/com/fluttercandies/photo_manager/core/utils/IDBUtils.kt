@@ -33,6 +33,7 @@ import com.fluttercandies.photo_manager.core.PhotoManager
 import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.entity.AssetPathEntity
 import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
+import com.fluttercandies.photo_manager.extension.*
 import com.fluttercandies.photo_manager.util.LogUtils
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -129,126 +130,6 @@ interface IDBUtils {
     ): List<AssetEntity>
 
     fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean = true): AssetEntity?
-
-    fun getMediaType(type: Int): Int {
-        return when (type) {
-            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE -> 1
-            MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> 2
-            MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO -> 3
-            else -> 0
-        }
-    }
-
-    fun convertTypeToMediaType(type: Int): Int {
-        return MediaStoreUtils.convertTypeToMediaType(type)
-    }
-
-    fun getTypeFromMediaType(mediaType: Int): Int {
-        return when (mediaType) {
-            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE -> 1
-            MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> 2
-            MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO -> 3
-            else -> 0
-        }
-    }
-
-    fun Cursor.getInt(columnName: String): Int {
-        return getInt(getColumnIndex(columnName))
-    }
-
-    fun Cursor.getString(columnName: String): String {
-        return getString(getColumnIndex(columnName)) ?: ""
-    }
-
-    fun Cursor.getStringOrNull(columnName: String): String? {
-        return getString(getColumnIndex(columnName))
-    }
-
-    fun Cursor.getLong(columnName: String): Long {
-        return getLong(getColumnIndex(columnName))
-    }
-
-    fun Cursor.getDouble(columnName: String): Double {
-        return getDouble(getColumnIndex(columnName))
-    }
-
-    fun Cursor.toAssetEntity(
-        context: Context,
-        checkIfExists: Boolean = true,
-        throwIfNotExists: Boolean = true,
-    ): AssetEntity? {
-        val id = getLong(_ID)
-        val path = getString(DATA)
-        if (checkIfExists && path.isNotBlank() && !File(path).exists()) {
-            if (throwIfNotExists) {
-                throwMsg("Asset ($id) does not exists at its path ($path).")
-            }
-            return null
-        }
-
-        val date = if (isAboveAndroidQ) {
-            var tmpTime = getLong(DATE_TAKEN) / 1000
-            if (tmpTime == 0L) {
-                tmpTime = getLong(DATE_ADDED)
-            }
-            tmpTime
-        } else getLong(DATE_ADDED)
-        val type = getInt(MediaStore.Files.FileColumns.MEDIA_TYPE)
-        val mimeType = getString(MIME_TYPE)
-        val duration = if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) 0
-        else getLong(DURATION)
-        var width = getInt(WIDTH)
-        var height = getInt(HEIGHT)
-        val displayName = getString(DISPLAY_NAME)
-        val modifiedDate = getLong(DATE_MODIFIED)
-        var orientation: Int = getInt(ORIENTATION)
-        val isFavorite = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && getInt(IS_FAVORITE) == 1
-        val relativePath: String? = if (isAboveAndroidQ) {
-            getString(RELATIVE_PATH)
-        } else null
-        if (width == 0 || height == 0) {
-            try {
-                if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE && !mimeType.contains("svg")) {
-                    val uri = getUri(id, getMediaType(type))
-                    context.contentResolver.openInputStream(uri)?.use {
-                        ExifInterface(it).apply {
-                            width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
-                            height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
-                        }
-                    }
-                } else if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
-                    val mmr = MediaMetadataRetriever()
-                    mmr.setDataSource(path)
-                    width = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)
-                        ?.toInt() ?: 0
-                    height = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)
-                        ?.toInt() ?: 0
-                    orientation =
-                        mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)
-                            ?.toInt()
-                            ?: orientation
-                    if (isAboveAndroidQ) mmr.close() else mmr.release()
-                }
-            } catch (e: Throwable) {
-                LogUtils.error(e)
-            }
-        }
-        return AssetEntity(
-            id,
-            path,
-            duration,
-            date,
-            width,
-            height,
-            getMediaType(type),
-            displayName,
-            modifiedDate,
-            orientation,
-            isFavorite,
-            androidQRelativePath = relativePath,
-            mimeType = mimeType
-        )
-    }
 
     fun getAssetPathEntityFromId(
         context: Context,
@@ -550,12 +431,12 @@ interface IDBUtils {
         val asset = getAssetEntity(context, id) ?: return null
 
         /// Apparently no LatLng for audios.
-        if (asset.type == getMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO)) {
+        if (asset.type == MediaStoreUtils.convertMediaTypeToType(MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO)) {
             return null;
         }
 
         // For videos, use MediaMetadataRetriever to extract location
-        if (asset.type == getMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)) {
+        if (asset.type == MediaStoreUtils.convertMediaTypeToType(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)) {
             return try {
                 val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(asset.path)
@@ -573,7 +454,7 @@ interface IDBUtils {
         }
 
         // For images, use ExifInterface
-        if (asset.type == getMediaType(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)) {
+        if (asset.type == MediaStoreUtils.convertMediaTypeToType(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)) {
             return try {
                 val exifInfo = getExif(context, id)
                 exifInfo?.latLong

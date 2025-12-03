@@ -37,6 +37,7 @@ class ImageItemWidget extends StatelessWidget {
             thumbnailSize: option.size,
             thumbnailFormat: option.format,
             fit: BoxFit.cover,
+            errorBuilder: (context, e, s) => Text(e.toString()),
           ),
         ),
         PositionedDirectional(
