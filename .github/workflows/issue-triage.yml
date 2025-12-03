@@ -16,13 +16,14 @@ jobs:
   triage-issues:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           repository: fluttercandies/triage_bot_for_flutter_photo_manager
       - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.10'
       - run: dart pub get
         working-directory: pkgs/issue_triage_bot
-
       # Delay 2 minutes to allow a grace period between opening or transferring
       # an issue and assigning a label.
       - name: sleep 2m
