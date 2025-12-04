@@ -38,7 +38,7 @@ object DBUtils : IDBUtils {
 
         var selection: String = "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL"
         if (where != null) {
-            selection += "$selection $where"
+            selection += " $where"
         }
         selection += ") GROUP BY (${MediaStore.MediaColumns.BUCKET_ID}"
 
