@@ -11,6 +11,7 @@
 #import "PMManager.h"
 #import "PMMD5Utils.h"
 #import "PMPathFilterOption.h"
+#import "PMRequestTypeUtils.h"
 #import "PMResultHandler.h"
 
 @implementation PMManager {
@@ -1217,40 +1218,7 @@
         return [optionGroup getFetchOptions:type];
     }
     
-    // When filterOption is nil, we still need to filter by media type
-    PHFetchOptions *options = [PHFetchOptions new];
-    
-    BOOL containsImage = [PMRequestTypeUtils containsImage:type];
-    BOOL containsVideo = [PMRequestTypeUtils containsVideo:type];
-    BOOL containsAudio = [PMRequestTypeUtils containsAudio:type];
-    
-    NSMutableString *typeWhere = [NSMutableString new];
-    NSMutableArray *args = [NSMutableArray new];
-    
-    if (containsImage) {
-        [typeWhere appendString:@"mediaType == %d"];
-        [args addObject:@(PHAssetMediaTypeImage)];
-    }
-    if (containsVideo) {
-        if (![typeWhere isEmpty]) {
-            [typeWhere appendString:@" OR "];
-        }
-        [typeWhere appendString:@"mediaType == %d"];
-        [args addObject:@(PHAssetMediaTypeVideo)];
-    }
-    if (containsAudio) {
-        if (![typeWhere isEmpty]) {
-            [typeWhere appendString:@" OR "];
-        }
-        [typeWhere appendString:@"mediaType == %d"];
-        [args addObject:@(PHAssetMediaTypeAudio)];
-    }
-    
-    if (![typeWhere isEmpty]) {
-        options.predicate = [NSPredicate predicateWithFormat:typeWhere argumentArray:args];
-    }
-    
-    return options;
+    return [PMRequestTypeUtils getFetchOptionsByType:type];
 }
 
 #pragma clang diagnostic push
