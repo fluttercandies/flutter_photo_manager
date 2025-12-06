@@ -130,13 +130,13 @@
 }
 
 - (NSUInteger)getAssetCountWithType:(int)type option:(NSObject<PMBaseFilter> *)filter {
-    PHFetchOptions *options = [filter getFetchOptions:type];
+    PHFetchOptions *options = [self getAssetOptions:type filterOption:filter];
     PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithOptions:options];
     return result.count;
 }
 
 - (NSArray<PMAssetEntity *> *)getAssetsWithType:(int)type option:(NSObject<PMBaseFilter> *)option start:(int)start end:(int)end {
-    PHFetchOptions *options = [option getFetchOptions:type];
+    PHFetchOptions *options = [self getAssetOptions:type filterOption:option];
     PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithOptions:options];
     
     NSUInteger endOffset = end;
@@ -151,7 +151,8 @@
             break;
         }
         PHAsset *asset = result[i];
-        PMAssetEntity *pmAsset = [self convertPHAssetToAssetEntity:asset needTitle:[option needTitle]];
+        BOOL needTitle = option ? [option needTitle] : NO;
+        PMAssetEntity *pmAsset = [self convertPHAssetToAssetEntity:asset needTitle:needTitle];
         [array addObject: pmAsset];
     }
     
@@ -1212,7 +1213,44 @@
 }
 
 - (PHFetchOptions *)getAssetOptions:(int)type filterOption:(NSObject<PMBaseFilter> *)optionGroup {
-    return [optionGroup getFetchOptions:type];
+    if (optionGroup) {
+        return [optionGroup getFetchOptions:type];
+    }
+    
+    // When filterOption is nil, we still need to filter by media type
+    PHFetchOptions *options = [PHFetchOptions new];
+    
+    BOOL containsImage = [PMRequestTypeUtils containsImage:type];
+    BOOL containsVideo = [PMRequestTypeUtils containsVideo:type];
+    BOOL containsAudio = [PMRequestTypeUtils containsAudio:type];
+    
+    NSMutableString *typeWhere = [NSMutableString new];
+    NSMutableArray *args = [NSMutableArray new];
+    
+    if (containsImage) {
+        [typeWhere appendString:@"mediaType == %d"];
+        [args addObject:@(PHAssetMediaTypeImage)];
+    }
+    if (containsVideo) {
+        if (![typeWhere isEmpty]) {
+            [typeWhere appendString:@" OR "];
+        }
+        [typeWhere appendString:@"mediaType == %d"];
+        [args addObject:@(PHAssetMediaTypeVideo)];
+    }
+    if (containsAudio) {
+        if (![typeWhere isEmpty]) {
+            [typeWhere appendString:@" OR "];
+        }
+        [typeWhere appendString:@"mediaType == %d"];
+        [args addObject:@(PHAssetMediaTypeAudio)];
+    }
+    
+    if (![typeWhere isEmpty]) {
+        options.predicate = [NSPredicate predicateWithFormat:typeWhere argumentArray:args];
+    }
+    
+    return options;
 }
 
 #pragma clang diagnostic push
