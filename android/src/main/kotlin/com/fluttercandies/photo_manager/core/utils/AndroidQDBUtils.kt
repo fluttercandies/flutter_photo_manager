@@ -42,10 +42,9 @@ object AndroidQDBUtils : IDBUtils {
         val list = ArrayList<AssetPathEntity>()
         val args = ArrayList<String>()
         val where = option?.makeWhere(requestType, args)
+            ?: " AND ${RequestTypeUtils.toWhere(requestType)}"
         var selections = "$BUCKET_ID IS NOT NULL"
-        if (where != null) {
-            selections += " $where"
-        }
+        selections += " $where"
 
         val cursor = context.contentResolver.logQuery(
             allUri,
@@ -90,10 +89,9 @@ object AndroidQDBUtils : IDBUtils {
         val list = ArrayList<AssetPathEntity>()
         val args = ArrayList<String>()
         val where = option?.makeWhere(requestType, args)
+            ?: " AND ${RequestTypeUtils.toWhere(requestType)}"
         var selections = "$BUCKET_ID IS NOT NULL"
-        if (where != null) {
-            selections += " $where"
-        }
+        selections += " $where"
 
         val cursor = context.contentResolver.logQuery(
             allUri,
@@ -153,14 +151,13 @@ object AndroidQDBUtils : IDBUtils {
             args.add(pathId)
         }
         val where = option?.makeWhere(requestType, args)
+            ?: " AND ${RequestTypeUtils.toWhere(requestType)}"
         var selection = if (isAll) {
             "$BUCKET_ID IS NOT NULL"
         } else {
             "$BUCKET_ID = ?"
         }
-        if (where != null) {
-            selection += " $where"
-        }
+        selection += " $where"
         val sortOrder = getSortOrder(page * size, size, option)
         val cursor = context.contentResolver.logQuery(
             allUri,
@@ -195,14 +192,13 @@ object AndroidQDBUtils : IDBUtils {
             args.add(galleryId)
         }
         val where = option?.makeWhere(requestType, args)
+            ?: " AND ${RequestTypeUtils.toWhere(requestType)}"
         var selection = if (isAll) {
             "$BUCKET_ID IS NOT NULL"
         } else {
             "$BUCKET_ID = ?"
         }
-        if (where != null) {
-            selection += " $where"
-        }
+        selection += " $where"
         val pageSize = end - start
         val sortOrder = getSortOrder(start, pageSize, option)
         val cursor = context.contentResolver.logQuery(
@@ -259,6 +255,7 @@ object AndroidQDBUtils : IDBUtils {
         val isAll = pathId == ""
         val args = ArrayList<String>()
         val where = option?.makeWhere(type, args)
+            ?: " AND ${RequestTypeUtils.toWhere(type)}"
         val idSelection: String
         if (isAll) {
             idSelection = ""
@@ -267,9 +264,7 @@ object AndroidQDBUtils : IDBUtils {
             args.add(pathId)
         }
         var selection = "$BUCKET_ID IS NOT NULL"
-        if (where != null) {
-            selection += " $where"
-        }
+        selection += " $where"
         selection += " $idSelection"
         val cursor = context.contentResolver.logQuery(
             allUri,
