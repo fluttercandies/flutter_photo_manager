@@ -520,16 +520,13 @@ interface IDBUtils {
 
     // Nullable for implementations.
     fun getSortOrder(start: Int, pageSize: Int, filterOption: FilterOption?): String? {
-        val builder = StringBuilder()
-        if (filterOption != null) {
-            val orderBy = filterOption.orderByCondString()
-            if (orderBy != null) {
-                builder.append(orderBy)
-                builder.append(" ")
-            }
-        }
-        builder.append("LIMIT $pageSize OFFSET $start")
-        return builder.toString()
+        // MediaStore expects an ORDER BY before LIMIT/OFFSET. When no filter option is
+        // provided we need a deterministic default or Android will generate an invalid
+        // query such as `ORDER BY LIMIT 30 OFFSET 0`.
+        val orderBy = filterOption?.orderByCondString()
+            ?: "${MediaStore.MediaColumns.DATE_ADDED} DESC, ${MediaStore.MediaColumns.DATE_MODIFIED} DESC"
+
+        return "$orderBy LIMIT $pageSize OFFSET $start"
     }
 
     fun copyToGallery(context: Context, assetId: String, galleryId: String): AssetEntity
