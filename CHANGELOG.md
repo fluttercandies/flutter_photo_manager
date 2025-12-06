@@ -10,8 +10,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 **Fixes**
 
-- Fix iOS/macOS returning all media types when `filterOption` is not specified instead of respecting the requested type.
-- Fix Android returning all media types when `filterOption` is not specified instead of respecting the requested type.
+- Fix all media assets being returned when `filterOption` is not specified instead of respecting the requested type.
 
 ## 3.8.2
 
