@@ -106,6 +106,8 @@ class PermissionDelegate34 : PermissionDelegate() {
         if (requestCode == CODE_REQUEST_LIMITED) {
             val handler = resultHandler ?: return
             resultHandler = null
+            // Notify the listener that the user has completed the limited selection
+            permissionsUtils.permissionsListener?.onLimitedSelectionChanged()
             handler.reply(1)
             return
         }

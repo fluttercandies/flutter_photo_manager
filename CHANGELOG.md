@@ -8,7 +8,9 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+**Fixes**
+
+- Fix Android 14+ limited permission photo selection not reflecting deselection in Flutter layer. When users modify their photo selection via `presentLimited()`, the changes are now properly notified to the Flutter layer.
 
 ## 3.8.3
 
