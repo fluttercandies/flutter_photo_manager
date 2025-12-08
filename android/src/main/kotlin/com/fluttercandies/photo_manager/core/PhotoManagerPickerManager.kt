@@ -104,9 +104,9 @@ class PhotoManagerPickerManager(val context: Context) :
                 }
                 else -> {
                     // Common (both images and videos)
-                    // Use generic ACTION_PICK which allows selection from all media
+                    // Use generic ACTION_PICK with Images URI as base
+                    // Note: Legacy picker only supports single selection
                     intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                    intent.type = "image/* video/*"
                 }
             }
             

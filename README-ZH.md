@@ -256,7 +256,7 @@ if (assets.isNotEmpty) {
   - `RequestType.common`：图片和视频（默认）
   - `RequestType.image`：仅图片
   - `RequestType.video`：仅视频
-- `useItemProvider`：（仅 iOS）处理 iCloud 资源。默认：false
+- `useItemProvider`：（仅 iOS）处理 iCloud 资源。默认：false。**注意**：完整的 iCloud 支持计划在未来版本中实现。目前仅返回本地库中可用的资源。
 
 > **注意**：此方法不需要先调用 `requestPermissionExtend()`。它独立于应用的权限状态工作。
 

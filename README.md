@@ -266,7 +266,7 @@ if (assets.isNotEmpty) {
   - `RequestType.common`: Both images and videos (default)
   - `RequestType.image`: Only images
   - `RequestType.video`: Only videos
-- `useItemProvider`: (iOS only) Handle iCloud assets. Default: false
+- `useItemProvider`: (iOS only) Handle iCloud assets. Default: false. **Note**: Full iCloud support is planned for a future release. Currently, only assets available in the local library will be returned.
 
 > **Note**: This method does not require calling `requestPermissionExtend()` first. It works independently of the app's permission status.
 

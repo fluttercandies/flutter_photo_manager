@@ -241,7 +241,8 @@ class PhotoManager {
   /// - [useItemProvider]: **iOS/macOS only**. If true, uses `NSItemProvider` to handle
   ///   assets that may not be in the local photo library (e.g., iCloud photos).
   ///   This provides better support for cloud-backed assets but may have slower loading.
-  ///   Default is false.
+  ///   Default is false. **Note**: Full NSItemProvider support is planned for future release.
+  ///   Currently, only assets available in the local library will be returned.
   ///
   /// ### Returns:
   /// A list of [AssetEntity] objects representing the selected assets.
