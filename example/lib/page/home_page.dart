@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,6 +47,11 @@ class _NewHomePageState extends State<NewHomePage> {
               title: 'Get all gallery list',
               onPressed: _scanGalleryList,
             ),
+            if (Platform.isIOS || Platform.isAndroid)
+              CustomButton(
+                title: 'Pick assets with native picker (no permission)',
+                onPressed: _pickAssetsWithNativePicker,
+              ),
             if (Platform.isIOS || Platform.isAndroid)
               CustomButton(
                 title: 'Change limited photos with PhotosUI',
@@ -269,5 +275,78 @@ class _NewHomePageState extends State<NewHomePage> {
 
   Future<void> _changeLimitPhotos() async {
     await PhotoManager.presentLimited();
+  }
+
+  Future<void> _pickAssetsWithNativePicker() async {
+    try {
+      // Launch native picker to select up to 9 assets
+      final List<AssetEntity> assets = await PhotoManager.pickAssets(
+        maxCount: 9,
+        requestType: RequestType.common, // Allow both images and videos
+      );
+
+      if (assets.isEmpty) {
+        showToast('No assets selected');
+        return;
+      }
+
+      showToast('Selected ${assets.length} asset(s)');
+
+      // Navigate to gallery list page with picked assets
+      if (mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => Scaffold(
+              appBar: AppBar(title: const Text('Picked Assets')),
+              body: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 4,
+                  crossAxisSpacing: 4,
+                ),
+                itemCount: assets.length,
+                itemBuilder: (context, index) {
+                  final asset = assets[index];
+                  return FutureBuilder<Uint8List?>(
+                    future: asset.thumbnailData,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return Stack(
+                          fit: StackFit.expand,
+                          children: <Widget>[
+                            Image.memory(
+                              snapshot.data!,
+                              fit: BoxFit.cover,
+                            ),
+                            if (asset.type == AssetType.video)
+                              const Align(
+                                alignment: Alignment.bottomRight,
+                                child: Padding(
+                                  padding: EdgeInsets.all(4.0),
+                                  child: Icon(
+                                    Icons.videocam,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      }
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      showToast('Error picking assets: $e');
+      debugPrint('Error picking assets: $e');
+    }
   }
 }
