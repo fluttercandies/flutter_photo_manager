@@ -262,7 +262,8 @@ class PhotoManager {
   /// if (assets.isNotEmpty) {
   ///   for (final asset in assets) {
   ///     final file = await asset.file;
-  ///     // Use the file...\n  ///   }
+  ///     // Use the file...
+  ///   }
   /// }
   /// ```
   ///
