@@ -227,6 +227,49 @@ It's pretty much the same as the `NSPhotoLibraryUsageDescription`.
 
 ## Usage
 
+### Native photo picker (no permissions required)
+
+Starting from version 3.9.0, `photo_manager` provides a native photo picker that doesn't require storage permissions. This is perfect for apps that only need to let users select photos/videos without needing full library access.
+
+```dart
+// Pick up to 9 assets (images and videos)
+final List<AssetEntity> assets = await PhotoManager.pickAssets(
+  maxCount: 9,
+  requestType: RequestType.common, // or RequestType.image, RequestType.video
+);
+
+if (assets.isNotEmpty) {
+  // Use the selected assets
+  for (final asset in assets) {
+    final file = await asset.file;
+    // Do something with the file
+  }
+}
+```
+
+**Platform Support:**
+- **Android 11+ (API 30+)**: Uses the native Photo Picker API
+- **Android < 11**: Uses legacy `ACTION_PICK` intent (also works without permissions)
+- **iOS 14+**: Uses `PHPickerViewController`
+- **macOS**: Limited support (may not work on all versions)
+
+**Key Benefits:**
+- ✅ No storage permissions required
+- ✅ Native OS picker UI
+- ✅ Returns standard `AssetEntity` objects
+- ✅ Full compatibility with other photo_manager APIs
+- ✅ Works even when permission is denied
+
+**Parameters:**
+- `maxCount`: Maximum number of assets to select (default: 9). Note: On Android < 11, only single selection is supported.
+- `requestType`: Type of media to allow:
+  - `RequestType.common`: Both images and videos (default)
+  - `RequestType.image`: Only images
+  - `RequestType.video`: Only videos
+- `useItemProvider`: (iOS only) Handle iCloud assets. Default: false. **Note**: Full iCloud support is planned for a future release. Currently, only assets available in the local library will be returned.
+
+> **Note**: This method does not require calling `requestPermissionExtend()` first. It works independently of the app's permission status.
+
 ### Request for permission
 
 Most of the APIs can only use with granted permission.

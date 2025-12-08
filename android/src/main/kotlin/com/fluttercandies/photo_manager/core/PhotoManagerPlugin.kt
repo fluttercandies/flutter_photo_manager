@@ -60,6 +60,7 @@ class PhotoManagerPlugin(
     val deleteManager = PhotoManagerDeleteManager(applicationContext, activity)
     val writeManager = PhotoManagerWriteManager(applicationContext, activity)
     val favoriteManager = PhotoManagerFavoriteManager(applicationContext)
+    val pickerManager = PhotoManagerPickerManager(applicationContext)
 
     fun bindActivity(activity: Activity?) {
         this.activity = activity
@@ -67,6 +68,7 @@ class PhotoManagerPlugin(
         deleteManager.bindActivity(activity)
         writeManager.bindActivity(activity)
         favoriteManager.bindActivity(activity)
+        pickerManager.bindActivity(activity)
     }
 
     private val notifyChannel = PhotoManagerNotifyChannel(
@@ -336,7 +338,25 @@ class PhotoManagerPlugin(
                     resultHandler.reply(it.value)
                 }
             }
+
+            Methods.picker -> {
+                handlePickerMethod(resultHandler)
+            }
         }
+    }
+
+    private fun handlePickerMethod(resultHandler: ResultHandler) {
+        if (activity == null) {
+            resultHandler.replyError("Activity is null. Cannot launch picker.")
+            return
+        }
+
+        val call = resultHandler.call
+        val maxCount = call.argument<Int>("maxCount") ?: 9
+        val type = call.argument<Int>("type") ?: 0
+
+        // Launch the picker - it will handle both modern and legacy approaches
+        pickerManager.launchPicker(activity!!, maxCount, type, resultHandler)
     }
 
     private fun handleMethodResult(

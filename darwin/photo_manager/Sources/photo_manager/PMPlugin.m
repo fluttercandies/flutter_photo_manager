@@ -112,7 +112,8 @@
         @"clearFileCache",
         @"releaseMemoryCache",
         @"ignorePermissionCheck",
-        @"getPermissionState"
+        @"getPermissionState",
+        @"picker"
     ];
     return [notNeedPermissionMethods containsObject:method];
 }
@@ -158,6 +159,8 @@
         [handler reply:nil];
     } else if ([method isEqualToString:@"getPermissionState"]) {
         [self getPermissionState:handler];
+    } else if ([method isEqualToString:@"picker"]) {
+        [self launchNativePicker:handler];
     }
 }
 
@@ -764,5 +767,140 @@
         [handler reply:[self convertToResult:newId]];
     }];
 }
+
+#pragma mark - Native Picker
+
+- (void)launchNativePicker:(PMResultHandler *)handler {
+#if TARGET_OS_IOS
+    if (@available(iOS 14.0, *)) {
+        [self launchNativePickerIOS:handler];
+    } else {
+        [handler replyError:@"PHPickerViewController requires iOS 14.0 or later"];
+    }
+#elif TARGET_OS_OSX
+    if (@available(macOS 11.0, *)) {
+        [handler replyError:@"PHPickerViewController is not fully supported on macOS"];
+    } else {
+        [handler replyError:@"PHPickerViewController requires macOS 11.0 or later"];
+    }
+#else
+    [handler replyError:@"PHPickerViewController is not supported on this platform"];
+#endif
+}
+
+#if TARGET_OS_IOS
+- (void)launchNativePickerIOS:(PMResultHandler *)handler API_AVAILABLE(ios(14.0)) {
+    FlutterMethodCall *call = handler.call;
+    int maxCount = [call.arguments[@"maxCount"] intValue];
+    int type = [call.arguments[@"type"] intValue];
+    BOOL useItemProvider = [call.arguments[@"useItemProvider"] boolValue];
+    
+    // Store handler and configuration for delegate callback
+    self.pickerResultHandler = handler;
+    self.pickerUseItemProvider = useItemProvider;
+    
+    // Configure PHPicker
+    PHPickerConfiguration *config = [[PHPickerConfiguration alloc] init];
+    config.selectionLimit = maxCount;
+    
+    // Set filter based on type
+    // 0 = common (images + videos), 1 = images only, 2 = videos only
+    if (type == 1) {
+        config.filter = [PHPickerFilter imagesFilter];
+    } else if (type == 2) {
+        config.filter = [PHPickerFilter videosFilter];
+    } else {
+        // Common - allow both images and videos
+        config.filter = [PHPickerFilter anyFilterMatchingSubfilters:@[
+            [PHPickerFilter imagesFilter],
+            [PHPickerFilter videosFilter]
+        ]];
+    }
+    
+    PHPickerViewController *picker = [[PHPickerViewController alloc] initWithConfiguration:config];
+    picker.delegate = self;
+    
+    // Present picker on main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIViewController *controller = [self getCurrentViewController];
+        if (!controller) {
+            [handler replyError:@"Unable to get current view controller"];
+            self.pickerResultHandler = nil;
+            return;
+        }
+        [controller presentViewController:picker animated:YES completion:nil];
+    });
+}
+
+#pragma mark - PHPickerViewControllerDelegate
+
+- (void)picker:(PHPickerViewController *)picker didFinishPicking:(NSArray<PHPickerResult *> *)results API_AVAILABLE(ios(14.0)) {
+    PMResultHandler *handler = self.pickerResultHandler;
+    BOOL useItemProvider = self.pickerUseItemProvider;
+    
+    // Clear stored handler
+    self.pickerResultHandler = nil;
+    
+    // Dismiss picker
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [picker dismissViewControllerAnimated:YES completion:nil];
+    });
+    
+    if (!handler) {
+        return;
+    }
+    
+    // Handle empty results (user cancelled)
+    if (results.count == 0) {
+        [handler reply:@{@"data": @[]}];
+        return;
+    }
+    
+    // Process results in background
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        NSMutableArray *assetDicts = [NSMutableArray array];
+        dispatch_group_t group = dispatch_group_create();
+        
+        for (PHPickerResult *result in results) {
+            dispatch_group_enter(group);
+            
+            // Always try to get PHAsset from library first if assetIdentifier is available
+            if (result.assetIdentifier) {
+                PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[result.assetIdentifier] options:nil];
+                if (fetchResult.count > 0) {
+                    PHAsset *asset = fetchResult.firstObject;
+                    PMAssetEntity *entity = [self.manager convertPHAssetToAssetEntity:asset needTitle:NO];
+                    if (entity) {
+                        NSDictionary *assetDict = [PMConvertUtils convertPMAssetToMap:entity needTitle:NO];
+                        @synchronized (assetDicts) {
+                            [assetDicts addObject:assetDict];
+                        }
+                    }
+                    dispatch_group_leave(group);
+                    continue;
+                }
+            }
+            
+            // If useItemProvider is false or assetIdentifier was not available, we're done
+            // (This happens when asset is not in library, like an iCloud photo not yet downloaded)
+            if (!useItemProvider) {
+                dispatch_group_leave(group);
+                continue;
+            }
+            
+            // When useItemProvider is true and asset is not in library, handle via NSItemProvider
+            // Note: This is a placeholder for future implementation
+            // The full implementation would need to handle loading data from NSItemProvider
+            // and creating temporary assets, which is complex
+            dispatch_group_leave(group);
+        }
+        
+        // Wait for all async operations to complete
+        dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+            [handler reply:@{@"data": assetDicts}];
+        });
+    });
+}
+#endif
 
 @end

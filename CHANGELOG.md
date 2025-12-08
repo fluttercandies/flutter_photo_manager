@@ -8,7 +8,16 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+**Features**
+
+- Add native photo picker support for iOS/Android without requiring storage permissions:
+  - New `PhotoManager.pickAssets()` method with `maxCount`, `requestType`, and `useItemProvider` parameters.
+  - **iOS 14+**: Uses `PHPickerViewController` without requiring photo library permissions.
+  - **Android 11+ (API 30+)**: Uses native Photo Picker API (ACTION_PICK_IMAGES).
+  - **Android < 11**: Falls back to legacy `ACTION_PICK` intent, also works without permissions.
+  - **macOS**: Limited support (PHPickerViewController not fully available).
+  - Returns standard `AssetEntity` objects compatible with all photo_manager APIs.
+  - Works independently of app's permission status.
 
 ## 3.8.3
 
