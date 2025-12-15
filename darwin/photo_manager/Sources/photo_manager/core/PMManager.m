@@ -11,6 +11,7 @@
 #import "PMManager.h"
 #import "PMMD5Utils.h"
 #import "PMPathFilterOption.h"
+#import "PMRequestTypeUtils.h"
 #import "PMResultHandler.h"
 
 @implementation PMManager {
@@ -130,13 +131,13 @@
 }
 
 - (NSUInteger)getAssetCountWithType:(int)type option:(NSObject<PMBaseFilter> *)filter {
-    PHFetchOptions *options = [filter getFetchOptions:type];
+    PHFetchOptions *options = [self getAssetOptions:type filterOption:filter];
     PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithOptions:options];
     return result.count;
 }
 
 - (NSArray<PMAssetEntity *> *)getAssetsWithType:(int)type option:(NSObject<PMBaseFilter> *)option start:(int)start end:(int)end {
-    PHFetchOptions *options = [option getFetchOptions:type];
+    PHFetchOptions *options = [self getAssetOptions:type filterOption:option];
     PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithOptions:options];
     
     NSUInteger endOffset = end;
@@ -151,7 +152,8 @@
             break;
         }
         PHAsset *asset = result[i];
-        PMAssetEntity *pmAsset = [self convertPHAssetToAssetEntity:asset needTitle:[option needTitle]];
+        BOOL needTitle = option ? [option needTitle] : NO;
+        PMAssetEntity *pmAsset = [self convertPHAssetToAssetEntity:asset needTitle:needTitle];
         [array addObject: pmAsset];
     }
     
@@ -1212,7 +1214,11 @@
 }
 
 - (PHFetchOptions *)getAssetOptions:(int)type filterOption:(NSObject<PMBaseFilter> *)optionGroup {
-    return [optionGroup getFetchOptions:type];
+    if (optionGroup) {
+        return [optionGroup getFetchOptions:type];
+    }
+    
+    return [PMRequestTypeUtils getFetchOptionsByType:type];
 }
 
 #pragma clang diagnostic push

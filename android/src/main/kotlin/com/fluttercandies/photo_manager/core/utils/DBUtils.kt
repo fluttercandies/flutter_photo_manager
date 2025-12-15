@@ -35,6 +35,7 @@ object DBUtils : IDBUtils {
         val list = ArrayList<AssetPathEntity>()
         val args = ArrayList<String>()
         val where = option?.makeWhere(requestType, args)
+            ?: " AND ${RequestTypeUtils.toWhere(requestType)}"
 
         var selection: String = "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL"
         if (where != null) {
@@ -74,11 +75,10 @@ object DBUtils : IDBUtils {
         val projection = IDBUtils.storeBucketKeys + arrayOf("count(1)")
         val args = ArrayList<String>()
         val where = option?.makeWhere(requestType, args)
+            ?: " AND ${RequestTypeUtils.toWhere(requestType)}"
         var selections =
             "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL"
-        if (where != null) {
-            selections += " $where"
-        }
+        selections += " $where"
 
         val cursor = context.contentResolver.logQuery(
             allUri,
@@ -112,6 +112,7 @@ object DBUtils : IDBUtils {
     ): AssetPathEntity? {
         val args = ArrayList<String>()
         val where = option?.makeWhere(type, args)
+            ?: " AND ${RequestTypeUtils.toWhere(type)}"
         val idSelection: String
         if (pathId == "") {
             idSelection = ""
@@ -120,9 +121,7 @@ object DBUtils : IDBUtils {
             args.add(pathId)
         }
         var selection: String = "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL"
-        if (where != null) {
-            selection += " $where"
-        }
+        selection += " $where"
         selection += " $idSelection) GROUP BY (${MediaStore.MediaColumns.BUCKET_ID}"
 
         val cursor = context.contentResolver.logQuery(
@@ -157,15 +156,14 @@ object DBUtils : IDBUtils {
             args.add(pathId)
         }
         val where = option?.makeWhere(requestType, args)
+            ?: " AND ${RequestTypeUtils.toWhere(requestType)}"
         val keys = keys()
         var selection = if (isAll) {
             "${MediaStore.MediaColumns.BUCKET_ID} IS NOT NULL"
         } else {
             "${MediaStore.MediaColumns.BUCKET_ID} = ?"
         }
-        if (where != null) {
-            selection += " $where"
-        }
+        selection += " $where"
         val sortOrder = getSortOrder(page * size, size, option)
         val cursor = context.contentResolver.logQuery(
             allUri,
@@ -199,6 +197,7 @@ object DBUtils : IDBUtils {
             args.add(galleryId)
         }
         val where = option?.makeWhere(requestType, args)
+            ?: " AND ${RequestTypeUtils.toWhere(requestType)}"
         val keys = keys()
 
         var selection = if (isAll) {
@@ -206,9 +205,7 @@ object DBUtils : IDBUtils {
         } else {
             "${MediaStore.MediaColumns.BUCKET_ID} = ?"
         }
-        if (where != null) {
-            selection += " $where"
-        }
+        selection += " $where"
         val pageSize = end - start
         val sortOrder = getSortOrder(start, pageSize, option)
         val cursor = context.contentResolver.logQuery(

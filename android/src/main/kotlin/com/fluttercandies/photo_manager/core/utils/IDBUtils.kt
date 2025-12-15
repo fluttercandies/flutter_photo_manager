@@ -647,6 +647,7 @@ interface IDBUtils {
         val cr = context.contentResolver
         val args = ArrayList<String>()
         val where = option?.makeWhere(requestType, args, false)
+            ?: RequestTypeUtils.toWhere(requestType)
         val order = option?.orderByCondString()
         cr.logQuery(allUri, arrayOf(_ID), where, args.toTypedArray(), order).use {
             return it.count
@@ -662,12 +663,11 @@ interface IDBUtils {
         val cr = context.contentResolver
         val args = ArrayList<String>()
         var where = option?.makeWhere(requestType, args, false)
+            ?: RequestTypeUtils.toWhere(requestType)
 
         run {
             val result = StringBuilder()
-            if (where != null) {
-                result.append(where)
-            }
+            result.append(where)
             if (galleryId != PhotoManager.ALL_ID) {
                 if (result.trim().isNotEmpty()) {
                     result.append(" AND ")
@@ -696,6 +696,7 @@ interface IDBUtils {
         val cr = context.contentResolver
         val args = ArrayList<String>()
         val where = option?.makeWhere(requestType, args, false)
+            ?: RequestTypeUtils.toWhere(requestType)
         val order = option?.orderByCondString()
         cr.logQuery(allUri, keys(), where, args.toTypedArray(), order).use {
             val result = ArrayList<AssetEntity>()

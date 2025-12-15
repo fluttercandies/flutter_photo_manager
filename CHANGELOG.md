@@ -10,6 +10,12 @@ To know more about breaking changes, see the [Migration Guide][].
 
 *None.*
 
+## 3.8.3
+
+**Fixes**
+
+- Fix all media assets being returned when `filterOption` is not specified instead of respecting the requested type.
+
 ## 3.8.2
 
 **Fixes**
