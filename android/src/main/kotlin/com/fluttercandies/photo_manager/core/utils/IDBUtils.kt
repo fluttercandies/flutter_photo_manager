@@ -23,6 +23,7 @@ import android.provider.MediaStore.MediaColumns.IS_FAVORITE
 import android.provider.MediaStore.MediaColumns.MIME_TYPE
 import android.provider.MediaStore.MediaColumns.ORIENTATION
 import android.provider.MediaStore.MediaColumns.RELATIVE_PATH
+import android.provider.MediaStore.MediaColumns.SIZE
 import android.provider.MediaStore.MediaColumns.TITLE
 import android.provider.MediaStore.MediaColumns.WIDTH
 import android.provider.MediaStore.MediaColumns._ID
@@ -60,6 +61,7 @@ interface IDBUtils {
             DATE_ADDED, // 创建时间
             DATE_MODIFIED, // 修改时间
             MIME_TYPE, // mime type
+            SIZE, // file size in bytes
             DATE_TAKEN //日期
         ).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(DATE_TAKEN) // 拍摄时间
@@ -79,6 +81,7 @@ interface IDBUtils {
             ORIENTATION, // 角度
             DATE_MODIFIED, // 修改时间
             MIME_TYPE, // mime type
+            SIZE, // file size in bytes
             DURATION //时长
         ).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(DATE_TAKEN) // 拍摄时间

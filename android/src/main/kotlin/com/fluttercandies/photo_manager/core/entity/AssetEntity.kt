@@ -20,7 +20,8 @@ data class AssetEntity(
     val lat: Double? = null,
     val lng: Double? = null,
     val androidQRelativePath: String? = null,
-    val mimeType: String? = null
+    val mimeType: String? = null,
+    val fileSize: Long = 0
 ) {
     fun getUri(): Uri = MediaStoreUtils.getUri(
         id,

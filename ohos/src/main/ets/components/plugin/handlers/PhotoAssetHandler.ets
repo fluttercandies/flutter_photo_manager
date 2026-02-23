@@ -65,6 +65,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
         if (photoAsset != null) {
           let file = await fs.open(photoAsset.uri, fs.OpenMode.READ_ONLY);
           // let stat = await fs.stat(photoAsset.uri);
+          // MediaLibraryKit documents PhotoKeys.SIZE as the asset size in bytes.
           let size = PhotoAssetHandler.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.SIZE)
           let arrayBuffer: ArrayBuffer = new ArrayBuffer(size as number);
           await fs.read(file.fd, arrayBuffer);
@@ -427,6 +428,8 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
     // let date_taken = this.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.DATE_TAKEN);
     let orientation = PhotoAssetHandler.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.ORIENTATION);
     let is_favorite = PhotoAssetHandler.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.FAVORITE);
+    // Keep parity with MediaLibraryKit PhotoKeys.SIZE (bytes).
+    let file_size = PhotoAssetHandler.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.SIZE);
     // let title = this.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.TITLE);
 
     return new Map<string, ESObject>(
@@ -452,6 +455,7 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
         // longitude: data['lng'] as double?,
         // ['lng', 1.0],
         ['mimeType', media_type?.toString()],
+        ['fileSize', file_size],
       ]
     );
   }

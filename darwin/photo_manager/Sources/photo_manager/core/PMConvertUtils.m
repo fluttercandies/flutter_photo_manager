@@ -86,7 +86,7 @@
         typeInt = 3;
     }
     
-    return @{
+    NSMutableDictionary *dict = [@{
         @"id": asset.localIdentifier,
         @"createDt": @(createDt),
         @"width": @(asset.pixelWidth),
@@ -99,12 +99,26 @@
         @"lat": @(asset.location.coordinate.latitude),
         @"title": needTitle ? [asset title] : @"",
         @"subtype": @(asset.mediaSubtypes),
-    };
+    } mutableCopy];
+
+    // Use the current resource so size semantics match `AssetEntity.file`.
+    PHAssetResource *resource = [asset getCurrentResource];
+    if (!resource) {
+        resource = [asset getRawResource];
+    }
+    if (resource) {
+        NSNumber *size = [resource valueForKey:@"fileSize"];
+        if (size && [size longLongValue] > 0) {
+            dict[@"fileSize"] = size;
+        }
+    }
+
+    return dict;
 }
 
 + (NSDictionary *)convertPMAssetToMap:(PMAssetEntity *)asset
                             needTitle:(BOOL)needTitle {
-    return @{
+    NSMutableDictionary *dict = [@{
         @"id": asset.id,
         @"createDt": @(asset.createDt),
         @"width": @(asset.width),
@@ -117,7 +131,11 @@
         @"lat": @(asset.lat),
         @"title": needTitle ? asset.title : @"",
         @"subtype": @(asset.subtype),
-    };
+    } mutableCopy];
+    if (asset.fileSize > 0) {
+        dict[@"fileSize"] = @(asset.fileSize);
+    }
+    return dict;
 }
 
 + (NSObject <PMBaseFilter> *)convertMapToOptionContainer:(NSDictionary *)map {

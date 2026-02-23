@@ -402,7 +402,19 @@
     entity.title = needTitle ? [asset title] : @"";
     entity.favorite = asset.isFavorite;
     entity.subtype = asset.mediaSubtypes;
-    
+
+    // Use the current resource so size semantics match `AssetEntity.file`.
+    PHAssetResource *resource = [asset getCurrentResource];
+    if (!resource) {
+        resource = [asset getRawResource];
+    }
+    if (resource) {
+        NSNumber *size = [resource valueForKey:@"fileSize"];
+        if (size) {
+            entity.fileSize = [size longLongValue];
+        }
+    }
+
     return entity;
 }
 

@@ -86,6 +86,7 @@ fun Cursor.toAssetEntity(
     val displayName = getString(DISPLAY_NAME)
     val modifiedDate = getLong(DATE_MODIFIED)
     var orientation: Int = getInt(ORIENTATION)
+    val fileSize = getLong(MediaStore.MediaColumns.SIZE)
     val isFavorite = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && getInt(IS_FAVORITE) == 1
     val relativePath: String? = if (isAboveAndroidQ) {
         getString(RELATIVE_PATH)
@@ -132,7 +133,8 @@ fun Cursor.toAssetEntity(
         orientation,
         isFavorite,
         androidQRelativePath = relativePath,
-        mimeType = mimeType
+        mimeType = mimeType,
+        fileSize = fileSize
     )
 }
 
