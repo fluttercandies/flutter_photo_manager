@@ -8,7 +8,9 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+**Features**
+
+- Add `fileSize` property to `AssetEntity` — returns the file size in bytes read from platform metadata, without downloading files from iCloud or other cloud storage. Supported on iOS/macOS (via `PHAssetResource`), Android (via `MediaStore.MediaColumns.SIZE`), and OHOS.
 
 ## 3.8.3
 

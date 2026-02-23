@@ -60,6 +60,7 @@ interface IDBUtils {
             DATE_ADDED, // 创建时间
             DATE_MODIFIED, // 修改时间
             MIME_TYPE, // mime type
+            MediaStore.MediaColumns.SIZE, // file size in bytes
             DATE_TAKEN //日期
         ).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(DATE_TAKEN) // 拍摄时间
@@ -79,6 +80,7 @@ interface IDBUtils {
             ORIENTATION, // 角度
             DATE_MODIFIED, // 修改时间
             MIME_TYPE, // mime type
+            MediaStore.MediaColumns.SIZE, // file size in bytes
             DURATION //时长
         ).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(DATE_TAKEN) // 拍摄时间

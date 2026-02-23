@@ -35,6 +35,7 @@
 @property(nonatomic, assign) NSUInteger subtype;
 @property(nonatomic, assign) BOOL favorite;
 @property(nonatomic, assign) BOOL isLocallyAvailable;
+@property(nonatomic, assign) long long fileSize;
 
 - (instancetype)initWithId:(NSString *)id
                   createDt:(long)createDt

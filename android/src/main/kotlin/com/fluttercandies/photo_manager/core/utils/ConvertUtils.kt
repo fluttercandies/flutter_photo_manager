@@ -60,6 +60,9 @@ object ConvertUtils {
         if (entity.mimeType != null) {
             data["mimeType"] = entity.mimeType
         }
+        if (entity.fileSize > 0) {
+            data["fileSize"] = entity.fileSize
+        }
         return data
     }
 
