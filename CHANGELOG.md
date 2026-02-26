@@ -8,7 +8,9 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+**Improvements**
+
+- Improve output file extension recognition for Darwin platforms
 
 ## 3.8.3
 
