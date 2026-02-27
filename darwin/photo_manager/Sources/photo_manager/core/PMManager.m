@@ -972,7 +972,7 @@
     }
     // Extract path extension from the filename, fallback to title's if it's empty from the resource.
     NSString *extension = [filename pathExtension];
-    if (resource && ![extension isEmpty]) {
+    if (resource && [extension isEmpty]) {
         extension = [[asset title] pathExtension];
     }
     
