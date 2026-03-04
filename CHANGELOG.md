@@ -10,7 +10,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 **Improvements**
 
-- Improve output file extension recognition for Darwin platforms
+- Improve output file extension recognition for Darwin platforms.
+- Bump `compileSdkVersion` to 36 for Android.
+- Bump EXIF interface and Glide for Android.
+- Code lints update for Android.
 
 ## 3.8.3
 
