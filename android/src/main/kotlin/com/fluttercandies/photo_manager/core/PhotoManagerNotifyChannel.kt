@@ -14,7 +14,6 @@ import com.fluttercandies.photo_manager.core.utils.IDBUtils
 import com.fluttercandies.photo_manager.util.LogUtils
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
-import androidx.core.net.toUri
 
 @Suppress("Range")
 class PhotoManagerNotifyChannel(
