@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.provider.BaseColumns
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.*
 import com.fluttercandies.photo_manager.core.utils.IDBUtils
@@ -94,7 +93,8 @@ class PhotoManagerNotifyChannel(
         val type: Int,
         handler: Handler = Handler(Looper.getMainLooper())
     ) : ContentObserver(handler) {
-        var uri: Uri = "content://${MediaStore.AUTHORITY}".toUri()
+        @Suppress("UseKtx")
+        var uri: Uri = Uri.parse("content://${MediaStore.AUTHORITY}")
 
         val context: Context
             get() = applicationContext
@@ -113,7 +113,7 @@ class PhotoManagerNotifyChannel(
                 val cursor = cr.query(
                     allUri,
                     arrayOf(DATE_ADDED, DATE_MODIFIED, MEDIA_TYPE),
-                    "${BaseColumns._ID} = ?",
+                    "$_ID = ?",
                     arrayOf(id.toString()),
                     null
                 )
@@ -161,20 +161,20 @@ class PhotoManagerNotifyChannel(
                     val cursor = cr.query(
                         allUri,
                         arrayOf(
-                            MediaStore.MediaColumns.BUCKET_ID,
-                            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME
+                            BUCKET_ID,
+                            BUCKET_DISPLAY_NAME
                         ),
-                        "${BaseColumns._ID} = ?",
+                        "$_ID = ?",
                         arrayOf(id.toString()),
                         null
                     )
                     cursor?.use {
                         if (cursor.moveToNext()) {
                             val galleryId = cursor.getLong(
-                                cursor.getColumnIndex(MediaStore.MediaColumns.BUCKET_ID)
+                                cursor.getColumnIndex(BUCKET_ID)
                             )
                             val galleryName = cursor.getString(
-                                cursor.getColumnIndex(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME)
+                                cursor.getColumnIndex(BUCKET_DISPLAY_NAME)
                             )
                             return Pair(galleryId, galleryName)
                         }
@@ -186,9 +186,9 @@ class PhotoManagerNotifyChannel(
                         allUri,
                         arrayOf(
                             MediaStore.Audio.AudioColumns.ALBUM_ID,
-                            MediaStore.Audio.AudioColumns.ALBUM
+                            ALBUM
                         ),
-                        "${BaseColumns._ID} = ?",
+                        "$_ID = ?",
                         arrayOf(id.toString()),
                         null
                     )
@@ -198,7 +198,7 @@ class PhotoManagerNotifyChannel(
                                 cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ID)
                             )
                             val galleryName = cursor.getString(
-                                cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM)
+                                cursor.getColumnIndex(ALBUM)
                             )
                             return Pair(galleryId, galleryName)
                         }
@@ -209,7 +209,7 @@ class PhotoManagerNotifyChannel(
                     val cursor = cr.query(
                         allUri,
                         arrayOf("bucket_id", "bucket_display_name"),
-                        "${BaseColumns._ID} = ?",
+                        "$_ID = ?",
                         arrayOf(id.toString()),
                         null
                     )
