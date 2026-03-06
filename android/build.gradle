@@ -35,7 +35,7 @@ apply plugin: 'kotlin-android'
 
 android {
     if (project.android.hasProperty('namespace')) {
-        namespace 'com.flutterandies.photo_manager'
+        namespace 'com.fluttercandies.photo_manager'
     }
 
     compileSdkVersion 36
