@@ -9,9 +9,6 @@ on:
     types:
       - created
 
-permissions:
-  contents: write
-
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
