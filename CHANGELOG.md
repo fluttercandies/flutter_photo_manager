@@ -10,6 +10,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 **Fixes**
 
+- Fix delayed native deletion confirmation dialogs on iOS by elevating the dispatch queue priority of `deleteWithIds`, `removeInAlbum`, and `deleteAlbum` to `QOS_CLASS_USER_INITIATED`.
 - Fix Android 14+ permission requests incorrectly short-circuiting when only part of the requested media access was already granted.
 - Fix Darwin video durations being truncated instead of rounded, so `AssetEntity.duration` matches the system album display more closely.
 - Fix Darwin `getTitleAsync` returning a null channel result by falling back to an empty string.

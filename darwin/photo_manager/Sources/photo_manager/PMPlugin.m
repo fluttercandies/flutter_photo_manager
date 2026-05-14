@@ -356,7 +356,10 @@
         [method isEqualToString:@"getAssetListRange"] ||
         [method isEqualToString:@"getFullFile"] ||
         [method isEqualToString:@"getMediaUrl"] ||
-        [method isEqualToString:@"fetchEntityProperties"]) {
+        [method isEqualToString:@"fetchEntityProperties"] ||
+        [method isEqualToString:@"deleteWithIds"] ||
+        [method isEqualToString:@"removeInAlbum"] ||
+        [method isEqualToString:@"deleteAlbum"]) {
         return QOS_CLASS_USER_INITIATED;
     }
 
@@ -371,10 +374,7 @@
     }
 
     if ([method isEqualToString:@"clearFileCache"] ||
-        [method isEqualToString:@"releaseMemoryCache"] ||
-        [method isEqualToString:@"deleteWithIds"] ||
-        [method isEqualToString:@"removeInAlbum"] ||
-        [method isEqualToString:@"deleteAlbum"]) {
+        [method isEqualToString:@"releaseMemoryCache"]) {
         return QOS_CLASS_BACKGROUND;
     }
 
