@@ -963,17 +963,15 @@
                          isOrigin:(Boolean)isOrigin
                          fileType:(AVFileType)fileType
                           manager:(NSFileManager *)manager {
-    // Obtain filename from resource or asset's title.
     NSString *filename;
     if (resource) {
         filename = resource.originalFilename;
     } else {
         filename = [asset title];
     }
-    // Extract path extension from the filename, fallback to title's if it's empty from the resource.
-    NSString *extension = [filename pathExtension];
-    if (resource && [extension isEmpty]) {
-        extension = [[asset title] pathExtension];
+    NSString *fallbackExtension = [filename pathExtension];
+    if (resource && [fallbackExtension isEmpty]) {
+        fallbackExtension = [[asset title] pathExtension];
     }
     
     NSString *id = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
@@ -988,7 +986,10 @@
         }
     }
     
-    // Convert the extension to lowercased.
+    NSString *extension = [filename pathExtension];
+    if ([extension isEmpty]) {
+        extension = fallbackExtension;
+    }
     filename = [filename stringByDeletingPathExtension];
     filename = [filename stringByAppendingPathExtension:[extension stringByReplacingOccurrencesOfString:@"." withString:@""]];
     
