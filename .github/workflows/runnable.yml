@@ -122,9 +122,11 @@ jobs:
           name: app-release-${{github.sha}}.apk
       - name: comment url in pull request
         uses: actions/github-script@10b53a9ec6c222bb4ce97aa6bd2b5f739696b536
-        if: github.event_name == 'pull_request'
+        if: |
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository
         with:
-          github-token: ${{ secrets.COMMENT_URL_APK_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             github.issues.createComment({
               issue_number: context.issue.number,
