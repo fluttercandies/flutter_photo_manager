@@ -10,7 +10,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 **Fixes**
 
-- Fix the `AssetEntity.duration` API docs to describe audio durations in seconds, matching the actual returned value and preserving the existing API behavior.
+- Fix the `AssetEntity.duration` API docs to clarify that audio and video durations are returned in seconds across supported platforms, preserving the existing API behavior.
 - Fix Android 14+ limited permission photo selection not reflecting deselection in Flutter layer. When users modify their photo selection via `presentLimited()`, the changes are now properly notified to the Flutter layer.
 - Fix delayed native deletion confirmation dialogs on iOS by elevating the dispatch queue priority of `deleteWithIds`, `removeInAlbum`, and `deleteAlbum` to `QOS_CLASS_USER_INITIATED`.
 - Fix Android 14+ permission requests incorrectly short-circuiting when only part of the requested media access was already granted.
