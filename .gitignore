@@ -17,3 +17,6 @@ doc/
 *.iml
 .metadata
 _codeql_detected_source_root
+
+# FVM Version Cache
+.fvm/

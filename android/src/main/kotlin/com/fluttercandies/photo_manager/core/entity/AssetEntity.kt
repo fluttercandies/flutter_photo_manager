@@ -20,7 +20,10 @@ data class AssetEntity(
     val lat: Double? = null,
     val lng: Double? = null,
     val androidQRelativePath: String? = null,
-    val mimeType: String? = null
+    val mimeType: String? = null,
+    // AIGC START - Android motion photo uses same subtype as iOS live photo for isLivePhoto
+    val subtype: Int = 0
+    // AIGC END
 ) {
     fun getUri(): Uri = MediaStoreUtils.getUri(
         id,

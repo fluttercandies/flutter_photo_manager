@@ -990,6 +990,38 @@ mixin AndroidPlugin on BasePlugin {
     return result == true;
   }
 
+  /// Save a Motion Photo to the gallery from the given [imageFile] and [videoFile].
+  ///
+  /// On Android, Motion Photo is a single JPEG file with an embedded video.
+  /// The image and video bytes are concatenated into one file.
+  Future<AssetEntity> saveMotionPhoto({
+    required File imageFile,
+    required File videoFile,
+    required String? title,
+    String? desc,
+    String? relativePath,
+  }) async {
+    assert(Platform.isAndroid);
+    if (!imageFile.existsSync()) {
+      throw ArgumentError('The image file does not exists.');
+    }
+    if (!videoFile.existsSync()) {
+      throw ArgumentError('The video file does not exists.');
+    }
+    final Map result = await _channel.invokeMethod(
+      PMConstants.mSaveMotionPhoto,
+      <String, dynamic>{
+        'imagePath': imageFile.absolute.path,
+        'videoPath': videoFile.absolute.path,
+        'title': title,
+        'desc': desc,
+        'relativePath': relativePath,
+        ...onlyAddPermission,
+      },
+    );
+    return ConvertUtils.convertMapToAsset(result.cast(), title: title);
+  }
+
   Future<bool> androidRemoveNoExistsAssets() async {
     final bool? result = await _channel.invokeMethod(
       PMConstants.mRemoveNoExistsAssets,

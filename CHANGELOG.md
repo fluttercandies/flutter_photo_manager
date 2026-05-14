@@ -8,7 +8,18 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+**Features**
+
+- Add `saveMotionPhoto` for Android to save Motion Photo (image + video merged into a single file).
+- Add `saveMotionPhoto` to `AndroidEditor` in the Dart API.
+- Add test entries in the example app for Android Motion Photo saving and iOS Live Photo saving.
+
+**Fixes**
+
+- Fixed `saveLivePhoto` on iOS/macOS failing with `PHPhotosErrorDomain (-1)` when the source HEIC/MOV files lack Live Photo metadata. The method now injects the required `kCGImagePropertyMakerAppleDictionary` (asset identifier) into the image and writes `com.apple.quicktime.content.identifier` + a `still-image-time` timed metadata track into the video before saving, following the [LimitPoint/LivePhoto](https://github.com/LimitPoint/LivePhoto) approach. This allows manually-created (non-camera) HEIC + MOV pairs to be saved as Live Photos.
+
+- Fix Motion Photo not being recognized by Android gallery by injecting required XMP metadata (Camera:MotionPhoto, Container:Directory) according to Android Motion Photo format 1.0 specification.
+- Fix Motion Photo not recognized on Xiaomi/MIUI by adding legacy MicroVideo XMP attributes (GCamera:MicroVideo, GCamera:MicroVideoOffset) and ensuring proper `.jpg` file extension.
 
 ## 3.9.0
 

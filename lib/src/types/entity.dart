@@ -441,11 +441,13 @@ class AssetEntity {
 
   /// The subtype of the asset.
   ///
-  /// * Android: Always 0.
+  /// * Android: 0 normally; set to live photo subtype when the image is a motion photo (XMP MicroVideo/MotionPhoto).
   /// * iOS/macOS: https://developer.apple.com/documentation/photokit/phassetmediasubtype
   final int subtype;
 
-  /// Whether the asset is a live photo. Only valid on iOS/macOS.
+  /// Whether the asset is a live photo (iOS/macOS) or motion photo (Android).
+  ///
+  /// On Android, this is true when the image has XMP MicroVideo=1 or MotionPhoto=1.
   bool get isLivePhoto => subtype & _livePhotosType == _livePhotosType;
 
   /// The type value of the [type].

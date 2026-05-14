@@ -565,15 +565,18 @@
         NSString *videoPath = call.arguments[@"videoPath"];
         NSString *title = call.arguments[@"title"];
         NSString *desc = call.arguments[@"desc"];
+        [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"[LivePhoto][Plugin] Received saveLivePhoto - imagePath: %@, videoPath: %@, title: %@, desc: %@", imagePath, videoPath, title, desc]];
         [manager saveLivePhoto:imagePath
                      videoPath:videoPath
                          title:title
                           desc:desc
                          block:^(PMAssetEntity *asset, NSObject *error) {
             if (asset) {
+                [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"[LivePhoto][Plugin] Success - asset id: %@", asset.id]];
                 [handler reply:[PMConvertUtils convertPMAssetToMap:asset needTitle:NO]];
                 return;
             }
+            [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"[LivePhoto][Plugin] Error - %@", error]];
             [handler replyError:error];
         }];
     } else if ([call.method isEqualToString:@"assetExists"]) {

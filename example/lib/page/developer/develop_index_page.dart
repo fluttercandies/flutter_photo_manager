@@ -36,6 +36,8 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
   static const exampleHeicUrl =
       'https://cdn.jsdelivr.net/gh/ExampleAssets/ExampleAsset@master/preview_0.heic';
 
+
+
   Widget _buildVerboseLogSwitch(BuildContext conetxt) {
     final PhotoProvider provider = context.watch<PhotoProvider>();
     final bool verboseLog = provider.showVerboseLog;
@@ -111,6 +113,16 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
             ElevatedButton(
               onPressed: _saveLivePhoto,
               child: const Text('Save live photo'),
+            ),
+          if (Platform.isAndroid)
+            ElevatedButton(
+              onPressed: _saveAndroidMotionPhoto,
+              child: const Text('Save Android Motion Photo'),
+            ),
+          if (Platform.isIOS || Platform.isMacOS)
+            ElevatedButton(
+              onPressed: _saveIosLivePhoto,
+              child: const Text('Save iOS Live Photo (IMG_0189)'),
             ),
           if (Platform.isIOS || Platform.isMacOS)
             ElevatedButton(
@@ -285,6 +297,85 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
         },
       ),
     );
+  }
+
+  /// Copy a bundled asset to a temporary file.
+  Future<File> _copyAssetToTempFile(String assetPath) async {
+    final byteData = await rootBundle.load(assetPath);
+    final tmp = Directory.systemTemp;
+    final fileName = assetPath.split('/').last;
+    final file = File('${tmp.path}/$fileName');
+    await file.writeAsBytes(
+      byteData.buffer.asUint8List(
+        byteData.offsetInBytes,
+        byteData.lengthInBytes,
+      ),
+    );
+    return file;
+  }
+
+  /// Save Android Motion Photo using android.jpg and android.mp4
+  Future<void> _saveAndroidMotionPhoto() async {
+    File? imgFile;
+    File? videoFile;
+    try {
+      imgFile = await _copyAssetToTempFile('assets/android.jpg');
+      print('Image copied to ${imgFile.path}, length: ${imgFile.lengthSync()}');
+      videoFile = await _copyAssetToTempFile('assets/android.mp4');
+      print(
+        'Video copied to ${videoFile.path}, length: ${videoFile.lengthSync()}',
+      );
+
+      final asset = await PhotoManager.editor.android.saveMotionPhoto(
+        imageFile: imgFile,
+        videoFile: videoFile,
+        title: 'android_motion_photo',
+      );
+      print('save android motion photo result : ${asset.id}');
+    } catch (e) {
+      print('save android motion photo error: $e');
+    } finally {
+      imgFile?.deleteSync();
+      videoFile?.deleteSync();
+      print('The temp files have been deleted.');
+    }
+  }
+
+  /// Save iOS Live Photo using IMG_0189.HEIC and IMG_0189.MOV
+  Future<void> _saveIosLivePhoto() async {
+    File? imgFile;
+    File? videoFile;
+    try {
+      imgFile = await _copyAssetToTempFile('assets/IMG_0189.heic');
+      print('[LivePhoto] Image copied to ${imgFile.path}');
+      print('[LivePhoto]   exists: ${imgFile.existsSync()}');
+      print('[LivePhoto]   length: ${imgFile.lengthSync()}');
+      print('[LivePhoto]   absolute: ${imgFile.absolute.path}');
+
+      videoFile = await _copyAssetToTempFile('assets/IMG_0189.mov');
+      print('[LivePhoto] Video copied to ${videoFile.path}');
+      print('[LivePhoto]   exists: ${videoFile.existsSync()}');
+      print('[LivePhoto]   length: ${videoFile.lengthSync()}');
+      print('[LivePhoto]   absolute: ${videoFile.absolute.path}');
+
+      print('[LivePhoto] Calling saveLivePhoto with title: IMG_0189');
+      final asset = await PhotoManager.editor.darwin.saveLivePhoto(
+        imageFile: imgFile,
+        videoFile: videoFile,
+        title: 'IMG_0189',
+      );
+      print('[LivePhoto] Save success! asset id: ${asset.id}');
+      print('[LivePhoto]   type: ${asset.type}');
+      print('[LivePhoto]   size: ${asset.width}x${asset.height}');
+      print('[LivePhoto]   title: ${asset.title}');
+    } catch (e, stack) {
+      print('[LivePhoto] ERROR: $e');
+      print('[LivePhoto] Stack: $stack');
+    } finally {
+      imgFile?.deleteSync();
+      videoFile?.deleteSync();
+      print('[LivePhoto] Temp files deleted.');
+    }
   }
 
   void navToWidget(Widget widget) {

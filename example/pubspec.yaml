@@ -29,6 +29,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/IMG_0189.HEIC
+    - assets/IMG_0189.MOV
+    - assets/android.jpg
+    - assets/android.mp4
 
 dependency_overrides:
   photo_manager:

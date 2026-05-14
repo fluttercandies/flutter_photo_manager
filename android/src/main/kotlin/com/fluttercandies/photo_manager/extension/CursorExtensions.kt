@@ -27,6 +27,8 @@ import com.fluttercandies.photo_manager.core.entity.AssetEntity
 import com.fluttercandies.photo_manager.core.utils.IDBUtils.Companion.isAboveAndroidQ
 import com.fluttercandies.photo_manager.core.utils.MediaStoreUtils
 import com.fluttercandies.photo_manager.util.LogUtils
+import com.fluttercandies.photo_manager.util.MotionPhotoUtils
+import java.io.ByteArrayInputStream
 import java.io.File
 
 fun Cursor.getInt(columnName: String): Int {
@@ -90,14 +92,25 @@ fun Cursor.toAssetEntity(
     val relativePath: String? = if (isAboveAndroidQ) {
         getString(RELATIVE_PATH)
     } else null
+    // AIGC START - motion photo (Android) subtype for isLivePhoto
+    var imageSubtype = 0
+    // AIGC END
     if (width == 0 || height == 0) {
         try {
             if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE && !mimeType.contains("svg")) {
                 val uri = getUri(id, MediaStoreUtils.convertTypeToMediaType(type))
-                context.contentResolver.openInputStream(uri)?.use {
-                    ExifInterface(it).apply {
-                        width = getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
-                        height = getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+                context.contentResolver.openInputStream(uri)?.use { stream ->
+                    val buf = ByteArray(MotionPhotoUtils.XMP_READ_LIMIT)
+                    val n = stream.read(buf)
+                    if (n > 0) {
+                        val copy = buf.copyOf(n)
+                        val exif = ExifInterface(ByteArrayInputStream(copy))
+                        width = exif.getAttribute(ExifInterface.TAG_IMAGE_WIDTH)?.toInt() ?: width
+                        height = exif.getAttribute(ExifInterface.TAG_IMAGE_LENGTH)?.toInt() ?: height
+                        imageSubtype = MotionPhotoUtils.getMotionPhotoSubtype(exif)
+                        if (imageSubtype == 0) {
+                            imageSubtype = if (MotionPhotoUtils.isMotionPhotoFromStream(ByteArrayInputStream(copy))) MotionPhotoUtils.SUBTYPE_LIVE_PHOTO else 0
+                        }
                     }
                 }
             } else if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
@@ -119,6 +132,27 @@ fun Cursor.toAssetEntity(
             LogUtils.error(e)
         }
     }
+    // AIGC START - detect motion photo when width/height already set (no exif opened above)
+    if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE && !mimeType.contains("svg") && imageSubtype == 0) {
+        try {
+            val uri = getUri(id, MediaStoreUtils.convertTypeToMediaType(type))
+            context.contentResolver.openInputStream(uri)?.use { stream ->
+                val buf = ByteArray(MotionPhotoUtils.XMP_READ_LIMIT)
+                val n = stream.read(buf)
+                if (n > 0) {
+                    val copy = buf.copyOf(n)
+                    val exif = ExifInterface(ByteArrayInputStream(copy))
+                    imageSubtype = MotionPhotoUtils.getMotionPhotoSubtype(exif)
+                    if (imageSubtype == 0) {
+                        imageSubtype = if (MotionPhotoUtils.isMotionPhotoFromStream(ByteArrayInputStream(copy))) MotionPhotoUtils.SUBTYPE_LIVE_PHOTO else 0
+                    }
+                }
+            }
+        } catch (e: Throwable) {
+            LogUtils.error(e)
+        }
+    }
+    // AIGC END
     return AssetEntity(
         id,
         path,
@@ -132,7 +166,8 @@ fun Cursor.toAssetEntity(
         orientation,
         isFavorite,
         androidQRelativePath = relativePath,
-        mimeType = mimeType
+        mimeType = mimeType,
+        subtype = imageSubtype
     )
 }
 

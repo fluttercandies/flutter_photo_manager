@@ -236,6 +236,23 @@ class PhotoManager(private val context: Context) {
         )
     }
 
+    fun saveMotionPhoto(
+        imagePath: String,
+        videoPath: String,
+        title: String,
+        desc: String,
+        relativePath: String,
+    ): AssetEntity {
+        return dbUtils.saveMotionPhoto(
+            context,
+            imagePath,
+            videoPath,
+            title,
+            desc,
+            relativePath,
+        )
+    }
+
     fun assetExists(id: String, resultHandler: ResultHandler) {
         val exists: Boolean = dbUtils.assetExists(context, id)
         resultHandler.reply(exists)

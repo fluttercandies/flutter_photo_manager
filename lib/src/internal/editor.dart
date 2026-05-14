@@ -397,6 +397,26 @@ class AndroidEditor {
     return plugin.androidMoveAssetsToPath(assetIds, targetPath);
   }
 
+  /// Save a Motion Photo to the gallery from the given [imageFile] and [videoFile].
+  ///
+  /// On Android, Motion Photo is a single JPEG file with embedded video bytes.
+  /// The [title] should not contain the extension.
+  Future<AssetEntity> saveMotionPhoto({
+    required File imageFile,
+    required File videoFile,
+    required String title,
+    String? desc,
+    String? relativePath,
+  }) {
+    return plugin.saveMotionPhoto(
+      imageFile: imageFile,
+      videoFile: videoFile,
+      title: title,
+      desc: desc,
+      relativePath: relativePath,
+    );
+  }
+
   /// Removes all assets from the gallery that are no longer available on disk.
   ///
   /// This method is intended to be used after manually deleting files from the

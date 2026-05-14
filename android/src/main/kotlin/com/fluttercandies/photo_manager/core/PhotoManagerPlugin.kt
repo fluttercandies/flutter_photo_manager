@@ -561,6 +561,28 @@ class PhotoManagerPlugin(
                 }
             }
 
+            Methods.saveMotionPhoto -> {
+                try {
+                    val imagePath = call.argument<String>("imagePath")!!
+                    val videoPath = call.argument<String>("videoPath")!!
+                    val title = call.argument<String>("title") ?: ""
+                    val desc = call.argument<String?>("desc") ?: ""
+                    val relativePath = call.argument<String?>("relativePath") ?: ""
+                    val entity = photoManager.saveMotionPhoto(
+                        imagePath,
+                        videoPath,
+                        title,
+                        desc,
+                        relativePath,
+                    )
+                    val map = ConvertUtils.convertAsset(entity)
+                    resultHandler.reply(map)
+                } catch (e: Exception) {
+                    LogUtils.error("save motion photo error", e)
+                    resultHandler.replyError(call.method, message = null, details = e)
+                }
+            }
+
             Methods.favoriteAsset -> {
                 val assetId = call.argument<String>("id")!!
                 val isFavorite = call.argument<Boolean>("favorite")!!

@@ -55,7 +55,10 @@ object ConvertUtils {
             "lat" to entity.lat,
             "lng" to entity.lng,
             "title" to entity.displayName,
-            "relativePath" to entity.relativePath
+            "relativePath" to entity.relativePath,
+            // AIGC START - Android motion photo reuses isLivePhoto (subtype)
+            "subtype" to entity.subtype
+            // AIGC END
         )
         if (entity.mimeType != null) {
             data["mimeType"] = entity.mimeType
