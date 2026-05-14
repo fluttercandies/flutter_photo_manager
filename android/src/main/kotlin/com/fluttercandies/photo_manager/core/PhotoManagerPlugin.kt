@@ -54,6 +54,18 @@ class PhotoManagerPlugin(
                 needPermissions: MutableList<String>,
             ) {
             }
+
+            override fun onLimitedSelectionChanged() {
+                // Send a notification to Flutter that the media library has changed
+                // so that any listeners can refresh their asset lists
+                notifyChannel.onOuterChange(
+                    null,
+                    "update",
+                    null,
+                    null,
+                    0
+                )
+            }
         }
     }
 
