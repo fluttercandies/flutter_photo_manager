@@ -74,10 +74,13 @@ class PermissionDelegate34 : PermissionDelegate() {
         var granted = true
 
         if (containsImage || containsVideo) {
-            var hasPermission = havePermission(context, mediaImage)
-            hasPermission = hasPermission || havePermission(context, mediaVideo)
-            hasPermission = hasPermission || havePermission(context, mediaVisualUserSelected)
-            granted = granted && hasPermission
+            granted = granted && hasRequestedVisualPermissions(
+                containsImage = containsImage,
+                containsVideo = containsVideo,
+                hasImagePermission = havePermission(context, mediaImage),
+                hasVideoPermission = havePermission(context, mediaVideo),
+                hasLimitedPermission = havePermission(context, mediaVisualUserSelected),
+            )
         }
 
         if (containsAudio) {
@@ -238,4 +241,30 @@ class PermissionDelegate34 : PermissionDelegate() {
 
         return result
     }
+}
+
+internal fun hasRequestedVisualPermissions(
+    containsImage: Boolean,
+    containsVideo: Boolean,
+    hasImagePermission: Boolean,
+    hasVideoPermission: Boolean,
+    hasLimitedPermission: Boolean,
+): Boolean {
+    if (!containsImage && !containsVideo) {
+        return true
+    }
+
+    if (hasLimitedPermission) {
+        return true
+    }
+
+    if (containsImage && !hasImagePermission) {
+        return false
+    }
+
+    if (containsVideo && !hasVideoPermission) {
+        return false
+    }
+
+    return true
 }
