@@ -402,7 +402,29 @@
     entity.title = needTitle ? [asset title] : @"";
     entity.favorite = asset.isFavorite;
     entity.subtype = asset.mediaSubtypes;
-    
+
+    // Read file size from PHAssetResource metadata (no iCloud download required).
+    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:asset];
+    PHAssetResource *primaryResource = nil;
+    for (PHAssetResource *r in resources) {
+        if (r.type == PHAssetResourceTypePhoto ||
+            r.type == PHAssetResourceTypeVideo ||
+            r.type == PHAssetResourceTypeFullSizePhoto ||
+            r.type == PHAssetResourceTypeFullSizeVideo) {
+            primaryResource = r;
+            break;
+        }
+    }
+    if (!primaryResource) {
+        primaryResource = resources.firstObject;
+    }
+    if (primaryResource) {
+        NSNumber *size = [primaryResource valueForKey:@"fileSize"];
+        if (size) {
+            entity.fileSize = [size longLongValue];
+        }
+    }
+
     return entity;
 }
 

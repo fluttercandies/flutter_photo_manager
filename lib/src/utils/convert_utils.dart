@@ -128,6 +128,7 @@ class ConvertUtils {
       modifiedDateSecond: data['modifiedDt'] as int?,
       relativePath: data['relativePath'] as String?,
       mimeType: data['mimeType'] as String?,
+      fileSize: data['fileSize'] as int?,
       latitude: lat,
       longitude: lng,
     );

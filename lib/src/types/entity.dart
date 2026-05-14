@@ -385,6 +385,7 @@ class AssetEntity {
     LatLng? latLng,
     this.mimeType,
     this.subtype = 0,
+    this.fileSize,
   }) : _latLng = latLng ??
             LatLng.fromValues(latitude: latitude, longitude: longitude);
 
@@ -894,6 +895,17 @@ class AssetEntity {
   ///  * https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#MIME_TYPE
   final String? mimeType;
 
+  /// The file size of the asset in bytes.
+  ///  * Android: `MediaStore.MediaColumns.SIZE`.
+  ///  * iOS/macOS: Obtained from `PHAssetResource` metadata.
+  ///  * OHOS: `photoAccessHelper.PhotoKeys.SIZE`.
+  ///
+  /// This value is read from metadata at query time, without downloading
+  /// the file from iCloud or other cloud storage.
+  ///
+  /// Returns `null` if the file size is unavailable.
+  final int? fileSize;
+
   /// Get the mime type async.
   ///  * Android: `MediaStore.MediaColumns.MIME_TYPE`.
   ///  * iOS/macOS: MIME type from `PHAssetResource.uniformTypeIdentifier`.
@@ -922,6 +934,7 @@ class AssetEntity {
     double? longitude,
     String? mimeType,
     int? subtype,
+    int? fileSize,
   }) {
     return AssetEntity(
       id: id ?? this.id,
@@ -939,6 +952,7 @@ class AssetEntity {
       longitude: longitude ?? this.longitude,
       mimeType: mimeType ?? this.mimeType,
       subtype: subtype ?? this.subtype,
+      fileSize: fileSize ?? this.fileSize,
     );
   }
 
