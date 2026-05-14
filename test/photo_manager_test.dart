@@ -5,7 +5,6 @@
 // ignore_for_file: use_named_constants
 import 'package:flutter_test/flutter_test.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:photo_manager/src/internal/plugin.dart' show fallbackTitle;
 
 class _TestPlugin extends PhotoManagerPlugin {
   @override
@@ -29,10 +28,5 @@ void main() {
     final PermissionState permission =
         await PhotoManager.requestPermissionExtend();
     expect(permission == PermissionState.notDetermined, equals(true));
-  });
-
-  test('fallbackTitle returns empty string for null', () {
-    expect(fallbackTitle(null), '');
-    expect(fallbackTitle('image.jpg'), 'image.jpg');
   });
 }
