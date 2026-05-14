@@ -17,6 +17,8 @@
 + (NSDictionary *)convertPHAssetToMap:(PHAsset *)asset
                             needTitle:(BOOL)needTitle;
 
++ (long)roundDurationSeconds:(NSTimeInterval)duration;
+
 + (NSDictionary *)convertPMAssetToMap:(PMAssetEntity *)asset
                             needTitle:(BOOL)needTitle;
 

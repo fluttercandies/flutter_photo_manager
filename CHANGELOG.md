@@ -11,6 +11,7 @@ To know more about breaking changes, see the [Migration Guide][].
 **Fixes**
 
 - Fix Android 14+ permission requests incorrectly short-circuiting when only part of the requested media access was already granted.
+- Fix Darwin video durations being truncated instead of rounded, so `AssetEntity.duration` matches the system album display more closely.
 
 ## 3.9.0
 
