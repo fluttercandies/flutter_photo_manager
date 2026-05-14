@@ -393,8 +393,8 @@
                                                createDt:createDt
                                                   width:asset.pixelWidth
                                                  height:asset.pixelHeight
-                                               duration:(long) asset.duration
-                                                   type:type];
+                                                duration:[PMConvertUtils roundDurationSeconds:asset.duration]
+                                                    type:type];
     entity.phAsset = asset;
     entity.modifiedDt = modifiedTimeStamp;
     entity.lat = asset.location.coordinate.latitude;
@@ -1505,7 +1505,7 @@
                 return;
             }
             NSTimeInterval time = CMTimeGetSeconds(context.duration);
-            [handler reply:@((long) time)];
+            [handler reply:@([PMConvertUtils roundDurationSeconds:time])];
         }];
         return;
     }
