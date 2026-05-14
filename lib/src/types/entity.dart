@@ -452,7 +452,7 @@ class AssetEntity {
   final int typeInt;
 
   /// The duration of the asset, but in different units.
-  ///  * [AssetType.audio] is in **milliseconds**.
+  ///  * [AssetType.audio] is in **seconds**.
   ///  * [AssetType.video] is in **seconds**.
   ///  * [AssetType.image] and [AssetType.other] are Always 0.
   ///
