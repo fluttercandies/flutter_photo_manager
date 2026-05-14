@@ -1103,10 +1103,10 @@
                  resultHandler:(PMResultHandler *)handler
                progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PHImageRequestOptions *options = [PHImageRequestOptions new];
-    [options setDeliveryMode:PHImageRequestOptionsDeliveryModeOpportunistic];
+    [options setDeliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat];
     [options setNetworkAccessAllowed:YES];
     [options setResizeMode:PHImageRequestOptionsResizeModeNone];
-    [options setSynchronous:YES];
+    [options setSynchronous:NO];
     [options setVersion:PHImageRequestOptionsVersionCurrent];
     
     __block double lastProgress = 0.0;
@@ -1171,17 +1171,19 @@
                 [innerStrongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
                 return;
             }
-            
-            NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
-            if (data) {
-                NSString *path = [innerStrongSelf writeFullFileWithAssetId:asset imageData: data];
-                [handler reply:path];
-                [innerStrongSelf notifySuccess:progressHandler];
-            } else {
-                [handler replyError:[NSString stringWithFormat:@"Failed to convert %@ to a JPEG file.", asset.localIdentifier]];
-                [innerStrongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
-            }
-            [innerStrongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
+
+            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+                NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
+                if (data) {
+                    NSString *path = [innerStrongSelf writeFullFileWithAssetId:asset imageData:data];
+                    [handler reply:path];
+                    [innerStrongSelf notifySuccess:progressHandler];
+                } else {
+                    [handler replyError:[NSString stringWithFormat:@"Failed to convert %@ to a JPEG file.", asset.localIdentifier]];
+                    [innerStrongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+                }
+                [innerStrongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
+            });
         }];
 
         [strongSelf addRequstId:[handler getCancelToken] requestId:requestId];

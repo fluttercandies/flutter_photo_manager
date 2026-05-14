@@ -15,6 +15,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Fix Android 14+ permission requests incorrectly short-circuiting when only part of the requested media access was already granted.
 - Fix Darwin video durations being truncated instead of rounded, so `AssetEntity.duration` matches the system album display more closely.
 - Fix Darwin `getTitleAsync` returning a null channel result by falling back to an empty string.
+- Fix Darwin image `loadFile(isOrigin: false)` blocking the iOS UI thread by making the request asynchronous and moving JPEG file conversion off the main thread, allowing `PMProgressHandler` updates to arrive while loading.
 
 ## 3.9.0
 
