@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data' as typed_data;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as path;
 import 'package:photo_manager/platform_utils.dart';
@@ -22,6 +23,9 @@ import 'enums.dart';
 import 'progress_handler.dart';
 
 PhotoManagerPlugin plugin = PhotoManagerPlugin();
+
+@visibleForTesting
+String fallbackTitle(String? title) => title ?? '';
 
 mixin BasePlugin {
   MethodChannel _channel = const PMMethodChannel(PMConstants.channelPrefix);
@@ -551,17 +555,19 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     PMDarwinAVFileType? darwinFileType,
   }) async {
     if (Platform.isIOS || Platform.isMacOS) {
-      return await _channel.invokeMethod(
-        PMConstants.mGetTitleAsync,
-        <String, dynamic>{
-          'id': entity.id,
-          'subtype': subtype,
-          'isOrigin': isOrigin,
-          'darwinFileType': darwinFileType?.value ?? 0,
-        },
+      return fallbackTitle(
+        await _channel.invokeMethod<String>(
+          PMConstants.mGetTitleAsync,
+          <String, dynamic>{
+            'id': entity.id,
+            'subtype': subtype,
+            'isOrigin': isOrigin,
+            'darwinFileType': darwinFileType?.value ?? 0,
+          },
+        ),
       );
     }
-    return entity.title ?? '';
+    return fallbackTitle(entity.title);
   }
 
   Future<String?> getMediaUrl(
