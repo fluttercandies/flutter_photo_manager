@@ -5,6 +5,9 @@ on:
     types: [ published ]
   workflow_dispatch:
 
+# Disable permissions for all of the available permissions
+permissions: {}
+
 jobs:
   publish:
     runs-on: ubuntu-latest
