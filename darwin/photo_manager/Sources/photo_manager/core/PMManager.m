@@ -963,34 +963,36 @@
                          isOrigin:(Boolean)isOrigin
                          fileType:(AVFileType)fileType
                           manager:(NSFileManager *)manager {
-    // Obtain filename from resource or asset's title.
     NSString *filename;
     if (resource) {
         filename = resource.originalFilename;
     } else {
         filename = [asset title];
     }
-    // Extract path extension from the filename, fallback to title's if it's empty from the resource.
-    NSString *extension = [filename pathExtension];
-    if (resource && [extension isEmpty]) {
-        extension = [[asset title] pathExtension];
+    NSString *fallbackExtension = [filename pathExtension];
+    if (resource && [fallbackExtension isEmpty]) {
+        fallbackExtension = [[asset title] pathExtension];
     }
     
-    NSString *id = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
-    NSString *modifiedDate = [NSString stringWithFormat:@"%f", asset.modificationDate.timeIntervalSince1970];
-    filename = [NSString stringWithFormat:@"%@_%@%@_%@",
-                id, modifiedDate, isOrigin ? @"_o" : @"", filename];
+    // Determine the target extension before building the timestamped filename so
+    // that the dot embedded in the %f timestamp format does not cause pathExtension
+    // to return a bogus fractional-seconds value instead of triggering the fallback.
+    NSString *targetExtension = fallbackExtension;
     if (fileType) {
         NSString *newExtension = [PMConvertUtils convertAVFileTypeToExtension:fileType];
         if (newExtension) {
-            NSString *filenameWithoutExtension = [filename stringByDeletingPathExtension];
-            filename = [filenameWithoutExtension stringByAppendingPathExtension:[newExtension stringByReplacingOccurrencesOfString:@"." withString:@""]];
+            targetExtension = [newExtension stringByReplacingOccurrencesOfString:@"." withString:@""];
         }
     }
-    
-    // Convert the extension to lowercased.
-    filename = [filename stringByDeletingPathExtension];
-    filename = [filename stringByAppendingPathExtension:[extension stringByReplacingOccurrencesOfString:@"." withString:@""]];
+
+    NSString *id = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+    NSString *modifiedDate = [NSString stringWithFormat:@"%f", asset.modificationDate.timeIntervalSince1970];
+    NSString *filenameBase = [filename stringByDeletingPathExtension];
+    filename = [NSString stringWithFormat:@"%@_%@%@_%@",
+                id, modifiedDate, isOrigin ? @"_o" : @"", filenameBase];
+    if (![targetExtension isEmpty]) {
+        filename = [filename stringByAppendingPathExtension:targetExtension];
+    }
     
     NSString *typeDirPath;
     if (resource) {
