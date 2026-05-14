@@ -551,15 +551,16 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     PMDarwinAVFileType? darwinFileType,
   }) async {
     if (Platform.isIOS || Platform.isMacOS) {
-      return await _channel.invokeMethod(
-        PMConstants.mGetTitleAsync,
-        <String, dynamic>{
-          'id': entity.id,
-          'subtype': subtype,
-          'isOrigin': isOrigin,
-          'darwinFileType': darwinFileType?.value ?? 0,
-        },
-      );
+      return await _channel.invokeMethod<String>(
+            PMConstants.mGetTitleAsync,
+            <String, dynamic>{
+              'id': entity.id,
+              'subtype': subtype,
+              'isOrigin': isOrigin,
+              'darwinFileType': darwinFileType?.value ?? 0,
+            },
+          ) ??
+          '';
     }
     return entity.title ?? '';
   }
