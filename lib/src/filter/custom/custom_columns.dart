@@ -27,12 +27,16 @@ import '../../utils/column_utils.dart';
 /// ```
 ///
 /// {@endtemplate}
-class CustomColumns {
+abstract class CustomColumns {
   /// {@macro custom_columns}
   const CustomColumns();
 
-  /// The base columns, contains the common columns.
-  static const CustomColumns base = CustomColumns();
+  /// The platform columns for the current platform.
+  ///
+  /// This factory determines the platform once and returns the appropriate
+  /// implementation. On unsupported platforms (e.g., Linux CI), it falls back
+  /// to Android column names.
+  static final CustomColumns base = _createForPlatform();
 
   /// The android columns, contains the android specific columns.
   static const AndroidMediaColumns android = AndroidMediaColumns();
@@ -45,26 +49,8 @@ class CustomColumns {
 
   static const ColumnUtils utils = ColumnUtils.instance;
 
-  /// Whether the current platform is android.
-  bool get isAndroid => Platform.isAndroid;
-
-  /// Whether the current platform is ios or macos.
-  bool get isDarwin => Platform.isIOS || Platform.isMacOS;
-
-  /// Whether the current platform is OpenHarmony OS.
-  bool get isOhos => PlatformUtils.isOhos;
-
   /// The id column.
-  String get id {
-    if (isAndroid) {
-      return '_id';
-    } else if (isDarwin) {
-      return 'localIdentifier';
-    } else if (isOhos) {
-      return 'uri';
-    }
-    throw UnsupportedError('Unsupported platform with id');
-  }
+  String get id;
 
   /// The media type column.
   ///
@@ -79,60 +65,28 @@ class CustomColumns {
   /// - 1: image
   /// - 2: video
   /// - 3: audio
-  String get mediaType {
-    if (isAndroid || isOhos) {
-      return 'media_type';
-    } else if (isDarwin) {
-      return 'mediaType';
-    } else {
-      throw UnsupportedError('Unsupported platform with mediaType');
-    }
-  }
+  String get mediaType;
 
   /// The width column.
   ///
   /// In android, the value of this column maybe null.
   ///
   /// In iOS/macOS, the value of this column not null.
-  String get width {
-    if (isAndroid || isOhos) {
-      return 'width';
-    } else if (isDarwin) {
-      return 'pixelWidth';
-    } else {
-      throw UnsupportedError('Unsupported platform with width');
-    }
-  }
+  String get width;
 
   /// The height column.
   ///
   /// In android, the value of this column maybe null.
   ///
   /// In iOS/macOS, the value of this column not null.
-  String get height {
-    if (isAndroid || isOhos) {
-      return 'height';
-    } else if (isDarwin) {
-      return 'pixelHeight';
-    } else {
-      throw UnsupportedError('Unsupported platform with height');
-    }
-  }
+  String get height;
 
   /// The duration column.
   ///
   /// In android, the value of this column maybe null.
   ///
   /// In iOS/macOS, the value of this column is 0 when the media is image.
-  String get duration {
-    if (isAndroid || isOhos) {
-      return 'duration';
-    } else if (isDarwin) {
-      return 'duration';
-    } else {
-      throw UnsupportedError('Unsupported platform with duration');
-    }
-  }
+  String get duration;
 
   /// The creation date column.
   ///
@@ -157,43 +111,19 @@ class CustomColumns {
   /// ```
   ///
   /// {@endtemplate}
-  String get createDate {
-    if (isAndroid || isOhos) {
-      return 'date_added';
-    } else if (isDarwin) {
-      return 'creationDate';
-    } else {
-      throw UnsupportedError('Unsupported platform with createDate');
-    }
-  }
+  String get createDate;
 
   /// The modified date column.
   ///
   /// {@macro date_column}
-  String get modifiedDate {
-    if (isAndroid || isOhos) {
-      return 'date_modified';
-    } else if (isDarwin) {
-      return 'modificationDate';
-    } else {
-      throw UnsupportedError('Unsupported platform with modifiedDate');
-    }
-  }
+  String get modifiedDate;
 
   /// The favorite column.
   ///
   /// in darwin: 1 is favorite, 0 is not favorite.
   ///
   ///
-  String get isFavorite {
-    if (isAndroid || isOhos) {
-      return 'is_favorite';
-    } else if (isDarwin) {
-      return 'favorite';
-    } else {
-      throw UnsupportedError('Unsupported platform with isFavorite');
-    }
-  }
+  String get isFavorite;
 
   List<String> getValues() {
     return [
@@ -209,7 +139,7 @@ class CustomColumns {
   }
 
   static List<String> values() {
-    return const CustomColumns().getValues();
+    return base.getValues();
   }
 
   static List<String> dateColumns() {
@@ -236,9 +166,111 @@ class CustomColumns {
     } else if (PlatformUtils.isOhos) {
       return const OhosColumns().getValues();
     } else {
-      throw UnsupportedError('Unsupported platform with platformValues');
+      return const AndroidMediaColumns().getValues();
     }
   }
+
+  static CustomColumns _createForPlatform() {
+    if (Platform.isAndroid) {
+      return const AndroidCustomColumns();
+    }
+    if (Platform.isIOS || Platform.isMacOS) {
+      return const DarwinCustomColumns();
+    }
+    if (PlatformUtils.isOhos) {
+      return const OhosCustomColumns();
+    }
+    // Fallback for unsupported platforms (e.g., Linux CI).
+    // Returns Android column names as defaults.
+    return const AndroidCustomColumns();
+  }
+}
+
+/// Android platform implementation of [CustomColumns].
+class AndroidCustomColumns extends CustomColumns {
+  const AndroidCustomColumns();
+
+  @override
+  String get id => '_id';
+
+  @override
+  String get mediaType => 'media_type';
+
+  @override
+  String get width => 'width';
+
+  @override
+  String get height => 'height';
+
+  @override
+  String get duration => 'duration';
+
+  @override
+  String get createDate => 'date_added';
+
+  @override
+  String get modifiedDate => 'date_modified';
+
+  @override
+  String get isFavorite => 'is_favorite';
+}
+
+/// Darwin (iOS/macOS) platform implementation of [CustomColumns].
+class DarwinCustomColumns extends CustomColumns {
+  const DarwinCustomColumns();
+
+  @override
+  String get id => 'localIdentifier';
+
+  @override
+  String get mediaType => 'mediaType';
+
+  @override
+  String get width => 'pixelWidth';
+
+  @override
+  String get height => 'pixelHeight';
+
+  @override
+  String get duration => 'duration';
+
+  @override
+  String get createDate => 'creationDate';
+
+  @override
+  String get modifiedDate => 'modificationDate';
+
+  @override
+  String get isFavorite => 'favorite';
+}
+
+/// OpenHarmony OS platform implementation of [CustomColumns].
+class OhosCustomColumns extends CustomColumns {
+  const OhosCustomColumns();
+
+  @override
+  String get id => 'uri';
+
+  @override
+  String get mediaType => 'media_type';
+
+  @override
+  String get width => 'width';
+
+  @override
+  String get height => 'height';
+
+  @override
+  String get duration => 'duration';
+
+  @override
+  String get createDate => 'date_added';
+
+  @override
+  String get modifiedDate => 'date_modified';
+
+  @override
+  String get isFavorite => 'is_favorite';
 }
 
 // columns: [instance_id, compilation, disc_number, duration, album_artist,
@@ -254,15 +286,38 @@ class CustomColumns {
 /// A class that contains the names of the columns used in the custom filter.
 ///
 /// About the values mean, please see document of android: https://developer.android.com/reference/android/provider/MediaStore
-class AndroidMediaColumns extends CustomColumns {
+class AndroidMediaColumns extends AndroidCustomColumns {
   const AndroidMediaColumns();
 
+  @override
+  String get id => '_id';
+
+  @override
+  String get mediaType => 'media_type';
+
+  @override
+  String get width => 'width';
+
+  @override
+  String get height => 'height';
+
+  @override
+  String get duration => 'duration';
+
+  @override
+  String get createDate => 'date_added';
+
+  @override
+  String get modifiedDate => 'date_modified';
+
+  @override
+  String get isFavorite => 'is_favorite';
+
   String _getKey(String value) {
-    if (isAndroid) {
-      return value;
-    } else {
+    if (Platform.isIOS || Platform.isMacOS || PlatformUtils.isOhos) {
       throw UnsupportedError('Unsupported column $value in platform');
     }
+    return value;
   }
 
   String get instanceId => _getKey('instance_id');
@@ -403,15 +458,38 @@ class AndroidMediaColumns extends CustomColumns {
 /// A class that contains the names of the columns of the iOS/macOS platform.
 ///
 /// About the values mean, please see document of iOS: https://developer.apple.com/documentation/photokit/phasset
-class DarwinColumns extends CustomColumns {
+class DarwinColumns extends DarwinCustomColumns {
   const DarwinColumns();
 
+  @override
+  String get id => 'localIdentifier';
+
+  @override
+  String get mediaType => 'mediaType';
+
+  @override
+  String get width => 'pixelWidth';
+
+  @override
+  String get height => 'pixelHeight';
+
+  @override
+  String get duration => 'duration';
+
+  @override
+  String get createDate => 'creationDate';
+
+  @override
+  String get modifiedDate => 'modificationDate';
+
+  @override
+  String get isFavorite => 'favorite';
+
   String _getKey(String value) {
-    if (isDarwin) {
-      return value;
-    } else {
+    if (Platform.isAndroid || PlatformUtils.isOhos) {
       throw UnsupportedError('Unsupported column $value in platform');
     }
+    return value;
   }
 
   String get mediaSubtypes => _getKey('mediaSubtypes');
@@ -458,15 +536,38 @@ class DarwinColumns extends CustomColumns {
 /// A class that contains the names of the columns used in the custom filter.
 ///
 /// About the values mean, please see document of ohos: https://developer.android.com/reference/android/provider/MediaStore
-class OhosColumns extends CustomColumns {
+class OhosColumns extends OhosCustomColumns {
   const OhosColumns();
 
+  @override
+  String get id => 'uri';
+
+  @override
+  String get mediaType => 'media_type';
+
+  @override
+  String get width => 'width';
+
+  @override
+  String get height => 'height';
+
+  @override
+  String get duration => 'duration';
+
+  @override
+  String get createDate => 'date_added';
+
+  @override
+  String get modifiedDate => 'date_modified';
+
+  @override
+  String get isFavorite => 'is_favorite';
+
   String _getKey(String value) {
-    if (isOhos) {
-      return value;
-    } else {
+    if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
       throw UnsupportedError('Unsupported column $value in platform');
     }
+    return value;
   }
 
   String get displayName => _getKey('display_name');

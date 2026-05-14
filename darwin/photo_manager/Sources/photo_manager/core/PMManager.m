@@ -393,8 +393,8 @@
                                                createDt:createDt
                                                   width:asset.pixelWidth
                                                  height:asset.pixelHeight
-                                               duration:(long) asset.duration
-                                                   type:type];
+                                                duration:[PMConvertUtils roundDurationSeconds:asset.duration]
+                                                    type:type];
     entity.phAsset = asset;
     entity.modifiedDt = modifiedTimeStamp;
     entity.lat = asset.location.coordinate.latitude;
@@ -963,16 +963,21 @@
                          isOrigin:(Boolean)isOrigin
                          fileType:(AVFileType)fileType
                           manager:(NSFileManager *)manager {
-    NSString *id = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
-    NSString *modifiedDate = [NSString stringWithFormat:@"%f", asset.modificationDate.timeIntervalSince1970];
-    NSString *homePath = NSTemporaryDirectory();
-    NSMutableString *path = [NSMutableString stringWithString:homePath];
+    // Obtain filename from resource or asset's title.
     NSString *filename;
     if (resource) {
         filename = resource.originalFilename;
     } else {
         filename = [asset title];
     }
+    // Extract path extension from the filename, fallback to title's if it's empty from the resource.
+    NSString *extension = [filename pathExtension];
+    if (resource && [extension isEmpty]) {
+        extension = [[asset title] pathExtension];
+    }
+    
+    NSString *id = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+    NSString *modifiedDate = [NSString stringWithFormat:@"%f", asset.modificationDate.timeIntervalSince1970];
     filename = [NSString stringWithFormat:@"%@_%@%@_%@",
                 id, modifiedDate, isOrigin ? @"_o" : @"", filename];
     if (fileType) {
@@ -984,7 +989,6 @@
     }
     
     // Convert the extension to lowercased.
-    NSString *extension = [filename pathExtension];
     filename = [filename stringByDeletingPathExtension];
     filename = [filename stringByAppendingPathExtension:[extension stringByReplacingOccurrencesOfString:@"." withString:@""]];
     
@@ -1010,6 +1014,9 @@
             typeDirPath = PM_OTHER_CACHE_PATH;
         }
     }
+    
+    NSString *homePath = NSTemporaryDirectory();
+    NSMutableString *path = [NSMutableString stringWithString:homePath];
     NSString *dirPath = [NSString stringWithFormat:@"%@%@", homePath, typeDirPath];
     if (manager == nil) {
         manager = NSFileManager.defaultManager;
@@ -1498,7 +1505,7 @@
                 return;
             }
             NSTimeInterval time = CMTimeGetSeconds(context.duration);
-            [handler reply:@((long) time)];
+            [handler reply:@([PMConvertUtils roundDurationSeconds:time])];
         }];
         return;
     }

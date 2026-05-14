@@ -10,7 +10,7 @@ class CustomFilterPage extends StatefulWidget {
 }
 
 class _CustomFilterPageState extends State<CustomFilterPage> {
-  static const columns = CustomColumns.base;
+  static final columns = CustomColumns.base;
 
   @override
   Widget build(BuildContext context) {

@@ -163,6 +163,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     PMFilter? filterOption,
     required PMPathFilter pathFilterOption,
   }) async {
+    _throwIfCustomFilterNotSupported(filterOption);
     if (onlyAll) {
       hasAll = true;
     }
@@ -194,6 +195,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   }
 
   Future<int> getAssetCountFromPath(AssetPathEntity path) async {
+    _throwIfCustomFilterNotSupported(path.filterOption);
     final int result = await _channel.invokeMethod(
       PMConstants.mGetAssetCountFromPath,
       <String, dynamic>{
@@ -216,6 +218,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     int size = 15,
     RequestType type = RequestType.common,
   }) async {
+    _throwIfCustomFilterNotSupported(optionGroup);
     final Map result = await _channel.invokeMethod(
       PMConstants.mGetAssetListPaged,
       <String, dynamic>{
@@ -240,6 +243,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     required int end,
     required PMFilter? optionGroup,
   }) async {
+    _throwIfCustomFilterNotSupported(optionGroup);
     final Map map = await _channel.invokeMethod(
       PMConstants.mGetAssetListRange,
       <String, dynamic>{
@@ -348,6 +352,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     RequestType type,
     PMFilter? optionGroup,
   ) {
+    _throwIfCustomFilterNotSupported(optionGroup);
     return _channel.invokeMethod(
       PMConstants.mFetchPathProperties,
       <String, dynamic>{
@@ -546,15 +551,16 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     PMDarwinAVFileType? darwinFileType,
   }) async {
     if (Platform.isIOS || Platform.isMacOS) {
-      return await _channel.invokeMethod(
-        PMConstants.mGetTitleAsync,
-        <String, dynamic>{
-          'id': entity.id,
-          'subtype': subtype,
-          'isOrigin': isOrigin,
-          'darwinFileType': darwinFileType?.value ?? 0,
-        },
-      );
+      return await _channel.invokeMethod<String>(
+            PMConstants.mGetTitleAsync,
+            <String, dynamic>{
+              'id': entity.id,
+              'subtype': subtype,
+              'isOrigin': isOrigin,
+              'darwinFileType': darwinFileType?.value ?? 0,
+            },
+          ) ??
+          '';
     }
     return entity.title ?? '';
   }
@@ -579,6 +585,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
   Future<List<AssetPathEntity>> getSubPathEntities(
     AssetPathEntity pathEntity,
   ) async {
+    _throwIfCustomFilterNotSupported(pathEntity.filterOption);
     if (PlatformUtils.isOhos) {
       return <AssetPathEntity>[];
     }
@@ -708,6 +715,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     PMFilter? filterOption,
     RequestType type = RequestType.common,
   }) async {
+    _throwIfCustomFilterNotSupported(filterOption);
     final filter = filterOption ?? PMFilter.defaultValue();
     final count = await _channel.invokeMethod(
       PMConstants.mGetAssetCount,
@@ -725,6 +733,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     RequestType type = RequestType.common,
     PMFilter? filterOption,
   }) async {
+    _throwIfCustomFilterNotSupported(filterOption);
     final filter = filterOption ?? PMFilter.defaultValue();
     final Map result = await _channel.invokeMethod(
       PMConstants.mGetAssetsByRange,
@@ -804,6 +813,27 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return _channel.invokeMethod(
       PMConstants.mCancelAllRequest,
     );
+  }
+
+  /// Validates if the [filter] is supported on the current platform.
+  ///
+  /// For [CustomFilter], it's only supported on Android, iOS, macOS, and Ohos.
+  ///
+  /// In the test environment, we allow all platforms to bypass this check
+  /// to ensure the package can be tested and built in CI environments (like Linux).
+  void _throwIfCustomFilterNotSupported(PMFilter? filter) {
+    if (filter == null || filter.type != BaseFilterType.custom) {
+      return;
+    }
+    final isSupported = Platform.isAndroid ||
+        Platform.isIOS ||
+        Platform.isMacOS ||
+        PlatformUtils.isOhos;
+    if (!isSupported && !Platform.environment.containsKey('FLUTTER_TEST')) {
+      throw UnsupportedError(
+        'CustomFilter is not supported on ${Platform.operatingSystem}',
+      );
+    }
   }
 }
 

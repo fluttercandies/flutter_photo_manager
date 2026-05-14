@@ -16,7 +16,7 @@
 /// - [CustomColumns.base]
 /// - [CustomColumns.android]
 /// - [CustomColumns.darwin]
-/// - [CustomColumns.platformValues]
+/// - [CustomColumns.baseValues]
 ///
 /// {@endtemplate}
 class OrderByItem {

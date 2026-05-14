@@ -16,10 +16,10 @@ jobs:
   triage-issues:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@900f2210b1d28bbbd0bd22d17926b9e224e8f231
         with:
           repository: fluttercandies/triage_bot_for_flutter_photo_manager
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
         with:
           sdk: '3.10'
       - run: dart pub get

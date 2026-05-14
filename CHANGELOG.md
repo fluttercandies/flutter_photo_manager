@@ -11,6 +11,23 @@ To know more about breaking changes, see the [Migration Guide][].
 **Fixes**
 
 - Fix Android 14+ limited permission photo selection not reflecting deselection in Flutter layer. When users modify their photo selection via `presentLimited()`, the changes are now properly notified to the Flutter layer.
+- Fix delayed native deletion confirmation dialogs on iOS by elevating the dispatch queue priority of `deleteWithIds`, `removeInAlbum`, and `deleteAlbum` to `QOS_CLASS_USER_INITIATED`.
+- Fix Android 14+ permission requests incorrectly short-circuiting when only part of the requested media access was already granted.
+- Fix Darwin video durations being truncated instead of rounded, so `AssetEntity.duration` matches the system album display more closely.
+- Fix Darwin `getTitleAsync` returning a null channel result by falling back to an empty string.
+
+## 3.9.0
+
+**Improvements**
+
+- Improve output file extension recognition for Darwin platforms.
+- Refactor `CustomColumns` to use platform-separated architecture.
+- Add public platform behavior classes
+  (`AndroidCustomColumns`, `DarwinCustomColumns`, `OhosCustomColumns`) for `CustomColumns`.
+- Avoid `UnsupportedError` when using `CustomFilter` in non-mobile environments (e.g., CI/Unit tests).
+- Bump `compileSdkVersion` to 36 for Android.
+- Bump EXIF interface and Glide for Android.
+- Code lints update for Android.
 
 ## 3.8.3
 

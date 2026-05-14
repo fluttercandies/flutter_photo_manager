@@ -18,15 +18,12 @@ class ColumnUtils {
   String convertDateTimeToSql(DateTime date, {bool isSeconds = true}) {
     final unix = date.millisecondsSinceEpoch;
 
-    if (Platform.isAndroid) {
-      return isSeconds ? (unix ~/ 1000).toString() : unix.toString();
-    } else if (Platform.isIOS || Platform.isMacOS) {
+    if (Platform.isIOS || Platform.isMacOS) {
       // The NSDate epoch starts at 2001-01-01T00:00:00Z, so we subtract this from the Unix timestamp in seconds.
       final secondsFrom2001 = (unix / 1000) - 978307200;
       final dateStr = secondsFrom2001.toStringAsFixed(6);
       return 'CAST($dateStr, "NSDate")';
-    } else {
-      throw UnsupportedError('Unsupported platform with date');
     }
+    return isSeconds ? (unix ~/ 1000).toString() : unix.toString();
   }
 }

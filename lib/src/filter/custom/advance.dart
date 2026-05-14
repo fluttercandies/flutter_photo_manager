@@ -129,24 +129,7 @@ abstract class WhereConditionItem {
   static final platformConditions = _platformValues();
 
   static List<String> _platformValues() {
-    if (Platform.isAndroid) {
-      return [
-        'is not null',
-        'is null',
-        '==',
-        '!=',
-        '>',
-        '>=',
-        '<',
-        '<=',
-        'like',
-        'not like',
-        'in',
-        'not in',
-        'between',
-        'not between',
-      ];
-    } else if (Platform.isIOS || Platform.isMacOS) {
+    if (Platform.isIOS || Platform.isMacOS) {
       // The NSPredicate syntax is used on iOS and macOS.
       return [
         '!= nil',
@@ -165,7 +148,22 @@ abstract class WhereConditionItem {
         'not between',
       ];
     }
-    throw UnsupportedError('Unsupported platform');
+    return [
+      'is not null',
+      'is null',
+      '==',
+      '!=',
+      '>',
+      '>=',
+      '<',
+      '<=',
+      'like',
+      'not like',
+      'in',
+      'not in',
+      'between',
+      'not between',
+    ];
   }
 
   /// Same [text] is converted, no readable.
