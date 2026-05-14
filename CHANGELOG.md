@@ -8,7 +8,9 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+**Fixes**
+
+- Fix Android 14+ permission requests incorrectly short-circuiting when only part of the requested media access was already granted.
 
 ## 3.9.0
 
