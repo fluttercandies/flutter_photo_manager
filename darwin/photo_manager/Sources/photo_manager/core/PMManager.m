@@ -974,24 +974,25 @@
         fallbackExtension = [[asset title] pathExtension];
     }
     
-    NSString *id = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
-    NSString *modifiedDate = [NSString stringWithFormat:@"%f", asset.modificationDate.timeIntervalSince1970];
-    filename = [NSString stringWithFormat:@"%@_%@%@_%@",
-                id, modifiedDate, isOrigin ? @"_o" : @"", filename];
+    // Determine the target extension before building the timestamped filename so
+    // that the dot embedded in the %f timestamp format does not cause pathExtension
+    // to return a bogus fractional-seconds value instead of triggering the fallback.
+    NSString *targetExtension = fallbackExtension;
     if (fileType) {
         NSString *newExtension = [PMConvertUtils convertAVFileTypeToExtension:fileType];
         if (newExtension) {
-            NSString *filenameWithoutExtension = [filename stringByDeletingPathExtension];
-            filename = [filenameWithoutExtension stringByAppendingPathExtension:[newExtension stringByReplacingOccurrencesOfString:@"." withString:@""]];
+            targetExtension = [newExtension stringByReplacingOccurrencesOfString:@"." withString:@""];
         }
     }
-    
-    NSString *extension = [filename pathExtension];
-    if ([extension isEmpty]) {
-        extension = fallbackExtension;
+
+    NSString *id = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+    NSString *modifiedDate = [NSString stringWithFormat:@"%f", asset.modificationDate.timeIntervalSince1970];
+    NSString *filenameBase = [filename stringByDeletingPathExtension];
+    filename = [NSString stringWithFormat:@"%@_%@%@_%@",
+                id, modifiedDate, isOrigin ? @"_o" : @"", filenameBase];
+    if (![targetExtension isEmpty]) {
+        filename = [filename stringByAppendingPathExtension:targetExtension];
     }
-    filename = [filename stringByDeletingPathExtension];
-    filename = [filename stringByAppendingPathExtension:[extension stringByReplacingOccurrencesOfString:@"." withString:@""]];
     
     NSString *typeDirPath;
     if (resource) {
