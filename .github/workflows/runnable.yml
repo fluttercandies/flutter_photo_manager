@@ -16,6 +16,9 @@ on:
     paths-ignore:
       - "**.md"
 
+# Disable permissions for all of the available permissions
+permissions: {}
+
 jobs:
   analyze:
     name: Analyze on ${{ matrix.os }}
