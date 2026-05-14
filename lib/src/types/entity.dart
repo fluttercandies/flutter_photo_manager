@@ -451,8 +451,8 @@ class AssetEntity {
   /// The type value of the [type].
   final int typeInt;
 
-  /// The duration of the asset, but in different units.
-  ///  * [AssetType.audio] is in **milliseconds**.
+  /// The duration of the asset in seconds for audio and video assets.
+  ///  * [AssetType.audio] is in **seconds**.
   ///  * [AssetType.video] is in **seconds**.
   ///  * [AssetType.image] and [AssetType.other] are Always 0.
   ///
@@ -729,7 +729,7 @@ class AssetEntity {
   /// This getter will return [Duration.zero] if the asset if not video.
   ///
   /// See also:
-  ///  * [duration] which is the duration of the asset, but in different units.
+  ///  * [duration] which stores the duration in seconds.
   Duration get videoDuration => Duration(seconds: duration);
 
   /// The [Size] for the asset.
