@@ -169,7 +169,13 @@
 }
 
 - (BOOL)existsWithId:(NSString *)assetId {
-    PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHFetchResult<PHAsset *> *result;
+    @try {
+        result = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    } @catch (NSException *exception) {
+        NSLog(@"photo_manager: Failed to check asset existence %@: %@", assetId, exception);
+        return NO;
+    }
     return result && result.count == 1;
 }
 
@@ -178,7 +184,13 @@
                         isOrigin:(BOOL)isOrigin
                          subtype:(int)subtype
                         fileType:(AVFileType)fileType {
-    PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHFetchResult<PHAsset *> *result;
+    @try {
+        result = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    } @catch (NSException *exception) {
+        NSLog(@"photo_manager: Failed to fetch asset %@: %@", assetId, exception);
+        return NO;
+    }
     if (!result) {
         return NO;
     }
@@ -426,7 +438,13 @@
             return entity;
         }
     }
-    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHFetchResult *fetchResult;
+    @try {
+        fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    } @catch (NSException *exception) {
+        NSLog(@"photo_manager: Failed to fetch asset %@: %@", assetId, exception);
+        return nil;
+    }
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (!asset) {
         return nil;
