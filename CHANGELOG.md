@@ -10,6 +10,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 **Fixes**
 
+- Stop auto-declaring `READ_EXTERNAL_STORAGE` in the Android library manifest so host apps must opt in explicitly when they need broad media-library access on Android 12L and lower.
 - Fix the `AssetEntity.duration` API docs to clarify that audio and video durations are returned in seconds across supported platforms, preserving the existing API behavior.
 - Fix Android 14+ limited permission photo selection not reflecting deselection in Flutter layer. When users modify their photo selection via `presentLimited()`, the changes are now properly notified to the Flutter layer.
 - Fix delayed native deletion confirmation dialogs on iOS by elevating the dispatch queue priority of `deleteWithIds`, `removeInAlbum`, and `deleteAlbum` to `QOS_CLASS_USER_INITIATED`.

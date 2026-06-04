@@ -38,9 +38,12 @@ class PhotoManager {
   static base.PhotoManagerPlugin get plugin => base.plugin;
 
   /// ### Android (AndroidManifest.xml)
-  ///  * READ_EXTERNAL_STORAGE (REQUIRED)
-  ///  * WRITE_EXTERNAL_STORAGE
-  ///  * ACCESS_MEDIA_LOCATION
+  ///  * Declare `READ_EXTERNAL_STORAGE` in your app manifest when you need
+  ///    broad media-library access on Android 12L and lower.
+  ///  * Declare `READ_MEDIA_IMAGES` / `READ_MEDIA_VIDEO` in your app manifest
+  ///    when you need broad media-library access on Android 13 and higher.
+  ///  * Declare `WRITE_EXTERNAL_STORAGE` / `ACCESS_MEDIA_LOCATION` in your app
+  ///    manifest if your use case requires them.
   ///
   /// ### iOS (Info.plist)
   ///  * NSPhotoLibraryUsageDescription

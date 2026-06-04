@@ -855,6 +855,10 @@ rootProject.allprojects {
 如果你想了解如何同时使用 ProGuard 和 Glide，请参阅
 [ProGuard for Glide](https://github.com/bumptech/glide#proguard)。
 
+> 从下一个版本开始，插件不再通过 Android library manifest 自动声明媒体/存储权限。
+> 如果你的应用确实需要广泛的媒体库访问能力，请在宿主应用自己的 manifest 中显式声明所需权限。
+> 如果你的应用只是一次性让用户选择文件，建议优先使用系统选择器，而不是申请广泛媒体权限。
+
 #### Android 14 (API level 34) 额外配置
 
 当你的应用在 API 34 (Android 14) 的设备上运行时，

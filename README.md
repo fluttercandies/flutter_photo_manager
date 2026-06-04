@@ -913,6 +913,12 @@ rootProject.allprojects {
 See [ProGuard for Glide](https://github.com/bumptech/glide#proguard)
 if you want to know more about using ProGuard and Glide together.
 
+> Starting from the next release, this plugin no longer auto-declares Android
+> media/storage permissions in its library manifest. If your app needs broad
+> media-library access, declare the required permissions in your own app
+> manifest explicitly. If your app only needs one-off user-selected files,
+> prefer a system picker instead of broad media permissions.
+
 #### Android 14 (API 34) extra configs
 
 When running on Android 14 (API level 34),
