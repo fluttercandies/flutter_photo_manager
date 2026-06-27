@@ -21,6 +21,9 @@
 
     // dict, key: cancelToken, value: PHImageRequestID
     NSMutableDictionary<NSString *, NSNumber*> *requestIdMap;
+    // Serial queue that serializes all requestIdMap mutations/reads.
+    dispatch_queue_t _requestIdQueue;
+    dispatch_queue_t _imageFileProcessingQueue;
 }
 
 - (instancetype)init {
@@ -28,6 +31,14 @@
     if (self) {
         cacheContainer = [PMCacheContainer new];
         requestIdMap = [NSMutableDictionary new];
+        _requestIdQueue = dispatch_queue_create(
+            "com.fluttercandies.photo_manager.requestIdQueue",
+            DISPATCH_QUEUE_SERIAL
+        );
+        _imageFileProcessingQueue = dispatch_queue_create(
+            "com.fluttercandies.photo_manager.imageFileProcessingQueue",
+            DISPATCH_QUEUE_SERIAL
+        );
     }
     return self;
 }
@@ -1105,10 +1116,10 @@
                  resultHandler:(PMResultHandler *)handler
                progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PHImageRequestOptions *options = [PHImageRequestOptions new];
-    [options setDeliveryMode:PHImageRequestOptionsDeliveryModeOpportunistic];
+    [options setDeliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat];
     [options setNetworkAccessAllowed:YES];
     [options setResizeMode:PHImageRequestOptionsResizeModeNone];
-    [options setSynchronous:YES];
+    [options setSynchronous:NO];
     [options setVersion:PHImageRequestOptionsVersionCurrent];
     
     __block double lastProgress = 0.0;
@@ -1167,23 +1178,42 @@
                 [innerStrongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
                 return;
             }
-            
-            BOOL downloadFinished = [PMManager isDownloadFinish:info];
-            if (!downloadFinished) {
+
+            if ([info[PHImageCancelledKey] boolValue]) {
+                [innerStrongSelf handleCancelRequest:handler progressHandler:progressHandler];
                 [innerStrongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
                 return;
             }
-            
-            NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
-            if (data) {
-                NSString *path = [innerStrongSelf writeFullFileWithAssetId:asset imageData: data];
-                [handler reply:path];
-                [innerStrongSelf notifySuccess:progressHandler];
-            } else {
-                [handler replyError:[NSString stringWithFormat:@"Failed to convert %@ to a JPEG file.", asset.localIdentifier]];
-                [innerStrongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+
+            if ([info[PHImageResultIsDegradedKey] boolValue]) {
+                return;
             }
-            [innerStrongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
+
+            NSString *cancelToken = [handler getCancelToken];
+            dispatch_async(innerStrongSelf->_imageFileProcessingQueue, ^{
+                // Drop the result if the request was cancelled while we were waiting.
+                if (![innerStrongSelf isRequestActiveWithCancelToken:cancelToken]) {
+                    [innerStrongSelf handleCancelRequestIfNeeded:handler progressHandler:progressHandler];
+                    return;
+                }
+                NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
+                if (data) {
+                    NSString *path = [innerStrongSelf writeFullFileWithAssetId:asset imageData:data];
+                    if (![innerStrongSelf consumeRequestWithCancelToken:cancelToken]) {
+                        [innerStrongSelf handleCancelRequestIfNeeded:handler progressHandler:progressHandler];
+                        return;
+                    }
+                    [handler reply:path];
+                    [innerStrongSelf notifySuccess:progressHandler];
+                } else {
+                    if (![innerStrongSelf consumeRequestWithCancelToken:cancelToken]) {
+                        [innerStrongSelf handleCancelRequestIfNeeded:handler progressHandler:progressHandler];
+                        return;
+                    }
+                    [handler replyError:[NSString stringWithFormat:@"Failed to convert %@ to a JPEG file.", asset.localIdentifier]];
+                    [innerStrongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+                }
+            });
         }];
 
         [strongSelf addRequstId:[handler getCancelToken] requestId:requestId];
@@ -1191,10 +1221,7 @@
 }
 
 + (BOOL)isDownloadFinish:(NSDictionary *)info {
-    BOOL finished;
-    finished = ![info[PHImageCancelledKey] boolValue]; // Not cancelled.
-    finished = ![info[PHImageResultIsDegradedKey] boolValue]; // Not thumbnail.
-    return finished;
+    return ![info[PHImageCancelledKey] boolValue] && ![info[PHImageResultIsDegradedKey] boolValue];
 }
 
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type filterOption:(NSObject <PMBaseFilter> *)filterOption {
@@ -1988,39 +2015,75 @@
     [handler replyError:@"Request canceled"];
 }
 
+- (void)handleCancelRequestIfNeeded:(PMResultHandler *)handler
+                     progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+    if ([handler isReplied]) {
+        return;
+    }
+    [self handleCancelRequest:handler progressHandler:progressHandler];
+}
+
 - (void) addRequstId:(NSString *)cancelToken
             requestId:(PHImageRequestID)requestId {
-    requestIdMap[cancelToken] = @(requestId);
+    dispatch_sync(_requestIdQueue, ^{
+        requestIdMap[cancelToken] = @(requestId);
+    });
 }
 
 // When the request is finished
 - (void) removeRequstIdWithCancelToken:(NSString *)cancelToken {
-    NSNumber *requestId = requestIdMap[cancelToken];
-    if (requestId) {
+    dispatch_sync(_requestIdQueue, ^{
         [requestIdMap removeObjectForKey:cancelToken];
-    }
+    });
+}
+
+- (BOOL) isRequestActiveWithCancelToken:(NSString *)cancelToken {
+    __block BOOL active = NO;
+    dispatch_sync(_requestIdQueue, ^{
+        active = requestIdMap[cancelToken] != nil;
+    });
+    return active;
+}
+
+- (BOOL) consumeRequestWithCancelToken:(NSString *)cancelToken {
+    __block BOOL active = NO;
+    dispatch_sync(_requestIdQueue, ^{
+        active = requestIdMap[cancelToken] != nil;
+        if (active) {
+            [requestIdMap removeObjectForKey:cancelToken];
+        }
+    });
+    return active;
 }
 
 - (void) cancelRequestWithCancelToken:(NSString *)cancelToken {
-    NSNumber *requestId = requestIdMap[cancelToken];
+    __block NSNumber *requestId = nil;
+    dispatch_sync(_requestIdQueue, ^{
+        requestId = requestIdMap[cancelToken];
+        if (requestId) {
+            [requestIdMap removeObjectForKey:cancelToken];
+        }
+    });
     if (requestId) {
         // PHImageManager methods must be called on the main thread to avoid crashes
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.cachingManager cancelImageRequest:requestId.intValue];
         });
-        [requestIdMap removeObjectForKey:cancelToken];
     }
 }
 
 - (void) cancelAllRequest {
+    __block NSArray<NSNumber *> *requestIds = nil;
+    dispatch_sync(_requestIdQueue, ^{
+        requestIds = [requestIdMap allValues];
+        [requestIdMap removeAllObjects];
+    });
     // PHImageManager methods must be called on the main thread to avoid crashes
     dispatch_async(dispatch_get_main_queue(), ^{
-        for (NSString *key in requestIdMap) {
-            NSNumber *requestId = requestIdMap[key];
+        for (NSNumber *requestId in requestIds) {
             [self.cachingManager cancelImageRequest:requestId.intValue];
         }
     });
-    [requestIdMap removeAllObjects];
 }
 
 # pragma mark progress
