@@ -2,6 +2,7 @@
 
 @implementation PMResultHandler {
     BOOL isReply;
+    NSLock *_replyLock;
 }
 
 - (instancetype)initWithResult:(FlutterResult)result {
@@ -9,6 +10,7 @@
     if (self) {
         self.result = result;
         isReply = NO;
+        _replyLock = [NSLock new];
     }
     
     return self;
@@ -19,6 +21,8 @@
     if (self) {
         self.call = call;
         self.result = result;
+        isReply = NO;
+        _replyLock = [NSLock new];
     }
 
     return self;
@@ -29,22 +33,20 @@
 }
 
 - (void)reply:(id)obj {
-    if (isReply) {
+    if (![self markReplied]) {
         return;
     }
-    isReply = YES;
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         self.result(obj);
     });
 }
 
 - (void)replyError:(NSObject *)value {
-    if (isReply) {
+    if (![self markReplied]) {
         return;
     }
-    isReply = YES;
-    
+
     FlutterError *flutterError;
     if ([value isKindOfClass:[NSError class]]) {
         NSError *error = (NSError *)value;
@@ -74,21 +76,33 @@
 }
 
 - (void)notImplemented {
-    if (isReply) {
+    if (![self markReplied]) {
         return;
     }
-    isReply = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
         self.result(FlutterMethodNotImplemented);
     });
 }
 
 - (BOOL)isReplied {
-    return isReply;
+    [_replyLock lock];
+    BOOL replied = isReply;
+    [_replyLock unlock];
+    return replied;
 }
 
 - (NSString *)getCancelToken {
     return self.call.arguments[@"cancelToken"];
+}
+
+- (BOOL)markReplied {
+    [_replyLock lock];
+    BOOL shouldReply = !isReply;
+    if (shouldReply) {
+        isReply = YES;
+    }
+    [_replyLock unlock];
+    return shouldReply;
 }
 
 @end

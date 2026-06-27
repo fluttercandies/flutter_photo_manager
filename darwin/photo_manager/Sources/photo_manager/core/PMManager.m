@@ -23,6 +23,7 @@
     NSMutableDictionary<NSString *, NSNumber*> *requestIdMap;
     // Serial queue that serializes all requestIdMap mutations/reads.
     dispatch_queue_t _requestIdQueue;
+    dispatch_queue_t _imageFileProcessingQueue;
 }
 
 - (instancetype)init {
@@ -32,6 +33,10 @@
         requestIdMap = [NSMutableDictionary new];
         _requestIdQueue = dispatch_queue_create(
             "com.fluttercandies.photo_manager.requestIdQueue",
+            DISPATCH_QUEUE_SERIAL
+        );
+        _imageFileProcessingQueue = dispatch_queue_create(
+            "com.fluttercandies.photo_manager.imageFileProcessingQueue",
             DISPATCH_QUEUE_SERIAL
         );
     }
@@ -1173,15 +1178,19 @@
                 [innerStrongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
                 return;
             }
-            
-            BOOL downloadFinished = [PMManager isDownloadFinish:info];
-            if (!downloadFinished) {
+
+            if ([info[PHImageCancelledKey] boolValue]) {
+                [innerStrongSelf handleCancelRequest:handler progressHandler:progressHandler];
                 [innerStrongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
                 return;
             }
 
+            if ([info[PHImageResultIsDegradedKey] boolValue]) {
+                return;
+            }
+
             NSString *cancelToken = [handler getCancelToken];
-            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+            dispatch_async(innerStrongSelf->_imageFileProcessingQueue, ^{
                 // Drop the result if the request was cancelled while we were waiting.
                 if (![innerStrongSelf isRequestActiveWithCancelToken:cancelToken]) {
                     return;
@@ -1189,13 +1198,18 @@
                 NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
                 if (data) {
                     NSString *path = [innerStrongSelf writeFullFileWithAssetId:asset imageData:data];
+                    if (![innerStrongSelf consumeRequestWithCancelToken:cancelToken]) {
+                        return;
+                    }
                     [handler reply:path];
                     [innerStrongSelf notifySuccess:progressHandler];
                 } else {
+                    if (![innerStrongSelf consumeRequestWithCancelToken:cancelToken]) {
+                        return;
+                    }
                     [handler replyError:[NSString stringWithFormat:@"Failed to convert %@ to a JPEG file.", asset.localIdentifier]];
                     [innerStrongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
                 }
-                [innerStrongSelf removeRequstIdWithCancelToken:cancelToken];
             });
         }];
 
@@ -1204,10 +1218,7 @@
 }
 
 + (BOOL)isDownloadFinish:(NSDictionary *)info {
-    BOOL finished;
-    finished = ![info[PHImageCancelledKey] boolValue]; // Not cancelled.
-    finished = ![info[PHImageResultIsDegradedKey] boolValue]; // Not thumbnail.
-    return finished;
+    return ![info[PHImageCancelledKey] boolValue] && ![info[PHImageResultIsDegradedKey] boolValue];
 }
 
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type filterOption:(NSObject <PMBaseFilter> *)filterOption {
@@ -2019,6 +2030,17 @@
     __block BOOL active = NO;
     dispatch_sync(_requestIdQueue, ^{
         active = requestIdMap[cancelToken] != nil;
+    });
+    return active;
+}
+
+- (BOOL) consumeRequestWithCancelToken:(NSString *)cancelToken {
+    __block BOOL active = NO;
+    dispatch_sync(_requestIdQueue, ^{
+        active = requestIdMap[cancelToken] != nil;
+        if (active) {
+            [requestIdMap removeObjectForKey:cancelToken];
+        }
     });
     return active;
 }
