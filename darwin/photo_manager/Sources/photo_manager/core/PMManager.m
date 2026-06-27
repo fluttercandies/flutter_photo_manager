@@ -1193,18 +1193,21 @@
             dispatch_async(innerStrongSelf->_imageFileProcessingQueue, ^{
                 // Drop the result if the request was cancelled while we were waiting.
                 if (![innerStrongSelf isRequestActiveWithCancelToken:cancelToken]) {
+                    [innerStrongSelf handleCancelRequestIfNeeded:handler progressHandler:progressHandler];
                     return;
                 }
                 NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
                 if (data) {
                     NSString *path = [innerStrongSelf writeFullFileWithAssetId:asset imageData:data];
                     if (![innerStrongSelf consumeRequestWithCancelToken:cancelToken]) {
+                        [innerStrongSelf handleCancelRequestIfNeeded:handler progressHandler:progressHandler];
                         return;
                     }
                     [handler reply:path];
                     [innerStrongSelf notifySuccess:progressHandler];
                 } else {
                     if (![innerStrongSelf consumeRequestWithCancelToken:cancelToken]) {
+                        [innerStrongSelf handleCancelRequestIfNeeded:handler progressHandler:progressHandler];
                         return;
                     }
                     [handler replyError:[NSString stringWithFormat:@"Failed to convert %@ to a JPEG file.", asset.localIdentifier]];
@@ -2010,6 +2013,14 @@
             progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     [self notifyProgress:progressHandler progress:0 state:PMProgressStateCancel];
     [handler replyError:@"Request canceled"];
+}
+
+- (void)handleCancelRequestIfNeeded:(PMResultHandler *)handler
+                     progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+    if ([handler isReplied]) {
+        return;
+    }
+    [self handleCancelRequest:handler progressHandler:progressHandler];
 }
 
 - (void) addRequstId:(NSString *)cancelToken
