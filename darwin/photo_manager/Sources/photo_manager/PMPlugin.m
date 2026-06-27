@@ -355,6 +355,7 @@
     if ([method isEqualToString:@"getAssetListPaged"] ||
         [method isEqualToString:@"getAssetListRange"] ||
         [method isEqualToString:@"getFullFile"] ||
+        [method isEqualToString:@"getFileSize"] ||
         [method isEqualToString:@"getMediaUrl"] ||
         [method isEqualToString:@"fetchEntityProperties"] ||
         [method isEqualToString:@"deleteWithIds"] ||
@@ -605,6 +606,10 @@
                                                    isOrigin:isOrigin
                                                    fileType:fileType];
         [handler reply:title];
+    } else if ([call.method isEqualToString:@"getFileSize"]) {
+        NSString *assetId = call.arguments[@"id"];
+        NSUInteger fileSize = [manager getFileSizeWithAssetId:assetId];
+        [handler reply:@(fileSize)];
     } else if ([call.method isEqualToString:@"getMimeTypeAsync"]) {
         NSString *assetId = call.arguments[@"id"];
         NSString *mimeType = [manager getMimeTypeAsyncWithAssetId:assetId];

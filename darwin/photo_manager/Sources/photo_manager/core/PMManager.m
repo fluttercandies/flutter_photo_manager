@@ -1529,6 +1529,27 @@
     return @"";
 }
 
+- (NSUInteger)getFileSizeWithAssetId:(NSString *)assetId {
+    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
+    if (!asset) {
+        return 0;
+    }
+    PHAssetResource *resource = [asset getCurrentResource];
+    if (!resource) {
+        return 0;
+    }
+    @try {
+        NSNumber *fileSize = [resource valueForKey:@"fileSize"];
+        if (![fileSize isKindOfClass:NSNumber.class]) {
+            return 0;
+        }
+        return fileSize.unsignedIntegerValue;
+    } @catch (NSException *exception) {
+        return 0;
+    }
+}
+
 - (NSString *)getMimeTypeAsyncWithAssetId:(NSString *)assetId {
     PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
