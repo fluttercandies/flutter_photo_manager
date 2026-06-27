@@ -10,6 +10,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 **Fixes**
 
+- Fix Darwin crashes when querying assets by local identifier by catching PhotoKit exceptions and returning safe fallback results instead of aborting the process.
 - Fix the `AssetEntity.duration` API docs to clarify that audio and video durations are returned in seconds across supported platforms, preserving the existing API behavior.
 - Fix Android 14+ limited permission photo selection not reflecting deselection in Flutter layer. When users modify their photo selection via `presentLimited()`, the changes are now properly notified to the Flutter layer.
 - Fix delayed native deletion confirmation dialogs on iOS by elevating the dispatch queue priority of `deleteWithIds`, `removeInAlbum`, and `deleteAlbum` to `QOS_CLASS_USER_INITIATED`.
