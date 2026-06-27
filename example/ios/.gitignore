@@ -32,3 +32,4 @@ Runner/GeneratedPluginRegistrant.*
 !default.pbxuser
 !default.perspectivev3
 .build/
+.derived-data*
