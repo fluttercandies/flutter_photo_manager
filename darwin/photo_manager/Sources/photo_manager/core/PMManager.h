@@ -106,6 +106,8 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
                              isOrigin:(BOOL)isOrigin
                              fileType:(AVFileType)fileType;
 
+- (NSUInteger)getFileSizeWithAssetId:(NSString *)assetId;
+
 - (NSString*)getMimeTypeAsyncWithAssetId: (NSString *) assetId;
 
 - (void)getMediaUrl:(NSString *)assetId

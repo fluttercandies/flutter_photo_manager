@@ -23,6 +23,7 @@ import android.provider.MediaStore.MediaColumns.IS_FAVORITE
 import android.provider.MediaStore.MediaColumns.MIME_TYPE
 import android.provider.MediaStore.MediaColumns.ORIENTATION
 import android.provider.MediaStore.MediaColumns.RELATIVE_PATH
+import android.provider.MediaStore.MediaColumns.SIZE
 import android.provider.MediaStore.MediaColumns.TITLE
 import android.provider.MediaStore.MediaColumns.WIDTH
 import android.provider.MediaStore.MediaColumns._ID
@@ -130,6 +131,21 @@ interface IDBUtils {
     ): List<AssetEntity>
 
     fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean = true): AssetEntity?
+
+    fun getFileSize(context: Context, id: String): Long {
+        context.contentResolver.logQuery(
+            allUri,
+            arrayOf(SIZE),
+            idSelection,
+            arrayOf(id),
+            null
+        ).use {
+            if (it.moveToNext()) {
+                return it.getLong(SIZE)
+            }
+        }
+        return 0
+    }
 
     fun getAssetPathEntityFromId(
         context: Context,
