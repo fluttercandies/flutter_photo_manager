@@ -10,10 +10,12 @@ build/
 .vscode/
 android/.classpath
 android/.project
+**/DerivedData/
 
-fvm
-doc/
+.fvm
 .env
 *.iml
 .metadata
 _codeql_detected_source_root
+
+doc/
