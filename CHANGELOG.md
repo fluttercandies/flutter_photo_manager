@@ -6,40 +6,16 @@ that can be found in the LICENSE file. -->
 
 To know more about breaking changes, see the [Migration Guide][].
 
-## 3.10.0
+## Unreleased
 
 **Improvements**
 
-- Migrate to built-in Kotlin per the official Flutter migration guide:
-  https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-plugin-authors
-- Remove `apply plugin: "kotlin-android"` and the Kotlin Gradle Plugin
-  classpath from `android/build.gradle`; the Kotlin compiler is now
-  provided by the Flutter Gradle plugin via `android.builtInKotlin=true`.
-- Replace the legacy `kotlinOptions { jvmTarget = '17' }` block in both
-  the plugin and the example app with the modern
-  `kotlin { compilerOptions { jvmTarget = ... } }` DSL.
-- Bump minimum Flutter version to 3.44.0 and Dart SDK to 3.12.0, as
-  required by the new `kotlin.compilerOptions` DSL.
-- Bump `compileSdkVersion` and example `compileSdk` stay on 36; no
-  behavior change for users.
-- Fix pre-existing typo in `android/build.gradle` where the Android
-  `namespace` was declared as `com.flutterandies.photo_manager` while
-  the Kotlin sources live under `com.fluttercandies.photo_manager`.
-  The mismatch was masked by the legacy `kotlin-android` plugin
-  reading the package from the source directories; built-in Kotlin
-  enforces the declared `namespace`, so the typo is corrected to
-  `com.fluttercandies.photo_manager` to match the actual code and
-  the auto-generated `GeneratedPluginRegistrant.java`.
+- Migrate the Android plugin to Flutter's built-in Kotlin integration with a compatibility fallback for projects that still require `kotlin-android`, without changing the package's public Flutter or Dart version constraints.
+- Fix the Android plugin `namespace` to `com.fluttercandies.photo_manager` so it matches the plugin package and Kotlin sources.
 
 **Fixes**
 
-- Fixes the warning: "Your app uses the following plugins that apply
-  Kotlin Gradle Plugin (KGP)".
-
-## Unreleased
-
-**Fixes**
-
+- Reduce built-in Kotlin migration warnings for supported project configurations while preserving legacy Flutter compatibility.
 - Fix the `AssetEntity.duration` API docs to clarify that audio and video durations are returned in seconds across supported platforms, preserving the existing API behavior.
 - Fix Android 14+ limited permission photo selection not reflecting deselection in Flutter layer. When users modify their photo selection via `presentLimited()`, the changes are now properly notified to the Flutter layer.
 - Fix delayed native deletion confirmation dialogs on iOS by elevating the dispatch queue priority of `deleteWithIds`, `removeInAlbum`, and `deleteAlbum` to `QOS_CLASS_USER_INITIATED`.

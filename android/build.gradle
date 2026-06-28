@@ -11,6 +11,21 @@ String library_version = versionMatcher.group(1).replaceAll("\\+", "-")
 group 'com.fluttercandies.photo_manager'
 version library_version
 
+def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
+
+if (agpMajor < 9) {
+    buildscript {
+        ext.kotlin_version = '1.9.23'
+        repositories {
+            google()
+            mavenCentral()
+        }
+
+        dependencies {
+            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        }
+    }
+}
 rootProject.allprojects {
     repositories {
         google()
@@ -19,6 +34,10 @@ rootProject.allprojects {
 }
 
 apply plugin: 'com.android.library'
+
+if (agpMajor < 9) {
+    apply plugin: 'kotlin-android'
+}
 
 android {
     if (project.android.hasProperty('namespace')) {
