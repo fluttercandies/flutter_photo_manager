@@ -57,6 +57,23 @@
     return options;
 }
 
+- (PHFetchResult<PHAsset *> *)fetchAssetsWithLocalIdentifiersSafely:(NSArray<NSString *> *)ids
+                                                            options:(PHFetchOptions *)options
+                                                          operation:(NSString *)operation {
+    @try {
+        return [PHAsset fetchAssetsWithLocalIdentifiers:ids options:options];
+    } @catch (NSException *exception) {
+        NSString *log = [NSString stringWithFormat:
+                         @"Failed to fetch assets for %@, ids count = %lu, exception = %@, reason = %@",
+                         operation,
+                         (unsigned long)ids.count,
+                         exception.name ?: @"UnknownException",
+                         exception.reason ?: @"Unknown reason"];
+        [PMLogUtils.sharedInstance info:log];
+        return nil;
+    }
+}
+
 - (NSArray<PMAssetPathEntity *> *)getAssetPathList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(NSObject <PMBaseFilter> *)option pathFilterOption:(PMPathFilterOption *)pathFilterOption {
     NSMutableArray<PMAssetPathEntity *> *array = [NSMutableArray new];
     PHFetchOptions *assetOptions = [self getAssetOptions:type filterOption:option];
@@ -172,7 +189,9 @@
 }
 
 - (BOOL)existsWithId:(NSString *)assetId {
-    PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHFetchResult<PHAsset *> *result = [self fetchAssetsWithLocalIdentifiersSafely:@[assetId]
+                                                                           options:[self singleFetchOptions]
+                                                                         operation:@"existsWithId"];
     return result && result.count == 1;
 }
 
@@ -181,7 +200,9 @@
                         isOrigin:(BOOL)isOrigin
                          subtype:(int)subtype
                         fileType:(AVFileType)fileType {
-    PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHFetchResult<PHAsset *> *result = [self fetchAssetsWithLocalIdentifiersSafely:@[assetId]
+                                                                           options:[self singleFetchOptions]
+                                                                         operation:@"entityIsLocallyAvailable"];
     if (!result) {
         return NO;
     }
@@ -429,7 +450,9 @@
             return entity;
         }
     }
-    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHFetchResult *fetchResult = [self fetchAssetsWithLocalIdentifiersSafely:@[assetId]
+                                                                     options:[self singleFetchOptions]
+                                                                   operation:@"getAssetEntity"];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (!asset) {
         return nil;
@@ -1294,11 +1317,18 @@
 #pragma clang diagnostic pop
 
 - (void)deleteWithIds:(NSArray<NSString *> *)ids changedBlock:(ChangeIds)block {
+    PHFetchOptions *options = [PHFetchOptions new];
+    options.fetchLimit = ids.count;
+    PHFetchResult<PHAsset *> *result = [self fetchAssetsWithLocalIdentifiersSafely:ids
+                                                                           options:options
+                                                                         operation:@"deleteWithIds"];
+    if (!result) {
+        block(@[]);
+        return;
+    }
+
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
-        PHFetchOptions *options = [PHFetchOptions new];
-        options.fetchLimit = ids.count;
-        PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:ids options:options];
         [PHAssetChangeRequest deleteAssets:result];
     }
      completionHandler:^(BOOL success, NSError *error) {
@@ -1548,7 +1578,9 @@
                                subtype:(int)subtype
                               isOrigin:(BOOL)isOrigin
                               fileType:(AVFileType)fileType {
-    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHFetchResult *fetchResult = [self fetchAssetsWithLocalIdentifiersSafely:@[assetId]
+                                                                     options:[self singleFetchOptions]
+                                                                   operation:@"getTitleAsyncWithAssetId"];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (asset) {
         return [asset filenameWithOptions:subtype isOrigin:isOrigin fileType:fileType];
@@ -1557,7 +1589,9 @@
 }
 
 - (NSUInteger)getFileSizeWithAssetId:(NSString *)assetId {
-    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHFetchResult *fetchResult = [self fetchAssetsWithLocalIdentifiersSafely:@[assetId]
+                                                                     options:[self singleFetchOptions]
+                                                                   operation:@"getFileSizeWithAssetId"];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (!asset) {
         return 0;
@@ -1578,7 +1612,9 @@
 }
 
 - (NSString *)getMimeTypeAsyncWithAssetId:(NSString *)assetId {
-    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHFetchResult *fetchResult = [self fetchAssetsWithLocalIdentifiersSafely:@[assetId]
+                                                                     options:[self singleFetchOptions]
+                                                                   operation:@"getMimeTypeAsyncWithAssetId"];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (asset) {
         return [asset mimeType];
@@ -1589,7 +1625,15 @@
 - (void)getMediaUrl:(NSString *)assetId
       resultHandler:(PMResultHandler *)handler
     progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]].firstObject;
+    PHFetchResult<PHAsset *> *fetchResult = [self fetchAssetsWithLocalIdentifiersSafely:@[assetId]
+                                                                                 options:[self singleFetchOptions]
+                                                                               operation:@"getMediaUrl"];
+    PHAsset *asset = fetchResult.firstObject;
+    if (!asset) {
+        [handler replyError:[NSString stringWithFormat:@"Asset %@ is not found", assetId]];
+        [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
+        return;
+    }
     
     if (@available(iOS 9.1, *)) {
         if ((asset.mediaSubtypes & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
@@ -1715,7 +1759,13 @@
         return;
     }
     
-    __block PHFetchResult<PHAsset *> *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:[self singleFetchOptions]];
+    __block PHFetchResult<PHAsset *> *asset = [self fetchAssetsWithLocalIdentifiersSafely:@[id]
+                                                                                   options:[self singleFetchOptions]
+                                                                                 operation:@"copyAssetWithId"];
+    if (!asset || asset.count == 0) {
+        block(nil, [NSString stringWithFormat:@"Asset [%@] not found.", id]);
+        return;
+    }
     NSError *error;
     [PHPhotoLibrary.sharedPhotoLibrary performChangesAndWait:^{
         PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
@@ -1845,7 +1895,13 @@
     
     PHFetchOptions *options = [PHFetchOptions new];
     options.fetchLimit = ids.count;
-    PHFetchResult<PHAsset *> *assetResult = [PHAsset fetchAssetsWithLocalIdentifiers:ids options:options];
+    PHFetchResult<PHAsset *> *assetResult = [self fetchAssetsWithLocalIdentifiersSafely:ids
+                                                                                options:options
+                                                                              operation:@"removeInAlbumWithAssetId"];
+    if (!assetResult) {
+        block(@"Failed to fetch assets to remove from album.");
+        return;
+    }
     NSError *error;
     [PHPhotoLibrary.sharedPhotoLibrary
      performChangesAndWait:^{
@@ -1915,7 +1971,9 @@
 }
 
 - (void)favoriteWithId:(NSString *)id favorite:(BOOL)favorite block:(void (^)(BOOL result, NSObject *error))block {
-    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:[self singleFetchOptions]];
+    PHFetchResult *fetchResult = [self fetchAssetsWithLocalIdentifiersSafely:@[id]
+                                                                     options:[self singleFetchOptions]
+                                                                   operation:@"favoriteWithId"];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (!asset) {
         block(NO, [NSString stringWithFormat:@"Asset %@ not found.", id]);
@@ -1980,7 +2038,12 @@
 - (void)requestCacheAssetsThumb:(NSArray *)ids option:(PMThumbLoadOption *)option {
     PHFetchOptions *fetchOptions = [PHFetchOptions new];
     fetchOptions.fetchLimit = ids.count;
-    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:ids options:fetchOptions];
+    PHFetchResult<PHAsset *> *fetchResult = [self fetchAssetsWithLocalIdentifiersSafely:ids
+                                                                                options:fetchOptions
+                                                                              operation:@"requestCacheAssetsThumb"];
+    if (!fetchResult) {
+        return;
+    }
     NSMutableArray *array = [NSMutableArray new];
     
     for (id asset in fetchResult) {
