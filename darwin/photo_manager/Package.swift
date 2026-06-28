@@ -15,14 +15,17 @@ let package = Package(
     .macOS("10.15")
   ],
   products: [
-    .library(
-      name: "photo-manager", targets: [packageName])
+    .library(name: "photo-manager", targets: [packageName])
   ],
-  dependencies: [],
+  dependencies: [
+    .package(name: "FlutterFramework", path: "../FlutterFramework")
+  ],
   targets: [
     .target(
       name: packageName,
-      dependencies: [],
+      dependencies: [
+        .product(name: "FlutterFramework", package: "FlutterFramework")
+      ],
       resources: [
         .process("Resources")
       ],

@@ -68,6 +68,7 @@ class Methods {
         const val cancelCacheRequests = "cancelCacheRequests"
         const val assetExists = "assetExists"
         const val getFullFile = "getFullFile"
+        const val getFileSize = "getFileSize"
         const val getOriginBytes = "getOriginBytes"
         const val getMediaUrl = "getMediaUrl"
         const val fetchEntityProperties = "fetchEntityProperties"

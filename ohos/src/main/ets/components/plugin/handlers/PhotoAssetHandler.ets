@@ -55,6 +55,19 @@ export class PhotoAssetHandler extends HandlerBase implements MethodCallHandlerB
         }
       }
         break;
+      case 'getFileSize': {
+        let args: Map<string, ESObject> = call.args;
+        let id: string = args.get('id');
+        let photoAsset: photoAccessHelper.PhotoAsset | null = await PhotoAssetHandler.getPhotoAsset(id);
+        if (photoAsset != null) {
+          let size = PhotoAssetHandler.getAssetMember(photoAsset, photoAccessHelper.PhotoKeys.SIZE);
+          result.success(size ?? 0);
+        }
+        else {
+          result.error(`${call.method} failed`, `not find asset by ${id}`, null);
+        }
+      }
+        break;
       case 'getOriginBytes': {
         let args: Map<string, ESObject> = call.args;
         let id: string = args.get('id');

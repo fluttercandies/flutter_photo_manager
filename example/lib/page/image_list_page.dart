@@ -190,6 +190,14 @@ class _GalleryContentListPageState extends State<GalleryContentListPage> {
               ),
             ),
             ElevatedButton(
+              child: const Text('fileSize'),
+              onPressed: () => CommonUtil.showResultDialog(
+                context,
+                'fileSize',
+                entity.fileSize.then((int size) => '$size bytes'),
+              ),
+            ),
+            ElevatedButton(
               child: const Text('show 500 size thumb '),
               onPressed: () => showThumb(entity, 500),
             ),

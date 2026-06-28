@@ -428,6 +428,11 @@ class PhotoManagerPlugin(
                 photoManager.getFile(id, isOrigin, resultHandler)
             }
 
+            Methods.getFileSize -> {
+                val id = call.argument<String>("id")!!
+                resultHandler.reply(photoManager.getFileSize(id))
+            }
+
             Methods.getOriginBytes -> {
                 val id = call.argument<String>("id")!!
                 photoManager.getOriginBytes(id, resultHandler, needLocationPermission)

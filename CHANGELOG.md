@@ -16,6 +16,7 @@ To know more about breaking changes, see the [Migration Guide][].
 **Fixes**
 
 - Reduce built-in Kotlin migration warnings for supported project configurations while preserving legacy Flutter compatibility.
+- Fix Darwin crashes when querying assets by local identifier by catching PhotoKit exceptions and returning safe fallback results instead of aborting the process.
 - Fix the `AssetEntity.duration` API docs to clarify that audio and video durations are returned in seconds across supported platforms, preserving the existing API behavior.
 - Fix Android 14+ limited permission photo selection not reflecting deselection in Flutter layer. When users modify their photo selection via `presentLimited()`, the changes are now properly notified to the Flutter layer.
 - Fix delayed native deletion confirmation dialogs on iOS by elevating the dispatch queue priority of `deleteWithIds`, `removeInAlbum`, and `deleteAlbum` to `QOS_CLASS_USER_INITIATED`.
@@ -23,6 +24,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Fix Darwin video durations being truncated instead of rounded, so `AssetEntity.duration` matches the system album display more closely.
 - Fix Darwin `getTitleAsync` returning a null channel result by falling back to an empty string.
 - Fix Darwin Live Photo exports with an explicit `darwinFileType`, restoring iOS conversions such as Live Photo MOV-to-MP4 output.
+- Fix Darwin image `loadFile(isOrigin: false)` blocking the iOS UI thread by making the request asynchronous and moving JPEG file conversion off the main thread, allowing `PMProgressHandler` updates to arrive while loading.
 
 ## 3.9.0
 

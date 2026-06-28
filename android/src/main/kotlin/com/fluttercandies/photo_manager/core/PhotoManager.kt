@@ -165,6 +165,10 @@ class PhotoManager(private val context: Context) {
         resultHandler.reply(path)
     }
 
+    fun getFileSize(id: String): Long {
+        return dbUtils.getFileSize(context, id)
+    }
+
     fun saveImage(
         bytes: ByteArray,
         filename: String,

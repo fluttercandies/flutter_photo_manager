@@ -735,6 +735,9 @@ class AssetEntity {
   /// The [Size] for the asset.
   Size get size => Size(width.toDouble(), height.toDouble());
 
+  /// The file size of the asset in bytes.
+  Future<int> get fileSize => plugin.getFileSize(this);
+
   /// The create time in unix timestamp of the asset.
   final int? createDateSecond;
 

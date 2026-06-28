@@ -3,8 +3,11 @@
 // in the LICENSE file.
 
 // ignore_for_file: use_named_constants
+
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photo_manager/src/internal/constants.dart';
 
 class _TestPlugin extends PhotoManagerPlugin {
   @override
@@ -14,6 +17,16 @@ class _TestPlugin extends PhotoManagerPlugin {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      const MethodChannel(PMConstants.channelPrefix),
+      null,
+    );
+  });
+
   test('RequestType equality test', () {
     expect(RequestType.image == const RequestType(1), equals(true));
     expect(RequestType.video == const RequestType(2), equals(true));
@@ -28,5 +41,28 @@ void main() {
     final PermissionState permission =
         await PhotoManager.requestPermissionExtend();
     expect(permission == PermissionState.notDetermined, equals(true));
+  });
+
+  test('AssetEntity.fileSize resolves the asset file size', () async {
+    MethodCall? capturedCall;
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      const MethodChannel(PMConstants.channelPrefix),
+      (MethodCall call) async {
+        capturedCall = call;
+        return 12345;
+      },
+    );
+
+    final entity = AssetEntity(
+      id: 'asset-id',
+      typeInt: AssetType.image.index,
+      width: 1,
+      height: 1,
+    );
+
+    await expectLater(entity.fileSize, completion(12345));
+    expect(capturedCall?.method, PMConstants.mGetFileSize);
+    expect(capturedCall?.arguments['id'], 'asset-id');
   });
 }

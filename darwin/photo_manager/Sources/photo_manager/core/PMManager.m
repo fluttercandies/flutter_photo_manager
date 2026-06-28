@@ -21,6 +21,9 @@
 
     // dict, key: cancelToken, value: PHImageRequestID
     NSMutableDictionary<NSString *, NSNumber*> *requestIdMap;
+    // Serial queue that serializes all requestIdMap mutations/reads.
+    dispatch_queue_t _requestIdQueue;
+    dispatch_queue_t _imageFileProcessingQueue;
 }
 
 - (instancetype)init {
@@ -28,6 +31,14 @@
     if (self) {
         cacheContainer = [PMCacheContainer new];
         requestIdMap = [NSMutableDictionary new];
+        _requestIdQueue = dispatch_queue_create(
+            "com.fluttercandies.photo_manager.requestIdQueue",
+            DISPATCH_QUEUE_SERIAL
+        );
+        _imageFileProcessingQueue = dispatch_queue_create(
+            "com.fluttercandies.photo_manager.imageFileProcessingQueue",
+            DISPATCH_QUEUE_SERIAL
+        );
     }
     return self;
 }
@@ -44,6 +55,23 @@
     PHFetchOptions *options = [PHFetchOptions new];
     options.fetchLimit = 1;
     return options;
+}
+
+- (PHFetchResult<PHAsset *> *)fetchAssetsWithLocalIdentifiersSafely:(NSArray<NSString *> *)ids
+                                                            options:(PHFetchOptions *)options
+                                                          operation:(NSString *)operation {
+    @try {
+        return [PHAsset fetchAssetsWithLocalIdentifiers:ids options:options];
+    } @catch (NSException *exception) {
+        NSString *log = [NSString stringWithFormat:
+                         @"Failed to fetch assets for %@, ids count = %lu, exception = %@, reason = %@",
+                         operation,
+                         (unsigned long)ids.count,
+                         exception.name ?: @"UnknownException",
+                         exception.reason ?: @"Unknown reason"];
+        [PMLogUtils.sharedInstance info:log];
+        return nil;
+    }
 }
 
 - (NSArray<PMAssetPathEntity *> *)getAssetPathList:(int)type hasAll:(BOOL)hasAll onlyAll:(BOOL)onlyAll option:(NSObject <PMBaseFilter> *)option pathFilterOption:(PMPathFilterOption *)pathFilterOption {
@@ -161,7 +189,9 @@
 }
 
 - (BOOL)existsWithId:(NSString *)assetId {
-    PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHFetchResult<PHAsset *> *result = [self fetchAssetsWithLocalIdentifiersSafely:@[assetId]
+                                                                           options:[self singleFetchOptions]
+                                                                         operation:@"existsWithId"];
     return result && result.count == 1;
 }
 
@@ -170,7 +200,9 @@
                         isOrigin:(BOOL)isOrigin
                          subtype:(int)subtype
                         fileType:(AVFileType)fileType {
-    PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHFetchResult<PHAsset *> *result = [self fetchAssetsWithLocalIdentifiersSafely:@[assetId]
+                                                                           options:[self singleFetchOptions]
+                                                                         operation:@"entityIsLocallyAvailable"];
     if (!result) {
         return NO;
     }
@@ -418,7 +450,9 @@
             return entity;
         }
     }
-    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHFetchResult *fetchResult = [self fetchAssetsWithLocalIdentifiersSafely:@[assetId]
+                                                                     options:[self singleFetchOptions]
+                                                                   operation:@"getAssetEntity"];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (!asset) {
         return nil;
@@ -1105,10 +1139,10 @@
                  resultHandler:(PMResultHandler *)handler
                progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     PHImageRequestOptions *options = [PHImageRequestOptions new];
-    [options setDeliveryMode:PHImageRequestOptionsDeliveryModeOpportunistic];
+    [options setDeliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat];
     [options setNetworkAccessAllowed:YES];
     [options setResizeMode:PHImageRequestOptionsResizeModeNone];
-    [options setSynchronous:YES];
+    [options setSynchronous:NO];
     [options setVersion:PHImageRequestOptionsVersionCurrent];
     
     __block double lastProgress = 0.0;
@@ -1167,23 +1201,42 @@
                 [innerStrongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
                 return;
             }
-            
-            BOOL downloadFinished = [PMManager isDownloadFinish:info];
-            if (!downloadFinished) {
+
+            if ([info[PHImageCancelledKey] boolValue]) {
+                [innerStrongSelf handleCancelRequest:handler progressHandler:progressHandler];
                 [innerStrongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
                 return;
             }
-            
-            NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
-            if (data) {
-                NSString *path = [innerStrongSelf writeFullFileWithAssetId:asset imageData: data];
-                [handler reply:path];
-                [innerStrongSelf notifySuccess:progressHandler];
-            } else {
-                [handler replyError:[NSString stringWithFormat:@"Failed to convert %@ to a JPEG file.", asset.localIdentifier]];
-                [innerStrongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+
+            if ([info[PHImageResultIsDegradedKey] boolValue]) {
+                return;
             }
-            [innerStrongSelf removeRequstIdWithCancelToken:[handler getCancelToken]];
+
+            NSString *cancelToken = [handler getCancelToken];
+            dispatch_async(innerStrongSelf->_imageFileProcessingQueue, ^{
+                // Drop the result if the request was cancelled while we were waiting.
+                if (![innerStrongSelf isRequestActiveWithCancelToken:cancelToken]) {
+                    [innerStrongSelf handleCancelRequestIfNeeded:handler progressHandler:progressHandler];
+                    return;
+                }
+                NSData *data = [PMImageUtil convertToData:image formatType:PMThumbFormatTypeJPEG quality:1.0];
+                if (data) {
+                    NSString *path = [innerStrongSelf writeFullFileWithAssetId:asset imageData:data];
+                    if (![innerStrongSelf consumeRequestWithCancelToken:cancelToken]) {
+                        [innerStrongSelf handleCancelRequestIfNeeded:handler progressHandler:progressHandler];
+                        return;
+                    }
+                    [handler reply:path];
+                    [innerStrongSelf notifySuccess:progressHandler];
+                } else {
+                    if (![innerStrongSelf consumeRequestWithCancelToken:cancelToken]) {
+                        [innerStrongSelf handleCancelRequestIfNeeded:handler progressHandler:progressHandler];
+                        return;
+                    }
+                    [handler replyError:[NSString stringWithFormat:@"Failed to convert %@ to a JPEG file.", asset.localIdentifier]];
+                    [innerStrongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+                }
+            });
         }];
 
         [strongSelf addRequstId:[handler getCancelToken] requestId:requestId];
@@ -1191,10 +1244,7 @@
 }
 
 + (BOOL)isDownloadFinish:(NSDictionary *)info {
-    BOOL finished;
-    finished = ![info[PHImageCancelledKey] boolValue]; // Not cancelled.
-    finished = ![info[PHImageResultIsDegradedKey] boolValue]; // Not thumbnail.
-    return finished;
+    return ![info[PHImageCancelledKey] boolValue] && ![info[PHImageResultIsDegradedKey] boolValue];
 }
 
 - (PMAssetPathEntity *)fetchPathProperties:(NSString *)id type:(int)type filterOption:(NSObject <PMBaseFilter> *)filterOption {
@@ -1267,11 +1317,18 @@
 #pragma clang diagnostic pop
 
 - (void)deleteWithIds:(NSArray<NSString *> *)ids changedBlock:(ChangeIds)block {
+    PHFetchOptions *options = [PHFetchOptions new];
+    options.fetchLimit = ids.count;
+    PHFetchResult<PHAsset *> *result = [self fetchAssetsWithLocalIdentifiersSafely:ids
+                                                                           options:options
+                                                                         operation:@"deleteWithIds"];
+    if (!result) {
+        block(@[]);
+        return;
+    }
+
     [[PHPhotoLibrary sharedPhotoLibrary]
      performChanges:^{
-        PHFetchOptions *options = [PHFetchOptions new];
-        options.fetchLimit = ids.count;
-        PHFetchResult<PHAsset *> *result = [PHAsset fetchAssetsWithLocalIdentifiers:ids options:options];
         [PHAssetChangeRequest deleteAssets:result];
     }
      completionHandler:^(BOOL success, NSError *error) {
@@ -1521,7 +1578,9 @@
                                subtype:(int)subtype
                               isOrigin:(BOOL)isOrigin
                               fileType:(AVFileType)fileType {
-    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHFetchResult *fetchResult = [self fetchAssetsWithLocalIdentifiersSafely:@[assetId]
+                                                                     options:[self singleFetchOptions]
+                                                                   operation:@"getTitleAsyncWithAssetId"];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (asset) {
         return [asset filenameWithOptions:subtype isOrigin:isOrigin fileType:fileType];
@@ -1529,8 +1588,33 @@
     return @"";
 }
 
+- (NSUInteger)getFileSizeWithAssetId:(NSString *)assetId {
+    PHFetchResult *fetchResult = [self fetchAssetsWithLocalIdentifiersSafely:@[assetId]
+                                                                     options:[self singleFetchOptions]
+                                                                   operation:@"getFileSizeWithAssetId"];
+    PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
+    if (!asset) {
+        return 0;
+    }
+    PHAssetResource *resource = [asset getCurrentResource];
+    if (!resource) {
+        return 0;
+    }
+    @try {
+        NSNumber *fileSize = [resource valueForKey:@"fileSize"];
+        if (![fileSize isKindOfClass:NSNumber.class]) {
+            return 0;
+        }
+        return fileSize.unsignedIntegerValue;
+    } @catch (NSException *exception) {
+        return 0;
+    }
+}
+
 - (NSString *)getMimeTypeAsyncWithAssetId:(NSString *)assetId {
-    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]];
+    PHFetchResult *fetchResult = [self fetchAssetsWithLocalIdentifiersSafely:@[assetId]
+                                                                     options:[self singleFetchOptions]
+                                                                   operation:@"getMimeTypeAsyncWithAssetId"];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (asset) {
         return [asset mimeType];
@@ -1541,7 +1625,15 @@
 - (void)getMediaUrl:(NSString *)assetId
       resultHandler:(PMResultHandler *)handler
     progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PHAsset *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:[self singleFetchOptions]].firstObject;
+    PHFetchResult<PHAsset *> *fetchResult = [self fetchAssetsWithLocalIdentifiersSafely:@[assetId]
+                                                                                 options:[self singleFetchOptions]
+                                                                               operation:@"getMediaUrl"];
+    PHAsset *asset = fetchResult.firstObject;
+    if (!asset) {
+        [handler replyError:[NSString stringWithFormat:@"Asset %@ is not found", assetId]];
+        [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
+        return;
+    }
     
     if (@available(iOS 9.1, *)) {
         if ((asset.mediaSubtypes & PHAssetMediaSubtypePhotoLive) == PHAssetMediaSubtypePhotoLive) {
@@ -1667,7 +1759,13 @@
         return;
     }
     
-    __block PHFetchResult<PHAsset *> *asset = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:[self singleFetchOptions]];
+    __block PHFetchResult<PHAsset *> *asset = [self fetchAssetsWithLocalIdentifiersSafely:@[id]
+                                                                                   options:[self singleFetchOptions]
+                                                                                 operation:@"copyAssetWithId"];
+    if (!asset || asset.count == 0) {
+        block(nil, [NSString stringWithFormat:@"Asset [%@] not found.", id]);
+        return;
+    }
     NSError *error;
     [PHPhotoLibrary.sharedPhotoLibrary performChangesAndWait:^{
         PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
@@ -1797,7 +1895,13 @@
     
     PHFetchOptions *options = [PHFetchOptions new];
     options.fetchLimit = ids.count;
-    PHFetchResult<PHAsset *> *assetResult = [PHAsset fetchAssetsWithLocalIdentifiers:ids options:options];
+    PHFetchResult<PHAsset *> *assetResult = [self fetchAssetsWithLocalIdentifiersSafely:ids
+                                                                                options:options
+                                                                              operation:@"removeInAlbumWithAssetId"];
+    if (!assetResult) {
+        block(@"Failed to fetch assets to remove from album.");
+        return;
+    }
     NSError *error;
     [PHPhotoLibrary.sharedPhotoLibrary
      performChangesAndWait:^{
@@ -1867,7 +1971,9 @@
 }
 
 - (void)favoriteWithId:(NSString *)id favorite:(BOOL)favorite block:(void (^)(BOOL result, NSObject *error))block {
-    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:[self singleFetchOptions]];
+    PHFetchResult *fetchResult = [self fetchAssetsWithLocalIdentifiersSafely:@[id]
+                                                                     options:[self singleFetchOptions]
+                                                                   operation:@"favoriteWithId"];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (!asset) {
         block(NO, [NSString stringWithFormat:@"Asset %@ not found.", id]);
@@ -1932,7 +2038,12 @@
 - (void)requestCacheAssetsThumb:(NSArray *)ids option:(PMThumbLoadOption *)option {
     PHFetchOptions *fetchOptions = [PHFetchOptions new];
     fetchOptions.fetchLimit = ids.count;
-    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:ids options:fetchOptions];
+    PHFetchResult<PHAsset *> *fetchResult = [self fetchAssetsWithLocalIdentifiersSafely:ids
+                                                                                options:fetchOptions
+                                                                              operation:@"requestCacheAssetsThumb"];
+    if (!fetchResult) {
+        return;
+    }
     NSMutableArray *array = [NSMutableArray new];
     
     for (id asset in fetchResult) {
@@ -1967,39 +2078,75 @@
     [handler replyError:@"Request canceled"];
 }
 
+- (void)handleCancelRequestIfNeeded:(PMResultHandler *)handler
+                     progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+    if ([handler isReplied]) {
+        return;
+    }
+    [self handleCancelRequest:handler progressHandler:progressHandler];
+}
+
 - (void) addRequstId:(NSString *)cancelToken
             requestId:(PHImageRequestID)requestId {
-    requestIdMap[cancelToken] = @(requestId);
+    dispatch_sync(_requestIdQueue, ^{
+        requestIdMap[cancelToken] = @(requestId);
+    });
 }
 
 // When the request is finished
 - (void) removeRequstIdWithCancelToken:(NSString *)cancelToken {
-    NSNumber *requestId = requestIdMap[cancelToken];
-    if (requestId) {
+    dispatch_sync(_requestIdQueue, ^{
         [requestIdMap removeObjectForKey:cancelToken];
-    }
+    });
+}
+
+- (BOOL) isRequestActiveWithCancelToken:(NSString *)cancelToken {
+    __block BOOL active = NO;
+    dispatch_sync(_requestIdQueue, ^{
+        active = requestIdMap[cancelToken] != nil;
+    });
+    return active;
+}
+
+- (BOOL) consumeRequestWithCancelToken:(NSString *)cancelToken {
+    __block BOOL active = NO;
+    dispatch_sync(_requestIdQueue, ^{
+        active = requestIdMap[cancelToken] != nil;
+        if (active) {
+            [requestIdMap removeObjectForKey:cancelToken];
+        }
+    });
+    return active;
 }
 
 - (void) cancelRequestWithCancelToken:(NSString *)cancelToken {
-    NSNumber *requestId = requestIdMap[cancelToken];
+    __block NSNumber *requestId = nil;
+    dispatch_sync(_requestIdQueue, ^{
+        requestId = requestIdMap[cancelToken];
+        if (requestId) {
+            [requestIdMap removeObjectForKey:cancelToken];
+        }
+    });
     if (requestId) {
         // PHImageManager methods must be called on the main thread to avoid crashes
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.cachingManager cancelImageRequest:requestId.intValue];
         });
-        [requestIdMap removeObjectForKey:cancelToken];
     }
 }
 
 - (void) cancelAllRequest {
+    __block NSArray<NSNumber *> *requestIds = nil;
+    dispatch_sync(_requestIdQueue, ^{
+        requestIds = [requestIdMap allValues];
+        [requestIdMap removeAllObjects];
+    });
     // PHImageManager methods must be called on the main thread to avoid crashes
     dispatch_async(dispatch_get_main_queue(), ^{
-        for (NSString *key in requestIdMap) {
-            NSNumber *requestId = requestIdMap[key];
+        for (NSNumber *requestId in requestIds) {
             [self.cachingManager cancelImageRequest:requestId.intValue];
         }
     });
-    [requestIdMap removeAllObjects];
 }
 
 # pragma mark progress
