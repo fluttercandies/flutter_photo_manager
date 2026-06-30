@@ -11,7 +11,9 @@ String library_version = versionMatcher.group(1).replaceAll("\\+", "-")
 group 'com.fluttercandies.photo_manager'
 version library_version
 
-def useBuiltInKotlin = (project.findProperty("android.builtInKotlin") ?: "false").toString().toBoolean()
+def builtInKotlinFlag = (project.findProperty("android.builtInKotlin") ?: "false").toString().toBoolean()
+def hasKotlinExtension = project.extensions.findByName("kotlin") != null
+def useBuiltInKotlin = builtInKotlinFlag && hasKotlinExtension
 
 if (!useBuiltInKotlin) {
     buildscript {
