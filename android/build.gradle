@@ -11,9 +11,9 @@ String library_version = versionMatcher.group(1).replaceAll("\\+", "-")
 group 'com.fluttercandies.photo_manager'
 version library_version
 
-def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
+def useBuiltInKotlin = (project.findProperty("android.builtInKotlin") ?: "false").toString().toBoolean()
 
-if (agpMajor < 9) {
+if (!useBuiltInKotlin) {
     buildscript {
         ext.kotlin_version = '1.9.23'
         repositories {
@@ -35,7 +35,7 @@ rootProject.allprojects {
 
 apply plugin: 'com.android.library'
 
-if (agpMajor < 9) {
+if (!useBuiltInKotlin) {
     apply plugin: 'kotlin-android'
 }
 
@@ -66,8 +66,10 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+if (useBuiltInKotlin) {
+    kotlin {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        }
     }
 }
