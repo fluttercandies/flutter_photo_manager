@@ -11,18 +11,23 @@ String library_version = versionMatcher.group(1).replaceAll("\\+", "-")
 group 'com.fluttercandies.photo_manager'
 version library_version
 
-buildscript {
-    ext.kotlin_version = '1.9.23'
-    repositories {
-        google()
-        mavenCentral()
-    }
+def builtInKotlinFlag = (project.findProperty("android.builtInKotlin") ?: "false").toString().toBoolean()
+def hasKotlinExtension = project.extensions.findByName("kotlin") != null
+def useBuiltInKotlin = builtInKotlinFlag && hasKotlinExtension
 
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+if (!useBuiltInKotlin) {
+    buildscript {
+        ext.kotlin_version = '1.9.23'
+        repositories {
+            google()
+            mavenCentral()
+        }
+
+        dependencies {
+            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        }
     }
 }
-
 rootProject.allprojects {
     repositories {
         google()
@@ -31,11 +36,14 @@ rootProject.allprojects {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+
+if (!useBuiltInKotlin) {
+    apply plugin: 'kotlin-android'
+}
 
 android {
     if (project.android.hasProperty('namespace')) {
-        namespace 'com.flutterandies.photo_manager'
+        namespace 'com.fluttercandies.photo_manager'
     }
 
     compileSdkVersion 36
@@ -49,10 +57,6 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = '17'
-    }
-
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
@@ -62,4 +66,12 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.16.0'
     implementation 'androidx.exifinterface:exifinterface:1.4.2'
     testImplementation 'junit:junit:4.13.2'
+}
+
+if (useBuiltInKotlin) {
+    kotlin {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        }
+    }
 }

@@ -8,8 +8,14 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+**Improvements**
+
+- Migrate the Android plugin to Flutter's built-in Kotlin integration with a compatibility fallback for projects that still require `kotlin-android`, without changing the package's public Flutter or Dart version constraints.
+- Fix the Android plugin `namespace` to `com.fluttercandies.photo_manager` so it matches the plugin package and Kotlin sources.
+
 **Fixes**
 
+- Reduce built-in Kotlin migration warnings for supported project configurations while preserving legacy Flutter compatibility.
 - Fix Darwin crashes when querying assets by local identifier by catching PhotoKit exceptions and returning safe fallback results instead of aborting the process.
 - Fix the `AssetEntity.duration` API docs to clarify that audio and video durations are returned in seconds across supported platforms, preserving the existing API behavior.
 - Fix Android 14+ limited permission photo selection not reflecting deselection in Flutter layer. When users modify their photo selection via `presentLimited()`, the changes are now properly notified to the Flutter layer.
