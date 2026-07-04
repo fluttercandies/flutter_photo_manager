@@ -18,6 +18,7 @@ import '../internal/plugin.dart';
 import '../internal/progress_handler.dart';
 import '../utils/convert_utils.dart';
 import 'cancel_token.dart';
+import 'darwin.dart';
 import 'thumbnail.dart';
 import 'types.dart';
 
@@ -191,6 +192,20 @@ class AssetPathEntity {
       albumType: albumType,
       type: type,
       optionGroup: filterOption,
+    );
+  }
+
+  /// A Darwin (iOS/macOS) only namespace of PhotoKit reads for this path.
+  ///
+  /// Groups Apple-specific hierarchy reads (e.g. [DarwinAssetPath.getParentPathList])
+  /// so that [AssetPathEntity] itself stays lean. Throws an [OSError] when
+  /// accessed on a non-Darwin platform, so guard with [Platform] if needed.
+  DarwinAssetPath get darwin {
+    if (Platform.isIOS || Platform.isMacOS) {
+      return DarwinAssetPath(this);
+    }
+    throw const OSError(
+      'AssetPathEntity.darwin is only available on iOS or macOS.',
     );
   }
 
@@ -522,6 +537,21 @@ class AssetEntity {
   ///  * https://developer.android.com/reference/android/provider/MediaStore.Images.ImageColumns#LATITUDE
   ///  * https://developer.apple.com/documentation/corelocation/cllocation?language=objc#declaration
   double? get longitude => _latLng?.longitude;
+
+  /// A Darwin (iOS/macOS) only namespace of PhotoKit reads for this asset.
+  ///
+  /// Groups Apple-specific reads such as [DarwinAsset.cloudIdentifier],
+  /// [DarwinAsset.hasAdjustments] and [DarwinAsset.baseFile], so that
+  /// [AssetEntity] itself stays lean. Throws an [OSError] when accessed on a
+  /// non-Darwin platform, so guard with [Platform] if needed.
+  DarwinAsset get darwin {
+    if (Platform.isIOS || Platform.isMacOS) {
+      return DarwinAsset(this);
+    }
+    throw const OSError(
+      'AssetEntity.darwin is only available on iOS or macOS.',
+    );
+  }
 
   /// Whether this asset is locally available.
   ///  * Android: Always true.

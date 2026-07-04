@@ -116,6 +116,24 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 - (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(NSObject<PMBaseFilter> *)option;
 
+/// Resolve stable cloud identifiers for the given local identifiers.
+/// Values are the `PHCloudIdentifier.stringValue`, or `NSNull` when absent.
+/// Returns an empty dictionary below iOS 15 / macOS 12.
+- (NSDictionary<NSString *, id> *)getCloudIdentifiersWithIds:(NSArray<NSString *> *)ids;
+
+/// Whether the asset with [assetId] contains adjustment (edit) data.
+- (BOOL)hasAdjustmentsWithId:(NSString *)assetId;
+
+/// Export the base (unedited) file of the asset with [assetId].
+- (void)getBaseAdjustmentFileWithId:(NSString *)assetId
+                           isOrigin:(BOOL)isOrigin
+                           fileType:(AVFileType)fileType
+                      resultHandler:(PMResultHandler *)handler
+                    progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
+
+/// The parent folders containing the album/folder with [id].
+- (NSArray<PMAssetPathEntity *> *)getParentPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(NSObject<PMBaseFilter> *)option;
+
 - (void)copyAssetWithId:(NSString *)id toGallery:(NSString *)gallery block:(AssetBlockResult)block;
 
 - (void)createFolderWithName:(NSString *)name parentId:(NSString *)id block:(void (^)(NSString *newId, NSObject *error))block;

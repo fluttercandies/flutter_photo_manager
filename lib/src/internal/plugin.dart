@@ -29,6 +29,24 @@ mixin BasePlugin {
   final Map<String, dynamic> onlyAddPermission = <String, dynamic>{
     'onlyAddPermission': true,
   };
+
+  void _injectProgressHandlerParams(
+    Map<String, dynamic> params,
+    PMProgressHandler? progressHandler,
+  ) {
+    if (progressHandler != null) {
+      params['progressHandler'] = progressHandler.channelIndex;
+    }
+  }
+
+  void _setCancelToken(
+    Map<String, dynamic> params,
+    PMCancelToken? cancelToken,
+  ) {
+    if (cancelToken != null) {
+      params[PMConstants.cancelTokenKey] = cancelToken.key;
+    }
+  }
 }
 
 class PMMethodChannel extends MethodChannel {
@@ -255,24 +273,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
       },
     );
     return ConvertUtils.convertToAssetList(map.cast());
-  }
-
-  void _injectProgressHandlerParams(
-    Map<String, dynamic> params,
-    PMProgressHandler? progressHandler,
-  ) {
-    if (progressHandler != null) {
-      params['progressHandler'] = progressHandler.channelIndex;
-    }
-  }
-
-  void _setCancelToken(
-    Map<String, dynamic> params,
-    PMCancelToken? cancelToken,
-  ) {
-    if (cancelToken != null) {
-      params[PMConstants.cancelTokenKey] = cancelToken.key;
-    }
   }
 
   /// Get thumbnail of asset id.
@@ -951,6 +951,85 @@ mixin IosPlugin on BasePlugin {
       },
     );
     return result['errorMsg'] == null;
+  }
+
+  /// Resolve the stable cloud identifiers for the given [ids] (localIdentifiers).
+  ///
+  /// Returns a map keyed by the input localIdentifier. A value is `null` when
+  /// the asset has no cloud identifier. Returns an empty map on unsupported
+  /// platforms (non-Darwin, iOS < 15, macOS < 12).
+  ///
+  /// Backed by `PHPhotoLibrary.cloudIdentifierMappingsForLocalIdentifiers`.
+  Future<Map<String, String?>> getCloudIdentifiers(List<String> ids) async {
+    if (!(Platform.isIOS || Platform.isMacOS)) {
+      return <String, String?>{};
+    }
+    final Map result = await _channel.invokeMethod(
+      PMConstants.mGetCloudIdentifiers,
+      <String, dynamic>{'ids': ids},
+    );
+    return result.map(
+      (key, value) => MapEntry(key as String, value as String?),
+    );
+  }
+
+  /// Whether the asset with [id] contains adjustment (edit) data.
+  ///
+  /// Backed by `PHAsset.hasAdjustments` (iOS/macOS 15+) with a resource-based
+  /// fallback on older systems.
+  Future<bool> hasAdjustments(String id) async {
+    assert(Platform.isIOS || Platform.isMacOS);
+    final bool? result = await _channel.invokeMethod<bool>(
+      PMConstants.mHasAdjustments,
+      <String, dynamic>{'id': id},
+    );
+    return result ?? false;
+  }
+
+  /// Export the base (unedited) file of the asset with [id].
+  ///
+  /// Mirrors [getFullFile] but targets the base adjustment resource.
+  Future<String?> getBaseAdjustmentFile(
+    String id, {
+    bool isOrigin = true,
+    PMProgressHandler? progressHandler,
+    PMDarwinAVFileType? darwinFileType,
+    PMCancelToken? cancelToken,
+  }) async {
+    assert(Platform.isIOS || Platform.isMacOS);
+    final params = <String, dynamic>{
+      'id': id,
+      'isOrigin': isOrigin,
+      'darwinFileType': darwinFileType?.value ?? 0,
+    };
+    _injectProgressHandlerParams(params, progressHandler);
+    _setCancelToken(params, cancelToken);
+    return _channel.invokeMethod(PMConstants.mGetBaseAdjustmentFile, params);
+  }
+
+  /// Request the parent folders containing [pathEntity].
+  ///
+  /// Mirrors [getSubPathEntities] but walks up the hierarchy. Backed by
+  /// `PHCollectionList.fetchCollectionListsContainingCollection:`.
+  Future<List<AssetPathEntity>> getParentPathEntities(
+    AssetPathEntity pathEntity,
+  ) async {
+    assert(Platform.isIOS || Platform.isMacOS);
+    final Map result = await _channel.invokeMethod(
+      PMConstants.mGetParentPath,
+      <String, dynamic>{
+        'id': pathEntity.id,
+        'type': pathEntity.type.value,
+        'albumType': pathEntity.albumType,
+        'option': pathEntity.filterOption?.toMap(),
+      },
+    );
+    final items = result['list'] as Map;
+    return ConvertUtils.convertToPathList(
+      items.cast(),
+      type: pathEntity.type,
+      filterOption: pathEntity.filterOption,
+    );
   }
 }
 

@@ -1060,6 +1060,31 @@ await PhotoManager.editor.darwin.removeAssetsInAlbum(
 PhotoManager.editor.darwin.deletePath();
 ```
 
+##### Darwin 专属只读接口（`AssetEntity.darwin` / `AssetPathEntity.darwin`）
+
+PhotoKit 专属的只读能力统一收拢在 `.darwin` 访问器下，避免让公共实体类膨胀。
+在非 Darwin 平台访问 `.darwin` 会抛出 `OSError`，请用 `Platform` 判断后再调用
+（或仅在 iOS/macOS 上使用）。
+
+```dart
+// 云标识在同一 iCloud 图库的多设备间保持稳定（iOS 15+/macOS 12+），
+// 不像每台设备各不相同的 `AssetEntity.id`。
+final String? cloudId = await entity.darwin.cloudIdentifier;
+
+// 批量解析多个资源时优先用批量接口，比在循环里逐个读取高效得多，
+// 返回以 localIdentifier 为键的 map。
+final Map<String, String?> cloudIds =
+    await PhotoManager.plugin.getCloudIdentifiers(<String>[entity.id, ...]);
+
+// 判断资源是否有编辑，以及导出未编辑的原始文件。
+if (await entity.darwin.hasAdjustments) {
+  final File? base = await entity.darwin.baseFile();
+}
+
+// 获取包含某相册/文件夹的父级文件夹，可用于面包屑导航。
+final List<AssetPathEntity> parents = await path.darwin.getParentPathList();
+```
+
 #### 适用于 OpenHarmony 的功能
 
 > 鸿蒙官方处于安全考虑已禁止相关资源能力。

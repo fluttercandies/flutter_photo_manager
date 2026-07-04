@@ -8,6 +8,13 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+**Features**
+
+- Add Darwin (iOS/macOS) only namespaced accessors `AssetEntity.darwin` and `AssetPathEntity.darwin` that group PhotoKit-specific reads without bloating the shared entity classes:
+  - `asset.darwin.cloudIdentifier` and the batch `PhotoManager.plugin.getCloudIdentifiers` resolve stable cross-device cloud identifiers (iOS 15+/macOS 12+).
+  - `asset.darwin.hasAdjustments` reports whether an asset has edits, and `asset.darwin.baseFile()` exports the unedited base file.
+  - `path.darwin.getParentPathList()` returns the parent folders containing an album or folder.
+
 **Improvements**
 
 - Migrate the Android plugin to Flutter's built-in Kotlin integration with a compatibility fallback for projects that still require `kotlin-android`, without changing the package's public Flutter or Dart version constraints.

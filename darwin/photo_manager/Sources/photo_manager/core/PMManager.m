@@ -1700,6 +1700,109 @@
     return [self convertPHCollectionToPMAssetPathArray:phCollectionArray option:options];
 }
 
+- (NSArray<PMAssetPathEntity *> *)getParentPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(NSObject<PMBaseFilter> *)option {
+    PHFetchOptions *options = [self getAssetOptions:type filterOption:option];
+
+    // The root and system albums (e.g. Recent, All Photos) have no parent.
+    if ([PMFolderUtils isRecentCollection:id]) {
+        return @[];
+    }
+
+    // Both albums (PHAssetCollection) and folders (PHCollectionList) can be
+    // contained by a parent folder, so resolve the input accordingly.
+    PHCollection *collection;
+    if (albumType == PM_TYPE_ALBUM) {
+        PHFetchResult<PHAssetCollection *> *result =
+            [PHAssetCollection fetchAssetCollectionsWithLocalIdentifiers:@[id] options:nil];
+        collection = result.firstObject;
+    } else {
+        PHFetchResult<PHCollectionList *> *result =
+            [PHCollectionList fetchCollectionListsWithLocalIdentifiers:@[id] options:nil];
+        collection = result.firstObject;
+    }
+    if (!collection) {
+        return @[];
+    }
+
+    PHFetchResult<PHCollectionList *> *parents =
+        [PHCollectionList fetchCollectionListsContainingCollection:collection options:nil];
+    NSMutableArray<PHCollection *> *parentArray = [NSMutableArray new];
+    for (PHCollectionList *parent in parents) {
+        [parentArray addObject:parent];
+    }
+    return [self convertPHCollectionToPMAssetPathArray:parentArray option:options];
+}
+
+- (NSDictionary<NSString *, id> *)getCloudIdentifiersWithIds:(NSArray<NSString *> *)ids {
+    NSMutableDictionary<NSString *, id> *result = [NSMutableDictionary dictionary];
+    if (@available(iOS 15.0, macOS 12.0, *)) {
+        NSDictionary<NSString *, PHCloudIdentifierMapping *> *mappings =
+            [PHPhotoLibrary.sharedPhotoLibrary cloudIdentifierMappingsForLocalIdentifiers:ids];
+        for (NSString *localId in ids) {
+            PHCloudIdentifierMapping *mapping = mappings[localId];
+            NSString *value = nil;
+            if (mapping && mapping.error == nil) {
+                value = mapping.cloudIdentifier.stringValue;
+            }
+            // Keep the key so callers can tell "resolved to nothing" from
+            // "not requested"; NSNull is decoded as null on the Dart side.
+            result[localId] = value ?: (id) [NSNull null];
+        }
+    }
+    return result;
+}
+
+- (BOOL)hasAdjustmentsWithId:(NSString *)assetId {
+    PMAssetEntity *entity = [self getAssetEntity:assetId];
+    if (!entity || !entity.phAsset) {
+        return NO;
+    }
+    // Detect the adjustment-data resource. This is reliable across OS versions,
+    // unlike `PHAsset.hasAdjustments` which is only exposed on newer systems.
+    NSArray<PHAssetResource *> *resources =
+        [PHAssetResource assetResourcesForAsset:entity.phAsset];
+    for (PHAssetResource *resource in resources) {
+        if (resource.type == PHAssetResourceTypeAdjustmentData) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (void)getBaseAdjustmentFileWithId:(NSString *)assetId
+                           isOrigin:(BOOL)isOrigin
+                           fileType:(AVFileType)fileType
+                      resultHandler:(PMResultHandler *)handler
+                    progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+    PMAssetEntity *entity = [self getAssetEntity:assetId];
+    if (!entity || !entity.phAsset) {
+        [handler replyError:[NSString stringWithFormat:@"Asset %@ file cannot be obtained.", assetId]];
+        return;
+    }
+    PHAsset *asset = entity.phAsset;
+    PHAssetResource *resource = [asset getOriginalResource];
+    if (!resource) {
+        [handler replyError:[NSString stringWithFormat:@"Asset %@ does not have a base resource.", assetId]];
+        return;
+    }
+    // `fetchVideoResourceToFile:` writes an arbitrary resource's bytes to disk
+    // (and only performs AV conversion when a fileType is supplied), so it works
+    // for images too.
+    [self fetchVideoResourceToFile:asset
+                          resource:resource
+                   progressHandler:progressHandler
+                        withScheme:NO
+                          isOrigin:isOrigin
+                          fileType:fileType
+                             block:^(NSString *path, NSObject *error) {
+        if (path) {
+            [handler reply:path];
+        } else {
+            [handler replyError:error];
+        }
+    }];
+}
+
 - (NSArray<PMAssetPathEntity *> *)convertPHCollectionToPMAssetPathArray:(NSArray<PHCollection *> *)phArray
                                                                  option:(PHFetchOptions *)option {
     NSMutableArray<PMAssetPathEntity *> *result = [NSMutableArray new];

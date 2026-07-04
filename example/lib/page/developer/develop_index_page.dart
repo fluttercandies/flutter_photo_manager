@@ -16,6 +16,7 @@ import '../../util/log_export.dart';
 import 'create_entity_by_id.dart';
 import 'dev_title_page.dart';
 import 'ios/create_folder_example.dart';
+import 'ios/darwin_features_page.dart';
 import 'ios/edit_asset.dart';
 import 'issues_page/issue_index_page.dart';
 import 'permission_state_page.dart';
@@ -87,6 +88,11 @@ class _DeveloperIndexPageState extends State<DeveloperIndexPage> {
             child: const Text('Show iOS create folder example.'),
             onPressed: () => navToWidget(const CreateFolderExample()),
           ),
+          if (Platform.isIOS || Platform.isMacOS)
+            ElevatedButton(
+              child: const Text('Darwin: cloudId / adjustments / parent paths'),
+              onPressed: () => navToWidget(const DarwinFeaturesPage()),
+            ),
           ElevatedButton(
             child: const Text('Test edit image'),
             onPressed: () => navToWidget(const EditAssetPage()),
