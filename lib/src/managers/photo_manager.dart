@@ -87,7 +87,19 @@ class PhotoManager {
     return plugin.getPermissionState(requestOption);
   }
 
-  /// Prompts the limited assets selection modal on iOS.
+  /// Prompts the limited assets selection modal on iOS, or the system photo
+  /// picker on Android 14+ (API 34+).
+  ///
+  /// On Android 14+, [type] filters which media kinds the picker shows —
+  /// e.g. pass `RequestType.image` to only let the user pick images. On iOS
+  /// the system picker cannot be filtered by media type and [type] is ignored.
+  ///
+  /// Use this to give the user a chance to reselect when an earlier
+  /// [PermissionState.limited] grant does not contain the media kind your
+  /// app actually needs: neither iOS nor Android exposes which types are in
+  /// the current selection, so an image-only query against a videos-only
+  /// limited grant will legitimately return zero results — re-prompting here
+  /// is the recommended recovery path.
   ///
   /// This method only supports from iOS 14.0, and will behave differently on
   /// iOS 14 and 15:

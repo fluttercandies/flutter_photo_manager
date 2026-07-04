@@ -290,6 +290,24 @@ However, there is a slight difference in behavior (based on the emulator):
 On Android, the access permission to a certain resource cannot be revoked once it is granted,
 even if it hasn't been selected when using `presentLimited` in future actions.
 
+##### Handling a limited grant that doesn't match the requested type
+
+Neither iOS nor Android exposes which media kinds are inside the current limited
+selection. If your app requests `RequestType.image` but the user picked only
+videos while granting limited access, permission will still resolve to
+`PermissionState.limited`, and querying images will legitimately return zero
+results — the same as if the library truly had no images.
+
+The recommended recovery is to prompt for reselection when this happens:
+
+```dart
+if (state == PermissionState.limited) {
+  // On Android 14+, `type` filters the picker to only the media kinds you need.
+  // On iOS the picker cannot be filtered by type and `type` is ignored.
+  await PhotoManager.presentLimited(type: RequestType.image);
+}
+```
+
 ### Get albums/folders (`AssetPathEntity`)
 
 Albums or folders are abstracted as the [`AssetPathEntity`][] class.
