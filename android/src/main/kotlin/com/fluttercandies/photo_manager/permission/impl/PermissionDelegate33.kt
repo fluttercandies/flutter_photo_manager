@@ -31,8 +31,10 @@ class PermissionDelegate33 : PermissionDelegate() {
         val containsVideo = RequestTypeUtils.containsVideo(requestType)
         val containsAudio = RequestTypeUtils.containsAudio(requestType)
 
-        if (containsImage || containsVideo) {
+        if (containsImage) {
             permissions.add(mediaImage)
+        }
+        if (containsVideo) {
             permissions.add(mediaVideo)
         }
         if (containsAudio) {
