@@ -14,6 +14,9 @@ To know more about breaking changes, see the [Migration Guide][].
   - `asset.darwin.cloudIdentifier` and the batch `PhotoManager.plugin.getCloudIdentifiers` resolve stable cross-device cloud identifiers (iOS 15+/macOS 12+).
   - `asset.darwin.hasAdjustments` reports whether an asset has edits, and `asset.darwin.baseFile()` exports the unedited base file.
   - `path.darwin.getParentPathList()` returns the parent folders containing an album or folder.
+- Add `updateCreationDate` to `PhotoManager.editor.darwin` and `PhotoManager.editor.android` for modifying an asset's creation date after it has been saved.
+  - On iOS/macOS: updates the `PHAsset.creationDate` property.
+  - On Android Q (API 29)+: updates the MediaStore `DATE_TAKEN` field; unsupported on API 28 and below.
 
 **Improvements**
 

@@ -146,6 +146,8 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
 
 - (void)favoriteWithId:(NSString *)id favorite:(BOOL)favorite block:(void (^)(BOOL result, NSObject *))block;
 
+- (void)updateCreationDateWithId:(NSString *)id timestamp:(NSNumber *)timestamp block:(void (^)(BOOL result, NSObject *))block;
+
 - (void)clearFileCache;
 
 - (void)requestCacheAssetsThumb:(NSArray *)ids option:(PMThumbLoadOption *)option;

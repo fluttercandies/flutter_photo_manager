@@ -644,6 +644,17 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return result == true;
   }
 
+  Future<bool> updateCreationDate(String id, DateTime creationDate) async {
+    final bool? result = await _channel.invokeMethod(
+      PMConstants.mUpdateCreationDate,
+      <String, dynamic>{
+        'id': id,
+        'timestamp': creationDate.millisecondsSinceEpoch ~/ 1000,
+      },
+    );
+    return result == true;
+  }
+
   Future<void> ignorePermissionCheck(bool ignore) {
     return _channel.invokeMethod(
       PMConstants.mIgnorePermissionCheck,

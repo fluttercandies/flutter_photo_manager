@@ -311,6 +311,38 @@ class DarwinEditor {
     );
   }
 
+  /// Updates the creation date of the given [entity].
+  ///
+  /// This method modifies the creation date metadata of the asset.
+  /// On iOS/macOS, this updates the `creationDate` property of the asset.
+  ///
+  /// Returns the updated [AssetEntity] with the new creation date if the
+  /// operation was successful; otherwise, throws a [StateError].
+  ///
+  /// Example:
+  /// ```dart
+  /// final AssetEntity updated =
+  ///     await PhotoManager.editor.darwin.updateCreationDate(
+  ///   entity: myAsset,
+  ///   creationDate: DateTime(2023, 1, 15, 10, 30),
+  /// );
+  /// ```
+  Future<AssetEntity> updateCreationDate({
+    required AssetEntity entity,
+    required DateTime creationDate,
+  }) async {
+    final bool result = await plugin.updateCreationDate(
+      entity.id,
+      creationDate,
+    );
+    if (result) {
+      final int timestampInSeconds =
+          creationDate.millisecondsSinceEpoch ~/ 1000;
+      return entity.copyWith(createDateSecond: timestampInSeconds);
+    }
+    throw StateError('Failed to update creation date for asset ${entity.id}');
+  }
+
   /// Save Live Photo to the gallery from the given [imageFile] and [videoFile].
   ///
   /// {@macro photo_manager.Editor.TitleWhenSaving}
@@ -357,6 +389,40 @@ class AndroidEditor {
       'Failed to favorite the asset '
       '${entity.id} for unknown reason',
     );
+  }
+
+  /// Updates the creation date of the given [entity].
+  ///
+  /// This method modifies the creation date metadata of the asset.
+  /// On Android Q (API 29) and above, this updates the `DATE_TAKEN` field in
+  /// MediaStore. On Android P (API 28) and below, this method is not supported
+  /// and throws a [StateError].
+  ///
+  /// Returns the updated [AssetEntity] with the new creation date if the
+  /// operation was successful; otherwise, throws a [StateError].
+  ///
+  /// Example:
+  /// ```dart
+  /// final AssetEntity updated =
+  ///     await PhotoManager.editor.android.updateCreationDate(
+  ///   entity: myAsset,
+  ///   creationDate: DateTime(2023, 1, 15, 10, 30),
+  /// );
+  /// ```
+  Future<AssetEntity> updateCreationDate({
+    required AssetEntity entity,
+    required DateTime creationDate,
+  }) async {
+    final bool result = await plugin.updateCreationDate(
+      entity.id,
+      creationDate,
+    );
+    if (result) {
+      final int timestampInSeconds =
+          creationDate.millisecondsSinceEpoch ~/ 1000;
+      return entity.copyWith(createDateSecond: timestampInSeconds);
+    }
+    throw StateError('Failed to update creation date for asset ${entity.id}');
   }
 
   /// Moves the given [entity] to the specified [target] path.

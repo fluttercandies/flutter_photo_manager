@@ -552,6 +552,22 @@ interface IDBUtils {
 
     fun moveToGallery(context: Context, assetId: String, galleryId: String): AssetEntity
 
+    /**
+     * Update the creation date of the asset.
+     *
+     * On Android the creation date maps to MediaStore's `DATE_TAKEN` column
+     * (in milliseconds); [timestamp] is provided in seconds. Implemented here so
+     * both [DBUtils] and [AndroidQDBUtils] share the same behavior.
+     */
+    fun updateCreationDate(context: Context, assetId: String, timestamp: Long): Boolean {
+        val cr = context.contentResolver
+        val contentValues = ContentValues().apply {
+            put(DATE_TAKEN, timestamp * 1000)
+        }
+        val count = cr.update(allUri, contentValues, idSelection, arrayOf(assetId))
+        return count > 0
+    }
+
     fun getSomeInfo(context: Context, assetId: String): Pair<String, String?>?
 
     fun getUri(id: Long, type: Int, isOrigin: Boolean = false): Uri {
