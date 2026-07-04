@@ -727,10 +727,10 @@
                 [handler reply:@(result)];
             }
         }];
-    } else if ([@"updateDateTaken" isEqualToString:call.method]) {
+    } else if ([@"updateCreationDate" isEqualToString:call.method]) {
         NSString *id = call.arguments[@"id"];
         NSNumber *timestamp = call.arguments[@"timestamp"];
-        [manager updateDateTakenWithId:id timestamp:timestamp block:^(BOOL result, NSObject *error) {
+        [manager updateCreationDateWithId:id timestamp:timestamp block:^(BOOL result, NSObject *error) {
             if (error) {
                 [handler replyError:error];
             } else {

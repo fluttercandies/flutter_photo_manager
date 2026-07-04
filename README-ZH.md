@@ -1085,6 +1085,22 @@ if (await entity.darwin.hasAdjustments) {
 final List<AssetPathEntity> parents = await path.darwin.getParentPathList();
 ```
 
+##### 修改资源的创建日期
+
+修改已有资源的创建日期。成功返回更新后的 `AssetEntity`，失败抛出 `StateError`。
+
+- iOS/macOS：更新 `PHAsset.creationDate`。
+- Android Q（API 29）及以上：更新 MediaStore 的 `DATE_TAKEN` 字段
+  （API 28 及以下不支持）。
+
+```dart
+final AssetEntity updated =
+    await PhotoManager.editor.darwin.updateCreationDate( // 或 .android
+  entity: asset,
+  creationDate: DateTime(2023, 1, 15, 10, 30),
+);
+```
+
 #### 适用于 OpenHarmony 的功能
 
 > 鸿蒙官方处于安全考虑已禁止相关资源能力。

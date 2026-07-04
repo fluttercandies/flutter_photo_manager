@@ -290,9 +290,9 @@ class PhotoManager(private val context: Context) {
         }
     }
 
-    fun updateDateTaken(assetId: String, timestamp: Long, resultHandler: ResultHandler) {
+    fun updateCreationDate(assetId: String, timestamp: Long, resultHandler: ResultHandler) {
         try {
-            val result = dbUtils.updateDateTaken(context, assetId, timestamp)
+            val result = dbUtils.updateCreationDate(context, assetId, timestamp)
             resultHandler.reply(result)
         } catch (e: Exception) {
             LogUtils.error(e)

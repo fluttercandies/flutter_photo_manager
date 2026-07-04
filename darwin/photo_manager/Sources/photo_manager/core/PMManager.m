@@ -2104,7 +2104,7 @@
     block(YES, nil);
 }
 
-- (void)updateDateTakenWithId:(NSString *)id timestamp:(NSNumber *)timestamp block:(void (^)(BOOL result, NSObject *error))block {
+- (void)updateCreationDateWithId:(NSString *)id timestamp:(NSNumber *)timestamp block:(void (^)(BOOL result, NSObject *error))block {
     PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[id] options:[self singleFetchOptions]];
     PHAsset *asset = [self getFirstObjFromFetchResult:fetchResult];
     if (!asset) {

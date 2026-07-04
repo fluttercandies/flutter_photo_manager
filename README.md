@@ -1156,6 +1156,23 @@ if (await entity.darwin.hasAdjustments) {
 final List<AssetPathEntity> parents = await path.darwin.getParentPathList();
 ```
 
+##### Update an asset's creation date
+
+Modify the creation date of an existing asset. Returns the updated
+`AssetEntity` on success, or throws a `StateError` on failure.
+
+- iOS/macOS: updates `PHAsset.creationDate`.
+- Android Q (API 29)+: updates the MediaStore `DATE_TAKEN` field
+  (unsupported on API 28 and below).
+
+```dart
+final AssetEntity updated =
+    await PhotoManager.editor.darwin.updateCreationDate( // or .android
+  entity: asset,
+  creationDate: DateTime(2023, 1, 15, 10, 30),
+);
+```
+
 #### Features for OpenHarmony
 
 > The photo library feature is disabled in OpenHarmony officially because of the security concern.

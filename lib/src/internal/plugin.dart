@@ -644,12 +644,12 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     return result == true;
   }
 
-  Future<bool> updateDateTaken(String id, DateTime dateTime) async {
+  Future<bool> updateCreationDate(String id, DateTime creationDate) async {
     final bool? result = await _channel.invokeMethod(
-      PMConstants.mUpdateDateTaken,
+      PMConstants.mUpdateCreationDate,
       <String, dynamic>{
         'id': id,
-        'timestamp': dateTime.millisecondsSinceEpoch ~/ 1000,
+        'timestamp': creationDate.millisecondsSinceEpoch ~/ 1000,
       },
     );
     return result == true;
