@@ -64,6 +64,12 @@ class PMConstants {
   static const String mMoveAssetsToPath = 'moveAssetsToPath';
   static const String mColumnNames = 'getColumnNames';
 
+  /// Darwin (iOS/macOS) only methods.
+  static const String mGetCloudIdentifiers = 'getCloudIdentifiers';
+  static const String mHasAdjustments = 'hasAdjustments';
+  static const String mGetBaseAdjustmentFile = 'getBaseAdjustmentFile';
+  static const String mGetParentPath = 'getParentPath';
+
   static const String mGetAssetCount = 'getAssetCount';
   static const String mGetAssetsByRange = 'getAssetsByRange';
 

@@ -29,6 +29,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSString*)mimeType;
 - (PHAssetResource *)getCurrentResource;
 - (void)requestCurrentResourceData:(void (^)(NSData *_Nullable result))block;
+
+/// The base (unedited) resource of the asset, i.e. the original photo/video
+/// before any Photos.app adjustments were applied. Falls back to
+/// `getCurrentResource` when no distinct original resource exists.
+- (PHAssetResource *)getOriginalResource;
+
 - (PHAssetResource *)getLivePhotosResource;
 
 @end

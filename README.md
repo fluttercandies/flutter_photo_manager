@@ -1131,6 +1131,31 @@ Smart albums can't be deleted.
 PhotoManager.editor.darwin.deletePath();
 ```
 
+##### Darwin-only reads (`AssetEntity.darwin` / `AssetPathEntity.darwin`)
+
+PhotoKit-specific reads are grouped under a `.darwin` accessor so the shared
+entity classes stay lean. Accessing `.darwin` on a non-Darwin platform throws
+an `OSError`, so guard with `Platform` (or only call it on iOS/macOS).
+
+```dart
+// Cloud identifiers are stable across devices sharing the same iCloud Photo
+// Library (iOS 15+/macOS 12+), unlike the per-device `AssetEntity.id`.
+final String? cloudId = await entity.darwin.cloudIdentifier;
+
+// Prefer the batch call when resolving many assets; it's far more efficient
+// than reading the getter in a loop. Returns a map keyed by localIdentifier.
+final Map<String, String?> cloudIds =
+    await PhotoManager.plugin.getCloudIdentifiers(<String>[entity.id, ...]);
+
+// Whether the asset has edits, plus the unedited base file.
+if (await entity.darwin.hasAdjustments) {
+  final File? base = await entity.darwin.baseFile();
+}
+
+// Parent folders containing an album/folder, for breadcrumb navigation.
+final List<AssetPathEntity> parents = await path.darwin.getParentPathList();
+```
+
 #### Features for OpenHarmony
 
 > The photo library feature is disabled in OpenHarmony officially because of the security concern.

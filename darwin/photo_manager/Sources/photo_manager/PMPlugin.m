@@ -355,6 +355,7 @@
     if ([method isEqualToString:@"getAssetListPaged"] ||
         [method isEqualToString:@"getAssetListRange"] ||
         [method isEqualToString:@"getFullFile"] ||
+        [method isEqualToString:@"getBaseAdjustmentFile"] ||
         [method isEqualToString:@"getFileSize"] ||
         [method isEqualToString:@"getMediaUrl"] ||
         [method isEqualToString:@"fetchEntityProperties"] ||
@@ -635,6 +636,34 @@
         NSObject <PMBaseFilter> *option = [PMConvertUtils convertMapToOptionContainer:optionMap];
 
         NSArray<PMAssetPathEntity *> *array = [manager getSubPathWithId:galleryId type:type albumType:albumType option:option];
+        NSDictionary *pathData = [PMConvertUtils convertPathToMap:array];
+
+        [handler reply:@{@"list": pathData}];
+    } else if ([@"getCloudIdentifiers" isEqualToString:call.method]) {
+        NSArray<NSString *> *ids = call.arguments[@"ids"];
+        NSDictionary<NSString *, id> *mapping = [manager getCloudIdentifiersWithIds:ids];
+        [handler reply:mapping];
+    } else if ([@"hasAdjustments" isEqualToString:call.method]) {
+        NSString *assetId = call.arguments[@"id"];
+        BOOL hasAdjustments = [manager hasAdjustmentsWithId:assetId];
+        [handler reply:@(hasAdjustments)];
+    } else if ([@"getBaseAdjustmentFile" isEqualToString:call.method]) {
+        NSString *assetId = call.arguments[@"id"];
+        BOOL isOrigin = [call.arguments[@"isOrigin"] boolValue];
+        AVFileType fileType = [PMConvertUtils convertNumberToAVFileType:[call.arguments[@"darwinFileType"] intValue]];
+        PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:call.arguments];
+        [manager getBaseAdjustmentFileWithId:assetId
+                                    isOrigin:isOrigin
+                                    fileType:fileType
+                               resultHandler:handler
+                             progressHandler:progressHandler];
+    } else if ([@"getParentPath" isEqualToString:call.method]) {
+        NSString *galleryId = call.arguments[@"id"];
+        int type = [call.arguments[@"type"] intValue];
+        int albumType = [call.arguments[@"albumType"] intValue];
+        NSObject <PMBaseFilter> *option = [PMConvertUtils convertMapToOptionContainer:call.arguments[@"option"]];
+
+        NSArray<PMAssetPathEntity *> *array = [manager getParentPathWithId:galleryId type:type albumType:albumType option:option];
         NSDictionary *pathData = [PMConvertUtils convertPathToMap:array];
 
         [handler reply:@{@"list": pathData}];

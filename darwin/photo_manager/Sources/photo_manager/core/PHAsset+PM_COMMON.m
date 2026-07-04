@@ -209,6 +209,27 @@
     return nil;
 }
 
+- (PHAssetResource *)getOriginalResource {
+    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:self];
+    for (PHAssetResource *res in resources) {
+        if (!res.isValid) {
+            continue;
+        }
+        if (self.isImage && res.type == PHAssetResourceTypePhoto) {
+            return res;
+        }
+        if (self.isVideo && res.type == PHAssetResourceTypeVideo) {
+            return res;
+        }
+        if (self.isAudio && res.type == PHAssetResourceTypeAudio) {
+            return res;
+        }
+    }
+    // No distinct original resource (asset is unedited or only exposes a
+    // rendered resource), fall back to the current resource.
+    return [self getCurrentResource];
+}
+
 - (void)requestCurrentResourceData:(void (^)(NSData *_Nullable))block {
     PHAssetResource *res = [self getCurrentResource];
     
