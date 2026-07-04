@@ -213,12 +213,16 @@ class AssetPathEntity {
   ///
   /// [page] should starts with and greater than 0.
   /// [size] is item count of current [page].
+  /// [type] overrides the album's own [RequestType] for this call only, so a
+  /// caller can e.g. read only videos out of a `common` album. Defaults to the
+  /// album's [type] when omitted.
   ///
   /// The length of returned assets might be less than requested.
   /// Not existing assets will be excluded from the result.
   Future<List<AssetEntity>> getAssetListPaged({
     required int page,
     required int size,
+    RequestType? type,
   }) {
     assert(albumType == 1, 'Only album can request for assets.');
     assert(size > 0, 'Page size must be greater than 0.');
@@ -226,7 +230,7 @@ class AssetPathEntity {
       id,
       page: page,
       size: size,
-      type: type,
+      type: type ?? this.type,
       optionGroup: filterOption,
     );
   }
@@ -236,12 +240,16 @@ class AssetPathEntity {
   /// The [start] and [end] are similar to [String.substring], but it'll return
   /// the maximum assets if the total count of assets is fewer than the range,
   /// instead of throwing a [RangeError] like [String.substring].
+  /// [type] overrides the album's own [RequestType] for this call only, so a
+  /// caller can e.g. read only videos out of a `common` album. Defaults to the
+  /// album's [type] when omitted.
   ///
   /// The length of returned assets might be less than requested.
   /// Not existing assets will be excluded from the result.
   Future<List<AssetEntity>> getAssetListRange({
     required int start,
     required int end,
+    RequestType? type,
   }) async {
     assert(albumType == 1, 'Only album can request for assets.');
     assert(start >= 0, 'The start must be greater than 0.');
@@ -253,7 +261,7 @@ class AssetPathEntity {
     }
     return plugin.getAssetListRange(
       id,
-      type: type,
+      type: type ?? this.type,
       start: start,
       end: end,
       optionGroup: filterOption,

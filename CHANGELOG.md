@@ -10,6 +10,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 **Features**
 
+- Add an optional `type` parameter to `AssetPathEntity.getAssetListPaged` and `AssetPathEntity.getAssetListRange` so callers can filter to a specific `RequestType` within a single album (e.g. read videos out of a `common` album) without constructing a new `AssetPathEntity`. Defaults to the album's own `type` when omitted.
 - Add Darwin (iOS/macOS) only namespaced accessors `AssetEntity.darwin` and `AssetPathEntity.darwin` that group PhotoKit-specific reads without bloating the shared entity classes:
   - `asset.darwin.cloudIdentifier` and the batch `PhotoManager.plugin.getCloudIdentifiers` resolve stable cross-device cloud identifiers (iOS 15+/macOS 12+).
   - `asset.darwin.hasAdjustments` reports whether an asset has edits, and `asset.darwin.baseFile()` exports the unedited base file.
