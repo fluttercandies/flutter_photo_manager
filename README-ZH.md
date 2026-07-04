@@ -271,6 +271,22 @@ iOS14 引入了部分资源限制的权限 (`PermissionState.limited`)。
 在 Android 中一旦授予某个资源的访问权限，就无法撤销，
 即使再次使用 `presentLimited` 时不选中也不会撤销对它的访问权限。
 
+##### 受限授权与请求类型不匹配时的处理
+
+无论 iOS 还是 Android，系统都不会告知当前有限访问的选择集里包含哪些媒体类型。
+如果应用请求了 `RequestType.image`，但用户在授予有限访问时只勾选了视频，
+权限仍然会返回 `PermissionState.limited`，查询图片时也会合理地返回 0 条结果，
+和"库里确实没有图片"无法区分。
+
+推荐的处理方式是在这种情况下引导用户重新选择：
+
+```dart
+if (state == PermissionState.limited) {
+  // Android 14+ 上 `type` 会限制 picker 只显示对应类型；iOS 不支持按类型过滤，此参数会被忽略。
+  await PhotoManager.presentLimited(type: RequestType.image);
+}
+```
+
 ### 获取相簿或图集 (`AssetPathEntity`)
 
 相簿或者图集以抽象类 [`AssetPathEntity`][] 的形式呈现，

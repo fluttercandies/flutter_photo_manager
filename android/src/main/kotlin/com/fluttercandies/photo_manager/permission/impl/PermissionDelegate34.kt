@@ -45,9 +45,13 @@ class PermissionDelegate34 : PermissionDelegate() {
         val containsVideo = RequestTypeUtils.containsVideo(requestType)
         val containsAudio = RequestTypeUtils.containsAudio(requestType)
 
-        if (containsImage || containsVideo) {
+        if (containsImage) {
             permissions.add(mediaImage)
+        }
+        if (containsVideo) {
             permissions.add(mediaVideo)
+        }
+        if (containsImage || containsVideo) {
             permissions.add(mediaVisualUserSelected)
 
             if (mediaLocation) {
@@ -162,9 +166,15 @@ class PermissionDelegate34 : PermissionDelegate() {
         this.resultHandler = resultHandler
 
         val permissions = mutableListOf<String>()
-        if (RequestTypeUtils.containsImage(type) || RequestTypeUtils.containsVideo(type)) {
+        val containsImage = RequestTypeUtils.containsImage(type)
+        val containsVideo = RequestTypeUtils.containsVideo(type)
+        if (containsImage) {
             permissions.add(mediaImage)
+        }
+        if (containsVideo) {
             permissions.add(mediaVideo)
+        }
+        if (containsImage || containsVideo) {
             permissions.add(mediaVisualUserSelected)
         }
 
