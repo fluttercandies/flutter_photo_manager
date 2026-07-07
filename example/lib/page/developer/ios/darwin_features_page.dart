@@ -9,8 +9,8 @@ import 'package:photo_manager/photo_manager.dart';
 ///
 ///  * `asset.darwin.cloudIdentifier` and the batch
 ///    `PhotoManager.plugin.getCloudIdentifiers`
-///  * `asset.darwin.hasAdjustments` + `asset.darwin.baseFile()` +
-///    `asset.darwin.adjustmentData()`
+///  * `asset.darwin.hasAdjustments` + `asset.darwin.getBaseFile()` +
+///    `asset.darwin.getAdjustmentData()`
 ///  * `path.darwin.getParentPathList()`
 ///
 /// This page is only meaningful on iOS/macOS; the entry point in
@@ -128,18 +128,18 @@ class _DarwinFeaturesPageState extends State<DarwinFeaturesPage> {
     }
     final bool hasAdjustments = await asset.darwin.hasAdjustments;
     _log('✏️ hasAdjustments: $hasAdjustments');
-    final File? base = await asset.darwin.baseFile();
+    final File? base = await asset.darwin.getBaseFile();
     if (base == null) {
-      _log('📄 baseFile: <null>');
+      _log('📄 getBaseFile: <null>');
     } else {
       final int length = await base.length();
-      _log('📄 baseFile: ${base.path} ($length bytes)');
+      _log('📄 getBaseFile: ${base.path} ($length bytes)');
     }
-    final Uint8List? aae = await asset.darwin.adjustmentData();
+    final Uint8List? aae = await asset.darwin.getAdjustmentData();
     _log(
       aae == null
-          ? '🧬 adjustmentData: <null>'
-          : '🧬 adjustmentData: ${aae.length} bytes',
+          ? '🧬 getAdjustmentData: <null>'
+          : '🧬 getAdjustmentData: ${aae.length} bytes',
     );
   }
 
@@ -173,8 +173,8 @@ class _DarwinFeaturesPageState extends State<DarwinFeaturesPage> {
               child: Padding(
                 padding: EdgeInsets.all(24),
                 child: Text(
-                  'These APIs (cloudIdentifier / hasAdjustments / baseFile / '
-                  'adjustmentData / getParentPathList) are only available on '
+                  'These APIs (cloudIdentifier / hasAdjustments / getBaseFile / '
+                  'getAdjustmentData / getParentPathList) are only available on '
                   'iOS and macOS.',
                   textAlign: TextAlign.center,
                 ),
@@ -202,7 +202,7 @@ class _DarwinFeaturesPageState extends State<DarwinFeaturesPage> {
                         onPressed: _busy
                             ? null
                             : () => _run(_hasAdjustmentsAndBaseFile),
-                        child: const Text('hasAdjustments + baseFile + aae'),
+                        child: const Text('hasAdjustments + getBaseFile + aae'),
                       ),
                       ElevatedButton(
                         onPressed: _busy ? null : () => _run(_parentPaths),

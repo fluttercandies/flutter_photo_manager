@@ -96,7 +96,7 @@ void main() {
   });
 
   test(
-    'darwin.adjustmentData forwards to the getAdjustmentData channel method',
+    'darwin.getAdjustmentData forwards to the getAdjustmentData channel method',
     () async {
       MethodCall? capturedCall;
       final Uint8List payload = Uint8List.fromList(<int>[1, 2, 3, 4]);
@@ -116,7 +116,7 @@ void main() {
         height: 1,
       );
 
-      await expectLater(entity.darwin.adjustmentData(), completion(payload));
+      await expectLater(entity.darwin.getAdjustmentData(), completion(payload));
       expect(capturedCall?.method, PMConstants.mGetAdjustmentData);
       expect(capturedCall?.arguments['id'], 'asset-id');
     },
