@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -8,7 +9,8 @@ import 'package:photo_manager/photo_manager.dart';
 ///
 ///  * `asset.darwin.cloudIdentifier` and the batch
 ///    `PhotoManager.plugin.getCloudIdentifiers`
-///  * `asset.darwin.hasAdjustments` + `asset.darwin.baseFile()`
+///  * `asset.darwin.hasAdjustments` + `asset.darwin.baseFile()` +
+///    `asset.darwin.adjustmentData()`
 ///  * `path.darwin.getParentPathList()`
 ///
 /// This page is only meaningful on iOS/macOS; the entry point in
@@ -129,10 +131,16 @@ class _DarwinFeaturesPageState extends State<DarwinFeaturesPage> {
     final File? base = await asset.darwin.baseFile();
     if (base == null) {
       _log('📄 baseFile: <null>');
-      return;
+    } else {
+      final int length = await base.length();
+      _log('📄 baseFile: ${base.path} ($length bytes)');
     }
-    final int length = await base.length();
-    _log('📄 baseFile: ${base.path} ($length bytes)');
+    final Uint8List? aae = await asset.darwin.adjustmentData();
+    _log(
+      aae == null
+          ? '🧬 adjustmentData: <null>'
+          : '🧬 adjustmentData: ${aae.length} bytes',
+    );
   }
 
   Future<void> _parentPaths() async {
@@ -166,7 +174,8 @@ class _DarwinFeaturesPageState extends State<DarwinFeaturesPage> {
                 padding: EdgeInsets.all(24),
                 child: Text(
                   'These APIs (cloudIdentifier / hasAdjustments / baseFile / '
-                  'getParentPathList) are only available on iOS and macOS.',
+                  'adjustmentData / getParentPathList) are only available on '
+                  'iOS and macOS.',
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -193,7 +202,7 @@ class _DarwinFeaturesPageState extends State<DarwinFeaturesPage> {
                         onPressed: _busy
                             ? null
                             : () => _run(_hasAdjustmentsAndBaseFile),
-                        child: const Text('hasAdjustments + baseFile'),
+                        child: const Text('hasAdjustments + baseFile + aae'),
                       ),
                       ElevatedButton(
                         onPressed: _busy ? null : () => _run(_parentPaths),

@@ -14,6 +14,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Add Darwin (iOS/macOS) only namespaced accessors `AssetEntity.darwin` and `AssetPathEntity.darwin` that group PhotoKit-specific reads without bloating the shared entity classes:
   - `asset.darwin.cloudIdentifier` and the batch `PhotoManager.plugin.getCloudIdentifiers` resolve stable cross-device cloud identifiers (iOS 15+/macOS 12+).
   - `asset.darwin.hasAdjustments` reports whether an asset has edits, and `asset.darwin.baseFile()` exports the unedited base file.
+  - `asset.darwin.adjustmentData()` exports the raw AAE adjustment (edit-history) data backing an asset's edits, so callers can access the original resource, the edit metadata, and the rendered result separately (non-destructive editing).
   - `path.darwin.getParentPathList()` returns the parent folders containing an album or folder.
 - Add `updateCreationDate` to `PhotoManager.editor.darwin` and `PhotoManager.editor.android` for modifying an asset's creation date after it has been saved.
   - On iOS/macOS: updates the `PHAsset.creationDate` property.

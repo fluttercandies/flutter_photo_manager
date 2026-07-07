@@ -1018,6 +1018,16 @@ mixin IosPlugin on BasePlugin {
     return _channel.invokeMethod(PMConstants.mGetBaseAdjustmentFile, params);
   }
 
+  Future<typed_data.Uint8List?> getAdjustmentData(
+    String id, {
+    PMProgressHandler? progressHandler,
+  }) async {
+    assert(Platform.isIOS || Platform.isMacOS);
+    final params = <String, dynamic>{'id': id};
+    _injectProgressHandlerParams(params, progressHandler);
+    return _channel.invokeMethod(PMConstants.mGetAdjustmentData, params);
+  }
+
   /// Request the parent folders containing [pathEntity].
   ///
   /// Mirrors [getSubPathEntities] but walks up the hierarchy. Backed by

@@ -35,6 +35,14 @@ NS_ASSUME_NONNULL_BEGIN
 /// `getCurrentResource` when no distinct original resource exists.
 - (PHAssetResource *)getOriginalResource;
 
+/// The AAE adjustment-data resource (`PHAssetResourceTypeAdjustmentData`) that
+/// stores the edit history applied in the Photos app, or `nil` when the asset
+/// has no adjustments.
+///
+/// @note This resource is deliberately excluded by `getCurrentResource` /
+/// `getOriginalResource`, so it must be fetched through this dedicated accessor.
+- (nullable PHAssetResource *)getAdjustmentDataResource;
+
 - (PHAssetResource *)getLivePhotosResource;
 
 @end

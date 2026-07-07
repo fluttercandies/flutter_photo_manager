@@ -3,6 +3,7 @@
 // in the LICENSE file.
 
 import 'dart:io';
+import 'dart:typed_data' as typed_data;
 
 import '../internal/enums.dart';
 import '../internal/plugin.dart';
@@ -97,6 +98,26 @@ class DarwinAsset {
       return null;
     }
     return File(path);
+  }
+
+  /// Export the raw AAE adjustment (edit-history) data for this asset, or
+  /// `null` when the asset has no adjustments.
+  ///
+  /// Backed by the `PHAssetResourceTypeAdjustmentData` resource. Combine it with
+  /// [baseFile] (the unedited base image) and [AssetEntity.file] (the rendered
+  /// result) to reconstruct a non-destructive editing pipeline.
+  ///
+  ///  * [progressHandler] observes the (possibly network-bound) export progress.
+  ///
+  /// See also:
+  ///  * [hasAdjustments] to cheaply check whether adjustment data exists.
+  Future<typed_data.Uint8List?> adjustmentData({
+    PMProgressHandler? progressHandler,
+  }) {
+    return plugin.getAdjustmentData(
+      _asset.id,
+      progressHandler: progressHandler,
+    );
   }
 }
 

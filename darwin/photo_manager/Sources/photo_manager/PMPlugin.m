@@ -405,6 +405,7 @@
         [method isEqualToString:@"getAssetListRange"] ||
         [method isEqualToString:@"getFullFile"] ||
         [method isEqualToString:@"getBaseAdjustmentFile"] ||
+        [method isEqualToString:@"getAdjustmentData"] ||
         [method isEqualToString:@"getFileSize"] ||
         [method isEqualToString:@"getMediaUrl"] ||
         [method isEqualToString:@"fetchEntityProperties"] ||
@@ -706,6 +707,12 @@
                                     fileType:fileType
                                resultHandler:handler
                              progressHandler:progressHandler];
+    } else if ([@"getAdjustmentData" isEqualToString:call.method]) {
+        NSString *assetId = call.arguments[@"id"];
+        PMProgressHandler *progressHandler = [self getProgressHandlerFromDict:call.arguments];
+        [manager getAdjustmentDataWithId:assetId
+                           resultHandler:handler
+                         progressHandler:progressHandler];
     } else if ([@"getParentPath" isEqualToString:call.method]) {
         NSString *galleryId = call.arguments[@"id"];
         int type = [call.arguments[@"type"] intValue];

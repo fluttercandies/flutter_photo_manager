@@ -69,6 +69,7 @@ class PMConstants {
   static const String mGetCloudIdentifiers = 'getCloudIdentifiers';
   static const String mHasAdjustments = 'hasAdjustments';
   static const String mGetBaseAdjustmentFile = 'getBaseAdjustmentFile';
+  static const String mGetAdjustmentData = 'getAdjustmentData';
   static const String mGetParentPath = 'getParentPath';
 
   static const String mGetAssetCount = 'getAssetCount';

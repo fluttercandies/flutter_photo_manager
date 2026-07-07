@@ -4,6 +4,8 @@
 
 // ignore_for_file: use_named_constants
 
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -92,4 +94,33 @@ void main() {
     expect(entity.longitude, equals(45.0));
     expect(entity.latLng, isNotNull);
   });
+
+  test(
+    'darwin.adjustmentData forwards to the getAdjustmentData channel method',
+    () async {
+      MethodCall? capturedCall;
+      final Uint8List payload = Uint8List.fromList(<int>[1, 2, 3, 4]);
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel(PMConstants.channelPrefix),
+        (MethodCall call) async {
+          capturedCall = call;
+          return payload;
+        },
+      );
+
+      final entity = AssetEntity(
+        id: 'asset-id',
+        typeInt: AssetType.image.index,
+        width: 1,
+        height: 1,
+      );
+
+      await expectLater(entity.darwin.adjustmentData(), completion(payload));
+      expect(capturedCall?.method, PMConstants.mGetAdjustmentData);
+      expect(capturedCall?.arguments['id'], 'asset-id');
+    },
+    // The Darwin view and its plugin call assert on iOS/macOS only.
+    skip: !(Platform.isIOS || Platform.isMacOS),
+  );
 }
