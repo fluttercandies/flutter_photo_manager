@@ -15,7 +15,7 @@
 }
 
 - (bool)isVideo {
-    BOOL predicate = [self type] == PHAssetResourceTypeVideo || PHAssetResourceTypeFullSizeVideo;
+    BOOL predicate = [self type] == PHAssetResourceTypeVideo || [self type] == PHAssetResourceTypeFullSizeVideo;
     if (@available(iOS 9.1, *)) {
         predicate = (predicate || [self type] == PHAssetResourceTypePairedVideo);
     }
