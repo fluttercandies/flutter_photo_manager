@@ -267,26 +267,110 @@
 }
 
 - (PHAssetResource *)getLivePhotosResource {
+    NSArray<PHAssetResource *> *candidates = [self candidateResourcesForFetch:NO livePhoto:YES];
+    return candidates.firstObject;
+}
+
+- (NSArray<PHAssetResource *> *)candidateResourcesForFetch:(BOOL)isOrigin
+                                                 livePhoto:(BOOL)livePhoto {
     NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:self];
     if (resources.count == 0) {
-        return nil;
+        return @[];
     }
-    if (@available(iOS 9.1, *)) {
-        PHAssetResource *paired;
-        PHAssetResource *fullSizePaired;
+
+    // Collect the resources matching each interesting type. There can be at
+    // most one of each type per asset in practice, but if PhotoKit ever
+    // exposes more than one we keep the first (`isCurrent` in a later pass
+    // would be the tiebreaker, but PhotoKit does not surface it here).
+    PHAssetResource *primary;         // .photo / .video / .pairedVideo
+    PHAssetResource *fullSize;        // .fullSizePhoto / .fullSizeVideo / .fullSizePairedVideo
+    PHAssetResource *adjustmentBase;  // .adjustmentBasePhoto / .adjustmentBaseVideo / .adjustmentBasePairedVideo
+    PHAssetResource *alternate;       // .alternatePhoto (RAW+JPEG pair)
+
+    if (livePhoto) {
         for (PHAssetResource *r in resources) {
-            if (r.type == PHAssetResourceTypePairedVideo && !paired) {
-                paired = r;
-                continue;
-            }
-            if (r.type == PHAssetResourceTypeFullSizePairedVideo && !fullSizePaired) {
-                fullSizePaired = r;
-                continue;
+            if (!r.isValid) continue;
+            switch (r.type) {
+                case PHAssetResourceTypePairedVideo:
+                    if (!primary) primary = r;
+                    break;
+                case PHAssetResourceTypeFullSizePairedVideo:
+                    if (!fullSize) fullSize = r;
+                    break;
+                default:
+                    if (@available(iOS 10.0, macOS 10.15, *)) {
+                        if (r.type == PHAssetResourceTypeAdjustmentBasePairedVideo && !adjustmentBase) {
+                            adjustmentBase = r;
+                        }
+                    }
+                    break;
             }
         }
-        return fullSizePaired ?: paired;
+    } else if (self.isImage) {
+        for (PHAssetResource *r in resources) {
+            if (!r.isValid) continue;
+            switch (r.type) {
+                case PHAssetResourceTypePhoto:
+                    if (!primary) primary = r;
+                    break;
+                case PHAssetResourceTypeFullSizePhoto:
+                    if (!fullSize) fullSize = r;
+                    break;
+                case PHAssetResourceTypeAdjustmentBasePhoto:
+                    if (!adjustmentBase) adjustmentBase = r;
+                    break;
+                case PHAssetResourceTypeAlternatePhoto:
+                    if (!alternate) alternate = r;
+                    break;
+                default:
+                    break;
+            }
+        }
+    } else if (self.isVideo) {
+        for (PHAssetResource *r in resources) {
+            if (!r.isValid) continue;
+            switch (r.type) {
+                case PHAssetResourceTypeVideo:
+                    if (!primary) primary = r;
+                    break;
+                case PHAssetResourceTypeFullSizeVideo:
+                    if (!fullSize) fullSize = r;
+                    break;
+                default:
+                    if (@available(iOS 13.0, macOS 10.15, *)) {
+                        if (r.type == PHAssetResourceTypeAdjustmentBaseVideo && !adjustmentBase) {
+                            adjustmentBase = r;
+                        }
+                    }
+                    break;
+            }
+        }
+    } else if (self.isAudio) {
+        for (PHAssetResource *r in resources) {
+            if (!r.isValid) continue;
+            if (r.type == PHAssetResourceTypeAudio && !primary) {
+                primary = r;
+            }
+        }
     }
-    return nil;
+
+    NSMutableArray<PHAssetResource *> *ordered = [NSMutableArray arrayWithCapacity:4];
+    if (isOrigin) {
+        // Try the untouched original first, then the adjustment base (which is
+        // the "before" copy Photos keeps around when the user has edits), then
+        // the rendered current version as a last resort.
+        if (primary) [ordered addObject:primary];
+        if (adjustmentBase) [ordered addObject:adjustmentBase];
+        if (fullSize) [ordered addObject:fullSize];
+    } else {
+        // Prefer the rendered current version; fall back to the original bytes
+        // if the render is missing from iCloud, then to the adjustment base.
+        if (fullSize) [ordered addObject:fullSize];
+        if (primary) [ordered addObject:primary];
+        if (adjustmentBase) [ordered addObject:adjustmentBase];
+    }
+    if (alternate) [ordered addObject:alternate];
+    return ordered;
 }
 
 @end

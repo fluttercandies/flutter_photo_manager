@@ -45,6 +45,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (PHAssetResource *)getLivePhotosResource;
 
+/// Ordered list of `PHAssetResource`s to try when exporting an asset's file.
+///
+/// PhotoKit exposes several resources per asset (original, adjusted, rendered,
+/// paired video, ...) and any one of them can fail `writeDataForAssetResource`
+/// with a generic `PHPhotosErrorInternalError` when iCloud has not fully
+/// materialized that specific resource. Callers walk this list, retrying with
+/// the next candidate on failure until one succeeds or the list is exhausted.
+///
+/// @param isOrigin  When `YES`, the caller wants the original (unedited) bytes;
+///                  the returned order prefers the original resource type,
+///                  then adjustment base, then the rendered/full-size variant.
+///                  When `NO`, the caller wants the current rendered version
+///                  and the order is reversed.
+/// @param livePhoto When `YES`, resources for the Live Photo's paired video
+///                  are returned instead of the primary photo/video resources.
+- (NSArray<PHAssetResource *> *)candidateResourcesForFetch:(BOOL)isOrigin
+                                                 livePhoto:(BOOL)livePhoto;
+
 @end
 
 NS_ASSUME_NONNULL_END

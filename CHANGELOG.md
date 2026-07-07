@@ -28,6 +28,7 @@ To know more about breaking changes, see the [Migration Guide][].
 **Fixes**
 
 - Fix iOS 18+ raising `Unsupported fetch for asset collections with type 2 and subtype 2` when navigating into the primary album, caused by an invalid `SmartAlbum` + `AlbumRegular` combination in the recent-collection check.
+- Fix Darwin `AssetEntity.loadFile` / `originFile` sporadically failing with `PHPhotosErrorDomain (-1)` for edited assets and Live Photos by walking multiple `PHAssetResource` candidates and falling back to `PHImageManager` for plain videos/images when `writeDataForAssetResource` exhausts them.
 - Reduce built-in Kotlin migration warnings for supported project configurations while preserving legacy Flutter compatibility.
 - Fix Darwin crashes when querying assets by local identifier by catching PhotoKit exceptions and returning safe fallback results instead of aborting the process.
 - Fix the `AssetEntity.duration` API docs to clarify that audio and video durations are returned in seconds across supported platforms, preserving the existing API behavior.

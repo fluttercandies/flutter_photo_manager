@@ -14,6 +14,25 @@
 #import "PMRequestTypeUtils.h"
 #import "PMResultHandler.h"
 
+static NSString *PMResourceTypeName(PHAssetResourceType type) {
+    switch (type) {
+        case PHAssetResourceTypePhoto:                       return @"photo";
+        case PHAssetResourceTypeVideo:                       return @"video";
+        case PHAssetResourceTypeAudio:                       return @"audio";
+        case PHAssetResourceTypeAlternatePhoto:              return @"alternatePhoto";
+        case PHAssetResourceTypeFullSizePhoto:               return @"fullSizePhoto";
+        case PHAssetResourceTypeFullSizeVideo:               return @"fullSizeVideo";
+        case PHAssetResourceTypeAdjustmentData:              return @"adjustmentData";
+        case PHAssetResourceTypeAdjustmentBasePhoto:         return @"adjustmentBasePhoto";
+        case PHAssetResourceTypePairedVideo:                 return @"pairedVideo";
+        case PHAssetResourceTypeFullSizePairedVideo:         return @"fullSizePairedVideo";
+        case PHAssetResourceTypeAdjustmentBasePairedVideo:   return @"adjustmentBasePairedVideo";
+        case PHAssetResourceTypeAdjustmentBaseVideo:         return @"adjustmentBaseVideo";
+        default:
+            return [NSString stringWithFormat:@"unknown(%ld)", (long)type];
+    }
+}
+
 @implementation PMManager {
     PMCacheContainer *cacheContainer;
     
@@ -610,19 +629,18 @@
             progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
                  withScheme:(BOOL)withScheme
                    fileType:(AVFileType)fileType {
-    PHAssetResource *resource = [asset getLivePhotosResource];
-    if (!resource) {
+    NSArray<PHAssetResource *> *candidates = [asset candidateResourcesForFetch:YES livePhoto:YES];
+    if (candidates.count == 0) {
         [handler replyError:[NSString stringWithFormat:@"Asset %@ does not have a Live-Photo resource.", asset.localIdentifier]];
         return;
     }
-    
-    [self fetchVideoResourceToFile:asset
-                          resource:resource
-                   progressHandler:progressHandler
-                        withScheme:withScheme
-                          isOrigin:YES
-                          fileType:fileType
-                             block:^(NSString *path, NSObject *error) {
+    [self fetchVideoFileWithCandidates:candidates
+                                 asset:asset
+                       progressHandler:progressHandler
+                            withScheme:withScheme
+                              isOrigin:YES
+                              fileType:fileType
+                                 block:^(NSString *path, NSObject *error) {
         if (path) {
             [handler reply:path];
         } else {
@@ -635,23 +653,138 @@
                      handler:(PMResultHandler *)handler
              progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
                     fileType:(AVFileType)fileType {
-    PHAssetResource *resource = [asset getCurrentResource];
-    if (!resource) {
+    NSArray<PHAssetResource *> *candidates = [asset candidateResourcesForFetch:YES livePhoto:NO];
+    if (candidates.count == 0) {
         [handler replyError:[NSString stringWithFormat:@"Asset %@ does not have available resources.", asset.localIdentifier]];
         return;
     }
+    __weak typeof(self) weakSelf = self;
+    [self fetchVideoFileWithCandidates:candidates
+                                 asset:asset
+                       progressHandler:progressHandler
+                            withScheme:NO
+                              isOrigin:YES
+                              fileType:fileType
+                                 block:^(NSString *path, NSObject *walkerError) {
+        if (path) {
+            [handler reply:path];
+            return;
+        }
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) { return; }
+        // Every candidate resource failed (typical iCloud flake). Fall back to
+        // PHImageManager's requestAVAssetForVideo pipeline which frequently
+        // succeeds when the raw-resource pipeline can't materialize the file.
+        [strongSelf fallbackFetchVideoViaAVAsset:asset
+                                        isOrigin:YES
+                                      withScheme:NO
+                                        fileType:fileType
+                                 progressHandler:progressHandler
+                                           block:^(NSString *fbPath, NSObject *fbError) {
+            if (fbPath) {
+                [handler reply:fbPath];
+            } else {
+                // Prefer the walker's error over the fallback's since it
+                // carries the list of resource types we tried.
+                [handler replyError:walkerError ?: fbError];
+            }
+        }];
+    }];
+}
+
+// Compose the terminal error surfaced after every candidate resource fails.
+// Preserves the last underlying NSError's domain/code (so callers keep seeing
+// `PHPhotosErrorDomain (-1)` in their existing log matchers) while attaching
+// the list of resource types we tried into the failure-reason field. That
+// list is what surfaces as `PlatformException.details` on the Flutter side.
+- (NSObject *)composeFetchError:(NSObject *)lastError
+                          asset:(PHAsset *)asset
+                      attempted:(NSArray<NSString *> *)attempted {
+    NSString *attemptList = attempted.count > 0 ? [attempted componentsJoinedByString:@", "] : @"(none)";
+    NSString *description = [NSString stringWithFormat:
+                             @"Failed to export asset %@ after trying resources: [%@]",
+                             asset.localIdentifier, attemptList];
+    if ([lastError isKindOfClass:[NSError class]]) {
+        NSError *err = (NSError *)lastError;
+        NSMutableDictionary *userInfo = err.userInfo
+            ? [NSMutableDictionary dictionaryWithDictionary:err.userInfo]
+            : [NSMutableDictionary dictionary];
+        if (!userInfo[NSLocalizedDescriptionKey]) {
+            userInfo[NSLocalizedDescriptionKey] = description;
+        }
+        userInfo[NSLocalizedFailureReasonErrorKey] = description;
+        return [NSError errorWithDomain:err.domain code:err.code userInfo:userInfo];
+    }
+    if (lastError) {
+        return lastError;
+    }
+    return [NSError errorWithDomain:@"PMPhotoManager"
+                               code:-1
+                           userInfo:@{NSLocalizedDescriptionKey: description}];
+}
+
+- (void)fetchVideoFileWithCandidates:(NSArray<PHAssetResource *> *)candidates
+                               asset:(PHAsset *)asset
+                     progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
+                          withScheme:(BOOL)withScheme
+                            isOrigin:(BOOL)isOrigin
+                            fileType:(AVFileType)fileType
+                               block:(void (^)(NSString *path, NSObject *error))block {
+    [self fetchVideoFileFromCandidates:candidates
+                               atIndex:0
+                             attempted:[NSMutableArray arrayWithCapacity:candidates.count]
+                             lastError:nil
+                                 asset:asset
+                       progressHandler:progressHandler
+                            withScheme:withScheme
+                              isOrigin:isOrigin
+                              fileType:fileType
+                                 block:block];
+}
+
+- (void)fetchVideoFileFromCandidates:(NSArray<PHAssetResource *> *)candidates
+                             atIndex:(NSUInteger)index
+                           attempted:(NSMutableArray<NSString *> *)attempted
+                           lastError:(NSObject *)lastError
+                               asset:(PHAsset *)asset
+                     progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
+                          withScheme:(BOOL)withScheme
+                            isOrigin:(BOOL)isOrigin
+                            fileType:(AVFileType)fileType
+                               block:(void (^)(NSString *path, NSObject *error))block {
+    if (index >= candidates.count) {
+        block(nil, [self composeFetchError:lastError asset:asset attempted:attempted]);
+        return;
+    }
+    PHAssetResource *resource = candidates[index];
+    [attempted addObject:PMResourceTypeName(resource.type)];
+    __weak typeof(self) weakSelf = self;
     [self fetchVideoResourceToFile:asset
                           resource:resource
                    progressHandler:progressHandler
-                        withScheme:NO
-                          isOrigin:YES
+                        withScheme:withScheme
+                          isOrigin:isOrigin
                           fileType:fileType
                              block:^(NSString *path, NSObject *error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) { return; }
         if (path) {
-            [handler reply:path];
-        } else {
-            [handler replyError:error];
+            block(path, nil);
+            return;
         }
+        [[PMLogUtils sharedInstance]
+         info:[NSString stringWithFormat:@"Resource %@ failed for asset %@, trying next candidate. Error: %@",
+               PMResourceTypeName(resource.type), asset.localIdentifier, error]];
+        [strongSelf fetchVideoFileFromCandidates:candidates
+                                         atIndex:index + 1
+                                       attempted:attempted
+                                       lastError:error
+                                           asset:asset
+                                 progressHandler:progressHandler
+                                      withScheme:withScheme
+                                        isOrigin:isOrigin
+                                        fileType:fileType
+                                           block:block];
     }];
 }
 
@@ -672,6 +805,94 @@
             [handler replyError:error];
         }
     }];
+}
+
+// Fallback video fetch used when `writeDataForAssetResource` fails across every
+// candidate resource. Goes through PHImageManager's requestAVAssetForVideo,
+// which uses a different iCloud pipeline internally and often succeeds on
+// assets the resource-level API refuses. Not usable for Live Photo paired
+// videos (asset.mediaType is image), so only wire this into the plain-video
+// entry point.
+- (void)fallbackFetchVideoViaAVAsset:(PHAsset *)asset
+                            isOrigin:(BOOL)isOrigin
+                          withScheme:(BOOL)withScheme
+                            fileType:(AVFileType)fileType
+                     progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
+                               block:(void (^)(NSString *path, NSObject *error))block {
+    if (!asset.isVideo) {
+        // Live Photo (isImage=YES) and other non-video assets can't use this
+        // API; refuse to run rather than get an opaque PhotoKit rejection.
+        block(nil, [NSError errorWithDomain:@"PMPhotoManager" code:-1 userInfo:@{
+            NSLocalizedDescriptionKey: @"AVAsset fallback only applies to video assets."
+        }]);
+        return;
+    }
+
+    NSFileManager *manager = NSFileManager.defaultManager;
+    NSString *path = [self makeAssetOutputPath:asset resource:nil isOrigin:isOrigin fileType:fileType manager:manager];
+    if ([manager fileExistsAtPath:path]) {
+        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
+        block(withScheme ? [NSURL fileURLWithPath:path].absoluteString : path, nil);
+        return;
+    }
+
+    PHVideoRequestOptions *options = [PHVideoRequestOptions new];
+    [options setDeliveryMode:PHVideoRequestOptionsDeliveryModeHighQualityFormat];
+    [options setNetworkAccessAllowed:YES];
+    [options setVersion:isOrigin ? PHVideoRequestOptionsVersionOriginal : PHVideoRequestOptionsVersionCurrent];
+
+    __weak typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) { return; }
+        [strongSelf.cachingManager
+         requestAVAssetForVideo:asset
+         options:options
+         resultHandler:^(AVAsset *_Nullable avAsset,
+                         AVAudioMix *_Nullable audioMix,
+                         NSDictionary *_Nullable info) {
+            __strong typeof(weakSelf) innerSelf = weakSelf;
+            if (!innerSelf) { return; }
+            NSObject *error = info[PHImageErrorKey];
+            if (error) {
+                block(nil, error);
+                return;
+            }
+            if (![PMManager isDownloadFinish:info]) {
+                return;
+            }
+            if ([avAsset isKindOfClass:[AVURLAsset class]]) {
+                AVURLAsset *urlAsset = (AVURLAsset *)avAsset;
+                NSURL *videoURL = urlAsset.URL;
+                NSURL *destination = [NSURL fileURLWithPath:path];
+                if ([videoURL.path isEqualToString:destination.path]) {
+                    block(withScheme ? videoURL.absoluteString : videoURL.path, nil);
+                    return;
+                }
+                NSError *copyError;
+                [manager copyItemAtURL:videoURL toURL:destination error:&copyError];
+                if (copyError) {
+                    block(nil, copyError);
+                    return;
+                }
+                block(withScheme ? destination.absoluteString : path, nil);
+                return;
+            }
+            // AVComposition (adjusted asset) — export session handles it.
+            [innerSelf exportAVAssetToFile:avAsset
+                              destination:path
+                          progressHandler:progressHandler
+                               withScheme:withScheme
+                                 fileType:fileType
+                                    block:^(NSString *exportedPath, NSObject *exportError) {
+                if (exportedPath) {
+                    block(withScheme ? [NSURL fileURLWithPath:exportedPath].absoluteString : exportedPath, nil);
+                } else {
+                    block(nil, exportError);
+                }
+            }];
+        }];
+    });
 }
 
 - (void)fetchVideoResourceToFile:(PHAsset *)asset
@@ -1086,11 +1307,82 @@
 }
 
 - (void)fetchOriginImageFile:(PHAsset *)asset resultHandler:(PMResultHandler *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
-    PHAssetResource *imageResource = [asset getCurrentResource];
-    if (!imageResource) {
+    NSArray<PHAssetResource *> *candidates = [asset candidateResourcesForFetch:YES livePhoto:NO];
+    if (candidates.count == 0) {
         [handler replyError:[NSString stringWithFormat:@"Asset %@ does not have available resources.", asset.localIdentifier]];
         return;
     }
+    __weak typeof(self) weakSelf = self;
+    [self fetchImageFileFromCandidates:candidates
+                               atIndex:0
+                             attempted:[NSMutableArray arrayWithCapacity:candidates.count]
+                             lastError:nil
+                                 asset:asset
+                       progressHandler:progressHandler
+                                 block:^(NSString *path, NSObject *walkerError) {
+        if (path) {
+            [handler reply:path];
+            return;
+        }
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) { return; }
+        // Every candidate resource failed. Fall back to PHImageManager's
+        // requestImageDataAndOrientation pipeline, which is a separate iCloud
+        // materialization path and preserves the original HEIC/RAW bytes.
+        [strongSelf fallbackFetchImageDataFor:asset
+                                     isOrigin:YES
+                              progressHandler:progressHandler
+                                        block:^(NSString *fbPath, NSObject *fbError) {
+            if (fbPath) {
+                [handler reply:fbPath];
+            } else {
+                [handler replyError:walkerError ?: fbError];
+            }
+        }];
+    }];
+}
+
+- (void)fetchImageFileFromCandidates:(NSArray<PHAssetResource *> *)candidates
+                             atIndex:(NSUInteger)index
+                           attempted:(NSMutableArray<NSString *> *)attempted
+                           lastError:(NSObject *)lastError
+                               asset:(PHAsset *)asset
+                     progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
+                               block:(void (^)(NSString *path, NSObject *error))block {
+    if (index >= candidates.count) {
+        block(nil, [self composeFetchError:lastError asset:asset attempted:attempted]);
+        return;
+    }
+    PHAssetResource *resource = candidates[index];
+    [attempted addObject:PMResourceTypeName(resource.type)];
+    __weak typeof(self) weakSelf = self;
+    [self writeImageResourceToFile:resource
+                             asset:asset
+                   progressHandler:progressHandler
+                             block:^(NSString *path, NSObject *error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) { return; }
+        if (path) {
+            block(path, nil);
+            return;
+        }
+        [[PMLogUtils sharedInstance]
+         info:[NSString stringWithFormat:@"Resource %@ failed for asset %@, trying next candidate. Error: %@",
+               PMResourceTypeName(resource.type), asset.localIdentifier, error]];
+        [strongSelf fetchImageFileFromCandidates:candidates
+                                         atIndex:index + 1
+                                       attempted:attempted
+                                       lastError:error
+                                           asset:asset
+                                 progressHandler:progressHandler
+                                           block:block];
+    }];
+}
+
+- (void)writeImageResourceToFile:(PHAssetResource *)imageResource
+                           asset:(PHAsset *)asset
+                 progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
+                           block:(void (^)(NSString *path, NSObject *error))block {
     NSFileManager *fileManager = NSFileManager.defaultManager;
     NSString *path = [self makeAssetOutputPath:asset
                                       resource:imageResource
@@ -1099,13 +1391,13 @@
                                        manager:fileManager];
     if ([fileManager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
-        [handler reply:path];
+        block(path, nil);
         return;
     }
-    
+
     PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
     [options setNetworkAccessAllowed:YES];
-    
+
     __block double lastProgress = 0.0;
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
     __weak typeof(self) weakSelf = self;
@@ -1119,7 +1411,7 @@
             [strongSelf notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
         }
     }];
-    
+
     PHAssetResourceManager *resourceManager = PHAssetResourceManager.defaultManager;
     NSURL *fileUrl = [NSURL fileURLWithPath:path];
     [resourceManager writeDataForAssetResource:imageResource
@@ -1132,12 +1424,99 @@
         }
         if (error) {
             [strongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
-            [handler replyError:error];
+            block(nil, error);
         } else {
-            [handler reply:path];
             [strongSelf notifySuccess:progressHandler];
+            block(path, nil);
         }
     }];
+}
+
+// Fallback image fetch used when `writeDataForAssetResource` fails across
+// every candidate resource. Uses PHImageManager's data pipeline, which is a
+// separate iCloud-materialization path and returns the raw image bytes so we
+// can write them verbatim without a JPEG recompression.
+- (void)fallbackFetchImageDataFor:(PHAsset *)asset
+                         isOrigin:(BOOL)isOrigin
+                  progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
+                            block:(void (^)(NSString *path, NSObject *error))block {
+    NSFileManager *manager = NSFileManager.defaultManager;
+    NSString *path = [self makeAssetOutputPath:asset resource:nil isOrigin:isOrigin fileType:nil manager:manager];
+    if ([manager fileExistsAtPath:path]) {
+        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
+        block(path, nil);
+        return;
+    }
+
+    PHImageRequestOptions *options = [PHImageRequestOptions new];
+    [options setDeliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat];
+    [options setNetworkAccessAllowed:YES];
+    [options setSynchronous:NO];
+    [options setVersion:isOrigin ? PHImageRequestOptionsVersionOriginal : PHImageRequestOptionsVersionCurrent];
+
+    __weak typeof(self) weakSelf = self;
+    [options setProgressHandler:^(double progress, NSError *progressError, BOOL *stop, NSDictionary *info) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) { return; }
+        if (progressError) { return; }
+        if (progress != 1) {
+            [strongSelf notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+        }
+    }];
+
+    void (^dataHandler)(NSData *_Nullable, NSDictionary *_Nullable) = ^(NSData *_Nullable imageData, NSDictionary *_Nullable info) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) { return; }
+        NSObject *error = info[PHImageErrorKey];
+        if (error) {
+            block(nil, error);
+            return;
+        }
+        if (!imageData) {
+            block(nil, [NSError errorWithDomain:@"PMPhotoManager" code:-1 userInfo:@{
+                NSLocalizedDescriptionKey: @"PHImageManager returned no image data."
+            }]);
+            return;
+        }
+        NSError *writeError;
+        [imageData writeToFile:path options:NSDataWritingAtomic error:&writeError];
+        if (writeError) {
+            block(nil, writeError);
+            return;
+        }
+        [strongSelf notifySuccess:progressHandler];
+        block(path, nil);
+    };
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) { return; }
+        if (@available(iOS 13.0, macOS 10.15, *)) {
+            [strongSelf.cachingManager requestImageDataAndOrientationForAsset:asset
+                                                                     options:options
+                                                               resultHandler:^(NSData *_Nullable imageData,
+                                                                               NSString *_Nullable dataUTI,
+                                                                               CGImagePropertyOrientation orientation,
+                                                                               NSDictionary *_Nullable info) {
+                dataHandler(imageData, info);
+            }];
+        } else {
+#if TARGET_OS_IOS
+            [strongSelf.cachingManager requestImageDataForAsset:asset
+                                                        options:options
+                                                  resultHandler:^(NSData *_Nullable imageData,
+                                                                  NSString *_Nullable dataUTI,
+                                                                  UIImageOrientation orientation,
+                                                                  NSDictionary *_Nullable info) {
+                dataHandler(imageData, info);
+            }];
+#else
+            dataHandler(nil, @{PHImageErrorKey: [NSError errorWithDomain:@"PMPhotoManager" code:-1 userInfo:@{
+                NSLocalizedDescriptionKey: @"requestImageDataForAsset unavailable on this platform version."
+            }]});
+#endif
+        }
+    });
 }
 
 - (void)fetchFullSizeImageFile:(PHAsset *)asset
