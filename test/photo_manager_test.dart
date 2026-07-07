@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager/src/internal/constants.dart';
+import 'package:photo_manager/src/utils/convert_utils.dart';
 
 class _TestPlugin extends PhotoManagerPlugin {
   @override
@@ -64,5 +65,31 @@ void main() {
     await expectLater(entity.fileSize, completion(12345));
     expect(capturedCall?.method, PMConstants.mGetFileSize);
     expect(capturedCall?.arguments['id'], 'asset-id');
+  });
+
+  test('LatLng.fromValues keeps real zero coordinates', () {
+    expect(LatLng.fromValues(latitude: 0.0, longitude: 45.0), isNotNull);
+    expect(LatLng.fromValues(latitude: 45.0, longitude: 0.0), isNotNull);
+    expect(
+      LatLng.fromValues(latitude: 0.0, longitude: 0.0),
+      equals(const LatLng(latitude: 0.0, longitude: 0.0)),
+    );
+    expect(LatLng.fromValues(latitude: null, longitude: 0.0), isNull);
+    expect(LatLng.fromValues(latitude: 0.0, longitude: null), isNull);
+  });
+
+  test('convertMapToAsset keeps real zero lat/lng from the platform', () {
+    final entity = ConvertUtils.convertMapToAsset(<String, dynamic>{
+      'id': 'asset-id',
+      'type': AssetType.image.index,
+      'width': 1,
+      'height': 1,
+      'lat': 0.0,
+      'lng': 45.0,
+    });
+
+    expect(entity.latitude, equals(0.0));
+    expect(entity.longitude, equals(45.0));
+    expect(entity.latLng, isNotNull);
   });
 }

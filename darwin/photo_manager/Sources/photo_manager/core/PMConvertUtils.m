@@ -95,8 +95,8 @@
         @"duration": @(duration),
         @"type": @(typeInt),
         @"modifiedDt": @(modifiedDt),
-        @"lng": @(asset.location.coordinate.longitude),
-        @"lat": @(asset.location.coordinate.latitude),
+        @"lng": asset.location != nil ? @(asset.location.coordinate.longitude) : [NSNull null],
+        @"lat": asset.location != nil ? @(asset.location.coordinate.latitude) : [NSNull null],
         @"title": needTitle ? [asset title] : @"",
         @"subtype": @(asset.mediaSubtypes),
     };
@@ -113,8 +113,8 @@
         @"favorite": @(asset.favorite),
         @"type": @(asset.type),
         @"modifiedDt": @(asset.modifiedDt),
-        @"lng": @(asset.lng),
-        @"lat": @(asset.lat),
+        @"lng": asset.lng ?: [NSNull null],
+        @"lat": asset.lat ?: [NSNull null],
         @"title": needTitle ? asset.title : @"",
         @"subtype": @(asset.subtype),
     };

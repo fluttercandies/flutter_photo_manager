@@ -1005,13 +1005,10 @@ class LatLng {
   const LatLng({
     required this.latitude,
     required this.longitude,
-  }) : assert(latitude != 0.0 && longitude != 0.0);
+  });
 
   static LatLng? fromValues({double? latitude, double? longitude}) {
-    if (latitude == null ||
-        latitude == 0.0 ||
-        longitude == null ||
-        longitude == 0.0) {
+    if (latitude == null || longitude == null) {
       return null;
     }
     return LatLng(latitude: latitude, longitude: longitude);
@@ -1025,7 +1022,7 @@ class LatLng {
 
   @override
   bool operator ==(Object other) {
-    if (other is! AssetEntity) {
+    if (other is! LatLng) {
       return false;
     }
     return latitude == other.latitude && longitude == other.longitude;
