@@ -201,8 +201,57 @@
 #if TARGET_OS_IOS
 #if __IPHONE_14_0
 
+// `UIApplication.keyWindow` doesn't reflect the right window once an app adopts
+// (or is forced onto, per TN3187) the UIScene life cycle, and it's the only window
+// picking API compatible back to the plugin's iOS 9 deployment target.
+- (nullable UIWindow *)pm_keyWindow {
+    if (@available(iOS 13.0, *)) {
+        for (UIScene *scene in UIApplication.sharedApplication.connectedScenes) {
+            if (![scene isKindOfClass:UIWindowScene.class]) {
+                continue;
+            }
+            UIWindowScene *windowScene = (UIWindowScene *)scene;
+            if (windowScene.activationState != UISceneActivationStateForegroundActive) {
+                continue;
+            }
+            for (UIWindow *window in windowScene.windows) {
+                if (window.isKeyWindow) {
+                    return window;
+                }
+            }
+        }
+    }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    return UIApplication.sharedApplication.keyWindow;
+#pragma clang diagnostic pop
+}
+
 - (UIViewController *)getCurrentViewController {
-    UIViewController *controller = UIApplication.sharedApplication.keyWindow.rootViewController;
+    UIViewController *controller = nil;
+
+    // `registrar.viewController` (Flutter 3.38+) is scoped to the FlutterEngine that owns
+    // this plugin instance, so it's the correct pick in multi-engine/add-to-app hosts where
+    // several engines/windows can be alive at once. Dispatched dynamically so the plugin
+    // keeps compiling against older Flutter.framework headers that don't declare it.
+    // Fall back whenever it's unavailable, nil, or stale (a FlutterViewController pushed off
+    // a native nav stack stays attached to its engine, and thus non-nil, until it's
+    // deallocated -- long after its view has left the window).
+    id registrar = privateRegistrar;
+    if ([registrar respondsToSelector:@selector(viewController)]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+        UIViewController *registrarController = [registrar performSelector:@selector(viewController)];
+#pragma clang diagnostic pop
+        if (registrarController.isViewLoaded && registrarController.view.window != nil) {
+            controller = registrarController;
+        }
+    }
+
+    if (!controller) {
+        controller = [self pm_keyWindow].rootViewController;
+    }
+
     if (controller) {
         UIViewController *result = controller;
         while (1) {
