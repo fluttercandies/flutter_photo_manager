@@ -53,11 +53,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// materialized that specific resource. Callers walk this list, retrying with
 /// the next candidate on failure until one succeeds or the list is exhausted.
 ///
-/// @param isOrigin  When `YES`, the caller wants the original (unedited) bytes;
-///                  the returned order prefers the original resource type,
-///                  then adjustment base, then the rendered/full-size variant.
-///                  When `NO`, the caller wants the current rendered version
-///                  and the order is reversed.
+/// Order is `rendered/current → primary → adjustment base`, so an edited asset
+/// exports what the Photos app shows first, matching the plugin's historical
+/// behavior on both `isOrigin: true` and `isOrigin: false`.
+///
+/// @param isOrigin  Reserved for future opt-in ordering control; ignored for
+///                  the resource order today.
 /// @param livePhoto When `YES`, resources for the Live Photo's paired video
 ///                  are returned instead of the primary photo/video resources.
 - (NSArray<PHAssetResource *> *)candidateResourcesForFetch:(BOOL)isOrigin

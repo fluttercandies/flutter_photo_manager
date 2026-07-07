@@ -355,20 +355,17 @@
     }
 
     NSMutableArray<PHAssetResource *> *ordered = [NSMutableArray arrayWithCapacity:4];
-    if (isOrigin) {
-        // Try the untouched original first, then the adjustment base (which is
-        // the "before" copy Photos keeps around when the user has edits), then
-        // the rendered current version as a last resort.
-        if (primary) [ordered addObject:primary];
-        if (adjustmentBase) [ordered addObject:adjustmentBase];
-        if (fullSize) [ordered addObject:fullSize];
-    } else {
-        // Prefer the rendered current version; fall back to the original bytes
-        // if the render is missing from iCloud, then to the adjustment base.
-        if (fullSize) [ordered addObject:fullSize];
-        if (primary) [ordered addObject:primary];
-        if (adjustmentBase) [ordered addObject:adjustmentBase];
-    }
+    // Always prefer the rendered ("current") resource first, matching what the
+    // Photos app shows the user, and matching the plugin's historical behavior
+    // for both `loadFile(isOrigin: true)` and `loadFile(isOrigin: false)`.
+    // Fall back to the raw primary resource, then the adjustment base, when
+    // the preferred one is missing from iCloud or otherwise unreadable. The
+    // `isOrigin` parameter is kept in the signature for future opt-in ordering
+    // control but does not reshuffle the list today, so upgrading callers do
+    // not silently switch between edited and unedited exports.
+    if (fullSize) [ordered addObject:fullSize];
+    if (primary) [ordered addObject:primary];
+    if (adjustmentBase) [ordered addObject:adjustmentBase];
     if (alternate) [ordered addObject:alternate];
     return ordered;
 }

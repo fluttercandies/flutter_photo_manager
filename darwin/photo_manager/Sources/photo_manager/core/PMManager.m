@@ -634,6 +634,15 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
         [handler replyError:[NSString stringWithFormat:@"Asset %@ does not have a Live-Photo resource.", asset.localIdentifier]];
         return;
     }
+    NSString *cached = [self cachedPathForAsset:asset
+                                     candidates:candidates
+                                       isOrigin:YES
+                                       fileType:fileType
+                            includeFallbackPath:NO];
+    if (cached) {
+        [handler reply:withScheme ? [NSURL fileURLWithPath:cached].absoluteString : cached];
+        return;
+    }
     [self fetchVideoFileWithCandidates:candidates
                                  asset:asset
                        progressHandler:progressHandler
@@ -644,6 +653,7 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
         if (path) {
             [handler reply:path];
         } else {
+            [self notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
             [handler replyError:error];
         }
     }];
@@ -656,6 +666,15 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     NSArray<PHAssetResource *> *candidates = [asset candidateResourcesForFetch:YES livePhoto:NO];
     if (candidates.count == 0) {
         [handler replyError:[NSString stringWithFormat:@"Asset %@ does not have available resources.", asset.localIdentifier]];
+        return;
+    }
+    NSString *cached = [self cachedPathForAsset:asset
+                                     candidates:candidates
+                                       isOrigin:YES
+                                       fileType:fileType
+                            includeFallbackPath:YES];
+    if (cached) {
+        [handler reply:cached];
         return;
     }
     __weak typeof(self) weakSelf = self;
@@ -683,13 +702,50 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                                            block:^(NSString *fbPath, NSObject *fbError) {
             if (fbPath) {
                 [handler reply:fbPath];
-            } else {
-                // Prefer the walker's error over the fallback's since it
-                // carries the list of resource types we tried.
-                [handler replyError:walkerError ?: fbError];
+                return;
             }
+            [strongSelf notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
+            // Prefer the walker's error over the fallback's since it
+            // carries the list of resource types we tried.
+            [handler replyError:walkerError ?: fbError];
         }];
     }];
+}
+
+// Returns the first candidate resource whose cache file already exists, or
+// (when `includeFallbackPath` is YES) the AVAsset/image-data fallback cache
+// path if present. Used before walking candidates so that assets that
+// previously succeeded on a non-first candidate don't pay for a fresh
+// PhotoKit round-trip against the first candidate on every subsequent call.
+- (NSString *)cachedPathForAsset:(PHAsset *)asset
+                      candidates:(NSArray<PHAssetResource *> *)candidates
+                        isOrigin:(BOOL)isOrigin
+                        fileType:(AVFileType)fileType
+             includeFallbackPath:(BOOL)includeFallbackPath {
+    NSFileManager *fileManager = NSFileManager.defaultManager;
+    for (PHAssetResource *candidate in candidates) {
+        NSString *path = [self makeAssetOutputPath:asset
+                                          resource:candidate
+                                          isOrigin:isOrigin
+                                          fileType:fileType
+                                           manager:fileManager];
+        if ([fileManager fileExistsAtPath:path]) {
+            [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
+            return path;
+        }
+    }
+    if (includeFallbackPath) {
+        NSString *fallbackPath = [self makeAssetOutputPath:asset
+                                                  resource:nil
+                                                  isOrigin:isOrigin
+                                                  fileType:fileType
+                                                   manager:fileManager];
+        if ([fileManager fileExistsAtPath:fallbackPath]) {
+            [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", fallbackPath]];
+            return fallbackPath;
+        }
+    }
+    return nil;
 }
 
 // Compose the terminal error surfaced after every candidate resource fails.
@@ -981,7 +1037,9 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
             return;
         }
         if (error) {
-            [strongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            // Don't emit Failed here — the walker may retry with another
+            // candidate and only the terminal outcome should surface as a
+            // failure state to progress observers.
             block(nil, error);
             return;
         }
@@ -1312,6 +1370,15 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
         [handler replyError:[NSString stringWithFormat:@"Asset %@ does not have available resources.", asset.localIdentifier]];
         return;
     }
+    NSString *cached = [self cachedPathForAsset:asset
+                                     candidates:candidates
+                                       isOrigin:YES
+                                       fileType:nil
+                            includeFallbackPath:YES];
+    if (cached) {
+        [handler reply:cached];
+        return;
+    }
     __weak typeof(self) weakSelf = self;
     [self fetchImageFileFromCandidates:candidates
                                atIndex:0
@@ -1335,9 +1402,10 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                                         block:^(NSString *fbPath, NSObject *fbError) {
             if (fbPath) {
                 [handler reply:fbPath];
-            } else {
-                [handler replyError:walkerError ?: fbError];
+                return;
             }
+            [strongSelf notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
+            [handler replyError:walkerError ?: fbError];
         }];
     }];
 }
@@ -1423,7 +1491,7 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
             return;
         }
         if (error) {
-            [strongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            // Walker retries with the next candidate; don't emit Failed here.
             block(nil, error);
         } else {
             [strongSelf notifySuccess:progressHandler];
