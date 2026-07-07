@@ -245,10 +245,10 @@ class PhotoManager(private val context: Context) {
         resultHandler.reply(exists)
     }
 
-    fun getLocation(id: String): Map<String, Double> {
+    fun getLocation(id: String): Map<String, Double?> {
         val latLong = dbUtils.getLatLong(context, id)
         return if (latLong == null) {
-            mapOf("lat" to 0.0, "lng" to 0.0)
+            mapOf("lat" to null, "lng" to null)
         } else {
             mapOf("lat" to latLong[0], "lng" to latLong[1])
         }

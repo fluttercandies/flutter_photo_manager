@@ -110,9 +110,9 @@ class ConvertUtils {
     String? title,
   }) {
     final rawLat = data['lat'];
-    final lat = rawLat is num && rawLat != 0 ? rawLat.toDouble() : null;
+    final lat = rawLat is num ? rawLat.toDouble() : null;
     final rawLng = data['lng'];
-    final lng = rawLng is num && rawLng != 0 ? rawLng.toDouble() : null;
+    final lng = rawLng is num ? rawLng.toDouble() : null;
 
     final AssetEntity result = AssetEntity(
       id: data['id'] as String,

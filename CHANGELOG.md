@@ -38,6 +38,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Fix Darwin Live Photo exports with an explicit `darwinFileType`, restoring iOS conversions such as Live Photo MOV-to-MP4 output.
 - Fix Darwin image `loadFile(isOrigin: false)` blocking the iOS UI thread by making the request asynchronous and moving JPEG file conversion off the main thread, allowing `PMProgressHandler` updates to arrive while loading.
 - Fix `presentLimited()` on iOS resolving the presenting view controller through the deprecated `UIApplication.keyWindow`, which can return the wrong window (or none) once an app adopts the UIScene life cycle. The plugin now prefers the `FlutterViewController` attached to its own engine and falls back to scanning the foreground-active `UIWindowScene` for the key window.
+- Fix `latitude`/`longitude`/`latLng` being dropped whenever a coordinate component was exactly `0.0` (e.g. assets near the equator or prime meridian). Dart, Android, and iOS/macOS all used `0.0` as a "no location" sentinel; `0.0` is now treated as a valid coordinate, and the native platforms report the absence of location data as an explicit `null` instead.
 
 ## 3.9.0
 

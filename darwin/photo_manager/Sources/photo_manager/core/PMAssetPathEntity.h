@@ -29,8 +29,8 @@
 @property(nonatomic, assign) int type;
 @property(nonatomic, strong) PHAsset *phAsset;
 @property(nonatomic, assign) long modifiedDt;
-@property(nonatomic, assign) double lat;
-@property(nonatomic, assign) double lng;
+@property(nonatomic, strong, nullable) NSNumber *lat;
+@property(nonatomic, strong, nullable) NSNumber *lng;
 @property(nonatomic, copy) NSString *title;
 @property(nonatomic, assign) NSUInteger subtype;
 @property(nonatomic, assign) BOOL favorite;

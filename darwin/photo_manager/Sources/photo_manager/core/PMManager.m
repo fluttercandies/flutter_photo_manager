@@ -429,8 +429,13 @@
                                                     type:type];
     entity.phAsset = asset;
     entity.modifiedDt = modifiedTimeStamp;
-    entity.lat = asset.location.coordinate.latitude;
-    entity.lng = asset.location.coordinate.longitude;
+    if (asset.location != nil) {
+        entity.lat = @(asset.location.coordinate.latitude);
+        entity.lng = @(asset.location.coordinate.longitude);
+    } else {
+        entity.lat = nil;
+        entity.lng = nil;
+    }
     entity.title = needTitle ? [asset title] : @"";
     entity.favorite = asset.isFavorite;
     entity.subtype = asset.mediaSubtypes;
