@@ -3,6 +3,7 @@
 // in the LICENSE file.
 
 import 'dart:io';
+import 'dart:typed_data' as typed_data;
 
 import '../internal/enums.dart';
 import '../internal/plugin.dart';
@@ -62,7 +63,7 @@ class DarwinAsset {
   /// loops on older systems.
   ///
   /// See also:
-  ///  * [baseFile] to obtain the unedited version when this returns `true`.
+  ///  * [getBaseFile] to obtain the unedited version when this returns `true`.
   Future<bool> get hasAdjustments => plugin.hasAdjustments(_asset.id);
 
   /// Obtain the base (unedited) file of the asset, before any adjustments were
@@ -80,7 +81,7 @@ class DarwinAsset {
   ///
   /// See also:
   ///  * [hasAdjustments] to check whether a distinct base version exists.
-  Future<File?> baseFile({
+  Future<File?> getBaseFile({
     bool isOrigin = true,
     PMProgressHandler? progressHandler,
     PMDarwinAVFileType? darwinFileType,
@@ -97,6 +98,26 @@ class DarwinAsset {
       return null;
     }
     return File(path);
+  }
+
+  /// Export the raw AAE adjustment (edit-history) data for this asset, or
+  /// `null` when the asset has no adjustments.
+  ///
+  /// Backed by the `PHAssetResourceTypeAdjustmentData` resource. Combine it with
+  /// [getBaseFile] (the unedited base image) and [AssetEntity.file] (the
+  /// rendered result) to reconstruct a non-destructive editing pipeline.
+  ///
+  ///  * [progressHandler] observes the (possibly network-bound) export progress.
+  ///
+  /// See also:
+  ///  * [hasAdjustments] to cheaply check whether adjustment data exists.
+  Future<typed_data.Uint8List?> getAdjustmentData({
+    PMProgressHandler? progressHandler,
+  }) {
+    return plugin.getAdjustmentData(
+      _asset.id,
+      progressHandler: progressHandler,
+    );
   }
 }
 

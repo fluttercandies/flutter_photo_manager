@@ -1808,14 +1808,72 @@
     }];
 }
 
+- (void)getAdjustmentDataWithId:(NSString *)assetId
+                  resultHandler:(PMResultHandler *)handler
+                progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
+    PMAssetEntity *entity = [self getAssetEntity:assetId];
+    if (!entity || !entity.phAsset) {
+        [handler replyError:[NSString stringWithFormat:@"Asset %@ file cannot be obtained.", assetId]];
+        return;
+    }
+    PHAssetResource *resource = [entity.phAsset getAdjustmentDataResource];
+    if (!resource) {
+        // The asset has no adjustment data; reply with null so the Dart side
+        // resolves to `null` rather than an error.
+        [self notifySuccess:progressHandler];
+        [handler reply:nil];
+        return;
+    }
+
+    PHAssetResourceRequestOptions *options = [PHAssetResourceRequestOptions new];
+    [options setNetworkAccessAllowed:YES];
+
+    __block double lastProgress = 0.0;
+    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+    __weak typeof(self) weakSelf = self;
+    [options setProgressHandler:^(double progress) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+        lastProgress = progress;
+        if (progress != 1) {
+            [strongSelf notifyProgress:progressHandler progress:progress state:PMProgressStateLoading];
+        }
+    }];
+
+    // Adjustment data can be delivered across multiple callbacks, so accumulate.
+    NSMutableData *buffer = [NSMutableData data];
+    PHAssetResourceManager *resourceManager = PHAssetResourceManager.defaultManager;
+    [resourceManager requestDataForAssetResource:resource
+                                         options:options
+                             dataReceivedHandler:^(NSData *_Nonnull data) {
+        [buffer appendData:data];
+    }
+                               completionHandler:^(NSError *_Nullable error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+        if (error) {
+            [strongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+            [handler replyError:error.localizedDescription];
+        } else {
+            id result = [strongSelf.converter convertData:buffer];
+            [handler reply:result];
+            [strongSelf notifySuccess:progressHandler];
+        }
+    }];
+}
+
 - (NSArray<PMAssetPathEntity *> *)convertPHCollectionToPMAssetPathArray:(NSArray<PHCollection *> *)phArray
                                                                  option:(PHFetchOptions *)option {
     NSMutableArray<PMAssetPathEntity *> *result = [NSMutableArray new];
-    
+
     for (PHCollection *collection in phArray) {
         [result addObject:[self convertPHCollectionToPMPath:collection option:option]];
     }
-    
+
     return result;
 }
 

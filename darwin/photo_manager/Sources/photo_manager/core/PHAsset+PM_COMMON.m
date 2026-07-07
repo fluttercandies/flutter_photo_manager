@@ -230,6 +230,16 @@
     return [self getCurrentResource];
 }
 
+- (PHAssetResource *)getAdjustmentDataResource {
+    NSArray<PHAssetResource *> *resources = [PHAssetResource assetResourcesForAsset:self];
+    for (PHAssetResource *res in resources) {
+        if (res.type == PHAssetResourceTypeAdjustmentData) {
+            return res;
+        }
+    }
+    return nil;
+}
+
 - (void)requestCurrentResourceData:(void (^)(NSData *_Nullable))block {
     PHAssetResource *res = [self getCurrentResource];
     

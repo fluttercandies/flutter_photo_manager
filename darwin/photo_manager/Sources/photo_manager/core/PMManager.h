@@ -131,6 +131,12 @@ typedef void (^AssetBlockResult)(PMAssetEntity *, NSObject *);
                       resultHandler:(PMResultHandler *)handler
                     progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
 
+/// Export the raw AAE adjustment-data bytes of the asset with [assetId].
+/// Replies with `nil` when the asset has no adjustment data.
+- (void)getAdjustmentDataWithId:(NSString *)assetId
+                  resultHandler:(PMResultHandler *)handler
+                progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler;
+
 /// The parent folders containing the album/folder with [id].
 - (NSArray<PMAssetPathEntity *> *)getParentPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(NSObject<PMBaseFilter> *)option;
 

@@ -549,7 +549,7 @@ class AssetEntity {
   /// A Darwin (iOS/macOS) only namespace of PhotoKit reads for this asset.
   ///
   /// Groups Apple-specific reads such as [DarwinAsset.cloudIdentifier],
-  /// [DarwinAsset.hasAdjustments] and [DarwinAsset.baseFile], so that
+  /// [DarwinAsset.hasAdjustments] and [DarwinAsset.getBaseFile], so that
   /// [AssetEntity] itself stays lean. Throws an [OSError] when accessed on a
   /// non-Darwin platform, so guard with [Platform] if needed.
   DarwinAsset get darwin {
