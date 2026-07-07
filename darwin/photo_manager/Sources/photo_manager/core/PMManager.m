@@ -15,19 +15,28 @@
 #import "PMResultHandler.h"
 
 static NSString *PMResourceTypeName(PHAssetResourceType type) {
+    // Adjustment-base types have newer availability than the plugin's iOS 9
+    // deployment target, so guard the comparisons behind `@available` before
+    // touching the enum values.
+    if (@available(iOS 13.0, macOS 10.15, *)) {
+        if (type == PHAssetResourceTypeAdjustmentBaseVideo) return @"adjustmentBaseVideo";
+    }
+    if (@available(iOS 10.0, macOS 10.15, *)) {
+        if (type == PHAssetResourceTypeFullSizePairedVideo) return @"fullSizePairedVideo";
+        if (type == PHAssetResourceTypeAdjustmentBasePairedVideo) return @"adjustmentBasePairedVideo";
+    }
+    if (@available(iOS 9.1, macOS 10.15, *)) {
+        if (type == PHAssetResourceTypePairedVideo) return @"pairedVideo";
+    }
     switch (type) {
-        case PHAssetResourceTypePhoto:                       return @"photo";
-        case PHAssetResourceTypeVideo:                       return @"video";
-        case PHAssetResourceTypeAudio:                       return @"audio";
-        case PHAssetResourceTypeAlternatePhoto:              return @"alternatePhoto";
-        case PHAssetResourceTypeFullSizePhoto:               return @"fullSizePhoto";
-        case PHAssetResourceTypeFullSizeVideo:               return @"fullSizeVideo";
-        case PHAssetResourceTypeAdjustmentData:              return @"adjustmentData";
-        case PHAssetResourceTypeAdjustmentBasePhoto:         return @"adjustmentBasePhoto";
-        case PHAssetResourceTypePairedVideo:                 return @"pairedVideo";
-        case PHAssetResourceTypeFullSizePairedVideo:         return @"fullSizePairedVideo";
-        case PHAssetResourceTypeAdjustmentBasePairedVideo:   return @"adjustmentBasePairedVideo";
-        case PHAssetResourceTypeAdjustmentBaseVideo:         return @"adjustmentBaseVideo";
+        case PHAssetResourceTypePhoto:                return @"photo";
+        case PHAssetResourceTypeVideo:                return @"video";
+        case PHAssetResourceTypeAudio:                return @"audio";
+        case PHAssetResourceTypeAlternatePhoto:       return @"alternatePhoto";
+        case PHAssetResourceTypeFullSizePhoto:        return @"fullSizePhoto";
+        case PHAssetResourceTypeFullSizeVideo:        return @"fullSizeVideo";
+        case PHAssetResourceTypeAdjustmentData:       return @"adjustmentData";
+        case PHAssetResourceTypeAdjustmentBasePhoto:  return @"adjustmentBasePhoto";
         default:
             return [NSString stringWithFormat:@"unknown(%ld)", (long)type];
     }
@@ -640,9 +649,11 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                                        fileType:fileType
                             includeFallbackPath:NO];
     if (cached) {
+        [self notifySuccess:progressHandler];
         [handler reply:withScheme ? [NSURL fileURLWithPath:cached].absoluteString : cached];
         return;
     }
+    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
     [self fetchVideoFileWithCandidates:candidates
                                  asset:asset
                        progressHandler:progressHandler
@@ -674,9 +685,11 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                                        fileType:fileType
                             includeFallbackPath:YES];
     if (cached) {
+        [self notifySuccess:progressHandler];
         [handler reply:cached];
         return;
     }
+    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
     __weak typeof(self) weakSelf = self;
     [self fetchVideoFileWithCandidates:candidates
                                  asset:asset
@@ -895,7 +908,14 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     PHVideoRequestOptions *options = [PHVideoRequestOptions new];
     [options setDeliveryMode:PHVideoRequestOptionsDeliveryModeHighQualityFormat];
     [options setNetworkAccessAllowed:YES];
-    [options setVersion:isOrigin ? PHVideoRequestOptionsVersionOriginal : PHVideoRequestOptionsVersionCurrent];
+    // Match the walker's rendered-first preference: if the caller asked for
+    // the current version, the walker prefers the rendered/`fullSize`
+    // resource, and this fallback should hit the same conceptual bytes.
+    // `PHVideoRequestOptionsVersionCurrent` returns the edited AVComposition
+    // for adjusted assets and the original file for unedited ones, so we
+    // use it unconditionally. `isOrigin` is kept in the signature for
+    // future opt-in ordering control but does not switch versions today.
+    [options setVersion:PHVideoRequestOptionsVersionCurrent];
 
     __weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -925,6 +945,13 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                     block(withScheme ? videoURL.absoluteString : videoURL.path, nil);
                     return;
                 }
+                // `copyItemAtURL:toURL:` fails with NSFileWriteFileExistsError
+                // when the destination already has a stub from a prior aborted
+                // fetch. Match the guard `exportAssetToFile` uses on iOS 18.
+                if ([manager fileExistsAtPath:destination.path]) {
+                    block(withScheme ? destination.absoluteString : path, nil);
+                    return;
+                }
                 NSError *copyError;
                 [manager copyItemAtURL:videoURL toURL:destination error:&copyError];
                 if (copyError) {
@@ -935,17 +962,16 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                 return;
             }
             // AVComposition (adjusted asset) — export session handles it.
+            // Note: `exportAVAssetToFile` already applies the withScheme
+            // wrap when writing back, so we return its `exportedPath`
+            // verbatim to avoid a `file:///file:///…` double-wrap.
             [innerSelf exportAVAssetToFile:avAsset
                               destination:path
                           progressHandler:progressHandler
                                withScheme:withScheme
                                  fileType:fileType
                                     block:^(NSString *exportedPath, NSObject *exportError) {
-                if (exportedPath) {
-                    block(withScheme ? [NSURL fileURLWithPath:exportedPath].absoluteString : exportedPath, nil);
-                } else {
-                    block(nil, exportError);
-                }
+                block(exportedPath, exportedPath ? nil : exportError);
             }];
         }];
     });
@@ -1013,7 +1039,8 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     [options setNetworkAccessAllowed:YES];
     
     __block double lastProgress = 0.0;
-    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+    // `Prepare` is emitted once from the caller so multi-candidate walks don't
+    // bounce progress observers back to 0 between attempts.
     __weak typeof(self) weakSelf = self;
     [options setProgressHandler:^(double progress) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
@@ -1376,9 +1403,11 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                                        fileType:nil
                             includeFallbackPath:YES];
     if (cached) {
+        [self notifySuccess:progressHandler];
         [handler reply:cached];
         return;
     }
+    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
     __weak typeof(self) weakSelf = self;
     [self fetchImageFileFromCandidates:candidates
                                atIndex:0
@@ -1467,7 +1496,8 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     [options setNetworkAccessAllowed:YES];
 
     __block double lastProgress = 0.0;
-    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+    // `Prepare` is emitted once from the caller so multi-candidate walks don't
+    // bounce progress observers back to 0 between attempts.
     __weak typeof(self) weakSelf = self;
     [options setProgressHandler:^(double progress) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
@@ -1520,7 +1550,9 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     [options setDeliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat];
     [options setNetworkAccessAllowed:YES];
     [options setSynchronous:NO];
-    [options setVersion:isOrigin ? PHImageRequestOptionsVersionOriginal : PHImageRequestOptionsVersionCurrent];
+    // Match the walker's rendered-first preference (see the equivalent note
+    // on `fallbackFetchVideoViaAVAsset`).
+    [options setVersion:PHImageRequestOptionsVersionCurrent];
 
     __weak typeof(self) weakSelf = self;
     [options setProgressHandler:^(double progress, NSError *progressError, BOOL *stop, NSDictionary *info) {
@@ -2240,6 +2272,7 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     // `fetchVideoResourceToFile:` writes an arbitrary resource's bytes to disk
     // (and only performs AV conversion when a fileType is supplied), so it works
     // for images too.
+    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
     [self fetchVideoResourceToFile:asset
                           resource:resource
                    progressHandler:progressHandler
@@ -2276,7 +2309,8 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     [options setNetworkAccessAllowed:YES];
 
     __block double lastProgress = 0.0;
-    [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+    // `Prepare` is emitted once from the caller so multi-candidate walks don't
+    // bounce progress observers back to 0 between attempts.
     __weak typeof(self) weakSelf = self;
     [options setProgressHandler:^(double progress) {
         __strong typeof(weakSelf) strongSelf = weakSelf;

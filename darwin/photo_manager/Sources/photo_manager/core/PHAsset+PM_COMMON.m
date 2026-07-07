@@ -355,14 +355,16 @@
     }
 
     NSMutableArray<PHAssetResource *> *ordered = [NSMutableArray arrayWithCapacity:4];
-    // Always prefer the rendered ("current") resource first, matching what the
-    // Photos app shows the user, and matching the plugin's historical behavior
-    // for both `loadFile(isOrigin: true)` and `loadFile(isOrigin: false)`.
-    // Fall back to the raw primary resource, then the adjustment base, when
-    // the preferred one is missing from iCloud or otherwise unreadable. The
-    // `isOrigin` parameter is kept in the signature for future opt-in ordering
-    // control but does not reshuffle the list today, so upgrading callers do
-    // not silently switch between edited and unedited exports.
+    // Order: rendered ("fullSize") → primary → adjustment base → alternate.
+    // The fullSize resource is the one Photos shows the user for an edited
+    // asset, so preferring it first keeps the file exports "what you see is
+    // what you get". For unedited assets it is absent, so the primary
+    // resource is selected in practice. Note this is not a byte-for-byte
+    // reproduction of `getCurrentResource` on `main`, which used the private
+    // `isCurrent` KVC key as an additional tiebreaker; edge cases where
+    // `isCurrent` sits on the primary instead of the fullSize will see
+    // different first-choice bytes here, though the walker's later
+    // candidates cover the same set.
     if (fullSize) [ordered addObject:fullSize];
     if (primary) [ordered addObject:primary];
     if (adjustmentBase) [ordered addObject:adjustmentBase];
