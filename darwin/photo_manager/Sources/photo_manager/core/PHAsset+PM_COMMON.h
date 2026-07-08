@@ -53,9 +53,11 @@ NS_ASSUME_NONNULL_BEGIN
 /// materialized that specific resource. Callers walk this list, retrying with
 /// the next candidate on failure until one succeeds or the list is exhausted.
 ///
-/// Order is `rendered/current → primary → adjustment base`, so an edited asset
-/// exports what the Photos app shows first, matching the plugin's historical
-/// behavior on both `isOrigin: true` and `isOrigin: false`.
+/// Order is `rendered/current → primary → adjustment base → alternate`
+/// (alternate = the RAW/JPEG paired resource, only present for images that
+/// were captured as a RAW+JPEG pair). Rendered-first exports what the Photos
+/// app shows for an edited asset, matching the plugin's historical behavior
+/// on both `isOrigin: true` and `isOrigin: false`.
 ///
 /// @param isOrigin  Reserved for future opt-in ordering control; ignored for
 ///                  the resource order today.

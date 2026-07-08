@@ -784,12 +784,17 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
         userInfo[NSLocalizedFailureReasonErrorKey] = description;
         return [NSError errorWithDomain:err.domain code:err.code userInfo:userInfo];
     }
+    // Non-NSError underlying values (strings/exceptions from helper blocks)
+    // or the no-error path (empty candidate list): always return an NSError
+    // carrying the attempted-resource list, and stash the original value in
+    // userInfo so Xcode logs can still surface whatever the helper produced.
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+    userInfo[NSLocalizedDescriptionKey] = description;
+    userInfo[NSLocalizedFailureReasonErrorKey] = description;
     if (lastError) {
-        return lastError;
+        userInfo[@"underlyingValue"] = [lastError description] ?: @"<non-NSError value>";
     }
-    return [NSError errorWithDomain:@"PMPhotoManager"
-                               code:-1
-                           userInfo:@{NSLocalizedDescriptionKey: description}];
+    return [NSError errorWithDomain:@"PMPhotoManager" code:-1 userInfo:userInfo];
 }
 
 - (void)fetchVideoFileWithCandidates:(NSArray<PHAssetResource *> *)candidates
@@ -901,6 +906,7 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     NSString *path = [self makeAssetOutputPath:asset resource:nil isOrigin:isOrigin fileType:fileType manager:manager];
     if ([manager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
+        [self notifySuccess:progressHandler];
         block(withScheme ? [NSURL fileURLWithPath:path].absoluteString : path, nil);
         return;
     }
@@ -942,6 +948,7 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                 NSURL *videoURL = urlAsset.URL;
                 NSURL *destination = [NSURL fileURLWithPath:path];
                 if ([videoURL.path isEqualToString:destination.path]) {
+                    [innerSelf notifySuccess:progressHandler];
                     block(withScheme ? videoURL.absoluteString : videoURL.path, nil);
                     return;
                 }
@@ -949,6 +956,7 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                 // when the destination already has a stub from a prior aborted
                 // fetch. Match the guard `exportAssetToFile` uses on iOS 18.
                 if ([manager fileExistsAtPath:destination.path]) {
+                    [innerSelf notifySuccess:progressHandler];
                     block(withScheme ? destination.absoluteString : path, nil);
                     return;
                 }
@@ -958,6 +966,7 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                     block(nil, copyError);
                     return;
                 }
+                [innerSelf notifySuccess:progressHandler];
                 block(withScheme ? destination.absoluteString : path, nil);
                 return;
             }
@@ -1542,6 +1551,7 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     NSString *path = [self makeAssetOutputPath:asset resource:nil isOrigin:isOrigin fileType:nil manager:manager];
     if ([manager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"read cache from %@", path]];
+        [self notifySuccess:progressHandler];
         block(path, nil);
         return;
     }
