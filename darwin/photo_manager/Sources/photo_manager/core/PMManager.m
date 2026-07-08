@@ -14,6 +14,9 @@
 #import "PMRequestTypeUtils.h"
 #import "PMResultHandler.h"
 
+#import <AVFoundation/AVFoundation.h>
+#import <ImageIO/ImageIO.h>
+
 static NSString *PMResourceTypeName(PHAssetResourceType type) {
     // Adjustment-base types have newer availability than the plugin's iOS 9
     // deployment target, so guard the comparisons behind `@available` before
@@ -1993,40 +1996,361 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     }];
 }
 
+#pragma mark - Live Photo Metadata Helpers
+
+// Live Photos require the still image and paired video to share a
+// `com.apple.quicktime.content.identifier` UUID. When callers hand us plain
+// HEIC/JPEG + MOV/MP4 the Photos framework rejects the resource pair with
+// PHPhotosErrorDomain -1. These helpers inject the identifier into both files
+// (image via `kCGImagePropertyMakerAppleDictionary["17"]`, video via a
+// QuickTime metadata item + a still-image-time metadata track) before we
+// submit the creation request. Reference: https://github.com/LimitPoint/LivePhoto
+//
+// `sourceType` (out) receives the source image's UTI so the caller can set
+// `PHAssetResourceCreationOptions.uniformTypeIdentifier` accurately.
+- (NSURL *)addLivePhotoAssetIdentifier:(NSString *)assetIdentifier
+                                  desc:(NSString *)desc
+                          toImageAtURL:(NSURL *)imageURL
+                             outputURL:(NSURL *)outputURL
+                            sourceUTI:(NSString **)sourceUTIOut {
+    CGImageSourceRef imageSource = CGImageSourceCreateWithURL((__bridge CFURLRef)imageURL, nil);
+    if (!imageSource) {
+        [PMLogUtils.sharedInstance info:@"[LivePhoto][Meta] Failed to create image source"];
+        return nil;
+    }
+    CFStringRef sourceType = CGImageSourceGetType(imageSource);
+    if (!sourceType) {
+        CFRelease(imageSource);
+        [PMLogUtils.sharedInstance info:@"[LivePhoto][Meta] Failed to determine source image type"];
+        return nil;
+    }
+    if (sourceUTIOut) {
+        // Copy the string — CGImageSourceGetType returns a CFStringRef whose
+        // lifetime is tied to the source, which we release below.
+        *sourceUTIOut = [NSString stringWithString:(__bridge NSString *)sourceType];
+    }
+    CGImageDestinationRef imageDestination = CGImageDestinationCreateWithURL(
+        (__bridge CFURLRef)outputURL, sourceType, 1, nil);
+    if (!imageDestination) {
+        CFRelease(imageSource);
+        [PMLogUtils.sharedInstance info:@"[LivePhoto][Meta] Failed to create image destination"];
+        return nil;
+    }
+    NSDictionary *srcProps = (__bridge_transfer NSDictionary *)
+        CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil);
+    NSMutableDictionary *props = srcProps ? [srcProps mutableCopy]
+                                          : [NSMutableDictionary dictionary];
+    props[(__bridge NSString *)kCGImagePropertyMakerAppleDictionary] =
+        @{ @"17" : assetIdentifier };
+    if (![desc isNilOrNull] && desc.length > 0) {
+        NSString *tiffKey = (__bridge NSString *)kCGImagePropertyTIFFDictionary;
+        NSString *tiffDescKey = (__bridge NSString *)kCGImagePropertyTIFFImageDescription;
+        NSMutableDictionary *tiff = props[tiffKey] ? [props[tiffKey] mutableCopy]
+                                                   : [NSMutableDictionary dictionary];
+        tiff[tiffDescKey] = desc;
+        props[tiffKey] = tiff;
+    }
+    // Streams encoded bytes through — no CG decode/re-encode.
+    CGImageDestinationAddImageFromSource(imageDestination, imageSource, 0,
+                                         (__bridge CFDictionaryRef)props);
+    BOOL ok = CGImageDestinationFinalize(imageDestination);
+    CFRelease(imageSource);
+    CFRelease(imageDestination);
+    if (!ok) {
+        [PMLogUtils.sharedInstance info:@"[LivePhoto][Meta] CGImageDestinationFinalize failed"];
+        return nil;
+    }
+    return outputURL;
+}
+
+- (void)addLivePhotoAssetIdentifier:(NSString *)assetIdentifier
+                       toVideoAtURL:(NSURL *)videoURL
+                          outputURL:(NSURL *)outputURL
+                         completion:(void (^)(NSURL *resultURL, NSError *error))completion {
+    AVURLAsset *videoAsset = [AVURLAsset URLAssetWithURL:videoURL options:nil];
+    NSArray<AVAssetTrack *> *videoTracks = [videoAsset tracksWithMediaType:AVMediaTypeVideo];
+    if (videoTracks.count == 0) {
+        completion(nil, [NSError errorWithDomain:@"PMManager" code:-1
+                                       userInfo:@{NSLocalizedDescriptionKey: @"No video track found in source file"}]);
+        return;
+    }
+    AVAssetTrack *videoTrack = videoTracks.firstObject;
+
+    NSError *error = nil;
+    AVAssetWriter *assetWriter = [AVAssetWriter assetWriterWithURL:outputURL
+                                                         fileType:AVFileTypeQuickTimeMovie
+                                                            error:&error];
+    if (error || !assetWriter) {
+        completion(nil, error);
+        return;
+    }
+
+    AVAssetReader *videoReader = [[AVAssetReader alloc] initWithAsset:videoAsset error:&error];
+    if (error || !videoReader) {
+        completion(nil, error);
+        return;
+    }
+    AVAssetReaderTrackOutput *videoReaderOutput =
+        [AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:videoTrack
+                                                  outputSettings:nil];
+    [videoReader addOutput:videoReaderOutput];
+
+    CMFormatDescriptionRef videoFmt =
+        (__bridge CMFormatDescriptionRef)videoTrack.formatDescriptions.firstObject;
+    AVAssetWriterInput *videoWriterInput =
+        [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo
+                                          outputSettings:nil
+                                        sourceFormatHint:videoFmt];
+    videoWriterInput.transform = videoTrack.preferredTransform;
+    videoWriterInput.expectsMediaDataInRealTime = NO;
+    [assetWriter addInput:videoWriterInput];
+
+    AVAssetReader *audioReader = nil;
+    AVAssetReaderTrackOutput *audioReaderOutput = nil;
+    AVAssetWriterInput *audioWriterInput = nil;
+    NSArray<AVAssetTrack *> *audioTracks = [videoAsset tracksWithMediaType:AVMediaTypeAudio];
+    if (audioTracks.count > 0) {
+        AVAssetTrack *audioTrack = audioTracks.firstObject;
+        audioReader = [[AVAssetReader alloc] initWithAsset:videoAsset error:&error];
+        if (!error && audioReader) {
+            audioReaderOutput =
+                [AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:audioTrack
+                                                         outputSettings:nil];
+            [audioReader addOutput:audioReaderOutput];
+            audioWriterInput =
+                [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio
+                                                  outputSettings:nil];
+            audioWriterInput.expectsMediaDataInRealTime = NO;
+            [assetWriter addInput:audioWriterInput];
+        }
+    }
+
+    AVMutableMetadataItem *identifierItem = [AVMutableMetadataItem metadataItem];
+    identifierItem.key = @"com.apple.quicktime.content.identifier";
+    identifierItem.keySpace = AVMetadataKeySpaceQuickTimeMetadata;
+    identifierItem.value = assetIdentifier;
+    identifierItem.dataType = @"com.apple.metadata.datatype.UTF-8";
+    assetWriter.metadata = @[identifierItem];
+
+    NSString *keyStillImageTime = @"com.apple.quicktime.still-image-time";
+    NSDictionary *spec = @{
+        (__bridge NSString *)kCMMetadataFormatDescriptionMetadataSpecificationKey_Identifier :
+            [NSString stringWithFormat:@"mdta/%@", keyStillImageTime],
+        (__bridge NSString *)kCMMetadataFormatDescriptionMetadataSpecificationKey_DataType :
+            @"com.apple.metadata.datatype.int8"
+    };
+    CMFormatDescriptionRef metaFmtDesc = NULL;
+    CMMetadataFormatDescriptionCreateWithMetadataSpecifications(
+        kCFAllocatorDefault, kCMMetadataFormatType_Boxed,
+        (__bridge CFArrayRef)@[spec], &metaFmtDesc);
+    AVAssetWriterInput *metadataWriterInput =
+        [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeMetadata
+                                          outputSettings:nil
+                                        sourceFormatHint:metaFmtDesc];
+    AVAssetWriterInputMetadataAdaptor *metadataAdaptor =
+        [AVAssetWriterInputMetadataAdaptor
+            assetWriterInputMetadataAdaptorWithAssetWriterInput:metadataWriterInput];
+    [assetWriter addInput:metadataWriterInput];
+    if (metaFmtDesc) {
+        CFRelease(metaFmtDesc);
+    }
+
+    [assetWriter startWriting];
+    [assetWriter startSessionAtSourceTime:kCMTimeZero];
+
+    AVMutableMetadataItem *stillItem = [AVMutableMetadataItem metadataItem];
+    stillItem.key = keyStillImageTime;
+    stillItem.keySpace = AVMetadataKeySpaceQuickTimeMetadata;
+    stillItem.value = @0;
+    stillItem.dataType = @"com.apple.metadata.datatype.int8";
+    CMTime duration = videoAsset.duration;
+    CMTime midPoint = CMTimeMake(duration.value / 2, duration.timescale);
+    Float64 fps = videoTrack.nominalFrameRate;
+    // Round up so fractional fps (time-lapse, slow-mo variants) doesn't
+    // truncate to zero and crash the CMTimeMake divide below.
+    int32_t fpsInt = fps >= 1.0 ? (int32_t)ceil(fps) : 30;
+    CMTime frameDur = CMTimeMake(duration.timescale / fpsInt, duration.timescale);
+    CMTimeRange stillRange = CMTimeRangeMake(midPoint, frameDur);
+    AVTimedMetadataGroup *metaGroup =
+        [[AVTimedMetadataGroup alloc] initWithItems:@[stillItem] timeRange:stillRange];
+    if (![metadataAdaptor appendTimedMetadataGroup:metaGroup]) {
+        [PMLogUtils.sharedInstance info:@"[LivePhoto][Meta] Failed to append still-image-time metadata group"];
+    }
+    [metadataWriterInput markAsFinished];
+
+    dispatch_group_t doneGroup = dispatch_group_create();
+    dispatch_queue_t videoQueue = dispatch_queue_create("com.fluttercandies.pm.livePhotoVideoQueue", NULL);
+    dispatch_queue_t audioQueue = dispatch_queue_create("com.fluttercandies.pm.livePhotoAudioQueue", NULL);
+
+    dispatch_group_enter(doneGroup);
+    if ([videoReader startReading]) {
+        [videoWriterInput requestMediaDataWhenReadyOnQueue:videoQueue usingBlock:^{
+            // Keep videoReader alive until the block finishes — the output
+            // holds only an unowned reference back to its reader, so if the
+            // outer function's strong ref goes out of scope before the block
+            // runs, copyNextSampleBuffer will throw
+            // "output not added to a reader".
+            (void)videoReader;
+            while (videoWriterInput.readyForMoreMediaData) {
+                CMSampleBufferRef buf = [videoReaderOutput copyNextSampleBuffer];
+                if (buf) {
+                    [videoWriterInput appendSampleBuffer:buf];
+                    CFRelease(buf);
+                } else {
+                    [videoWriterInput markAsFinished];
+                    dispatch_group_leave(doneGroup);
+                    return;
+                }
+            }
+        }];
+    } else {
+        [videoWriterInput markAsFinished];
+        dispatch_group_leave(doneGroup);
+    }
+
+    if (audioWriterInput && audioReader) {
+        dispatch_group_enter(doneGroup);
+        if ([audioReader startReading]) {
+            [audioWriterInput requestMediaDataWhenReadyOnQueue:audioQueue usingBlock:^{
+                (void)audioReader;
+                while (audioWriterInput.readyForMoreMediaData) {
+                    CMSampleBufferRef buf = [audioReaderOutput copyNextSampleBuffer];
+                    if (buf) {
+                        [audioWriterInput appendSampleBuffer:buf];
+                        CFRelease(buf);
+                    } else {
+                        [audioWriterInput markAsFinished];
+                        dispatch_group_leave(doneGroup);
+                        return;
+                    }
+                }
+            }];
+        } else {
+            [audioWriterInput markAsFinished];
+            dispatch_group_leave(doneGroup);
+        }
+    }
+
+    dispatch_group_notify(doneGroup, dispatch_get_main_queue(), ^{
+        [assetWriter finishWritingWithCompletionHandler:^{
+            if (assetWriter.status == AVAssetWriterStatusCompleted) {
+                completion(outputURL, nil);
+            } else {
+                completion(nil, assetWriter.error);
+            }
+        }];
+    });
+}
+
 - (void)saveLivePhoto:(NSString *)imagePath
             videoPath:(NSString *)videoPath
                 title:(NSString *)title
                  desc:(NSString *)desc
                 block:(AssetBlockResult)block {
     [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"Saving Live Photo with imagePath: %@, videoPath: %@, filename: %@, desc: %@", imagePath, videoPath, title, desc]];
-    NSURL *imageURL = [NSURL fileURLWithPath:imagePath];
-    NSURL *videoURL = [NSURL fileURLWithPath:videoPath];
 
-    __block NSString *assetId = nil;
-    __weak typeof(self) weakSelf = self;
-    [[PHPhotoLibrary sharedPhotoLibrary]
-     performChanges:^{
-        PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
-        PHAssetResourceCreationOptions *imageOptions = [PHAssetResourceCreationOptions new];
-        [imageOptions setOriginalFilename:title];
-        [request addResourceWithType:PHAssetResourceTypePhoto fileURL:imageURL options:imageOptions];
-        PHAssetResourceCreationOptions *videoOptions = [PHAssetResourceCreationOptions new];
-        [videoOptions setOriginalFilename:title];
-        [request addResourceWithType:PHAssetResourceTypePairedVideo fileURL:videoURL options:videoOptions];
-        assetId = request.placeholderForCreatedAsset.localIdentifier;
+    NSFileManager *fm = NSFileManager.defaultManager;
+    if (![fm fileExistsAtPath:imagePath]) {
+        block(nil, [NSError errorWithDomain:@"PMManager" code:-1 userInfo:@{
+            NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Image file does not exist at path: %@", imagePath]
+        }]);
+        return;
     }
-     completionHandler:^(BOOL success, NSError *error) {
+    if (![fm fileExistsAtPath:videoPath]) {
+        block(nil, [NSError errorWithDomain:@"PMManager" code:-1 userInfo:@{
+            NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Video file does not exist at path: %@", videoPath]
+        }]);
+        return;
+    }
+
+    NSString *assetIdentifier = [[NSUUID UUID] UUIDString];
+    NSString *tmpDir = [NSTemporaryDirectory() stringByAppendingPathComponent:@"pm_livephoto"];
+    [fm createDirectoryAtPath:tmpDir withIntermediateDirectories:YES attributes:nil error:nil];
+
+    NSString *imageExt = imagePath.pathExtension.length > 0 ? imagePath.pathExtension : @"jpg";
+    // Paired Live Photo video is always QuickTime .mov — Photos rejects
+    // other containers even if the source was MP4/HEVC.
+    NSString *videoExt = @"mov";
+    NSURL *srcImageURL = [NSURL fileURLWithPath:imagePath];
+    NSURL *srcVideoURL = [NSURL fileURLWithPath:videoPath];
+    NSURL *tmpImageURL = [NSURL fileURLWithPath:
+        [[tmpDir stringByAppendingPathComponent:assetIdentifier] stringByAppendingPathExtension:imageExt]];
+    NSURL *tmpVideoURL = [NSURL fileURLWithPath:
+        [[tmpDir stringByAppendingPathComponent:assetIdentifier] stringByAppendingPathExtension:videoExt]];
+    [fm removeItemAtURL:tmpImageURL error:nil];
+    [fm removeItemAtURL:tmpVideoURL error:nil];
+
+    NSString *imageUTI = nil;
+    NSURL *enrichedImageURL = [self addLivePhotoAssetIdentifier:assetIdentifier
+                                                           desc:desc
+                                                  toImageAtURL:srcImageURL
+                                                     outputURL:tmpImageURL
+                                                     sourceUTI:&imageUTI];
+    if (!enrichedImageURL) {
+        block(nil, [NSError errorWithDomain:@"PMManager" code:-1 userInfo:@{
+            NSLocalizedDescriptionKey: @"Failed to write Live Photo metadata to image file"
+        }]);
+        return;
+    }
+
+    __weak typeof(self) weakSelf = self;
+    [self addLivePhotoAssetIdentifier:assetIdentifier
+                         toVideoAtURL:srcVideoURL
+                            outputURL:tmpVideoURL
+                           completion:^(NSURL *enrichedVideoURL, NSError *videoError) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (!strongSelf) {
+        if (!strongSelf) { return; }
+        if (!enrichedVideoURL) {
+            [fm removeItemAtURL:tmpImageURL error:nil];
+            // AVAssetWriter may have written a partial file before failing.
+            [fm removeItemAtURL:tmpVideoURL error:nil];
+            block(nil, videoError ?: [NSError errorWithDomain:@"PMManager" code:-1 userInfo:@{
+                NSLocalizedDescriptionKey: @"Failed to write Live Photo metadata to video file"
+            }]);
             return;
         }
-        if (success) {
-            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Created Live Photo asset = %@", assetId]];
-            block([strongSelf getAssetEntity:assetId], nil);
-        } else {
-            [PMLogUtils.sharedInstance info: [NSString stringWithFormat:@"Create Live Photo asset failed = %@, %@", assetId, error]];
-            block(nil, error);
+
+        PHAssetResourceCreationOptions *imageOptions = [PHAssetResourceCreationOptions new];
+        PHAssetResourceCreationOptions *videoOptions = [PHAssetResourceCreationOptions new];
+        if (imageUTI.length > 0) {
+            imageOptions.uniformTypeIdentifier = imageUTI;
         }
+        videoOptions.uniformTypeIdentifier = AVFileTypeQuickTimeMovie;
+        if (![title isNilOrNull] && title.length > 0) {
+            NSString *baseTitle = title.stringByDeletingPathExtension;
+            [imageOptions setOriginalFilename:[baseTitle stringByAppendingPathExtension:imageExt]];
+            [videoOptions setOriginalFilename:[baseTitle stringByAppendingPathExtension:videoExt]];
+        }
+
+        __block NSString *assetId = nil;
+        [[PHPhotoLibrary sharedPhotoLibrary]
+         performChanges:^{
+            PHAssetCreationRequest *request = [PHAssetCreationRequest creationRequestForAsset];
+            [request addResourceWithType:PHAssetResourceTypePhoto fileURL:enrichedImageURL options:imageOptions];
+            [request addResourceWithType:PHAssetResourceTypePairedVideo fileURL:enrichedVideoURL options:videoOptions];
+            assetId = request.placeholderForCreatedAsset.localIdentifier;
+        }
+         completionHandler:^(BOOL success, NSError *saveError) {
+            [fm removeItemAtURL:tmpImageURL error:nil];
+            [fm removeItemAtURL:tmpVideoURL error:nil];
+            if (success) {
+                [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"Created Live Photo asset = %@", assetId]];
+                // Warn (don't fail) if Photos accepted the pair but didn't
+                // classify it as a Live Photo — indicates the metadata was
+                // ignored and the pair was flattened to a still + video.
+                PHFetchResult *r = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil];
+                PHAsset *created = r.firstObject;
+                if (created && (created.mediaSubtypes & PHAssetMediaSubtypePhotoLive) == 0) {
+                    [PMLogUtils.sharedInstance info:[NSString stringWithFormat:
+                        @"[LivePhoto] WARNING: saved asset %@ was NOT recognized as Live Photo (mediaSubtypes=%lu)",
+                        assetId, (unsigned long)created.mediaSubtypes]];
+                }
+                block([strongSelf getAssetEntity:assetId], nil);
+            } else {
+                [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"Create Live Photo asset failed = %@, %@", assetId, saveError]];
+                block(nil, saveError);
+            }
+        }];
     }];
 }
 
