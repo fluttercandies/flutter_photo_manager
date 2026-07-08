@@ -1403,6 +1403,28 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     return resource.type == PHAssetResourceTypePhoto || resource.type == PHAssetResourceTypeFullSizePhoto;
 }
 
+// Common raster formats that PHImageManager reliably returns byte-identical
+// via its data pipeline. RAW/exotic formats are excluded — for those we walk
+// the PHAssetResource candidates instead so users still receive the raw
+// underlying resource bytes (e.g. a .dng file) rather than a JPEG rendition.
+- (BOOL)canFetchOriginViaImageManager:(PHAssetResource *)primary {
+    // Only substitute PHImageManager for the unedited primary photo resource.
+    // A `.fullSizePhoto` candidate (present only for edited assets) is the
+    // rendered edit that Photos shows the user; the walker returns those
+    // exact bytes, whereas PHImageManager may re-encode HEIC→JPEG for edits,
+    // silently changing the returned format.
+    if (primary.type != PHAssetResourceTypePhoto) {
+        return NO;
+    }
+    NSString *uti = primary.uniformTypeIdentifier ?: @"";
+    return [uti isEqualToString:@"public.jpeg"]
+        || [uti isEqualToString:@"public.heic"]
+        || [uti isEqualToString:@"public.heif"]
+        || [uti isEqualToString:@"public.heic-sequence"]
+        || [uti isEqualToString:@"public.heif-sequence"]
+        || [uti isEqualToString:@"public.png"];
+}
+
 - (void)fetchOriginImageFile:(PHAsset *)asset resultHandler:(PMResultHandler *)handler progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler {
     NSArray<PHAssetResource *> *candidates = [asset candidateResourcesForFetch:YES livePhoto:NO];
     if (candidates.count == 0) {
@@ -1421,33 +1443,72 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     }
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
     __weak typeof(self) weakSelf = self;
-    [self fetchImageFileFromCandidates:candidates
-                               atIndex:0
-                             attempted:[NSMutableArray arrayWithCapacity:candidates.count]
-                             lastError:nil
-                                 asset:asset
-                       progressHandler:progressHandler
-                                 block:^(NSString *path, NSObject *walkerError) {
-        if (path) {
-            [handler reply:path];
-            return;
-        }
+    // Prefer PHImageManager.requestImageDataAndOrientation with
+    // deliveryMode=HighQualityFormat first: PHAssetResourceRequestOptions has
+    // no deliveryMode control, so writeDataForAssetResource can deliver the
+    // locally downsampled bytes when the user has "Optimize iPhone Storage"
+    // enabled and iCloud has replaced the local file with a low-quality
+    // proxy (#1118). PHImageManager's HighQualityFormat guarantees the full
+    // iCloud original is materialized when networkAccessAllowed=YES. Fall
+    // back to the PHAssetResource walker if PHImageManager cannot deliver —
+    // that path still covers cases like adjustment-base / RAW alternate
+    // resources that PHImageManager doesn't expose.
+    //
+    // For non-raster / RAW primaries we walk resources first: PHImageManager
+    // would return a JPEG rendition instead of the underlying RAW/DNG bytes.
+    void (^runWalker)(NSObject *seedError) = ^(NSObject *seedError) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         if (!strongSelf) { return; }
-        // Every candidate resource failed. Fall back to PHImageManager's
-        // requestImageDataAndOrientation pipeline, which is a separate iCloud
-        // materialization path and preserves the original HEIC/RAW bytes.
-        [strongSelf fallbackFetchImageDataFor:asset
-                                     isOrigin:YES
-                              progressHandler:progressHandler
-                                        block:^(NSString *fbPath, NSObject *fbError) {
-            if (fbPath) {
-                [handler reply:fbPath];
+        [strongSelf fetchImageFileFromCandidates:candidates
+                                         atIndex:0
+                                       attempted:[NSMutableArray arrayWithCapacity:candidates.count]
+                                       lastError:seedError
+                                           asset:asset
+                                 progressHandler:progressHandler
+                                           block:^(NSString *walkerPath, NSObject *walkerError) {
+            if (walkerPath) {
+                [handler reply:walkerPath];
                 return;
             }
-            [strongSelf notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
-            [handler replyError:walkerError ?: fbError];
+            __strong typeof(weakSelf) inner = weakSelf;
+            if (!inner) { return; }
+            if (seedError) {
+                // PHImageManager already ran and failed — walker was the
+                // fallback. Nothing else to try.
+                [inner notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
+                [handler replyError:walkerError ?: seedError];
+                return;
+            }
+            // Walker ran as the primary path (RAW / exotic UTI) and every
+            // candidate failed. Fall back to PHImageManager for one more
+            // attempt — matches historical behaviour for non-raster assets.
+            [inner fallbackFetchImageDataFor:asset
+                                    isOrigin:YES
+                             progressHandler:progressHandler
+                                       block:^(NSString *fbPath, NSObject *fbError) {
+                if (fbPath) {
+                    [handler reply:fbPath];
+                    return;
+                }
+                [inner notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
+                [handler replyError:walkerError ?: fbError];
+            }];
         }];
+    };
+
+    if (![self canFetchOriginViaImageManager:candidates.firstObject]) {
+        runWalker(nil);
+        return;
+    }
+    [self fallbackFetchImageDataFor:asset
+                            isOrigin:YES
+                     progressHandler:progressHandler
+                               block:^(NSString *primaryPath, NSObject *primaryError) {
+        if (primaryPath) {
+            [handler reply:primaryPath];
+            return;
+        }
+        runWalker(primaryError);
     }];
 }
 
@@ -1542,10 +1603,12 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     }];
 }
 
-// Fallback image fetch used when `writeDataForAssetResource` fails across
-// every candidate resource. Uses PHImageManager's data pipeline, which is a
-// separate iCloud-materialization path and returns the raw image bytes so we
-// can write them verbatim without a JPEG recompression.
+// Fetches image bytes via PHImageManager's data pipeline. Used as the
+// primary path for `fetchOriginImageFile` (so we can request
+// HighQualityFormat delivery, which PHAssetResourceRequestOptions does not
+// expose — see #1118), and as the last-resort path for other flows that
+// walk PHAssetResource candidates via `writeDataForAssetResource`. Writes
+// the raw image bytes verbatim, so there is no JPEG recompression.
 - (void)fallbackFetchImageDataFor:(PHAsset *)asset
                          isOrigin:(BOOL)isOrigin
                   progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
@@ -1580,6 +1643,15 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     void (^dataHandler)(NSData *_Nullable, NSDictionary *_Nullable) = ^(NSData *_Nullable imageData, NSDictionary *_Nullable info) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         if (!strongSelf) { return; }
+        // With deliveryMode=HighQualityFormat + synchronous=NO, PhotoKit is
+        // documented to deliver a single non-degraded callback, but historical
+        // reports (and the equivalent guard elsewhere in this file) show that
+        // a degraded interim result can slip through on some iOS versions.
+        // Ignore it and wait for the definitive callback — writing degraded
+        // bytes to disk would reproduce the very symptom of #1118.
+        if ([info[PHImageResultIsDegradedKey] boolValue]) {
+            return;
+        }
         NSObject *error = info[PHImageErrorKey];
         if (error) {
             block(nil, error);
