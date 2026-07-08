@@ -1442,6 +1442,13 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
         return;
     }
     [self notifyProgress:progressHandler progress:0 state:PMProgressStatePrepare];
+    PHAssetResource *primary = candidates.firstObject;
+    BOOL viaImageManager = [self canFetchOriginViaImageManager:primary];
+    [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:
+        @"[#1118] fetchOriginImageFile id=%@ primary.type=%d uti=%@ → %@",
+        asset.localIdentifier, (int)primary.type,
+        primary.uniformTypeIdentifier ?: @"(nil)",
+        viaImageManager ? @"PHImageManager first" : @"walker first"]];
     __weak typeof(self) weakSelf = self;
     // Prefer PHImageManager.requestImageDataAndOrientation with
     // deliveryMode=HighQualityFormat first: PHAssetResourceRequestOptions has
@@ -1496,7 +1503,7 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
         }];
     };
 
-    if (![self canFetchOriginViaImageManager:candidates.firstObject]) {
+    if (!viaImageManager) {
         runWalker(nil);
         return;
     }
@@ -1597,6 +1604,12 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
             // Walker retries with the next candidate; don't emit Failed here.
             block(nil, error);
         } else {
+            long long size = [(NSNumber *)[[NSFileManager.defaultManager attributesOfItemAtPath:path error:nil]
+                              objectForKey:NSFileSize] longLongValue];
+            [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:
+                @"[#1118] writeDataForAssetResource delivered %lld bytes (uti=%@ type=%d) → %@",
+                size, imageResource.uniformTypeIdentifier ?: @"(nil)",
+                (int)imageResource.type, path]];
             [strongSelf notifySuccess:progressHandler];
             block(path, nil);
         }
@@ -1650,9 +1663,13 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
         // Ignore it and wait for the definitive callback — writing degraded
         // bytes to disk would reproduce the very symptom of #1118.
         if ([info[PHImageResultIsDegradedKey] boolValue]) {
+            [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:
+                @"[#1118] PHImageManager degraded intermediate dropped, data=%lu",
+                (unsigned long)imageData.length]];
             return;
         }
         if ([info[PHImageCancelledKey] boolValue]) {
+            [[PMLogUtils sharedInstance] info:@"[#1118] PHImageManager cancelled"];
             block(nil, [NSError errorWithDomain:@"PMPhotoManager" code:-2 userInfo:@{
                 NSLocalizedDescriptionKey: @"PHImageManager request was cancelled."
             }]);
@@ -1674,6 +1691,7 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
         // originals (multi-MB HEIC/JPEG) can otherwise stall UI for tens of
         // milliseconds while writing. Matches the pattern used by
         // `fetchFullSizeImageFile:` below.
+        NSUInteger dataLength = imageData.length;
         dispatch_async(strongSelf->_imageFileProcessingQueue, ^{
             __strong typeof(weakSelf) innerSelf = weakSelf;
             if (!innerSelf) { return; }
@@ -1683,6 +1701,9 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                 block(nil, writeError);
                 return;
             }
+            [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:
+                @"[#1118] PHImageManager delivered %lu bytes → %@",
+                (unsigned long)dataLength, path]];
             [innerSelf notifySuccess:progressHandler];
             block(path, nil);
         });
