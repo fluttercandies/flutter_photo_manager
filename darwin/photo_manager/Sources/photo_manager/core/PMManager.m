@@ -1479,26 +1479,17 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
             }
             __strong typeof(weakSelf) inner = weakSelf;
             if (!inner) { return; }
-            void (^tryOfflineProxy)(NSObject *finalError) = ^(NSObject *finalError) {
-                // Every network-touching path has failed. Try one last request
-                // with networkAccessAllowed=NO to surface the local proxy
-                // Photos keeps under Optimize Storage — better a small image
-                // than an opaque -1009.
-                [inner fetchOfflineImageProxyFor:asset
-                                progressHandler:progressHandler
-                                          block:^(NSString *proxyPath, NSObject *proxyError) {
-                    if (proxyPath) {
-                        [handler reply:proxyPath];
-                        return;
-                    }
-                    [inner notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
-                    [handler replyError:finalError ?: proxyError];
-                }];
-            };
             if (seedError) {
                 // PHImageManager already ran and failed — walker was the
-                // fallback. Try offline proxy as last resort.
-                tryOfflineProxy(walkerError ?: seedError);
+                // fallback. Both paths need network to materialise the iCloud
+                // original; if that's why they failed the caller can't get
+                // bytes offline (PhotoKit's data APIs refuse iCloud-only
+                // assets with PHPhotosErrorNetworkAccessRequired even with
+                // networkAccessAllowed=NO). Surface the underlying error so
+                // callers can distinguish "network needed" from other
+                // failures and route to the thumbnail API if appropriate.
+                [inner notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
+                [handler replyError:walkerError ?: seedError];
                 return;
             }
             // Walker ran as the primary path (RAW / exotic UTI) and every
@@ -1512,7 +1503,8 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                     [handler reply:fbPath];
                     return;
                 }
-                tryOfflineProxy(walkerError ?: fbError);
+                [inner notifyProgress:progressHandler progress:0 state:PMProgressStateFailed];
+                [handler replyError:walkerError ?: fbError];
             }];
         }];
     };
@@ -1722,125 +1714,6 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                 (unsigned long)dataLength, path]];
             [innerSelf notifySuccess:progressHandler];
             block(path, nil);
-        });
-    };
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (!strongSelf) { return; }
-        if (@available(iOS 13.0, macOS 10.15, *)) {
-            [strongSelf.cachingManager requestImageDataAndOrientationForAsset:asset
-                                                                     options:options
-                                                               resultHandler:^(NSData *_Nullable imageData,
-                                                                               NSString *_Nullable dataUTI,
-                                                                               CGImagePropertyOrientation orientation,
-                                                                               NSDictionary *_Nullable info) {
-                dataHandler(imageData, info);
-            }];
-        } else {
-#if TARGET_OS_IOS
-            [strongSelf.cachingManager requestImageDataForAsset:asset
-                                                        options:options
-                                                  resultHandler:^(NSData *_Nullable imageData,
-                                                                  NSString *_Nullable dataUTI,
-                                                                  UIImageOrientation orientation,
-                                                                  NSDictionary *_Nullable info) {
-                dataHandler(imageData, info);
-            }];
-#else
-            dataHandler(nil, @{PHImageErrorKey: [NSError errorWithDomain:@"PMPhotoManager" code:-1 userInfo:@{
-                NSLocalizedDescriptionKey: @"requestImageDataForAsset unavailable on this platform version."
-            }]});
-#endif
-        }
-    });
-}
-
-// Tail fallback used when both the PHImageManager (HighQualityFormat +
-// networkAccessAllowed=YES) primary and the PHAssetResource walker have
-// failed — typically because the device is offline and the requested
-// resource is only present as an iCloud stub. Requests one more time with
-// deliveryMode=Opportunistic + networkAccessAllowed=NO and *accepts the
-// degraded result*, so the caller receives the local downsampled proxy
-// (the "small image" Photos.app itself falls back to offline) instead of
-// an opaque network error. The proxy is cached at a distinct
-// `proxy_`-prefixed filename so a subsequent online call still traverses
-// the primary path and materialises the iCloud original — no cross-mode
-// pollution.
-- (void)fetchOfflineImageProxyFor:(PHAsset *)asset
-                  progressHandler:(NSObject <PMProgressHandlerProtocol> *)progressHandler
-                            block:(void (^)(NSString *path, NSObject *error))block {
-    NSFileManager *manager = NSFileManager.defaultManager;
-    NSString *base = [self makeAssetOutputPath:asset resource:nil isOrigin:YES fileType:nil manager:manager];
-    NSString *dir = [base stringByDeletingLastPathComponent];
-    NSString *proxyPath = [dir stringByAppendingPathComponent:
-                           [@"proxy_" stringByAppendingString:[base lastPathComponent]]];
-    if ([manager fileExistsAtPath:proxyPath]) {
-        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:
-            @"[#1118] local proxy cache hit → %@", proxyPath]];
-        [self notifySuccess:progressHandler];
-        block(proxyPath, nil);
-        return;
-    }
-
-    PHImageRequestOptions *options = [PHImageRequestOptions new];
-    [options setDeliveryMode:PHImageRequestOptionsDeliveryModeOpportunistic];
-    [options setNetworkAccessAllowed:NO];
-    [options setSynchronous:NO];
-    [options setVersion:PHImageRequestOptionsVersionCurrent];
-
-    __weak typeof(self) weakSelf = self;
-    // Opportunistic mode can fire the result handler more than once in
-    // principle. With networkAccessAllowed=NO a second callback is unlikely
-    // (no iCloud round trip is scheduled), but guard against double-reply
-    // regardless — the wrapping PMResultHandler treats a second reply as a
-    // programmer error.
-    __block BOOL replied = NO;
-    void (^dataHandler)(NSData *_Nullable, NSDictionary *_Nullable) = ^(NSData *_Nullable imageData, NSDictionary *_Nullable info) {
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (!strongSelf) { return; }
-        if (replied) { return; }
-        if ([info[PHImageCancelledKey] boolValue]) {
-            replied = YES;
-            [[PMLogUtils sharedInstance] info:@"[#1118] local-proxy PHImageManager cancelled"];
-            block(nil, [NSError errorWithDomain:@"PMPhotoManager" code:-2 userInfo:@{
-                NSLocalizedDescriptionKey: @"PHImageManager request was cancelled."
-            }]);
-            return;
-        }
-        NSObject *error = info[PHImageErrorKey];
-        if (error) {
-            replied = YES;
-            [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:
-                @"[#1118] local-proxy PHImageManager error: %@", error]];
-            block(nil, error);
-            return;
-        }
-        if (!imageData) {
-            replied = YES;
-            [[PMLogUtils sharedInstance] info:@"[#1118] local-proxy no data available"];
-            block(nil, [NSError errorWithDomain:@"PMPhotoManager" code:-1 userInfo:@{
-                NSLocalizedDescriptionKey: @"No local proxy available for asset."
-            }]);
-            return;
-        }
-        replied = YES;
-        NSUInteger dataLength = imageData.length;
-        BOOL degraded = [info[PHImageResultIsDegradedKey] boolValue];
-        dispatch_async(strongSelf->_imageFileProcessingQueue, ^{
-            __strong typeof(weakSelf) innerSelf = weakSelf;
-            if (!innerSelf) { return; }
-            NSError *writeError;
-            [imageData writeToFile:proxyPath options:NSDataWritingAtomic error:&writeError];
-            if (writeError) {
-                block(nil, writeError);
-                return;
-            }
-            [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:
-                @"[#1118] local proxy delivered %lu bytes%@ → %@",
-                (unsigned long)dataLength, degraded ? @" (degraded)" : @"", proxyPath]];
-            [innerSelf notifySuccess:progressHandler];
-            block(proxyPath, nil);
         });
     };
 
