@@ -27,6 +27,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 **Fixes**
 
+- Fix iOS 18+ raising `Unsupported fetch for asset collections with type 2 and subtype 2` when navigating into the primary album, caused by an invalid `SmartAlbum` + `AlbumRegular` combination in the recent-collection check.
 - Reduce built-in Kotlin migration warnings for supported project configurations while preserving legacy Flutter compatibility.
 - Fix Darwin crashes when querying assets by local identifier by catching PhotoKit exceptions and returning safe fallback results instead of aborting the process.
 - Fix the `AssetEntity.duration` API docs to clarify that audio and video durations are returned in seconds across supported platforms, preserving the existing API behavior.
