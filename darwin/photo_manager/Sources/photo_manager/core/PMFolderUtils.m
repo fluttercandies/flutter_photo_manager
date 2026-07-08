@@ -20,19 +20,24 @@
 }
 
 + (BOOL)isRecentCollection:(NSString *)id {
+    // iOS 18 tightened `fetchAssetCollectionsWithType:subtype:` to raise
+    // "Unsupported fetch for asset collections with type 2 and subtype 2"
+    // for the (SmartAlbum, AlbumRegular) combination that older releases
+    // silently tolerated. AlbumRegular is a subtype of the Album *type*,
+    // never SmartAlbum, so the previous call was already meaningless — we
+    // just want the user's primary library, which is exactly what
+    // `SmartAlbumUserLibrary` targets.
     PHFetchResult<PHAssetCollection *> *result = [PHAssetCollection
                                                   fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum
-                                                  subtype:PHAssetCollectionSubtypeAlbumRegular
+                                                  subtype:PHAssetCollectionSubtypeSmartAlbumUserLibrary
                                                   options:nil];
-    
-    if (result && result.count) {
-        for (PHAssetCollection *collection in result) {
-            if (collection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumUserLibrary) {
-                return [id isEqualToString:collection.localIdentifier];
-            }
+
+    for (PHAssetCollection *collection in result) {
+        if (collection.assetCollectionSubtype == PHAssetCollectionSubtypeSmartAlbumUserLibrary) {
+            return [id isEqualToString:collection.localIdentifier];
         }
     }
-    
+
     return NO;
 }
 
