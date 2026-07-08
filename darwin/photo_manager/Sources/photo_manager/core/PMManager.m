@@ -9,7 +9,7 @@
 #import "PMFolderUtils.h"
 #import "PMImageUtil.h"
 #import "PMManager.h"
-#import "PMMD5Utils.h"
+#import "PMHashUtils.h"
 #import "PMPathFilterOption.h"
 #import "PMRequestTypeUtils.h"
 #import "PMResultHandler.h"
@@ -1392,7 +1392,7 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     NSError *error;
     [manager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:@{} error:&error];
     [path appendString:@"/"];
-    [path appendString:[PMMD5Utils getMD5FromString:asset.localIdentifier]];
+    [path appendString:[PMHashUtils sha256FromString:asset.localIdentifier]];
     [path appendString:@"_exif"];
     [path appendString:@".jpg"];
     [manager createFileAtPath:path contents:imageData attributes:@{}];
