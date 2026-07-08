@@ -1652,6 +1652,12 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
         if ([info[PHImageResultIsDegradedKey] boolValue]) {
             return;
         }
+        if ([info[PHImageCancelledKey] boolValue]) {
+            block(nil, [NSError errorWithDomain:@"PMPhotoManager" code:-2 userInfo:@{
+                NSLocalizedDescriptionKey: @"PHImageManager request was cancelled."
+            }]);
+            return;
+        }
         NSObject *error = info[PHImageErrorKey];
         if (error) {
             block(nil, error);
@@ -1663,14 +1669,23 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
             }]);
             return;
         }
-        NSError *writeError;
-        [imageData writeToFile:path options:NSDataWritingAtomic error:&writeError];
-        if (writeError) {
-            block(nil, writeError);
-            return;
-        }
-        [strongSelf notifySuccess:progressHandler];
-        block(path, nil);
+        // Move disk I/O off the main thread — PhotoKit invokes the
+        // resultHandler on the queue we dispatched from (main), and large
+        // originals (multi-MB HEIC/JPEG) can otherwise stall UI for tens of
+        // milliseconds while writing. Matches the pattern used by
+        // `fetchFullSizeImageFile:` below.
+        dispatch_async(strongSelf->_imageFileProcessingQueue, ^{
+            __strong typeof(weakSelf) innerSelf = weakSelf;
+            if (!innerSelf) { return; }
+            NSError *writeError;
+            [imageData writeToFile:path options:NSDataWritingAtomic error:&writeError];
+            if (writeError) {
+                block(nil, writeError);
+                return;
+            }
+            [innerSelf notifySuccess:progressHandler];
+            block(path, nil);
+        });
     };
 
     dispatch_async(dispatch_get_main_queue(), ^{
