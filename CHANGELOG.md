@@ -19,6 +19,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Add `updateCreationDate` to `PhotoManager.editor.darwin` and `PhotoManager.editor.android` for modifying an asset's creation date after it has been saved.
   - On iOS/macOS: updates the `PHAsset.creationDate` property.
   - On Android Q (API 29)+: updates the MediaStore `DATE_TAKEN` field; unsupported on API 28 and below.
+- Add `PhotoManager.canManageMedia()` and `PhotoManager.requestManageMedia()` to check and request the Android 12 (API 31+) `MANAGE_MEDIA` special permission. When granted, MediaStore delete/trash/favorite/write requests no longer prompt the user for confirmation on each call. Both methods return `false` on iOS/macOS/OpenHarmony and on Android below 12. Host apps must add `<uses-permission android:name="android.permission.MANAGE_MEDIA"/>` to opt in.
 
 **Improvements**
 

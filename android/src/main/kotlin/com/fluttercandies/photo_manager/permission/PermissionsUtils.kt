@@ -6,6 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import android.provider.Settings
 import androidx.core.content.PermissionChecker
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import com.fluttercandies.photo_manager.core.entity.PermissionResult
@@ -196,6 +199,45 @@ class PermissionsUtils {
 
     fun presentLimited(type: Int, resultHandler: ResultHandler) {
         delegate.presentLimited(this, context!!, type, resultHandler)
+    }
+
+    /**
+     * Whether the app currently holds the special MANAGE_MEDIA permission.
+     *
+     * Available on Android 12 (API 31) and above; returns false on older
+     * versions. When granted, MediaStore create*Request intents (delete,
+     * trash, favorite, write) skip the system confirmation dialog.
+     */
+    fun canManageMedia(applicationContext: Context): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            return false
+        }
+        return MediaStore.canManageMedia(applicationContext)
+    }
+
+    /**
+     * Opens the system Settings page where the user can toggle the
+     * MANAGE_MEDIA permission for this app. No-op on Android below 12.
+     *
+     * Returns true if the intent was launched. Callers should re-check
+     * [canManageMedia] after the user returns from Settings.
+     */
+    fun requestManageMedia(applicationContext: Context): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            return false
+        }
+        val intent = Intent(Settings.ACTION_REQUEST_MANAGE_MEDIA).apply {
+            data = Uri.fromParts("package", applicationContext.packageName, null)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        val target = mActivity ?: applicationContext
+        return try {
+            target.startActivity(intent)
+            true
+        } catch (e: Exception) {
+            LogUtils.error("Failed to launch ACTION_REQUEST_MANAGE_MEDIA", e)
+            false
+        }
     }
 
     fun getAuthValue(requestType: Int, mediaLocation: Boolean): PermissionResult {

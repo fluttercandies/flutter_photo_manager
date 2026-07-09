@@ -959,6 +959,40 @@ even if your `targetSdkVersion` and `compileSdkVersion` is not `33`:
 </manifest>
 ```
 
+#### Android 12 (API 31) `MANAGE_MEDIA` (optional)
+
+Android 12 introduced the [`MANAGE_MEDIA`][manage_media_docs] special
+permission. When granted, `PhotoManager.editor.deleteWithIds`,
+`moveToTrash`, and favorite operations no longer show the system
+confirmation dialog on each call, which is useful for gallery / media
+management apps that perform bulk operations.
+
+To opt in, declare the permission in your `AndroidManifest.xml`:
+
+```xml
+<manifest>
+    <uses-permission android:name="android.permission.MANAGE_MEDIA" />
+</manifest>
+```
+
+The user must additionally toggle the switch for your app in
+`Settings > Apps > Special app access > Media management`. There is no
+runtime dialog; use the APIs below to check the state and route the user
+to the settings page:
+
+```dart
+if (!await PhotoManager.canManageMedia()) {
+  await PhotoManager.requestManageMedia();
+  // Re-check canManageMedia() after the user returns from Settings.
+}
+```
+
+Both methods return `false` on iOS/macOS/OpenHarmony and on Android
+versions below 12. `READ_MEDIA_*` and `ACCESS_MEDIA_LOCATION` remain
+prerequisites — `MANAGE_MEDIA` only suppresses the confirmation dialog.
+
+[manage_media_docs]: https://developer.android.com/reference/android/provider/MediaStore#canManageMedia(android.content.Context)
+
 ### iOS extra configs
 
 #### Localized system albums name

@@ -348,6 +348,14 @@ class PhotoManagerPlugin(
                     resultHandler.reply(it.value)
                 }
             }
+
+            Methods.canManageMedia -> {
+                resultHandler.reply(permissionsUtils.canManageMedia(applicationContext))
+            }
+
+            Methods.requestManageMedia -> {
+                resultHandler.reply(permissionsUtils.requestManageMedia(applicationContext))
+            }
         }
     }
 

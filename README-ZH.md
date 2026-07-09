@@ -899,6 +899,36 @@ rootProject.allprojects {
 </manifest>
 ```
 
+#### Android 12 (API 31) `MANAGE_MEDIA` （可选）
+
+Android 12 引入了 [`MANAGE_MEDIA`][manage_media_docs] 这个特殊权限。授予该权限后，
+`PhotoManager.editor.deleteWithIds`、`moveToTrash`、收藏等操作不再触发系统的
+逐次确认弹窗，适合有批量操作诉求的相册 / 媒体管理类应用。
+
+如果需要启用，请在 `AndroidManifest.xml` 中声明：
+
+```xml
+<manifest>
+    <uses-permission android:name="android.permission.MANAGE_MEDIA" />
+</manifest>
+```
+
+用户还需要在 `设置 > 应用 > 特殊应用权限 > 媒体管理` 里手动为你的应用打开开关，
+系统不会弹出运行时弹窗。可以使用下列 API 检查状态并跳转到设置页：
+
+```dart
+if (!await PhotoManager.canManageMedia()) {
+  await PhotoManager.requestManageMedia();
+  // 用户从设置页返回后再次调用 canManageMedia() 检查是否已授予。
+}
+```
+
+两个方法在 iOS / macOS / OpenHarmony 及 Android 12 以下均返回 `false`。
+`READ_MEDIA_*` 和 `ACCESS_MEDIA_LOCATION` 仍然是前置依赖，
+`MANAGE_MEDIA` 只是移除了系统的确认弹窗。
+
+[manage_media_docs]: https://developer.android.com/reference/android/provider/MediaStore#canManageMedia(android.content.Context)
+
 ### iOS 额外配置
 
 #### 配置系统相册名称的国际化

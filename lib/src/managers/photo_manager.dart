@@ -172,6 +172,38 @@ class PhotoManager {
   /// Open the system settings page of the current app.
   static Future<void> openSetting() => plugin.openSetting();
 
+  /// Whether the app currently holds the Android `MANAGE_MEDIA` special
+  /// permission (Android 12+ / API 31+).
+  ///
+  /// When granted, `deleteWithIds`, `moveToTrash`, `favoriteAsset`, and other
+  /// MediaStore mutation intents no longer show the system confirmation
+  /// dialog to the user. This is useful for gallery/media-manager apps that
+  /// want to perform bulk operations without per-item prompts.
+  ///
+  /// Requires `<uses-permission android:name="android.permission.MANAGE_MEDIA"/>`
+  /// in the host app's `AndroidManifest.xml`. Returns `false` on iOS/macOS/
+  /// OpenHarmony and on Android versions below 12.
+  ///
+  /// See also:
+  ///  * [requestManageMedia] to send the user to the Settings page where the
+  ///    permission can be toggled.
+  ///  * https://developer.android.com/reference/android/provider/MediaStore#canManageMedia(android.content.Context)
+  static Future<bool> canManageMedia() => plugin.canManageMedia();
+
+  /// Opens the system Settings page where the user can grant the Android
+  /// `MANAGE_MEDIA` permission to this app. Returns `true` if the Settings
+  /// intent was launched.
+  ///
+  /// The system provides no result callback; re-check [canManageMedia] once
+  /// the user returns to the app (for example when the app resumes).
+  ///
+  /// No-op that returns `false` on iOS/macOS/OpenHarmony and on Android
+  /// versions below 12.
+  ///
+  /// See also:
+  ///  * https://developer.android.com/reference/android/provider/Settings#ACTION_REQUEST_MANAGE_MEDIA
+  static Future<bool> requestManageMedia() => plugin.requestManageMedia();
+
   /// Release native caches, there are no common use case for this method,
   /// so this method is not recommended.
   ///
