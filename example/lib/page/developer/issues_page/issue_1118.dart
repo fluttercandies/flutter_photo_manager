@@ -40,6 +40,16 @@ class _Issue1118PageState extends State<Issue1118Page>
   List<_Candidate> _candidates = [];
   bool _busy = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // Native `[#1118]` diagnostic logs go through `PMLogUtils`, which is
+    // gated by an off-by-default `isLog` flag. Flip it on for this page so
+    // the routing decision + delivered byte count show up in Xcode Console
+    // without the tester having to remember `PhotoManager.setLog(true)`.
+    PhotoManager.setLog(true);
+  }
+
   Future<void> _scanCandidates() async {
     if (_busy) {
       return;
