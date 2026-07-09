@@ -10,6 +10,7 @@
 // native side — grep those in the Xcode Console for the routing decision.
 
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
@@ -118,6 +119,8 @@ class _Issue1118PageState extends State<Issue1118Page>
     setState(() => _busy = true);
     try {
       addLog('DIAG ${c.asset.id} — expected=${_fmt(c.expectedSize)} '
+          '${c.asset.width}×${c.asset.height} '
+          'mime=${c.asset.mimeType ?? "?"} '
           'local=${c.locallyAvailable}');
       final sw = Stopwatch()..start();
       File? file;
@@ -136,13 +139,53 @@ class _Issue1118PageState extends State<Issue1118Page>
       }
       final actual = file.lengthSync();
       final ratio = c.expectedSize == 0 ? 0.0 : actual / c.expectedSize;
+      // Decode the returned file to check its actual pixel dimensions —
+      // the definitive answer to "did we get the full-resolution original".
+      // `PHAssetResource.fileSize` KVC has known quirks for some asset
+      // types (notably PNG screenshots, which report an inflated internal
+      // buffer size instead of the on-disk PNG byte count), so a low
+      // actual/expected ratio alone can produce false-positive PROXY
+      // verdicts. Comparing decoded dims to `asset.width × height` cuts
+      // through the ambiguity.
+      int? decodedW;
+      int? decodedH;
+      try {
+        final bytes = await file.readAsBytes();
+        final codec = await ui.instantiateImageCodec(bytes);
+        final frame = await codec.getNextFrame();
+        decodedW = frame.image.width;
+        decodedH = frame.image.height;
+        frame.image.dispose();
+        codec.dispose();
+      } catch (_) {
+        // ignore decode failure — verdict falls back to size-only
+      }
+      final dimsMatchAsset = decodedW == c.asset.width &&
+          decodedH == c.asset.height;
       String verdict;
-      if (c.expectedSize == 0) {
-        verdict = '? (fileSize unknown)';
+      if (dimsMatchAsset) {
+        // Decoded resolution equals asset resolution → this IS the full
+        // original regardless of what fileSize claims.
+        verdict = '✓ FULL ($decodedW×$decodedH matches asset)';
+      } else if (c.expectedSize == 0) {
+        verdict = '? (fileSize unknown, decoded=$decodedW×$decodedH)';
       } else if (ratio >= 0.99) {
         verdict = '✓ FULL';
       } else if (ratio < 0.5) {
-        verdict = '✗ PROXY(#1118!)';
+        if (decodedW != null && decodedH != null) {
+          final decodedPx = decodedW * decodedH;
+          final assetPx = c.asset.width * c.asset.height;
+          if (assetPx > 0 && decodedPx / assetPx >= 0.99) {
+            verdict = '✓ FULL (fileSize KVC unreliable; '
+                'decoded=$decodedW×$decodedH)';
+          } else {
+            verdict = '✗ PROXY(#1118!) '
+                'decoded=$decodedW×$decodedH vs '
+                '${c.asset.width}×${c.asset.height}';
+          }
+        } else {
+          verdict = '✗ PROXY(#1118!) (decode failed)';
+        }
       } else {
         verdict = '~ MISMATCH (ratio=${ratio.toStringAsFixed(2)})';
       }
