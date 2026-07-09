@@ -19,6 +19,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Add `updateCreationDate` to `PhotoManager.editor.darwin` and `PhotoManager.editor.android` for modifying an asset's creation date after it has been saved.
   - On iOS/macOS: updates the `PHAsset.creationDate` property.
   - On Android Q (API 29)+: updates the MediaStore `DATE_TAKEN` field; unsupported on API 28 and below.
+- Add `PhotoManager.canManageMedia()` and `PhotoManager.requestManageMedia()` for the Android 12 (API 31+) `MANAGE_MEDIA` special permission.
 
 **Improvements**
 

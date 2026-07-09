@@ -64,6 +64,8 @@ class PMConstants {
   static const String mMoveAssetsToPath = 'moveAssetsToPath';
   static const String mColumnNames = 'getColumnNames';
   static const String mUpdateCreationDate = 'updateCreationDate';
+  static const String mCanManageMedia = 'canManageMedia';
+  static const String mRequestManageMedia = 'requestManageMedia';
 
   /// Darwin (iOS/macOS) only methods.
   static const String mGetCloudIdentifiers = 'getCloudIdentifiers';

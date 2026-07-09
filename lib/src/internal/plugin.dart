@@ -700,6 +700,26 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     }
   }
 
+  Future<bool> canManageMedia() async {
+    if (!Platform.isAndroid) {
+      return false;
+    }
+    final bool? result = await _channel.invokeMethod<bool>(
+      PMConstants.mCanManageMedia,
+    );
+    return result ?? false;
+  }
+
+  Future<bool> requestManageMedia() async {
+    if (!Platform.isAndroid) {
+      return false;
+    }
+    final bool? result = await _channel.invokeMethod<bool>(
+      PMConstants.mRequestManageMedia,
+    );
+    return result ?? false;
+  }
+
   Future<String?> getMimeTypeAsync(AssetEntity entity) async {
     if (Platform.isAndroid || PlatformUtils.isOhos) {
       return entity.mimeType;
