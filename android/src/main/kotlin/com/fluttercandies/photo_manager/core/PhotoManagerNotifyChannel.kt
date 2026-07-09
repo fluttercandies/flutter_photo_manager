@@ -3,6 +3,7 @@ package com.fluttercandies.photo_manager.core
 import android.content.ContentResolver
 import android.content.Context
 import android.database.ContentObserver
+import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
@@ -102,6 +103,29 @@ class PhotoManagerNotifyChannel(
         val cr: ContentResolver
             get() = context.contentResolver
 
+        // ContentObserver callbacks run on the handler thread. When
+        // MediaProvider rejects the query with "Volume <name> not found" on
+        // devices where the primary volume is transiently unavailable, letting
+        // it propagate would crash that thread. Downgrade only that specific
+        // IllegalArgumentException to a null cursor so the change notification
+        // is dropped for this event; other IllegalArgumentException causes
+        // (bad projection, unauthorized column, etc.) still surface.
+        private fun safeQuery(
+            uri: Uri,
+            projection: Array<String>,
+            selection: String,
+            selectionArgs: Array<String>
+        ): Cursor? = try {
+            cr.query(uri, projection, selection, selectionArgs, null)
+        } catch (e: IllegalArgumentException) {
+            if (IDBUtils.isVolumeNotFound(e)) {
+                LogUtils.error("MediaStore observer query hit missing volume, dropping event", e)
+                null
+            } else {
+                throw e
+            }
+        }
+
         override fun onChange(selfChange: Boolean, uri: Uri?) {
             if (uri == null) {
                 return
@@ -110,12 +134,11 @@ class PhotoManagerNotifyChannel(
             val id = last?.toLongOrNull()
 
             if (id != null) { // insert or update
-                val cursor = cr.query(
+                val cursor = safeQuery(
                     allUri,
                     arrayOf(DATE_ADDED, DATE_MODIFIED, MEDIA_TYPE),
                     "$_ID = ?",
-                    arrayOf(id.toString()),
-                    null
+                    arrayOf(id.toString())
                 )
                 cursor?.use {
                     if (!cursor.moveToNext()) {
@@ -158,15 +181,14 @@ class PhotoManagerNotifyChannel(
         private fun getGalleryIdAndName(id: Long, type: Int): Pair<Long?, String?> {
             when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-                    val cursor = cr.query(
+                    val cursor = safeQuery(
                         allUri,
                         arrayOf(
                             BUCKET_ID,
                             BUCKET_DISPLAY_NAME
                         ),
                         "$_ID = ?",
-                        arrayOf(id.toString()),
-                        null
+                        arrayOf(id.toString())
                     )
                     cursor?.use {
                         if (cursor.moveToNext()) {
@@ -182,15 +204,14 @@ class PhotoManagerNotifyChannel(
                 }
 
                 type == MEDIA_TYPE_AUDIO -> {
-                    val cursor = cr.query(
+                    val cursor = safeQuery(
                         allUri,
                         arrayOf(
                             MediaStore.Audio.AudioColumns.ALBUM_ID,
                             ALBUM
                         ),
                         "$_ID = ?",
-                        arrayOf(id.toString()),
-                        null
+                        arrayOf(id.toString())
                     )
                     cursor?.use {
                         if (cursor.moveToNext()) {
@@ -206,12 +227,11 @@ class PhotoManagerNotifyChannel(
                 }
 
                 else -> {
-                    val cursor = cr.query(
+                    val cursor = safeQuery(
                         allUri,
                         arrayOf("bucket_id", "bucket_display_name"),
                         "$_ID = ?",
-                        arrayOf(id.toString()),
-                        null
+                        arrayOf(id.toString())
                     )
                     cursor?.use {
                         if (cursor.moveToNext()) {

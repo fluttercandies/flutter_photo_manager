@@ -5,6 +5,7 @@ import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
+import android.database.MatrixCursor
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
@@ -96,6 +97,20 @@ interface IDBUtils {
         val allUri: Uri
             get() = MediaStore.Files.getContentUri(VOLUME_EXTERNAL)
 
+        // MediaProvider throws IllegalArgumentException with the hard-coded
+        // English message `"Volume " + volumeName + " not found"` on devices
+        // where the primary shared-storage volume is transiently unavailable
+        // (Direct Boot, secondary user / work profile without primary storage
+        // mounted, some OEM storage quirks, OTA mount race). The volume name is
+        // any valid identifier, so match on the fixed prefix + suffix so future
+        // MediaProvider volume aliases still route through the graceful path.
+        // Callers should only downgrade this specific case; other
+        // IllegalArgumentException causes (bad projection, unauthorized column,
+        // malformed CustomFilter selection) must still surface.
+        fun isVolumeNotFound(e: IllegalArgumentException): Boolean {
+            val msg = e.message ?: return false
+            return msg.startsWith("Volume ") && msg.endsWith(" not found")
+        }
     }
 
     fun keys(): Array<String>
@@ -774,6 +789,21 @@ interface IDBUtils {
             val cursor = query(uri, projection, selection, selectionArgs, sortOrder)
             log(LogUtils::info, cursor)
             return cursor ?: throwMsg("Failed to obtain the cursor.")
+        } catch (e: IllegalArgumentException) {
+            // See IDBUtils.isVolumeNotFound: the specific case where
+            // MediaProvider can't resolve the primary volume is downgraded to
+            // an empty cursor so the gallery renders empty for that moment
+            // instead of surfacing a PlatformException. Every other
+            // IllegalArgumentException (bad projection, malformed CustomFilter
+            // selection, unauthorized column) still propagates.
+            if (IDBUtils.isVolumeNotFound(e)) {
+                log(LogUtils::error, null)
+                LogUtils.error("MediaStore volume unavailable, returning empty cursor", e)
+                return MatrixCursor(projection ?: emptyArray())
+            }
+            log(LogUtils::error, null)
+            LogUtils.error("happen query error", e)
+            throw e
         } catch (e: Exception) {
             log(LogUtils::error, null)
             LogUtils.error("happen query error", e)

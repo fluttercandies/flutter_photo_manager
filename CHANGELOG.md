@@ -28,6 +28,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 **Fixes**
 
+- Fix Android `PlatformException`s from `IllegalArgumentException: Volume external_primary not found` by returning an empty cursor when MediaProvider reports the primary volume as unavailable, and guard the media-store `ContentObserver` against the same exception.
 - Fix Darwin `AssetEntity.originFile` returning the locally-downsampled proxy for iCloud + "Optimize iPhone Storage"-affected photos by preferring `PHImageManager` with `HighQualityFormat` over `writeDataForAssetResource` on unedited raster primaries.
 - Fix Darwin `PhotoManager.editor.darwin.saveLivePhoto` returning `PHPhotosErrorDomain (-1)` when the caller-supplied image and video lacked the shared Live Photo pairing identifier `PHAssetCreationRequest` requires.
 - Fix iOS 18+ raising `Unsupported fetch for asset collections with type 2 and subtype 2` when navigating into the primary album, caused by an invalid `SmartAlbum` + `AlbumRegular` combination in the recent-collection check.
