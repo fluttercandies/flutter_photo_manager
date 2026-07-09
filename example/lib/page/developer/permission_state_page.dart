@@ -31,6 +31,8 @@ class _PermissionStatePageState extends State<PermissionStatePage> {
 
   IosAccessLevel _iosAccessLevel = IosAccessLevel.readWrite; // 添加这一行
 
+  bool? _canManageMedia;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,6 +89,29 @@ class _PermissionStatePageState extends State<PermissionStatePage> {
           ),
           if (_permissionState != null)
             Text('Current Permission State: $_permissionState'),
+          if (Platform.isAndroid) ...[
+            const Divider(),
+            const Text(
+              'Android MANAGE_MEDIA (API 31+)',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const Text(
+              'When granted, delete/trash/favorite/write requests skip the '
+              'system confirmation dialog. Requires the '
+              'android.permission.MANAGE_MEDIA manifest entry and a user '
+              'toggle in Settings > Special app access > Media management.',
+            ),
+            ElevatedButton(
+              onPressed: _checkCanManageMedia,
+              child: const Text('Check canManageMedia()'),
+            ),
+            ElevatedButton(
+              onPressed: _requestManageMedia,
+              child: const Text('Open MANAGE_MEDIA Settings'),
+            ),
+            if (_canManageMedia != null)
+              Text('canManageMedia: $_canManageMedia'),
+          ],
         ].paddingAll(16),
       ),
     );
@@ -117,5 +142,16 @@ class _PermissionStatePageState extends State<PermissionStatePage> {
     setState(() {
       _permissionState = state;
     });
+  }
+
+  Future<void> _checkCanManageMedia() async {
+    final bool result = await PhotoManager.canManageMedia();
+    setState(() {
+      _canManageMedia = result;
+    });
+  }
+
+  Future<void> _requestManageMedia() async {
+    await PhotoManager.requestManageMedia();
   }
 }
