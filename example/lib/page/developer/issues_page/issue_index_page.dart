@@ -11,6 +11,7 @@ import 'issue_1025.dart';
 import 'issue_1031.dart';
 import 'issue_1051.dart';
 import 'issue_1053.dart';
+import 'issue_1118.dart';
 import 'issue_1152.dart';
 import 'issue_1271_demo.dart';
 import 'issue_734.dart';
@@ -76,6 +77,7 @@ class IssuePage extends StatelessWidget {
             Issus1051(),
             Issus1053(),
             Issus1152(),
+            Issue1118Page(),
             Issue1271DemoPage(),
           ],
         ),
@@ -117,8 +119,9 @@ mixin IssueBase<T extends StatefulWidget> on State<T> {
     }
   }
 
-  Widget buildLogWidget({bool expaned = true}) {
+  Widget buildLogWidget({bool expanded = true}) {
     final w = ListView.separated(
+      shrinkWrap: !expanded,
       itemBuilder: (_, index) {
         final log = _logs[index];
         return Text(log);
@@ -127,7 +130,7 @@ mixin IssueBase<T extends StatefulWidget> on State<T> {
       separatorBuilder: (_, __) => const Divider(),
     );
 
-    if (expaned) {
+    if (expanded) {
       return Expanded(child: w);
     } else {
       return w;
