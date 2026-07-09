@@ -8,6 +8,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+*None.*
+
+## 3.10.0
+
 **Features**
 
 - Add an optional `type` parameter to `AssetPathEntity.getAssetListPaged` and `AssetPathEntity.getAssetListRange` so callers can filter to a specific `RequestType` within a single album (e.g. read videos out of a `common` album) without constructing a new `AssetPathEntity`. Defaults to the album's own `type` when omitted.
