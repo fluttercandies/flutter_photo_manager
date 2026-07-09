@@ -160,8 +160,8 @@ class _Issue1118PageState extends State<Issue1118Page>
       } catch (_) {
         // ignore decode failure — verdict falls back to size-only
       }
-      final dimsMatchAsset = decodedW == c.asset.width &&
-          decodedH == c.asset.height;
+      final dimsMatchAsset =
+          decodedW == c.asset.width && decodedH == c.asset.height;
       String verdict;
       if (dimsMatchAsset) {
         // Decoded resolution equals asset resolution → this IS the full
