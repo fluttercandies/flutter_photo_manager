@@ -27,6 +27,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 **Fixes**
 
+- Fix Darwin `AssetEntity.originFile` returning the locally-downsampled proxy for iCloud + "Optimize iPhone Storage"-affected photos by preferring `PHImageManager` with `HighQualityFormat` over `writeDataForAssetResource` on unedited raster primaries.
 - Fix Darwin `PhotoManager.editor.darwin.saveLivePhoto` returning `PHPhotosErrorDomain (-1)` when the caller-supplied image and video lacked the shared Live Photo pairing identifier `PHAssetCreationRequest` requires.
 - Fix iOS 18+ raising `Unsupported fetch for asset collections with type 2 and subtype 2` when navigating into the primary album, caused by an invalid `SmartAlbum` + `AlbumRegular` combination in the recent-collection check.
 - Fix Darwin `AssetEntity.loadFile` / `originFile` sporadically failing with `PHPhotosErrorDomain (-1)` for edited assets and Live Photos by walking multiple `PHAssetResource` candidates and falling back to `PHImageManager` for plain videos/images when `writeDataForAssetResource` exhausts them.
