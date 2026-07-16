@@ -1075,6 +1075,20 @@ mixin IosPlugin on BasePlugin {
 }
 
 mixin AndroidPlugin on BasePlugin {
+  Future<List<String>> restoreFromTrash(List<AssetEntity> list) async {
+    assert(
+      Platform.isAndroid || Platform.environment.containsKey('FLUTTER_TEST'),
+    );
+    final List result = await _channel.invokeMethod(
+      PMConstants.mRestoreFromTrash,
+      <String, dynamic>{
+        'ids': list.map((e) => e.id).toList(),
+        'types': list.map((e) => e.typeInt).toList(),
+      },
+    );
+    return result.cast<String>();
+  }
+
   Future<void> forceOldApi() async {
     assert(Platform.isAndroid);
     if (Platform.isAndroid) {
