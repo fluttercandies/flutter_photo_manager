@@ -122,6 +122,7 @@ class ConvertUtils {
       duration: data['duration'] as int? ?? 0,
       orientation: data['orientation'] as int? ?? 0,
       isFavorite: data[CustomColumns.base.isFavorite] as bool? ?? false,
+      isTrashed: data['is_trashed'] as bool? ?? false,
       title: data['title'] as String? ?? title,
       subtype: data['subtype'] as int? ?? 0,
       createDateSecond: data['createDt'] as int?,

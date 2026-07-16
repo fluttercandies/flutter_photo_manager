@@ -95,6 +95,21 @@ void main() {
     expect(entity.latLng, isNotNull);
   });
 
+  test('convertMapToAsset reads Android trash state', () {
+    final data = <String, dynamic>{
+      'id': 'asset-id',
+      'type': AssetType.image.index,
+      'width': 1,
+      'height': 1,
+    };
+
+    expect(ConvertUtils.convertMapToAsset(data).isTrashed, isFalse);
+    data['is_trashed'] = true;
+    final trashed = ConvertUtils.convertMapToAsset(data);
+    expect(trashed.isTrashed, isTrue);
+    expect(trashed.copyWith(isTrashed: false).isTrashed, isFalse);
+  });
+
   test(
     'darwin.getAdjustmentData forwards to the getAdjustmentData channel method',
     () async {

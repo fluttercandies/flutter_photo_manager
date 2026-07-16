@@ -18,6 +18,7 @@ import android.provider.MediaStore.MediaColumns.DISPLAY_NAME
 import android.provider.MediaStore.MediaColumns.DURATION
 import android.provider.MediaStore.MediaColumns.HEIGHT
 import android.provider.MediaStore.MediaColumns.IS_FAVORITE
+import android.provider.MediaStore.MediaColumns.IS_TRASHED
 import android.provider.MediaStore.MediaColumns.MIME_TYPE
 import android.provider.MediaStore.MediaColumns.ORIENTATION
 import android.provider.MediaStore.MediaColumns.RELATIVE_PATH
@@ -87,6 +88,7 @@ fun Cursor.toAssetEntity(
     val modifiedDate = getLong(DATE_MODIFIED)
     var orientation: Int = getInt(ORIENTATION)
     val isFavorite = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && getInt(IS_FAVORITE) == 1
+    val isTrashed = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && getInt(IS_TRASHED) == 1
     val relativePath: String? = if (isAboveAndroidQ) {
         getString(RELATIVE_PATH)
     } else null
@@ -131,6 +133,7 @@ fun Cursor.toAssetEntity(
         modifiedDate,
         orientation,
         isFavorite,
+        isTrashed,
         androidQRelativePath = relativePath,
         mimeType = mimeType
     )
