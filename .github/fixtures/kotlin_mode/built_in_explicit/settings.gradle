@@ -1,0 +1,12 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = "photo_manager_built_in_kotlin_fixture"
+
+include ":photo_manager"
+project(":photo_manager").projectDir = file("../../../../android")

@@ -11,23 +11,20 @@ String library_version = versionMatcher.group(1).replaceAll("\\+", "-")
 group 'com.fluttercandies.photo_manager'
 version library_version
 
-def builtInKotlinFlag = (project.findProperty("android.builtInKotlin") ?: "false").toString().toBoolean()
-def hasKotlinExtension = project.extensions.findByName("kotlin") != null
-def useBuiltInKotlin = builtInKotlinFlag && hasKotlinExtension
+// Keep this top-level: a conditional buildscript block can run after Gradle
+// has resolved the script classpath.
+buildscript {
+    ext.kotlin_version = '1.9.23'
+    repositories {
+        google()
+        mavenCentral()
+    }
 
-if (!useBuiltInKotlin) {
-    buildscript {
-        ext.kotlin_version = '1.9.23'
-        repositories {
-            google()
-            mavenCentral()
-        }
-
-        dependencies {
-            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
+
 rootProject.allprojects {
     repositories {
         google()
@@ -36,6 +33,17 @@ rootProject.allprojects {
 }
 
 apply plugin: 'com.android.library'
+
+// AGP creates its built-in Kotlin extension when the Android plugin is
+// applied. Checking before this point always misdetects the built-in path.
+def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
+def builtInKotlinProperty = project.findProperty("android.builtInKotlin")
+// AGP 9+ enables built-in Kotlin by default when the property is absent.
+def builtInKotlinRequested = builtInKotlinProperty == null
+        ? agpMajor >= 9
+        : builtInKotlinProperty.toString().toBoolean()
+def hasKotlinExtension = project.extensions.findByName("kotlin") != null
+def useBuiltInKotlin = builtInKotlinRequested && hasKotlinExtension
 
 if (!useBuiltInKotlin) {
     apply plugin: 'kotlin-android'
@@ -55,6 +63,12 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+    }
+
+    if (!useBuiltInKotlin) {
+        kotlinOptions {
+            jvmTarget = '17'
+        }
     }
 
     sourceSets {
