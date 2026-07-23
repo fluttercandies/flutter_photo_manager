@@ -124,30 +124,34 @@ void main() {
     skip: !(Platform.isIOS || Platform.isMacOS),
   );
 
-  test('restoreFromTrash forwards asset IDs and types', () async {
-    MethodCall? capturedCall;
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-      const MethodChannel(PMConstants.channelPrefix),
-      (MethodCall call) async {
-        capturedCall = call;
-        return <String>['asset-id'];
-      },
-    );
+  test(
+    'restoreFromTrash forwards asset IDs and types',
+    () async {
+      MethodCall? capturedCall;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel(PMConstants.channelPrefix),
+        (MethodCall call) async {
+          capturedCall = call;
+          return <String>['asset-id'];
+        },
+      );
 
-    final entity = AssetEntity(
-      id: 'asset-id',
-      typeInt: AssetType.image.index,
-      width: 1,
-      height: 1,
-    );
+      final entity = AssetEntity(
+        id: 'asset-id',
+        typeInt: AssetType.image.index,
+        width: 1,
+        height: 1,
+      );
 
-    await expectLater(
-      PhotoManager.plugin.restoreFromTrash(<AssetEntity>[entity]),
-      completion(<String>['asset-id']),
-    );
-    expect(capturedCall?.method, PMConstants.mRestoreFromTrash);
-    expect(capturedCall?.arguments['ids'], <String>['asset-id']);
-    expect(capturedCall?.arguments['types'], <int>[AssetType.image.index]);
-  });
+      await expectLater(
+        PhotoManager.plugin.restoreFromTrash(<AssetEntity>[entity]),
+        completion(<String>['asset-id']),
+      );
+      expect(capturedCall?.method, PMConstants.mRestoreFromTrash);
+      expect(capturedCall?.arguments['ids'], <String>['asset-id']);
+      expect(capturedCall?.arguments['types'], <int>[AssetType.image.index]);
+    },
+    skip: !Platform.isAndroid,
+  );
 }

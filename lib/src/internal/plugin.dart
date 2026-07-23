@@ -1076,9 +1076,7 @@ mixin IosPlugin on BasePlugin {
 
 mixin AndroidPlugin on BasePlugin {
   Future<List<String>> restoreFromTrash(List<AssetEntity> list) async {
-    assert(
-      Platform.isAndroid || Platform.environment.containsKey('FLUTTER_TEST'),
-    );
+    assert(Platform.isAndroid);
     final List result = await _channel.invokeMethod(
       PMConstants.mRestoreFromTrash,
       <String, dynamic>{
