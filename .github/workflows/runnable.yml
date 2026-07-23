@@ -104,11 +104,24 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
+      - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a
+        with:
+          gradle-version: '9.5.1'
+          cache-disabled: true
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
         with:
           channel: "stable"
           cache: true
       - run: flutter doctor -v
+      - name: Cache Gradle
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
       - run: flutter pub get
       - run: flutter build apk --release
         name: Build apk
@@ -116,6 +129,21 @@ jobs:
       - name: Run Android unit tests
         run: ./gradlew photo_manager:test
         working-directory: ${{ github.workspace }}/example/android
+      - name: Verify legacy Kotlin project
+        run: |
+          gradle -p .github/fixtures/kotlin_mode/legacy help \
+            -DphotoManager.expectedBuiltInKotlin=false \
+            -I ../../../scripts/verify_photo_manager_kotlin_mode.init.gradle
+      - name: Verify explicit built-in Kotlin project
+        run: |
+          gradle -p .github/fixtures/kotlin_mode/built_in_explicit help \
+            -DphotoManager.expectedBuiltInKotlin=true \
+            -I ../../../scripts/verify_photo_manager_kotlin_mode.init.gradle
+      - name: Verify AGP-default built-in Kotlin project
+        run: |
+          gradle -p .github/fixtures/kotlin_mode/built_in_default help \
+            -DphotoManager.expectedBuiltInKotlin=true \
+            -I ../../../scripts/verify_photo_manager_kotlin_mode.init.gradle
       - name: Upload artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         id: apk
