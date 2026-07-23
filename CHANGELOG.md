@@ -8,7 +8,9 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+**Fixes**
+
+- Fix Gradle 9 configuration failures in the legacy Kotlin fallback and correctly select built-in Kotlin when `android.builtInKotlin` is unset.
 
 ## 3.10.0
 

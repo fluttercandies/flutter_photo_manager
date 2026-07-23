@@ -1,0 +1,22 @@
+gradle.afterProject { project, state ->
+    if (project.name != "photo_manager" || state.failure != null) {
+        return
+    }
+
+    def builtInKotlin = System.getProperty("photoManager.expectedBuiltInKotlin")
+    if (builtInKotlin == null) {
+        throw new GradleException("Missing expected built-in Kotlin mode")
+    }
+    def expectsBuiltInKotlin = builtInKotlin.toBoolean()
+    def appliesKotlinPlugin =
+        project.pluginManager.hasPlugin("org.jetbrains.kotlin.android") ||
+        project.pluginManager.hasPlugin("kotlin-android")
+
+    if (appliesKotlinPlugin == expectsBuiltInKotlin) {
+        throw new GradleException(
+            expectsBuiltInKotlin
+                ? "photo_manager applied KGP in built-in Kotlin mode"
+                : "photo_manager did not apply KGP in legacy Kotlin mode"
+        )
+    }
+}
