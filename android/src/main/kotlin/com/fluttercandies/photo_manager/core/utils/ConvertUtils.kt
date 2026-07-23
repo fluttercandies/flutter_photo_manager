@@ -51,6 +51,7 @@ object ConvertUtils {
             "height" to entity.height,
             "orientation" to entity.orientation,
             "is_favorite" to entity.isFavorite,
+            "is_trashed" to entity.isTrashed,
             "modifiedDt" to entity.modifiedDate,
             "lat" to entity.lat,
             "lng" to entity.lng,

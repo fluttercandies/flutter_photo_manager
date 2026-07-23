@@ -391,6 +391,7 @@ class AssetEntity {
     this.duration = 0,
     this.orientation = 0,
     this.isFavorite = false,
+    this.isTrashed = false,
     this.title,
     this.createDateSecond,
     this.modifiedDateSecond,
@@ -920,6 +921,13 @@ class AssetEntity {
   ///  * [AndroidEditor.favoriteAsset] to update the favorite status.
   final bool isFavorite;
 
+  /// Whether the asset is in the device trash.
+  ///  * Android 11 and above: `MediaStore.MediaColumns.IS_TRASHED`.
+  ///  * Android 10 and below: Always false.
+  ///  * iOS/macOS: Always false.
+  ///  * OpenHarmony: Always false.
+  final bool isTrashed;
+
   /// The relative path abstraction of the asset.
   ///  * Android 10 and above: `MediaStore.MediaColumns.RELATIVE_PATH`.
   ///  * Android 9 and below: The parent path of `MediaStore.MediaColumns.DATA`.
@@ -955,6 +963,7 @@ class AssetEntity {
     int? duration,
     int? orientation,
     bool? isFavorite,
+    bool? isTrashed,
     String? title,
     int? createDateSecond,
     int? modifiedDateSecond,
@@ -972,6 +981,7 @@ class AssetEntity {
       duration: duration ?? this.duration,
       orientation: orientation ?? this.orientation,
       isFavorite: isFavorite ?? this.isFavorite,
+      isTrashed: isTrashed ?? this.isTrashed,
       title: title ?? this.title,
       createDateSecond: createDateSecond ?? this.createDateSecond,
       modifiedDateSecond: modifiedDateSecond ?? this.modifiedDateSecond,
@@ -984,14 +994,16 @@ class AssetEntity {
   }
 
   @override
-  int get hashCode => id.hashCode ^ isFavorite.hashCode;
+  int get hashCode => id.hashCode ^ isFavorite.hashCode ^ isTrashed.hashCode;
 
   @override
   bool operator ==(Object other) {
     if (other is! AssetEntity) {
       return false;
     }
-    return id == other.id && isFavorite == other.isFavorite;
+    return id == other.id &&
+        isFavorite == other.isFavorite &&
+        isTrashed == other.isTrashed;
   }
 
   @override
