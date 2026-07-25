@@ -475,6 +475,21 @@ class AndroidEditor {
   Future<List<String>> moveToTrash(List<AssetEntity> list) {
     return plugin.moveToTrash(list);
   }
+
+  /// Restores the given assets from the Android system trash.
+  ///
+  /// The assets must be instances retained by the caller before they were
+  /// moved to trash. Android hides trashed assets from normal MediaStore
+  /// queries, so they cannot be fetched again through the usual asset APIs.
+  ///
+  /// Android shows a system prompt unless the app has media management access.
+  /// The returned list contains the IDs restored after the user accepts the
+  /// prompt, or is empty if the user cancels it.
+  ///
+  /// This method requires Android 11 (API 30) or newer.
+  Future<List<String>> restoreFromTrash(List<AssetEntity> list) {
+    return plugin.restoreFromTrash(list);
+  }
 }
 
 /// An editor for OpenHarmony.

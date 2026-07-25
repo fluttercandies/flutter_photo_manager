@@ -34,6 +34,7 @@ class PMConstants {
   static const String mForceOldApi = 'forceOldApi';
   static const String mDeleteWithIds = 'deleteWithIds';
   static const String mMoveToTrash = 'moveToTrash';
+  static const String mRestoreFromTrash = 'restoreFromTrash';
   static const String mSaveImage = 'saveImage';
   static const String mSaveImageWithPath = 'saveImageWithPath';
   static const String mSaveVideo = 'saveVideo';

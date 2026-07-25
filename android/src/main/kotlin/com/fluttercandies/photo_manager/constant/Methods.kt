@@ -83,6 +83,7 @@ class Methods {
 
         const val deleteWithIds = "deleteWithIds"
         const val moveToTrash = "moveToTrash"
+        const val restoreFromTrash = "restoreFromTrash"
 
         const val saveImage = "saveImage"
         const val saveImageWithPath = "saveImageWithPath"
