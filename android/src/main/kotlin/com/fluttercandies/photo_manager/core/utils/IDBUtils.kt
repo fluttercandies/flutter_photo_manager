@@ -9,6 +9,7 @@ import android.database.MatrixCursor
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns.BUCKET_DISPLAY_NAME
@@ -21,6 +22,7 @@ import android.provider.MediaStore.MediaColumns.DISPLAY_NAME
 import android.provider.MediaStore.MediaColumns.DURATION
 import android.provider.MediaStore.MediaColumns.HEIGHT
 import android.provider.MediaStore.MediaColumns.IS_FAVORITE
+import android.provider.MediaStore.MediaColumns.IS_TRASHED
 import android.provider.MediaStore.MediaColumns.MIME_TYPE
 import android.provider.MediaStore.MediaColumns.ORIENTATION
 import android.provider.MediaStore.MediaColumns.RELATIVE_PATH
@@ -66,6 +68,7 @@ interface IDBUtils {
         ).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(DATE_TAKEN) // 拍摄时间
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) add(IS_FAVORITE)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) add(IS_TRASHED)
         }
 
         val storeVideoKeys = mutableListOf(
@@ -85,6 +88,7 @@ interface IDBUtils {
         ).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(DATE_TAKEN) // 拍摄时间
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) add(IS_FAVORITE)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) add(IS_TRASHED)
         }
 
         val typeKeys = arrayOf(
@@ -767,7 +771,8 @@ interface IDBUtils {
         projection: Array<String>?,
         selection: String?,
         selectionArgs: Array<String>?,
-        sortOrder: String?
+        sortOrder: String?,
+        includeTrashed: Boolean = false
     ): Cursor {
         fun log(logFunc: (log: String) -> Unit, cursor: Cursor?) {
             if (LogUtils.isLog) {
@@ -786,7 +791,17 @@ interface IDBUtils {
         }
 
         try {
-            val cursor = query(uri, projection, selection, selectionArgs, sortOrder)
+            val cursor = if (includeTrashed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val queryArgs = Bundle().apply {
+                    putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selection)
+                    putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, selectionArgs)
+                    putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, sortOrder)
+                    putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_INCLUDE)
+                }
+                query(uri, projection, queryArgs, null)
+            } else {
+                query(uri, projection, selection, selectionArgs, sortOrder)
+            }
             log(LogUtils::info, cursor)
             return cursor ?: throwMsg("Failed to obtain the cursor.")
         } catch (e: IllegalArgumentException) {

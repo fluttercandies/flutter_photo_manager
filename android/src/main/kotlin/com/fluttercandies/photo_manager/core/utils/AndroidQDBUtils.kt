@@ -238,7 +238,8 @@ object AndroidQDBUtils : IDBUtils {
             keys(),
             selection,
             args,
-            null
+            null,
+            includeTrashed = true
         )
         cursor.use {
             return if (it.moveToNext()) it.toAssetEntity(context, checkIfExists)
