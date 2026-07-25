@@ -13,6 +13,7 @@ import com.fluttercandies.photo_manager.core.entity.PermissionResult
 import com.fluttercandies.photo_manager.core.entity.ThumbLoadOption
 import com.fluttercandies.photo_manager.core.entity.filter.FilterOption
 import com.fluttercandies.photo_manager.core.utils.ConvertUtils
+import com.fluttercandies.photo_manager.core.utils.MediaStoreUtils
 import com.fluttercandies.photo_manager.permission.PermissionsListener
 import com.fluttercandies.photo_manager.permission.PermissionsUtils
 import com.fluttercandies.photo_manager.util.LogUtils
@@ -688,6 +689,37 @@ class PhotoManagerPlugin(
                 } catch (e: Exception) {
                     LogUtils.error("deleteWithIds failed", e)
                     resultHandler.replyError("deleteWithIds failed")
+                }
+            }
+
+            Methods.restoreFromTrash -> {
+                try {
+                    val ids = call.argument<List<String>>("ids")!!
+                    val types = call.argument<List<Int>>("types")!!
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        require(ids.size == types.size) {
+                            "restoreFromTrash requires one asset type for each ID"
+                        }
+                        val uris = ids.mapIndexed { index, id ->
+                            MediaStoreUtils.getUri(
+                                id.toLong(),
+                                MediaStoreUtils.convertTypeToMediaType(types[index])
+                            )
+                        }
+                        deleteManager.restoreFromTrashInApi30(uris, resultHandler)
+                    } else {
+                        LogUtils.error("Restoring from trash requires Android 11+ (API 30+).")
+                        resultHandler.replyError(
+                            "restoreFromTrash requires Android 11+ (API 30+).",
+                            "Current API level: ${Build.VERSION.SDK_INT}",
+                            UnsupportedOperationException(
+                                "MediaStore trash is unavailable below Android 11."
+                            )
+                        )
+                    }
+                } catch (e: Exception) {
+                    LogUtils.error("restoreFromTrash failed", e)
+                    resultHandler.replyError("restoreFromTrash failed", message = e.message)
                 }
             }
 
