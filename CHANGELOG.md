@@ -8,6 +8,15 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+*None.*
+
+## 3.11.0
+
+**Features**
+
+- Add `AndroidEditor.restoreFromTrash` to restore assets from the Android system trash.
+- Add `AssetEntity.isTrashed` exposing the Android `MediaStore.MediaColumns.IS_TRASHED` state.
+
 **Fixes**
 
 - Fix Gradle 9 configuration failures in the legacy Kotlin fallback and correctly select built-in Kotlin when `android.builtInKotlin` is unset.
