@@ -8,6 +8,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+**Breaking changes**
+
+- The Darwin (iOS/macOS) implementation no longer links `CoreLocation`, so apps that do not save assets with location no longer need an `NSLocationWhenInUseUsageDescription` purpose string (#1428). Saving with `latitude`/`longitude` on iOS/macOS now throws; install the `photo_manager_location` plugin to keep that capability (which links `CoreLocation`).
+
 **Fixes**
 
 - Avoid App Store rejections caused by referencing the private `PHAsset.filename` selector. The Darwin `title` lookup now uses the public `PHAssetResource.originalFilename` API directly instead of KVC'ing into the non-public `filename` selector.

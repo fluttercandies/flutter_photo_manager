@@ -20,8 +20,8 @@ A Flutter plugin that provides assets abstraction management APIs.
   s.osx.dependency 'FlutterMacOS'
   s.ios.dependency 'Flutter'
 
-  s.ios.frameworks = 'Photos', 'PhotosUI', 'CoreLocation'
-  s.osx.frameworks = 'Photos', 'PhotosUI', 'CoreLocation'
+  s.ios.frameworks = 'Photos', 'PhotosUI'
+  s.osx.frameworks = 'Photos', 'PhotosUI'
 
   s.ios.deployment_target = '9.0'
   s.osx.deployment_target = '10.15'

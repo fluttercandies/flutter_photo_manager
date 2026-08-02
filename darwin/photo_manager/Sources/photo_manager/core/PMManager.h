@@ -1,6 +1,5 @@
 #import "PMFileHelper.h"
 #import "PMImport.h"
-#import <CoreLocation/CoreLocation.h>
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
 

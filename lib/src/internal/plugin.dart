@@ -406,6 +406,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     DateTime? creationDate,
   }) async {
     _throwIfOrientationInvalid(orientation);
+    _throwIfLocationUnsupportedOnDarwin(latitude, longitude);
     final Map result = await _channel.invokeMethod(
       PMConstants.mSaveImage,
       <String, dynamic>{
@@ -435,6 +436,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     DateTime? creationDate,
   }) async {
     _throwIfOrientationInvalid(orientation);
+    _throwIfLocationUnsupportedOnDarwin(latitude, longitude);
     final File file = File(inputFilePath);
     if (!file.existsSync()) {
       throw ArgumentError('The input file $inputFilePath does not exists.');
@@ -473,6 +475,7 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     double? longitude,
     DateTime? creationDate,
   }) async {
+    _throwIfLocationUnsupportedOnDarwin(latitude, longitude);
     _throwIfOrientationInvalid(orientation);
     if (!inputFile.existsSync()) {
       throw ArgumentError('The input file ${inputFile.path} does not exists.');
@@ -1173,4 +1176,17 @@ void _throwIfOrientationInvalid(int? value) {
     'The given orientation is invalid, '
     'allowed values are 0, 90, 180, 270, and null.',
   );
+}
+
+void _throwIfLocationUnsupportedOnDarwin(double? latitude, double? longitude) {
+  if ((latitude != null || longitude != null) &&
+      (Platform.isIOS || Platform.isMacOS)) {
+    throw PlatformException(
+      code: 'location-save-unsupported',
+      message: 'Saving with latitude/longitude is not supported in the core '
+          'package on iOS/macOS because it no longer links CoreLocation. '
+          'Install the photo_manager_location plugin to keep this capability. '
+          'See: https://github.com/fluttercandies/flutter_photo_manager_plugins',
+    );
+  }
 }

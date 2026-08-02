@@ -75,6 +75,10 @@ class Editor {
   /// {@template photo_manager.Editor.LocationWhenSaving}
   /// [latitude] and [longitude] specify the location metadata for the asset.
   /// Both parameters must be provided together or not at all.
+  ///
+  /// On iOS/macOS these parameters are not supported by the core package (which
+  /// no longer links CoreLocation); calling with them throws. Use the
+  /// `photo_manager_location` plugin instead. Android is unaffected.
   /// {@endtemplate}
   ///
   /// {@template photo_manager.Editor.CreationDateWhenSaving}
