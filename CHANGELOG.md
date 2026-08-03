@@ -8,7 +8,9 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+**Fixes**
+
+- Avoid App Store rejections caused by referencing the private `PHAsset.filename` selector. The Darwin `title` lookup now uses the public `PHAssetResource.originalFilename` API directly instead of KVC'ing into the non-public `filename` selector.
 
 ## 3.11.0
 

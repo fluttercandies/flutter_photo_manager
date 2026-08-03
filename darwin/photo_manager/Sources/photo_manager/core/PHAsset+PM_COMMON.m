@@ -41,30 +41,26 @@
 }
 
 - (NSString *)title {
+    // Avoid KVC into the private `PHAsset.filename` selector; App Store's static
+    // scanner flags references to it. `PHAssetResource.originalFilename` is the
+    // only public API for obtaining an asset's filename.
     PMLogUtils *logger = [PMLogUtils sharedInstance];
-    [logger info:@"get title start"];
-    @try {
-        NSString *result = [self valueForKey:@"filename"];
-        [logger info:@"get title from kvo"];
-        return result;
-    } @catch (NSException *exception) {
-        [logger info: @"get title from PHAssetResource"];
-        NSArray *array = [PHAssetResource assetResourcesForAsset:self];
-        for (PHAssetResource *resource in array) {
-            if ([self isImage] && resource.type == PHAssetResourceTypePhoto) {
-                return resource.originalFilename;
-            } else if ([self isVideo] && resource.type == PHAssetResourceTypeVideo) {
-                return resource.originalFilename;
-            }
+    [logger info:@"get title from PHAssetResource"];
+    NSArray *array = [PHAssetResource assetResourcesForAsset:self];
+    for (PHAssetResource *resource in array) {
+        if ([self isImage] && resource.type == PHAssetResourceTypePhoto) {
+            return resource.originalFilename;
+        } else if ([self isVideo] && resource.type == PHAssetResourceTypeVideo) {
+            return resource.originalFilename;
         }
-        
-        PHAssetResource *firstRes = array.firstObject;
-        if (firstRes) {
-            return firstRes.originalFilename;
-        }
-        
-        return @"";
     }
+
+    PHAssetResource *firstRes = array.firstObject;
+    if (firstRes) {
+        return firstRes.originalFilename;
+    }
+
+    return @"";
 }
 
 - (NSString *)filenameWithOptions:(int)subtype isOrigin:(BOOL)isOrigin fileType:(AVFileType)fileType {
