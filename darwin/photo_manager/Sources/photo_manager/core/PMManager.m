@@ -1961,6 +1961,12 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
      creationDate:(NSNumber *)creationDate
             block:(AssetBlockResult)block {
     [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"Saving image with data, length: %lu, filename: %@, desc: %@", (unsigned long)data.length, filename, desc]];
+    // Location-tagged saving requires the photo_manager_location plugin, so that
+    // apps that don't use it don't link CoreLocation (issue #1428).
+    if (![latitude isNilOrNull] && ![longitude isNilOrNull]) {
+        block(nil, @"Saving assets with location coordinates requires the photo_manager_location plugin (CoreLocation link). See: https://github.com/fluttercandies/flutter_photo_manager_plugins");
+        return;
+    }
 
     __block NSString *assetId = nil;
     __weak typeof(self) weakSelf = self;
@@ -1971,11 +1977,6 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
         [options setOriginalFilename:filename];
         [request addResourceWithType:PHAssetResourceTypePhoto data:data options:options];
         
-        // Set location if provided
-        if (![latitude isNilOrNull] && ![longitude isNilOrNull]) {
-            CLLocation *location = [[CLLocation alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]];
-            [request setLocation:location];
-        }
         
         // Set creation date if provided
         if (![creationDate isNilOrNull]) {
@@ -2014,6 +2015,12 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     }
 
     [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"Saving image with path: %@ filename: %@, desc: %@", path, filename, desc]];
+    // Location-tagged saving requires the photo_manager_location plugin, so that
+    // apps that don't use it don't link CoreLocation (issue #1428).
+    if (![latitude isNilOrNull] && ![longitude isNilOrNull]) {
+        block(nil, @"Saving assets with location coordinates requires the photo_manager_location plugin (CoreLocation link). See: https://github.com/fluttercandies/flutter_photo_manager_plugins");
+        return;
+    }
     
     NSURL *fileURL = [NSURL fileURLWithPath:path];
     __block NSString *assetId = nil;
@@ -2027,11 +2034,6 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
         }
         [request addResourceWithType:PHAssetResourceTypePhoto fileURL:fileURL options:options];
         
-        // Set location if provided
-        if (![latitude isNilOrNull] && ![longitude isNilOrNull]) {
-            CLLocation *location = [[CLLocation alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]];
-            [request setLocation:location];
-        }
         
         // Set creation date if provided
         if (![creationDate isNilOrNull]) {
@@ -2070,6 +2072,12 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     }
 
     [PMLogUtils.sharedInstance info:[NSString stringWithFormat:@"Saving video with path: %@, filename: %@, desc %@", path, filename, desc]];
+    // Location-tagged saving requires the photo_manager_location plugin, so that
+    // apps that don't use it don't link CoreLocation (issue #1428).
+    if (![latitude isNilOrNull] && ![longitude isNilOrNull]) {
+        block(nil, @"Saving assets with location coordinates requires the photo_manager_location plugin (CoreLocation link). See: https://github.com/fluttercandies/flutter_photo_manager_plugins");
+        return;
+    }
 
     NSURL *fileURL = [NSURL fileURLWithPath:path];
     __block NSString *assetId = nil;
@@ -2083,11 +2091,6 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
         }
         [request addResourceWithType:PHAssetResourceTypeVideo fileURL:fileURL options:options];
         
-        // Set location if provided
-        if (![latitude isNilOrNull] && ![longitude isNilOrNull]) {
-            CLLocation *location = [[CLLocation alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]];
-            [request setLocation:location];
-        }
         
         // Set creation date if provided
         if (![creationDate isNilOrNull]) {

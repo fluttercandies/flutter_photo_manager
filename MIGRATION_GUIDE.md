@@ -5,26 +5,29 @@ If you want to see the new feature support, please refer to [readme][] and [chan
 
 <!-- TOC -->
 * [Migration Guide](#migration-guide)
-  * [3.x to 3.4](#3x-to-34)
+  * [3.x to 3.12](#3x-to-312)
     * [Overall](#overall)
+      * [`saveImage` / `saveVideo` with location on Darwin](#saveimage--savevideo-with-location-on-darwin)
+  * [3.x to 3.4](#3x-to-34)
+    * [Overall](#overall-1)
       * [`saveLivePhoto`](#savelivephoto)
   * [3.x to 3.3](#3x-to-33)
-    * [Overall](#overall-1)
+    * [Overall](#overall-2)
       * [`saveImage`](#saveimage)
   * [3.0.x to 3.1](#30x-to-31)
-    * [Overall](#overall-2)
+    * [Overall](#overall-3)
       * [`containsLivePhotos`](#containslivephotos)
       * [`AlbumType`](#albumtype)
   * [2.x to 3.0](#2x-to-30)
-    * [Overall](#overall-3)
+    * [Overall](#overall-4)
       * [`AssetEntityImage` and `AssetEntityImageProvider`](#assetentityimage-and-assetentityimageprovider)
   * [2.x to 2.8](#2x-to-28)
-    * [Overall](#overall-4)
-  * [2.x to 2.2](#2x-to-22)
     * [Overall](#overall-5)
+  * [2.x to 2.2](#2x-to-22)
+    * [Overall](#overall-6)
       * [`assetCount`](#assetcount)
   * [1.x to 2.0](#1x-to-20)
-    * [Overall](#overall-6)
+    * [Overall](#overall-7)
     * [API migrations](#api-migrations)
       * [`getAssetListPaged`](#getassetlistpaged)
       * [Filtering only videos](#filtering-only-videos)
@@ -33,6 +36,48 @@ If you want to see the new feature support, please refer to [readme][] and [chan
   * [0.6 to 1.0](#06-to-10)
   * [0.5 To 0.6](#05-to-06)
 <!-- TOC -->
+
+## 3.x to 3.12
+
+### Overall
+
+The Darwin (iOS/macOS) implementation no longer links `CoreLocation`, so apps
+that do not save assets with location no longer need an
+`NSLocationWhenInUseUsageDescription` purpose string.
+
+#### `saveImage` / `saveVideo` with location on Darwin
+
+Passing `latitude` / `longitude` to `PhotoManager.editor.saveImage`,
+`saveImageWithPath`, or `saveVideo` on iOS/macOS now throws. Install the
+[`photo_manager_location`](https://github.com/fluttercandies/flutter_photo_manager_plugins/tree/main/packages/photo_manager_location)
+plugin to keep this capability (it links `CoreLocation` explicitly).
+
+Before:
+
+```dart
+final entity = await PhotoManager.editor.saveImage(
+  bytes,
+  filename: 'photo.jpg',
+  latitude: 37.7749,
+  longitude: -122.4194,
+);
+```
+
+After:
+
+```dart
+import 'package:photo_manager_location/photo_manager_location.dart';
+
+final entity = await PhotoManagerLocation.editor.saveImage(
+  bytes,
+  filename: 'photo.jpg',
+  latitude: 37.7749,
+  longitude: -122.4194,
+);
+```
+
+Android is unaffected — location saving via MediaStore remains in the core
+package.
 
 ## 3.x to 3.4
 
