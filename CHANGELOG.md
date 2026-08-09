@@ -8,6 +8,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+*None.*
+
+## 3.12.0
+
 **Breaking changes**
 
 - The Darwin (iOS/macOS) implementation no longer links `CoreLocation`, so apps that do not save assets with location no longer need an `NSLocationWhenInUseUsageDescription` purpose string (#1428). Saving with `latitude`/`longitude` on iOS/macOS now throws; install the `photo_manager_location` plugin to keep that capability (which links `CoreLocation`).
