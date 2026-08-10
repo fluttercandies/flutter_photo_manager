@@ -15,4 +15,14 @@
     }
 }
 
++ (BOOL)moveItemAtPath:(NSString *)sourcePath toPath:(NSString *)destinationPath error:(NSError * _Nullable *)error {
+    NSFileManager *fileManager = NSFileManager.defaultManager;
+    [fileManager removeItemAtPath:destinationPath error:nil];
+    if (![fileManager moveItemAtPath:sourcePath toPath:destinationPath error:error]) {
+        [fileManager removeItemAtPath:sourcePath error:nil];
+        return NO;
+    }
+    return YES;
+}
+
 @end
