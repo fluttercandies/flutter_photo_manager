@@ -317,16 +317,24 @@ object DBUtils : IDBUtils {
         }
 
         val insertedUri = cr.insert(insertUri, cv) ?: throwMsg("Cannot insert new asset.")
-        val outputStream = cr.openOutputStream(insertedUri)
-            ?: throwMsg("Cannot open output stream for $insertedUri.")
-        val inputStream = File(asset.path).inputStream()
-        inputStream.use {
-            outputStream.use {
-                inputStream.copyTo(outputStream)
+        try {
+            val outputStream = cr.openOutputStream(insertedUri)
+                ?: throwMsg("Cannot open output stream for $insertedUri.")
+            val inputStream = File(asset.path).inputStream()
+            inputStream.use {
+                outputStream.use {
+                    inputStream.copyTo(outputStream)
+                }
             }
+        } catch (e: Exception) {
+            // IS_PENDING is unavailable pre-Q, so delete the inserted row to
+            // avoid leaving a visible incomplete item. Best-effort: never let
+            // a cleanup failure mask the original error. See #1434.
+            runCatching { cr.delete(insertedUri, null, null) }
+            throw e
+        } finally {
+            cursor.close()
         }
-
-        cursor.close()
         val insertedId = insertedUri.lastPathSegment
             ?: throwMsg("Cannot open output stream for $insertedUri.")
         return getAssetEntity(context, insertedId) ?: throwIdNotFound(assetId)
