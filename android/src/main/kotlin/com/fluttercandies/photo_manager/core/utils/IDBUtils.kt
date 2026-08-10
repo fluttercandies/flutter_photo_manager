@@ -440,12 +440,31 @@ interface IDBUtils {
         shouldKeepPath: Boolean = false,
     ): AssetEntity {
         val cr = context.contentResolver
+        if (isAboveAndroidQ && !shouldKeepPath) {
+            // Mark the row pending so other apps/scanners don't see a
+            // half-written item; clear it only once the write succeeds.
+            values.put(MediaStore.MediaColumns.IS_PENDING, 1)
+        }
         val uri = cr.insert(contentUri, values) ?: throwMsg("Cannot insert new asset.")
         val id = ContentUris.parseId(uri)
-        if (!shouldKeepPath) {
-            val outputStream = cr.openOutputStream(uri)
-                ?: throwMsg("Cannot open the output stream for $uri.")
-            outputStream.use { os -> inputStream.use { it.copyTo(os) } }
+        try {
+            if (!shouldKeepPath) {
+                val outputStream = cr.openOutputStream(uri)
+                    ?: throwMsg("Cannot open the output stream for $uri.")
+                outputStream.use { os -> inputStream.use { it.copyTo(os) } }
+            }
+            if (isAboveAndroidQ && !shouldKeepPath) {
+                val published = ContentValues().apply {
+                    put(MediaStore.MediaColumns.IS_PENDING, 0)
+                }
+                cr.update(uri, published, null, null)
+            }
+        } catch (e: Exception) {
+            // Delete the inserted row so a failed/aborted save never leaves a
+            // visible incomplete item behind. Best-effort: never let a cleanup
+            // failure mask the original error. See #1434.
+            runCatching { cr.delete(uri, null, null) }
+            throw e
         }
         cr.notifyChange(uri, null)
         return getAssetEntity(context, id.toString()) ?: throwIdNotFound(id)

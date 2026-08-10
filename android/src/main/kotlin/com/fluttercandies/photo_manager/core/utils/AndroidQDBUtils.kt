@@ -373,20 +373,30 @@ object AndroidQDBUtils : IDBUtils {
             }
             put(MediaStore.Files.FileColumns.MEDIA_TYPE, mediaType)
             put(RELATIVE_PATH, relativePath)
+            // Mark pending so the half-written copy isn't visible until done.
+            put(IS_PENDING, 1)
         }
 
         val insertedUri = cr.insert(insertUri, cv) ?: throwMsg("Cannot insert new asset.")
-        val outputStream = cr.openOutputStream(insertedUri)
-            ?: throwMsg("Cannot open output stream for $insertedUri.")
-        val inputUri = getUri(asset, true)
-        val inputStream = cr.openInputStream(inputUri)
-            ?: throwMsg("Cannot open input stream for $inputUri")
-        inputStream.use {
-            outputStream.use {
-                inputStream.copyTo(outputStream)
+        try {
+            val outputStream = cr.openOutputStream(insertedUri)
+                ?: throwMsg("Cannot open output stream for $insertedUri.")
+            val inputUri = getUri(asset, true)
+            val inputStream = cr.openInputStream(inputUri)
+                ?: throwMsg("Cannot open input stream for $inputUri")
+            inputStream.use {
+                outputStream.use {
+                    inputStream.copyTo(outputStream)
+                }
             }
+            val published = ContentValues().apply { put(IS_PENDING, 0) }
+            cr.update(insertedUri, published, null, null)
+        } catch (e: Exception) {
+            runCatching { cr.delete(insertedUri, null, null) }
+            throw e
+        } finally {
+            cursor.close()
         }
-        cursor.close()
 
         val insertedId = insertedUri.lastPathSegment
             ?: throwMsg("Cannot open output stream for $insertedUri.")
