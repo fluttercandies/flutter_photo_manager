@@ -12,6 +12,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 - Fix failed cache writes leaving incomplete files that were later treated as valid cache entries (#1432).
 - Fix Android save/copy operations leaving visible incomplete MediaStore items when the write fails (#1434).
+- Fix Android thumbnail requests not deterministically releasing Glide resources (#1436).
 
 ## 3.12.0
 
