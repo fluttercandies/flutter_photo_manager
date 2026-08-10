@@ -65,6 +65,7 @@ class PMConstants {
   static const String mMoveAssetsToPath = 'moveAssetsToPath';
   static const String mColumnNames = 'getColumnNames';
   static const String mUpdateCreationDate = 'updateCreationDate';
+  static const String mRenameAsset = 'renameAsset';
   static const String mCanManageMedia = 'canManageMedia';
   static const String mRequestManageMedia = 'requestManageMedia';
 

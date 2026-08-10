@@ -42,7 +42,8 @@ class PhotoManagerWriteManager(val context: Context, private var activity: Activ
 
     enum class OperationType {
         MOVE,       // Move files to another folder
-        UPDATE      // Generic update operation
+        UPDATE,     // Generic update operation
+        RENAME      // Rename files (update DISPLAY_NAME)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
@@ -61,6 +62,7 @@ class PhotoManagerWriteManager(val context: Context, private var activity: Activ
                 val success = when (operation.operationType) {
                     OperationType.MOVE -> performMove(operation.uris, operation.targetPath)
                     OperationType.UPDATE -> performUpdate(operation.uris, operation.targetPath)
+                    OperationType.RENAME -> performRename(operation.uris, operation.targetPath)
                 }
                 writeHandler?.reply(success)
             } else {
@@ -189,5 +191,99 @@ class PhotoManagerWriteManager(val context: Context, private var activity: Activ
             resultHandler.reply(false)
             writeHandler = null
         }
+    }
+
+    /**
+     * Rename a single asset by updating its MediaStore DISPLAY_NAME.
+     *
+     * Files owned by the app (or under legacy storage, or when the app holds
+     * MANAGE_MEDIA access) are renamed directly without any user prompt.
+     * Files owned by other apps under scoped storage require write consent:
+     * on Android 11+ (API 30+) the system [MediaStore.createWriteRequest]
+     * dialog is shown; below that the operation is unsupported and surfaces an
+     * error. See issue #1314.
+     *
+     * @param uri Content URI of the asset to rename.
+     * @param newName New display name including the file extension
+     *                (e.g. "IMG_001.jpg").
+     * @param resultHandler Replies `true`/`false`, or an error.
+     */
+    fun renameAsset(uri: Uri, newName: String, resultHandler: ResultHandler) {
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, newName)
+        }
+        try {
+            val updated = cr.update(uri, values, null, null)
+            resultHandler.reply(updated > 0)
+        } catch (e: SecurityException) {
+            // The asset belongs to another app under scoped storage; request
+            // write consent before retrying the update.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                requestRenamePermission(uri, newName, resultHandler)
+            } else {
+                LogUtils.error("Renaming other apps' media requires Android 11+", e)
+                resultHandler.replyError(
+                    "renameAsset requires Android 11+ for files not owned by the app",
+                    message = e.message
+                )
+            }
+        } catch (e: Exception) {
+            LogUtils.error("Failed to rename asset", e)
+            resultHandler.replyError("renameAsset failed", message = e.message)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun requestRenamePermission(
+        uri: Uri,
+        newName: String,
+        resultHandler: ResultHandler
+    ) {
+        if (activity == null) {
+            LogUtils.error("Activity is null, cannot request write permission")
+            resultHandler.reply(false)
+            return
+        }
+
+        this.writeHandler = resultHandler
+        this.pendingOperation = WriteOperation(listOf(uri), newName, OperationType.RENAME)
+
+        try {
+            val pendingIntent = MediaStore.createWriteRequest(cr, listOf(uri))
+            activity?.startIntentSenderForResult(
+                pendingIntent.intentSender,
+                androidRWriteRequestCode,
+                null,
+                0,
+                0,
+                0
+            )
+        } catch (e: Exception) {
+            LogUtils.error("Failed to create write request for rename", e)
+            resultHandler.reply(false)
+            pendingOperation = null
+            writeHandler = null
+        }
+    }
+
+    /**
+     * Apply the DISPLAY_NAME update after write consent has been granted.
+     */
+    private fun performRename(uris: List<Uri>, newName: String): Boolean {
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, newName)
+        }
+        var successCount = 0
+        for (uri in uris) {
+            try {
+                if (cr.update(uri, values, null, null) > 0) {
+                    successCount++
+                }
+            } catch (e: Exception) {
+                LogUtils.error("Failed to rename URI: $uri", e)
+            }
+        }
+        LogUtils.info("Renamed $successCount/${uris.size} files to $newName")
+        return successCount > 0
     }
 }
