@@ -24,18 +24,25 @@ object ThumbnailUtil {
         frame: Long,
         resultHandler: ResultHandler
     ) {
+        var target: FutureTarget<Bitmap>? = null
         try {
-            val resource = Glide.with(context)
+            target = Glide.with(context)
                 .asBitmap()
                 .apply(RequestOptions().frame(frame).priority(Priority.IMMEDIATE))
                 .load(entity.getUri())
                 .signature(ObjectKey(entity.modifiedDate))
-                .submit(width, height).get()
+                .submit(width, height)
+            val resource = target.get()
             val bos = ByteArrayOutputStream()
             resource.compress(format, quality, bos)
             resultHandler.reply(bos.toByteArray())
         } catch (e: Exception) {
             resultHandler.replyError("Thumbnail request error", e.toString())
+        } finally {
+            // Release the decoded bitmap deterministically; leaving it to GC /
+            // Glide lifecycle handling delays reuse and raises GC pressure
+            // during fast scrolling. See #1436.
+            target?.let { Glide.with(context).clear(it) }
         }
     }
 

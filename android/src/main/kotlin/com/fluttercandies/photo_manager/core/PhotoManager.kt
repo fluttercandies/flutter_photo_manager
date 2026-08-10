@@ -19,6 +19,7 @@ import com.fluttercandies.photo_manager.thumb.ThumbnailUtil
 import com.fluttercandies.photo_manager.util.LogUtils
 import com.fluttercandies.photo_manager.util.ResultHandler
 import java.util.concurrent.Executors
+import java.util.concurrent.ConcurrentHashMap
 
 class PhotoManager(private val context: Context) {
     companion object {
@@ -315,26 +316,34 @@ class PhotoManager(private val context: Context) {
         return asset.getUri()
     }
 
-    private val cacheFutures = ArrayList<FutureTarget<Bitmap>>()
+    private val cacheFutures: MutableSet<FutureTarget<Bitmap>> = ConcurrentHashMap.newKeySet()
 
     fun requestCache(ids: List<String>, option: ThumbLoadOption, resultHandler: ResultHandler) {
         val pathList = dbUtils.getAssetsPath(context, ids)
+        // Schedule only the newly requested targets, not the accumulated history.
+        val newFutures = ArrayList<FutureTarget<Bitmap>>(pathList.size)
         for (s in pathList) {
             val future = ThumbnailUtil.requestCacheThumb(context, s, option)
-            cacheFutures.add(future)
+            if (cacheFutures.add(future)) {
+                newFutures.add(future)
+            }
         }
         resultHandler.reply(1)
-        val needExecuteFutures = cacheFutures.toList()
-        for (cacheFuture in needExecuteFutures) {
+        for (cacheFuture in newFutures) {
             threadPool.execute {
-                if (cacheFuture.isCancelled) {
-                    return@execute
-                }
-
                 try {
                     cacheFuture.get()
                 } catch (e: Exception) {
                     LogUtils.error(e)
+                } finally {
+                    // Clear and drop the target once it completes so its bitmap
+                    // is released deterministically and the set never retains
+                    // finished targets. Safe against a concurrent cancel: the
+                    // clear is idempotent. See #1436.
+                    if (cacheFutures.remove(cacheFuture)) {
+                        runCatching { Glide.with(context).clear(cacheFuture) }
+                            .onFailure { LogUtils.error(it) }
+                    }
                 }
             }
         }
@@ -344,7 +353,8 @@ class PhotoManager(private val context: Context) {
         val needCancelFutures = cacheFutures.toList()
         cacheFutures.clear()
         for (futureTarget in needCancelFutures) {
-            Glide.with(context).clear(futureTarget)
+            runCatching { Glide.with(context).clear(futureTarget) }
+                .onFailure { LogUtils.error(it) }
         }
     }
 
