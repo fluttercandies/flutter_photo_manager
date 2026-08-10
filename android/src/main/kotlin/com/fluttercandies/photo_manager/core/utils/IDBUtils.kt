@@ -261,35 +261,23 @@ interface IDBUtils {
     ): AssetEntity {
         filePath.checkDirs()
         val file = File(filePath)
-        var inputStream = FileInputStream(file)
-        fun refreshStream() {
-            inputStream = FileInputStream(file)
-        }
-
         val typeFromStream: String = URLConnection.guessContentTypeFromName(title)
             ?: URLConnection.guessContentTypeFromName(filePath)
-            ?: inputStream.let {
-                val type = URLConnection.guessContentTypeFromStream(inputStream)
-                refreshStream()
-                type
-            }
+            ?: FileInputStream(file).use { URLConnection.guessContentTypeFromStream(it) }
             ?: "image/*"
 
-        val exif = ExifInterface(inputStream)
-        val (width, height) = Pair(
-            exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0),
-            exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0)
-        )
-        val (rotationDegrees, latLong) = Pair(
-            orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
-            if (isAboveAndroidQ) {
-                if (latitude != null && longitude != null) {
-                    doubleArrayOf(latitude, longitude)
-                } else null
-            } else exif.latLong
-        )
-        refreshStream()
-
+        var width = 0
+        var height = 0
+        var rotationDegrees = 0
+        var latLong: DoubleArray? = null
+        FileInputStream(file).use { stream ->
+            val exif = ExifInterface(stream)
+            width = exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0)
+            height = exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0)
+            val (rot, ll) = rotationAndLatLong(orientation, latitude, longitude, exif)
+            rotationDegrees = rot
+            latLong = ll
+        }
         val shouldKeepPath = if (!isAboveAndroidQ) {
             val dir = Environment.getExternalStorageDirectory()
             file.absolutePath.startsWith(dir.path)
@@ -325,6 +313,11 @@ interface IDBUtils {
             }
         }
 
+        // Open the copy stream only when the MediaStore needs the bytes; when
+        // shouldKeepPath is set the row references the existing file, so there
+        // is nothing to copy and no FD to hold open. See #1438.
+        val inputStream = if (shouldKeepPath) null else FileInputStream(file)
+
         return insertUri(
             context,
             inputStream,
@@ -347,34 +340,16 @@ interface IDBUtils {
     ): AssetEntity {
         filePath.checkDirs()
         val file = File(filePath)
-        var inputStream = FileInputStream(file)
-        fun refreshStream() {
-            inputStream = FileInputStream(file)
-        }
-
         val typeFromStream = URLConnection.guessContentTypeFromName(title)
             ?: URLConnection.guessContentTypeFromName(filePath)
-            ?: inputStream.let {
-                val type = URLConnection.guessContentTypeFromStream(inputStream)
-                refreshStream()
-                type
-            }
+            ?: FileInputStream(file).use { URLConnection.guessContentTypeFromStream(it) }
             ?: "video/*"
 
         val info = VideoUtils.getPropertiesUseMediaPlayer(filePath)
 
-        val (rotationDegrees, latLong) = ExifInterface(inputStream).let { exif ->
-            Pair(
-                orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0,
-                if (isAboveAndroidQ) {
-                    if (latitude != null && longitude != null) {
-                        doubleArrayOf(latitude, longitude)
-                    } else null
-                } else exif.latLong
-            )
+        val (rotationDegrees, latLong) = FileInputStream(file).use { stream ->
+            rotationAndLatLong(orientation, latitude, longitude, ExifInterface(stream))
         }
-        refreshStream()
-
         val shouldKeepPath = if (!isAboveAndroidQ) {
             val dir = Environment.getExternalStorageDirectory()
             file.absolutePath.startsWith(dir.path)
@@ -423,6 +398,11 @@ interface IDBUtils {
             }
         }
 
+        // Open the copy stream only when the MediaStore needs the bytes; when
+        // shouldKeepPath is set the row references the existing file, so there
+        // is nothing to copy and no FD to hold open. See #1438.
+        val inputStream = if (shouldKeepPath) null else FileInputStream(file)
+
         return insertUri(
             context,
             inputStream,
@@ -432,9 +412,22 @@ interface IDBUtils {
         )
     }
 
+    private fun rotationAndLatLong(
+        orientation: Int?,
+        latitude: Double?,
+        longitude: Double?,
+        exif: ExifInterface
+    ): Pair<Int, DoubleArray?> {
+        val rotation = orientation ?: if (isAboveAndroidQ) exif.rotationDegrees else 0
+        val latLong = if (isAboveAndroidQ) {
+            if (latitude != null && longitude != null) doubleArrayOf(latitude, longitude) else null
+        } else exif.latLong
+        return Pair(rotation, latLong)
+    }
+
     private fun insertUri(
         context: Context,
-        inputStream: InputStream,
+        inputStream: InputStream?,
         contentUri: Uri,
         values: ContentValues,
         shouldKeepPath: Boolean = false,
@@ -448,7 +441,7 @@ interface IDBUtils {
         val uri = cr.insert(contentUri, values) ?: throwMsg("Cannot insert new asset.")
         val id = ContentUris.parseId(uri)
         try {
-            if (!shouldKeepPath) {
+            if (!shouldKeepPath && inputStream != null) {
                 val outputStream = cr.openOutputStream(uri)
                     ?: throwMsg("Cannot open the output stream for $uri.")
                 outputStream.use { os -> inputStream.use { it.copyTo(os) } }
