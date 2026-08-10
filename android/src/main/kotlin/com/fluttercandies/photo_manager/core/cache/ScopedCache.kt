@@ -32,18 +32,30 @@ class ScopedCache {
         if (uri == Uri.EMPTY) {
             throwIdNotFound(assetId)
         }
+        // Write into a temporary file first, then atomically rename it into the
+        // final cache path. A failed or aborted copy never leaves an incomplete
+        // file at the cache path, which would otherwise be served as a valid
+        // entry on the next request via the `exists()` check above. See #1432.
+        val tempFile = File(targetFile.parentFile, targetFile.name + ".tmp")
         try {
             LogUtils.info(
                 "Caching $assetId [origin: $isOrigin] into ${targetFile.absolutePath}"
             )
             val inputStream = contentResolver.openInputStream(uri)
-            val outputStream = FileOutputStream(targetFile)
-            outputStream.use { os ->
-                inputStream?.use { it.copyTo(os) }
+                ?: throw IllegalStateException("Cannot open input stream for $assetId")
+            FileOutputStream(tempFile).use { os ->
+                inputStream.use { it.copyTo(os) }
             }
         } catch (e: Exception) {
+            tempFile.delete()
             LogUtils.error("Caching $assetId [origin: $isOrigin] error", e)
             throw e
+        }
+        // renameTo atomically replaces the target on the same filesystem. If it
+        // somehow fails, surface the error rather than leaving the temp behind.
+        if (!tempFile.renameTo(targetFile)) {
+            tempFile.delete()
+            throw IllegalStateException("Failed to move cache file for $assetId")
         }
         return targetFile
     }

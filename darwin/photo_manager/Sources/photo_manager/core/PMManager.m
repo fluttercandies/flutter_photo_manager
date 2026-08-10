@@ -955,18 +955,23 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                     block(withScheme ? videoURL.absoluteString : videoURL.path, nil);
                     return;
                 }
-                // `copyItemAtURL:toURL:` fails with NSFileWriteFileExistsError
-                // when the destination already has a stub from a prior aborted
-                // fetch. Match the guard `exportAssetToFile` uses on iOS 18.
-                if ([manager fileExistsAtPath:destination.path]) {
-                    [innerSelf notifySuccess:progressHandler];
-                    block(withScheme ? destination.absoluteString : path, nil);
+                // Copy into a temporary file first, then atomically move it
+                // into the cache path. This avoids both the
+                // NSFileWriteFileExistsError that `copyItemAtURL:toURL:`
+                // raises on a pre-existing destination and the risk of
+                // serving a stub left by a prior aborted fetch. See #1432.
+                NSString *tempPath = [path stringByAppendingPathExtension:@"pmcache"];
+                NSURL *tempUrl = [NSURL fileURLWithPath:tempPath];
+                [manager removeItemAtPath:tempPath error:nil];
+                NSError *copyError;
+                if (![manager copyItemAtURL:videoURL toURL:tempUrl error:&copyError]) {
+                    [manager removeItemAtPath:tempPath error:nil];
+                    block(nil, copyError);
                     return;
                 }
-                NSError *copyError;
-                [manager copyItemAtURL:videoURL toURL:destination error:&copyError];
-                if (copyError) {
-                    block(nil, copyError);
+                NSError *moveError;
+                if (![PMFileHelper moveItemAtPath:tempPath toPath:path error:&moveError]) {
+                    block(nil, moveError);
                     return;
                 }
                 [innerSelf notifySuccess:progressHandler];
@@ -1066,9 +1071,14 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     }];
     
     PHAssetResourceManager *resourceManager = PHAssetResourceManager.defaultManager;
-    NSURL *fileUrl = [NSURL fileURLWithPath:path];
+    // Write to a temporary file first, then atomically move it into place so a
+    // failed or aborted fetch never leaves a stub at the final cache path.
+    // See #1432.
+    NSString *tempPath = [path stringByAppendingPathExtension:@"pmcache"];
+    NSURL *tempUrl = [NSURL fileURLWithPath:tempPath];
+    [fileManager removeItemAtPath:tempPath error:nil];
     [resourceManager writeDataForAssetResource:resource
-                                        toFile:fileUrl
+                                        toFile:tempUrl
                                        options:options
                              completionHandler:^(NSError *_Nullable error) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
@@ -1076,10 +1086,16 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
             return;
         }
         if (error) {
+            [fileManager removeItemAtPath:tempPath error:nil];
             // Don't emit Failed here — the walker may retry with another
             // candidate and only the terminal outcome should surface as a
             // failure state to progress observers.
             block(nil, error);
+            return;
+        }
+        NSError *moveError;
+        if (![PMFileHelper moveItemAtPath:tempPath toPath:path error:&moveError]) {
+            block(nil, moveError);
             return;
         }
         if (fileType) {
@@ -1125,11 +1141,13 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     NSString *path = [self makeAssetOutputPath:asset resource:nil isOrigin:NO fileType:fileType manager:manager];
     if ([manager fileExistsAtPath:path]) {
         [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Read cache from %@", path]];
+        [self notifySuccess:progressHandler];
         if (withScheme) {
             block([NSURL fileURLWithPath:path].absoluteString, nil);
         } else {
             block(path, nil);
         }
+        return;
     }
 
     PHVideoRequestOptions *options = [PHVideoRequestOptions new];
@@ -1202,22 +1220,25 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                 }
                 NSError *error;
                 NSString *destinationPath = destination.path;
-                if ([manager fileExistsAtPath:destinationPath]) {
-                    [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Reading cache from %@", destinationPath]];
-                    if (withScheme) {
-                        block(destination.absoluteString, nil);
-                    } else {
-                        block(destinationPath, nil);
-                    }
-                    [innerStrongSelf notifySuccess:progressHandler];
-                    return;
-                }
+                // Copy into a temporary file first, then atomically move into
+                // the cache path, so a failed copy never leaves a partial file
+                // that the next request would serve as a valid entry. See #1432.
+                NSString *tempPath = [destinationPath stringByAppendingPathExtension:@"pmcache"];
+                NSURL *tempUrl = [NSURL fileURLWithPath:tempPath];
+                [manager removeItemAtPath:tempPath error:nil];
                 [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:@"Caching the video to %@", destination]];
                 [[NSFileManager defaultManager] copyItemAtURL:videoURL
-                                                        toURL:destination
+                                                        toURL:tempUrl
                                                         error:&error];
                 if (error) {
+                    [manager removeItemAtPath:tempPath error:nil];
                     block(nil, error);
+                    [innerStrongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
+                    return;
+                }
+                NSError *moveError;
+                if (![PMFileHelper moveItemAtPath:tempPath toPath:destinationPath error:&moveError]) {
+                    block(nil, moveError);
                     [innerStrongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
                     return;
                 }
@@ -1395,7 +1416,15 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     [path appendString:[PMHashUtils sha256FromString:asset.localIdentifier]];
     [path appendString:@"_exif"];
     [path appendString:@".jpg"];
-    [manager createFileAtPath:path contents:imageData attributes:@{}];
+    // createFileAtPath:contents: is atomic, but its BOOL return was previously
+    // discarded — on failure the method returned a path to a non-existent file
+    // that the caller replied with unconditionally. Surface the failure
+    // instead. See #1432.
+    if (![manager createFileAtPath:path contents:imageData attributes:@{}]) {
+        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:
+            @"Failed to write full-size image cache at %@", path]];
+        return nil;
+    }
     return path;
 }
 
@@ -1597,9 +1626,14 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
     }];
 
     PHAssetResourceManager *resourceManager = PHAssetResourceManager.defaultManager;
-    NSURL *fileUrl = [NSURL fileURLWithPath:path];
+    // Write to a temporary file first, then atomically move it into place so a
+    // failed or aborted fetch never leaves a stub at the final cache path
+    // (which fileExistsAtPath would later serve as a valid entry). See #1432.
+    NSString *tempPath = [path stringByAppendingPathExtension:@"pmcache"];
+    NSURL *tempUrl = [NSURL fileURLWithPath:tempPath];
+    [fileManager removeItemAtPath:tempPath error:nil];
     [resourceManager writeDataForAssetResource:imageResource
-                                        toFile:fileUrl
+                                        toFile:tempUrl
                                        options:options
                              completionHandler:^(NSError *_Nullable error) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
@@ -1607,18 +1641,24 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
             return;
         }
         if (error) {
+            [fileManager removeItemAtPath:tempPath error:nil];
             // Walker retries with the next candidate; don't emit Failed here.
             block(nil, error);
-        } else {
-            long long size = [(NSNumber *)[[NSFileManager.defaultManager attributesOfItemAtPath:path error:nil]
-                              objectForKey:NSFileSize] longLongValue];
-            [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:
-                @"[#1118] writeDataForAssetResource delivered %lld bytes (uti=%@ type=%d) → %@",
-                size, imageResource.uniformTypeIdentifier ?: @"(nil)",
-                (int)imageResource.type, path]];
-            [strongSelf notifySuccess:progressHandler];
-            block(path, nil);
+            return;
         }
+        NSError *moveError;
+        if (![PMFileHelper moveItemAtPath:tempPath toPath:path error:&moveError]) {
+            block(nil, moveError);
+            return;
+        }
+        long long size = [(NSNumber *)[[NSFileManager.defaultManager attributesOfItemAtPath:path error:nil]
+                          objectForKey:NSFileSize] longLongValue];
+        [[PMLogUtils sharedInstance] info:[NSString stringWithFormat:
+            @"[#1118] writeDataForAssetResource delivered %lld bytes (uti=%@ type=%d) → %@",
+            size, imageResource.uniformTypeIdentifier ?: @"(nil)",
+            (int)imageResource.type, path]];
+        [strongSelf notifySuccess:progressHandler];
+        block(path, nil);
     }];
 }
 
@@ -1837,6 +1877,12 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
                     NSString *path = [innerStrongSelf writeFullFileWithAssetId:asset imageData:data];
                     if (![innerStrongSelf consumeRequestWithCancelToken:cancelToken]) {
                         [innerStrongSelf handleCancelRequestIfNeeded:handler progressHandler:progressHandler];
+                        return;
+                    }
+                    if (!path) {
+                        [handler replyError:[NSString stringWithFormat:
+                            @"Failed to write full-size image cache for %@.", asset.localIdentifier]];
+                        [innerStrongSelf notifyProgress:progressHandler progress:lastProgress state:PMProgressStateFailed];
                         return;
                     }
                     [handler reply:path];

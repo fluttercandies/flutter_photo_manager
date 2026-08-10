@@ -8,7 +8,9 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
-*None.*
+**Fixes**
+
+- Fix failed cache writes leaving incomplete files that were later treated as valid cache entries (#1432).
 
 ## 3.12.0
 
