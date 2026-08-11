@@ -649,6 +649,18 @@ class PhotoManagerPlugin(
                 }
             }
 
+            Methods.renameAsset -> {
+                val assetId = call.argument<String>("id")!!
+                val newName = call.argument<String>("newName")!!
+                try {
+                    val uri = photoManager.getUri(assetId)
+                    writeManager.renameAsset(uri, newName, resultHandler)
+                } catch (e: Exception) {
+                    LogUtils.error("renameAsset failed", e)
+                    resultHandler.replyError("renameAsset failed", message = e.message)
+                }
+            }
+
             Methods.deleteWithIds -> {
                 try {
                     val ids = call.argument<List<String>>("ids")!!

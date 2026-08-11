@@ -8,6 +8,10 @@ To know more about breaking changes, see the [Migration Guide][].
 
 ## Unreleased
 
+**Features**
+
+- Add `AndroidEditor.renameAsset` to rename an asset by updating its MediaStore `DISPLAY_NAME` on Android (#1314).
+
 **Fixes**
 
 - Fix failed cache writes leaving incomplete files that were later treated as valid cache entries (#1432).

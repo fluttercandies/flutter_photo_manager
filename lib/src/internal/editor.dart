@@ -467,6 +467,35 @@ class AndroidEditor {
     return plugin.androidMoveAssetsToPath(assetIds, targetPath);
   }
 
+  /// Renames the given [entity] on Android.
+  ///
+  /// The [newTitle] is the new display name of the asset, **including the file
+  /// extension** (e.g. `IMG_001.jpg`). Only the `DISPLAY_NAME` column of the
+  /// MediaStore record is updated; the underlying file is renamed by the
+  /// MediaProvider accordingly.
+  ///
+  /// Behavior by ownership and platform version:
+  /// - Files owned by the app (or under legacy storage, or when the app holds
+  ///   media management access) are renamed silently without any prompt.
+  /// - Files owned by other apps under scoped storage show the system
+  ///   `createWriteRequest` consent dialog on Android 11+ (API 30+).
+  /// - Renaming other apps' files below Android 11 is unsupported and throws.
+  ///
+  /// Returns `true` if the asset was renamed; otherwise `false`.
+  ///
+  /// ```dart
+  /// final ok = await PhotoManager.editor.android.renameAsset(
+  ///   entity: asset,
+  ///   newTitle: 'IMG_001.jpg',
+  /// );
+  /// ```
+  Future<bool> renameAsset({
+    required AssetEntity entity,
+    required String newTitle,
+  }) {
+    return plugin.androidRenameAsset(entity.id, newTitle);
+  }
+
   /// Removes all assets from the gallery that are no longer available on disk.
   ///
   /// This method is intended to be used after manually deleting files from the

@@ -1134,6 +1134,21 @@ mixin AndroidPlugin on BasePlugin {
     return result == true;
   }
 
+  /// Rename the given [assetId] on Android.
+  ///
+  /// [newTitle] is the new display name, including the file extension
+  /// (e.g. "IMG_001.jpg"). Files owned by the app are renamed silently; files
+  /// owned by other apps prompt the user for write consent on Android 11+.
+  ///
+  /// Returns true if the operation was successful, false otherwise.
+  Future<bool> androidRenameAsset(String assetId, String newTitle) async {
+    final result = await _channel.invokeMethod(
+      PMConstants.mRenameAsset,
+      <String, dynamic>{'id': assetId, 'newName': newTitle},
+    );
+    return result == true;
+  }
+
   Future<bool> androidRemoveNoExistsAssets() async {
     final bool? result = await _channel.invokeMethod(
       PMConstants.mRemoveNoExistsAssets,
