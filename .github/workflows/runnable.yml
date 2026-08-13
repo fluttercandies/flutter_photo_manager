@@ -28,6 +28,8 @@ jobs:
         os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@900f2210b1d28bbbd0bd22d17926b9e224e8f231
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9
         with:
           distribution: 'zulu'
@@ -64,6 +66,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@900f2210b1d28bbbd0bd22d17926b9e224e8f231
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9
         with:
           distribution: 'zulu'
@@ -80,7 +84,7 @@ jobs:
           chmod +x ./copy_on_publish.sh
           ./copy_on_publish.sh
       - name: Publish dry run
-        uses: k-paxian/dart-package-publisher@master
+        uses: k-paxian/dart-package-publisher@8fdba1dbf624c712706281a6f91cb50b6bfc2eaf
         with:
           credentialJson: "MockCredentialJson"
           accessToken: "MockAccessToken"
@@ -100,6 +104,8 @@ jobs:
       issues: write
     steps:
       - uses: actions/checkout@900f2210b1d28bbbd0bd22d17926b9e224e8f231
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9
         with:
           distribution: 'zulu'
@@ -156,6 +162,9 @@ jobs:
         if: |
           github.event_name == 'pull_request' &&
           github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          ARTIFACT_URL: ${{ steps.apk.outputs.artifact-url }}
+          COMMIT_SHA: ${{ github.sha }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -163,7 +172,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Download apk from [here](${{ steps.apk.outputs.artifact-url }}) for ${{ github.sha}}'
+              body: `Download apk from [here](${process.env.ARTIFACT_URL}) for ${process.env.COMMIT_SHA}`
             })
 
   test_android_on_windows:
@@ -175,6 +184,8 @@ jobs:
         os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@900f2210b1d28bbbd0bd22d17926b9e224e8f231
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9
         with:
           distribution: 'zulu'
@@ -196,6 +207,8 @@ jobs:
         os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@900f2210b1d28bbbd0bd22d17926b9e224e8f231
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9
         with:
           distribution: 'zulu'
@@ -217,6 +230,8 @@ jobs:
         os: [macos-latest]
     steps:
       - uses: actions/checkout@900f2210b1d28bbbd0bd22d17926b9e224e8f231
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9
         with:
           distribution: 'zulu'

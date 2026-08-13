@@ -12,6 +12,9 @@ on:
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+permissions:
+  contents: read
+
 jobs:
   build-apk:
     runs-on: ubuntu-latest
@@ -19,6 +22,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@900f2210b1d28bbbd0bd22d17926b9e224e8f231
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9
         with:
           distribution: 'zulu'
@@ -33,8 +38,10 @@ jobs:
         name: Build apk
         working-directory: ${{ github.workspace }}/example
       - name: Upload apk to release ${{ github.event.release.tag_name }}
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          gh release upload ${{ github.event.release.tag_name }} build/app/outputs/flutter-apk/*.apk
+          gh release upload "$RELEASE_TAG" build/app/outputs/flutter-apk/*.apk
           echo "Show apk download url: "
-          gh release view ${{ github.event.release.tag_name }} --json assets --jq '.assets.[].url'
+          gh release view "$RELEASE_TAG" --json assets --jq '.assets.[].url'
         working-directory: ${{ github.workspace }}/example
