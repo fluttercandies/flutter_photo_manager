@@ -127,47 +127,41 @@ class PhotoManagerNotifyChannel(
         }
 
         override fun onChange(selfChange: Boolean, uri: Uri?) {
+            // Dispatch target on frameworks below API 30, which have no
+            // change-kind flags; the type is inferred from the row state.
+            handleOnChange(uri, null)
+        }
+
+        override fun onChange(selfChange: Boolean, uri: Uri?, flags: Int) {
+            // Dispatch target on API 30+, where MediaProvider tags row
+            // notifications with the kind of change. Untagged notifications
+            // (flags without any kind bit, e.g. plain
+            // ContentResolver#notifyChange calls) fall back to the row-state
+            // inference used pre-30.
+            val kind = flags and (
+                ContentResolver.NOTIFY_INSERT
+                    or ContentResolver.NOTIFY_UPDATE
+                    or ContentResolver.NOTIFY_DELETE
+                )
+            handleOnChange(
+                uri,
+                when (kind) {
+                    ContentResolver.NOTIFY_INSERT -> "insert"
+                    ContentResolver.NOTIFY_UPDATE -> "update"
+                    ContentResolver.NOTIFY_DELETE -> "delete"
+                    else -> null
+                },
+            )
+        }
+
+        private fun handleOnChange(uri: Uri?, authoritativeType: String?) {
             if (uri == null) {
                 return
             }
             val last = uri.lastPathSegment
             val id = last?.toLongOrNull()
 
-            if (id != null) { // insert or update
-                val cursor = safeQuery(
-                    allUri,
-                    arrayOf(DATE_ADDED, DATE_MODIFIED, MEDIA_TYPE),
-                    "$_ID = ?",
-                    arrayOf(id.toString())
-                )
-                cursor?.use {
-                    if (!cursor.moveToNext()) {
-                        // If the ID not have item, make it as deleted.
-                        onOuterChange(uri, "delete", id, null, type)
-                        return
-                    }
-                    // Find date to determine insert or update.
-                    val addTimestampSecond = cursor.getLong(cursor.getColumnIndex(DATE_ADDED))
-                    val currentTimeMillis = System.currentTimeMillis()
-
-                    val diffTime = currentTimeMillis / 1000 - addTimestampSecond
-
-                    // Within 30s, it is considered to be inserted, if it is exceeded, it is considered to be changed
-                    val typeString = if (diffTime < 30) {
-                        "insert"
-                    } else {
-                        "update"
-                    }
-                    // get Type
-                    val type = cursor.getInt(cursor.getColumnIndex(MEDIA_TYPE))
-                    val (gId, gName) = getGalleryIdAndName(id, type)
-
-                    if (gId == null || gName == null) {
-                        return
-                    }
-                    onOuterChange(uri, typeString, id, gId, type)
-                }
-            } else { // delete
+            if (id == null) { // collection-level change
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                     if (uri == this.uri) {
                         onOuterChange(uri, "insert", null, null, type)
@@ -175,6 +169,55 @@ class PhotoManagerNotifyChannel(
                     }
                 }
                 onOuterChange(uri, "delete", null, null, type)
+                return
+            }
+
+            if (authoritativeType == "delete") {
+                // The row is gone; no point in querying it.
+                onOuterChange(uri, "delete", id, null, type)
+                return
+            }
+
+            val cursor = safeQuery(
+                allUri,
+                arrayOf(DATE_ADDED, DATE_MODIFIED, MEDIA_TYPE),
+                "$_ID = ?",
+                arrayOf(id.toString())
+            )
+            cursor?.use {
+                if (!it.moveToNext()) {
+                    // The row is not visible to this app. On Android 10+,
+                    // rows inserted by other packages — such as files pushed
+                    // via `adb push` or desktop drag-and-drop to an emulator
+                    // — stay pending and hidden until their owner publishes
+                    // them (#1443). An INSERT flag still proves an insert,
+                    // but every other invisible outcome (a trashed row, a
+                    // still-pending row being updated, a real deletion with
+                    // an untagged notification) is reported as "delete",
+                    // matching the historical behavior for missing rows.
+                    val typeString =
+                        if (authoritativeType == "insert") "insert" else "delete"
+                    onOuterChange(uri, typeString, id, null, type)
+                    return
+                }
+                // Find date to determine insert or update for untagged events.
+                val typeString = authoritativeType ?: run {
+                    val addTimestampSecond = it.getLong(it.getColumnIndex(DATE_ADDED))
+
+                    // Within 30s, it is considered to be inserted, if it is exceeded, it is considered to be changed
+                    if (System.currentTimeMillis() / 1000 - addTimestampSecond < 30) {
+                        "insert"
+                    } else {
+                        "update"
+                    }
+                }
+                // get Type
+                val mediaType = it.getInt(it.getColumnIndex(MEDIA_TYPE))
+                val (gId, _) = getGalleryIdAndName(id, mediaType)
+
+                // The gallery may fail to resolve in racy cases; galleryId
+                // is optional in the payload, so still deliver the event.
+                onOuterChange(uri, typeString, id, gId, mediaType)
             }
         }
 

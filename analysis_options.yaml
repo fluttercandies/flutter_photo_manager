@@ -17,6 +17,14 @@ analyzer:
     prefer_single_quotes: warning
     require_trailing_commas: warning
     invalid_annotation_target: false
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 
 linter:
   rules:
