@@ -11,7 +11,7 @@ let packageName = "photo_manager"
 let package = Package(
   name: packageName,
   platforms: [
-    .iOS("9.0"),
+    .iOS("13.0"),
     .macOS("10.15")
   ],
   products: [
