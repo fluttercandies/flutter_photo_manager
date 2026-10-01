@@ -1365,7 +1365,9 @@ static NSString *PMResourceTypeName(PHAssetResourceType type) {
 
     NSString *id = [asset.localIdentifier stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
     NSString *modifiedDate = [NSString stringWithFormat:@"%f", asset.modificationDate.timeIntervalSince1970];
-    NSString *filenameBase = [filename stringByDeletingPathExtension];
+    // The title (or the resource's original filename) is not under the app's
+    // control, so it is sanitised and bounded before it becomes part of a path.
+    NSString *filenameBase = [PMFileHelper cacheFilenameTitleForTitle:[filename stringByDeletingPathExtension]];
     filename = [NSString stringWithFormat:@"%@_%@%@_%@",
                 id, modifiedDate, isOrigin ? @"_o" : @"", filenameBase];
     if (![targetExtension isEmpty]) {
