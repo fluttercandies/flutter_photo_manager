@@ -19,6 +19,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Fix Android thumbnail requests not deterministically releasing Glide resources (#1436).
 - Fix Android path-based saves leaking file descriptors by not closing inspection streams (#1438).
 - Fix Android change notifications reporting inserts of not-yet-published rows (e.g. files pushed via `adb push` or desktop drag-and-drop) as deletions (#1443).
+- Fix Swift Package Manager iOS builds failing platform-graph validation on Flutter SDKs whose generated `FlutterFramework` package declares a minimum iOS of 13.0, by raising the SwiftPM manifest's iOS platform from 9.0 to 13.0. The CocoaPods iOS deployment target (9.0) and macOS configuration are unchanged (#1449).
 
 ## 3.12.0
 
