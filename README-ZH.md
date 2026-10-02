@@ -146,6 +146,11 @@ import 'package:photo_manager/photo_manager.dart';
 最低的平台版本:
 **Android API 16, iOS 9.0, macOS 10.15**.
 
+> [!NOTE]
+> iOS 9.0 的最低版本适用于 CocoaPods 构建。使用 Swift Package Manager 构建时，
+> iOS 最低版本为 **13.0**，以匹配较新 Flutter SDK 生成的 `FlutterFramework`
+> SwiftPM 包所要求的 iOS 13.0。macOS 最低版本（10.15）两者相同。
+
 - Android：[Android 配置准备](#android-配置准备).
 - iOS：[iOS 配置准备](#ios-配置准备).
 - macOS：与 iOS 几乎一致。
