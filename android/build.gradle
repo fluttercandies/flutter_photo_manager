@@ -46,7 +46,7 @@ def hasKotlinExtension = project.extensions.findByName("kotlin") != null
 def useBuiltInKotlin = builtInKotlinRequested && hasKotlinExtension
 
 if (!useBuiltInKotlin) {
-    apply plugin: 'kotlin-android'
+    project.pluginManager.apply('kotlin-android')
 }
 
 android {
