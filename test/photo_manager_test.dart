@@ -140,6 +140,43 @@ void main() {
   );
 
   test(
+    'getAssetListRange forwards checkIfExists to the channel',
+    () async {
+      MethodCall? capturedCall;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel(PMConstants.channelPrefix),
+        (MethodCall call) async {
+          capturedCall = call;
+          return <String, dynamic>{'data': <dynamic>[]};
+        },
+      );
+
+      await PhotoManager.plugin.getAssetListRange(
+        'path-id',
+        type: RequestType.image,
+        start: 0,
+        end: 10,
+        optionGroup: null,
+        checkIfExists: false,
+      );
+
+      expect(capturedCall?.method, PMConstants.mGetAssetListRange);
+      expect(capturedCall?.arguments['checkIfExists'], false);
+
+      await PhotoManager.plugin.getAssetListRange(
+        'path-id',
+        type: RequestType.image,
+        start: 0,
+        end: 10,
+        optionGroup: null,
+      );
+
+      expect(capturedCall?.arguments['checkIfExists'], true);
+    },
+  );
+
+  test(
     'restoreFromTrash forwards asset IDs and types',
     () async {
       MethodCall? capturedCall;
