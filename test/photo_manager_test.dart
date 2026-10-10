@@ -177,6 +177,59 @@ void main() {
   );
 
   test(
+    'AssetPathEntity.getAssetListPaged/getAssetListRange forward checkIfExists',
+    () async {
+      final List<MethodCall> calls = <MethodCall>[];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel(PMConstants.channelPrefix),
+        (MethodCall call) async {
+          calls.add(call);
+          if (call.method == PMConstants.mGetAssetCountFromPath) {
+            // getAssetListRange asks for the album size before the range call.
+            return 10;
+          }
+          return <String, dynamic>{'data': <dynamic>[]};
+        },
+      );
+
+      final path = AssetPathEntity(
+        id: 'path-id',
+        name: 'album',
+        type: RequestType.image,
+      );
+
+      // Finds the forwarded channel call for [method], ignoring the count call.
+      MethodCall lastCall(String method) =>
+          calls.lastWhere((MethodCall c) => c.method == method);
+
+      await path.getAssetListPaged(page: 0, size: 10);
+      expect(
+        lastCall(PMConstants.mGetAssetListPaged).arguments['checkIfExists'],
+        true,
+      );
+
+      await path.getAssetListPaged(page: 0, size: 10, checkIfExists: false);
+      expect(
+        lastCall(PMConstants.mGetAssetListPaged).arguments['checkIfExists'],
+        false,
+      );
+
+      await path.getAssetListRange(start: 0, end: 10);
+      expect(
+        lastCall(PMConstants.mGetAssetListRange).arguments['checkIfExists'],
+        true,
+      );
+
+      await path.getAssetListRange(start: 0, end: 10, checkIfExists: false);
+      expect(
+        lastCall(PMConstants.mGetAssetListRange).arguments['checkIfExists'],
+        false,
+      );
+    },
+  );
+
+  test(
     'restoreFromTrash forwards asset IDs and types',
     () async {
       MethodCall? capturedCall;
