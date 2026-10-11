@@ -145,8 +145,7 @@ object DBUtils : IDBUtils {
         page: Int,
         size: Int,
         requestType: Int,
-        option: FilterOption?,
-        checkIfExists: Boolean
+        option: FilterOption?
     ): List<AssetEntity> {
         val isAll = pathId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -175,7 +174,7 @@ object DBUtils : IDBUtils {
             while (it.moveToNext()) {
                 it.toAssetEntity(
                     context,
-                    checkIfExists = checkIfExists,
+                    checkIfExists = option?.checkIfExists ?: true,
                     throwIfNotExists = false,
                 )?.apply {
                     list.add(this)
@@ -191,8 +190,7 @@ object DBUtils : IDBUtils {
         start: Int,
         end: Int,
         requestType: Int,
-        option: FilterOption?,
-        checkIfExists: Boolean
+        option: FilterOption?
     ): List<AssetEntity> {
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -223,7 +221,7 @@ object DBUtils : IDBUtils {
             while (it.moveToNext()) {
                 it.toAssetEntity(
                     context,
-                    checkIfExists = checkIfExists,
+                    checkIfExists = option?.checkIfExists ?: true,
                     throwIfNotExists = false,
                 )?.apply {
                     list.add(this)

@@ -382,11 +382,8 @@ class PhotoManagerPlugin(
                 val page = call.argument<Int>("page")!!
                 val size = call.argument<Int>("size")!!
                 val option = call.getOption()
-                val checkIfExists = call.argument<Boolean>("checkIfExists") ?: true
                 val list =
-                    photoManager.getAssetListPaged(
-                        galleryId, type, page, size, option, checkIfExists
-                    )
+                    photoManager.getAssetListPaged(galleryId, type, page, size, option)
                 resultHandler.reply(ConvertUtils.convertAssets(list))
             }
 
@@ -404,11 +401,8 @@ class PhotoManagerPlugin(
                 val start = call.getInt("start")
                 val end = call.getInt("end")
                 val option = call.getOption()
-                val checkIfExists = call.argument<Boolean>("checkIfExists") ?: true
                 val list: List<AssetEntity> =
-                    photoManager.getAssetListRange(
-                        galleryId, type, start, end, option, checkIfExists
-                    )
+                    photoManager.getAssetListRange(galleryId, type, start, end, option)
                 resultHandler.reply(ConvertUtils.convertAssets(list))
             }
 

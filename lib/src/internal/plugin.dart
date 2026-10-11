@@ -235,7 +235,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     int page = 0,
     int size = 15,
     RequestType type = RequestType.common,
-    bool checkIfExists = true,
   }) async {
     _throwIfCustomFilterNotSupported(optionGroup);
     final Map result = await _channel.invokeMethod(
@@ -246,7 +245,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'page': page,
         'size': size,
         'option': optionGroup?.toMap(),
-        'checkIfExists': checkIfExists,
       },
     );
     return ConvertUtils.convertToAssetList(result.cast());
@@ -262,7 +260,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
     required int start,
     required int end,
     required PMFilter? optionGroup,
-    bool checkIfExists = true,
   }) async {
     _throwIfCustomFilterNotSupported(optionGroup);
     final Map map = await _channel.invokeMethod(
@@ -273,7 +270,6 @@ class PhotoManagerPlugin with BasePlugin, IosPlugin, AndroidPlugin, OhosPlugin {
         'start': start,
         'end': end,
         'option': optionGroup?.toMap(),
-        'checkIfExists': checkIfExists,
       },
     );
     return ConvertUtils.convertToAssetList(map.cast());

@@ -142,8 +142,7 @@ object AndroidQDBUtils : IDBUtils {
         page: Int,
         size: Int,
         requestType: Int,
-        option: FilterOption?,
-        checkIfExists: Boolean
+        option: FilterOption?
     ): List<AssetEntity> {
         val isAll = pathId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -171,7 +170,7 @@ object AndroidQDBUtils : IDBUtils {
             cursorWithRange(it, page * size, size) { cursor ->
                 cursor.toAssetEntity(
                     context,
-                    checkIfExists = checkIfExists,
+                    checkIfExists = option?.checkIfExists ?: true,
                     throwIfNotExists = false,
                 )?.apply {
                     list.add(this)
@@ -188,8 +187,7 @@ object AndroidQDBUtils : IDBUtils {
         start: Int,
         end: Int,
         requestType: Int,
-        option: FilterOption?,
-        checkIfExists: Boolean
+        option: FilterOption?
     ): List<AssetEntity> {
         val isAll = galleryId.isEmpty()
         val list = ArrayList<AssetEntity>()
@@ -218,7 +216,7 @@ object AndroidQDBUtils : IDBUtils {
             cursorWithRange(it, start, pageSize) { cursor ->
                 cursor.toAssetEntity(
                     context,
-                    checkIfExists = checkIfExists,
+                    checkIfExists = option?.checkIfExists ?: true,
                     throwIfNotExists = false,
                 )?.apply {
                     list.add(this)

@@ -5,6 +5,7 @@ import com.fluttercandies.photo_manager.core.utils.RequestTypeUtils
 class CustomOption(private val map: Map<*, *>) : FilterOption() {
 
     override val containsPathModified: Boolean = map["containsPathModified"] as Boolean
+    override val checkIfExists: Boolean = map["checkIfExists"] as? Boolean ?: true
 
     override fun orderByCondString(): String? {
         val list = map["orderBy"] as? List<*>

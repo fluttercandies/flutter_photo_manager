@@ -139,45 +139,19 @@ void main() {
     skip: !(Platform.isIOS || Platform.isMacOS),
   );
 
-  test(
-    'getAssetListRange forwards checkIfExists to the channel',
-    () async {
-      MethodCall? capturedCall;
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(
-        const MethodChannel(PMConstants.channelPrefix),
-        (MethodCall call) async {
-          capturedCall = call;
-          return <String, dynamic>{'data': <dynamic>[]};
-        },
-      );
+  test('PMFilter serializes checkIfExists for the channel', () {
+    Object? sent(PMFilter f) =>
+        (f.toMap()['child'] as Map<String, dynamic>)['checkIfExists'];
 
-      await PhotoManager.plugin.getAssetListRange(
-        'path-id',
-        type: RequestType.image,
-        start: 0,
-        end: 10,
-        optionGroup: null,
-        checkIfExists: false,
-      );
-
-      expect(capturedCall?.method, PMConstants.mGetAssetListRange);
-      expect(capturedCall?.arguments['checkIfExists'], false);
-
-      await PhotoManager.plugin.getAssetListRange(
-        'path-id',
-        type: RequestType.image,
-        start: 0,
-        end: 10,
-        optionGroup: null,
-      );
-
-      expect(capturedCall?.arguments['checkIfExists'], true);
-    },
-  );
+    final skip = FilterOptionGroup(checkIfExists: false);
+    expect(sent(FilterOptionGroup()), true);
+    expect(sent(skip), false);
+    expect(sent(skip.copyWith()), false);
+    expect(sent(CustomFilter.sql(where: '')..checkIfExists = false), false);
+  });
 
   test(
-    'AssetPathEntity.getAssetListPaged/getAssetListRange forward checkIfExists',
+    'AssetPathEntity.getAssetListPaged/getAssetListRange forward the filter checkIfExists',
     () async {
       final List<MethodCall> calls = <MethodCall>[];
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -193,39 +167,33 @@ void main() {
         },
       );
 
-      final path = AssetPathEntity(
-        id: 'path-id',
-        name: 'album',
-        type: RequestType.image,
-      );
+      AssetPathEntity pathWith(PMFilter filter) => AssetPathEntity(
+            id: 'path-id',
+            name: 'album',
+            type: RequestType.image,
+            filterOption: filter,
+          );
 
-      // Finds the forwarded channel call for [method], ignoring the count call.
-      MethodCall lastCall(String method) =>
-          calls.lastWhere((MethodCall c) => c.method == method);
+      // Reads checkIfExists from the last [method] call's serialized filter.
+      Object? sent(String method) {
+        final call = calls.lastWhere((MethodCall c) => c.method == method);
+        return (call.arguments['option'] as Map)['child']['checkIfExists'];
+      }
 
-      await path.getAssetListPaged(page: 0, size: 10);
-      expect(
-        lastCall(PMConstants.mGetAssetListPaged).arguments['checkIfExists'],
-        true,
-      );
+      final skip = pathWith(FilterOptionGroup(checkIfExists: false));
+      final check = pathWith(FilterOptionGroup());
 
-      await path.getAssetListPaged(page: 0, size: 10, checkIfExists: false);
-      expect(
-        lastCall(PMConstants.mGetAssetListPaged).arguments['checkIfExists'],
-        false,
-      );
+      await check.getAssetListPaged(page: 0, size: 10);
+      expect(sent(PMConstants.mGetAssetListPaged), true);
 
-      await path.getAssetListRange(start: 0, end: 10);
-      expect(
-        lastCall(PMConstants.mGetAssetListRange).arguments['checkIfExists'],
-        true,
-      );
+      await skip.getAssetListPaged(page: 0, size: 10);
+      expect(sent(PMConstants.mGetAssetListPaged), false);
 
-      await path.getAssetListRange(start: 0, end: 10, checkIfExists: false);
-      expect(
-        lastCall(PMConstants.mGetAssetListRange).arguments['checkIfExists'],
-        false,
-      );
+      await check.getAssetListRange(start: 0, end: 10);
+      expect(sent(PMConstants.mGetAssetListRange), true);
+
+      await skip.getAssetListRange(start: 0, end: 10);
+      expect(sent(PMConstants.mGetAssetListRange), false);
     },
   );
 

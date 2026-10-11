@@ -218,18 +218,12 @@ class AssetPathEntity {
   /// album's [type] when omitted.
   ///
   /// The length of returned assets might be less than requested.
-  /// [checkIfExists] controls whether assets whose file no longer exists are
-  /// excluded from the result. Defaults to `true`. Set it to `false` to skip
-  /// the per-asset file check, which is much faster for large ranges but may
-  /// include assets that were deleted outside of MediaStore.
-  ///  * Android: Each asset is checked with `File.exists()` when `true`.
-  ///  * iOS/macOS: Ignored. PhotoKit never returns missing assets.
-  ///  * OpenHarmony: Ignored.
+  /// Not existing assets will be excluded from the result, unless
+  /// [PMFilter.checkIfExists] of [filterOption] is `false` (Android only).
   Future<List<AssetEntity>> getAssetListPaged({
     required int page,
     required int size,
     RequestType? type,
-    bool checkIfExists = true,
   }) {
     assert(albumType == 1, 'Only album can request for assets.');
     assert(size > 0, 'Page size must be greater than 0.');
@@ -239,7 +233,6 @@ class AssetPathEntity {
       size: size,
       type: type ?? this.type,
       optionGroup: filterOption,
-      checkIfExists: checkIfExists,
     );
   }
 
@@ -253,18 +246,12 @@ class AssetPathEntity {
   /// album's [type] when omitted.
   ///
   /// The length of returned assets might be less than requested.
-  /// [checkIfExists] controls whether assets whose file no longer exists are
-  /// excluded from the result. Defaults to `true`. Set it to `false` to skip
-  /// the per-asset file check, which is much faster for large ranges but may
-  /// include assets that were deleted outside of MediaStore.
-  ///  * Android: Each asset is checked with `File.exists()` when `true`.
-  ///  * iOS/macOS: Ignored. PhotoKit never returns missing assets.
-  ///  * OpenHarmony: Ignored.
+  /// Not existing assets will be excluded from the result, unless
+  /// [PMFilter.checkIfExists] of [filterOption] is `false` (Android only).
   Future<List<AssetEntity>> getAssetListRange({
     required int start,
     required int end,
     RequestType? type,
-    bool checkIfExists = true,
   }) async {
     assert(albumType == 1, 'Only album can request for assets.');
     assert(start >= 0, 'The start must be greater than 0.');
@@ -280,7 +267,6 @@ class AssetPathEntity {
       start: start,
       end: end,
       optionGroup: filterOption,
-      checkIfExists: checkIfExists,
     );
   }
 

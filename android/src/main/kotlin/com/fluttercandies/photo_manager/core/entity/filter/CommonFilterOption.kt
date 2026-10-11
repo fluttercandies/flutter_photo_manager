@@ -13,6 +13,7 @@ class CommonFilterOption(map: Map<*, *>) : FilterOption() {
     private val createDateCond = ConvertUtils.convertToDateCond(map["createDate"] as Map<*, *>)
     private val updateDateCond = ConvertUtils.convertToDateCond(map["updateDate"] as Map<*, *>)
     override val containsPathModified = map["containsPathModified"] as Boolean
+    override val checkIfExists = map["checkIfExists"] as? Boolean ?: true
 
     private val orderByCond: List<OrderByCond> =
         ConvertUtils.convertToOrderByConds(map["orders"] as List<*>)

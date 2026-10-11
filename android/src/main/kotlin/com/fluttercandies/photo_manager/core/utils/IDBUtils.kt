@@ -137,8 +137,7 @@ interface IDBUtils {
         page: Int,
         size: Int,
         requestType: Int = 0,
-        option: FilterOption?,
-        checkIfExists: Boolean = true
+        option: FilterOption?
     ): List<AssetEntity>
 
     fun getAssetListRange(
@@ -147,8 +146,7 @@ interface IDBUtils {
         start: Int,
         end: Int,
         requestType: Int,
-        option: FilterOption?,
-        checkIfExists: Boolean = true
+        option: FilterOption?
     ): List<AssetEntity>
 
     fun getAssetEntity(context: Context, id: String, checkIfExists: Boolean = true): AssetEntity?
