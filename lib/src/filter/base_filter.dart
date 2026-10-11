@@ -70,6 +70,20 @@ abstract class PMFilter {
   ///  * [PHFetchOptions.includeHiddenAssets](https://developer.apple.com/documentation/photos/phfetchoptions/includehiddenassets).
   bool includeHiddenAssets = false;
 
+  /// [checkIfExists] controls whether assets whose file no longer exists are
+  /// excluded from the result. Defaults to `true`. Set it to `false` to skip
+  /// the per-asset file check, which is much faster for large ranges but may
+  /// include assets that were deleted outside of MediaStore.
+  ///  * Android: Each asset is checked with `File.exists()` when `true`.
+  ///  * iOS/macOS: Ignored. PhotoKit never returns missing assets.
+  ///  * OpenHarmony: Ignored.
+  ///
+  /// Only [AssetPathEntity.getAssetListPaged] and
+  /// [AssetPathEntity.getAssetListRange] read this flag.
+  /// [PhotoManager.getAssetListRange] and [PhotoManager.getAssetListPaged]
+  /// never check for missing files on Android.
+  bool checkIfExists = true;
+
   /// The type of the filter.
   BaseFilterType get type;
 
@@ -96,6 +110,7 @@ abstract class PMFilter {
     return <String, dynamic>{
       'containsPathModified': containsPathModified,
       'includeHiddenAssets': includeHiddenAssets,
+      'checkIfExists': checkIfExists,
     };
   }
 }

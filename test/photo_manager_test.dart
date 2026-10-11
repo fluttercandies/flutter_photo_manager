@@ -139,6 +139,64 @@ void main() {
     skip: !(Platform.isIOS || Platform.isMacOS),
   );
 
+  test('PMFilter serializes checkIfExists for the channel', () {
+    Object? sent(PMFilter f) =>
+        (f.toMap()['child'] as Map<String, dynamic>)['checkIfExists'];
+
+    final skip = FilterOptionGroup(checkIfExists: false);
+    expect(sent(FilterOptionGroup()), true);
+    expect(sent(skip), false);
+    expect(sent(skip.copyWith()), false);
+    expect(sent(CustomFilter.sql(where: '')..checkIfExists = false), false);
+  });
+
+  test(
+    'AssetPathEntity.getAssetListPaged/getAssetListRange forward the filter checkIfExists',
+    () async {
+      final List<MethodCall> calls = <MethodCall>[];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel(PMConstants.channelPrefix),
+        (MethodCall call) async {
+          calls.add(call);
+          if (call.method == PMConstants.mGetAssetCountFromPath) {
+            // getAssetListRange asks for the album size before the range call.
+            return 10;
+          }
+          return <String, dynamic>{'data': <dynamic>[]};
+        },
+      );
+
+      AssetPathEntity pathWith(PMFilter filter) => AssetPathEntity(
+            id: 'path-id',
+            name: 'album',
+            type: RequestType.image,
+            filterOption: filter,
+          );
+
+      // Reads checkIfExists from the last [method] call's serialized filter.
+      Object? sent(String method) {
+        final call = calls.lastWhere((MethodCall c) => c.method == method);
+        return (call.arguments['option'] as Map)['child']['checkIfExists'];
+      }
+
+      final skip = pathWith(FilterOptionGroup(checkIfExists: false));
+      final check = pathWith(FilterOptionGroup());
+
+      await check.getAssetListPaged(page: 0, size: 10);
+      expect(sent(PMConstants.mGetAssetListPaged), true);
+
+      await skip.getAssetListPaged(page: 0, size: 10);
+      expect(sent(PMConstants.mGetAssetListPaged), false);
+
+      await check.getAssetListRange(start: 0, end: 10);
+      expect(sent(PMConstants.mGetAssetListRange), true);
+
+      await skip.getAssetListRange(start: 0, end: 10);
+      expect(sent(PMConstants.mGetAssetListRange), false);
+    },
+  );
+
   test(
     'restoreFromTrash forwards asset IDs and types',
     () async {
