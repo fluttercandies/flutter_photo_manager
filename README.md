@@ -1052,6 +1052,7 @@ Use it with extra caution.**
 
 ```dart
 // Deleted IDs will returned, if it fails, the result will be an empty list.
+// IDs of assets that do not exist are ignored.
 final List<String> result = await PhotoManager.editor.deleteWithIds(
   <String>[entity.id],
 );
