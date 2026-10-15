@@ -985,6 +985,7 @@ PhotoCachingManager().requestCacheAssets(assets: assets, option: option);
 
 ```dart
 // 调用方法会返回被删除的资源，如果全部失败会返回空列表。
+// 不存在的资源 ID 会被忽略。
 final List<String> result = await PhotoManager.editor.deleteWithIds(
   <String>[entity.id],
 );

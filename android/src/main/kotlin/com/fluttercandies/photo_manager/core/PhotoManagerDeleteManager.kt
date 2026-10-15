@@ -79,9 +79,11 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
     }
 
     private fun handleAndroidRDelete(resultCode: Int) {
+        val deleteIds = androidRDeleteIds
+        androidRDeleteIds = null
         if (resultCode == Activity.RESULT_OK) {
             androidRHandler?.apply {
-                val ids = call.argument<List<String>>("ids") ?: return@apply
+                val ids = deleteIds ?: call.argument<List<String>>("ids") ?: return@apply
                 androidRHandler?.reply(ids)
             }
         } else {
@@ -106,10 +108,14 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
     private var androidRHandler: ResultHandler? = null
     private var androidQHandler: ResultHandler? = null
 
+    /** IDs sent with the pending delete request, replied instead of the requested IDs. */
+    private var androidRDeleteIds: List<String>? = null
+
     @RequiresApi(Build.VERSION_CODES.R)
-    fun deleteInApi30(uris: List<Uri?>, resultHandler: ResultHandler) {
+    fun deleteInApi30(idUris: Map<String, Uri>, resultHandler: ResultHandler) {
         this.androidRHandler = resultHandler
-        val pendingIntent = MediaStore.createDeleteRequest(cr, uris.mapNotNull { it })
+        this.androidRDeleteIds = idUris.keys.toList()
+        val pendingIntent = MediaStore.createDeleteRequest(cr, idUris.values.toList())
         activity?.startIntentSenderForResult(
             pendingIntent.intentSender,
             androidRDeleteRequestCode,
@@ -193,6 +199,7 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
     @RequiresApi(Build.VERSION_CODES.R)
     fun moveToTrashInApi30(uris: List<Uri?>, resultHandler: ResultHandler) {
         this.androidRHandler = resultHandler
+        this.androidRDeleteIds = null
         val pendingIntent = MediaStore.createTrashRequest(cr, uris.mapNotNull { it }, true)
         activity?.startIntentSenderForResult(
             pendingIntent.intentSender,
@@ -207,6 +214,7 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
     @RequiresApi(Build.VERSION_CODES.R)
     fun restoreFromTrashInApi30(uris: List<Uri?>, resultHandler: ResultHandler) {
         this.androidRHandler = resultHandler
+        this.androidRDeleteIds = null
         val pendingIntent = MediaStore.createTrashRequest(cr, uris.mapNotNull { it }, false)
         activity?.startIntentSenderForResult(
             pendingIntent.intentSender,

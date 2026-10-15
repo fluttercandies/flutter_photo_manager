@@ -311,10 +311,10 @@ class PhotoManager(private val context: Context) {
     }
 
     fun getUri(id: String): Uri {
-        val asset = dbUtils.getAssetEntity(context, id)
-            ?: throw RuntimeException("Failed to find asset $id")
-        return asset.getUri()
+        return getUriOrNull(id) ?: throw RuntimeException("Failed to find asset $id")
     }
+
+    fun getUriOrNull(id: String): Uri? = dbUtils.getAssetEntity(context, id)?.getUri()
 
     private val cacheFutures: MutableSet<FutureTarget<Bitmap>> = ConcurrentHashMap.newKeySet()
 
