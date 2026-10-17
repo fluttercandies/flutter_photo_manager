@@ -19,6 +19,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Fix Android thumbnail requests not deterministically releasing Glide resources (#1436).
 - Fix Android path-based saves leaking file descriptors by not closing inspection streams (#1438).
 - Fix Android change notifications reporting inserts of not-yet-published rows (e.g. files pushed via `adb push` or desktop drag-and-drop) as deletions (#1443).
+- Fix Darwin current-resource lookup returning the asset's first unfiltered resource instead of the single matching one when only one resource passes the type filter.
 
 ## 3.12.0
 
