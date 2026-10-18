@@ -145,6 +145,10 @@ analyze` must be **clean** (no errors *or* warnings) before any commit. Key poin
   --show-sdk-path)" -fmodules <file>.m` catches syntax/type errors against the
   real `Photos` SDK. For a brand‑new PhotoKit API, isolate it in a tiny probe
   `.m` (`@import Photos;`) and syntax‑check that first.
+- **Darwin unit tests:** `sh .github/scripts/run_darwin_unit_tests.sh` (macOS
+  with Xcode) compiles the XCTest cases in `darwin/photo_manager/Tests/` with the
+  Foundation‑only sources they cover and runs them with `xctest`; CI runs it in
+  `Test Darwin build`.
 - **Full native build:** `cd example && flutter build macos --debug` (or `ios`).
   This compiles the plugin end‑to‑end. It needs a working CocoaPods toolchain; if
   the host manages Ruby through a version manager (rbenv/rvm/asdf/chruby/system),
