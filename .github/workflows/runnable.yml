@@ -232,6 +232,8 @@ jobs:
       - uses: actions/checkout@900f2210b1d28bbbd0bd22d17926b9e224e8f231
         with:
           persist-credentials: false
+      - name: Run Darwin unit tests
+        run: sh .github/scripts/run_darwin_unit_tests.sh
       - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9
         with:
           distribution: 'zulu'
