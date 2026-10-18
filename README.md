@@ -148,6 +148,12 @@ import 'package:photo_manager/photo_manager.dart';
 Minimum platform versions:
 **Android 16, iOS 9.0, macOS 10.15**.
 
+> [!NOTE]
+> The iOS 9.0 minimum applies to CocoaPods builds. When building with Swift
+> Package Manager, the iOS minimum is **13.0**, to match the iOS 13.0
+> requirement of Flutter's generated `FlutterFramework` SwiftPM package on
+> recent Flutter SDKs. The macOS minimum (10.15) is the same for both.
+
 - Android: [Android config preparation](#android-config-preparation).
 - iOS: [iOS config preparation](#ios-config-preparation).
 - macOS: Pretty much the same with iOS.
