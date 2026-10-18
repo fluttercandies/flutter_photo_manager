@@ -20,6 +20,7 @@ To know more about breaking changes, see the [Migration Guide][].
 - Fix Android path-based saves leaking file descriptors by not closing inspection streams (#1438).
 - Fix Android change notifications reporting inserts of not-yet-published rows (e.g. files pushed via `adb push` or desktop drag-and-drop) as deletions (#1443).
 - Fix Darwin file requests failing with `NSFileWriteInvalidFileNameError` for assets whose title is long, such as videos imported from social apps, by bounding and sanitising the title used in the export cache filename (#1445).
+- Fix Swift Package Manager iOS builds failing platform-graph validation on Flutter SDKs whose generated `FlutterFramework` package declares a minimum iOS of 13.0 (#1449).
 
 ## 3.12.0
 
