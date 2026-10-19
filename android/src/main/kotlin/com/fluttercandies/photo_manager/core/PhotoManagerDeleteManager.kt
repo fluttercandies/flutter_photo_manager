@@ -81,14 +81,11 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
     private fun handleAndroidRDelete(resultCode: Int) {
         val deleteIds = androidRDeleteIds
         androidRDeleteIds = null
-        if (resultCode == Activity.RESULT_OK) {
-            androidRHandler?.apply {
-                val ids = deleteIds ?: call.argument<List<String>>("ids") ?: return@apply
-                androidRHandler?.reply(ids)
-            }
-        } else {
-            androidRHandler?.reply(listOf<String>())
-        }
+        val handler = androidRHandler ?: return
+        val ids = androidRResultIds(resultCode == Activity.RESULT_OK, deleteIds) {
+            handler.call.argument<List<String>>("ids")
+        } ?: return
+        handler.reply(ids)
     }
 
     fun deleteInApi28(ids: List<String>) {
@@ -226,3 +223,23 @@ class PhotoManagerDeleteManager(val context: Context, private var activity: Acti
         )
     }
 }
+
+/** Maps each distinct ID to its URI in input order, dropping IDs that have no MediaStore row. */
+internal fun <T : Any> collectDeleteUris(ids: List<String>, uriOf: (String) -> T?): LinkedHashMap<String, T> {
+    val result = LinkedHashMap<String, T>()
+    for (id in ids) {
+        if (id in result) continue
+        result[id] = uriOf(id) ?: continue
+    }
+    return result
+}
+
+/**
+ * IDs replied for an Android 11+ request: nothing when the user cancels, otherwise the IDs
+ * submitted with the request, falling back to the call's IDs for requests that recorded none.
+ */
+internal fun androidRResultIds(
+    approved: Boolean,
+    submittedIds: List<String>?,
+    requestedIds: () -> List<String>?,
+): List<String>? = if (approved) submittedIds ?: requestedIds() else emptyList()

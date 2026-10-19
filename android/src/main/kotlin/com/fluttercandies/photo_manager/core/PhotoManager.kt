@@ -311,10 +311,14 @@ class PhotoManager(private val context: Context) {
     }
 
     fun getUri(id: String): Uri {
-        return getUriOrNull(id) ?: throw RuntimeException("Failed to find asset $id")
+        val asset = dbUtils.getAssetEntity(context, id)
+            ?: throw RuntimeException("Failed to find asset $id")
+        return asset.getUri()
     }
 
-    fun getUriOrNull(id: String): Uri? = dbUtils.getAssetEntity(context, id)?.getUri()
+    /** Resolves from the MediaStore row alone, so a row whose file is gone can still be deleted. */
+    fun getUriOrNull(id: String): Uri? =
+        dbUtils.getAssetEntity(context, id, checkIfExists = false)?.getUri()
 
     private val cacheFutures: MutableSet<FutureTarget<Bitmap>> = ConcurrentHashMap.newKeySet()
 

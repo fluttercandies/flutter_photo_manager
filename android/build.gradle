@@ -74,6 +74,11 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+
+    testOptions {
+        // Lets JVM tests construct framework types such as ContextWrapper.
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {

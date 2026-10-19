@@ -665,11 +665,10 @@ class PhotoManagerPlugin(
                 try {
                     val ids = call.argument<List<String>>("ids")!!
                     // IDs that no longer exist are ignored, as on other platforms.
-                    val idUriMap = LinkedHashMap<String, Uri>()
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        for (id in ids) {
-                            idUriMap[id] = photoManager.getUriOrNull(id) ?: continue
-                        }
+                    val idUriMap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        collectDeleteUris(ids, photoManager::getUriOrNull)
+                    } else {
+                        LinkedHashMap<String, Uri>()
                     }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                         if (idUriMap.isEmpty()) {
