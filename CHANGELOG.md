@@ -11,6 +11,7 @@ To know more about breaking changes, see the [Migration Guide][].
 **Features**
 
 - Add `AndroidEditor.renameAsset` to rename an asset by updating its MediaStore `DISPLAY_NAME` on Android (#1314).
+- Add `PMFilter.checkIfExists` (also on `FilterOptionGroup`). Set it to `false` to skip the per-asset file existence check on Android when listing assets, which is much faster for large ranges but may include assets deleted outside of MediaStore (#1362).
 
 **Fixes**
 

@@ -48,9 +48,11 @@ class FilterOptionGroup extends PMFilter {
     DateTimeCond? updateTimeCond,
     List<OrderOption> orders = const <OrderOption>[],
     bool includeHiddenAssets = false,
+    bool checkIfExists = true,
   }) {
     super.containsPathModified = containsPathModified;
     super.includeHiddenAssets = includeHiddenAssets;
+    super.checkIfExists = checkIfExists;
     _map[AssetType.image] = imageOption;
     _map[AssetType.video] = videoOption;
     _map[AssetType.audio] = audioOption;
@@ -140,6 +142,7 @@ class FilterOptionGroup extends PMFilter {
     for (final AssetType type in _map.keys) {
       _map[type] = _map[type]!.merge(other.getOption(type));
     }
+    checkIfExists = other.checkIfExists;
     containsPathModified = other.containsPathModified;
     containsLivePhotos = other.containsLivePhotos;
     includeHiddenAssets = other.includeHiddenAssets;
@@ -201,6 +204,7 @@ class FilterOptionGroup extends PMFilter {
     FilterOption? audioOption,
     bool? containsPathModified,
     bool? includeHiddenAssets,
+    bool? checkIfExists,
     @Deprecated(
       'The option will be enabled by default. '
       'This will be removed in v4.0.0',
@@ -221,6 +225,7 @@ class FilterOptionGroup extends PMFilter {
     updateTimeCond ??= this.updateTimeCond;
     orders ??= this.orders;
     includeHiddenAssets ??= this.includeHiddenAssets;
+    checkIfExists ??= this.checkIfExists;
 
     final FilterOptionGroup result = FilterOptionGroup()
       ..setOption(AssetType.image, imageOption!)
@@ -229,6 +234,7 @@ class FilterOptionGroup extends PMFilter {
       ..containsPathModified = containsPathModified
       ..includeHiddenAssets = includeHiddenAssets
       ..containsLivePhotos = containsLivePhotos
+      ..checkIfExists = checkIfExists
       ..onlyLivePhotos = onlyLivePhotos
       ..createTimeCond = createTimeCond
       ..updateTimeCond = updateTimeCond

@@ -218,7 +218,8 @@ class AssetPathEntity {
   /// album's [type] when omitted.
   ///
   /// The length of returned assets might be less than requested.
-  /// Not existing assets will be excluded from the result.
+  /// Not existing assets will be excluded from the result, unless
+  /// [PMFilter.checkIfExists] of [filterOption] is `false` (Android only).
   Future<List<AssetEntity>> getAssetListPaged({
     required int page,
     required int size,
@@ -245,7 +246,8 @@ class AssetPathEntity {
   /// album's [type] when omitted.
   ///
   /// The length of returned assets might be less than requested.
-  /// Not existing assets will be excluded from the result.
+  /// Not existing assets will be excluded from the result, unless
+  /// [PMFilter.checkIfExists] of [filterOption] is `false` (Android only).
   Future<List<AssetEntity>> getAssetListRange({
     required int start,
     required int end,

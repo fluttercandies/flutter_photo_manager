@@ -172,7 +172,11 @@ object DBUtils : IDBUtils {
         )
         cursor.use {
             while (it.moveToNext()) {
-                it.toAssetEntity(context, throwIfNotExists = false)?.apply {
+                it.toAssetEntity(
+                    context,
+                    checkIfExists = option?.checkIfExists ?: true,
+                    throwIfNotExists = false,
+                )?.apply {
                     list.add(this)
                 }
             }
@@ -215,7 +219,11 @@ object DBUtils : IDBUtils {
         )
         cursor.use {
             while (it.moveToNext()) {
-                it.toAssetEntity(context, throwIfNotExists = false)?.apply {
+                it.toAssetEntity(
+                    context,
+                    checkIfExists = option?.checkIfExists ?: true,
+                    throwIfNotExists = false,
+                )?.apply {
                     list.add(this)
                 }
             }

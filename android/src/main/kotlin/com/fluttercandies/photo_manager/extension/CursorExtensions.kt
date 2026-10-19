@@ -92,7 +92,11 @@ fun Cursor.toAssetEntity(
     val relativePath: String? = if (isAboveAndroidQ) {
         getString(RELATIVE_PATH)
     } else null
-    if (width == 0 || height == 0) {
+    // The exists check above is skipped when checkIfExists is false, so verify
+    // the file here before opening it to avoid crashing on dangling rows (#728).
+    if ((width == 0 || height == 0) &&
+        (checkIfExists || (path.isNotBlank() && File(path).exists()))
+    ) {
         try {
             if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE && !mimeType.contains("svg")) {
                 val uri = getUri(id, MediaStoreUtils.convertTypeToMediaType(type))
