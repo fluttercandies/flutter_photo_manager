@@ -316,6 +316,10 @@ class PhotoManager(private val context: Context) {
         return asset.getUri()
     }
 
+    /** Resolves from the MediaStore row alone, so a row whose file is gone can still be deleted. */
+    fun getUriOrNull(id: String): Uri? =
+        dbUtils.getAssetEntity(context, id, checkIfExists = false)?.getUri()
+
     private val cacheFutures: MutableSet<FutureTarget<Bitmap>> = ConcurrentHashMap.newKeySet()
 
     fun requestCache(ids: List<String>, option: ThumbLoadOption, resultHandler: ResultHandler) {

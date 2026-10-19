@@ -17,6 +17,7 @@ To know more about breaking changes, see the [Migration Guide][].
 
 - Fix Darwin current-resource lookup returning the asset's first unfiltered resource instead of the single matching one when only one resource passes the type filter.
 - Fix failed cache writes leaving incomplete files that were later treated as valid cache entries (#1432).
+- Fix `deleteWithIds` failing for the whole batch on Android 10+ when any of the IDs does not exist, and returning IDs that were not deleted on Android 11+ (#1454).
 - Fix Android save/copy operations leaving visible incomplete MediaStore items when the write fails (#1434).
 - Fix Android thumbnail requests not deterministically releasing Glide resources (#1436).
 - Fix Android path-based saves leaking file descriptors by not closing inspection streams (#1438).

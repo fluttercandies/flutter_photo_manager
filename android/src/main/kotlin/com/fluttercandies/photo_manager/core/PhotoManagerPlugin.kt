@@ -664,16 +664,20 @@ class PhotoManagerPlugin(
             Methods.deleteWithIds -> {
                 try {
                     val ids = call.argument<List<String>>("ids")!!
+                    // IDs that no longer exist are ignored, as on other platforms.
+                    val idUriMap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        collectDeleteUris(ids, photoManager::getUriOrNull)
+                    } else {
+                        LinkedHashMap<String, Uri>()
+                    }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        val uris = ids.map { photoManager.getUri(it) }.toList()
-                        deleteManager.deleteInApi30(uris, resultHandler)
-                    } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
-                        val idUriMap = HashMap<String, Uri?>()
-                        for (id in ids) {
-                            val uri = photoManager.getUri(id)
-                            idUriMap[id] = uri
+                        if (idUriMap.isEmpty()) {
+                            resultHandler.reply(emptyList<String>())
+                        } else {
+                            deleteManager.deleteInApi30(idUriMap, resultHandler)
                         }
-                        deleteManager.deleteJustInApi29(idUriMap, resultHandler)
+                    } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+                        deleteManager.deleteJustInApi29(HashMap<String, Uri?>(idUriMap), resultHandler)
                     } else {
                         deleteManager.deleteInApi28(ids)
                         resultHandler.reply(ids)
