@@ -183,7 +183,7 @@
     }
     
     if (filtered.count == 1) {
-        return resources[0];
+        return filtered[0];
     }
     
     for (PHAssetResource *res in filtered) {
