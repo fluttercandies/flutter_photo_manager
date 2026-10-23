@@ -14,7 +14,8 @@ jobs:
       issues: write
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
       ISSUE_NUMBER: ${{ github.event.issue.number }}
     steps:
       - name: remove label
-        run: gh issue edit "$ISSUE_NUMBER" --remove-label 'await triage'
+        run: gh issue edit "$ISSUE_NUMBER" --repo "$GH_REPO" --remove-label 'await triage'
