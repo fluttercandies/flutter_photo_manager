@@ -109,7 +109,7 @@ class SizeConstraint {
     this.maxWidth = 100000,
     this.minHeight = 0,
     this.maxHeight = 100000,
-    this.ignoreSize = false,
+    this.ignoreSize = true,
   });
 
   /// The minimum width for queried images.
