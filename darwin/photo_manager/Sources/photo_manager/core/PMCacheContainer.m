@@ -22,7 +22,9 @@
 }
 
 - (PMAssetEntity *)getAssetEntity:(NSString *)id {
-    return map[id];
+    @synchronized (map) {
+        return self->map[id];
+    }
 }
 
 - (void)clearCache {
